@@ -115,6 +115,7 @@
 				DFDB14772CC97B0E00153876 /* Sources */,
 				DFDB14782CC97B0E00153876 /* Frameworks */,
 				DFDB14792CC97B0E00153876 /* Resources */,
+				DFED7A602CC9A42A00D8BCA9 /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -209,6 +210,9 @@
 			);
 			mainGroup = DFDB14722CC97B0E00153876;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
 			projectDirPath = "";
@@ -244,6 +248,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DFED7A602CC9A42A00D8BCA9 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        \"$SWIFTLINT_CMD\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint for '${CONFIGURATION}' configuration.\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DFDB14772CC97B0E00153876 /* Sources */ = {
@@ -412,6 +439,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
@@ -458,6 +486,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
@@ -625,6 +654,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = exactVersion;
+				version = 0.57.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = DFDB14732CC97B0E00153876 /* Project object */;
 }
