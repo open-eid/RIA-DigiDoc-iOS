@@ -1,0 +1,2 @@
+excluded:
+  - RIADigiDocTests/Mocks/*/*.swift
