@@ -1,0 +1,11 @@
+[modules.RIADigiDoc]
+imports = ["Foundation"]
+testableImports = ["Cuckoo"]
+sources = [
+    "RIADigiDoc/**/*.swift",
+]
+output = "RIADigiDocTests/Mocks/Generated/GeneratedMocks+RIADigiDoc.swift"
+
+[modules.RIADigiDoc.options]
+glob = true
+keepDocumentation = false
