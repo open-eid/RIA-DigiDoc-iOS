@@ -1,2 +1,17 @@
 excluded:
   - RIADigiDocTests/Mocks/*/*.swift
+
+opt_in_rules:
+  - accessibility_label_for_image
+  - accessibility_trait_for_button
+  - fatal_error_message
+  - force_unwrapping
+  - period_spacing
+  - private_swiftui_state
+  - unused_parameter
+
+line_length:
+  - 120
+  - 120
+
+reporter: "xcode"
