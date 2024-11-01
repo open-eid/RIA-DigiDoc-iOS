@@ -1,0 +1,4 @@
+module digidocpp {
+    header "Signature.h"
+    export *
+}
