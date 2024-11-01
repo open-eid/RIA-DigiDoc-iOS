@@ -7,6 +7,7 @@ class AppAssembler {
     let container: Container
 
     private init() {
+
         container = Container()
 
         // Register Repository
@@ -28,6 +29,10 @@ class AppAssembler {
                 preconditionFailure("Unable to find SomeServiceProtocol")
             }
             return SomeViewModel(someService: someService)
+        }
+
+        container.register(LibrarySetup.self) { _ in
+            return LibrarySetup()
         }
     }
 

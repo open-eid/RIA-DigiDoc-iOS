@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1600"
+   LastUpgradeVersion = "1610"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -22,6 +22,17 @@
                BlueprintIdentifier = "DFDB148B2CC97B1000153876"
                BuildableName = "RIADigiDocTests.xctest"
                BlueprintName = "RIADigiDocTests"
+               ReferencedContainer = "container:RIADigiDoc.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DFDB14952CC97B1000153876"
+               BuildableName = "RIADigiDocUITests.xctest"
+               BlueprintName = "RIADigiDocUITests"
                ReferencedContainer = "container:RIADigiDoc.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,6 +65,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "DFDB147A2CC97B0E00153876"
+            BuildableName = "RIADigiDoc.app"
+            BlueprintName = "RIADigiDoc"
+            ReferencedContainer = "container:RIADigiDoc.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

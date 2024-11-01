@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DF1DE03B2CCAF55B0068283D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF1DE03A2CCAF55B0068283D /* Swinject */; };
+		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
 		DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFBECAB12CCC2A610035F949 /* Cuckoo */; };
+		DFF4758C2CD50FE600DCC649 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DFF4758B2CD50FE600DCC649 /* Libdigidoclib */; };
+		DFF4758E2CD5100400DCC649 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DFF4758D2CD5100400DCC649 /* Libdigidoclib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,7 +30,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DFD24C3B2CD1B718004C1D2E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
+		DFB9E80C2CD5109400EEEFBA /* Libdigidoclib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Libdigidoclib; sourceTree = "<group>"; };
 		DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RIADigiDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,6 +61,7 @@
 				Domain/Repository/Some/SomeRepositoryProtocol.swift,
 				Domain/Service/SomeService.swift,
 				Domain/Service/SomeServiceProtocol.swift,
+				LibrarySetup.swift,
 				ViewModel/SomeViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
@@ -84,7 +102,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DF1DE03B2CCAF55B0068283D /* Swinject in Frameworks */,
+				DFF4758E2CD5100400DCC649 /* Libdigidoclib in Frameworks */,
+				DFF4758C2CD50FE600DCC649 /* Libdigidoclib in Frameworks */,
+				DF8424A12CD442DC003F592D /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,12 +126,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DFA16AFE2CD18BD00099D34F /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				DFB9E80C2CD5109400EEEFBA /* Libdigidoclib */,
+			);
+			path = Modules;
+			sourceTree = "<group>";
+		};
+		DFA16B4A2CD18C7C0099D34F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DFD24C382CD1B718004C1D2E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DFDB14722CC97B0E00153876 = {
 			isa = PBXGroup;
 			children = (
 				DFDB147D2CC97B0E00153876 /* RIADigiDoc */,
 				DFDB148F2CC97B1000153876 /* RIADigiDocTests */,
 				DFDB14992CC97B1000153876 /* RIADigiDocUITests */,
+				DFA16AFE2CD18BD00099D34F /* Modules */,
+				DFD24C382CD1B718004C1D2E /* Frameworks */,
 				DFDB147C2CC97B0E00153876 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +181,7 @@
 				DFDB14782CC97B0E00153876 /* Frameworks */,
 				DFDB14792CC97B0E00153876 /* Resources */,
 				DFED7A602CC9A42A00D8BCA9 /* SwiftLint */,
+				DFD24C3B2CD1B718004C1D2E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -147,7 +192,9 @@
 			);
 			name = RIADigiDoc;
 			packageProductDependencies = (
-				DF1DE03A2CCAF55B0068283D /* Swinject */,
+				DF8424A02CD442DC003F592D /* Swinject */,
+				DFF4758B2CD50FE600DCC649 /* Libdigidoclib */,
+				DFF4758D2CD5100400DCC649 /* Libdigidoclib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -208,8 +255,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastSwiftUpdateCheck = 1610;
+				LastUpgradeCheck = 1610;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
 					DFDB147A2CC97B0E00153876 = {
@@ -236,12 +283,18 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
-				DF1DE0392CCAF55B0068283D /* XCRemoteSwiftPackageReference "Swinject" */,
 				DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */,
+				DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = DFA16B4A2CD18C7C0099D34F /* Products */;
+					ProjectRef = DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				DFDB147A2CC97B0E00153876 /* RIADigiDoc */,
@@ -374,6 +427,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -436,6 +490,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -465,6 +520,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -497,6 +553,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -512,6 +569,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -544,6 +602,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -556,6 +615,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -581,6 +641,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -605,6 +666,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -628,6 +690,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -688,7 +751,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		DF1DE0392CCAF55B0068283D /* XCRemoteSwiftPackageReference "Swinject" */ = {
+		DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
 			requirement = {
@@ -715,9 +778,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DF1DE03A2CCAF55B0068283D /* Swinject */ = {
+		DF8424A02CD442DC003F592D /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DF1DE0392CCAF55B0068283D /* XCRemoteSwiftPackageReference "Swinject" */;
+			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
 		DFBECAB12CCC2A610035F949 /* Cuckoo */ = {
@@ -729,6 +792,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
 			productName = "plugin:CuckooPluginSingleFile";
+		};
+		DFF4758B2CD50FE600DCC649 /* Libdigidoclib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Libdigidoclib;
+		};
+		DFF4758D2CD5100400DCC649 /* Libdigidoclib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Libdigidoclib;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
