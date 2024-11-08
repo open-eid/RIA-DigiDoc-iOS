@@ -23,7 +23,6 @@ public:
         try {
             digidoc::Conf::init(conf);
             digidoc::initialize("RIA DigiDoc 3.0", "RIA DigiDoc");
-            digidoc::Container::openPtr("");
         } catch(const digidoc::Exception &e) {
             std::vector<digidoc::Exception> causes = e.causes();
             @throw [[DigiDocExceptionWrapper alloc] init:

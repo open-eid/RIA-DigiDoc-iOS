@@ -7,33 +7,82 @@ class AppAssembler {
     let container: Container
 
     private init() {
-
         container = Container()
+    }
 
-        // Register Repository
-        container.register(SomeRepositoryProtocol.self) { _ in
-            SomeRepository()
-        }
+    func initialize() async {
+        await setup()
+    }
+
+    // swiftlint:disable:next function_body_length
+    private func setup() async {
 
         // Register Service
-        container.register(SomeServiceProtocol.self) { resolver in
-            guard let someRepository = resolver.resolve(SomeRepositoryProtocol.self) else {
-                preconditionFailure("Unable to find SomeRepositoryProtocol")
+        container.register(SomeServiceProtocol.self) { _ in
+            return SomeService()
+        }
+
+        // Register Repository
+        container.register(SomeRepositoryProtocol.self) { resolver in
+            guard let someService = resolver.resolve(SomeServiceProtocol.self) else {
+                preconditionFailure("Unable to find SomeServiceProtocol")
             }
-            return SomeService(someRepository: someRepository)
+            return SomeRepository(someService: someService)
         }
 
         // Register ViewModel
         container.register(SomeViewModel.self) { resolver in
-            guard let someService = resolver.resolve(SomeServiceProtocol.self) else {
-                preconditionFailure("Unable to find SomeServiceProtocol")
+            guard let someRepository = resolver.resolve(SomeRepositoryProtocol.self) else {
+                preconditionFailure("Unable to find SomeRepositoryProtocol")
             }
-            return SomeViewModel(someService: someService)
+            return SomeViewModel(someRepository: someRepository)
         }
 
         container.register(LibrarySetup.self) { _ in
             return LibrarySetup()
+        }.inObjectScope(.container)
+
+        container.register(FileOpeningServiceProtocol.self) { _ in
+            return FileOpeningService()
         }
+
+        container.register(FileOpeningRepositoryProtocol.self) { resolver in
+            guard let fileOpeningService = resolver.resolve(FileOpeningServiceProtocol.self) else {
+                preconditionFailure("Unable to find FileOpeningServiceProtocol")
+            }
+            return FileOpeningRepository(fileOpeningService: fileOpeningService)
+        }
+
+        container.register(SharedContainerViewModel.self) { _ in
+            return SharedContainerViewModel()
+        }.inObjectScope(.container)
+
+        container.register(MainSignatureViewModel.self) { resolver in
+            guard let sharedContainerViewModel = resolver.resolve(SharedContainerViewModel.self) else {
+                preconditionFailure("Unable to find SharedContainerViewModel")
+            }
+            return MainSignatureViewModel(sharedContainerViewModel: sharedContainerViewModel)
+        }
+
+        container.register(FileOpeningViewModel.self) { resolver in
+            guard let fileOpeningRepository = resolver.resolve(FileOpeningRepositoryProtocol.self) else {
+                preconditionFailure("Unable to find FileOpeningRepositoryProtocol")
+            }
+
+            guard let sharedContainerViewModel = resolver.resolve(SharedContainerViewModel.self) else {
+                preconditionFailure("Unable to find SharedContainerViewModel")
+            }
+            return FileOpeningViewModel(
+                fileOpeningRepository: fileOpeningRepository,
+                sharedContainerViewModel: sharedContainerViewModel)
+        }
+
+        container.register(SigningViewModel.self) { resolver in
+            guard let sharedContainerViewModel = resolver.resolve(SharedContainerViewModel.self) else {
+                preconditionFailure("Unable to find SharedContainerViewModel")
+            }
+            return SigningViewModel(sharedContainerViewModel: sharedContainerViewModel)
+        }.inObjectScope(.graph)
     }
 
     func resolve<T>(_: T.Type) -> T {

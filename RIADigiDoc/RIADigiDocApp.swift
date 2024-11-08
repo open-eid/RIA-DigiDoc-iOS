@@ -1,24 +1,32 @@
 import SwiftUI
-import LibdigidoclibSwift
 
 @main
 struct RIADigiDocApp: App {
+    @State private var isSetupComplete = false
 
-    let librarySetup = AppAssembler.shared.resolve(LibrarySetup.self)
-
-    init() {
-        initializeLibdigidoc()
-    }
+    init() {}
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if isSetupComplete {
+                ContentView()
+            } else {
+                LaunchScreenView()
+                    .onAppear {
+                        Task {
+                            await AppAssembler.shared.initialize()
+                            await self.initializeLibdigidoc()
+                            await MainActor.run {
+                                self.isSetupComplete = true
+                            }
+                        }
+                    }
+            }
         }
     }
 
-    func initializeLibdigidoc() {
-        Task {
-            await librarySetup.setupLibraries()
-        }
+    func initializeLibdigidoc() async {
+        let librarySetup = AppAssembler.shared.resolve(LibrarySetup.self)
+        await librarySetup.setupLibraries()
     }
 }

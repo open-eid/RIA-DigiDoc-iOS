@@ -1,5 +1,5 @@
 {
-  "originHash" : "3fcaadd7a0abe635c6b25b7b37349f07d62128e3f04700e7d962ee3b6a0eaf19",
+  "originHash" : "892448d2cd4060be27cb0525dd1d6ced535f57e9aee261966df7836ec2535348",
   "pins" : [
     {
       "identity" : "aexml",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Brightify/Cuckoo.git",
       "state" : {
-        "revision" : "d0f1b4e1e2b2a94127b66754f3fcc000572efa33",
-        "version" : "2.0.9"
+        "revision" : "305e7a1f55816f5b6410a69c9b031ee7bf602486",
+        "version" : "2.0.10"
       }
     },
     {

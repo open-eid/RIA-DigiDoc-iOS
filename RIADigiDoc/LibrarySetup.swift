@@ -3,7 +3,7 @@ import LibdigidoclibSwift
 import OSLog
 
 actor LibrarySetup {
-    static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LibrarySetup")
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LibrarySetup")
 
     func setupLibraries() async {
         do {
@@ -13,6 +13,7 @@ actor LibrarySetup {
         } catch let error {
             switch error {
             case .initializationFailed(let message): LibrarySetup.logger.error("\(message)")
+            default: LibrarySetup.logger.error("Unknown error")
             }
         }
     }

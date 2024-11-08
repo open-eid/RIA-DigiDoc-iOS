@@ -3,19 +3,19 @@ import Cuckoo
 
 @MainActor
 final class SomeViewModelTests {
-    var mockSomeService: MockSomeServiceProtocol
+    var mockSomeRepository: MockSomeRepositoryProtocol
     var someViewModel: SomeViewModel
 
     init() async throws {
-        mockSomeService = MockSomeServiceProtocol()
-        someViewModel = SomeViewModel(someService: mockSomeService)
+        mockSomeRepository = MockSomeRepositoryProtocol()
+        someViewModel = SomeViewModel(someRepository: mockSomeRepository)
     }
 
     @Test
     func getSomeObject_success() async {
         let expectedObject = SomeObject(id: 3, name: "Test Object")
 
-        stub(mockSomeService) { mock in
+        stub(mockSomeRepository) { mock in
             when(mock.fetchSomeObject()).thenReturn(expectedObject)
         }
 
@@ -24,6 +24,6 @@ final class SomeViewModelTests {
         #expect(someViewModel.someObject?.id == expectedObject.id)
         #expect(someViewModel.someObject?.name == expectedObject.name)
 
-        verify(mockSomeService).fetchSomeObject()
+        verify(mockSomeRepository).fetchSomeObject()
     }
 }

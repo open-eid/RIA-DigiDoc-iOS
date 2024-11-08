@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF17B6312CDD1A99009B1E17 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6302CDD1A99009B1E17 /* Libdigidoclib */; };
+		DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6392CDD2996009B1E17 /* Swinject */; };
 		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
 		DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFBECAB12CCC2A610035F949 /* Cuckoo */; };
 		DFF4758C2CD50FE600DCC649 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DFF4758B2CD50FE600DCC649 /* Libdigidoclib */; };
@@ -56,12 +58,23 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DI/AppAssembler.swift,
+				Domain/Model/AlertMessage.swift,
 				Domain/Model/SomeObject.swift,
+				Domain/Repository/FileOpening/FileOpeningRepository.swift,
+				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Repository/Some/SomeRepository.swift,
 				Domain/Repository/Some/SomeRepositoryProtocol.swift,
-				Domain/Service/SomeService.swift,
-				Domain/Service/SomeServiceProtocol.swift,
+				Domain/Service/FileOpening/FileOpeningService.swift,
+				Domain/Service/FileOpening/FileOpeningServiceProtocol.swift,
+				Domain/Service/Some/SomeService.swift,
+				Domain/Service/Some/SomeServiceProtocol.swift,
+				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
+				Util/Constants.swift,
+				ViewModel/FileOpeningViewModel.swift,
+				ViewModel/MainSignatureViewModel.swift,
+				ViewModel/Shared/SharedContainerViewModel.swift,
+				ViewModel/SigningViewModel.swift,
 				ViewModel/SomeViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
@@ -112,7 +125,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF17B6312CDD1A99009B1E17 /* Libdigidoclib in Frameworks */,
 				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
+				DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +235,8 @@
 			name = RIADigiDocTests;
 			packageProductDependencies = (
 				DFBECAB12CCC2A610035F949 /* Cuckoo */,
+				DF17B6302CDD1A99009B1E17 /* Libdigidoclib */,
+				DF17B6392CDD2996009B1E17 /* Swinject */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -764,7 +781,7 @@
 			repositoryURL = "https://github.com/Brightify/Cuckoo.git";
 			requirement = {
 				kind = exactVersion;
-				version = 2.0.9;
+				version = 2.0.10;
 			};
 		};
 		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
@@ -778,6 +795,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DF17B6302CDD1A99009B1E17 /* Libdigidoclib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Libdigidoclib;
+		};
+		DF17B6392CDD2996009B1E17 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
 		DF8424A02CD442DC003F592D /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
