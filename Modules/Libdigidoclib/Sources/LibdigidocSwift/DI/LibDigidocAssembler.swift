@@ -13,6 +13,10 @@ public class LibDigidocAssembler {
         container.register(DigiDocConfProtocol.self) { _ in
             DigiDocConf()
         }
+
+        container.register(SignedContainerProtocol.self) { _ in
+            SignedContainer()
+        }
     }
 
     public func resolve<T>(_: T.Type) -> T {

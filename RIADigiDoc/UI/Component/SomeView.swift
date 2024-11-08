@@ -1,7 +1,13 @@
 import SwiftUI
 
 struct SomeView: View {
-    @ObservedObject var viewModel: SomeViewModel
+    @StateObject private var viewModel: SomeViewModel
+
+    init(
+        viewModel: SomeViewModel = AppAssembler.shared.resolve(SomeViewModel.self)
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         VStack {
@@ -19,6 +25,5 @@ struct SomeView: View {
 }
 
 #Preview {
-    let someViewModel = AppAssembler.shared.resolve(SomeViewModel.self)
-    SomeView(viewModel: someViewModel)
+    SomeView()
 }

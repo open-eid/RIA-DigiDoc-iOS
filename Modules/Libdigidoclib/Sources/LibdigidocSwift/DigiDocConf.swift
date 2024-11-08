@@ -1,6 +1,5 @@
 import Foundation
 import LibdigidoclibObjC
-import OSLog
 
 public final class DigiDocConf: DigiDocConfProtocol {
 
@@ -10,24 +9,12 @@ public final class DigiDocConf: DigiDocConfProtocol {
         let digidocConf = DigiDocConfWrapper()
         digidocConf.setLogLevel(0)
 
-        var errorLogMessage = "Libdigidocpp initialization error code: "
+        var errorLogMessage = "Libdigidocpp initialization error: "
 
         let isInitialized = await withCheckedContinuation { continuation in
             DigiDocConfWrapper.initWithConf(digidocConf) { success, error in
                 if let error = error as NSError? {
-                    let errorCode = error.code
-                    let userData = error.userInfo
-
-                    if let message = userData["message"] as? String {
-                        errorLogMessage += ", message: \(message)"
-                    }
-
-                    errorLogMessage += ", code: \(errorCode)"
-
-                    if let causes = userData["causes"] as? [DigiDocExceptionWrapper] {
-                        let causesDescriptions = causes.map { $0.description }
-                        errorLogMessage += ", causes: [\(causesDescriptions.joined(separator: ", "))]"
-                    }
+                    errorLogMessage += ErrorUtil.getErrorMessage(error)
 
                     continuation.resume(returning: false)
                 } else {

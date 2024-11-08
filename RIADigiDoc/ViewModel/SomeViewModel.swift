@@ -1,16 +1,17 @@
 import Foundation
+import LibdigidoclibSwift
 
 @MainActor
 class SomeViewModel: ObservableObject {
     @Published var someObject: SomeObject?
 
-    private let someService: SomeServiceProtocol
+    private let someRepository: SomeRepositoryProtocol
 
-    init(someService: SomeServiceProtocol) {
-        self.someService = someService
+    init(someRepository: SomeRepositoryProtocol) {
+        self.someRepository = someRepository
     }
 
     func getSomeObject() async {
-        someObject = await someService.fetchSomeObject()
+        someObject = await someRepository.fetchSomeObject()
     }
 }
