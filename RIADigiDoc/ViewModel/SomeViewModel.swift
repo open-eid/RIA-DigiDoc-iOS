@@ -1,5 +1,5 @@
 import Foundation
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 @MainActor
 class SomeViewModel: ObservableObject {

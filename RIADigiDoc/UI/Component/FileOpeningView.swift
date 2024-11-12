@@ -1,5 +1,5 @@
 import SwiftUI
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 struct FileOpeningView: View {
     @StateObject private var viewModel: FileOpeningViewModel

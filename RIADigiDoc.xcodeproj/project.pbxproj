@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DF17B6312CDD1A99009B1E17 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6302CDD1A99009B1E17 /* Libdigidoclib */; };
 		DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6392CDD2996009B1E17 /* Swinject */; };
+		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
+		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
 		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
+		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
 		DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFBECAB12CCC2A610035F949 /* Cuckoo */; };
-		DFF4758C2CD50FE600DCC649 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DFF4758B2CD50FE600DCC649 /* Libdigidoclib */; };
-		DFF4758E2CD5100400DCC649 /* Libdigidoclib in Frameworks */ = {isa = PBXBuildFile; productRef = DFF4758D2CD5100400DCC649 /* Libdigidoclib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,8 +46,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DF17B64D2CE26949009B1E17 /* UtilsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UtilsLib; sourceTree = "<group>"; };
+		DF3E4A862CE2C54600137235 /* CommonsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsLib; sourceTree = "<group>"; };
+		DF3E4A872CE2C5B500137235 /* LibdigidocLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LibdigidocLib; sourceTree = "<group>"; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
-		DFB9E80C2CD5109400EEEFBA /* Libdigidoclib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Libdigidoclib; sourceTree = "<group>"; };
 		DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RIADigiDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,7 +72,6 @@
 				Domain/Service/Some/SomeServiceProtocol.swift,
 				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
-				Util/Constants.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
@@ -115,8 +116,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFF4758E2CD5100400DCC649 /* Libdigidoclib in Frameworks */,
-				DFF4758C2CD50FE600DCC649 /* Libdigidoclib in Frameworks */,
+				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
+				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
 				DF8424A12CD442DC003F592D /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -125,7 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DF17B6312CDD1A99009B1E17 /* Libdigidoclib in Frameworks */,
+				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
 				DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */,
 			);
@@ -144,7 +145,9 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				DFB9E80C2CD5109400EEEFBA /* Libdigidoclib */,
+				DF17B64D2CE26949009B1E17 /* UtilsLib */,
+				DF3E4A862CE2C54600137235 /* CommonsLib */,
+				DF3E4A872CE2C5B500137235 /* LibdigidocLib */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -208,8 +211,8 @@
 			name = RIADigiDoc;
 			packageProductDependencies = (
 				DF8424A02CD442DC003F592D /* Swinject */,
-				DFF4758B2CD50FE600DCC649 /* Libdigidoclib */,
-				DFF4758D2CD5100400DCC649 /* Libdigidoclib */,
+				DF3E4A7E2CE269C900137235 /* UtilsLib */,
+				DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -235,8 +238,8 @@
 			name = RIADigiDocTests;
 			packageProductDependencies = (
 				DFBECAB12CCC2A610035F949 /* Cuckoo */,
-				DF17B6302CDD1A99009B1E17 /* Libdigidoclib */,
 				DF17B6392CDD2996009B1E17 /* Swinject */,
+				DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -795,19 +798,27 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DF17B6302CDD1A99009B1E17 /* Libdigidoclib */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Libdigidoclib;
-		};
 		DF17B6392CDD2996009B1E17 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
 		};
+		DF3E4A7E2CE269C900137235 /* UtilsLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UtilsLib;
+		};
+		DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LibdigidocLib;
+		};
 		DF8424A02CD442DC003F592D /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
+		};
+		DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LibdigidocLib;
 		};
 		DFBECAB12CCC2A610035F949 /* Cuckoo */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -818,14 +829,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
 			productName = "plugin:CuckooPluginSingleFile";
-		};
-		DFF4758B2CD50FE600DCC649 /* Libdigidoclib */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Libdigidoclib;
-		};
-		DFF4758D2CD5100400DCC649 /* Libdigidoclib */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Libdigidoclib;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

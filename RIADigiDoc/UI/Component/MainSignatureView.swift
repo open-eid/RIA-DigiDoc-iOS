@@ -1,5 +1,5 @@
 import SwiftUI
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 struct MainSignatureView: View {
     @StateObject private var viewModel: MainSignatureViewModel

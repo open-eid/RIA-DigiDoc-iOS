@@ -1,4 +1,6 @@
 import SwiftUI
+import LibdigidocLibSwift
+import UtilsLib
 
 @main
 struct RIADigiDocApp: App {
@@ -14,8 +16,10 @@ struct RIADigiDocApp: App {
                 LaunchScreenView()
                     .onAppear {
                         Task {
-                            await AppAssembler.shared.initialize()
-                            await self.initializeLibdigidoc()
+                            await setupAssemblers()
+
+                            let librarySetup = AppAssembler.shared.resolve(LibrarySetup.self)
+                            await librarySetup.setupLibraries()
                             await MainActor.run {
                                 self.isSetupComplete = true
                             }
@@ -25,8 +29,9 @@ struct RIADigiDocApp: App {
         }
     }
 
-    func initializeLibdigidoc() async {
-        let librarySetup = AppAssembler.shared.resolve(LibrarySetup.self)
-        await librarySetup.setupLibraries()
+    private func setupAssemblers() async {
+        await AppAssembler.shared.initialize()
+        await LibDigidocAssembler.shared.initialize()
+        await UtilsLibAssembler.shared.initialize()
     }
 }

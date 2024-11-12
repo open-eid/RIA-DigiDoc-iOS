@@ -1,5 +1,5 @@
 import SwiftUI
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode

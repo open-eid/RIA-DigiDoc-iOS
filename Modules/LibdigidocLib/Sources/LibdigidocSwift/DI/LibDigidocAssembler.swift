@@ -1,0 +1,34 @@
+import Swinject
+
+@MainActor
+public class LibDigidocAssembler {
+    public static let shared = LibDigidocAssembler()
+
+    let container: Container
+
+    private init() {
+        container = Container()
+    }
+
+    public func initialize() async {
+        await setup()
+    }
+
+    private func setup() async {
+
+        container.register(DigiDocConfProtocol.self) { _ in
+            DigiDocConf()
+        }
+
+        container.register(SignedContainerProtocol.self) { _ in
+            SignedContainer()
+        }
+    }
+
+    public func resolve<T>(_: T.Type) -> T {
+        guard let resolved = container.resolve(T.self) else {
+            preconditionFailure("Unable to find \(T.Type.self)")
+        }
+        return resolved
+    }
+}

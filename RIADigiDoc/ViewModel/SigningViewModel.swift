@@ -1,6 +1,6 @@
 import Foundation
 import OSLog
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 @MainActor
 class SigningViewModel: ObservableObject {

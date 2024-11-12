@@ -1,5 +1,5 @@
 import Foundation
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 protocol FileOpeningRepositoryProtocol: Sendable {
     func isFileSizeValid(url: URL) async throws -> Bool
