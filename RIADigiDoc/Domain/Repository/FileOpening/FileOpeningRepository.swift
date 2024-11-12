@@ -1,5 +1,5 @@
 import Foundation
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 actor FileOpeningRepository: FileOpeningRepositoryProtocol {
     private let fileOpeningService: FileOpeningServiceProtocol

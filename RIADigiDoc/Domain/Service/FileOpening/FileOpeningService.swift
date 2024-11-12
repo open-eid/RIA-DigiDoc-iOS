@@ -1,5 +1,6 @@
 import Foundation
-import LibdigidoclibSwift
+import LibdigidocLibSwift
+import CommonsLib
 
 actor FileOpeningService: FileOpeningServiceProtocol {
     func isFileSizeValid(url: URL) async throws -> Bool {
@@ -50,7 +51,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             appropriateFor: nil,
             create: false)
         let signedContainersDirectory = cachesDirectory.appendingPathComponent(
-            Constants.Container.signedContainerFolder,
+            Constants.Container.SignedContainerFolder,
             isDirectory: true
         )
 

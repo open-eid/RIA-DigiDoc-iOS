@@ -1,6 +1,6 @@
 import Foundation
-import LibdigidoclibSwift
 import OSLog
+import LibdigidocLibSwift
 
 actor LibrarySetup {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LibrarySetup")

@@ -1,5 +1,5 @@
 import Foundation
-import LibdigidoclibSwift
+import LibdigidocLibSwift
 
 class SharedContainerViewModel: ObservableObject {
     private var signedContainer: SignedContainer?
