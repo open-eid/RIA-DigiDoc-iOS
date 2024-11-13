@@ -16,7 +16,6 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var signatureId: String?
     public var claimedSigningTime: String?
     public var signatureMethod: String?
-    public var dataToSign: Data?
     public var ocspProducedAt: String?
     public var timeStampTime: String?
     public var signedBy: String?
@@ -31,7 +30,6 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
          signatureId: String? = nil,
          claimedSigningTime: String? = nil,
          signatureMethod: String? = nil,
-         dataToSign: Data? = nil,
          ocspProducedAt: String? = nil,
          timeStampTime: String? = nil,
          signedBy: String? = nil,
@@ -44,7 +42,6 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.signatureId = signatureId
         self.claimedSigningTime = claimedSigningTime
         self.signatureMethod = signatureMethod
-        self.dataToSign = dataToSign
         self.ocspProducedAt = ocspProducedAt
         self.timeStampTime = timeStampTime
         self.signedBy = signedBy

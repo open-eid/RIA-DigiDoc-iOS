@@ -19,15 +19,16 @@ extension URL {
                 return mimetype
             }
         } catch {
-            return defaultMimeType
+            if let mimeType = mimeTypeForFileExtension() {
+                return mimeType
+            }
         }
 
-        guard let mimeTypeFromUTType = UTType(filenameExtension: self.pathExtension),
-              let preferredMimeType = mimeTypeFromUTType.preferredMIMEType, !preferredMimeType.isEmpty else {
-            return defaultMimeType
+        if isDdoc() {
+            return Constants.MimeType.Ddoc
         }
 
-        return preferredMimeType.lowercased()
+        return mimeTypeForFileExtension() ?? defaultMimeType
     }
 
     public func isContainer() -> Bool {
@@ -37,7 +38,17 @@ extension URL {
             return true
         }
 
-        return false
+        return isDdoc()
+    }
+
+    public func isDdoc() -> Bool {
+        do {
+            let xmlData = try Data(contentsOf: self)
+            let result = MimeTypeDecoder().parse(xmlData: xmlData)
+            return result == .ddoc
+        } catch {
+            return false
+        }
     }
 
     public func md5Hash() -> String {
@@ -122,5 +133,13 @@ extension URL {
         let isZip = fileData.starts(with: [0x50, 0x4b, 0x03, 0x04])
         try fileHandle.close()
         return isZip
+    }
+
+    private func mimeTypeForFileExtension() -> String? {
+        guard let mimeTypeFromUTType = UTType(filenameExtension: self.pathExtension),
+              let preferredMimeType = mimeTypeFromUTType.preferredMIMEType, !preferredMimeType.isEmpty else {
+            return nil
+        }
+        return preferredMimeType.lowercased()
     }
 }

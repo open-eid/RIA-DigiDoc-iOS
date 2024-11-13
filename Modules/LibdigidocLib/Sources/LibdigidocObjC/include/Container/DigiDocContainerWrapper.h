@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable DigiDocContainerWrapper *)sharedInstance;
 
 - (void)create:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
-- (void)open:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
+- (void)open:(NSString *)url validateOnline:(BOOL)validateOnline completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
 
 - (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
 - (DigiDocContainer *)getContainer;
