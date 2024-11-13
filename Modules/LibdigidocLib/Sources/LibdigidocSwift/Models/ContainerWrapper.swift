@@ -48,7 +48,7 @@ public actor ContainerWrapper: Sendable {
 
     public static func open(file: URL) async throws -> ContainerWrapper? {
         try await withCheckedThrowingContinuation { continuation in
-            DigiDocContainerWrapper.sharedInstance()?.open(file.path) { container, error in
+            DigiDocContainerWrapper.sharedInstance()?.open(file.path, validateOnline: true) { container, error in
                 if let error = error as NSError? {
                     let errorMessage = "Unable to open container: \(ErrorUtil.getErrorMessage(error))"
                     continuation.resume(throwing: DigiDocError.containerOpeningFailed(errorMessage))
@@ -150,7 +150,6 @@ public actor ContainerWrapper: Sendable {
                 signatureId: signature.id,
                 claimedSigningTime: signature.claimedSigningTime,
                 signatureMethod: signature.signatureMethod,
-                dataToSign: signature.dataToSign,
                 ocspProducedAt: signature.ocspProducedAt,
                 timeStampTime: signature.timeStampTime,
                 signedBy: signature.signedBy,

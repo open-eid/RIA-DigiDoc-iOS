@@ -7,6 +7,7 @@
 #import <digidocpp/crypto/X509Cert.h>
 
 #import "DigiDocContainerWrapper.h"
+#import "CB/DigiDocContainerOpenCB.h"
 #import "../Model/DigiDocContainer.h"
 #import "Exception/DigiDocExceptionWrapper.h"
 #import "Exception/Util/ExceptionUtil.h"
@@ -40,7 +41,6 @@ public:
             digiDocSignature.id = [NSString stringWithUTF8String:signature->id().c_str()];
             digiDocSignature.claimedSigningTime = [NSString stringWithUTF8String:signature->claimedSigningTime().c_str()];
             digiDocSignature.signatureMethod = [NSString stringWithUTF8String:signature->signatureMethod().c_str()];
-            digiDocSignature.dataToSign = [NSData dataWithBytes:signature->dataToSign().data() length:signature->dataToSign().size()];
             digiDocSignature.ocspProducedAt = [NSString stringWithUTF8String:signature->OCSPProducedAt().c_str()];
             digiDocSignature.timeStampTime = [NSString stringWithUTF8String:signature->TimeStampTime().c_str()];
             digiDocSignature.signedBy = [NSString stringWithUTF8String:signature->signedBy().c_str()];
@@ -78,9 +78,13 @@ public:
         }
     }
 
-    DigiDocContainer* open(NSString *url) {
+    DigiDocContainer* open(NSString *url, bool validateOnline) {
         try {
-            container = digidoc::Container::openPtr(url.UTF8String);
+            DigiDocContainerOpenCB *containerOpenCB = [[DigiDocContainerOpenCB alloc] initWithValidation:validateOnline];
+
+            digidoc::ContainerOpenCB *cb = static_cast<digidoc::ContainerOpenCB *>([containerOpenCB containerOpenCBImplInstance]);
+
+            container = digidoc::Container::openPtr(url.UTF8String, cb);
             return toDigiDocContainer(container.get());
         } catch(const digidoc::Exception &e) {
             std::vector<digidoc::Exception> causes = e.causes();
@@ -186,12 +190,12 @@ private:
     });
 }
 
-- (void)open:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion {
+- (void)open:(NSString *)url validateOnline:(BOOL)validateOnline completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         DigiDocContainer *container = NULL;
         NSError *digidocException = nil;
         @try {
-            container = _impl->open(url);
+            container = _impl->open(url, validateOnline);
         } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
             digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{NSLocalizedDescriptionKey: exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
         }

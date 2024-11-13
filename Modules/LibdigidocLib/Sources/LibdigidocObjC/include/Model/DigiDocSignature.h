@@ -16,7 +16,6 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 @property (strong, nonatomic) NSString *id;
 @property (strong, nonatomic) NSString *claimedSigningTime;
 @property (strong, nonatomic) NSString *signatureMethod;
-@property (strong, nonatomic) NSData *dataToSign;
 @property (strong, nonatomic) NSString *ocspProducedAt;
 @property (strong, nonatomic) NSString *timeStampTime;
 @property (strong, nonatomic) NSString *signedBy;
