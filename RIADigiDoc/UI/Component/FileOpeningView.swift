@@ -2,6 +2,7 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct FileOpeningView: View {
+    @EnvironmentObject var languageSettings: LanguageSettings
     @StateObject private var viewModel: FileOpeningViewModel
 
     @Binding var isFileOpeningLoading: Bool
@@ -33,7 +34,7 @@ struct FileOpeningView: View {
             }.alert(item: $viewModel.errorMessage) { errorMessage in
                 Alert(
                     title: Text("Error"),
-                    message: Text(errorMessage.message ?? "Unknown error"),
+                    message: Text(errorMessage.message ?? "General error"),
                     dismissButton: .default(Text("OK")) {
                         viewModel.handleError()
                         isFileOpeningLoading = viewModel.isFileOpeningLoading

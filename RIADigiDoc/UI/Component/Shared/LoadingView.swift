@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct LoadingView: View {
+    @EnvironmentObject var languageSettings: LanguageSettings
+
     @State private var isLoading: Bool = false
     @State private var rotationAngle: Double = 0
 

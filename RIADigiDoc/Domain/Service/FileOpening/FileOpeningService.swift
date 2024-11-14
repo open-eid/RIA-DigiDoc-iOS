@@ -13,7 +13,8 @@ actor FileOpeningService: FileOpeningServiceProtocol {
 
             return true
         } catch {
-            throw FileOpeningError.unableToRetrieveFileSize(error.localizedDescription)
+            throw FileOpeningError
+                .unableToRetrieveFileSize
         }
     }
 
@@ -36,11 +37,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
     }
 
     func openOrCreateContainer(dataFiles: [URL]) async throws -> SignedContainer {
-        guard let firstFile = dataFiles.first else {
-            throw FileOpeningError.emptyFile
-        }
-
-        return try await SignedContainer.openOrCreate(file: firstFile, dataFiles: dataFiles)
+        return try await SignedContainer.openOrCreate(dataFiles: dataFiles)
     }
 
     private func cacheFile(from sourceURL: URL) throws -> URL {

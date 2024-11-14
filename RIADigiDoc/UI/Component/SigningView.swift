@@ -3,6 +3,7 @@ import LibdigidocLibSwift
 
 struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: SigningViewModel
 
@@ -13,10 +14,13 @@ struct SigningView: View {
     }
 
     var body: some View {
-
         VStack {
             Text("Signing")
                 .font(.headline)
+
+            Spacer()
+
+            Text("Container: \(viewModel.containerName)")
 
             Spacer()
 
@@ -27,15 +31,17 @@ struct SigningView: View {
 
             Text("Container signatures")
             List(viewModel.signatures, id: \.self) { signature in
-                Text(signature.signedBy ?? "")
+                Text(signature.signedBy)
                 Text(signature.status.rawValue)
-                Text(signature.trustedSigningTime ?? "")
+                Text(signature.trustedSigningTime)
             }
 
             Spacer()
         }
         .onAppear {
-            viewModel.loadDataFiles(signedContainer: viewModel.sharedContainerViewModel.getSignedContainer())
+            viewModel.loadContainerData(
+                signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
+            )
         }
     }
 }

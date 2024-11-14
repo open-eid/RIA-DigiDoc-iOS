@@ -9,12 +9,12 @@ public final class DigiDocConf: DigiDocConfProtocol {
         let digidocConf = DigiDocConfWrapper()
         digidocConf.setLogLevel(0)
 
-        var errorLogMessage = "Libdigidocpp initialization error: "
+        var errorDetail: ErrorDetail?
 
         let isInitialized = await withCheckedContinuation { continuation in
             DigiDocConfWrapper.initWithConf(digidocConf) { success, error in
                 if let error = error as NSError? {
-                    errorLogMessage += ErrorUtil.getErrorMessage(error)
+                    errorDetail = ErrorDetail(nsError: error)
 
                     continuation.resume(returning: false)
                 } else {
@@ -24,7 +24,7 @@ public final class DigiDocConf: DigiDocConfProtocol {
         }
 
         guard isInitialized, DigiDocConfWrapper.sharedInstance() != nil else {
-            throw DigiDocError.initializationFailed(errorLogMessage)
+            throw DigiDocError.initializationFailed(errorDetail ?? ErrorDetail())
         }
     }
 }

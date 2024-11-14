@@ -4,6 +4,7 @@ import UtilsLib
 
 @main
 struct RIADigiDocApp: App {
+    @StateObject private var languageSettings = LanguageSettings()
     @State private var isSetupComplete = false
 
     init() {}
@@ -12,6 +13,7 @@ struct RIADigiDocApp: App {
         WindowGroup {
             if isSetupComplete {
                 ContentView()
+                    .environmentObject(languageSettings)
             } else {
                 LaunchScreenView()
                     .onAppear {

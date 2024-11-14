@@ -2,6 +2,8 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct MainSignatureView: View {
+    @EnvironmentObject var languageSettings: LanguageSettings
+
     @StateObject private var viewModel: MainSignatureViewModel
 
     @State private var isFileOpeningLoading = false
@@ -15,7 +17,7 @@ struct MainSignatureView: View {
 
     var body: some View {
         VStack {
-            Button("Choose a file") {
+            Button(languageSettings.localized("Choose file")) {
                 viewModel.isImporting = true
             }
             .fileImporter(

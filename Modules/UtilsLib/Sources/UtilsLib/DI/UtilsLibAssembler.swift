@@ -26,6 +26,10 @@ public class UtilsLibAssembler {
             }
             return MimeTypeResolver(mimeTypeCache: mimeTypeCache)
         }
+
+        container.register(MimeTypeDecoderProtocol.self) { _ in
+            return MimeTypeDecoder()
+        }
     }
 
     func resolve<T>(_: T.Type) -> T {

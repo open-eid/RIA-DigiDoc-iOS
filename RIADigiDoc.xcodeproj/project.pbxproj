@@ -72,6 +72,7 @@
 				Domain/Service/Some/SomeServiceProtocol.swift,
 				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
+				"Supporting files/Localizable.xcstrings",
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
@@ -298,6 +299,8 @@
 			knownRegions = (
 				en,
 				Base,
+				et,
+				ru,
 			);
 			mainGroup = DFDB14722CC97B0E00153876;
 			minimizedProjectReferenceProxies = 1;
@@ -471,6 +474,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
@@ -527,6 +531,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
