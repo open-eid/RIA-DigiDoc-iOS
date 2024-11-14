@@ -3,6 +3,7 @@ import Foundation
 public struct Constants {
     public struct Container {
         public static let SignedContainerFolder = "SignedContainers"
+        public static let DefaultName = "newFile"
     }
 
     public struct MimeType {

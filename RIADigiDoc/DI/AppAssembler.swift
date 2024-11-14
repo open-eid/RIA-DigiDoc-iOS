@@ -83,6 +83,10 @@ class AppAssembler {
             }
             return SigningViewModel(sharedContainerViewModel: sharedContainerViewModel)
         }.inObjectScope(.graph)
+
+        container.register(LanguageSettingsProtocol.self) { _ in
+            return LanguageSettings()
+        }
     }
 
     func resolve<T>(_: T.Type) -> T {

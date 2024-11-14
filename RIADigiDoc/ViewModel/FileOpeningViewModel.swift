@@ -25,17 +25,26 @@ class FileOpeningViewModel: ObservableObject {
 
     func handleFiles() async {
         do {
+            FileOpeningViewModel.logger.debug("Handling chosen files from file system")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
+
+            FileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
+
+            if validFiles.isEmpty {
+                FileOpeningViewModel.logger.debug("No valid files found")
+                throw FileOpeningError.noDataFiles
+            }
+
             sharedContainerViewModel.setSignedContainer(
                 signedContainer:
                     try await fileOpeningRepository.openOrCreateContainer(urls: validFiles))
+            FileOpeningViewModel.logger.debug("Signed container set successfully")
             handleLoadingSuccess()
 
         } catch {
-            FileOpeningViewModel.logger.error("\(error.localizedDescription)")
-            errorMessage = AlertMessage(message: error.localizedDescription)
+            handleError(error)
         }
     }
 
@@ -48,5 +57,37 @@ class FileOpeningViewModel: ObservableObject {
         errorMessage = nil
         isFileOpeningLoading = false
         isNavigatingToNextView = false
+    }
+
+    private func handleError(_ error: Error) {
+        let ddeMessage = (error as? DigiDocError)?.description ?? error.localizedDescription
+        FileOpeningViewModel.logger.error("\(ddeMessage)")
+
+        if let dde = error as? DigiDocError {
+            errorMessage = createAlertMessage(for: dde)
+        } else {
+            errorMessage = AlertMessage(message: error.localizedDescription)
+        }
+    }
+
+    private func createAlertMessage(for error: DigiDocError) -> AlertMessage {
+        switch error {
+        case .initializationFailed:
+            return AlertMessage(message: NSLocalizedString("General error", comment: ""))
+        case .containerCreationFailed(let errorDetail),
+                .containerOpeningFailed(let errorDetail),
+                .containerSavingFailed(let errorDetail):
+            return AlertMessage(
+                message: String(
+                    format: NSLocalizedString("Failed to open container %@", comment: ""),
+                    errorDetail.userInfo["fileName"] ?? "")
+            )
+        case .addingFilesToContainerFailed(let errorDetail):
+            return AlertMessage(
+                message: String(
+                    format: NSLocalizedString("Failed to open file %@", comment: ""),
+                    errorDetail.userInfo["fileName"] ?? "")
+            )
+        }
     }
 }

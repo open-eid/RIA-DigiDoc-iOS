@@ -38,7 +38,7 @@ public:
             digiDocSignature.timestampCert = getCertDataFromX509(signature->TimeStampCertificate());
             digiDocSignature.ocspCert = getCertDataFromX509(signature->OCSPCertificate());
 
-            digiDocSignature.id = [NSString stringWithUTF8String:signature->id().c_str()];
+            digiDocSignature.signatureId = [NSString stringWithUTF8String:signature->id().c_str()];
             digiDocSignature.claimedSigningTime = [NSString stringWithUTF8String:signature->claimedSigningTime().c_str()];
             digiDocSignature.signatureMethod = [NSString stringWithUTF8String:signature->signatureMethod().c_str()];
             digiDocSignature.ocspProducedAt = [NSString stringWithUTF8String:signature->OCSPProducedAt().c_str()];
