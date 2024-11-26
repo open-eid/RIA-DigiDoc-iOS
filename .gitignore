@@ -12,3 +12,6 @@ playground.xcworkspace
 # Swift Package Manager
 Packages/
 xcuserdata
+
+# Cuckoo
+**/Mocks/**

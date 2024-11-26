@@ -16,6 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
+        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10)),
         .package(path: "../CommonsLib")
     ],
     targets: [
@@ -27,7 +28,10 @@ let package = Package(
         ),
         .testTarget(
             name: "UtilsLibTests",
-            dependencies: ["UtilsLib"]
+            dependencies: ["UtilsLib", "Cuckoo", "CommonsLib"],
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
         )
     ]
 )
