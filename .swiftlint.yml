@@ -1,5 +1,6 @@
 excluded:
   - RIADigiDocTests/Mocks/*/*.swift
+  - Modules/**/Mocks/*/*.swift
 
 opt_in_rules:
   - accessibility_label_for_image
