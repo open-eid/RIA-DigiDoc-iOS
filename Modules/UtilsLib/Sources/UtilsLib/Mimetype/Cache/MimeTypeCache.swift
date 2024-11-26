@@ -9,7 +9,7 @@ actor MimeTypeCache: MimeTypeCacheProtocol {
         if let cachedEntry = cache[md5]?.mimeType {
             return cachedEntry
         } else {
-            let mimeType = fileUrl.mimeType()
+            let mimeType = await fileUrl.mimeType()
             await setMimeType(md5: md5, mimeType: mimeType)
             return mimeType
         }

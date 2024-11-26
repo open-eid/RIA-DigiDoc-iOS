@@ -5,7 +5,10 @@ public final class DigiDocConf: DigiDocConfProtocol {
 
     public init() {}
 
-    static public func initDigiDoc() async throws(DigiDocError) {
+}
+
+extension DigiDocConf {
+    static public func initDigiDoc() async throws {
         let digidocConf = DigiDocConfWrapper()
         digidocConf.setLogLevel(0)
 

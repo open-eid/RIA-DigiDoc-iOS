@@ -8,11 +8,13 @@ import CommonsLib
 
 extension URL {
 
-    public func mimeType() -> String {
+    @MainActor
+    public func mimeType(fileUtil: FileUtilProtocol =
+                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) -> String {
         let defaultMimeType = Constants.MimeType.Default
 
         do {
-            if try isZipFile(), let mimetype = try FileUtil.getMimeTypeFromZipFile(
+            if try isZipFile(), let mimetype = try fileUtil.getMimeTypeFromZipFile(
                 from: self,
                 fileNameToFind: "mimetype"
             ) {
@@ -31,6 +33,7 @@ extension URL {
         return mimeTypeForFileExtension() ?? defaultMimeType
     }
 
+    @MainActor
     public func isContainer() -> Bool {
         let mimetype = mimeType()
 
@@ -41,10 +44,12 @@ extension URL {
         return isDdoc()
     }
 
-    public func isDdoc() -> Bool {
+    @MainActor
+    public func isDdoc(mimeTypeDecoder: MimeTypeDecoderProtocol =
+                       UtilsLibAssembler.shared.resolve(MimeTypeDecoderProtocol.self)) -> Bool {
         do {
             let xmlData = try Data(contentsOf: self)
-            let result = MimeTypeDecoder().parse(xmlData: xmlData)
+            let result = mimeTypeDecoder.parse(xmlData: xmlData)
             return result == .ddoc
         } catch {
             return false
@@ -61,9 +66,10 @@ extension URL {
         }
     }
 
+    @MainActor
     public func isPDF() -> Bool {
         let mimeType = self.mimeType()
-        return mimeType == Constants.MimeType.Pdf || self.pathExtension.lowercased() == Constants.Extension.Pdf
+        return mimeType == Constants.MimeType.Pdf
     }
 
     public func isSignedPDF() -> Bool {

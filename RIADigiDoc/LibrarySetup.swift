@@ -12,7 +12,7 @@ actor LibrarySetup {
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
         } catch let error {
             switch error {
-            case .initializationFailed(let errorDetail):
+            case DigiDocError.initializationFailed(let errorDetail):
                 LibrarySetup.logger.error("\(errorDetail.description)")
             default: LibrarySetup.logger.error("Unknown error")
             }

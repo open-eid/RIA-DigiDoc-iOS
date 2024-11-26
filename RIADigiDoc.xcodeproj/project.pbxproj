@@ -11,6 +11,8 @@
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
 		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
+		DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F12B2CF020C200185A7F /* CommonsLib */; };
+		DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F1302CF0217C00185A7F /* CommonsLib */; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
 		DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFBECAB12CCC2A610035F949 /* Cuckoo */; };
 /* End PBXBuildFile section */
@@ -73,6 +75,8 @@
 				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
 				"Supporting files/Localizable.xcstrings",
+				Util/LanguageSettings.swift,
+				Util/LanguageSettingsProtocol.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
@@ -118,6 +122,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
+				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
 				DF8424A12CD442DC003F592D /* Swinject in Frameworks */,
 			);
@@ -128,6 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
+				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
 				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
 				DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */,
 			);
@@ -214,6 +220,7 @@
 				DF8424A02CD442DC003F592D /* Swinject */,
 				DF3E4A7E2CE269C900137235 /* UtilsLib */,
 				DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */,
+				DFB1F1302CF0217C00185A7F /* CommonsLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -241,6 +248,7 @@
 				DFBECAB12CCC2A610035F949 /* Cuckoo */,
 				DF17B6392CDD2996009B1E17 /* Swinject */,
 				DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */,
+				DFB1F12B2CF020C200185A7F /* CommonsLib */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -820,6 +828,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
+		};
+		DFB1F12B2CF020C200185A7F /* CommonsLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsLib;
+		};
+		DFB1F1302CF0217C00185A7F /* CommonsLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsLib;
 		};
 		DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,5 +1,7 @@
 import Foundation
 
-public protocol SignedContainerProtocol: Sendable {
-    static func openOrCreate(dataFiles: [URL]) async throws -> SignedContainer
+protocol SignedContainerProtocol: Sendable {
+    func getDataFiles() async -> [DataFileWrapper]
+    func getSignatures() async -> [SignatureWrapper]
+    func getContainerName() async -> String
 }

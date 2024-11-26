@@ -4,7 +4,7 @@ import Swinject
 public class UtilsLibAssembler {
     public static let shared = UtilsLibAssembler()
 
-    let container: Container
+    private let container: Container
 
     private init() {
         container = Container()
@@ -30,9 +30,13 @@ public class UtilsLibAssembler {
         container.register(MimeTypeDecoderProtocol.self) { _ in
             return MimeTypeDecoder()
         }
+
+        container.register(FileUtilProtocol.self) { _ in
+            return FileUtil()
+        }
     }
 
-    func resolve<T>(_: T.Type) -> T {
+    public func resolve<T>(_: T.Type) -> T {
         guard let resolved = container.resolve(T.self) else {
             preconditionFailure("Unable to find \(T.Type.self)")
         }
