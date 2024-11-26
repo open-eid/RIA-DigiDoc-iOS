@@ -1,9 +1,9 @@
 import Foundation
 import ZIPFoundation
 
-struct FileUtil {
+struct FileUtil: FileUtilProtocol {
 
-    static func getMimeTypeFromZipFile(
+    func getMimeTypeFromZipFile(
         from zipFileURL: URL,
         fileNameToFind: String
     ) throws -> String? {

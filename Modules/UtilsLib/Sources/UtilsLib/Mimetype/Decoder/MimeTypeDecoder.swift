@@ -6,7 +6,9 @@ public class MimeTypeDecoder: MimeTypeDecoderProtocol {
 
     var isDdoc: Bool = false
 
-    func isElementFound(named elementName: String, attributes: [String: String]) -> Bool {
+    public init() {}
+
+    public func isElementFound(named elementName: String, attributes: [String: String]) -> Bool {
         if elementName == "SignedDoc", attributes["format"] == "DIGIDOC-XML" {
             return true
         }
@@ -14,7 +16,7 @@ public class MimeTypeDecoder: MimeTypeDecoderProtocol {
         return false
     }
 
-    func handleFoundElement(named elementName: String) {
+    public func handleFoundElement(named elementName: String) {
         if elementName == "SignedDoc" {
             isDdoc = true
         }

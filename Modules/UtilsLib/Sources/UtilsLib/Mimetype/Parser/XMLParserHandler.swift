@@ -6,7 +6,7 @@ class XMLParserHandler: NSObject, XMLParserDelegate {
 
     // swiftlint:disable:next blanket_disable_command
     // swiftlint:disable unused_parameter
-    func parser(
+    public func parser(
         _ parser: XMLParser,
         didStartElement elementName: String,
         namespaceURI: String?,

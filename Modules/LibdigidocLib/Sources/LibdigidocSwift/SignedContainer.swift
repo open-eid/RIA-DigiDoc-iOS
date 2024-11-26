@@ -21,6 +21,22 @@ public actor SignedContainer: Sendable, SignedContainerProtocol {
         self.container = container
     }
 
+    public func getDataFiles() async -> [DataFileWrapper] {
+        return await container.getDataFiles()
+    }
+
+    public func getSignatures() async -> [SignatureWrapper] {
+        return await container.getSignatures()
+    }
+
+    public func getContainerName() async -> String {
+        return SignedContainer.containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
+    }
+}
+
+extension SignedContainer {
+
+    @MainActor
     public static func openOrCreate(dataFiles: [URL]) async throws -> SignedContainer {
         SignedContainer.logger.debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
@@ -63,18 +79,6 @@ public actor SignedContainer: Sendable, SignedContainerProtocol {
             isExistingContainer = false
             return try await create(containerFile: containerFile, dataFiles: dataFiles)
         }
-    }
-
-    public func getDataFiles() async -> [DataFileWrapper] {
-        return await container.getDataFiles()
-    }
-
-    public func getSignatures() async -> [SignatureWrapper] {
-        return await container.getSignatures()
-    }
-
-    public func getContainerName() async -> String {
-        return SignedContainer.containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }
 
     private static func open(file: URL) async throws -> SignedContainer {
