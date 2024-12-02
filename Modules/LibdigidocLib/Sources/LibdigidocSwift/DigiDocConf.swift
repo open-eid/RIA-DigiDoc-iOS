@@ -10,7 +10,7 @@ public final class DigiDocConf: DigiDocConfProtocol {
 extension DigiDocConf {
     static public func initDigiDoc() async throws {
         let digidocConf = DigiDocConfWrapper()
-        digidocConf.setLogLevel(0)
+        digidocConf.setLogLevel(4)
 
         var errorDetail: ErrorDetail?
 

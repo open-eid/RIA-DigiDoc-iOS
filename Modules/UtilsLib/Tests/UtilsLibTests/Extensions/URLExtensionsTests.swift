@@ -5,6 +5,7 @@ import CoreGraphics
 import Testing
 import Cuckoo
 import CommonsLib
+import CommonsTestShared
 @testable import UtilsLib
 
 @MainActor
@@ -35,8 +36,8 @@ final class URLExtensionsTests {
     @Test
     func mimetype_successWithZipFileExtensionWhenMimeTypeNotAvailable() {
 
-        let mockContainer = try? createMockContainer(
-            with: ["testfile.txt":"Test content"],
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["testfile.txt": "Test content"],
             containerExtension: "zip")
 
         let mockFileUtil = MockFileUtilProtocol()
@@ -75,7 +76,7 @@ final class URLExtensionsTests {
 
     @Test
     func isContainer_successWithContainerFile() {
-        let mockContainer = try? createMockContainer(
+        let mockContainer = try? TestContainerUtil.createMockContainer(
             with: ["mimetype": Constants.MimeType.Asice],
             containerExtension: "asice")
 
@@ -87,7 +88,7 @@ final class URLExtensionsTests {
     @Test
     func isDdoc_success() {
         do {
-            let mockContainer = try createMockContainer(
+            let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
                       """
                         <SignedDoc format="DIGIDOC-XML"></SignedDoc>
@@ -113,7 +114,7 @@ final class URLExtensionsTests {
     @Test
     func isDdoc_returnFalseForUnknownContainer() {
         do {
-            let mockContainer = try createMockContainer(
+            let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
                       """
                         <SignedDoc format="DIGIDOC-XML"></SignedDoc>
@@ -143,7 +144,7 @@ final class URLExtensionsTests {
             let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("testFile.txt")
             try fileContent.write(to: tempFileURL, atomically: true, encoding: .utf8)
 
-            let expectedMD5Hash = Insecure.MD5.hash(data: fileContent.data(using: .utf8)!)
+            let expectedMD5Hash = Insecure.MD5.hash(data: fileContent.data(using: .utf8) ?? Data())
                 .map { String(format: "%02x", $0) }
                 .joined()
 
@@ -165,35 +166,6 @@ final class URLExtensionsTests {
         let md5Hash = nonexistentFileURL.md5Hash()
 
         #expect("" == md5Hash)
-    }
-
-    private func createMockContainer(with files: [String: String], containerExtension: String) throws -> URL {
-        let tempDir = FileManager.default.temporaryDirectory
-            let uniqueZipName = "\(UUID().uuidString).\(containerExtension)"
-            let zipURL = tempDir.appendingPathComponent(uniqueZipName)
-
-            do {
-                let archive = try Archive(url: zipURL, accessMode: .create)
-                for (fileName, fileContent) in files {
-                    let fileData = fileContent.data(using: .utf8)
-                    guard let fileData else {
-                        preconditionFailure("Unable to get file data")
-                    }
-                    try archive.addEntry(
-                        with: fileName,
-                        type: .file,
-                        uncompressedSize: Int64(fileData.count),
-                        compressionMethod: .deflate,
-                        provider: { position, size -> Data in
-                            let positionInt = Int(position)
-                            let sizeInt = Int(size)
-                            return fileData.subdata(in: positionInt..<positionInt + sizeInt)
-                        }
-                    )
-                }
-            }
-
-            return zipURL
     }
 
     private func createTestPDF(at url: URL) -> URL {

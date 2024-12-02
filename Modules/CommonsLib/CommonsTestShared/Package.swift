@@ -4,30 +4,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "CommonsLib",
+    name: "CommonsTestShared",
     platforms: [.iOS(.v15)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "CommonsLib",
-            targets: ["CommonsLib"]
+            name: "CommonsTestShared",
+            targets: ["CommonsTestShared"]
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10))
+        .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "CommonsLib"
-        ),
-        .testTarget(
-            name: "CommonsLibTests",
-            dependencies: ["CommonsLib", "Cuckoo"],
-            swiftSettings: [
-                .swiftLanguageMode(.v5)
-            ]
+            name: "CommonsTestShared",
+            dependencies: ["ZIPFoundation"]
         )
     ]
 )
