@@ -17,7 +17,8 @@ let package = Package(
         .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
         .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10)),
-        .package(path: "../CommonsLib")
+        .package(path: "../CommonsLib"),
+        .package(path: "../CommonsLib/CommonsTestShared")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -28,7 +29,7 @@ let package = Package(
         ),
         .testTarget(
             name: "UtilsLibTests",
-            dependencies: ["UtilsLib", "Cuckoo", "CommonsLib"],
+            dependencies: ["UtilsLib", "Swinject", "Cuckoo", "CommonsLib", "CommonsTestShared"],
             swiftSettings: [
                 .swiftLanguageMode(.v5)
             ]
