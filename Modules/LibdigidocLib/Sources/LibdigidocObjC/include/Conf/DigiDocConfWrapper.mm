@@ -64,25 +64,21 @@ private:
     return _impl->logLevel();
 }
 
-+ (void)initWithConf:(DigiDocConfWrapper *)conf completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *digidocException = nil;
-            if (conf) {
-                @try {
-                    DigiDocConfWrapperImpl::initConf(conf->_impl);
-                } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
-                    digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{@"message":exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
-                }
+- (void)initWithConf:(void (^)(BOOL success, NSError * _Nullable error))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *digidocException = nil;
+        if (self) {
+            @try {
+                DigiDocConfWrapperImpl::initConf(self->_impl);
+            } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
+                digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{@"message":exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
             }
+        }
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                BOOL isSuccess = ([self sharedInstance] != nil);
-                if (completion) {
-                    completion(isSuccess, digidocException);
-                }
-            });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) {
+                completion(digidocException == nil, digidocException);
+            }
         });
     });
 }

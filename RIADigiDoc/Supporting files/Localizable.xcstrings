@@ -220,6 +220,30 @@
         }
       }
     },
+    "Libdigidocpp is already initialized" : {
+      "comment" : "Meant to be shown in logging only",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libdigidocpp is already initialized"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libdigidocpp on juba initsialiseeritud"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libdigidocpp уже инициализирована"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "Loading" : {
       "comment" : "Loading label",
       "localizations" : {

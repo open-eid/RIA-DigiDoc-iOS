@@ -39,9 +39,11 @@ struct SigningView: View {
             Spacer()
         }
         .onAppear {
-            viewModel.loadContainerData(
-                signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
-            )
+            Task {
+                await viewModel.loadContainerData(
+                    signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
+                )
+            }
         }
     }
 }

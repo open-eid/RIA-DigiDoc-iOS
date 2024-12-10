@@ -4,20 +4,22 @@ import LibdigidocLibObjC
 import CommonsLib
 import UtilsLib
 
-public actor SignedContainer: Sendable, SignedContainerProtocol {
+public actor SignedContainer: SignedContainerProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.LibdigidocLib", category: "SignedContainer")
 
     private static let signedContainerLogTag: String = "SignedContainer"
-    private static var containerFile: URL?
-    private static var isExistingContainer: Bool = false
 
-    var container: ContainerWrapper
+    private let containerFile: URL?
+    private let isExistingContainer: Bool
+    private let container: ContainerWrapper
 
-    public init() {
-        container = ContainerWrapper()
-    }
-
-    public init(container: ContainerWrapper) {
+    public init(
+        containerFile: URL? = nil,
+        isExistingContainer: Bool = false,
+        container: ContainerWrapper = ContainerWrapper()
+    ) {
+        self.containerFile = containerFile
+        self.isExistingContainer = isExistingContainer
         self.container = container
     }
 
@@ -30,7 +32,7 @@ public actor SignedContainer: Sendable, SignedContainerProtocol {
     }
 
     public func getContainerName() async -> String {
-        return SignedContainer.containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
+        return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }
 }
 
@@ -38,9 +40,9 @@ extension SignedContainer {
 
     @MainActor
     public static func openOrCreate(dataFiles: [URL]) async throws -> SignedContainer {
-        SignedContainer.logger.debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
+        logger.debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
-            SignedContainer.logger.error("Unable to create or open container. First datafile is nil")
+            logger.error("Unable to create or open container. First datafile is nil")
             throw DigiDocError.containerCreationFailed(
                 ErrorDetail(
                     message: "Cannot create or open container. Datafiles are empty"
@@ -49,8 +51,7 @@ extension SignedContainer {
         }
 
         let isFirstDataFileContainer = firstFile.isContainer() || (firstFile.isPDF() && firstFile.isSignedPDF())
-
-        containerFile = firstFile
+        var containerFile: URL? = firstFile
 
         if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
             firstFile.pathExtension != CommonsLib.Constants.Extension.Default {
@@ -72,40 +73,27 @@ extension SignedContainer {
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
             SignedContainer.logger.debug("Opening existing container")
-            isExistingContainer = true
             return try await open(file: containerFile)
         } else {
             SignedContainer.logger.debug("Creating a new container")
-            isExistingContainer = false
             return try await create(containerFile: containerFile, dataFiles: dataFiles)
         }
     }
 
     private static func open(file: URL) async throws -> SignedContainer {
-        let openedContainer = try await ContainerWrapper.open(file: file)
-
-        guard let container = openedContainer else {
-            throw DigiDocError.containerOpeningFailed(
-                ErrorDetail(
-                    message: "Cannot open container. Container is nil"
-                )
-            )
-        }
-
-        return SignedContainer(
-            container: container
-        )
+        let container = try await ContainerWrapper().open(containerFile: file)
+        return SignedContainer(containerFile: file, isExistingContainer: true, container: container)
     }
 
     private static func create(
         containerFile: URL,
         dataFiles: [URL]
     ) async throws -> SignedContainer {
-        let containerWrapper = try await ContainerWrapper.create(file: containerFile)
+        let container = try await ContainerWrapper().create(file: containerFile)
 
-        try await containerWrapper.addDataFiles(dataFiles: dataFiles.compactMap { $0 })
+        try await container.addDataFiles(dataFiles: dataFiles.compactMap { $0 })
 
-        let isSaved = try await containerWrapper.save(file: containerFile)
+        let isSaved = try await container.save(file: containerFile)
         guard isSaved else {
             throw DigiDocError
                 .containerSavingFailed(
@@ -115,8 +103,8 @@ extension SignedContainer {
                 )
         }
 
-        let container = await containerWrapper.getContainer()
-        guard let container else {
+        let createdContainer = await container.getContainer()
+        guard let createdContainer else {
             throw DigiDocError
                 .containerOpeningFailed(
                     ErrorDetail(
@@ -125,6 +113,6 @@ extension SignedContainer {
                 )
         }
 
-        return SignedContainer(container: container)
+        return SignedContainer(containerFile: containerFile, isExistingContainer: false, container: createdContainer)
     }
 }

@@ -2,6 +2,7 @@ import Foundation
 
 public enum DigiDocError: Error {
     case initializationFailed(ErrorDetail)
+    case alreadyInitialized
     case containerCreationFailed(ErrorDetail)
     case containerOpeningFailed(ErrorDetail)
     case addingFilesToContainerFailed(ErrorDetail)
@@ -15,6 +16,9 @@ public enum DigiDocError: Error {
                 .addingFilesToContainerFailed(let errorDetail),
                 .containerSavingFailed(let errorDetail):
             return errorDetail
+
+        case .alreadyInitialized:
+            return ErrorDetail(message: "Libdigidocpp is already initialized")
         }
     }
 

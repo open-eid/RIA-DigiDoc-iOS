@@ -107,6 +107,9 @@ public:
     }
 
     DigiDocContainer* getContainer() {
+        if (container == NULL) {
+            return NULL;
+        }
         return toDigiDocContainer(container.get());
     }
 
@@ -157,19 +160,6 @@ private:
         _impl = new DigiDocContainerWrapperImpl();
     }
     return self;
-}
-
-+ (nullable DigiDocContainerWrapper *)sharedInstance {
-    static DigiDocContainerWrapper *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        DigiDocContainerWrapperImpl* instanceImpl = DigiDocContainerWrapperImpl::instance();
-        if (instanceImpl) {
-            sharedInstance = [[DigiDocContainerWrapper alloc] init];
-            sharedInstance->_impl = instanceImpl;
-        }
-    });
-    return sharedInstance;
 }
 
 - (void)create:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion {

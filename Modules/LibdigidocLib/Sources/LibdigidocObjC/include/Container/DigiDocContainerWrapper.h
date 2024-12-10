@@ -6,7 +6,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DigiDocContainerWrapper : NSObject
 
 - (instancetype)init;
-+ (nullable DigiDocContainerWrapper *)sharedInstance;
 
 - (void)create:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
 - (void)open:(NSString *)url validateOnline:(BOOL)validateOnline completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
