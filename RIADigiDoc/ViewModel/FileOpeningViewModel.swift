@@ -75,8 +75,8 @@ class FileOpeningViewModel: ObservableObject {
         case .initializationFailed:
             return AlertMessage(message: NSLocalizedString("General error", comment: ""))
         case .containerCreationFailed(let errorDetail),
-                .containerOpeningFailed(let errorDetail),
-                .containerSavingFailed(let errorDetail):
+            .containerOpeningFailed(let errorDetail),
+            .containerSavingFailed(let errorDetail):
             return AlertMessage(
                 message: String(
                     format: NSLocalizedString("Failed to open container %@", comment: ""),
@@ -88,6 +88,8 @@ class FileOpeningViewModel: ObservableObject {
                     format: NSLocalizedString("Failed to open file %@", comment: ""),
                     errorDetail.userInfo["fileName"] ?? "")
             )
+        case .alreadyInitialized:
+            return AlertMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
         }
     }
 }

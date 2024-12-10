@@ -21,7 +21,7 @@ class SigningViewModel: ObservableObject {
         self.sharedContainerViewModel = sharedContainerViewModel
     }
 
-    func loadContainerData(signedContainer: SignedContainer?) {
+    func loadContainerData(signedContainer: SignedContainer?) async {
         SigningViewModel.logger.debug("Loading container data")
         guard let signedContainer else {
             SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")

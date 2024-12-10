@@ -14,6 +14,8 @@ actor LibrarySetup {
             switch error {
             case DigiDocError.initializationFailed(let errorDetail):
                 LibrarySetup.logger.error("\(errorDetail.description)")
+            case DigiDocError.alreadyInitialized:
+                LibrarySetup.logger.error("Cannot initialize Libdigidocpp: Already initialized")
             default: LibrarySetup.logger.error("Unknown error")
             }
         }

@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setLogLevel:(int)level;
 - (int)logLevel;
 
-+ (void)initWithConf:(DigiDocConfWrapper *)conf completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
+- (void)initWithConf:(void (^)(BOOL success, NSError * _Nullable error))completion;
 + (nullable DigiDocConfWrapper *)sharedInstance;
 
 @end
