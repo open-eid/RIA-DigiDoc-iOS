@@ -30,12 +30,11 @@ class SigningViewModel: ObservableObject {
 
         self.signedContainer = signedContainer
 
-        Task {
-            self.containerName = await signedContainer.getContainerName()
-            self.dataFiles = await signedContainer.getDataFiles()
-            self.signatures = await signedContainer.getSignatures()
+        self.containerName = await signedContainer.getContainerName()
+        self.dataFiles = await signedContainer.getDataFiles()
+        self.signatures = await signedContainer.getSignatures()
 
-            SigningViewModel.logger.debug("Container data loaded")
-        }
+        SigningViewModel.logger.debug("Container data loaded")
+
     }
 }

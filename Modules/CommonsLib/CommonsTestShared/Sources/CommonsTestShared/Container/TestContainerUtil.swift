@@ -6,9 +6,10 @@ public class TestContainerUtil {
     public init() {}
 
     public static func createMockContainer(with files: [String: String], containerExtension: String) throws -> URL {
-        let tempDir = FileManager.default.temporaryDirectory
+        let subfolder = "TestContainers"
+        let tempDirectory = TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
         let uniqueZipName = "\(UUID().uuidString).\(containerExtension)"
-        let zipURL = tempDir.appendingPathComponent(uniqueZipName)
+        let zipURL = tempDirectory.appendingPathComponent(uniqueZipName)
 
         do {
             let archive = try Archive(url: zipURL, accessMode: .create)

@@ -10,35 +10,19 @@ final class FileUtilTests {
 
     private static let testSubFolder = "FileUtilTests"
 
-    private let fileUtil: FileUtil
+    private let fileUtil: FileUtilProtocol
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
         fileUtil = FileUtil()
 
-        var tempDir: URL
-        if #available(iOS 16.0, *) {
-            tempDir = FileManager.default.temporaryDirectory.appending(
-                path: "FileUtilTests",
-                directoryHint: .isDirectory
-            )
-        } else {
-            tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("FileUtilTests", isDirectory: true)
-        }
+        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: "FileUtilTests")
         try? FileManager.default.removeItem(at: tempDir)
     }
 
     deinit {
-        var tempDir: URL
-        if #available(iOS 16.0, *) {
-            tempDir = FileManager.default.temporaryDirectory.appending(
-                path: "FileUtilTests",
-                directoryHint: .isDirectory
-            )
-        } else {
-            tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("FileUtilTests", isDirectory: true)
-        }
+        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: "FileUtilTests")
         try? FileManager.default.removeItem(at: tempDir)
     }
 

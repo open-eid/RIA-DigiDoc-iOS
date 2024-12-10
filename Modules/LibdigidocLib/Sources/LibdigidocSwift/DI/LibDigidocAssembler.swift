@@ -23,6 +23,10 @@ public class LibDigidocAssembler {
         container.register(SignedContainerProtocol.self) { _ in
             SignedContainer()
         }
+
+        container.register(ContainerWrapperProtocol.self) { _ in
+            ContainerWrapper()
+        }
     }
 
     public func resolve<T>(_: T.Type) -> T {

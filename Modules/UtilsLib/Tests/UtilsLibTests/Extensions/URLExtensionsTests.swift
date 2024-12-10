@@ -17,20 +17,17 @@ final class URLExtensionsTests {
 
     @Test
     func mimetype_successWithRegularFile() {
-        do {
-            let fileContent = "Test file"
-            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("testFile.txt")
-            try fileContent.write(to: tempFileURL, atomically: true, encoding: .utf8)
+        let tempFileURL = TestFileUtil.createSampleFile()
 
-            let mockFileUtil = MockFileUtilProtocol()
-
-            let mimetype = tempFileURL.mimeType(fileUtil: mockFileUtil)
-
-            #expect("text/plain" == mimetype)
-        } catch {
-            Issue.record("Could not create mock container")
-            return
+        defer {
+            try? FileManager.default.removeItem(at: tempFileURL)
         }
+
+        let mockFileUtil = MockFileUtilProtocol()
+
+        let mimetype = tempFileURL.mimeType(fileUtil: mockFileUtil)
+
+        #expect("text/plain" == mimetype)
     }
 
     @Test
@@ -54,7 +51,12 @@ final class URLExtensionsTests {
 
     @Test
     func isPDF_success() {
-        let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("testFile.pdf")
+        let tempFileURL = TestFileUtil.getTemporaryDirectory(
+            subfolder: "URLExtensionsTests"
+        ).appendingPathComponent(
+            "testFile.pdf"
+        )
+
         let pdfURL = createTestPDF(at: tempFileURL)
 
         let isPDF = pdfURL.isPDF()
@@ -140,11 +142,9 @@ final class URLExtensionsTests {
     @Test
     func md5Hash_success() {
         do {
-            let fileContent = "Test file"
-            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("testFile.txt")
-            try fileContent.write(to: tempFileURL, atomically: true, encoding: .utf8)
+            let tempFileURL = TestFileUtil.createSampleFile()
 
-            let expectedMD5Hash = Insecure.MD5.hash(data: fileContent.data(using: .utf8) ?? Data())
+            let expectedMD5Hash = Insecure.MD5.hash(data: try Data(contentsOf: tempFileURL))
                 .map { String(format: "%02x", $0) }
                 .joined()
 
@@ -161,7 +161,11 @@ final class URLExtensionsTests {
 
     @Test
     func md5Hash_returnEmptyStringIfFileDoesNotExist() {
-        let nonexistentFileURL = FileManager.default.temporaryDirectory.appendingPathComponent("nonexistentFile.txt")
+        let nonexistentFileURL = TestFileUtil.getTemporaryDirectory(
+            subfolder: "URLExtensionsTests"
+        ).appendingPathComponent(
+            "nonexistentFile.txt"
+        )
 
         let md5Hash = nonexistentFileURL.md5Hash()
 

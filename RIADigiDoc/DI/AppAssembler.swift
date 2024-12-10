@@ -16,28 +16,6 @@ class AppAssembler {
 
     // swiftlint:disable:next function_body_length
     private func setup() async {
-
-        // Register Service
-        container.register(SomeServiceProtocol.self) { _ in
-            return SomeService()
-        }
-
-        // Register Repository
-        container.register(SomeRepositoryProtocol.self) { resolver in
-            guard let someService = resolver.resolve(SomeServiceProtocol.self) else {
-                preconditionFailure("Unable to find SomeServiceProtocol")
-            }
-            return SomeRepository(someService: someService)
-        }
-
-        // Register ViewModel
-        container.register(SomeViewModel.self) { resolver in
-            guard let someRepository = resolver.resolve(SomeRepositoryProtocol.self) else {
-                preconditionFailure("Unable to find SomeRepositoryProtocol")
-            }
-            return SomeViewModel(someRepository: someRepository)
-        }
-
         container.register(LibrarySetup.self) { _ in
             return LibrarySetup()
         }.inObjectScope(.container)

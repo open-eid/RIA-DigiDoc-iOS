@@ -11,12 +11,12 @@ public actor SignedContainer: SignedContainerProtocol {
 
     private let containerFile: URL?
     private let isExistingContainer: Bool
-    private let container: ContainerWrapper
+    private let container: ContainerWrapperProtocol
 
     public init(
         containerFile: URL? = nil,
         isExistingContainer: Bool = false,
-        container: ContainerWrapper = ContainerWrapper()
+        container: ContainerWrapperProtocol = ContainerWrapper()
     ) {
         self.containerFile = containerFile
         self.isExistingContainer = isExistingContainer

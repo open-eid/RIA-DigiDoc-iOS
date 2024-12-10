@@ -24,18 +24,18 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var status: SignatureStatus
     public var diagnosticsInfo: String
 
-    init(signingCert: Data,
-         timestampCert: Data,
-         ocspCert: Data,
-         signatureId: String,
-         claimedSigningTime: String,
-         signatureMethod: String,
-         ocspProducedAt: String,
-         timeStampTime: String,
-         signedBy: String,
-         trustedSigningTime: String,
-         status: SignatureStatus = .unknown,
-         diagnosticsInfo: String) {
+    public init(signingCert: Data,
+                timestampCert: Data,
+                ocspCert: Data,
+                signatureId: String,
+                claimedSigningTime: String,
+                signatureMethod: String,
+                ocspProducedAt: String,
+                timeStampTime: String,
+                signedBy: String,
+                trustedSigningTime: String,
+                status: SignatureStatus = .unknown,
+                diagnosticsInfo: String) {
         self.signingCert = signingCert
         self.timestampCert = timestampCert
         self.ocspCert = ocspCert

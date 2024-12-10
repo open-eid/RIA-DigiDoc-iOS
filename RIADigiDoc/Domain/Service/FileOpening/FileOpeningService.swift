@@ -4,18 +4,13 @@ import CommonsLib
 
 actor FileOpeningService: FileOpeningServiceProtocol {
     func isFileSizeValid(url: URL) async throws -> Bool {
-        do {
-            let resources = try url.resourceValues(forKeys: [.fileSizeKey])
+        let resources = try url.resourceValues(forKeys: [.fileSizeKey])
 
-            guard let fileSize = resources.fileSize, fileSize > 0 else {
-                throw FileOpeningError.invalidFileSize
-            }
-
-            return true
-        } catch {
-            throw FileOpeningError
-                .unableToRetrieveFileSize
+        guard let fileSize = resources.fileSize, fileSize > 0 else {
+            throw FileOpeningError.invalidFileSize
         }
+
+        return true
     }
 
     func getValidFiles(_ result: Result<[URL], Error>) async throws -> [URL] {
