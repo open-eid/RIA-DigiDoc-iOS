@@ -4,7 +4,7 @@ import LibdigidocLibObjC
 import CommonsLib
 import UtilsLib
 
-public actor ContainerWrapper: Sendable {
+public actor ContainerWrapper: ContainerWrapperProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.LibdigidocLib", category: "ContainerWrapper")
 
     private var dataFiles: [DataFileWrapper]

@@ -13,8 +13,6 @@ struct ContentView: View {
                 }
                 .padding()
 
-                SomeView()
-
                 MainSignatureView()
             }
         }

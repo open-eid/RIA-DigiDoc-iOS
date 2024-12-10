@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6392CDD2996009B1E17 /* Swinject */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
@@ -64,15 +65,10 @@
 			membershipExceptions = (
 				DI/AppAssembler.swift,
 				Domain/Model/AlertMessage.swift,
-				Domain/Model/SomeObject.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
-				Domain/Repository/Some/SomeRepository.swift,
-				Domain/Repository/Some/SomeRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
 				Domain/Service/FileOpening/FileOpeningServiceProtocol.swift,
-				Domain/Service/Some/SomeService.swift,
-				Domain/Service/Some/SomeServiceProtocol.swift,
 				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
 				"Supporting files/Localizable.xcstrings",
@@ -82,7 +78,6 @@
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
 				ViewModel/SigningViewModel.swift,
-				ViewModel/SomeViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
 		};
@@ -137,6 +132,7 @@
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
 				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
+				DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */,
 				DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -239,7 +235,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				DFBECAB42CCC2A730035F949 /* PBXTargetDependency */,
+				DF0B68A02D07DC2300A5457C /* PBXTargetDependency */,
 				DFDB148E2CC97B1000153876 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -252,6 +248,7 @@
 				DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */,
 				DFB1F12B2CF020C200185A7F /* CommonsLib */,
 				DF9B53972CF7B01B00971F2A /* UtilsLib */,
+				DF0B681B2D0779EF00A5457C /* CommonsTestShared */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -319,6 +316,7 @@
 				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */,
 				DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */,
+				DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -410,9 +408,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DFBECAB42CCC2A730035F949 /* PBXTargetDependency */ = {
+		DF0B68A02D07DC2300A5457C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = DFBECAB32CCC2A730035F949 /* CuckooPluginSingleFile */;
+			productRef = DF0B689F2D07DC2300A5457C /* CuckooPluginSingleFile */;
 		};
 		DFDB148E2CC97B1000153876 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -486,6 +484,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
@@ -543,6 +542,7 @@
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
@@ -589,7 +589,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -638,7 +638,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -664,6 +664,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
@@ -690,6 +691,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
@@ -714,6 +716,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = RIADigiDoc;
@@ -738,6 +741,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = RIADigiDoc;
@@ -786,6 +790,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/CommonsLib/CommonsTestShared;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -814,6 +825,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsTestShared;
+		};
+		DF0B689F2D07DC2300A5457C /* CuckooPluginSingleFile */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
+			productName = "plugin:CuckooPluginSingleFile";
+		};
 		DF17B6392CDD2996009B1E17 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */;
@@ -852,11 +872,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
 			productName = Cuckoo;
-		};
-		DFBECAB32CCC2A730035F949 /* CuckooPluginSingleFile */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
-			productName = "plugin:CuckooPluginSingleFile";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

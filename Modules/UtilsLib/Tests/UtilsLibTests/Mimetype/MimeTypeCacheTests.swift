@@ -8,7 +8,7 @@ import Cuckoo
 
 final class MimeTypeCacheTests {
 
-    private var mimeTypeCache: MimeTypeCache!
+    private var mimeTypeCache: MimeTypeCacheProtocol!
     private var tempDirectory: URL!
 
     init() async throws {
@@ -23,11 +23,7 @@ final class MimeTypeCacheTests {
 
     @Test
     func getMimeType_setAndGetFromCache() async throws {
-        let fileUrl = TestFileUtil.createSampleFile(
-            name: "sample",
-            withExtension: "txt",
-            contents: "Sample file"
-        )
+        let fileUrl = TestFileUtil.createSampleFile()
         let md5 = fileUrl.md5Hash()
         let expectedMimeType = "text/plain"
 

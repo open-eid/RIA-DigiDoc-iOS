@@ -267,10 +267,6 @@
         }
       }
     },
-    "Loading..." : {
-      "comment" : "In \"Some View\", delete later",
-      "shouldTranslate" : false
-    },
     "Logo" : {
       "localizations" : {
         "en" : {
@@ -292,10 +288,6 @@
           }
         }
       }
-    },
-    "Name: %@" : {
-      "comment" : "In \"Some View\", delete later",
-      "shouldTranslate" : false
     },
     "OK" : {
       "comment" : "OK button",

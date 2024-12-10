@@ -9,7 +9,7 @@ import CommonsTestShared
 final class MimeTypeResolverTests {
 
     private var mockMimeTypeCache: MockMimeTypeCacheProtocol!
-    private var resolver: MimeTypeResolver!
+    private var resolver: MimeTypeResolverProtocol!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
