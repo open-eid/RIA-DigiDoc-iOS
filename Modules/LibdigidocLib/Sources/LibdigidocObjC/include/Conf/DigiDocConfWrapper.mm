@@ -3,45 +3,62 @@
 #import <digidocpp/Container.h>
 #import "digidocpp/Exception.h"
 #import "DigiDocConfWrapper.h"
+#import "../Model/DigiDocConfig.h"
 #import "Exception/DigiDocExceptionWrapper.h"
 #import "Exception/Util/ExceptionUtil.h"
 
-class DigiDocConfWrapperImpl : public digidoc::ConfCurrent {
+class DigiDocConfCurrent: public digidoc::ConfCurrent {
+
+private:
+    DigiDocConfig *currentConf;
+
 public:
-    DigiDocConfWrapperImpl() : logsLevel(2) {}
-    ~DigiDocConfWrapperImpl() override = default;
+    DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
+    ~DigiDocConfCurrent() override = default;
 
-    int logLevel() const override {
-        return logsLevel;
+    int logLevel() const final {
+        return currentConf.logLevel;
+    }
+    
+    std::string logFile() const override {
+        return [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/libdigidocpp.log"].UTF8String;
     }
 
-    void setLogLevel(int level) {
-        logsLevel = level;
+    std::string TSLCache() const override {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSString *libraryDirectory = paths[0];
+        [NSFileManager.defaultManager createFileAtPath:[libraryDirectory stringByAppendingPathComponent:@"EE_T.xml"] contents:nil attributes:nil];
+        return libraryDirectory.UTF8String;
     }
 
-    static void initConf(digidoc::Conf* conf) {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                try {
-                    digidoc::Conf::init(conf);
-                    digidoc::initialize("RIA DigiDoc 3.0", "RIA DigiDoc");
-                } catch(const digidoc::Exception &e) {
-                    std::vector<digidoc::Exception> causes = e.causes();
-                    @throw [[DigiDocExceptionWrapper alloc] init:
-                                [[DigiDocException alloc] init:[NSString stringWithUTF8String:e.msg().c_str()] code:static_cast<NSInteger>(e.code()) causes:[ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]]
-                    ];
-                }
-            });
+    static Conf* instance() {
+        return digidoc::Conf::instance();
+    }
+};
+
+class DigiDocConfWrapperImpl {
+public:
+    DigiDocConfWrapperImpl() {}
+
+    static void initConf(DigiDocConfig *conf) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            try {
+                DigiDocConfCurrent *currentConf = new DigiDocConfCurrent(conf);
+                digidoc::Conf::init(currentConf);
+                digidoc::initialize("RIA DigiDoc 3.0", "RIA DigiDoc");
+            } catch(const digidoc::Exception &e) {
+                std::vector<digidoc::Exception> causes = e.causes();
+                @throw [[DigiDocExceptionWrapper alloc] init:
+                            [[DigiDocException alloc] init:[NSString stringWithUTF8String:e.msg().c_str()] code:static_cast<NSInteger>(e.code()) causes:[ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]]
+                ];
+            }
         });
     }
 
     static DigiDocConfWrapperImpl* instance() {
-        return static_cast<DigiDocConfWrapperImpl*>(digidoc::Conf::instance());
+        static DigiDocConfWrapperImpl instance;
+        return &instance;
     }
-
-private:
-    int logsLevel;
 };
 
 @implementation DigiDocConfWrapper {
@@ -56,20 +73,12 @@ private:
     return self;
 }
 
-- (void)setLogLevel:(int)level {
-    _impl->setLogLevel(level);
-}
-
-- (int)logLevel {
-    return _impl->logLevel();
-}
-
-- (void)initWithConf:(void (^)(BOOL success, NSError * _Nullable error))completion {
+- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *digidocException = nil;
         if (self) {
             @try {
-                DigiDocConfWrapperImpl::initConf(self->_impl);
+                DigiDocConfWrapperImpl::initConf(conf);
             } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
                 digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{@"message":exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
             }
@@ -87,10 +96,10 @@ private:
     static DigiDocConfWrapper *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        DigiDocConfWrapperImpl* instanceImpl = DigiDocConfWrapperImpl::instance();
+        digidoc::Conf* instanceImpl = DigiDocConfCurrent::instance();
         if (instanceImpl) {
             sharedInstance = [[DigiDocConfWrapper alloc] init];
-            sharedInstance->_impl = instanceImpl;
+            sharedInstance->_impl = DigiDocConfWrapperImpl::instance();
         }
     });
     return sharedInstance;
