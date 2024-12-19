@@ -44,3 +44,15 @@ output = "RIADigiDocTests/Mocks/Generated/GeneratedMocks+RIADigiDoc.swift"
 [modules.RIADigiDoc.options]
 glob = true
 keepDocumentation = false
+
+[modules.FileImportShareExtension]
+imports = ["Foundation", "Cuckoo", "UtilsLib", "CommonsLib", "Alamofire"]
+testableImports = ["FileImportShareExtension"]
+sources = [
+    "Extensions/FileImportShareExtension/**/*.swift",
+]
+output = "Extensions/FileImportShareExtensionTests/Mocks/Generated/GeneratedMocks+FileImportShareExtension.swift"
+
+[modules.FileImportShareExtension.options]
+glob = true
+keepDocumentation = false

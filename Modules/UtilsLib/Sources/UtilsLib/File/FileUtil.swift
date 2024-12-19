@@ -2,6 +2,7 @@ import Foundation
 import OSLog
 import System
 import ZIPFoundation
+import CommonsLib
 
 public struct FileUtil: FileUtilProtocol {
 
@@ -14,7 +15,7 @@ public struct FileUtil: FileUtilProtocol {
         let archive = try Archive(url: zipFileURL, accessMode: .read)
 
         if let entry = archive.first(where: { $0.path.contains(fileNameToFind) }) {
-            let extractedFile = try await Directories.getTempDirectory(subfolder: "tempfiles").validURL()
+            let extractedFile = try await Directories.getTempDirectory(subfolder: Constants.Folder.Temp).validURL()
                 .appendingPathComponent(entry.path)
             let fileManager = FileManager.default
 

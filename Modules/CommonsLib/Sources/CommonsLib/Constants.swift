@@ -28,4 +28,9 @@ public struct Constants {
         public static let Group = "group.ee.ria.digidoc.ios"
         public static let GroupDownload = "group.ee.ria.digidoc.ios.download"
     }
+
+    public struct Folder {
+        public static let Temp = "tempfiles"
+        public static let Shared = "shareddownloads"
+    }
 }

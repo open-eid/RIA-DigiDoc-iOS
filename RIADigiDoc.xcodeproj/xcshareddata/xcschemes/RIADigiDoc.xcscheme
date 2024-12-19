@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1610"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -38,6 +38,17 @@
                BlueprintIdentifier = "DFDB14952CC97B1000153876"
                BuildableName = "RIADigiDocUITests.xctest"
                BlueprintName = "RIADigiDocUITests"
+               ReferencedContainer = "container:RIADigiDoc.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DFCE022A2D148B4D00216362"
+               BuildableName = "FileImportShareExtensionTests.xctest"
+               BlueprintName = "FileImportShareExtensionTests"
                ReferencedContainer = "container:RIADigiDoc.xcodeproj">
             </BuildableReference>
          </TestableReference>

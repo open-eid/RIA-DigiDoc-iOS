@@ -3,9 +3,10 @@ import OSLog
 import UniformTypeIdentifiers
 import CommonsLib
 import UtilsLib
+import Alamofire
 
 @MainActor
-class ShareViewModel: ObservableObject {
+class ShareViewModel: NSObject, ObservableObject {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.FileImportShareExtension",
         category: "ShareViewController"
@@ -16,7 +17,10 @@ class ShareViewModel: ObservableObject {
     @discardableResult
     func importFiles(extensionContext: NSExtensionContext?) async -> Bool {
         ShareViewModel.logger.debug("Importing files...")
-        guard let items = extensionContext?.inputItems as? [NSExtensionItem] else { return false }
+        guard let items = extensionContext?.inputItems as? [NSExtensionItem], !items.isEmpty else {
+            status = .failed
+            return false
+        }
         do {
             let isImported = try await cacheItem(itemIndex: 0, providerIndex: 0, items: items)
             if isImported {
@@ -77,37 +81,34 @@ class ShareViewModel: ObservableObject {
                         .resume(
                             throwing: FileImportError.loadError(description: error.localizedDescription)
                         )
-                } else {
-                    if let item = item {
-                        if let itemData = item as? Data {
-                            DispatchQueue.main.async {
-                                do {
-                                    let convertedDataToUrl = try self.convertNSDataToURL(data: itemData)
-                                    guard let dataToUrl = convertedDataToUrl else { continuation.resume(
-                                        throwing: FileImportError.dataConversionFailed
-                                    )
-                                        return
-                                    }
-                                    continuation.resume(returning: dataToUrl)
-                                    return
-                                } catch {
-                                    continuation.resume(throwing: FileImportError.dataConversionFailed)
-                                    return
-                                }
+                } else if item != nil {
+                    if let itemData = item as? Data {
+                        Task {
+                            do {
+                                let dataToUrl = try await self.convertNSDataToURL(data: itemData)
+                                continuation.resume(returning: dataToUrl)
+                                return
+                            } catch {
+                                continuation.resume(throwing: FileImportError.dataConversionFailed)
+                                return
                             }
                         }
-                        if let itemUrl = item as? NSURL {
-                            continuation.resume(returning: itemUrl as URL)
-                            return
-                        }
+                    } else if let itemUrl = item as? URL {
+                        continuation.resume(returning: itemUrl)
+                        return
+                    } else {
+                        continuation.resume(throwing: FileImportError.invalidItemData)
+                        return
                     }
+                } else {
                     continuation.resume(throwing: FileImportError.invalidItemData)
+                    return
                 }
             }
         }
     }
 
-    func convertNSDataToURL(data: Data) throws -> URL? {
+    func convertNSDataToURL(data: Data) throws -> URL {
         let tempDirectoryURL = FileManager.default.temporaryDirectory
         let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
 
@@ -118,6 +119,10 @@ class ShareViewModel: ObservableObject {
     func cacheFileOnUrl(_ itemUrl: URL) async -> Bool {
         if itemUrl.scheme == "file" {
             do {
+                if try !itemUrl.checkResourceIsReachable() {
+                    throw URLError(.cannotOpenFile)
+                }
+
                 let groupTempFolderUrl = try Directories.getSharedFolder()
 
                 let filePath = groupTempFolderUrl.appendingPathComponent(itemUrl.lastPathComponent)
@@ -166,25 +171,48 @@ class ShareViewModel: ObservableObject {
             } catch {
                 ShareViewModel.logger.error("Unable to cache file: \(error.localizedDescription)")
             }
-        } else {
+        } else if itemUrl.isValidURL() {
             return await downloadFileFromUrl(itemUrl)
         }
+
         return false
     }
 
     func downloadFileFromUrl(_ itemUrl: URL) async -> Bool {
-        let sessionConfig = URLSessionConfiguration.background(withIdentifier: Constants.Identifier.GroupDownload)
-        sessionConfig.sharedContainerIdentifier = Constants.Identifier.Group
+        ShareViewModel.logger.debug("Downloading file from \(itemUrl.absoluteString)")
 
-        ShareViewModel.logger.debug("Downloading file from \(itemUrl.path)")
-
-        let session = URLSession(configuration: sessionConfig)
         do {
-            let (location, _) = try await session.download(from: itemUrl)
+            let destinationURL = try Directories.getTempDirectory(
+                subfolder: Constants.Folder.Shared
+            ).appendingPathComponent(
+                itemUrl.lastPathComponent
+            )
 
-            return await cacheFileOnUrl(location)
-        } catch {
-            ShareViewModel.logger.error("Unable to download file: \(error.localizedDescription)")
+            let destination: DownloadRequest.Destination = { _, _ in
+                return (destinationURL, [.createIntermediateDirectories, .removePreviousFile])
+            }
+
+            let request = AF.download(itemUrl, to: destination)
+
+            Task {
+                for await progress in request.downloadProgress() {
+                    let fileName = itemUrl.lastPathComponent
+                    let downloadProgress = progress.fractionCompleted * 100
+                    ShareViewModel.logger.debug(
+                        "\(String(format: "Download progress for file '%@': %.2f%%", fileName, downloadProgress))"
+                    )
+                }
+            }
+
+            let downloadTask = request.serializingDownloadedFileURL()
+
+            let fileURL = try await downloadTask.value
+            return await cacheFileOnUrl(fileURL)
+        } catch let error {
+            let errorDescription = error.localizedDescription
+            ShareViewModel.logger.error(
+                "\(String(format: "Unable to download file %@: %@", itemUrl.absoluteString, errorDescription))"
+            )
             return false
         }
     }
