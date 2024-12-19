@@ -14,7 +14,7 @@ extension FileOpeningError: LocalizedError {
         case .unableToRetrieveFileSize, .invalidFileSize:
             return NSLocalizedString("Invalid file size", comment: "")
         case .emptyFile, .noDataFiles:
-            return NSLocalizedString("General error", comment: "")
+            return NSLocalizedString("Could not load selected files", comment: "")
         }
     }
 }

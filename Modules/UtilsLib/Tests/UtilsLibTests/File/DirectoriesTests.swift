@@ -12,12 +12,12 @@ final class DirectoriesTests {
     }
 
     @Test
-    func getTempDirectoryURL_createDirectory() throws {
+    func getTempDirectory_createDirectory() throws {
         let fileManager = FileManager.default
         let subfolder = "testSubfolder"
         let expectedURL = TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
 
-        let resultURL = try Directories.getTempDirectoryURL(subfolder: subfolder)
+        let resultURL = try Directories.getTempDirectory(subfolder: subfolder)
 
         #expect(resultURL == expectedURL)
         #expect(fileManager.fileExists(atPath: resultURL.path))
@@ -26,14 +26,14 @@ final class DirectoriesTests {
     }
 
     @Test
-    func getTempDirectoryURL_doesntCreateDirectoryWhenExists() throws {
+    func getTempDirectory_doesntCreateDirectoryWhenExists() throws {
         let fileManager = FileManager.default
         let subfolder = "existingTestSubfolder"
         let existingDirectory = TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
 
         try fileManager.createDirectory(at: existingDirectory, withIntermediateDirectories: true, attributes: nil)
 
-        let resultURL = try Directories.getTempDirectoryURL(subfolder: subfolder)
+        let resultURL = try Directories.getTempDirectory(subfolder: subfolder)
 
         #expect(resultURL == existingDirectory)
         #expect(fileManager.fileExists(atPath: resultURL.path))

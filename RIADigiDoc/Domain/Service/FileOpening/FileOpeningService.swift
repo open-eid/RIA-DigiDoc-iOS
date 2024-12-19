@@ -1,8 +1,19 @@
 import Foundation
 import LibdigidocLibSwift
 import CommonsLib
+import UtilsLib
 
 actor FileOpeningService: FileOpeningServiceProtocol {
+
+    private let fileUtil: FileUtilProtocol
+
+    @MainActor
+    init(
+        fileUtil: FileUtilProtocol? = nil
+    ) {
+        self.fileUtil = fileUtil ?? UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)
+    }
+
     func isFileSizeValid(url: URL) async throws -> Bool {
         let resources = try url.resourceValues(forKeys: [.fileSizeKey])
 
@@ -13,15 +24,36 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         return true
     }
 
-    func getValidFiles(_ result: Result<[URL], Error>) async throws -> [URL] {
+    @MainActor
+    func getValidFiles(
+        _ result: Result<[URL], Error>
+    ) async throws -> [URL] {
         switch result {
         case .success(let urls):
             var validFiles: [URL] = []
 
-            for url in urls where url.startAccessingSecurityScopedResource() {
-                defer { url.stopAccessingSecurityScopedResource() }
-                if try await isFileSizeValid(url: url) {
-                    validFiles.append(try cacheFile(from: url))
+            for url in urls {
+                let validUrl = try url.validURL()
+                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl)
+                let requiresScopedAccess = try validFileUrl == nil && !fileUtil.isFileFromAppGroup(
+                    url: validUrl,
+                    appGroupURL: nil
+                )
+
+                if requiresScopedAccess {
+                    guard validUrl.startAccessingSecurityScopedResource() else {
+                        continue
+                    }
+                }
+
+                defer {
+                    if requiresScopedAccess {
+                        validUrl.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                if try await isFileSizeValid(url: validUrl) {
+                    await validFiles.append(try cacheFile(from: validUrl))
                 }
             }
 

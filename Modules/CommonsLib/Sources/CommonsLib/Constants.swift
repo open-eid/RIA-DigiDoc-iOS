@@ -23,4 +23,9 @@ public struct Constants {
         public static let Pdf = "pdf"
         public static let Default = "asice"
     }
+
+    public struct Identifier {
+        public static let Group = "group.ee.ria.digidoc.ios"
+        public static let GroupDownload = "group.ee.ria.digidoc.ios.download"
+    }
 }
