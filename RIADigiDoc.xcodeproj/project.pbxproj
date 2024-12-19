@@ -16,6 +16,12 @@
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
 		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
 		DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF9B53972CF7B01B00971F2A /* UtilsLib */; };
+		DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE3E2D1495EC001D951B /* CommonsLib */; };
+		DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE402D1495EE001D951B /* UtilsLib */; };
+		DFA3EE552D149B2B001D951B /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE542D149B2B001D951B /* Cuckoo */; };
+		DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5A2D14C4C2001D951B /* Alamofire */; };
+		DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
+		DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE6C2D15113A001D951B /* CommonsTestShared */; };
 		DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F12B2CF020C200185A7F /* CommonsLib */; };
 		DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F1302CF0217C00185A7F /* CommonsLib */; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
@@ -29,6 +35,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = DF4E43C02D0BA38600967997;
 			remoteInfo = FileImportShareExtension;
+		};
+		DFCE022F2D148B4D00216362 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFDB14732CC97B0E00153876 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DFDB147A2CC97B0E00153876;
+			remoteInfo = RIADigiDoc;
 		};
 		DFDB148D2CC97B1000153876 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -76,6 +89,8 @@
 		DF3E4A872CE2C5B500137235 /* LibdigidocLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LibdigidocLib; sourceTree = "<group>"; };
 		DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FileImportShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
+		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
+		DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileImportShareExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RIADigiDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,19 +119,19 @@
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
 		};
-		DF4E43D02D0BA38600967997 /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
-		};
 		DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Supporting files/Localizable.xcstrings",
 				Util/LanguageSettings.swift,
 				Util/LanguageSettingsProtocol.swift,
+			);
+			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
+		};
+		DF88987A2D1492B500A805CA /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
 			);
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 		};
@@ -127,15 +142,42 @@
 			);
 			target = DFDB147A2CC97B0E00153876 /* RIADigiDoc */;
 		};
+		DFA3EE362D14950A001D951B /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtensionTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Error/FileImportError.swift,
+				Model/Status.swift,
+				UI/ShareView.swift,
+				UI/ShareViewController.swift,
+				ViewModel/ShareViewModel.swift,
+			);
+			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;
+		};
+		DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Util/LanguageSettings.swift,
+				Util/LanguageSettingsProtocol.swift,
+			);
+			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DF4E43C22D0BA38600967997 /* FileImportShareExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				DF4E43D02D0BA38600967997 /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtension" target */,
+				DF88987A2D1492B500A805CA /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtension" target */,
+				DFA3EE362D14950A001D951B /* Exceptions for "FileImportShareExtension" folder in "FileImportShareExtensionTests" target */,
 			);
-			path = FileImportShareExtension;
+			name = FileImportShareExtension;
+			path = Extensions/FileImportShareExtension;
+			sourceTree = "<group>";
+		};
+		DFCE022C2D148B4D00216362 /* FileImportShareExtensionTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = FileImportShareExtensionTests;
+			path = Extensions/FileImportShareExtensionTests;
 			sourceTree = "<group>";
 		};
 		DFDB147D2CC97B0E00153876 /* RIADigiDoc */ = {
@@ -144,6 +186,7 @@
 				DF8EA12C2CC98A02004B09AA /* Exceptions for "RIADigiDoc" folder in "RIADigiDoc" target */,
 				DF1DE0582CCB18790068283D /* Exceptions for "RIADigiDoc" folder in "RIADigiDocTests" target */,
 				DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */,
+				DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */,
 			);
 			path = RIADigiDoc;
 			sourceTree = "<group>";
@@ -165,8 +208,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */,
 				DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */,
 				DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFCE02282D148B4D00216362 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */,
+				DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */,
+				DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */,
+				DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */,
+				DFA3EE552D149B2B001D951B /* Cuckoo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +280,7 @@
 		DFD24C382CD1B718004C1D2E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DFA3EE432D14962C001D951B /* FileImportShareExtension */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -236,6 +293,7 @@
 				DFDB14992CC97B1000153876 /* RIADigiDocUITests */,
 				DFA16AFE2CD18BD00099D34F /* Modules */,
 				DF4E43C22D0BA38600967997 /* FileImportShareExtension */,
+				DFCE022C2D148B4D00216362 /* FileImportShareExtensionTests */,
 				DFD24C382CD1B718004C1D2E /* Frameworks */,
 				DFDB147C2CC97B0E00153876 /* Products */,
 			);
@@ -248,6 +306,7 @@
 				DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */,
 				DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */,
 				DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */,
+				DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -274,10 +333,39 @@
 			packageProductDependencies = (
 				DF4E6D812D11DE7B00F6111A /* CommonsLib */,
 				DF4E6D832D120CFC00F6111A /* UtilsLib */,
+				DFA3EE5A2D14C4C2001D951B /* Alamofire */,
 			);
 			productName = FileImportShareExtension;
 			productReference = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DFCE02332D148B4D00216362 /* Build configuration list for PBXNativeTarget "FileImportShareExtensionTests" */;
+			buildPhases = (
+				DFCE02272D148B4D00216362 /* Sources */,
+				DFCE02282D148B4D00216362 /* Frameworks */,
+				DFCE02292D148B4D00216362 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DFCE02302D148B4D00216362 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DFCE022C2D148B4D00216362 /* FileImportShareExtensionTests */,
+			);
+			name = FileImportShareExtensionTests;
+			packageProductDependencies = (
+				DFA3EE3E2D1495EC001D951B /* CommonsLib */,
+				DFA3EE402D1495EE001D951B /* UtilsLib */,
+				DFA3EE542D149B2B001D951B /* Cuckoo */,
+				DFA3EE5C2D14C9B7001D951B /* Alamofire */,
+				DFA3EE6C2D15113A001D951B /* CommonsTestShared */,
+			);
+			productName = FileImportShareExtensionTest;
+			productReference = DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		DFDB147A2CC97B0E00153876 /* RIADigiDoc */ = {
 			isa = PBXNativeTarget;
@@ -370,11 +458,15 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1610;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
 					DF4E43C02D0BA38600967997 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					DFCE022A2D148B4D00216362 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = DFDB147A2CC97B0E00153876;
 					};
 					DFDB147A2CC97B0E00153876 = {
 						CreatedOnToolsVersion = 16.0;
@@ -405,6 +497,7 @@
 				DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */,
 				DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */,
 				DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */,
+				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -421,12 +514,20 @@
 				DFDB148B2CC97B1000153876 /* RIADigiDocTests */,
 				DFDB14952CC97B1000153876 /* RIADigiDocUITests */,
 				DF4E43C02D0BA38600967997 /* FileImportShareExtension */,
+				DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DF4E43BF2D0BA38600967997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFCE02292D148B4D00216362 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -487,6 +588,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DFCE02272D148B4D00216362 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DFDB14772CC97B0E00153876 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -520,6 +628,11 @@
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 			targetProxy = DF4E43C92D0BA38600967997 /* PBXContainerItemProxy */;
 		};
+		DFCE02302D148B4D00216362 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DFDB147A2CC97B0E00153876 /* RIADigiDoc */;
+			targetProxy = DFCE022F2D148B4D00216362 /* PBXContainerItemProxy */;
+		};
 		DFDB148E2CC97B1000153876 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DFDB147A2CC97B0E00153876 /* RIADigiDoc */;
@@ -536,13 +649,13 @@
 		DF4E43CD2D0BA38600967997 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FileImportShareExtension/FileImportShareExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Extensions/FileImportShareExtension/FileImportShareExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FileImportShareExtension/Info.plist;
+				INFOPLIST_FILE = Extensions/FileImportShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Import to RIA DigiDoc";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -566,13 +679,13 @@
 		DF4E43CE2D0BA38600967997 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = FileImportShareExtension/FileImportShareExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Extensions/FileImportShareExtension/FileImportShareExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = FileImportShareExtension/Info.plist;
+				INFOPLIST_FILE = Extensions/FileImportShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Import to RIA DigiDoc";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -594,11 +707,61 @@
 			};
 			name = Release;
 		};
+		DFCE02312D148B4D00216362 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Extensions/FileImportShareExtension/**",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc.FileImportShareExtensionTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
+			};
+			name = Debug;
+		};
+		DFCE02322D148B4D00216362 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Extensions/FileImportShareExtension/**",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc.FileImportShareExtensionTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_INTEROP_MODE = objc;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		DFDB149E2CC97B1000153876 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -664,6 +827,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -932,6 +1096,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		DFCE02332D148B4D00216362 /* Build configuration list for PBXNativeTarget "FileImportShareExtensionTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DFCE02312D148B4D00216362 /* Debug */,
+				DFCE02322D148B4D00216362 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DFDB14762CC97B0E00153876 /* Build configuration list for PBXProject "RIADigiDoc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -984,6 +1157,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 2.9.1;
+			};
+		};
+		DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = exactVersion;
+				version = 5.10.2;
 			};
 		};
 		DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */ = {
@@ -1043,6 +1224,34 @@
 		DF9B53972CF7B01B00971F2A /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
+		};
+		DFA3EE3E2D1495EC001D951B /* CommonsLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsLib;
+		};
+		DFA3EE402D1495EE001D951B /* UtilsLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UtilsLib;
+		};
+		DFA3EE542D149B2B001D951B /* Cuckoo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
+			productName = Cuckoo;
+		};
+		DFA3EE5A2D14C4C2001D951B /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DFA3EE5C2D14C9B7001D951B /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DFA3EE6C2D15113A001D951B /* CommonsTestShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
+			productName = CommonsTestShared;
 		};
 		DFB1F12B2CF020C200185A7F /* CommonsLib */ = {
 			isa = XCSwiftPackageProductDependency;

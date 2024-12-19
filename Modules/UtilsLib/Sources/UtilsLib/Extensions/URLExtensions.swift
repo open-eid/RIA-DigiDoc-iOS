@@ -192,6 +192,22 @@ extension URL {
         throw URLError(.badURL)
     }
 
+    public func isValidURL() -> Bool {
+        do {
+            let detector = try NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+
+            let matches = detector.matches(
+                in: self.absoluteString,
+                options: [],
+                range: NSRange(location: 0, length: self.absoluteString.utf16.count)
+            )
+
+            return matches.count > 0
+        } catch {
+            return false
+        }
+    }
+
     func isFolder() -> Bool {
         var isDirectory: ObjCBool = false
         let exists = FileManager.default.fileExists(atPath: self.path, isDirectory: &isDirectory)

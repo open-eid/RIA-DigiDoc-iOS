@@ -172,6 +172,153 @@ final class URLExtensionsTests {
         #expect("" == md5Hash)
     }
 
+    @Test
+    func validURL_returnValidURL() throws {
+        let fileUtilMock = MockFileUtilProtocol()
+
+        let nonExistentFileLocation = URL(fileURLWithPath: "/path/to/valid/file.txt")
+
+        stub(fileUtilMock) { fileUtil in
+            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nonExistentFileLocation)
+        }
+
+        let result = try nonExistentFileLocation.validURL(fileUtil: fileUtilMock)
+
+        #expect(nonExistentFileLocation == result)
+    }
+
+    @Test
+    func validURL_returnSameURLWhenFileFromAppGroup() throws {
+        let fileUtilMock = MockFileUtilProtocol()
+
+        stub(fileUtilMock) { fileUtil in
+            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
+        }
+
+        do {
+            let fileURL = try Directories.getSharedFolder().appendingPathComponent("testfolder").appendingPathComponent(
+                "testFile.txt"
+            )
+
+            let testURL = URL(fileURLWithPath: fileURL.path)
+
+            let result = try testURL.validURL(fileUtil: fileUtilMock)
+
+            #expect(testURL == result)
+        } catch {
+            Issue.record("Could not get shared folder")
+            return
+        }
+    }
+
+    @Test
+    func validURL_returnURLWhenFileFromiCloudDownloaded() throws {
+        let fileUtilMock = MockFileUtilProtocol()
+        stub(fileUtilMock) { fileUtil in
+            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
+            when(fileUtil.isFileFromiCloud(fileURL: any(URL.self))).thenReturn(true)
+            when(fileUtil.isFileDownloadedFromiCloud(fileURL: any(URL.self))).thenReturn(true)
+        }
+
+        let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
+
+        let result = try testURL.validURL(fileUtil: fileUtilMock)
+
+        #expect(testURL == result)
+    }
+
+    @Test
+    func validURL_throwErrorWhenInvalidURL() throws {
+
+        let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
+
+        let fileUtilMock = MockFileUtilProtocol()
+        stub(fileUtilMock) { fileUtil in
+            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
+            when(fileUtil.isFileFromiCloud(fileURL: any(URL.self))).thenReturn(false)
+        }
+
+        do {
+            _ = try testURL.validURL(fileUtil: fileUtilMock)
+            Issue.record("Expected .badURL error")
+            return
+        } catch let error as URLError {
+            #expect(error.code == .badURL)
+        } catch {
+            Issue.record("Expected .badURL error")
+            return
+        }
+    }
+
+    @Test
+    func isFolder_returnTrueWhenPathIsDirectory() throws {
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "TestFolder")
+        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+
+        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
+
+        defer {
+            try? FileManager.default.removeItem(at: testFileURL)
+        }
+
+        let result = tempDirectoryURL.isFolder()
+
+        #expect(result)
+    }
+
+    @Test
+    func isFolder_returnFalseWhenPathIsFile() throws {
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "TestFolder")
+        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+
+        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
+
+        defer {
+            try? FileManager.default.removeItem(at: testFileURL)
+        }
+
+        let result = testFileURL.isFolder()
+
+        #expect(!result)
+    }
+
+    @Test
+    func folderContents_returnContentsWhenValidFolder() throws {
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: UUID().uuidString)
+        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+
+        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
+
+        defer {
+            try? FileManager.default.removeItem(at: testFileURL)
+        }
+
+        let result = try tempDirectoryURL.folderContents()
+
+        #expect(1 == result.count)
+        #expect(testFileURL == result.first)
+    }
+
+    @Test
+    func folderContents_returnEmptyWhenNotFolder() throws {
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: UUID().uuidString)
+        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+
+        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
+
+        defer {
+            try? FileManager.default.removeItem(at: testFileURL)
+        }
+
+        let result = try testFileURL.folderContents()
+
+        #expect(result.isEmpty)
+    }
+
     private func createTestPDF(at url: URL) -> URL {
         var pageSize = CGRect(x: 0, y: 0, width: 100, height: 100)
 
