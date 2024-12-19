@@ -102,10 +102,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     @MainActor
     private func addDataFile(dataFile: URL) async throws -> Bool {
         let lock = NSLock()
+        let mimetype = await dataFile.mimeType()
         return try await withCheckedThrowingContinuation { continuation in
             digiDocContainerWrapper.addDataFile(
                 dataFile.path,
-                mimetype: dataFile.mimeType()) { success, error in
+                mimetype: mimetype) { success, error in
                     lock.lock()
                     defer { lock.unlock() }
                     if let error = error as NSError? {

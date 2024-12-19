@@ -16,7 +16,7 @@ final class URLExtensionsTests {
     }
 
     @Test
-    func mimetype_successWithRegularFile() {
+    func mimetype_successWithRegularFile() async {
         let tempFileURL = TestFileUtil.createSampleFile()
 
         defer {
@@ -25,13 +25,13 @@ final class URLExtensionsTests {
 
         let mockFileUtil = MockFileUtilProtocol()
 
-        let mimetype = tempFileURL.mimeType(fileUtil: mockFileUtil)
+        let mimetype = await tempFileURL.mimeType(fileUtil: mockFileUtil)
 
         #expect("text/plain" == mimetype)
     }
 
     @Test
-    func mimetype_successWithZipFileExtensionWhenMimeTypeNotAvailable() {
+    func mimetype_successWithZipFileExtensionWhenMimeTypeNotAvailable() async {
 
         let mockContainer = try? TestContainerUtil.createMockContainer(
             with: ["testfile.txt": "Test content"],
@@ -44,13 +44,13 @@ final class URLExtensionsTests {
                 .thenThrow(Archive.ArchiveError.unreadableArchive)
         }
 
-        let mimetype = mockContainer?.mimeType(fileUtil: mockFileUtil)
+        let mimetype = await mockContainer?.mimeType(fileUtil: mockFileUtil)
 
         #expect("application/zip" == mimetype)
     }
 
     @Test
-    func isPDF_success() {
+    func isPDF_success() async {
         let tempFileURL = TestFileUtil.getTemporaryDirectory(
             subfolder: "URLExtensionsTests"
         ).appendingPathComponent(
@@ -59,7 +59,7 @@ final class URLExtensionsTests {
 
         let pdfURL = createTestPDF(at: tempFileURL)
 
-        let isPDF = pdfURL.isPDF()
+        let isPDF = await pdfURL.isPDF()
         let isSignedPDF = pdfURL.isSignedPDF()
         #expect(isPDF)
         #expect(!isSignedPDF)
@@ -68,21 +68,21 @@ final class URLExtensionsTests {
     }
 
     @Test
-    func isContainer_returnFalseForRegularFile() {
+    func isContainer_returnFalseForRegularFile() async {
         let nonexistentFileURL = URL(fileURLWithPath: "/path/to/file.txt")
 
-        let isContainer = nonexistentFileURL.isContainer()
+        let isContainer = await nonexistentFileURL.isContainer()
 
         #expect(!isContainer)
     }
 
     @Test
-    func isContainer_successWithContainerFile() {
+    func isContainer_successWithContainerFile() async {
         let mockContainer = try? TestContainerUtil.createMockContainer(
             with: ["mimetype": Constants.MimeType.Asice],
             containerExtension: "asice")
 
-        let isContainer = mockContainer?.isContainer() ?? false
+        let isContainer = await mockContainer?.isContainer() ?? false
 
         #expect(isContainer)
     }

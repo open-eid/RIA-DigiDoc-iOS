@@ -27,7 +27,7 @@ final class FileUtilTests {
     }
 
     @Test
-    func getMimeTypeFromZipFile_returnCorrectMimeType() throws {
+    func getMimeTypeFromZipFile_returnCorrectMimeType() async throws {
         let asiceMimetype = CommonsLib.Constants.MimeType.Asice
         let zipFileURL = try TestContainerUtil.createMockContainer(
             with: ["mimetype": asiceMimetype],
@@ -35,7 +35,7 @@ final class FileUtilTests {
 
         let fileNameToFind = "mimetype"
 
-        let mimeType = try fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
+        let mimeType = try await fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
 
         #expect(asiceMimetype == mimeType)
 
@@ -43,14 +43,14 @@ final class FileUtilTests {
     }
 
     @Test
-    func getMimeTypeFromZipFile_returnNilWhenFileDoesNotExist() throws {
+    func getMimeTypeFromZipFile_returnNilWhenFileDoesNotExist() async throws {
         let zipFileURL = try TestContainerUtil.createMockContainer(
             with: [:],
             containerExtension: "zip")
 
         let fileNameToFind = "nonexistentfile.txt"
 
-        let mimeType = try fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
+        let mimeType = try await fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
 
         #expect(mimeType == nil)
 

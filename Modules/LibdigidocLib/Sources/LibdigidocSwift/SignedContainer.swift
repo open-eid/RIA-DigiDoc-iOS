@@ -50,7 +50,9 @@ extension SignedContainer {
             )
         }
 
-        let isFirstDataFileContainer = firstFile.isContainer() || (firstFile.isPDF() && firstFile.isSignedPDF())
+        let isFirstDataFilePDF = await firstFile.isPDF() && firstFile.isSignedPDF()
+
+        let isFirstDataFileContainer = await firstFile.isContainer() || isFirstDataFilePDF
         var containerFile: URL? = firstFile
 
         if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&

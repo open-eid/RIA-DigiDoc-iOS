@@ -2,6 +2,7 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct MainSignatureView: View {
+
     @EnvironmentObject var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: MainSignatureViewModel
@@ -9,10 +10,14 @@ struct MainSignatureView: View {
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToNextView = false
 
+    @Binding private var externalFiles: [URL]
+
     init(
-        viewModel: MainSignatureViewModel = AppAssembler.shared.resolve(MainSignatureViewModel.self)
+        viewModel: MainSignatureViewModel = AppAssembler.shared.resolve(MainSignatureViewModel.self),
+        externalFiles: Binding<[URL]>
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self._externalFiles = externalFiles
     }
 
     var body: some View {
@@ -40,9 +45,17 @@ struct MainSignatureView: View {
                 isActive: $isNavigatingToNextView
             ) {}
         }
+        .onChange(of: externalFiles) { extFiles in
+            if !extFiles.isEmpty {
+                isFileOpeningLoading = true
+                viewModel.isImporting = false
+                self.viewModel.setChosenFiles(.success(extFiles))
+                externalFiles = []
+            }
+        }
     }
 }
 
 #Preview {
-    MainSignatureView()
+    MainSignatureView(externalFiles: .constant([]))
 }

@@ -3,6 +3,7 @@ import CryptoKit
 import PDFKit
 import UniformTypeIdentifiers
 import OSLog
+import System
 import ZIPFoundation
 import CommonsLib
 
@@ -10,11 +11,11 @@ extension URL {
 
     @MainActor
     public func mimeType(fileUtil: FileUtilProtocol =
-                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) -> String {
+                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) async -> String {
         let defaultMimeType = Constants.MimeType.Default
 
         do {
-            if try isZipFile(), let mimetype = try fileUtil.getMimeTypeFromZipFile(
+            if try isZipFile(), let mimetype = try await fileUtil.getMimeTypeFromZipFile(
                 from: self,
                 fileNameToFind: "mimetype"
             ) {
@@ -34,8 +35,8 @@ extension URL {
     }
 
     @MainActor
-    public func isContainer() -> Bool {
-        let mimetype = mimeType()
+    public func isContainer() async -> Bool {
+        let mimetype = await mimeType()
 
         if Constants.MimeType.SignatureContainers.contains(mimetype) {
             return true
@@ -67,8 +68,8 @@ extension URL {
     }
 
     @MainActor
-    public func isPDF() -> Bool {
-        let mimeType = self.mimeType()
+    public func isPDF() async -> Bool {
+        let mimeType = await self.mimeType()
         return mimeType == Constants.MimeType.Pdf
     }
 
@@ -130,6 +131,81 @@ extension URL {
         }
 
         return false
+    }
+
+    @MainActor
+    public func validURL(fileUtil: FileUtilProtocol =
+                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) throws -> URL {
+        _ = self.startAccessingSecurityScopedResource()
+
+        defer {
+            self.stopAccessingSecurityScopedResource()
+        }
+        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self)
+
+        if let validFileURL = validFileInApp {
+            return validFileURL
+        }
+
+        // Check if file is opened externally (outside of application)
+        let appGroupURL = try Directories.getSharedFolder()
+        let resolvedAppGroupURL = appGroupURL.deletingLastPathComponent().resolvingSymlinksInPath()
+
+        let normalizedURL = FilePath(stringLiteral: self.resolvingSymlinksInPath().path).lexicallyNormalized()
+
+        let resolvedAppGroupFilePath = FilePath(
+            stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path
+        )
+
+        let isFromAppGroup = normalizedURL.starts(with: resolvedAppGroupFilePath)
+
+        if isFromAppGroup {
+            return self
+        }
+
+        // Check if file is opened from iCloud
+        if fileUtil.isFileFromiCloud(fileURL: self) {
+            if !fileUtil.isFileDownloadedFromiCloud(fileURL: self) {
+
+                var fileLocationURL: URL?
+
+                fileUtil.downloadFileFromiCloud(fileURL: self) { downloadedFileUrl in
+                    if let fileUrl = downloadedFileUrl {
+                        DispatchQueue.main.async {
+                            fileLocationURL = fileUrl
+                        }
+                    } else {
+                        return
+                    }
+                }
+
+                guard let fileLocation = fileLocationURL else {
+                    throw URLError(.badURL)
+                }
+
+                return fileLocation
+            } else {
+                return self
+            }
+        }
+
+        throw URLError(.badURL)
+    }
+
+    func isFolder() -> Bool {
+        var isDirectory: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: self.path, isDirectory: &isDirectory)
+        return exists && isDirectory.boolValue
+    }
+
+    func folderContents() throws -> [URL] {
+        let fileManager = FileManager.default
+
+        if isFolder() {
+            let fileURLs = try fileManager.contentsOfDirectory(at: self, includingPropertiesForKeys: nil)
+            return fileURLs
+        }
+        return []
     }
 
     // Check if file is zip format

@@ -94,6 +94,30 @@
         }
       }
     },
+    "Could not load selected files" : {
+      "comment" : "No files or when loading files is unsuccessful",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load selected files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failide laadimine ebaõnnestus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось загрузить выбранные файлы"
+          }
+        }
+      }
+    },
     "Error" : {
       "comment" : "Title for error alerts",
       "localizations" : {
@@ -189,11 +213,11 @@
       }
     },
     "Globe" : {
-      "comment" : "In \"Some View\", delete later",
+      "comment" : "In \"Content View\", delete later",
       "shouldTranslate" : false
     },
     "Hello, world!" : {
-      "comment" : "In \"Some View\", delete later",
+      "comment" : "In \"Content View\", delete later",
       "shouldTranslate" : false
     },
     "Invalid file size" : {
@@ -268,6 +292,7 @@
       }
     },
     "Logo" : {
+      "comment" : "Accessibility label for launch screen logo",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -308,6 +333,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Share Extension Import Completed" : {
+      "comment" : "Files shared from share extension successfully",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File is now cached for you. Go to RIA DigiDoc application to finish import"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail on ajutisse kausta salvestatud. Impordi lõpetamiseks mine RIA DigiDoc rakendusse."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл кэширован. Перейти к приложению RIA DigiDoc для завершения импорта"
+          }
+        }
+      }
+    },
+    "Share Extension Import Failed" : {
+      "comment" : "Files shared from share extension unsuccessfully",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to import file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili importimine ebaõnnestus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось импортировать файл"
+          }
+        }
+      }
+    },
+    "Share Extension Import Progress" : {
+      "comment" : "Files import in progress from share extension",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing files..."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laadin faile..."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импорт файлов..."
+          }
+        }
+      }
+    },
+    "Share Extension Import Title" : {
+      "comment" : "Title for files import from share extension",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili import"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импорт файла"
           }
         }
       }

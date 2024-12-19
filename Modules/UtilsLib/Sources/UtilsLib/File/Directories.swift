@@ -1,8 +1,8 @@
 import Foundation
 import CommonsLib
 
-struct Directories {
-    static func getTempDirectoryURL(subfolder: String) throws -> URL {
+public struct Directories {
+    public static func getTempDirectory(subfolder: String) throws -> URL {
         var tempDirectory: URL
         if #available(iOS 16.0, *) {
             tempDirectory = FileManager.default.temporaryDirectory
@@ -24,5 +24,29 @@ struct Directories {
         }
 
         return tempDirectory
+    }
+
+    public static func getSharedFolder(
+        appGroupIdentifier: String = Constants.Identifier.Group,
+        subfolder: String = "Temp"
+    ) throws -> URL {
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) else {
+            throw URLError(.fileDoesNotExist)
+        }
+
+        let sharedContainerSubfolder = sharedContainerURL.appendingPathComponent(subfolder)
+
+        if !FileManager.default.fileExists(atPath: sharedContainerSubfolder.path) {
+            try FileManager.default
+                .createDirectory(
+                    at: sharedContainerSubfolder,
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+        }
+
+        return sharedContainerSubfolder
     }
 }

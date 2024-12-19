@@ -65,6 +65,10 @@ class AppAssembler {
         container.register(LanguageSettingsProtocol.self) { _ in
             return LanguageSettings()
         }
+
+        container.register(ContentViewModel.self) { _ in
+            return ContentViewModel()
+        }.inObjectScope(.graph)
     }
 
     func resolve<T>(_: T.Type) -> T {

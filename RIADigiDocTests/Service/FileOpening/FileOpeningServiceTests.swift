@@ -8,7 +8,7 @@ final class FileOpeningServiceTests {
     private var service: FileOpeningServiceProtocol!
 
     init() async throws {
-        service = FileOpeningService()
+        service = await FileOpeningService()
     }
 
     deinit {

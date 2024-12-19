@@ -3,7 +3,11 @@ import Foundation
 final class LanguageSettings: LanguageSettingsProtocol, ObservableObject {
 
     var currentLanguage: String {
-        Locale.current.languageCode ?? "en"
+        if #available(iOS 16, *) {
+            Locale.current.language.languageCode?.identifier ?? "en"
+        } else {
+            Locale.current.languageCode ?? "en"
+        }
     }
 
     func localized(_ key: String) -> String {
