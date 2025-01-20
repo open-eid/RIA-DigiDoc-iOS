@@ -53,4 +53,24 @@ public struct Constants {
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
     }
+
+    public struct Configuration {
+        public static let CachedConfigJson = "active-config.json"
+        public static let CachedConfigPub = "active-config.pub"
+        public static let CachedConfigRsa = "active-config.rsa"
+        public static let CacheConfigFolder = "config"
+
+        public static let DefaultConfigJson = "\(CacheConfigFolder)/default-config.json"
+        public static let DefaultConfigPub = "\(CacheConfigFolder)/default-config.pub"
+        public static let DefaultConfigRsa = "\(CacheConfigFolder)/default-config.rsa"
+        public static let DefaultConfigurationPropertiesFileName = "\(CacheConfigFolder)/configuration"
+
+        public static let UpdateDatePropertyName = "configurationUpdateDate"
+        public static let LastUpdateCheckDatePropertyName = "lastUpdateCheckDate"
+        public static let VersionSerialPropertyName = "versionSerial"
+
+        public static let TslFilesFolder = "tslFiles"
+
+        public static let DefaultTimeout = 5.0
+    }
 }

@@ -2,6 +2,7 @@ import Foundation
 import OSLog
 import UtilsLib
 
+@MainActor
 class ContentViewModel: ObservableObject {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ContentViewModel")

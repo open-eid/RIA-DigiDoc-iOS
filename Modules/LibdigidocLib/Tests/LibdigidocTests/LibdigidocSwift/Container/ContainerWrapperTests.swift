@@ -4,6 +4,7 @@ import Cuckoo
 import CommonsLib
 import CommonsTestShared
 import LibdigidocLibObjC
+import ConfigLib
 import UtilsLib
 
 @testable import LibdigidocLibSwift
@@ -12,16 +13,20 @@ final class ContainerWrapperTests {
 
     private var container: ContainerWrapperProtocol = ContainerWrapper()
     private let tempFileURL: URL
+    private let configurationProvider: ConfigurationProvider
 
     init() async throws {
-        await LibDigidocAssembler.shared.initialize()
         await UtilsLibAssembler.shared.initialize()
+        await ConfigLibAssembler.shared.initialize()
+        await LibDigidocLibAssembler.shared.initialize()
 
         tempFileURL = TestFileUtil.createSampleFile()
 
+        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
+
         do {
-            try await DigiDocConf.initDigiDoc()
-            try await DigiDocConf.initDigiDoc()
+            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
+            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
         } catch let error as DigiDocError {
             switch error {
             case .alreadyInitialized:

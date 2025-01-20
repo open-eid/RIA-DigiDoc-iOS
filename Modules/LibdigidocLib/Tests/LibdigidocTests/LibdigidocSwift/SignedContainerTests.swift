@@ -4,20 +4,25 @@ import Cuckoo
 import CommonsTestShared
 import LibdigidocLibObjC
 import CommonsLib
+import ConfigLib
 import UtilsLib
 
 @testable import LibdigidocLibSwift
 
 final class SignedContainerTests {
 
+    private let configurationProvider: ConfigurationProvider
     private var signedContainer: SignedContainerProtocol!
 
     init() async throws {
-        await LibDigidocAssembler.shared.initialize()
         await UtilsLibAssembler.shared.initialize()
+        await ConfigLibAssembler.shared.initialize()
+        await LibDigidocLibAssembler.shared.initialize()
+
+        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
-            try await DigiDocConf.initDigiDoc()
+            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
         } catch let error as DigiDocError {
             switch error {
             case .alreadyInitialized:

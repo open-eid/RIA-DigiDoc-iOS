@@ -89,4 +89,57 @@ public struct Directories {
 
         return cacheDirectory
     }
+
+    public static func getLibraryDirectory() -> URL? {
+        let fileManager = FileManager.default
+        if let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first {
+            return libraryDirectory
+        }
+        return nil
+    }
+
+    public static func getConfigDirectory(from directory: URL? = nil) throws -> URL {
+        let baseDirectory = try directory ?? getCacheDirectory()
+        return baseDirectory.appendingPathComponent(
+            Constants.Configuration.CacheConfigFolder,
+            conformingTo: .folder
+        )
+    }
+
+    public static func getTslCacheDirectory() -> URL? {
+        return getLibraryDirectory()
+    }
+
+    public static func getLibdigidocLogFile(from directory: URL?) throws -> URL? {
+        let libdigidocppLogFile = "libdigidocpp.log"
+
+        if let mainDirectory = directory {
+            let primaryLogsDirectory = mainDirectory.appendingPathComponent("logs")
+
+            if !FileManager.default.fileExists(atPath: primaryLogsDirectory.path) {
+                try FileManager.default.createDirectory(
+                    at: primaryLogsDirectory,
+                    withIntermediateDirectories: true,
+                    attributes: nil
+                )
+                return primaryLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+            } else {
+                return primaryLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+            }
+        }
+
+        let cacheDirectory = try getCacheDirectory()
+        let fallbackLogsDirectory = cacheDirectory.appendingPathComponent("logs")
+
+        if !FileManager.default.fileExists(atPath: fallbackLogsDirectory.path) {
+            try FileManager.default.createDirectory(
+                at: fallbackLogsDirectory,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+        }
+
+        return fallbackLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+    }
+
 }

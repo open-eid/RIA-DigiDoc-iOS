@@ -1,7 +1,7 @@
 import Foundation
 import ZIPFoundation
 
-public class TestContainerUtil {
+public struct TestContainerUtil {
 
     public init() {}
 

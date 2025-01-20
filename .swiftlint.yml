@@ -16,4 +16,8 @@ line_length:
   - 120
   - 120
 
+function_body_length:
+  - 100
+  - 150
+
 reporter: "xcode"

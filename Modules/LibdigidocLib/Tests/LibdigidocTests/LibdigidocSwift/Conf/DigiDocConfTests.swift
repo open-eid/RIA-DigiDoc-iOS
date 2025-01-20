@@ -2,22 +2,29 @@ import Foundation
 import Testing
 import Cuckoo
 import LibdigidocLibObjC
+import ConfigLib
+import UtilsLib
 
 @testable import LibdigidocLibSwift
 
 final class DigiDocConfTests {
 
+    private let configurationProvider: ConfigurationProvider
+
     init() async throws {
-        await LibDigidocAssembler.shared.initialize()
+        await ConfigLibAssembler.shared.initialize()
+        await LibDigidocLibAssembler.shared.initialize()
+
+        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
     }
 
     @Test
     func initDigiDoc_successAndReInitialization() async {
         do {
-            try await DigiDocConf.initDigiDoc()
+            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
             #expect(true)
 
-            try await DigiDocConf.initDigiDoc()
+            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
 
             Issue.record("Expected DigiDocError.alreadyInitialized to be thrown")
             return
