@@ -57,9 +57,13 @@ extension SignedContainer {
 
         if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
             firstFile.pathExtension != CommonsLib.Constants.Extension.Default {
-            containerFile = firstFile
+            let uniqueContainerFile = firstFile
                 .deletingPathExtension()
                 .appendingPathExtension(CommonsLib.Constants.Extension.Default)
+            containerFile = ContainerUtil.getSignatureContainerFile(
+                for: uniqueContainerFile,
+                in: uniqueContainerFile.deletingLastPathComponent()
+            )
         }
 
         guard let containerFile else {
@@ -115,6 +119,10 @@ extension SignedContainer {
                 )
         }
 
-        return SignedContainer(containerFile: containerFile, isExistingContainer: false, container: createdContainer)
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: false,
+            container: createdContainer
+        )
     }
 }
