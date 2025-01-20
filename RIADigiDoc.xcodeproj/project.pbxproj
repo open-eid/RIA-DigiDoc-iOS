@@ -11,6 +11,9 @@
 		DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF17B6392CDD2996009B1E17 /* Swinject */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
+		DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922A2D285A1D00F2990A /* ConfigLib */; };
+		DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922C2D2C371200F2990A /* Alamofire */; };
+		DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4295B12D39D2F400415C71 /* ConfigLib */; };
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
@@ -89,6 +92,7 @@
 		DF3E4A862CE2C54600137235 /* CommonsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsLib; sourceTree = "<group>"; };
 		DF3E4A872CE2C5B500137235 /* LibdigidocLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LibdigidocLib; sourceTree = "<group>"; };
 		DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FileImportShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF67D4F92D28531600F09EB9 /* ConfigLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ConfigLib; sourceTree = "<group>"; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
 		DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileImportShareExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -240,6 +244,8 @@
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
 				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
+				DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */,
+				DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */,
 				DF8424A12CD442DC003F592D /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +257,7 @@
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
 				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
+				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
 				DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */,
 				DF17B63A2CDD2996009B1E17 /* Swinject in Frameworks */,
@@ -270,6 +277,7 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				DF67D4F92D28531600F09EB9 /* ConfigLib */,
 				DF17B64D2CE26949009B1E17 /* UtilsLib */,
 				DF3E4A862CE2C54600137235 /* CommonsLib */,
 				DF3E4A872CE2C5B500137235 /* LibdigidocLib */,
@@ -400,6 +408,8 @@
 				DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */,
 				DFB1F1302CF0217C00185A7F /* CommonsLib */,
 				DF54F82E2D431BD50021D05A /* X509 */,
+				DF3E922A2D285A1D00F2990A /* ConfigLib */,
+				DF3E922C2D2C371200F2990A /* Alamofire */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -430,6 +440,7 @@
 				DFB1F12B2CF020C200185A7F /* CommonsLib */,
 				DF9B53972CF7B01B00971F2A /* UtilsLib */,
 				DF0B681B2D0779EF00A5457C /* CommonsTestShared */,
+				DF4295B12D39D2F400415C71 /* ConfigLib */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -1224,6 +1235,19 @@
 		DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LibdigidocLib;
+		};
+		DF3E922A2D285A1D00F2990A /* ConfigLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLib;
+		};
+		DF3E922C2D2C371200F2990A /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DF4295B12D39D2F400415C71 /* ConfigLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLib;
 		};
 		DF4E6D812D11DE7B00F6111A /* CommonsLib */ = {
 			isa = XCSwiftPackageProductDependency;

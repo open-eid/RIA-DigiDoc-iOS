@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <digidocpp/Conf.h>
 #import <digidocpp/Container.h>
+#import <digidocpp/crypto/X509Cert.h>
 #import "digidocpp/Exception.h"
 #import "DigiDocConfWrapper.h"
 #import "../Model/DigiDocConfig.h"
@@ -21,18 +22,72 @@ public:
     }
     
     std::string logFile() const override {
-        return [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/libdigidocpp.log"].UTF8String;
+        return currentConf.logFile.UTF8String;
     }
 
     std::string TSLCache() const override {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-        NSString *libraryDirectory = paths[0];
-        [NSFileManager.defaultManager createFileAtPath:[libraryDirectory stringByAppendingPathComponent:@"EE_T.xml"] contents:nil attributes:nil];
-        return libraryDirectory.UTF8String;
+        NSString *tslCachePath = currentConf.TSLCACHE;
+          NSLog(@"tslCachePath: %@", tslCachePath);
+      return tslCachePath.UTF8String;
+    }
+
+    std::string TSLUrl() const override {
+        return currentConf.TSLURL.UTF8String;
+    }
+
+    std::vector<digidoc::X509Cert> TSCerts() const override {
+        NSMutableArray<NSString *> *certBundle = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
+        return stringsToX509Certs(certBundle);
+    }
+
+    std::string TSUrl() const override {
+        return currentConf.TSAURL.UTF8String;
+    }
+
+    std::string ocsp(const std::string &issuer) const override {
+        NSString *ocspIssuer = [NSString stringWithCString:issuer.c_str() encoding:[NSString defaultCStringEncoding]];
+
+        NSString *ocspUrl = currentConf.OCSPISSUERS[ocspIssuer];
+        if (ocspUrl) {
+            return std::string([ocspUrl UTF8String]);
+        }
+        return digidoc::ConfCurrent::ocsp(issuer);
+    }
+
+    std::string verifyServiceUri() const override {
+        return currentConf.SIVAURL.UTF8String;
+    }
+
+    virtual std::vector<digidoc::X509Cert> verifyServiceCerts() const override {
+        NSMutableArray<NSString*> *certs = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *sivaFileName = [defaults stringForKey:@"kSivaFileCertName"];
+        return stringsToX509Certs(certs);
     }
 
     static Conf* instance() {
         return digidoc::Conf::instance();
+    }
+
+    std::vector<digidoc::X509Cert> stringsToX509Certs(NSArray<NSString*> *certBundle) const {
+        std::vector<digidoc::X509Cert> x509Certs;
+
+        for (NSString *certString in certBundle) {
+            NSData *data = [[NSData alloc] initWithBase64EncodedString:certString options:NSDataBase64DecodingIgnoreUnknownCharacters];
+
+            if (data == nil || data.length == 0) {
+                continue;
+            }
+
+            try {
+                const unsigned char *bytes = reinterpret_cast<const unsigned char*>(data.bytes);
+                x509Certs.emplace_back(bytes, data.length);
+            } catch (...) {
+                continue;
+            }
+        }
+
+        return x509Certs;
     }
 };
 
@@ -58,6 +113,11 @@ public:
     static DigiDocConfWrapperImpl* instance() {
         static DigiDocConfWrapperImpl instance;
         return &instance;
+    }
+
+    void updateConfiguration(DigiDocConfig *newConfig) {
+        DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(newConfig);
+        digidoc::Conf::init(newCurrentConf);
     }
 };
 
@@ -90,6 +150,10 @@ public:
             }
         });
     });
+}
+
+- (void)updateConfiguration:(DigiDocConfig *)conf {
+    _impl->updateConfiguration(conf);
 }
 
 + (nullable DigiDocConfWrapper *)sharedInstance {

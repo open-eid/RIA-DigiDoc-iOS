@@ -1,6 +1,7 @@
 import SwiftUI
 import LibdigidocLibSwift
 import UtilsLib
+import ConfigLib
 
 @main
 struct RIADigiDocApp: App {
@@ -42,8 +43,9 @@ struct RIADigiDocApp: App {
     }
 
     private func setupAssemblers() async {
-        await AppAssembler.shared.initialize()
-        await LibDigidocAssembler.shared.initialize()
         await UtilsLibAssembler.shared.initialize()
+        await ConfigLibAssembler.shared.initialize()
+        await LibDigidocLibAssembler.shared.initialize()
+        await AppAssembler.shared.initialize()
     }
 }

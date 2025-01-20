@@ -56,3 +56,15 @@ output = "Extensions/FileImportShareExtensionTests/Mocks/Generated/GeneratedMock
 [modules.FileImportShareExtension.options]
 glob = true
 keepDocumentation = false
+
+[modules.ConfigLib]
+imports = ["Foundation", "Swinject", "Cuckoo", "CommonsLib"]
+testableImports = ["ConfigLib"]
+sources = [
+    "Modules/ConfigLib/Sources/**/*.swift",
+]
+output = "Modules/ConfigLib/Tests/ConfigLibTests/Mocks/Generated/GeneratedMocks+ConfigLib.swift"
+
+[modules.ConfigLib.options]
+glob = true
+keepDocumentation = false

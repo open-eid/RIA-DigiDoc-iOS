@@ -1,8 +1,8 @@
 import Swinject
 
 @MainActor
-public class LibDigidocAssembler {
-    public static let shared = LibDigidocAssembler()
+public struct LibDigidocLibAssembler {
+    public static let shared = LibDigidocLibAssembler()
 
     let container: Container
 

@@ -13,6 +13,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
         .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10)),
+        .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
         .package(path: "../CommonsLib/CommonsTestShared")
@@ -34,12 +35,12 @@ let package = Package(
         ),
         .target(
             name: "LibdigidocLibSwift",
-            dependencies: ["LibdigidocLibObjC", "Swinject", "CommonsLib", "UtilsLib"],
+            dependencies: ["LibdigidocLibObjC", "Swinject", "CommonsLib", "ConfigLib", "UtilsLib"],
             path: "Sources/LibdigidocSwift"
         ),
         .testTarget(
             name: "LibdigidocLibTests",
-            dependencies: ["LibdigidocLibSwift", "Cuckoo", "CommonsLib", "UtilsLib", "CommonsTestShared"],
+            dependencies: ["LibdigidocLibSwift", "Cuckoo", "ConfigLib", "CommonsLib", "UtilsLib", "CommonsTestShared"],
             swiftSettings: [
                 .swiftLanguageMode(.v5)
             ]

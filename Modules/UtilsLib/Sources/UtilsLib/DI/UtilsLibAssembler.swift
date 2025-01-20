@@ -1,7 +1,7 @@
 import Swinject
 
 @MainActor
-public class UtilsLibAssembler {
+public struct UtilsLibAssembler {
     public static let shared = UtilsLibAssembler()
 
     private let container: Container

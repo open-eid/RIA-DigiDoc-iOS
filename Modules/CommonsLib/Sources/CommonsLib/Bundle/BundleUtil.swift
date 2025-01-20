@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-public class BundleUtil {
+public struct BundleUtil {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.CommonsLib", category: "BundleUtil")
 

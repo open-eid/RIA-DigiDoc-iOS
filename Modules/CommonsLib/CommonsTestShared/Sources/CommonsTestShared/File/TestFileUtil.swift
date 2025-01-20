@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 import CommonsLib
 
-public class TestFileUtil {
+public struct TestFileUtil {
 
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.CommonsLib.CommonsTestShared",
