@@ -8,7 +8,8 @@ struct MainSignatureView: View {
     @StateObject private var viewModel: MainSignatureViewModel
 
     @State private var isFileOpeningLoading = false
-    @State private var isNavigatingToNextView = false
+    @State private var isNavigatingToSigningView = false
+    @State private var isNavigatingToRecentDocumentsView = false
 
     @Binding private var externalFiles: [URL]
 
@@ -37,12 +38,21 @@ struct MainSignatureView: View {
             .fullScreenCover(isPresented: $isFileOpeningLoading) {
                 FileOpeningView(
                     isFileOpeningLoading: $isFileOpeningLoading,
-                    isNavigatingToNextView: $isNavigatingToNextView
+                    isNavigatingToNextView: $isNavigatingToSigningView
                 )
             }
             NavigationLink(
                 destination: SigningView(),
-                isActive: $isNavigatingToNextView
+                isActive: $isNavigatingToSigningView
+            ) {}
+
+            Button(languageSettings.localized("Recent documents")) {
+                isNavigatingToRecentDocumentsView = true
+            }
+
+            NavigationLink(
+                destination: RecentDocumentsView(),
+                isActive: $isNavigatingToRecentDocumentsView
             ) {}
         }
         .onChange(of: externalFiles) { extFiles in

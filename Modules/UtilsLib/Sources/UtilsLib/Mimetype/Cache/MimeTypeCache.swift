@@ -10,12 +10,12 @@ actor MimeTypeCache: MimeTypeCacheProtocol {
             return cachedEntry
         } else {
             let mimeType = await fileUrl.mimeType()
-            await setMimeType(md5: md5, mimeType: mimeType)
+            setMimeType(md5: md5, mimeType: mimeType)
             return mimeType
         }
     }
 
-    func setMimeType(md5: String, mimeType: String) async {
+    func setMimeType(md5: String, mimeType: String) {
         cache[md5] = MimeTypeCacheEntry(mimeType: mimeType)
     }
 }

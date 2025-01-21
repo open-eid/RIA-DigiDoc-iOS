@@ -79,6 +79,11 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             isDirectory: true
         )
 
+        // Check if file is already in signed containers directory (like Recent documents)
+        if sourceURL.absoluteString.hasPrefix(signedContainersDirectory.absoluteString) {
+            return sourceURL
+        }
+
         if !fileManager.fileExists(atPath: signedContainersDirectory.path) {
             try fileManager.createDirectory(
                 at: signedContainersDirectory,

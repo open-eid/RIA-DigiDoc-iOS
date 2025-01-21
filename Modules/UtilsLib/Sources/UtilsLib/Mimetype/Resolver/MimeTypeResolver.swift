@@ -1,4 +1,5 @@
 import Foundation
+import CommonsLib
 
 struct MimeTypeResolver: MimeTypeResolverProtocol {
 
@@ -8,11 +9,11 @@ struct MimeTypeResolver: MimeTypeResolverProtocol {
         self.mimeTypeCache = mimeTypeCache
     }
 
-    func mimeType(url: URL) async -> String {
+    public func mimeType(url: URL) async -> String {
         let cachedMimeType = await mimeTypeCache.getMimeType(fileUrl: url)
-
-        await mimeTypeCache.setMimeType(md5: url.md5Hash(), mimeType: cachedMimeType)
-
+        if cachedMimeType.isEmpty {
+            return CommonsLib.Constants.MimeType.Default
+        }
         return cachedMimeType
     }
 }

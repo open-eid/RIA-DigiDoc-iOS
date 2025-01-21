@@ -69,6 +69,13 @@ class AppAssembler {
         container.register(ContentViewModel.self) { _ in
             return ContentViewModel()
         }.inObjectScope(.graph)
+
+        container.register(RecentDocumentsViewModel.self) { resolver in
+            guard let sharedContainerViewModel = resolver.resolve(SharedContainerViewModel.self) else {
+                preconditionFailure("Unable to find SharedContainerViewModel")
+            }
+            return RecentDocumentsViewModel(sharedContainerViewModel: sharedContainerViewModel)
+        }
     }
 
     func resolve<T>(_: T.Type) -> T {
