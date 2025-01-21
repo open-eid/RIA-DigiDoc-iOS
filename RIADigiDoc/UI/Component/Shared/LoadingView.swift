@@ -12,7 +12,7 @@ struct LoadingView: View {
                 .resizable()
                 .frame(width: 100, height: 100)
                 .rotationEffect(.degrees(rotationAngle))
-                .accessibilityLabel("Loading")
+                .accessibilityLabel(languageSettings.localized("Loading"))
                 .onChange(of: isLoading) { _ in
                     withAnimation(Animation.linear(duration: 1).repeatForever(autoreverses: false)) {
                         rotationAngle += 360

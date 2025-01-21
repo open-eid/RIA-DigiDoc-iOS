@@ -102,6 +102,7 @@
 			membershipExceptions = (
 				DI/AppAssembler.swift,
 				Domain/Model/AlertMessage.swift,
+				Domain/Model/FileItem.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
@@ -114,6 +115,7 @@
 				ViewModel/ContentViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
+				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
 				ViewModel/SigningViewModel.swift,
 			);

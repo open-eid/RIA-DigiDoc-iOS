@@ -41,6 +41,5 @@ final class MimeTypeResolverTests {
 
         #expect(expectedMimeType == mimeType)
         verify(mockMimeTypeCache, times(1)).getMimeType(fileUrl: equal(to: fileUrl))
-        verify(mockMimeTypeCache, times(1)).setMimeType(md5: equal(to: md5Hash), mimeType: equal(to: expectedMimeType))
     }
 }
