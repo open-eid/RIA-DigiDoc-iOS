@@ -455,6 +455,30 @@
           }
         }
       }
+    },
+    "This app cannot be used in jailbroken device" : {
+      "comment" : "Text when app detects jailbroken device",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app cannot be used in jailbroken device"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seda rakendust ei saa kasutada turvamata (ingl jailbroken) seadmes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Данное приложение не может быть использовано на взломанном (джейлбрейк) устройстве"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
