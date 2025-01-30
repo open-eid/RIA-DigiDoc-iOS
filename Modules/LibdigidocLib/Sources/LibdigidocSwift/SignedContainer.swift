@@ -34,6 +34,10 @@ public actor SignedContainer: SignedContainerProtocol {
     public func getContainerName() async -> String {
         return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }
+
+    public func getContainerMimetype() async -> String {
+        return await container.getMimetype()
+    }
 }
 
 extension SignedContainer {

@@ -1,6 +1,29 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Certificate details" : {
+      "comment" : "Title of Certificate Details view",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate details"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaadi detailid"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Детали сертификата"
+          }
+        }
+      }
+    },
     "Choose file" : {
       "comment" : "Button to choose a file to sign or validate",
       "extractionState" : "manual",
@@ -48,6 +71,29 @@
         }
       }
     },
+    "Container format:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container format:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku formaat:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Формат контейнера:"
+          }
+        }
+      }
+    },
     "Container signatures" : {
       "comment" : "Signing view container signatures title",
       "localizations" : {
@@ -73,6 +119,7 @@
     },
     "Container: %@" : {
       "comment" : "Signing view container name",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -236,13 +283,28 @@
         }
       }
     },
-    "Globe" : {
-      "comment" : "In \"Content View\", delete later",
-      "shouldTranslate" : false
-    },
-    "Hello, world!" : {
-      "comment" : "In \"Content View\", delete later",
-      "shouldTranslate" : false
+    "Hash value of signature:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hash value of signature:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja sõnumilühend:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хэш значение подтверждения подлинности подписи"
+          }
+        }
+      }
     },
     "Invalid file size" : {
       "comment" : "When trying adding 0 byte file to container",
@@ -358,6 +420,98 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавние документы отсутствуют"
+          }
+        }
+      }
+    },
+    "OCSP Certificate issuer:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCSP Certificate issuer:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtivuskinnituse sertifikaadi väljaandja:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Организация, выдавшая сертификат OCSP:"
+          }
+        }
+      }
+    },
+    "OCSP Certificate:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCSP Certificate:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtivuskinnituse sertifikaat:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат OCSP:"
+          }
+        }
+      }
+    },
+    "OCSP time (UTC):" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCSP time (UTC):"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtivuskinnituse aeg (UTC):"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время подтверждения подлинности подписи (UTC):"
+          }
+        }
+      }
+    },
+    "OCSP time:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OCSP time:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtivuskinnituse aeg:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время подтверждения подлинности подписи:"
           }
         }
       }
@@ -553,8 +707,215 @@
         }
       }
     },
+    "Signature details" : {
+      "comment" : "Title for Signature Details view",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature details"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja detailid"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Детали подписи"
+          }
+        }
+      }
+    },
+    "Signature format:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature format:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja formaat:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Формат подписи:"
+          }
+        }
+      }
+    },
+    "Signature method:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature method:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja meetod:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Метод подписи:"
+          }
+        }
+      }
+    },
+    "Signature timestamp (UTC):" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature timestamp (UTC):"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja ajatempel (UTC):"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Временной штамп подписи (UTC):"
+          }
+        }
+      }
+    },
+    "Signature timestamp:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature timestamp:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja ajatempel:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Временной штамп подписи:"
+          }
+        }
+      }
+    },
+    "Signed file count:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed file count:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastatud failide arv:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Количество подписанных файлов:"
+          }
+        }
+      }
+    },
+    "Signer's certificate issuer:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signer's certificate issuer:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastaja sertifikaadi väljaandja:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Организация, выдавшая сертификат подписавшего:"
+          }
+        }
+      }
+    },
+    "Signer's Certificate:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signer's Certificate:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastaja sertifikaat:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат пользователя:"
+          }
+        }
+      }
+    },
+    "Signer's mobile time:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signer's mobile time:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastaja telefoni kellaaeg (UTC):"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время на мобильном телефоне подписывающего (UTC):"
+          }
+        }
+      }
+    },
     "Signing" : {
-      "comment" : "Signing view title",
+      "comment" : "Title for Signing view",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -596,6 +957,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Данное приложение не может быть использовано на взломанном (джейлбрейк) устройстве"
+          }
+        }
+      }
+    },
+    "TS Certificate issuer:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TS Certificate issuer:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempliteenuse sertifikaadi väljaandja:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Издатель сертификата временного штампа:"
+          }
+        }
+      }
+    },
+    "TS Certificate:" : {
+      "comment" : "Signature detail",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TS Certificate:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempliteenuse sertifikaat:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сертификат временного штампа:"
           }
         }
       }

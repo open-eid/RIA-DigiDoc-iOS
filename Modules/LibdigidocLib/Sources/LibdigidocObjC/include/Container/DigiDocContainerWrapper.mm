@@ -44,6 +44,8 @@ public:
             digiDocSignature.ocspProducedAt = [NSString stringWithUTF8String:signature->OCSPProducedAt().c_str()];
             digiDocSignature.timeStampTime = [NSString stringWithUTF8String:signature->TimeStampTime().c_str()];
             digiDocSignature.signedBy = [NSString stringWithUTF8String:signature->signedBy().c_str()];
+            digiDocSignature.format = [NSString stringWithUTF8String:signature->profile().c_str()];
+            digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
             digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];
 
             digidoc::Signature::Validator validator(signature);

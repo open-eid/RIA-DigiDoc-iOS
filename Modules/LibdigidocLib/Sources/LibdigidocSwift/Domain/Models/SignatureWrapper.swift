@@ -19,6 +19,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var ocspProducedAt: String
     public var timeStampTime: String
     public var signedBy: String
+    public var format: String
+    public var messageImprint: Data
     public var trustedSigningTime: String
 
     public var status: SignatureStatus
@@ -35,6 +37,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 signedBy: String,
                 trustedSigningTime: String,
                 status: SignatureStatus = .unknown,
+                format: String,
+                messageImprint: Data,
                 diagnosticsInfo: String) {
         self.signingCert = signingCert
         self.timestampCert = timestampCert
@@ -47,6 +51,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.signedBy = signedBy
         self.trustedSigningTime = trustedSigningTime
         self.status = status
+        self.format = format
+        self.messageImprint = messageImprint
         self.diagnosticsInfo = diagnosticsInfo
     }
 }

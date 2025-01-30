@@ -33,8 +33,8 @@ struct FileOpeningView: View {
                     }
             }.alert(item: $viewModel.errorMessage) { errorMessage in
                 Alert(
-                    title: Text("Error"),
-                    message: Text(errorMessage.message ?? "General error"),
+                    title: Text(languageSettings.localized("Error")),
+                    message: Text(languageSettings.localized(errorMessage.message ?? "General error")),
                     dismissButton: .default(Text("OK")) {
                         viewModel.handleError()
                         isFileOpeningLoading = viewModel.isFileOpeningLoading

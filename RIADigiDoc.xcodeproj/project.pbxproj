@@ -14,6 +14,7 @@
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
+		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 		DF8424A12CD442DC003F592D /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = DF8424A02CD442DC003F592D /* Swinject */; };
 		DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF9B53972CF7B01B00971F2A /* UtilsLib */; };
 		DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE3E2D1495EC001D951B /* CommonsLib */; };
@@ -102,6 +103,7 @@
 			membershipExceptions = (
 				DI/AppAssembler.swift,
 				Domain/Model/AlertMessage.swift,
+				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
@@ -112,11 +114,13 @@
 				"Supporting files/Localizable.xcstrings",
 				Util/LanguageSettings.swift,
 				Util/LanguageSettingsProtocol.swift,
+				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/ContentViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
+				ViewModel/SignatureDetailViewModel.swift,
 				ViewModel/SigningViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
@@ -235,6 +239,7 @@
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
+				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
 				DF8424A12CD442DC003F592D /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,6 +399,7 @@
 				DF3E4A7E2CE269C900137235 /* UtilsLib */,
 				DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */,
 				DFB1F1302CF0217C00185A7F /* CommonsLib */,
+				DF54F82E2D431BD50021D05A /* X509 */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -500,6 +506,7 @@
 				DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */,
 				DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */,
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
+				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -1153,6 +1160,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-certificates.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.7.0;
+			};
+		};
 		DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Swinject/Swinject.git";
@@ -1217,6 +1232,11 @@
 		DF4E6D832D120CFC00F6111A /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
+		};
+		DF54F82E2D431BD50021D05A /* X509 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
+			productName = X509;
 		};
 		DF8424A02CD442DC003F592D /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;

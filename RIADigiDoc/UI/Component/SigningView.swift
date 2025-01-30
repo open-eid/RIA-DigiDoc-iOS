@@ -5,6 +5,8 @@ struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var languageSettings: LanguageSettings
 
+    @State private var selectedSignature: SignatureWrapper?
+
     @StateObject private var viewModel: SigningViewModel
 
     init(
@@ -15,26 +17,25 @@ struct SigningView: View {
 
     var body: some View {
         VStack {
-            Text("Signing")
+            Text(languageSettings.localized("Signing"))
                 .font(.headline)
 
             Spacer()
 
-            Text("Container: \(viewModel.containerName)")
+            Text(String(format: languageSettings.localized("Container: %@"), viewModel.containerName))
 
             Spacer()
 
-            Text("Container files")
-            List(viewModel.dataFiles, id: \.self) { dataFile in
-                Text(dataFile.fileName)
-            }
+            Text(languageSettings.localized("Container files"))
+            DataFilesListView(dataFiles: viewModel.dataFiles)
 
-            Text("Container signatures")
-            List(viewModel.signatures, id: \.self) { signature in
-                Text(signature.signedBy)
-                Text(signature.status.rawValue)
-                Text(signature.trustedSigningTime)
-            }
+            Text(languageSettings.localized("Container signatures"))
+            SignaturesListView(
+                signatures: viewModel.signatures,
+                selectedSignature: $selectedSignature,
+                containerMimetype: $viewModel.containerMimetype,
+                dataFilesCount: viewModel.dataFiles.count
+            )
 
             Spacer()
         }
@@ -43,6 +44,8 @@ struct SigningView: View {
                 await viewModel.loadContainerData(
                     signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
                 )
+
+                await viewModel.loadContainerMimetype()
             }
         }
     }

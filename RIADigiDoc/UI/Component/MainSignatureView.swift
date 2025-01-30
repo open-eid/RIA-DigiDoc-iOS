@@ -41,6 +41,7 @@ struct MainSignatureView: View {
                     isNavigatingToNextView: $isNavigatingToSigningView
                 )
             }
+
             NavigationLink(
                 destination: SigningView(),
                 isActive: $isNavigatingToSigningView
