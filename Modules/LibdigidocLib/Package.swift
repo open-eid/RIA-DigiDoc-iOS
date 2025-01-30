@@ -39,7 +39,7 @@ let package = Package(
         ),
         .testTarget(
             name: "LibdigidocLibTests",
-            dependencies: ["LibdigidocLibSwift", "Cuckoo", "CommonsTestShared"],
+            dependencies: ["LibdigidocLibSwift", "Cuckoo", "CommonsLib", "UtilsLib", "CommonsTestShared"],
             swiftSettings: [
                 .swiftLanguageMode(.v5)
             ]

@@ -34,6 +34,10 @@ final class SigningViewModelTests {
         let dataFiles = await viewModel.dataFiles
         let signatures = await viewModel.signatures
 
+        defer {
+            try? FileManager.default.removeItem(at: tempFile)
+        }
+
         #expect(containerDataFiles.count == dataFiles.count)
         #expect(containerSignatures.count == signatures.count)
     }
@@ -72,5 +76,28 @@ final class SigningViewModelTests {
 
         #expect(dataFiles.isEmpty)
         #expect(signatures.isEmpty)
+    }
+
+    @Test
+    func loadContainerMimetype_success() async throws {
+        let tempFile = TestFileUtil.createSampleFile()
+
+        let signedContainer = try await SignedContainer.openOrCreate(
+            dataFiles: [tempFile]
+        )
+
+        let containerMimetype = await signedContainer.getContainerMimetype()
+
+        await viewModel.loadContainerData(signedContainer: signedContainer)
+
+        await viewModel.loadContainerMimetype()
+
+        let loadedContainerMimetype = await viewModel.containerMimetype
+
+        defer {
+            try? FileManager.default.removeItem(at: tempFile)
+        }
+
+        #expect(containerMimetype == loadedContainerMimetype)
     }
 }
