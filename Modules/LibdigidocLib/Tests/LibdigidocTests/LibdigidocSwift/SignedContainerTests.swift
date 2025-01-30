@@ -3,6 +3,7 @@ import Testing
 import Cuckoo
 import CommonsTestShared
 import LibdigidocLibObjC
+import CommonsLib
 import UtilsLib
 
 @testable import LibdigidocLibSwift
@@ -47,6 +48,13 @@ final class SignedContainerTests {
     func getSignatures_success() async throws {
         let signatures = await signedContainer.getSignatures()
         #expect(signatures.isEmpty)
+    }
+
+    @Test
+    func getContainerMimetype_success() async throws {
+        let mimetype = await signedContainer.getContainerMimetype()
+        #expect(!mimetype.isEmpty)
+        #expect(CommonsLib.Constants.MimeType.Asice == mimetype)
     }
 
     @Test
