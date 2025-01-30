@@ -44,8 +44,16 @@ final class ContainerUtilTests {
         let uniqueFileName = "file-\(UUID().uuidString)"
         let fileURL = tempDirectory.appendingPathComponent("\(uniqueFileName).txt")
         try? "Test content".write(to: fileURL, atomically: true, encoding: .utf8)
-        try? "Test content".write(to: tempDirectory.appendingPathComponent("\(uniqueFileName)-1.txt"), atomically: true, encoding: .utf8)
-        try? "Test content".write(to: tempDirectory.appendingPathComponent("\(uniqueFileName)-2.txt"), atomically: true, encoding: .utf8)
+        try? "Test content".write(
+            to: tempDirectory.appendingPathComponent("\(uniqueFileName)-1.txt"),
+            atomically: true,
+            encoding: .utf8
+        )
+        try? "Test content".write(
+            to: tempDirectory.appendingPathComponent("\(uniqueFileName)-2.txt"),
+            atomically: true,
+            encoding: .utf8
+        )
 
         let uniqueFileURL = ContainerUtil.getSignatureContainerFile(for: fileURL, in: tempDirectory)
 

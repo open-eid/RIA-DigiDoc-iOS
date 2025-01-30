@@ -205,6 +205,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                 signedBy: signature.signedBy,
                 trustedSigningTime: signature.trustedSigningTime,
                 status: signatureStatusToDigiDocStatus(signature.status),
+                format: signature.format,
+                messageImprint: signature.messageImprint,
                 diagnosticsInfo: signature.diagnosticsInfo
             )
         }

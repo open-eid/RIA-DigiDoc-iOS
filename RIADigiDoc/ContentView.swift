@@ -23,8 +23,8 @@ struct ContentView: View {
                     Image(systemName: "globe")
                         .imageScale(.large)
                         .foregroundStyle(.tint)
-                        .accessibilityLabel("Globe")
-                    Text("Hello, world!")
+                        .accessibilityLabel(Text(verbatim: "Globe"))
+                    Text(verbatim: "Hello, world!")
                 }
                 .padding()
 

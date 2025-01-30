@@ -76,6 +76,14 @@ class AppAssembler {
             }
             return RecentDocumentsViewModel(sharedContainerViewModel: sharedContainerViewModel)
         }
+
+        container.register(SignatureDetailViewModel.self) { _ in
+            return SignatureDetailViewModel()
+        }
+
+        container.register(CertificateDetailViewModel.self) { _ in
+            return CertificateDetailViewModel()
+        }
     }
 
     func resolve<T>(_: T.Type) -> T {

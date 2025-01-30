@@ -10,6 +10,7 @@ class SigningViewModel: ObservableObject {
     @Published var dataFiles: [DataFileWrapper] = []
     @Published var signatures: [SignatureWrapper] = []
     @Published var containerName: String = CommonsLib.Constants.Container.DefaultName
+    @Published var containerMimetype: String = "N/A"
 
     let sharedContainerViewModel: SharedContainerViewModel
 
@@ -35,6 +36,9 @@ class SigningViewModel: ObservableObject {
         self.signatures = await signedContainer.getSignatures()
 
         SigningViewModel.logger.debug("Container data loaded")
+    }
 
+    func loadContainerMimetype() async {
+        containerMimetype = await signedContainer.getContainerMimetype()
     }
 }

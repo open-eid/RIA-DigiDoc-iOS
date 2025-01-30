@@ -145,8 +145,7 @@ final class URLExtensionsTests {
             let tempFileURL = TestFileUtil.createSampleFile()
 
             let expectedMD5Hash = Insecure.MD5.hash(data: try Data(contentsOf: tempFileURL))
-                .map { String(format: "%02x", $0) }
-                .joined()
+                .hexString(separator: "")
 
             let md5Hash = tempFileURL.md5Hash()
 

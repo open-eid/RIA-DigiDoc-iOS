@@ -61,7 +61,7 @@ extension URL {
         do {
             let fileData = try Data(contentsOf: self)
             let md5Digest = Insecure.MD5.hash(data: fileData)
-            return md5Digest.map { String(format: "%02x", $0) }.joined()
+            return md5Digest.hexString(separator: "")
         } catch {
             return ""
         }
