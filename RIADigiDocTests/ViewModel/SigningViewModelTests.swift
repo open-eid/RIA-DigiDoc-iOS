@@ -2,13 +2,17 @@ import Foundation
 import LibdigidocLibSwift
 import Testing
 import Cuckoo
+import UtilsLib
+import CommonsLib
 import CommonsTestShared
 
 final class SigningViewModelTests {
     private var mockSharedContainerViewModel: MockSharedContainerViewModel!
     private var viewModel: SigningViewModel!
+    private var fileManager: FileManager!
 
     init() async throws {
+        fileManager = FileManager.default
         mockSharedContainerViewModel = MockSharedContainerViewModel()
         viewModel = await SigningViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
     }
@@ -78,26 +82,150 @@ final class SigningViewModelTests {
         #expect(signatures.isEmpty)
     }
 
-    @Test
-    func loadContainerMimetype_success() async throws {
-        let tempFile = TestFileUtil.createSampleFile()
+    func createCopyOfContainerForSaving_success() async throws {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+        let containerFile = testDirectory.appendingPathComponent("testfile-\(UUID().uuidString).asice")
+        let testData = Data("Sample data".utf8)
+        fileManager.createFile(atPath: containerFile.path, contents: testData, attributes: nil)
 
-        let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [tempFile]
-        )
+        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
 
-        let containerMimetype = await signedContainer.getContainerMimetype()
-
-        await viewModel.loadContainerData(signedContainer: signedContainer)
-
-        await viewModel.loadContainerMimetype()
-
-        let loadedContainerMimetype = await viewModel.containerMimetype
-
-        defer {
-            try? FileManager.default.removeItem(at: tempFile)
+        guard let file = fileCopy else {
+            Issue.record("Unable to get copy of container file")
+            return
         }
 
-        #expect(containerMimetype == loadedContainerMimetype)
+        #expect(file != nil)
+        #expect(fileManager.fileExists(atPath: file.path))
+
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func createCopyOfContainerForSaving_returnNilWithNilContainerURL() async {
+        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: nil)
+        #expect(fileCopy == nil)
+    }
+
+    @Test
+    func createCopyOfContainerForSaving_returnNilWhenFileDoesNotExist() async {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let nonExistentFile = testDirectory.appendingPathComponent("nonexistent-\(UUID().uuidString).asice")
+
+        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: nonExistentFile)
+
+        #expect(fileCopy == nil)
+
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func createCopyOfContainerForSaving_replaceExistingFile() async throws {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let containerFile = testDirectory.appendingPathComponent("testfile-\(UUID().uuidString).asice")
+        let testData = Data("Old Data".utf8)
+
+        fileManager.createFile(atPath: containerFile.path, contents: testData, attributes: nil)
+
+        let savedFilesDirectory = try Directories.getCacheDirectory(subfolder: CommonsLib.Constants.Folder.SavedFiles)
+        let expectedDestination = savedFilesDirectory.appendingPathComponent(
+            containerFile.lastPathComponent.sanitized()
+        )
+
+        fileManager.createFile(
+            atPath: expectedDestination.path,
+            contents: Data("Old content".utf8),
+            attributes: nil
+        )
+
+        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
+
+        guard let file = fileCopy else {
+            Issue.record("Unable to get copy of container file")
+            return
+        }
+
+        #expect(file != nil)
+        #expect(fileManager.fileExists(atPath: file.path))
+
+        let newData = try Data(contentsOf: file)
+        #expect(testData == newData)
+
+        try? fileManager.removeItem(at: expectedDestination)
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func checkIfContainerFileExists_returnTrueIfFileExists() async throws {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let testFile = testDirectory.appendingPathComponent("testFile-\(UUID().uuidString).asice")
+        fileManager.createFile(atPath: testFile.path, contents: Data(), attributes: nil)
+
+        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: testFile)
+        #expect(containerFileExists)
+
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func checkIfContainerFileExists_returnFalseIfFileDoesNotExist() async throws {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let nonExistentFile = testDirectory.appendingPathComponent("nonExistent-\(UUID().uuidString).asice")
+
+        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: nonExistentFile)
+        #expect(!containerFileExists)
+
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func checkIfContainerFileExists_returnFalseWithNilInput() async {
+        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: nil)
+        #expect(!containerFileExists)
+    }
+
+    @Test
+    func removeSavedFilesDirectory_successWhenDirectoryExists() async throws {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let savedFilesDirectory = testDirectory.appendingPathComponent("SavedFiles")
+        try fileManager.createDirectory(at: savedFilesDirectory, withIntermediateDirectories: true, attributes: nil)
+
+        let testFile = savedFilesDirectory.appendingPathComponent("test-\(UUID().uuidString).asice")
+        fileManager.createFile(atPath: testFile.path, contents: Data(), attributes: nil)
+
+        #expect(fileManager.fileExists(atPath: savedFilesDirectory.path))
+
+        await viewModel.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
+
+        #expect(!fileManager.fileExists(atPath: savedFilesDirectory.path))
+
+        try? fileManager.removeItem(at: testDirectory)
+    }
+
+    @Test
+    func removeSavedFilesDirectory_doesNotThrowErrorWhenRemovingDirectoryAndItDoesntExist() async {
+        let testDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
+
+        let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistentDir")
+
+        await #expect(throws: Never.self) {
+            await viewModel.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
+        }
+
+        #expect(!fileManager.fileExists(atPath: nonExistentDirectory.path))
+
+        try? fileManager.removeItem(at: testDirectory)
     }
 }

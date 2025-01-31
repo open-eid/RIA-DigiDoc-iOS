@@ -189,6 +189,30 @@
         }
       }
     },
+    "Done" : {
+      "comment" : "Title for success alerts",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valmis"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Готово"
+          }
+        }
+      }
+    },
     "Error" : {
       "comment" : "Title for error alerts",
       "localizations" : {
@@ -256,6 +280,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не удалось открыть файл %@"
+          }
+        }
+      }
+    },
+    "Failed to save file" : {
+      "comment" : "Error message when unable to save file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili salvestamine ebaõnnestus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось сохранить файл"
+          }
+        }
+      }
+    },
+    "File saved" : {
+      "comment" : "Alert success message for file saving",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File saved"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail salvestatud"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл сохранен"
           }
         }
       }
@@ -583,6 +655,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
           }
         }
       }

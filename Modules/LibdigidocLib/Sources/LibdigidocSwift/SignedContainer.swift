@@ -38,6 +38,10 @@ public actor SignedContainer: SignedContainerProtocol {
     public func getContainerMimetype() async -> String {
         return await container.getMimetype()
     }
+
+    public func getRawContainerFile() async -> URL? {
+        return containerFile
+    }
 }
 
 extension SignedContainer {

@@ -5,4 +5,5 @@ public protocol SignedContainerProtocol: Sendable {
     func getSignatures() async -> [SignatureWrapper]
     func getContainerName() async -> String
     func getContainerMimetype() async -> String
+    func getRawContainerFile() async -> URL?
 }

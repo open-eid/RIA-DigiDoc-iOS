@@ -106,4 +106,73 @@ final class DirectoriesTests {
             return
         }
     }
+
+    @Test
+    func getCacheDirectory_returnCorrectPath() throws {
+        let subfolder = "TestFolder-\(UUID().uuidString)"
+
+        let directory = try Directories.getCacheDirectory(subfolder: subfolder)
+
+        let expectedBaseDir = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        ).appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
+
+        let expectedDir = expectedBaseDir.appendingPathComponent(subfolder, isDirectory: true)
+
+        defer {
+            try? FileManager.default.removeItem(at: directory)
+        }
+
+        #expect(expectedDir == directory)
+    }
+
+    @Test
+    func getCacheDirectory_createDirectoryIfNotExists() throws {
+        let subfolder = "NewTestFolder-\(UUID().uuidString)"
+        let testDir = try Directories.getCacheDirectory(subfolder: subfolder)
+
+        #expect(FileManager.default.fileExists(atPath: testDir.path))
+
+        try FileManager.default.removeItem(at: testDir)
+    }
+
+    @Test
+    func getCacheDirectory_returnDirectoryWithoutSubfolder() throws {
+        let directory = try Directories.getCacheDirectory()
+
+        let expectedDir = try FileManager.default.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        ).appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
+
+        #expect(expectedDir == directory)
+    }
+
+    @Test
+    func getCacheDirectory_doesNotRecreateExistingDirectory() throws {
+        let subfolder = "ExistingFolder-\(UUID().uuidString)"
+        let testFile = "ExistingFile-\(UUID().uuidString)"
+        let testDir = try Directories.getCacheDirectory(subfolder: subfolder)
+
+        try FileManager.default.createDirectory(at: testDir, withIntermediateDirectories: true, attributes: nil)
+        try "Test file contents".write(to: testDir.appendingPathComponent(testFile), atomically: true, encoding: .utf8)
+
+        let testDirContents = try FileManager.default.contentsOfDirectory(atPath: testDir.path)
+        #expect(FileManager.default.fileExists(atPath: testDir.path))
+        #expect(!testDirContents.isEmpty && testDirContents.count == 1)
+
+        let directory = try Directories.getCacheDirectory(subfolder: subfolder)
+
+        let cacheDirContents = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+
+        #expect(FileManager.default.fileExists(atPath: directory.path))
+        #expect(!cacheDirContents.isEmpty && cacheDirContents.count == 1)
+
+        try FileManager.default.removeItem(at: directory)
+    }
 }
