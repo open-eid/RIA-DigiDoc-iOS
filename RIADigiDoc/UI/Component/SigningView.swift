@@ -8,6 +8,11 @@ struct SigningView: View {
     @State private var selectedSignature: SignatureWrapper?
 
     @StateObject private var viewModel: SigningViewModel
+    @State private var tempContainerURL: URL?
+    @State private var isShowingFileSaver = false
+    @State private var alertMessage: String?
+    @State private var isFileSaved: Bool = false
+    @State private var showAlert: Bool = false
 
     init(
         viewModel: SigningViewModel = AppAssembler.shared.resolve(SigningViewModel.self)
@@ -22,7 +27,41 @@ struct SigningView: View {
 
             Spacer()
 
-            Text(String(format: languageSettings.localized("Container: %@"), viewModel.containerName))
+            HStack {
+                Text(String(format: languageSettings.localized("Container: %@"), viewModel.containerName))
+                SaveButton(action: {
+                    Task {
+                        tempContainerURL = viewModel.createCopyOfContainerForSaving(
+                            containerURL: viewModel.containerURL
+                        )
+
+                        if viewModel.checkIfContainerFileExists(fileLocation: tempContainerURL) {
+                            isShowingFileSaver = true
+                        }
+                    }
+                }).fileMover(isPresented: $isShowingFileSaver, file: tempContainerURL) { result in
+                    switch result {
+                    case .success:
+                        isFileSaved = true
+                        alertMessage = languageSettings.localized("File saved")
+                    case .failure:
+                        isFileSaved = false
+                        alertMessage = languageSettings.localized("Failed to save file")
+                    }
+                    isShowingFileSaver = false
+                    showAlert = true
+                    viewModel.removeSavedFilesDirectory()
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: isFileSaved ? Text(languageSettings.localized("Done")) :
+                            Text(languageSettings.localized("Error")),
+                        message: Text(alertMessage ??
+                                      languageSettings.localized("General error")),
+                        dismissButton: .default(Text(languageSettings.localized("OK")))
+                    )
+                }
+            }
 
             Spacer()
 
@@ -44,8 +83,6 @@ struct SigningView: View {
                 await viewModel.loadContainerData(
                     signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
                 )
-
-                await viewModel.loadContainerMimetype()
             }
         }
     }
