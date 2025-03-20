@@ -17,7 +17,7 @@ let package = Package(
         .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
         .package(url: "https://github.com/TakeScoop/SwiftyRSA", exact: .init(1, 8, 0)),
-        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10)),
+        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 14)),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
         .package(path: "../CommonsLib/CommonsTestShared")
