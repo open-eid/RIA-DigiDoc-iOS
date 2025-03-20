@@ -2,8 +2,19 @@ import UIKit
 
 public struct JailbreakDetection {
 
+    private static func isSimulator() -> Bool {
+        #if targetEnvironment(simulator)
+            return true
+        #else
+            return false
+        #endif
+    }
+
     public static func isDeviceJailbroken() async -> Bool {
-        return await canOpenCommonJailbreakURLSchemes() || canAccessRestrictedAreas() || commonJailbreakFilesExist()
+        if isSimulator() { return false }
+
+        let canOpenJailbreakURLs = await canOpenCommonJailbreakURLSchemes()
+        return canOpenJailbreakURLs || canAccessRestrictedAreas() || commonJailbreakFilesExist()
     }
 
     // Common jailbreak files and directories

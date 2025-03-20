@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 10))
+        .package(url: "https://github.com/Brightify/Cuckoo.git", exact: .init(2, 0, 14))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
