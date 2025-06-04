@@ -2,28 +2,22 @@ import Foundation
 import Testing
 import CommonsLib
 import CommonsTestShared
-import Cuckoo
 import ZIPFoundation
 @testable import UtilsLib
 
-final class FileUtilTests {
+struct FileUtilTests {
 
     private static let testSubFolder = "FileUtilTests"
 
-    private let fileUtil: FileUtilProtocol
+    private let fileUtil: FileUtilProtocol!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
+        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: FileUtilTests.testSubFolder)
+        try? FileManager.default.removeItem(at: tempDir)
+
         fileUtil = FileUtil()
-
-        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: "FileUtilTests")
-        try? FileManager.default.removeItem(at: tempDir)
-    }
-
-    deinit {
-        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: "FileUtilTests")
-        try? FileManager.default.removeItem(at: tempDir)
     }
 
     @Test
@@ -96,7 +90,7 @@ final class FileUtilTests {
     }
 
     @Test
-    func isFileFromAppGroup_returnTrueWhenFileInsideAppGroup() throws {
+    func isFileFromAppGroup_returnTrueWhenFileInsideAppGroup() async throws {
 
         let appGroupFolder = try Directories.getSharedFolder()
         let fileInAppGroup = appGroupFolder.appendingPathComponent("file.txt")

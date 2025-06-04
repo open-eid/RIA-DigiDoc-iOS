@@ -62,7 +62,7 @@ public struct Directories {
                 in: .userDomainMask,
                 appropriateFor: nil,
                 create: false)
-            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+                .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
             if !subfolder.isEmpty {
                 cacheDirectory = cacheDirectory.appending(path: subfolder, directoryHint: .isDirectory)
             }
@@ -72,7 +72,7 @@ public struct Directories {
                 in: .userDomainMask,
                 appropriateFor: nil,
                 create: false)
-            .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
+                .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
             if !subfolder.isEmpty {
                 cacheDirectory = cacheDirectory.appendingPathComponent(subfolder, isDirectory: true)
             }

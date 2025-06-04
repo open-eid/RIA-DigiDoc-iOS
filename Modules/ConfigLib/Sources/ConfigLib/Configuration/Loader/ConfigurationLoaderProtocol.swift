@@ -1,5 +1,6 @@
 import Foundation
 
+/// @mockable
 public protocol ConfigurationLoaderProtocol: Sendable {
     func initConfiguration(cacheDir: URL) async throws
 

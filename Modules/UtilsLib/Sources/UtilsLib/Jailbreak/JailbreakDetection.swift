@@ -4,9 +4,9 @@ public struct JailbreakDetection {
 
     private static func isSimulator() -> Bool {
         #if targetEnvironment(simulator)
-            return true
+        return true
         #else
-            return false
+        return false
         #endif
     }
 

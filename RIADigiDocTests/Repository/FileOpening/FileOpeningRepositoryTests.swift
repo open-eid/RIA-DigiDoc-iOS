@@ -1,29 +1,23 @@
 import Foundation
 import LibdigidocLibSwift
 import Testing
-import Cuckoo
 import CommonsTestShared
 
-final class FileOpeningRepositoryTests {
-    private var mockFileOpeningService: MockFileOpeningServiceProtocol!
+struct FileOpeningRepositoryTests {
+    private var mockFileOpeningService: FileOpeningServiceProtocolMock!
     private var repository: FileOpeningRepositoryProtocol!
 
     init() async throws {
-        mockFileOpeningService = MockFileOpeningServiceProtocol()
+        mockFileOpeningService = FileOpeningServiceProtocolMock()
         repository = FileOpeningRepository(fileOpeningService: mockFileOpeningService)
-    }
-
-    deinit {
-        repository = nil
-        mockFileOpeningService = nil
     }
 
     @Test
     func isFileSizeValid_success() async throws {
         let tempFileURL = TestFileUtil.createSampleFile()
 
-        stub(mockFileOpeningService) { stub in
-            when(stub.isFileSizeValid(url: any())).thenReturn(true)
+        mockFileOpeningService.isFileSizeValidHandler = { @Sendable _ in
+            return true
         }
 
         let isValid = try await repository.isFileSizeValid(url: tempFileURL)
@@ -33,7 +27,8 @@ final class FileOpeningRepositoryTests {
         }
 
         #expect(isValid)
-        verify(mockFileOpeningService).isFileSizeValid(url: equal(to: tempFileURL))
+        #expect(mockFileOpeningService.isFileSizeValidCallCount == 1)
+        #expect(mockFileOpeningService.isFileSizeValidArgValues.first == tempFileURL)
     }
 
     @Test
@@ -42,38 +37,38 @@ final class FileOpeningRepositoryTests {
 
         let tempFileURL2 = TestFileUtil.createSampleFile()
 
-        let fileURLs = [
-            tempFileURL,
-            tempFileURL2
-        ]
+        let fileURLs = [tempFileURL, tempFileURL2]
 
-        let result: Result<[URL], any Error> = .success(fileURLs)
-
-        stub(mockFileOpeningService) { stub in
-            when(stub.getValidFiles(any())).thenReturn(fileURLs)
+        mockFileOpeningService.getValidFilesHandler = { @Sendable _ in
+            return fileURLs
         }
 
+        let result: Result<[URL], any Error> = .success(fileURLs)
         let validFiles = try await repository.getValidFiles(result)
 
-        #expect(fileURLs == validFiles)
-        verify(mockFileOpeningService).getValidFiles(any())
+        #expect(validFiles == fileURLs)
+        #expect(mockFileOpeningService.getValidFilesCallCount == 1)
+
+        guard case let .success(validFilesResult) =
+                mockFileOpeningService.getValidFilesArgValues.first,
+              case let .success(expectedValidFiles) = result,
+              validFilesResult == expectedValidFiles else {
+            Issue.record("Expected to have file urls set")
+            return
+        }
     }
 
     @Test
     func openOrCreateContainer_success() async throws {
         let tempFileURL = TestFileUtil.createSampleFile()
-
         let tempFileURL2 = TestFileUtil.createSampleFile()
 
-        let fileURLs = [
-            tempFileURL,
-            tempFileURL2
-        ]
+        let fileURLs = [tempFileURL, tempFileURL2]
 
         let signedContainer = SignedContainer()
 
-        stub(mockFileOpeningService) { stub in
-            when(stub.openOrCreateContainer(dataFiles: any())).thenReturn(signedContainer)
+        mockFileOpeningService.openOrCreateContainerHandler = { @Sendable _ in
+            return signedContainer
         }
 
         let result = try await repository.openOrCreateContainer(urls: fileURLs)
@@ -82,6 +77,7 @@ final class FileOpeningRepositoryTests {
         let resultContainerName = await result.getContainerName()
 
         #expect(signedContainerName == resultContainerName)
-        verify(mockFileOpeningService).openOrCreateContainer(dataFiles: equal(to: fileURLs))
+        #expect(mockFileOpeningService.openOrCreateContainerCallCount == 1)
+        #expect(mockFileOpeningService.openOrCreateContainerArgValues.first == fileURLs)
     }
 }

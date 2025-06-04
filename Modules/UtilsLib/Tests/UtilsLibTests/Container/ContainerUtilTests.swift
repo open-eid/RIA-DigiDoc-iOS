@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import UtilsLib
 
-final class ContainerUtilTests {
+struct ContainerUtilTests {
 
     var tempDirectory: URL!
 
@@ -12,10 +12,6 @@ final class ContainerUtilTests {
         let fileManager = FileManager.default
         tempDirectory = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try? fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: true, attributes: nil)
-    }
-
-    deinit {
-        try? FileManager.default.removeItem(at: tempDirectory)
     }
 
     @Test
@@ -36,7 +32,7 @@ final class ContainerUtilTests {
 
         let uniqueFileURL = ContainerUtil.getSignatureContainerFile(for: fileURL, in: tempDirectory)
 
-        #expect("\(fileURL.deletingPathExtension().lastPathComponent)-1.txt" == uniqueFileURL.lastPathComponent)
+        #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-1.txt")
     }
 
     @Test
@@ -57,7 +53,7 @@ final class ContainerUtilTests {
 
         let uniqueFileURL = ContainerUtil.getSignatureContainerFile(for: fileURL, in: tempDirectory)
 
-        #expect("\(fileURL.deletingPathExtension().lastPathComponent)-3.txt" == uniqueFileURL.lastPathComponent)
+        #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-3.txt")
     }
 
     @Test
@@ -68,7 +64,7 @@ final class ContainerUtilTests {
 
         let uniqueFileURL = ContainerUtil.getSignatureContainerFile(for: fileURL, in: tempDirectory)
 
-        #expect("\(uniqueFileName)-1" == uniqueFileURL.lastPathComponent)
+        #expect(uniqueFileURL.lastPathComponent == "\(uniqueFileName)-1")
     }
 
     @Test
@@ -79,6 +75,6 @@ final class ContainerUtilTests {
 
         let uniqueFileURL = ContainerUtil.getSignatureContainerFile(for: fileURL, in: tempDirectory)
 
-        #expect("\(fileURL.deletingPathExtension().lastPathComponent)-1.txt" == uniqueFileURL.lastPathComponent)
+        #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-1.txt")
     }
 }

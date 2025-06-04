@@ -9,6 +9,14 @@ class SettingsConfiguration {
     private let configUpdateInterval: Int
     private let configTslUrl: String
 
+    private let configurationDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
     init() {
         let args = CommandLine.arguments
         self.configBaseUrl = args.indices.contains(1) ? args[1] : "https://id.eesti.ee"
@@ -72,22 +80,19 @@ extension SettingsConfiguration {
 extension SettingsConfiguration {
     private func createDefaultConfiguration(versionSerial: Int) -> String {
         return """
-        {
-            "centralConfigurationServiceUrl": "\(configBaseUrl)",
-            "updateInterval": \(configUpdateInterval),
-            "updateDate": "\(Date())",
-            "versionSerial": \(versionSerial),
-            "tslUrl": "\(configTslUrl)"
-        }
+        central-configuration-service.url=\(configBaseUrl)
+        configuration.update-interval=\(configUpdateInterval)
+        configuration.version-serial=\(versionSerial)
+        configuration.download-date=\(configurationDateFormatter.string(from: Date()))
         """
     }
 
     private func saveAndMoveConfigurationFiles(configData: String, publicKey: String, signature: String, defaultConfiguration: String) throws {
         let files = [
-            ("config.json", configData),
-            ("publicKey.pub", publicKey),
-            ("signature.rsa", signature),
-            ("defaultConfiguration.json", defaultConfiguration)
+            ("default-config.json", configData),
+            ("default-config.pub", publicKey),
+            ("default-config.rsa", signature),
+            ("configuration.properties", defaultConfiguration)
         ]
 
         for (fileName, content) in files {

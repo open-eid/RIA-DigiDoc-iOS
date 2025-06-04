@@ -3,7 +3,7 @@ import OSLog
 import CommonsLib
 
 @MainActor
-class RecentDocumentsViewModel: ObservableObject {
+class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RecentDocumentsViewModel")
 
     @Published var isImporting = false
@@ -11,10 +11,10 @@ class RecentDocumentsViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var folderURL: URL
 
-    private let sharedContainerViewModel: SharedContainerViewModel
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
 
     init(
-        sharedContainerViewModel: SharedContainerViewModel,
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
         folderURL: URL? = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
@@ -35,7 +35,7 @@ class RecentDocumentsViewModel: ObservableObject {
         let sortedFiles = files.sorted { $0.modifiedDate > $1.modifiedDate }
         return sortedFiles.filter { file in
             CommonsLib.Constants.Container.ContainerExtensions.contains(file.url.pathExtension.lowercased()) &&
-            (searchText.isEmpty || file.name.localizedCaseInsensitiveContains(searchText))
+                (searchText.isEmpty || file.name.localizedCaseInsensitiveContains(searchText))
         }
     }
 

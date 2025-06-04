@@ -11,10 +11,10 @@ public enum DigiDocError: Error {
     public var errorDetail: ErrorDetail {
         switch self {
         case .initializationFailed(let errorDetail),
-                .containerCreationFailed(let errorDetail),
-                .containerOpeningFailed(let errorDetail),
-                .addingFilesToContainerFailed(let errorDetail),
-                .containerSavingFailed(let errorDetail):
+             .containerCreationFailed(let errorDetail),
+             .containerOpeningFailed(let errorDetail),
+             .addingFilesToContainerFailed(let errorDetail),
+             .containerSavingFailed(let errorDetail):
             return errorDetail
 
         case .alreadyInitialized:

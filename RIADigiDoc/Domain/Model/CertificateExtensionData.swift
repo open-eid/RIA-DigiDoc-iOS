@@ -1,6 +1,6 @@
 import Foundation
 
-struct CertificateExtensionData {
+public struct CertificateExtensionData: Sendable {
     let id: UUID = UUID()
     let name: String
     let oid: String

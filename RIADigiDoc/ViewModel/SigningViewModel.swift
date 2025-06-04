@@ -5,7 +5,7 @@ import CommonsLib
 import UtilsLib
 
 @MainActor
-class SigningViewModel: ObservableObject {
+class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModel")
 
     @Published var dataFiles: [DataFileWrapper] = []
@@ -14,12 +14,12 @@ class SigningViewModel: ObservableObject {
     @Published var containerMimetype: String = "N/A"
     @Published var containerURL: URL?
 
-    let sharedContainerViewModel: SharedContainerViewModel
+    let sharedContainerViewModel: SharedContainerViewModelProtocol
 
     var signedContainer: SignedContainer = SignedContainer()
 
     init(
-        sharedContainerViewModel: SharedContainerViewModel
+        sharedContainerViewModel: SharedContainerViewModelProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
     }
@@ -54,8 +54,8 @@ class SigningViewModel: ObservableObject {
             )
 
             let filename = containerLocation.lastPathComponent.sanitized().isEmpty
-            ? CommonsLib.Constants.Container.DefaultName
-            : containerLocation.lastPathComponent.sanitized()
+                ? CommonsLib.Constants.Container.DefaultName
+                : containerLocation.lastPathComponent.sanitized()
 
             let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(filename)
 

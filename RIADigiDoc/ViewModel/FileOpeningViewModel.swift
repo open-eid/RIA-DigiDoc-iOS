@@ -4,7 +4,7 @@ import LibdigidocLibSwift
 import UtilsLib
 
 @MainActor
-class FileOpeningViewModel: ObservableObject {
+class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     @Published var isFileOpeningLoading: Bool = false
     @Published var isNavigatingToNextView: Bool = false
 
@@ -14,12 +14,12 @@ class FileOpeningViewModel: ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 
     private let fileOpeningRepository: FileOpeningRepositoryProtocol
-    private let sharedContainerViewModel: SharedContainerViewModel
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileUtil: FileUtilProtocol
 
     init(
         fileOpeningRepository: FileOpeningRepositoryProtocol,
-        sharedContainerViewModel: SharedContainerViewModel,
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
         fileUtil: FileUtilProtocol? = nil
     ) {
         self.fileOpeningRepository = fileOpeningRepository
@@ -81,8 +81,8 @@ class FileOpeningViewModel: ObservableObject {
         case .initializationFailed:
             return AlertMessage(message: NSLocalizedString("General error", comment: ""))
         case .containerCreationFailed(let errorDetail),
-            .containerOpeningFailed(let errorDetail),
-            .containerSavingFailed(let errorDetail):
+             .containerOpeningFailed(let errorDetail),
+             .containerSavingFailed(let errorDetail):
             return AlertMessage(
                 message: String(
                     format: NSLocalizedString("Failed to open container %@", comment: ""),

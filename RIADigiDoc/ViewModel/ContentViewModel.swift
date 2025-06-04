@@ -3,11 +3,10 @@ import OSLog
 import UtilsLib
 
 @MainActor
-class ContentViewModel: ObservableObject {
+class ContentViewModel: ContentViewModelProtocol, ObservableObject {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ContentViewModel")
 
-    @MainActor
     func getSharedFiles() -> [URL] {
         do {
             ContentViewModel.logger.debug("Checking for shared files...")

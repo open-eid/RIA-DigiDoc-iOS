@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Cuckoo
 import CommonsLib
 import CommonsTestShared
 import LibdigidocLibObjC
@@ -65,7 +64,7 @@ final class ContainerWrapperTests {
     func getDataFiles_success() async throws {
         let dataFiles = await container.getDataFiles()
 
-        #expect(1 == dataFiles.count)
+        #expect(dataFiles.count == 1)
     }
 
     @Test
@@ -107,7 +106,7 @@ final class ContainerWrapperTests {
 
         let dataFiles = await container.getDataFiles()
 
-        #expect(3 == dataFiles.count)
+        #expect(dataFiles.count == 3)
     }
 
     @Test
@@ -140,7 +139,7 @@ final class ContainerWrapperTests {
 
         let dataFiles = await container.getDataFiles()
 
-        #expect(2 == dataFiles.count)
+        #expect(dataFiles.count == 2)
     }
 
     @Test

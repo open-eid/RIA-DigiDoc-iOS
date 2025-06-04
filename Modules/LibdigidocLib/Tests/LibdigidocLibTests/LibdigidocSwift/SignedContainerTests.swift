@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Cuckoo
 import CommonsTestShared
 import LibdigidocLibObjC
 import CommonsLib
@@ -46,7 +45,7 @@ final class SignedContainerTests {
     func getDataFiles_success() async throws {
         let dataFiles = await signedContainer.getDataFiles()
 
-        #expect(1 == dataFiles.count)
+        #expect(dataFiles.count == 1)
     }
 
     @Test
@@ -75,7 +74,7 @@ final class SignedContainerTests {
             dataFiles: [exampleContainer]
         )
 
-        #expect(signedContainer != nil)
+        await #expect(signedContainer.getContainerMimetype() == CommonsLib.Constants.MimeType.Asice)
     }
 
     @Test
@@ -87,7 +86,7 @@ final class SignedContainerTests {
         } catch let error as DigiDocError {
             switch error {
             case .containerCreationFailed(let errorDetail):
-                #expect("Cannot create or open container. Datafiles are empty" == errorDetail.message)
+                #expect(errorDetail.message == "Cannot create or open container. Datafiles are empty")
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")
                 return

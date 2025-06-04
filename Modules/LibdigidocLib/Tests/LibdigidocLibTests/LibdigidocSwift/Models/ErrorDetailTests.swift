@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Cuckoo
 
 @testable import LibdigidocLibSwift
 
@@ -11,7 +10,7 @@ final class ErrorDetailsTests {
         let errorDetail = ErrorDetail()
 
         #expect(errorDetail.message.isEmpty)
-        #expect(0 == errorDetail.code)
+        #expect(errorDetail.code == 0)
         #expect(errorDetail.userInfo.isEmpty)
     }
 
@@ -40,7 +39,7 @@ final class ErrorDetailsTests {
 
         #expect(nsError.localizedDescription == errorDetail.message)
         #expect(nsError.code == errorDetail.code)
-        #expect(["key": "value", NSLocalizedDescriptionKey: "Test NSError message"] == errorDetail.userInfo)
+        #expect(errorDetail.userInfo == ["key": "value", NSLocalizedDescriptionKey: "Test NSError message"])
     }
 
     @Test
@@ -56,11 +55,11 @@ final class ErrorDetailsTests {
 
         #expect(nsError.localizedDescription == errorDetail.message)
         #expect(nsError.code == errorDetail.code)
-        #expect([
+        #expect(errorDetail.userInfo == [
             "key": "value",
             NSLocalizedDescriptionKey: "Test NSError message",
             "extraKey": "extraValue"
-        ] == errorDetail.userInfo)
+        ])
     }
 
     @Test

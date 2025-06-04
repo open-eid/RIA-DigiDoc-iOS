@@ -34,7 +34,7 @@ struct SignaturesListView: View {
                             set: { if !$0 { self.selectedSignature = nil } }
                         )
                     ) {}
-                        .hidden()
+                    .hidden()
                 }
             }
         )

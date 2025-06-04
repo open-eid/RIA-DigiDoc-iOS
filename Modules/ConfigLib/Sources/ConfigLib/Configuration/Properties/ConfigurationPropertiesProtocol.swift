@@ -1,5 +1,6 @@
 import Foundation
 
+/// @mockable
 public protocol ConfigurationPropertiesProtocol: Sendable {
     func getConfigurationProperties(from propertiesFile: URL) async throws -> ConfigurationProperty
     func updateProperties(lastUpdateCheck: Date?, lastUpdated: Date?, serial: Int?) async

@@ -1,17 +1,13 @@
 import Foundation
 import LibdigidocLibSwift
 import Testing
-import Cuckoo
 
-final class SharedContainerViewModelTests {
+@MainActor
+struct SharedContainerViewModelTests {
     private var viewModel: SharedContainerViewModel!
 
     init() async throws {
         viewModel = SharedContainerViewModel()
-    }
-
-    deinit {
-        viewModel = nil
     }
 
     @Test

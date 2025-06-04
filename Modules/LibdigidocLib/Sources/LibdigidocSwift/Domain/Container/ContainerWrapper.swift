@@ -18,10 +18,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         dataFiles: [DataFileWrapper] = [],
         signatures: [SignatureWrapper] = [],
         mediatype: String? = nil) {
-            self.dataFiles = dataFiles
-            self.signatures = signatures
-            self.mediatype = mediatype ?? CommonsLib.Constants.MimeType.Default
-        }
+        self.dataFiles = dataFiles
+        self.signatures = signatures
+        self.mediatype = mediatype ?? CommonsLib.Constants.MimeType.Default
+    }
 
     public func getSignatures() async -> [SignatureWrapper] {
         return await getContainer()?.signatures ?? []
@@ -107,20 +107,20 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
             digiDocContainerWrapper.addDataFile(
                 dataFile.path,
                 mimetype: mimetype) { success, error in
-                    lock.lock()
-                    defer { lock.unlock() }
-                    if let error = error as NSError? {
-                        continuation.resume(
-                            throwing: DigiDocError.addingFilesToContainerFailed(
-                                ErrorDetail(
-                                    nsError: error,
-                                    extraInfo: ["fileName": dataFile.lastPathComponent])
-                            )
+                lock.lock()
+                defer { lock.unlock() }
+                if let error = error as NSError? {
+                    continuation.resume(
+                        throwing: DigiDocError.addingFilesToContainerFailed(
+                            ErrorDetail(
+                                nsError: error,
+                                extraInfo: ["fileName": dataFile.lastPathComponent])
                         )
-                    } else {
-                        continuation.resume(returning: success)
-                    }
+                    )
+                } else {
+                    continuation.resume(returning: success)
                 }
+            }
         }
     }
 

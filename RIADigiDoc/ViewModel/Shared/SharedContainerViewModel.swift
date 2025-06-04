@@ -1,7 +1,7 @@
 import Foundation
 import LibdigidocLibSwift
 
-class SharedContainerViewModel: ObservableObject {
+class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObject {
     private var signedContainer: SignedContainer?
     private var fileOpeningResult: Result<[URL], Error>?
 

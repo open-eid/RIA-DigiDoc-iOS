@@ -17,9 +17,9 @@ public actor ConfigurationProperties: ConfigurationPropertiesProtocol {
     public func getConfigurationProperties(from propertiesFile: URL) async throws -> ConfigurationProperty {
         guard let properties = loadProperties(from: propertiesFile) else {
             throw ConfigurationPropertyError
-                .noSuchFile(
-                    "\(Constants.Configuration.DefaultConfigurationPropertiesFileName).properties"
-                )
+            .noSuchFile(
+                "\(Constants.Configuration.DefaultConfigurationPropertiesFileName).properties"
+            )
         }
         return try ConfigurationProperty.fromProperties(properties: properties)
     }

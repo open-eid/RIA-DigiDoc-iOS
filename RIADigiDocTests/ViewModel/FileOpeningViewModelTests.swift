@@ -1,26 +1,20 @@
 import Foundation
 import LibdigidocLibSwift
 import Testing
-import Cuckoo
 
-final class FileOpeningViewModelTests {
-    private var mockFileOpeningRepository: MockFileOpeningRepositoryProtocol!
-    private var mockSharedContainerViewModel: MockSharedContainerViewModel!
+@MainActor
+struct FileOpeningViewModelTests {
+    private var mockFileOpeningRepository: FileOpeningRepositoryProtocolMock!
+    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
     private var viewModel: FileOpeningViewModel!
 
     init() async throws {
-        mockFileOpeningRepository = MockFileOpeningRepositoryProtocol()
-        mockSharedContainerViewModel = MockSharedContainerViewModel()
-        viewModel = await FileOpeningViewModel(
+        mockFileOpeningRepository = FileOpeningRepositoryProtocolMock()
+        mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        viewModel = FileOpeningViewModel(
             fileOpeningRepository: mockFileOpeningRepository,
             sharedContainerViewModel: mockSharedContainerViewModel
         )
-    }
-
-    deinit {
-        viewModel = nil
-        mockSharedContainerViewModel = nil
-        mockFileOpeningRepository = nil
     }
 
     @Test
@@ -29,42 +23,56 @@ final class FileOpeningViewModelTests {
         let signedContainer = SignedContainer()
         let result: Result<[URL], Error> = .success(validURLs)
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.getFileOpeningResult()).thenReturn(result)
-            when(stub.setSignedContainer(signedContainer: any())).thenDoNothing()
+        mockSharedContainerViewModel.getFileOpeningResultHandler = {
+            return result
         }
-        stub(mockFileOpeningRepository) { stub in
-            when(stub.getValidFiles(any())).thenReturn(validURLs)
-            when(stub.openOrCreateContainer(urls: any())).thenReturn(signedContainer)
+
+        mockSharedContainerViewModel.setSignedContainerHandler = { @Sendable _ in }
+
+        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+            return validURLs
+        }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { @Sendable _ in
+            return signedContainer
         }
 
         await viewModel.handleFiles()
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
 
         #expect(!isFileOpeningLoading)
         #expect(isNavigatingToNextView)
-        verify(mockSharedContainerViewModel).setSignedContainer(signedContainer: equal(to: signedContainer))
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+
+        let receivedSetContainer = mockSharedContainerViewModel.setSignedContainerArgValues.first
+
+        guard let receivedContainer = receivedSetContainer else { return }
+
+        let receivedRawContainerFile = await receivedContainer?.getRawContainerFile()
+        let signedContaninerRaw = await signedContainer.getRawContainerFile()
+
+        #expect(receivedRawContainerFile == signedContaninerRaw)
     }
 
     @Test
     func handleFiles_throwNoDataFilesErrorWhenNoFileOpeningResultNil() async throws {
         let error = FileOpeningError.noDataFiles
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.getFileOpeningResult()).thenReturn(nil)
+        mockSharedContainerViewModel.getFileOpeningResultHandler = {
+            return nil
         }
 
-        stub(mockFileOpeningRepository) { stub in
-            when(stub.getValidFiles(any())).thenReturn([])
+        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+            return []
         }
 
         await viewModel.handleFiles()
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
-        let errorMessage = await viewModel.errorMessage?.message
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let errorMessage = viewModel.errorMessage?.message
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)
@@ -76,19 +84,19 @@ final class FileOpeningViewModelTests {
         let error = FileOpeningError.noDataFiles
         let result: Result<[URL], Error> = .failure(error)
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.getFileOpeningResult()).thenReturn(result)
+        mockSharedContainerViewModel.getFileOpeningResultHandler = {
+            return result
         }
 
-        stub(mockFileOpeningRepository) { stub in
-            when(stub.getValidFiles(any())).thenThrow(error)
+        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+            throw error
         }
 
         await viewModel.handleFiles()
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
-        let errorMessage = await viewModel.errorMessage?.message
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let errorMessage = viewModel.errorMessage?.message
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)
@@ -100,19 +108,19 @@ final class FileOpeningViewModelTests {
         let error = FileOpeningError.noDataFiles
         let result: Result<[URL], Error> = .success([])
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.getFileOpeningResult()).thenReturn(result)
+        mockSharedContainerViewModel.getFileOpeningResultHandler = {
+            return result
         }
 
-        stub(mockFileOpeningRepository) { stub in
-            when(stub.getValidFiles(any())).thenReturn([])
+        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+            return []
         }
 
         await viewModel.handleFiles()
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
-        let errorMessage = await viewModel.errorMessage?.message
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let errorMessage = viewModel.errorMessage?.message
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)
@@ -121,10 +129,10 @@ final class FileOpeningViewModelTests {
 
     @Test
     func handleLoading_success() async {
-        await viewModel.handleLoadingSuccess()
+        viewModel.handleLoadingSuccess()
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
 
         #expect(!isFileOpeningLoading)
         #expect(isNavigatingToNextView)
@@ -132,12 +140,12 @@ final class FileOpeningViewModelTests {
 
     @Test
     func handleError_success() async {
-        await viewModel.handleError()
+        viewModel.handleError()
 
-        let errorMessage = await viewModel.errorMessage
+        let errorMessage = viewModel.errorMessage
 
-        let isFileOpeningLoading = await viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = await viewModel.isNavigatingToNextView
+        let isFileOpeningLoading = viewModel.isFileOpeningLoading
+        let isNavigatingToNextView = viewModel.isNavigatingToNextView
 
         #expect(errorMessage == nil)
         #expect(!isFileOpeningLoading)

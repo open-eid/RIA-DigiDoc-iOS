@@ -1,18 +1,13 @@
 import Foundation
 import Testing
-import Cuckoo
 import LibdigidocLibSwift
 import CommonsTestShared
 
-final class FileOpeningServiceTests {
+struct FileOpeningServiceTests {
     private var service: FileOpeningServiceProtocol!
 
     init() async throws {
         service = await FileOpeningService()
-    }
-
-    deinit {
-        service = nil
     }
 
     @Test
@@ -70,7 +65,7 @@ final class FileOpeningServiceTests {
             try? FileManager.default.removeItem(at: tempFileURL2)
         }
 
-        #expect(2 == validFiles.count)
+        #expect(validFiles.count == 2)
     }
 
     @Test
@@ -87,7 +82,7 @@ final class FileOpeningServiceTests {
             try? FileManager.default.removeItem(at: tempFileURL)
         }
 
-        #expect(2 == validFiles.count)
+        #expect(validFiles.count == 2)
     }
 
     @Test
@@ -135,7 +130,7 @@ final class FileOpeningServiceTests {
         } catch let error {
             switch error as? DigiDocError {
             case .containerCreationFailed(let errorDetail):
-                #expect("Cannot create or open container. Datafiles are empty" == errorDetail.message)
+                #expect(errorDetail.message == "Cannot create or open container. Datafiles are empty")
             default:
                 Issue.record("Expected 'containerCreationFailed' error")
                 return

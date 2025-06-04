@@ -135,7 +135,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             } else {
                 let currentDate = Date()
                 configurationProvider.configurationUpdateDate = configurationProvider.configurationUpdateDate ??
-                configuration?.configurationUpdateDate
+                    configuration?.configurationUpdateDate
                 configurationProvider.configurationLastUpdateCheckDate = currentDate
                 await configurationProperties.setConfigurationLastCheckDate(date: currentDate)
                 configuration = configurationProvider
@@ -154,7 +154,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             forResource: CommonsLib.Constants.Configuration.DefaultConfigJson,
             withExtension: nil
         ),
-              let confData = try? String(contentsOf: confDataURL) else {
+        let confData = try? String(contentsOf: confDataURL) else {
             throw ConfigurationLoaderError.configurationNotFound
         }
 
@@ -162,7 +162,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             forResource: CommonsLib.Constants.Configuration.DefaultConfigPub,
             withExtension: nil
         ),
-              let publicKey = try? String(contentsOf: publicKeyURL) else {
+        let publicKey = try? String(contentsOf: publicKeyURL) else {
             throw ConfigurationLoaderError.publicKeyNotFound
         }
 
@@ -170,7 +170,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             forResource: CommonsLib.Constants.Configuration.DefaultConfigRsa,
             withExtension: nil
         ),
-              let signatureBytes = try? Data(contentsOf: signatureURL) else {
+        let signatureBytes = try? Data(contentsOf: signatureURL) else {
             throw ConfigurationLoaderError.signatureNotFound
         }
 

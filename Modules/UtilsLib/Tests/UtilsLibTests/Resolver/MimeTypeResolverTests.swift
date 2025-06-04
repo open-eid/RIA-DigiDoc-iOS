@@ -1,26 +1,20 @@
 import Foundation
 import Testing
-import Cuckoo
 import CommonsLib
 import CommonsTestShared
 
 @testable import UtilsLib
 
-final class MimeTypeResolverTests {
+struct MimeTypeResolverTests {
 
-    private var mockMimeTypeCache: MockMimeTypeCacheProtocol!
+    private var mockMimeTypeCache: MimeTypeCacheProtocolMock!
     private var resolver: MimeTypeResolverProtocol!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
-        mockMimeTypeCache = MockMimeTypeCacheProtocol()
+        mockMimeTypeCache = MimeTypeCacheProtocolMock()
         resolver = MimeTypeResolver(mimeTypeCache: mockMimeTypeCache)
-    }
-
-    deinit {
-        resolver = nil
-        mockMimeTypeCache = nil
     }
 
     @Test
@@ -28,18 +22,15 @@ final class MimeTypeResolverTests {
         let fileUrl = TestFileUtil.createSampleFile(name: "image", withExtension: "png")
         let expectedMimeType = "image/png"
 
-        stub(mockMimeTypeCache) { mock in
-            when(mock.getMimeType(fileUrl: any())).thenReturn(expectedMimeType)
-        }
-
-        let md5Hash = fileUrl.md5Hash()
-        stub(mockMimeTypeCache) { mock in
-            when(mock.setMimeType(md5: equal(to: md5Hash), mimeType: equal(to: expectedMimeType))).thenDoNothing()
+        mockMimeTypeCache.getMimeTypeHandler = { @Sendable _ in
+            return expectedMimeType
         }
 
         let mimeType = await resolver.mimeType(url: fileUrl)
 
         #expect(expectedMimeType == mimeType)
-        verify(mockMimeTypeCache, times(1)).getMimeType(fileUrl: equal(to: fileUrl))
+
+        #expect(mockMimeTypeCache.getMimeTypeCallCount == 1)
+        #expect(mockMimeTypeCache.getMimeTypeArgValues.first == fileUrl)
     }
 }

@@ -57,7 +57,7 @@ struct SigningView: View {
                         title: isFileSaved ? Text(languageSettings.localized("Done")) :
                             Text(languageSettings.localized("Error")),
                         message: Text(alertMessage ??
-                                      languageSettings.localized("General error")),
+                                        languageSettings.localized("General error")),
                         dismissButton: .default(Text(languageSettings.localized("OK")))
                     )
                 }

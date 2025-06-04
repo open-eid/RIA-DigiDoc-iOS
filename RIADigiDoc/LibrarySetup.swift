@@ -43,7 +43,8 @@ actor LibrarySetup {
                 LibrarySetup.logger.error("\(errorDetail.description)")
             case DigiDocError.alreadyInitialized:
                 LibrarySetup.logger.error("Cannot initialize Libdigidocpp: Already initialized")
-            default: LibrarySetup.logger.error("Unknown initialization error: \(error.localizedDescription)")
+            default: LibrarySetup.logger.error(
+                "Unknown initialization error: \(error.localizedDescription). Error: \(error)")
             }
         }
     }
