@@ -1,5 +1,6 @@
 import Foundation
 
+/// @mockable
 public protocol FileUtilProtocol: Sendable {
     func getMimeTypeFromZipFile(
         from zipFileURL: URL,

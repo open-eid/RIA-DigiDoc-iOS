@@ -93,8 +93,8 @@ struct SignatureDetailView: View {
                         Text(languageSettings.localized("Signature timestamp:"))
                             .font(.headline)
                         Text(verbatim: DateUtil.getFormattedDateTime(
-                            dateTimeString: signature.timeStampTime,
-                            isUTC: false)
+                                dateTimeString: signature.timeStampTime,
+                                isUTC: false)
                         )
                     }
                 }
@@ -104,8 +104,8 @@ struct SignatureDetailView: View {
                         Text(languageSettings.localized("Signature timestamp (UTC):"))
                             .font(.headline)
                         Text(verbatim: DateUtil.getFormattedDateTime(
-                            dateTimeString: signature.timeStampTime,
-                            isUTC: true)
+                                dateTimeString: signature.timeStampTime,
+                                isUTC: true)
                         )
                     }
                 }
@@ -183,8 +183,8 @@ struct SignatureDetailView: View {
                         Text(languageSettings.localized("OCSP time:"))
                             .font(.headline)
                         Text(verbatim: DateUtil.getFormattedDateTime(
-                            dateTimeString: signature.ocspProducedAt,
-                            isUTC: false)
+                                dateTimeString: signature.ocspProducedAt,
+                                isUTC: false)
                         )
                     }
                 }
@@ -194,8 +194,8 @@ struct SignatureDetailView: View {
                         Text(languageSettings.localized("OCSP time (UTC):"))
                             .font(.headline)
                         Text(verbatim: DateUtil.getFormattedDateTime(
-                            dateTimeString: signature.ocspProducedAt,
-                            isUTC: true)
+                                dateTimeString: signature.ocspProducedAt,
+                                isUTC: true)
                         )
                     }
                 }
@@ -205,8 +205,8 @@ struct SignatureDetailView: View {
                         Text(languageSettings.localized("Signer's mobile time:"))
                             .font(.headline)
                         Text(verbatim: DateUtil.getFormattedDateTime(
-                            dateTimeString: signature.claimedSigningTime,
-                            isUTC: true)
+                                dateTimeString: signature.claimedSigningTime,
+                                isUTC: true)
                         )
                     }
                 }

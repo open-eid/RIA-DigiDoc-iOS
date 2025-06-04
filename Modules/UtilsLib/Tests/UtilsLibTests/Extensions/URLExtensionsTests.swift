@@ -3,16 +3,22 @@ import CryptoKit
 import ZIPFoundation
 import CoreGraphics
 import Testing
-import Cuckoo
 import CommonsLib
 import CommonsTestShared
 @testable import UtilsLib
 
 @MainActor
-final class URLExtensionsTests {
+struct URLExtensionsTests {
+
+    private let mockFileUtil: FileUtilProtocolMock!
+
+    private let mockMimetypeDecoder: MimeTypeDecoderProtocolMock!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
+
+        mockFileUtil = FileUtilProtocolMock()
+        mockMimetypeDecoder = MimeTypeDecoderProtocolMock()
     }
 
     @Test
@@ -23,11 +29,9 @@ final class URLExtensionsTests {
             try? FileManager.default.removeItem(at: tempFileURL)
         }
 
-        let mockFileUtil = MockFileUtilProtocol()
-
         let mimetype = await tempFileURL.mimeType(fileUtil: mockFileUtil)
 
-        #expect("text/plain" == mimetype)
+        #expect(mimetype == "text/plain")
     }
 
     @Test
@@ -37,16 +41,13 @@ final class URLExtensionsTests {
             with: ["testfile.txt": "Test content"],
             containerExtension: "zip")
 
-        let mockFileUtil = MockFileUtilProtocol()
-
-        stub(mockFileUtil) { fileUtil in
-            when(fileUtil.getMimeTypeFromZipFile(from: any(), fileNameToFind: any()))
-                .thenThrow(Archive.ArchiveError.unreadableArchive)
+        mockFileUtil.getMimeTypeFromZipFileHandler = { @Sendable _, _ in
+            throw Archive.ArchiveError.unreadableArchive
         }
 
         let mimetype = await mockContainer?.mimeType(fileUtil: mockFileUtil)
 
-        #expect("application/zip" == mimetype)
+        #expect(mimetype == "application/zip")
     }
 
     @Test
@@ -92,16 +93,14 @@ final class URLExtensionsTests {
         do {
             let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
-                      """
+                        """
                         <SignedDoc format="DIGIDOC-XML"></SignedDoc>
                       """
                 ],
                 containerExtension: "ddoc")
 
-            let mockMimetypeDecoder = MockMimeTypeDecoderProtocol()
-
-            stub(mockMimetypeDecoder) { decoder in
-                when(decoder.parse(xmlData: any())).thenReturn(ContainerType.ddoc)
+            mockMimetypeDecoder.parseHandler = { @Sendable _ in
+                return ContainerType.ddoc
             }
 
             let isDdoc = mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
@@ -118,16 +117,14 @@ final class URLExtensionsTests {
         do {
             let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
-                      """
+                        """
                         <SignedDoc format="DIGIDOC-XML"></SignedDoc>
                       """
                 ],
                 containerExtension: "ddoc")
 
-            let mockMimetypeDecoder = MockMimeTypeDecoderProtocol()
-
-            stub(mockMimetypeDecoder) { decoder in
-                when(decoder.parse(xmlData: any())).thenReturn(ContainerType.none)
+            mockMimetypeDecoder.parseHandler = { @Sendable _ in
+                return ContainerType.none
             }
 
             let isDdoc = mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
@@ -168,30 +165,26 @@ final class URLExtensionsTests {
 
         let md5Hash = nonexistentFileURL.md5Hash()
 
-        #expect("" == md5Hash)
+        #expect(md5Hash.isEmpty)
     }
 
     @Test
     func validURL_returnValidURL() throws {
-        let fileUtilMock = MockFileUtilProtocol()
-
         let nonExistentFileLocation = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        stub(fileUtilMock) { fileUtil in
-            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nonExistentFileLocation)
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in
+            return nonExistentFileLocation
         }
 
-        let result = try nonExistentFileLocation.validURL(fileUtil: fileUtilMock)
+        let result = try nonExistentFileLocation.validURL(fileUtil: mockFileUtil)
 
         #expect(nonExistentFileLocation == result)
     }
 
     @Test
     func validURL_returnSameURLWhenFileFromAppGroup() throws {
-        let fileUtilMock = MockFileUtilProtocol()
-
-        stub(fileUtilMock) { fileUtil in
-            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in
+            return nil
         }
 
         do {
@@ -201,7 +194,7 @@ final class URLExtensionsTests {
 
             let testURL = URL(fileURLWithPath: fileURL.path)
 
-            let result = try testURL.validURL(fileUtil: fileUtilMock)
+            let result = try testURL.validURL(fileUtil: mockFileUtil)
 
             #expect(testURL == result)
         } catch {
@@ -212,16 +205,13 @@ final class URLExtensionsTests {
 
     @Test
     func validURL_returnURLWhenFileFromiCloudDownloaded() throws {
-        let fileUtilMock = MockFileUtilProtocol()
-        stub(fileUtilMock) { fileUtil in
-            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
-            when(fileUtil.isFileFromiCloud(fileURL: any(URL.self))).thenReturn(true)
-            when(fileUtil.isFileDownloadedFromiCloud(fileURL: any(URL.self))).thenReturn(true)
-        }
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in nil }
+        mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in true }
+        mockFileUtil.isFileDownloadedFromiCloudHandler = { @Sendable _ in true }
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        let result = try testURL.validURL(fileUtil: fileUtilMock)
+        let result = try testURL.validURL(fileUtil: mockFileUtil)
 
         #expect(testURL == result)
     }
@@ -231,14 +221,11 @@ final class URLExtensionsTests {
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        let fileUtilMock = MockFileUtilProtocol()
-        stub(fileUtilMock) { fileUtil in
-            when(fileUtil.getValidFileInApp(currentURL: any(URL.self))).thenReturn(nil)
-            when(fileUtil.isFileFromiCloud(fileURL: any(URL.self))).thenReturn(false)
-        }
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in nil }
+        mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in false }
 
         do {
-            _ = try testURL.validURL(fileUtil: fileUtilMock)
+            _ = try testURL.validURL(fileUtil: mockFileUtil)
             Issue.record("Expected .badURL error")
             return
         } catch let error as URLError {
@@ -297,7 +284,7 @@ final class URLExtensionsTests {
 
         let result = try tempDirectoryURL.folderContents()
 
-        #expect(1 == result.count)
+        #expect(result.count == 1)
         #expect(testFileURL == result.first)
     }
 

@@ -8,7 +8,7 @@ import LibdigidocLibSwift
 import UtilsLib
 
 @MainActor
-class CertificateDetailViewModel: ObservableObject {
+class CertificateDetailViewModel: CertificateDetailViewModelProtocol, ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CertificateDetailViewModel")
 
     private static let oidToExtensionName: [String: String] = [
@@ -32,9 +32,9 @@ class CertificateDetailViewModel: ObservableObject {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
 
             return String(describing: certificate.subject
-                .flatMap { $0 }
-                .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
-                .Value(utf8String: ""))
+                            .flatMap { $0 }
+                            .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
+                            .Value(utf8String: ""))
         } catch {
             CertificateDetailViewModel.logger.error(
                 "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
@@ -48,9 +48,9 @@ class CertificateDetailViewModel: ObservableObject {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
 
             return String(describing: certificate.issuer
-                .flatMap { $0 }
-                .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
-                .Value(utf8String: ""))
+                            .flatMap { $0 }
+                            .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
+                            .Value(utf8String: ""))
         } catch {
             CertificateDetailViewModel.logger.error(
                 "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
@@ -179,6 +179,7 @@ class CertificateDetailViewModel: ObservableObject {
             return ""
         }
     }
+
     func getSignature(cert: Data) -> String {
         do {
             let node: ASN1Node = try DER.parse(Array(cert))

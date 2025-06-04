@@ -47,8 +47,9 @@ workflows:
       defaultCentralConfigurationTslUrl_input:
         description: Default Central Configuration TSL URL
         type: choice
-        default: https://repo.ria/tsl/trusted-test-mp.xml
+        default: http://10.0.25.57/tsl/trusted-test-mp.xml
         options:
+          - http://10.0.25.57/tsl/trusted-test-mp.xml
           - https://repo.ria/tsl/trusted-test-mp.xml
           - https://ec.europa.eu/tools/lotl/eu-lotl.xml
           - https://open-eid.github.io/test-TL/tl-mp-test-EE.xml
@@ -57,14 +58,25 @@ workflows:
         type: string
         default: "EE;EE_T"
       buildParameters_input:
-        description: |
-          Build parameters
+        description: Build parameters
         type: string
         default: "-DDEBUG"
+      enableTests_input:
+        description: Run tests?
+        type: boolean
+        default: false
     scripts:
+      - name: Parameters
+        script: |
+          echo Default Central Configuration URL: ${{ inputs.defaultCentralConfigurationUrl_input }}
+          echo Default Central Configuration Update Interval: ${{ inputs.defaultCentralConfigurationUpdateInterval_input }}
+          echo Default Central Configuration TSL URL: ${{ inputs.defaultCentralConfigurationTslUrl_input }}
+          echo "TSL member lists: ${{ inputs.memberTsl_input }}"
+          echo Build parameters: ${{ inputs.buildParameters_input }}
+          echo Run tests?: ${{ inputs.enableTests_input }}
       - name: Setup dependencies
         script: |
-          brew install swift-sh
+          brew install swift-sh mockolo
       - *get_app_version
       - *get_google_services_plist
       - name: "Setup config and TSL files"
@@ -86,10 +98,10 @@ workflows:
           # Get repo.ria values from environmental variables, as CodeMagic doesn't have access to repo.ria domain
           if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"repo.ria"* ]]; then
             echo "Using repo.ria configuration"
-            echo $REPO_RIA_DEFAULT_PROPERTIES | base64 --decode > $CONFIG_DIRECTORY/defaultConfiguration.json
-            echo $REPO_RIA_CONFIG | base64 --decode > $CONFIG_DIRECTORY/config.json
-            echo $REPO_RIA_PUB_KEY | base64 --decode > $CONFIG_DIRECTORY/publicKey.pub
-            echo $REPO_RIA_RSA | base64 --decode > $CONFIG_DIRECTORY/signature.rsa
+            echo $REPO_RIA_DEFAULT_PROPERTIES | base64 --decode > $CONFIG_DIRECTORY/configuration.properties
+            echo $REPO_RIA_CONFIG | base64 --decode > $CONFIG_DIRECTORY/default-config.json
+            echo $REPO_RIA_PUB_KEY | base64 --decode > $CONFIG_DIRECTORY/default-config.pub
+            echo $REPO_RIA_RSA | base64 --decode > $CONFIG_DIRECTORY/default-config.rsa
             echo $REPO_RIA_TRUSTED_TEST_MP | base64 --decode > $TSL_FILES_DIRECTORY/trusted-test-mp.xml
             echo $REPO_RIA_TL_MP_TEST_EE | base64 --decode > $TSL_FILES_DIRECTORY/tl-mp-test-EE.xml
             # EE_T.xml is too large to use in environmental variable. Using compressed variant
@@ -128,15 +140,25 @@ workflows:
             
             export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
             
-            mv -v defaultConfiguration.json $CONFIG_DIRECTORY/configuration.properties
-            mv -v config.json $CONFIG_DIRECTORY/default-config.json
-            mv -v publicKey.pub $CONFIG_DIRECTORY/default-config.pub
-            mv -v signature.rsa $CONFIG_DIRECTORY/default-config.rsa
+            mv -v configuration.properties $CONFIG_DIRECTORY/configuration.properties
+            mv -v default-config.json $CONFIG_DIRECTORY/default-config.json
+            mv -v default-config.pub $CONFIG_DIRECTORY/default-config.pub
+            mv -v default-config.rsa $CONFIG_DIRECTORY/default-config.rsa
           else
             echo "Skipping default configuration fetching for repo.ria"
           fi
       - name: Set up provisioning profiles settings on Xcode project
         script: xcode-project use-profiles
+      - name: Run tests
+        script: |
+          sh scripts/GenerateMocks.sh
+          
+          xcode-project run-tests \
+            --project RIADigiDoc.xcodeproj \
+            --scheme AllTests \
+            --device "iPhone 16"
+        when:
+          condition: ${{ inputs.enableTests_input }}
       - name: Increment build number
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number $APP_STORE_APP_ID)
@@ -207,7 +229,7 @@ workflows:
     scripts:
       - name: Setup dependencies
         script: |
-          brew install swift-sh
+          brew install swift-sh mockolo
       - *get_app_version
       - *get_google_services_plist
       - name: "Setup config and TSL files"
@@ -248,12 +270,20 @@ workflows:
           
           export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
 
-          mv -v defaultConfiguration.json $CONFIG_DIRECTORY/configuration.properties
-          mv -v config.json $CONFIG_DIRECTORY/default-config.json
-          mv -v publicKey.pub $CONFIG_DIRECTORY/default-config.pub
-          mv -v signature.rsa $CONFIG_DIRECTORY/default-config.rsa
+          mv -v configuration.properties $CONFIG_DIRECTORY/configuration.properties
+          mv -v default-config.json $CONFIG_DIRECTORY/default-config.json
+          mv -v default-config.pub $CONFIG_DIRECTORY/default-config.pub
+          mv -v default-config.rsa $CONFIG_DIRECTORY/default-config.rsa
       - name: Set up provisioning profiles settings on Xcode project
         script: xcode-project use-profiles
+      - name: Run tests
+        script: |
+            sh scripts/GenerateMocks.sh
+
+            xcode-project run-tests \
+                --project RIADigiDoc.xcodeproj \
+                --scheme AllTests \
+                --device "iPhone 16"
       - name: Increment build number
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number $APP_STORE_APP_ID)

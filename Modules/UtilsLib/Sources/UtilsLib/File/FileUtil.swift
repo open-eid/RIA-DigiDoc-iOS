@@ -68,11 +68,11 @@ public struct FileUtil: FileUtilProtocol {
                 if FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
                     with: FilePath(stringLiteral: resolvedSubdirectoryPath)
                 ) ||
-                    FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
-                        with: FilePath(
-                            stringLiteral: FileManager.default.temporaryDirectory.resolvingSymlinksInPath().path
-                        )
-                    ) {
+                FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
+                    with: FilePath(
+                        stringLiteral: FileManager.default.temporaryDirectory.resolvingSymlinksInPath().path
+                    )
+                ) {
                     return resolvedCurrentUrl
                 }
             }

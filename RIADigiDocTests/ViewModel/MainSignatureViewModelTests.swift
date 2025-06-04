@@ -1,19 +1,14 @@
 import Foundation
 import Testing
-import Cuckoo
 
-final class MainSignatureViewModelTests {
-    private var mockSharedContainerViewModel: MockSharedContainerViewModel!
+@MainActor
+struct MainSignatureViewModelTests {
+    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
     private var viewModel: MainSignatureViewModel!
 
     init() async throws {
-        mockSharedContainerViewModel = MockSharedContainerViewModel()
-        viewModel = await MainSignatureViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
-    }
-
-    deinit {
-        viewModel = nil
-        mockSharedContainerViewModel = nil
+        mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        viewModel = MainSignatureViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
     }
 
     @Test
@@ -21,7 +16,7 @@ final class MainSignatureViewModelTests {
         let isImportingValue = false
         let isFileOpeningLoading = false
 
-        let result = await viewModel.didUserCancelFileOpening(
+        let result = viewModel.didUserCancelFileOpening(
             isImportingValue: isImportingValue,
             isFileOpeningLoading: isFileOpeningLoading
         )
@@ -34,7 +29,7 @@ final class MainSignatureViewModelTests {
         let isImportingValue = true
         let isFileOpeningLoading = true
 
-        let result = await viewModel.didUserCancelFileOpening(
+        let result = viewModel.didUserCancelFileOpening(
             isImportingValue: isImportingValue,
             isFileOpeningLoading: isFileOpeningLoading
         )
@@ -47,7 +42,7 @@ final class MainSignatureViewModelTests {
         let isImportingValue = false
         let isFileOpeningLoading = true
 
-        let result = await viewModel.didUserCancelFileOpening(
+        let result = viewModel.didUserCancelFileOpening(
             isImportingValue: isImportingValue,
             isFileOpeningLoading: isFileOpeningLoading
         )
@@ -60,7 +55,7 @@ final class MainSignatureViewModelTests {
         let isImportingValue = true
         let isFileOpeningLoading = false
 
-        let result = await viewModel.didUserCancelFileOpening(
+        let result = viewModel.didUserCancelFileOpening(
             isImportingValue: isImportingValue,
             isFileOpeningLoading: isFileOpeningLoading
         )
@@ -72,25 +67,40 @@ final class MainSignatureViewModelTests {
     func setChosenFiles_success() async {
         let chosenFiles: Result<[URL], Error> = .success([URL(fileURLWithPath: "/path/to/file")])
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.setFileOpeningResult(fileOpeningResult: any())).thenDoNothing()
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+
+        viewModel.setChosenFiles(chosenFiles)
+
+        #expect(mockSharedContainerViewModel.setFileOpeningResultCallCount == 1)
+
+        guard case let .success(fileOpeningResultUrls) =
+                mockSharedContainerViewModel.setFileOpeningResultArgValues.first,
+              case let .success(expectedUrls) = chosenFiles,
+              fileOpeningResultUrls == expectedUrls else {
+            Issue.record("Expected to have chosen files set")
+            return
         }
-
-        await viewModel.setChosenFiles(chosenFiles)
-
-        verify(mockSharedContainerViewModel).setFileOpeningResult(fileOpeningResult: any())
     }
 
     @Test
     func setChosenFiles_successWithError() async {
         let chosenFiles: Result<[URL], Error> = .failure(FileOpeningError.noDataFiles)
 
-        stub(mockSharedContainerViewModel) { stub in
-            when(stub.setFileOpeningResult(fileOpeningResult: any())).thenDoNothing()
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+
+        viewModel.setChosenFiles(chosenFiles)
+
+        #expect(mockSharedContainerViewModel.setFileOpeningResultCallCount == 1)
+
+        guard
+            case let .failure(actualError) = mockSharedContainerViewModel.setFileOpeningResultArgValues.first,
+            case let .failure(expectedError) = chosenFiles,
+            let actualFileOpeningError = actualError as? FileOpeningError,
+            let expectedFileOpeningError = expectedError as? FileOpeningError,
+            actualFileOpeningError == expectedFileOpeningError
+        else {
+            Issue.record("Expected to have matching failure errors")
+            return
         }
-
-        await viewModel.setChosenFiles(chosenFiles)
-
-        verify(mockSharedContainerViewModel).setFileOpeningResult(fileOpeningResult: any())
     }
 }

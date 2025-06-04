@@ -1,24 +1,19 @@
 import Foundation
 import Testing
-import Cuckoo
 @testable import UtilsLib
 
-final class MimeTypeDecoderTests {
+@MainActor
+struct MimeTypeDecoderTests {
 
-    var mockMimeTypeDecoderDelegate: MockMimeTypeDecoderProtocol!
-    var mimeTypeDecoder: MimeTypeDecoder!
+    private let mockMimeTypeDecoderDelegate: MimeTypeDecoderProtocolMock!
+    private let mimeTypeDecoder: MimeTypeDecoder!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
-        mockMimeTypeDecoderDelegate = MockMimeTypeDecoderProtocol()
+        mockMimeTypeDecoderDelegate = MimeTypeDecoderProtocolMock()
         mimeTypeDecoder = MimeTypeDecoder()
         mimeTypeDecoder.delegate = mockMimeTypeDecoderDelegate
-    }
-
-    deinit {
-        mockMimeTypeDecoderDelegate = nil
-        mimeTypeDecoder = nil
     }
 
     @Test
@@ -46,8 +41,8 @@ final class MimeTypeDecoderTests {
 
     @Test
     func parse_success() {
-        stub(mockMimeTypeDecoderDelegate) { mockDelegate in
-            when(mockDelegate.isElementFound(named: anyString(), attributes: any())).thenReturn(true)
+        mockMimeTypeDecoderDelegate.isElementFoundHandler = { _, _ in
+            return true
         }
 
         let xmlString = """

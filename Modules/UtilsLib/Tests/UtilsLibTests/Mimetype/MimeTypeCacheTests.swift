@@ -2,11 +2,10 @@ import Foundation
 import Testing
 import CommonsLib
 import CommonsTestShared
-import Cuckoo
 
 @testable import UtilsLib
 
-final class MimeTypeCacheTests {
+struct MimeTypeCacheTests {
 
     private var mimeTypeCache: MimeTypeCacheProtocol!
     private var tempDirectory: URL!
@@ -15,10 +14,6 @@ final class MimeTypeCacheTests {
         await UtilsLibAssembler.shared.initialize()
 
         mimeTypeCache = MimeTypeCache()
-    }
-
-    deinit {
-        mimeTypeCache = nil
     }
 
     @Test

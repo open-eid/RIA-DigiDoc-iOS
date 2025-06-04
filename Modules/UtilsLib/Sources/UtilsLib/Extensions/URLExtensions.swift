@@ -11,7 +11,7 @@ extension URL {
 
     @MainActor
     public func mimeType(fileUtil: FileUtilProtocol =
-                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) async -> String {
+                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) async -> String {
         let defaultMimeType = Constants.MimeType.Default
 
         do {
@@ -47,7 +47,7 @@ extension URL {
 
     @MainActor
     public func isDdoc(mimeTypeDecoder: MimeTypeDecoderProtocol =
-                       UtilsLibAssembler.shared.resolve(MimeTypeDecoderProtocol.self)) -> Bool {
+                        UtilsLibAssembler.shared.resolve(MimeTypeDecoderProtocol.self)) -> Bool {
         do {
             let xmlData = try Data(contentsOf: self)
             let result = mimeTypeDecoder.parse(xmlData: xmlData)
@@ -135,7 +135,7 @@ extension URL {
 
     @MainActor
     public func validURL(fileUtil: FileUtilProtocol =
-                         UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) throws -> URL {
+                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) throws -> URL {
         _ = self.startAccessingSecurityScopedResource()
 
         defer {

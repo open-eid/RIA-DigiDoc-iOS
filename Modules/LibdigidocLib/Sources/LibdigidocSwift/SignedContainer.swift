@@ -76,12 +76,14 @@ extension SignedContainer {
 
         guard let containerFile else {
             let error = isFirstDataFileContainer
-            ? DigiDocError.containerOpeningFailed(ErrorDetail(message: "Cannot open container. Container file is nil"))
-            : DigiDocError.containerCreationFailed(
-                ErrorDetail(
-                    message: "Cannot create container. Container file is nil"
+                ? DigiDocError.containerOpeningFailed(
+                    ErrorDetail(
+                        message: "Cannot open container. Container file is nil"))
+                : DigiDocError.containerCreationFailed(
+                    ErrorDetail(
+                        message: "Cannot create container. Container file is nil"
+                    )
                 )
-            )
             throw error
         }
 
@@ -110,21 +112,21 @@ extension SignedContainer {
         let isSaved = try await container.save(file: containerFile)
         guard isSaved else {
             throw DigiDocError
-                .containerSavingFailed(
-                    ErrorDetail(
-                        message: "Cannot finish creating container. Unable to save the container"
-                    )
+            .containerSavingFailed(
+                ErrorDetail(
+                    message: "Cannot finish creating container. Unable to save the container"
                 )
+            )
         }
 
         let createdContainer = await container.getContainer()
         guard let createdContainer else {
             throw DigiDocError
-                .containerOpeningFailed(
-                    ErrorDetail(
-                        message: "Cannot open container after creation. Unable to get container"
-                    )
+            .containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot open container after creation. Unable to get container"
                 )
+            )
         }
 
         return SignedContainer(

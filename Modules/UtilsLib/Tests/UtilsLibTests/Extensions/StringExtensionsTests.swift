@@ -15,7 +15,7 @@ class StringSanitizationTests {
     @Test
     func sanitized_removesSymbols() {
         let symbols = "Test∑∞€©®←→Data"
-        #expect("TestData" == symbols.sanitized())
+        #expect(symbols.sanitized() == "TestData")
     }
 
     @Test

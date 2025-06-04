@@ -22,14 +22,12 @@
 		DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF9B53972CF7B01B00971F2A /* UtilsLib */; };
 		DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE3E2D1495EC001D951B /* CommonsLib */; };
 		DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE402D1495EE001D951B /* UtilsLib */; };
-		DFA3EE552D149B2B001D951B /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE542D149B2B001D951B /* Cuckoo */; };
 		DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5A2D14C4C2001D951B /* Alamofire */; };
 		DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
 		DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE6C2D15113A001D951B /* CommonsTestShared */; };
 		DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F12B2CF020C200185A7F /* CommonsLib */; };
 		DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F1302CF0217C00185A7F /* CommonsLib */; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
-		DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */ = {isa = PBXBuildFile; productRef = DFBECAB12CCC2A610035F949 /* Cuckoo */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +120,14 @@
 				ViewModel/ContentViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
+				ViewModel/Protocols/CertificateDetailViewModelProtocol.swift,
+				ViewModel/Protocols/ContentViewModelProtocol.swift,
+				ViewModel/Protocols/FileOpeningViewModelProtocol.swift,
+				ViewModel/Protocols/MainSignatureViewModelProtocol.swift,
+				ViewModel/Protocols/RecentDocumentsViewModelProtocol.swift,
+				ViewModel/Protocols/Shared/SharedContainerViewModelProtocol.swift,
+				ViewModel/Protocols/SignatureDetailViewModelProtocol.swift,
+				ViewModel/Protocols/SigningViewModelProtocol.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
 				ViewModel/SignatureDetailViewModel.swift,
@@ -171,6 +177,13 @@
 			);
 			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;
 		};
+		DFDBADEC2DE7BDBC00C8A9A5 /* Exceptions for "RIADigiDocTests" folder in "RIADigiDocTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TestPlans/AllTests.xctestplan,
+			);
+			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -203,6 +216,9 @@
 		};
 		DFDB148F2CC97B1000153876 /* RIADigiDocTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DFDBADEC2DE7BDBC00C8A9A5 /* Exceptions for "RIADigiDocTests" folder in "RIADigiDocTests" target */,
+			);
 			path = RIADigiDocTests;
 			sourceTree = "<group>";
 		};
@@ -232,7 +248,6 @@
 				DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */,
 				DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */,
 				DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */,
-				DFA3EE552D149B2B001D951B /* Cuckoo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,7 +271,6 @@
 			files = (
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
-				DFBECAB22CCC2A610035F949 /* Cuckoo in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
 				DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */,
@@ -374,7 +388,6 @@
 			packageProductDependencies = (
 				DFA3EE3E2D1495EC001D951B /* CommonsLib */,
 				DFA3EE402D1495EE001D951B /* UtilsLib */,
-				DFA3EE542D149B2B001D951B /* Cuckoo */,
 				DFA3EE5C2D14C9B7001D951B /* Alamofire */,
 				DFA3EE6C2D15113A001D951B /* CommonsTestShared */,
 			);
@@ -426,7 +439,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DF0B68A02D07DC2300A5457C /* PBXTargetDependency */,
 				DFDB148E2CC97B1000153876 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -434,7 +446,6 @@
 			);
 			name = RIADigiDocTests;
 			packageProductDependencies = (
-				DFBECAB12CCC2A610035F949 /* Cuckoo */,
 				DF17B6392CDD2996009B1E17 /* Swinject */,
 				DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */,
 				DFB1F12B2CF020C200185A7F /* CommonsLib */,
@@ -513,7 +524,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
-				DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */,
 				DF84249F2CD442DC003F592D /* XCRemoteSwiftPackageReference "Swinject" */,
 				DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */,
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
@@ -639,10 +649,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DF0B68A02D07DC2300A5457C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = DF0B689F2D07DC2300A5457C /* CuckooPluginSingleFile */;
-		};
 		DF4E43CA2D0BA38600967997 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
@@ -745,7 +751,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
 			};
@@ -769,7 +775,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
 				VALIDATE_PRODUCT = YES;
@@ -1020,7 +1026,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -1047,7 +1053,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RIADigiDoc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RIADigiDoc";
 				XROS_DEPLOYMENT_TARGET = 2.0;
@@ -1195,14 +1201,6 @@
 				version = 5.10.2;
 			};
 		};
-		DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Brightify/Cuckoo.git";
-			requirement = {
-				kind = exactVersion;
-				version = 2.0.14;
-			};
-		};
 		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -1217,11 +1215,6 @@
 		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonsTestShared;
-		};
-		DF0B689F2D07DC2300A5457C /* CuckooPluginSingleFile */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
-			productName = "plugin:CuckooPluginSingleFile";
 		};
 		DF17B6392CDD2996009B1E17 /* Swinject */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1279,11 +1272,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
 		};
-		DFA3EE542D149B2B001D951B /* Cuckoo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
-			productName = Cuckoo;
-		};
 		DFA3EE5A2D14C4C2001D951B /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
@@ -1310,11 +1298,6 @@
 		DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LibdigidocLib;
-		};
-		DFBECAB12CCC2A610035F949 /* Cuckoo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DFBECAB02CCC2A610035F949 /* XCRemoteSwiftPackageReference "Cuckoo" */;
-			productName = Cuckoo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

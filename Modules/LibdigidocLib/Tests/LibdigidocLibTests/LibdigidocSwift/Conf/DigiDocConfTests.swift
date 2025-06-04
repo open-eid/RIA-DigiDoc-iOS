@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Cuckoo
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib

@@ -2,10 +2,9 @@ import Foundation
 import CommonsLib
 import CommonsTestShared
 import Testing
-import Cuckoo
 @testable import UtilsLib
 
-final class DirectoriesTests {
+struct DirectoriesTests {
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()

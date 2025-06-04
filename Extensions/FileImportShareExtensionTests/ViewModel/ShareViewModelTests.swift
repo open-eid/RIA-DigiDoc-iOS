@@ -1,24 +1,20 @@
 import Foundation
 import Testing
 import UniformTypeIdentifiers
-import Cuckoo
 import CommonsTestShared
 
 @testable import FileImportShareExtension
 
+private let isLiveWebsiteTestsEnabled = false
+
 @MainActor
-final class ShareViewModelTests {
-    private static let isLiveWebsiteTestsEnabled = false
+struct ShareViewModelTests {
     private static let remoteURLForTestFile = "https://localhost/test.txt"
 
     private var viewModel: ShareViewModel!
 
     init() async throws {
         viewModel = ShareViewModel()
-    }
-
-    deinit {
-        viewModel = nil
     }
 
     @Test
@@ -136,7 +132,7 @@ final class ShareViewModelTests {
 
         let result = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.url.identifier)
 
-        #expect(result != nil)
+        #expect(result.isValidURL())
     }
 
     @Test
@@ -150,7 +146,7 @@ final class ShareViewModelTests {
 
         let result = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.data.identifier)
 
-        #expect(result != nil)
+        #expect(result.isValidURL())
     }
 
     @Test

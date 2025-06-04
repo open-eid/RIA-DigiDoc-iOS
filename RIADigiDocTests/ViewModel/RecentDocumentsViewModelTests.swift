@@ -1,21 +1,21 @@
 import Foundation
 import Testing
-import Cuckoo
 
+@MainActor
 class RecentDocumentsViewModelTests {
-    private var mockSharedContainerViewModel: MockSharedContainerViewModel!
+    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
 
-    private var viewModel: RecentDocumentsViewModel!
+    private let viewModel: RecentDocumentsViewModel!
 
-    private var tempFolderURL: URL!
+    private let tempFolderURL: URL!
 
     init() async throws {
-        mockSharedContainerViewModel = MockSharedContainerViewModel()
+        mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
 
         tempFolderURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempFolderURL, withIntermediateDirectories: true)
 
-        viewModel = await RecentDocumentsViewModel(
+        viewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             folderURL: tempFolderURL
         )
@@ -23,8 +23,6 @@ class RecentDocumentsViewModelTests {
 
     deinit {
         try? FileManager.default.removeItem(at: tempFolderURL)
-        mockSharedContainerViewModel = nil
-        viewModel = nil
     }
 
     @Test
@@ -38,40 +36,44 @@ class RecentDocumentsViewModelTests {
         try? "content".write(to: invalidFile, atomically: true, encoding: .utf8)
         try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: file1.path)
 
-        await viewModel.loadFiles()
+        viewModel.loadFiles()
 
-        let filesCount = await viewModel.files.count
+        let files = viewModel.files
 
-        #expect(2 == filesCount)
-        await #expect(viewModel.files.contains { $0.url == file1 })
-        await #expect(viewModel.files.contains { $0.url == file2 })
-        await #expect(!viewModel.files.contains { $0.url == invalidFile })
+        let containsFile1 = files.contains { $0.url == file1 }
+        let containsFile2 = files.contains { $0.url == file2 }
+        let containsInvalidFile = files.contains { $0.url == invalidFile }
+
+        #expect(files.count == 2)
+        #expect(containsFile1)
+        #expect(containsFile2)
+        #expect(!containsInvalidFile)
     }
 
     @Test
     func loadFiles_emptyFilesWhenNoFolderLocation() async {
-        let recentDocumentsViewModel = await RecentDocumentsViewModel(
+        let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             folderURL: nil
         )
 
-        await recentDocumentsViewModel.loadFiles()
+        recentDocumentsViewModel.loadFiles()
 
-        let filesCount = await recentDocumentsViewModel.files.count
+        let filesCount = recentDocumentsViewModel.files.count
 
-        #expect(0 == filesCount)
+        #expect(filesCount == 0)
     }
 
     @Test
     func loadFiles_emptyFilesWhenInvalidFolderLocation() async {
-        let recentDocumentsViewModel = await RecentDocumentsViewModel(
+        let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             folderURL: URL(fileURLWithPath: "/invalid/path")
         )
 
-        await recentDocumentsViewModel.loadFiles()
+        recentDocumentsViewModel.loadFiles()
 
-        let filesCount = await recentDocumentsViewModel.files.count
+        let filesCount = recentDocumentsViewModel.files.count
 
         #expect(filesCount == 0)
     }
@@ -97,9 +99,9 @@ class RecentDocumentsViewModelTests {
 
         let filteredFiles = viewModel.filteredFiles
 
-        #expect(2 == filteredFiles.count)
-        #expect("File1.asice" == filteredFiles[0].name)
-        #expect("File2.bdoc" == filteredFiles[1].name)
+        #expect(filteredFiles.count == 2)
+        #expect(filteredFiles[0].name == "File1.asice")
+        #expect(filteredFiles[1].name == "File2.bdoc")
     }
 
     @Test
@@ -107,19 +109,19 @@ class RecentDocumentsViewModelTests {
         let mockFileURLs = [URL(fileURLWithPath: "file1.asice"), URL(fileURLWithPath: "file2.bdoc")]
         let result: Result<[URL], Error> = .success(mockFileURLs)
 
-        stub(mockSharedContainerViewModel) { mock in
-            when(mock.setFileOpeningResult(fileOpeningResult: any())).then { receivedResult in
-                guard case let .success(receivedURLs) = receivedResult else {
-                    Issue.record("Expected a successful result")
-                    return
-                }
-                #expect(mockFileURLs == receivedURLs)
-            }
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+
+        viewModel.setChosenFiles(result)
+
+        #expect(mockSharedContainerViewModel.setFileOpeningResultCallCount == 1)
+
+        guard case let .success(fileOpeningResultValue) =
+                mockSharedContainerViewModel.setFileOpeningResultArgValues.first,
+              case let .success(expectedUrls) = result,
+              fileOpeningResultValue == expectedUrls else {
+            Issue.record("Expected to have chosen files set")
+            return
         }
-
-        await viewModel.setChosenFiles(result)
-
-        verify(mockSharedContainerViewModel).setFileOpeningResult(fileOpeningResult: any())
     }
 
     @Test
@@ -143,7 +145,7 @@ class RecentDocumentsViewModelTests {
 
         viewModel.deleteFile(at: IndexSet(integer: 0))
 
-        #expect(1 == viewModel.files.count)
+        #expect(viewModel.files.count == 1)
         #expect(viewModel.files.contains { $0.url == file })
     }
 }

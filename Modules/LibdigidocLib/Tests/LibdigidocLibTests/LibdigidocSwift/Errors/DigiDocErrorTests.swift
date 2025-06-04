@@ -1,6 +1,5 @@
 import Foundation
 import Testing
-import Cuckoo
 
 @testable import LibdigidocLibSwift
 
@@ -15,7 +14,7 @@ final class DigiDocErrorTests {
 
         #expect(errorDetail.message == retrievedDetail.message)
         #expect(errorDetail.code == retrievedDetail.code)
-        #expect(["key": "value"] == retrievedDetail.userInfo)
+        #expect(retrievedDetail.userInfo == ["key": "value"])
     }
 
     @Test
@@ -24,9 +23,9 @@ final class DigiDocErrorTests {
 
         let retrievedDetail = error.errorDetail
 
-        #expect("Libdigidocpp is already initialized" == retrievedDetail.message)
-        #expect(0 == retrievedDetail.code)
-        #expect([:] == retrievedDetail.userInfo)
+        #expect(retrievedDetail.message == "Libdigidocpp is already initialized")
+        #expect(retrievedDetail.code == 0)
+        #expect(retrievedDetail.userInfo == [:])
     }
 
     @Test
@@ -60,7 +59,7 @@ final class DigiDocErrorTests {
 
         let localizedDescription = error.errorDescription
 
-        #expect("Error message for testing" == localizedDescription)
+        #expect(localizedDescription == "Error message for testing")
     }
 
     @Test

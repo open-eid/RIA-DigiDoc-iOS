@@ -1,5 +1,6 @@
 import Foundation
 
+/// @mockable
 public protocol ConfigurationRepositoryProtocol: Sendable {
     func getConfiguration() async -> ConfigurationProvider?
 

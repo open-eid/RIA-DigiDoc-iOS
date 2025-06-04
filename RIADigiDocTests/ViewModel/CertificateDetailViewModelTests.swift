@@ -1,22 +1,17 @@
 import Foundation
 import Testing
-import Cuckoo
 import CryptoKit
 import X509
 import SwiftASN1
 import Security
 import CommonsTestShared
 
-final class CertificateDetailViewModelTests {
+struct CertificateDetailViewModelTests {
 
     private var viewModel: CertificateDetailViewModel!
 
     init() async throws {
-        viewModel = await CertificateDetailViewModel()
-    }
-
-    deinit {
-        viewModel = nil
+        viewModel = CertificateDetailViewModel()
     }
 
     @Test
@@ -25,7 +20,7 @@ final class CertificateDetailViewModelTests {
 
         let serialNumber = await viewModel.getSerialNumber(cert: sampleCert)
 
-        #expect("79:80:a8:17:21:7:5:fa:da:36:7b:29:e0:10:a0:2b:25:58:7f:2c" == serialNumber)
+        #expect(serialNumber == "79:80:a8:17:21:7:5:fa:da:36:7b:29:e0:10:a0:2b:25:58:7f:2c")
     }
 
     @Test
@@ -34,7 +29,7 @@ final class CertificateDetailViewModelTests {
 
         let version = await viewModel.getVersion(cert: sampleCert)
 
-        #expect("X509v3" == version)
+        #expect(version == "X509v3")
     }
 
     @Test
@@ -46,7 +41,7 @@ final class CertificateDetailViewModelTests {
             attribute: ASN1ObjectIdentifier.NameAttributes.commonName
         )
 
-        #expect("SubjectCommonName" == subjectCN)
+        #expect(subjectCN == "SubjectCommonName")
     }
 
     @Test
@@ -58,7 +53,7 @@ final class CertificateDetailViewModelTests {
             attribute: ASN1ObjectIdentifier.NameAttributes.commonName
         )
 
-        #expect("TestCommonName" == issuerCN)
+        #expect(issuerCN == "TestCommonName")
     }
 
     @Test
@@ -67,7 +62,7 @@ final class CertificateDetailViewModelTests {
 
         let signatureAlgorithm = await viewModel.getSignatureAlgorithm(cert: sampleCert)
 
-        #expect("SignatureAlgorithm.sha256WithRSAEncryption" == signatureAlgorithm)
+        #expect(signatureAlgorithm == "SignatureAlgorithm.sha256WithRSAEncryption")
     }
 
     @Test
@@ -76,7 +71,7 @@ final class CertificateDetailViewModelTests {
 
         let notValidBefore = await viewModel.getNotValidBefore(cert: sampleCert)
 
-        #expect("2025-01-31 17:02:12 +0000" == notValidBefore)
+        #expect(notValidBefore == "2025-01-31 17:02:12 +0000")
     }
 
     @Test
@@ -85,7 +80,7 @@ final class CertificateDetailViewModelTests {
 
         let notValidAfter = await viewModel.getNotValidAfter(cert: sampleCert)
 
-        #expect("2027-05-06 17:02:12 +0000" == notValidAfter)
+        #expect(notValidAfter == "2027-05-06 17:02:12 +0000")
     }
 
     @Test
@@ -94,7 +89,7 @@ final class CertificateDetailViewModelTests {
 
         let fingerprint = await viewModel.getSHA256Fingerprint(cert: sampleCert)
 
-        #expect(95 == fingerprint.count)
+        #expect(fingerprint.count == 95)
     }
 
     @Test
@@ -103,7 +98,7 @@ final class CertificateDetailViewModelTests {
 
         let fingerprint = await viewModel.getSHA1Fingerprint(cert: sampleCert)
 
-        #expect(59 == fingerprint.count)
+        #expect(fingerprint.count == 59)
     }
 
     @Test
@@ -112,7 +107,7 @@ final class CertificateDetailViewModelTests {
 
         let algorithm = await viewModel.getPublicKeyAlgorithm(cert: sampleCert)
 
-        #expect("RSA" == algorithm)
+        #expect(algorithm == "RSA")
     }
 
     @Test
@@ -136,7 +131,7 @@ final class CertificateDetailViewModelTests {
 
         let keyUsage = await viewModel.getKeyUsage(cert: sampleCert)
 
-        #expect("digitalSignature, keyEncipherment" == keyUsage)
+        #expect(keyUsage == "digitalSignature, keyEncipherment")
     }
 
     @Test
@@ -160,34 +155,34 @@ final class CertificateDetailViewModelTests {
 
         let extensions = await viewModel.getExtensions(cert: sampleCert)
 
-        #expect(6 == extensions.count)
+        #expect(extensions.count == 6)
     }
 
     @Test
     func certificateDataWithInvalidCertificateReturnsDefaultValues() async {
         let invalidCert = Data([0x00, 0x01, 0x02])
 
-        #expect(await "" == viewModel.getSerialNumber(cert: invalidCert))
-        #expect(await "" == viewModel.getVersion(cert: invalidCert))
-        #expect(await "" == viewModel.getSubjectAttribute(
-            cert: invalidCert,
-            attribute: ASN1ObjectIdentifier.NameAttributes.commonName)
+        #expect(await viewModel.getSerialNumber(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getVersion(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getSubjectAttribute(
+                    cert: invalidCert,
+                    attribute: ASN1ObjectIdentifier.NameAttributes.commonName).isEmpty
         )
-        #expect(await "" == viewModel.getIssuerAttribute(
-            cert: invalidCert,
-            attribute: ASN1ObjectIdentifier.NameAttributes.commonName)
+        #expect(await viewModel.getIssuerAttribute(
+                    cert: invalidCert,
+                    attribute: ASN1ObjectIdentifier.NameAttributes.commonName).isEmpty
         )
-        #expect(await "" == viewModel.getSignatureAlgorithm(cert: invalidCert))
-        #expect(await "" == viewModel.getNotValidBefore(cert: invalidCert))
-        #expect(await "" == viewModel.getNotValidAfter(cert: invalidCert))
-        #expect(await "" == viewModel.getPublicKeyAlgorithm(cert: invalidCert))
-        #expect(await "" == viewModel.getPublicKeyHexString(cert: invalidCert))
-        #expect(await "" == viewModel.getKeyUsage(cert: invalidCert))
-        #expect(await "" == viewModel.getSignature(cert: invalidCert))
-        #expect(await 0 == viewModel.getExtensions(cert: invalidCert).count)
-        #expect(await SHA256.hash(data: invalidCert).hexString() == viewModel.getSHA256Fingerprint(cert: invalidCert))
+        #expect(await viewModel.getSignatureAlgorithm(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getNotValidBefore(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getNotValidAfter(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getPublicKeyAlgorithm(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getPublicKeyHexString(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getKeyUsage(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getSignature(cert: invalidCert).isEmpty)
+        #expect(await viewModel.getExtensions(cert: invalidCert).count == 0)
+        #expect(await viewModel.getSHA256Fingerprint(cert: invalidCert) == SHA256.hash(data: invalidCert).hexString())
         #expect(
-            await Insecure.SHA1.hash(data: invalidCert).hexString() == viewModel.getSHA1Fingerprint(cert: invalidCert)
+            await viewModel.getSHA1Fingerprint(cert: invalidCert) == Insecure.SHA1.hash(data: invalidCert).hexString()
         )
     }
 }

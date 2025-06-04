@@ -1,25 +1,23 @@
 import Foundation
+import OSLog
 import LibdigidocLibSwift
 import Testing
-import Cuckoo
 import UtilsLib
 import CommonsLib
 import CommonsTestShared
 
-final class SigningViewModelTests {
-    private var mockSharedContainerViewModel: MockSharedContainerViewModel!
+@MainActor
+struct SigningViewModelTests {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModelTests")
+
+    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
     private var viewModel: SigningViewModel!
     private var fileManager: FileManager!
 
     init() async throws {
         fileManager = FileManager.default
-        mockSharedContainerViewModel = MockSharedContainerViewModel()
-        viewModel = await SigningViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
-    }
-
-    deinit {
-        viewModel = nil
-        mockSharedContainerViewModel = nil
+        mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        viewModel = SigningViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
     }
 
     @Test
@@ -35,8 +33,8 @@ final class SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: signedContainer)
 
-        let dataFiles = await viewModel.dataFiles
-        let signatures = await viewModel.signatures
+        let dataFiles = viewModel.dataFiles
+        let signatures = viewModel.signatures
 
         defer {
             try? FileManager.default.removeItem(at: tempFile)
@@ -46,7 +44,8 @@ final class SigningViewModelTests {
         #expect(containerSignatures.count == signatures.count)
     }
 
-    @Test
+    // Enable when its possible to get configuration data from test website
+    @Test(.disabled())
     func loadContainerData_successWithExistingContainer() async throws {
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
 
@@ -64,8 +63,8 @@ final class SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: signedContainer)
 
-        let dataFiles = await viewModel.dataFiles
-        let signatures = await viewModel.signatures
+        let dataFiles = viewModel.dataFiles
+        let signatures = viewModel.signatures
 
         #expect(containerDataFiles.count == dataFiles.count)
         #expect(containerSignatures.count == signatures.count)
@@ -75,8 +74,8 @@ final class SigningViewModelTests {
     func loadContainerData_returnEmptyValuesWhenSignedContainerNil() async {
         await viewModel.loadContainerData(signedContainer: nil)
 
-        let dataFiles = await viewModel.dataFiles
-        let signatures = await viewModel.signatures
+        let dataFiles = viewModel.dataFiles
+        let signatures = viewModel.signatures
 
         #expect(dataFiles.isEmpty)
         #expect(signatures.isEmpty)
@@ -89,14 +88,14 @@ final class SigningViewModelTests {
         let testData = Data("Sample data".utf8)
         fileManager.createFile(atPath: containerFile.path, contents: testData, attributes: nil)
 
-        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
+        let fileCopy = viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
 
         guard let file = fileCopy else {
             Issue.record("Unable to get copy of container file")
             return
         }
 
-        #expect(file != nil)
+        #expect(file.isFileURL)
         #expect(fileManager.fileExists(atPath: file.path))
 
         try? fileManager.removeItem(at: testDirectory)
@@ -104,7 +103,7 @@ final class SigningViewModelTests {
 
     @Test
     func createCopyOfContainerForSaving_returnNilWithNilContainerURL() async {
-        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: nil)
+        let fileCopy = viewModel.createCopyOfContainerForSaving(containerURL: nil)
         #expect(fileCopy == nil)
     }
 
@@ -115,7 +114,7 @@ final class SigningViewModelTests {
 
         let nonExistentFile = testDirectory.appendingPathComponent("nonexistent-\(UUID().uuidString).asice")
 
-        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: nonExistentFile)
+        let fileCopy = viewModel.createCopyOfContainerForSaving(containerURL: nonExistentFile)
 
         #expect(fileCopy == nil)
 
@@ -143,14 +142,14 @@ final class SigningViewModelTests {
             attributes: nil
         )
 
-        let fileCopy = await viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
+        let fileCopy = viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
 
         guard let file = fileCopy else {
             Issue.record("Unable to get copy of container file")
             return
         }
 
-        #expect(file != nil)
+        #expect(file.isFileURL)
         #expect(fileManager.fileExists(atPath: file.path))
 
         let newData = try Data(contentsOf: file)
@@ -168,7 +167,7 @@ final class SigningViewModelTests {
         let testFile = testDirectory.appendingPathComponent("testFile-\(UUID().uuidString).asice")
         fileManager.createFile(atPath: testFile.path, contents: Data(), attributes: nil)
 
-        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: testFile)
+        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: testFile)
         #expect(containerFileExists)
 
         try? fileManager.removeItem(at: testDirectory)
@@ -181,7 +180,7 @@ final class SigningViewModelTests {
 
         let nonExistentFile = testDirectory.appendingPathComponent("nonExistent-\(UUID().uuidString).asice")
 
-        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: nonExistentFile)
+        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: nonExistentFile)
         #expect(!containerFileExists)
 
         try? fileManager.removeItem(at: testDirectory)
@@ -189,7 +188,7 @@ final class SigningViewModelTests {
 
     @Test
     func checkIfContainerFileExists_returnFalseWithNilInput() async {
-        let containerFileExists = await viewModel.checkIfContainerFileExists(fileLocation: nil)
+        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: nil)
         #expect(!containerFileExists)
     }
 
@@ -206,7 +205,7 @@ final class SigningViewModelTests {
 
         #expect(fileManager.fileExists(atPath: savedFilesDirectory.path))
 
-        await viewModel.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
+        viewModel.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
 
         #expect(!fileManager.fileExists(atPath: savedFilesDirectory.path))
 
@@ -220,8 +219,8 @@ final class SigningViewModelTests {
 
         let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistentDir")
 
-        await #expect(throws: Never.self) {
-            await viewModel.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
+        #expect(throws: Never.self) {
+            self.viewModel.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
         }
 
         #expect(!fileManager.fileExists(atPath: nonExistentDirectory.path))

@@ -43,7 +43,7 @@ public actor ConfigurationProperty {
         }
 
         guard let downloadDateString = properties["configuration.download-date"],
-              let downloadDate = DateUtil.dateFormatter.date(from: downloadDateString) else {
+              let downloadDate = DateUtil.configurationDateFormatter.date(from: downloadDateString) else {
             throw ConfigurationPropertyError.missingOrInvalidProperty("configuration.download-date")
         }
 
