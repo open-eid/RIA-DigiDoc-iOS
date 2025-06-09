@@ -5,19 +5,28 @@ import ConfigLib
 
 @main
 struct RIADigiDocApp: App {
+    @AppStorage("colorScheme") private var colorScheme: Int = 2
+
     @StateObject private var languageSettings = LanguageSettings()
     @State private var isSetupComplete = false
     @State private var isJailbroken: Bool = false
 
-    init() {}
+    init() {
+    }
 
     var body: some Scene {
         WindowGroup {
             if isJailbroken {
                 JailbreakView()
+                    .environment(\.typography, Typography.current())
             } else if isSetupComplete {
-                ContentView()
-                    .environmentObject(languageSettings)
+                NavigationView {
+                    ContentView()
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+                .environmentObject(languageSettings)
+                .environment(\.typography, Typography.current())
+                .overlay(ToastOverlay())
             } else {
                 LaunchScreenView()
                     .onAppear {

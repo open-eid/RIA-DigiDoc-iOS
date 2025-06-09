@@ -3,6 +3,8 @@ import LibdigidocLibSwift
 
 struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode
+    @AppTheme private var theme
+    @AppTypography private var typography
     @EnvironmentObject var languageSettings: LanguageSettings
 
     @State private var selectedSignature: SignatureWrapper?
