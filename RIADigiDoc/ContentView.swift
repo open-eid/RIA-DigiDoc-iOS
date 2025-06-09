@@ -4,6 +4,8 @@ import UtilsLib
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @AppTheme private var theme
+    @AppTypography private var typography
     @EnvironmentObject var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: ContentViewModel
@@ -17,7 +19,13 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationView {
+        TopBarContainer(
+            leftIcon: "ic_m3_menu_48pt_wght400",
+            leftIconAccessibility: "Menu",
+            onLeftClick: {},
+            onRightPrimaryClick: {},
+            onRightSecondaryClick: {},
+            content: {
             ScrollView {
                 VStack {
                     Image(systemName: "globe")
@@ -25,6 +33,8 @@ struct ContentView: View {
                         .foregroundStyle(.tint)
                         .accessibilityLabel(Text(verbatim: "Globe"))
                     Text(verbatim: "Hello, world!")
+                        .foregroundStyle(theme.onBackground)
+                        .font(typography.bodyLarge)
                 }
                 .padding()
 
@@ -49,7 +59,7 @@ struct ContentView: View {
                     }
                 }
             }
-        }
+        })
     }
 }
 

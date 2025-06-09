@@ -595,6 +595,19 @@
 			</dict>
 		</dict>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Roboto_Condensed-Bold.ttf</string>
+		<string>Roboto_Condensed-Light.ttf</string>
+		<string>Roboto_Condensed-Medium.ttf</string>
+		<string>Roboto_Condensed-Regular.ttf</string>
+		<string>Roboto_Condensed-SemiBold.ttf</string>
+		<string>Roboto-Bold.ttf</string>
+		<string>Roboto-Light.ttf</string>
+		<string>Roboto-Medium.ttf</string>
+		<string>Roboto-Regular.ttf</string>
+		<string>Roboto-SemiBold.ttf</string>
+	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
