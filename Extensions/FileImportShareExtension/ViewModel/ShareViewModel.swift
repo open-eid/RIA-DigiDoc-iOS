@@ -6,7 +6,7 @@ import UtilsLib
 import Alamofire
 
 @MainActor
-class ShareViewModel: NSObject, ObservableObject {
+class ShareViewModel: NSObject, ShareViewModelProtocol, ObservableObject {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.FileImportShareExtension",
         category: "ShareViewController"
@@ -14,15 +14,31 @@ class ShareViewModel: NSObject, ObservableObject {
 
     @Published var status: Status = .processing
 
+    private let fileManager: FileManagerProtocol
+    private let resourceChecker: URLResourceCheckerProtocol
+
+    public init(
+        fileManager: FileManagerProtocol = FileManager.default,
+        resourceChecker: URLResourceCheckerProtocol = URLResourceChecker()
+    ) {
+        self.fileManager = fileManager
+        self.resourceChecker = resourceChecker
+    }
+
     @discardableResult
-    func importFiles(extensionContext: NSExtensionContext?) async -> Bool {
+    func importFiles(_ items: [ImportedFileItem]) async -> Bool {
         ShareViewModel.logger.debug("Importing files...")
-        guard let items = extensionContext?.inputItems as? [NSExtensionItem], !items.isEmpty else {
+        guard !items.isEmpty else {
             status = .failed
             return false
         }
         do {
-            let isImported = try await cacheItem(itemIndex: 0, providerIndex: 0, items: items)
+            let isImported = try await cacheItem(
+                itemIndex: 0,
+                providerIndex: 0,
+                items: items
+            )
+
             if isImported {
                 ShareViewModel.logger.debug("Files imported successfully")
             } else {
@@ -40,90 +56,52 @@ class ShareViewModel: NSObject, ObservableObject {
         return false
     }
 
-    func cacheItem(itemIndex: Int, providerIndex: Int, items: [NSExtensionItem]) async throws -> Bool {
+    func cacheItem(
+        itemIndex: Int,
+        providerIndex: Int,
+        items: [ImportedFileItem]
+    ) async throws -> Bool {
         guard itemIndex < items.count else {
             return true
         }
 
         let item = items[itemIndex]
-        guard let attachments = item.attachments, providerIndex < attachments.count else {
-            return try await cacheItem(itemIndex: itemIndex + 1, providerIndex: 0, items: items)
-        }
-
-        let provider = attachments[providerIndex]
-        let imported = try await cacheFileForProvider(provider: provider)
+        let imported = try await cacheFileForProvider(fileItem: item)
         if imported {
-            return try await cacheItem(itemIndex: itemIndex, providerIndex: providerIndex + 1, items: items)
+            return try await cacheItem(itemIndex: itemIndex + 1, providerIndex: providerIndex + 1, items: items)
         }
 
         return false
     }
 
-    func cacheFileForProvider(provider: NSItemProvider?) async throws -> Bool {
-        guard let provider = provider else { return false }
+    func cacheFileForProvider(fileItem: ImportedFileItem) async throws -> Bool {
+        let typeIdentifiers = [UTType.fileURL, UTType.url, UTType.data]
 
-        let typeIdentifiers = [UTType.fileURL.identifier, UTType.url.identifier, UTType.data.identifier]
-
-        for typeIdentifier in typeIdentifiers where provider.hasItemConformingToTypeIdentifier(typeIdentifier) {
-            let item = try await loadItem(for: provider, typeIdentifier: typeIdentifier)
-            return await cacheFileOnUrl(item)
+        if typeIdentifiers.contains(fileItem.typeIdentifier) {
+            return await cacheFileOnUrl(fileItem.fileUrl)
         }
 
         return false
-    }
-
-    @MainActor
-    func loadItem(for provider: NSItemProvider, typeIdentifier: String) async throws -> URL {
-        return try await withCheckedThrowingContinuation { continuation in
-            provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { item, error in
-                if let error = error {
-                    continuation
-                        .resume(
-                            throwing: FileImportError.loadError(description: error.localizedDescription)
-                        )
-                } else if item != nil {
-                    if let itemData = item as? Data {
-                        Task {
-                            do {
-                                let dataToUrl = try await self.convertNSDataToURL(data: itemData)
-                                continuation.resume(returning: dataToUrl)
-                                return
-                            } catch {
-                                continuation.resume(throwing: FileImportError.dataConversionFailed)
-                                return
-                            }
-                        }
-                    } else if let itemUrl = item as? URL {
-                        continuation.resume(returning: itemUrl)
-                        return
-                    } else {
-                        continuation.resume(throwing: FileImportError.invalidItemData)
-                        return
-                    }
-                } else {
-                    continuation.resume(throwing: FileImportError.invalidItemData)
-                    return
-                }
-            }
-        }
     }
 
     func convertNSDataToURL(data: Data) throws -> URL {
-        let tempDirectoryURL = FileManager.default.temporaryDirectory
+        let tempDirectoryURL = fileManager.temporaryDirectory
         let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
 
         try data.write(to: tempFileURL)
         return tempFileURL
     }
 
-    func cacheFileOnUrl(_ itemUrl: URL) async -> Bool {
+    func cacheFileOnUrl(
+        _ itemUrl: URL,
+    ) async -> Bool {
         if itemUrl.scheme == "file" {
             do {
-                if try !itemUrl.checkResourceIsReachable() {
+                if try !resourceChecker.checkResourceIsReachable(itemUrl) {
                     throw URLError(.cannotOpenFile)
                 }
 
-                let groupTempFolderUrl = try Directories.getSharedFolder()
+                let groupTempFolderUrl = try Directories.getSharedFolder(fileManager: fileManager)
 
                 let filePath = groupTempFolderUrl.appendingPathComponent(itemUrl.lastPathComponent)
 
@@ -183,7 +161,8 @@ class ShareViewModel: NSObject, ObservableObject {
 
         do {
             let destinationURL = try Directories.getTempDirectory(
-                subfolder: Constants.Folder.Shared
+                subfolder: Constants.Folder.Shared,
+                fileManager: fileManager
             ).appendingPathComponent(
                 itemUrl.lastPathComponent
             )

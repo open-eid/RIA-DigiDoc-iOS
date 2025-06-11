@@ -33,9 +33,11 @@ public struct TSLUtil {
         return filename.hasSuffix(".xml")
     }
 
-    private static func shouldCopyTSL(from sourcePath: String, to destinationPath: String) -> Bool {
-        let fileManager = FileManager.default
-
+    private static func shouldCopyTSL(
+        from sourcePath: String,
+        to destinationPath: String,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) -> Bool {
         if !fileManager.fileExists(atPath: destinationPath) {
             return true
         } else {
@@ -58,9 +60,11 @@ public struct TSLUtil {
         try data.write(to: URL(fileURLWithPath: destinationPath))
     }
 
-    private static func removeExistingETag(at filePath: String) throws {
+    private static func removeExistingETag(
+        at filePath: String,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws {
         let eTagURL = URL(fileURLWithPath: filePath).appendingPathExtension("etag")
-        let fileManager = FileManager.default
         if fileManager.fileExists(atPath: eTagURL.path) {
             try fileManager.removeItem(atPath: eTagURL.path)
         }
@@ -86,8 +90,10 @@ public struct TSLUtil {
         }
     }
 
-    private static func createDirectoryIfNotExist(at url: URL) throws {
-        let fileManager = FileManager.default
+    private static func createDirectoryIfNotExist(
+        at url: URL,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws {
         if !fileManager.fileExists(atPath: url.path) {
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
         }

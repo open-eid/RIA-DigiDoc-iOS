@@ -7,21 +7,24 @@ actor FileOpeningService: FileOpeningServiceProtocol {
 
     private let fileUtil: FileUtilProtocol
 
+    private let fileInspector: FileInspectorProtocol
+
+    @MainActor
+    private let fileManager: FileManagerProtocol
+
     @MainActor
     init(
-        fileUtil: FileUtilProtocol? = nil
+        fileUtil: FileUtilProtocol? = nil,
+        fileInspector: FileInspectorProtocol = FileInspector(),
+        fileManager: FileManagerProtocol = FileManager.default
     ) {
         self.fileUtil = fileUtil ?? UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)
+        self.fileInspector = fileInspector
+        self.fileManager = fileManager
     }
 
     func isFileSizeValid(url: URL) async throws -> Bool {
-        let resources = try url.resourceValues(forKeys: [.fileSizeKey])
-
-        guard let fileSize = resources.fileSize, fileSize > 0 else {
-            throw FileOpeningError.invalidFileSize
-        }
-
-        return true
+        return try fileInspector.fileSize(for: url) > 0
     }
 
     @MainActor
@@ -33,8 +36,8 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             var validFiles: [URL] = []
 
             for url in urls {
-                let validUrl = try url.validURL()
-                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl)
+                let validUrl = try url.validURL(fileManager: fileManager)
+                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl, fileManager: fileManager)
                 let requiresScopedAccess = try validFileUrl == nil && !fileUtil.isFileFromAppGroup(
                     url: validUrl,
                     appGroupURL: nil
@@ -53,7 +56,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
                 }
 
                 if try await isFileSizeValid(url: validUrl) {
-                    await validFiles.append(try cacheFile(from: validUrl))
+                    validFiles.append(try cacheFile(from: validUrl))
                 }
             }
 
@@ -67,8 +70,10 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         return try await SignedContainer.openOrCreate(dataFiles: dataFiles)
     }
 
-    private func cacheFile(from sourceURL: URL) throws -> URL {
-        let fileManager = FileManager.default
+    @MainActor
+    private func cacheFile(
+        from sourceURL: URL,
+    ) throws -> URL {
         let cachesDirectory = try fileManager.url(
             for: .cachesDirectory,
             in: .userDomainMask,

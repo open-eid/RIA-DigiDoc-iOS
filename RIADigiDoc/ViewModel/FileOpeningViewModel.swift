@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 import LibdigidocLibSwift
+import CommonsLib
 import UtilsLib
 
 @MainActor
@@ -16,15 +17,18 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     private let fileOpeningRepository: FileOpeningRepositoryProtocol
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileUtil: FileUtilProtocol
+    private let fileManager: FileManagerProtocol
 
     init(
         fileOpeningRepository: FileOpeningRepositoryProtocol,
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        fileUtil: FileUtilProtocol? = nil
+        fileUtil: FileUtilProtocol? = nil,
+        fileManager: FileManagerProtocol = FileManager.default
     ) {
         self.fileOpeningRepository = fileOpeningRepository
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileUtil = fileUtil ?? UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)
+        self.fileManager = fileManager
     }
 
     func handleFiles() async {
@@ -34,7 +38,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
-            try fileUtil.removeSharedFiles(url: Directories.getSharedFolder())
+            try fileUtil.removeSharedFiles(url:
+                                            Directories.getSharedFolder(fileManager: fileManager),
+                                           fileManager: fileManager)
 
             FileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
 

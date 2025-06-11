@@ -14,17 +14,13 @@ struct FileOpeningRepositoryTests {
 
     @Test
     func isFileSizeValid_success() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
 
         mockFileOpeningService.isFileSizeValidHandler = { @Sendable _ in
             return true
         }
 
         let isValid = try await repository.isFileSizeValid(url: tempFileURL)
-
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
 
         #expect(isValid)
         #expect(mockFileOpeningService.isFileSizeValidCallCount == 1)
@@ -33,9 +29,9 @@ struct FileOpeningRepositoryTests {
 
     @Test
     func getValidFiles_success() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
 
-        let tempFileURL2 = TestFileUtil.createSampleFile()
+        let tempFileURL2 = URL(fileURLWithPath: "/mock/path/test2.txt")
 
         let fileURLs = [tempFileURL, tempFileURL2]
 
@@ -60,8 +56,8 @@ struct FileOpeningRepositoryTests {
 
     @Test
     func openOrCreateContainer_success() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
-        let tempFileURL2 = TestFileUtil.createSampleFile()
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
+        let tempFileURL2 = URL(fileURLWithPath: "/mock/path/test2.txt")
 
         let fileURLs = [tempFileURL, tempFileURL2]
 

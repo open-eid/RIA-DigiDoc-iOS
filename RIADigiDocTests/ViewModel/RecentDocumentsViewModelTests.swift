@@ -1,9 +1,11 @@
 import Foundation
+import CommonsTestShared
 import Testing
 
 @MainActor
 class RecentDocumentsViewModelTests {
-    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
+    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
+    private let mockFileManager: FileManagerProtocolMock!
 
     private let viewModel: RecentDocumentsViewModel!
 
@@ -11,18 +13,15 @@ class RecentDocumentsViewModelTests {
 
     init() async throws {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        mockFileManager = FileManagerProtocolMock()
 
-        tempFolderURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try? FileManager.default.createDirectory(at: tempFolderURL, withIntermediateDirectories: true)
+        tempFolderURL = URL(fileURLWithPath: "/mock/path")
 
         viewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: tempFolderURL
+            folderURL: tempFolderURL,
+            fileManager: mockFileManager
         )
-    }
-
-    deinit {
-        try? FileManager.default.removeItem(at: tempFolderURL)
     }
 
     @Test
@@ -31,10 +30,17 @@ class RecentDocumentsViewModelTests {
         let file2 = tempFolderURL.appendingPathComponent("test2.bdoc")
         let invalidFile = tempFolderURL.appendingPathComponent("invalid.txt")
 
-        try? "content".write(to: file1, atomically: true, encoding: .utf8)
-        try? "content".write(to: file2, atomically: true, encoding: .utf8)
-        try? "content".write(to: invalidFile, atomically: true, encoding: .utf8)
-        try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: file1.path)
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
+            return [file1, file2, invalidFile]
+        }
+
+        mockFileManager.attributesOfItemHandler = { path in
+            if path == file1.path || path == file2.path {
+                return [.modificationDate: Date()]
+            }
+
+            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError, userInfo: nil)
+        }
 
         viewModel.loadFiles()
 
@@ -128,13 +134,22 @@ class RecentDocumentsViewModelTests {
     @MainActor
     func deleteFile_success() async {
         let file = tempFolderURL.appendingPathComponent("test1.asice")
-        try? "content".write(to: file, atomically: true, encoding: .utf8)
+
+        var mockFiles: Set<URL> = [file]
+
+        mockFileManager.removeItemHandler = { url in
+            guard mockFiles.contains(url) else {
+                throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError, userInfo: nil)
+            }
+            mockFiles.remove(url)
+        }
+
         viewModel.files = [FileItem(name: "test1.asice", url: file, modifiedDate: Date())]
 
         viewModel.deleteFile(at: IndexSet(integer: 0))
 
         #expect(!viewModel.files.contains { $0.url == file })
-        #expect(!FileManager.default.fileExists(atPath: file.path))
+        #expect(!mockFiles.contains(file))
     }
 
     @Test
@@ -143,8 +158,13 @@ class RecentDocumentsViewModelTests {
         let file = tempFolderURL.appendingPathComponent("test1.asice")
         viewModel.files = [FileItem(name: "test1.asice", url: file, modifiedDate: Date())]
 
+        mockFileManager.removeItemHandler = { _ in
+            throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError, userInfo: nil)
+        }
+
         viewModel.deleteFile(at: IndexSet(integer: 0))
 
+        #expect(mockFileManager.removeItemCallCount == 1)
         #expect(viewModel.files.count == 1)
         #expect(viewModel.files.contains { $0.url == file })
     }

@@ -17,6 +17,9 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     private let configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol
 
     @MainActor
+    private var fileManager: FileManagerProtocol
+
+    @MainActor
     public init(
         centralConfigurationRepository: CentralConfigurationRepositoryProtocol = ConfigLibAssembler.shared.resolve(
             CentralConfigurationRepositoryProtocol.self),
@@ -26,19 +29,24 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         ),
         configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol = ConfigLibAssembler.shared.resolve(
             ConfigurationSignatureVerifierProtocol.self
-        )
+        ),
+        fileManager: FileManagerProtocol = FileManager.default
     ) {
         self.centralConfigurationRepository = centralConfigurationRepository
         self.configurationProperty = configurationProperty
         self.configurationProperties = configurationProperties
         self.configurationSignatureVerifier = configurationSignatureVerifier
+
+        self.fileManager = fileManager
     }
 
     public func initConfiguration(cacheDir: URL) async throws {
         ConfigurationLoader.logger.debug("Initializing configuration")
 
-        if !FileManager.default.fileExists(atPath: cacheDir.path) {
-            try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
+        try await MainActor.run {
+            if !fileManager.fileExists(atPath: cacheDir.path) {
+                try fileManager.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
+            }
         }
 
         try await loadCachedConfiguration(afterCentralCheck: false, cacheDir: cacheDir)
@@ -86,10 +94,13 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         let publicKeyFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
         let signatureFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
 
-        if FileManager.default.fileExists(atPath: confFile.path) &&
-            FileManager.default.fileExists(atPath: publicKeyFile.path) &&
-            FileManager.default.fileExists(atPath: signatureFile.path) {
+        let configFilesExist = await MainActor.run {
+            fileManager.fileExists(atPath: confFile.path) &&
+            fileManager.fileExists(atPath: publicKeyFile.path) &&
+            fileManager.fileExists(atPath: signatureFile.path)
+        }
 
+        if configFilesExist {
             ConfigurationLoader.logger.debug("Initializing cached configuration")
 
             let confFileContents = try String(contentsOf: confFile, encoding: .utf8)

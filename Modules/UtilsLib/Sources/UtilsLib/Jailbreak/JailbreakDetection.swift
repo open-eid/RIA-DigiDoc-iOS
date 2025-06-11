@@ -1,4 +1,5 @@
 import UIKit
+import CommonsLib
 
 public struct JailbreakDetection {
 
@@ -35,19 +36,23 @@ public struct JailbreakDetection {
         "/usr/bin/def1nit3lyn0taja1lbr3aktool"
     ]
 
-    private static func canAccessRestrictedAreas() -> Bool {
+    private static func canAccessRestrictedAreas(
+        fileManager: FileManagerProtocol = FileManager.default,
+    ) -> Bool {
         let testPath = "/private/jailbreakTest"
         do {
             try "Jailbreak Test".write(toFile: testPath, atomically: true, encoding: .utf8)
-            try FileManager.default.removeItem(atPath: testPath)
+            try fileManager.removeItem(atPath: testPath)
             return true
         } catch {
             return false
         }
     }
 
-    private static func commonJailbreakFilesExist() -> Bool {
-        for path in commonJailbreakPaths where FileManager.default.fileExists(atPath: path) {
+    private static func commonJailbreakFilesExist(
+        fileManager: FileManagerProtocol = FileManager.default,
+    ) -> Bool {
+        for path in commonJailbreakPaths where fileManager.fileExists(atPath: path) {
             return true
         }
         return false

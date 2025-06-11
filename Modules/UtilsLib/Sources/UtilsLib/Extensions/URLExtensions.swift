@@ -135,20 +135,21 @@ extension URL {
 
     @MainActor
     public func validURL(fileUtil: FileUtilProtocol =
-                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) throws -> URL {
+                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self),
+                         fileManager: FileManagerProtocol = FileManager.default) throws -> URL {
         _ = self.startAccessingSecurityScopedResource()
 
         defer {
             self.stopAccessingSecurityScopedResource()
         }
-        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self)
+        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self, fileManager: fileManager)
 
         if let validFileURL = validFileInApp {
             return validFileURL
         }
 
         // Check if file is opened externally (outside of application)
-        let appGroupURL = try Directories.getSharedFolder()
+        let appGroupURL = try Directories.getSharedFolder(fileManager: fileManager)
         let resolvedAppGroupURL = appGroupURL.deletingLastPathComponent().resolvingSymlinksInPath()
 
         let normalizedURL = FilePath(stringLiteral: self.resolvingSymlinksInPath().path).lexicallyNormalized()
@@ -169,7 +170,7 @@ extension URL {
 
                 var fileLocationURL: URL?
 
-                fileUtil.downloadFileFromiCloud(fileURL: self) { downloadedFileUrl in
+                fileUtil.downloadFileFromiCloud(fileURL: self, fileManager: fileManager) { downloadedFileUrl in
                     if let fileUrl = downloadedFileUrl {
                         DispatchQueue.main.async {
                             fileLocationURL = fileUrl
@@ -208,17 +209,19 @@ extension URL {
         }
     }
 
-    func isFolder() -> Bool {
+    public func isFolder(
+        fileManager: FileManagerProtocol = FileManager.default
+    ) -> Bool {
         var isDirectory: ObjCBool = false
-        let exists = FileManager.default.fileExists(atPath: self.path, isDirectory: &isDirectory)
+        let exists = fileManager.fileExists(atPath: self.path, isDirectory: &isDirectory)
         return exists && isDirectory.boolValue
     }
 
-    func folderContents() throws -> [URL] {
-        let fileManager = FileManager.default
-
-        if isFolder() {
-            let fileURLs = try fileManager.contentsOfDirectory(at: self, includingPropertiesForKeys: nil)
+    public func folderContents(
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws -> [URL] {
+        if isFolder(fileManager: fileManager) {
+            let fileURLs = try fileManager.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [])
             return fileURLs
         }
         return []

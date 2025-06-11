@@ -24,38 +24,65 @@ for module in "${modules[@]}"; do
   output_file="${output_dir}/${module}+Mocks.swift"
 
   mkdir -p "$output_dir"
+
+  commons_test_dir="Modules/${module}/CommonsTestShared/Sources/CommonsTestShared/Mocks/Generated"
+  mkdir -p "$commons_test_dir"
+
   echo "\n\nGenerating mocks for $module...\n"
 
   # Set custom imports based on module
   case "$module" in
-    "LibdigidocLib")
-      custom_imports=("LibdigidocLibSwift")
-      testable_imports="LibdigidocLibSwift"
+    "CommonsLib")
+      custom_imports=()
+      testable_imports="CommonsLib"
+      destination="$commons_test_dir/${module}+Mocks.swift"
       ;;
     "ConfigLib")
-      custom_imports=("ConfigLib")
+      custom_imports=("CommonsLib")
       testable_imports="ConfigLib"
+      destination=""
+      ;;
+    "LibdigidocLib")
+      custom_imports=("CommonsLib")
+      testable_imports="LibdigidocLibSwift"
+      destination=""
       ;;
     "UtilsLib")
-      custom_imports=("UtilsLib" "CommonsLib")
+      custom_imports=("CommonsLib")
       testable_imports="UtilsLib"
+      destination=""
       ;;
     *)
       custom_imports=()
       testable_imports=""
+      destination=""
       ;;
   esac
 
-  # Run mockolo with or without custom imports
+  generate_mocks=(
+    mockolo
+      -s "$src_dir"
+      -d "$output_file"
+      --enable-args-history
+      --logging-level 1
+  )
+
+  # Add optional flags if values are provided
   if [ ${#custom_imports[@]} -gt 0 ]; then
-    mockolo -s "$src_dir" -d "$output_file" --enable-args-history \
-      --custom-imports "${custom_imports[@]}" \
-      --testable-imports "${testable_imports[@]}" \
-      --logging-level 1
-  else
-    mockolo -s "$src_dir" -d "$output_file" --enable-args-history \
-      --logging-level 1
+    generate_mocks+=(--custom-imports "${custom_imports[@]}")
   fi
+
+  if [ ${#testable_imports[@]} -gt 0 ]; then
+    generate_mocks+=(--testable-imports "${testable_imports[@]}")
+  fi
+
+  if [ -n "$destination" ]; then
+    generate_mocks+=(--destination "$destination")
+  fi
+
+  # Run the command
+  "${generate_mocks[@]}"
+
 done
 
 # Handle Extensions

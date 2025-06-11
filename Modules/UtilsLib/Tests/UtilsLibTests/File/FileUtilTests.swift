@@ -7,17 +7,13 @@ import ZIPFoundation
 
 struct FileUtilTests {
 
-    private static let testSubFolder = "FileUtilTests"
-
-    private let fileUtil: FileUtilProtocol!
+    private let mockFileManager: FileManagerProtocolMock
+    private let fileUtil: FileUtilProtocol
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
-
-        let tempDir = TestFileUtil.getTemporaryDirectory(subfolder: FileUtilTests.testSubFolder)
-        try? FileManager.default.removeItem(at: tempDir)
-
-        fileUtil = FileUtil()
+        self.mockFileManager = FileManagerProtocolMock()
+        self.fileUtil = FileUtil()
     }
 
     @Test
@@ -54,12 +50,11 @@ struct FileUtilTests {
     }
 
     @Test
-    func getValidFileInApp_returnFileURLWhenFileExistsInAppDirectory() throws {
-        let fileURL = TestFileUtil.createSampleFile()
+    func getValidFileInApp_returnFileURLWhenFileExistsInAppDirectory() async throws {
+        let fileURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
 
-        defer {
-            try? FileManager.default.removeItem(at: fileURL)
-        }
+        mockFileManager.urlsHandler = { _, _ in [fileURL] }
+        mockFileManager.contentsOfDirectoryHandler = { _ in [fileURL.path] }
 
         let result = try fileUtil.getValidFileInApp(currentURL: fileURL)
 
@@ -67,7 +62,7 @@ struct FileUtilTests {
     }
 
     @Test
-    func getValidFileInApp_returnNilWhenFileNotInDirectories() throws {
+    func getValidFileInApp_returnNilWhenFileNotInDirectories() async throws {
         let nonExistentFileURL = URL(fileURLWithPath: "someFolder")
 
         let result = try fileUtil.getValidFileInApp(currentURL: nonExistentFileURL)
@@ -76,13 +71,10 @@ struct FileUtilTests {
     }
 
     @Test
-    func getValidFileInApp_ContinueSearchAndReturnSameDirectoryURLWhenDirectoryAccessFails() throws {
-        let testDirectory = TestFileUtil.getTemporaryDirectory(subfolder: "FileUtilTests")
+    func getValidFileInApp_ContinueSearchAndReturnSameDirectoryURLWhenDirectoryAccessFails() async throws {
+        let testDirectory = URL(fileURLWithPath:
+                                    mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
         let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistent-\(UUID().uuidString)")
-
-        defer {
-            try? FileManager.default.removeItem(at: testDirectory)
-        }
 
         let result = try fileUtil.getValidFileInApp(currentURL: nonExistentDirectory)
 
@@ -92,16 +84,16 @@ struct FileUtilTests {
     @Test
     func isFileFromAppGroup_returnTrueWhenFileInsideAppGroup() async throws {
 
-        let appGroupFolder = try Directories.getSharedFolder()
-        let fileInAppGroup = appGroupFolder.appendingPathComponent("file.txt")
-
-        try FileManager.default.createDirectory(at: appGroupFolder, withIntermediateDirectories: true)
-        try "Test Data".write(to: fileInAppGroup, atomically: true, encoding: .utf8)
-
-        defer {
-            try? FileManager.default.removeItem(at: fileInAppGroup)
-            try? FileManager.default.removeItem(at: appGroupFolder)
+        mockFileManager.containerURLHandler = { _ in
+            FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+            )
         }
+
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        let appGroupFolder = try Directories.getSharedFolder(fileManager: mockFileManager)
+        let fileInAppGroup = appGroupFolder.appendingPathComponent("file.txt")
 
         let result = try fileUtil.isFileFromAppGroup(url: fileInAppGroup, appGroupURL: appGroupFolder)
 
@@ -109,20 +101,14 @@ struct FileUtilTests {
     }
 
     @Test
-    func isFileFromAppGroup_returnFalseWhenFileOutsideAppGroup() throws {
-        let appGroupFolder = try Directories.getSharedFolder()
-        let fileOutsideAppGroup = FileManager.default.temporaryDirectory.appendingPathComponent("OutsideFile.txt")
+    func isFileFromAppGroup_returnFalseWhenFileOutsideAppGroup() async throws {
+        let mockFileUrl = URL(fileURLWithPath: "/mock/path")
 
-        try FileManager.default.createDirectory(at: appGroupFolder, withIntermediateDirectories: true)
-        try "Test Data".write(to: fileOutsideAppGroup, atomically: true, encoding: .utf8)
-
-        defer {
-            try? FileManager.default.removeItem(at: fileOutsideAppGroup)
-            try? FileManager.default.removeItem(at: appGroupFolder)
-        }
+        mockFileManager.containerURLHandler = { _ in mockFileUrl }
+        mockFileManager.fileExistsHandler = { _ in true }
 
         let result = try fileUtil.isFileFromAppGroup(
-            url: fileOutsideAppGroup, appGroupURL: nil
+            url: mockFileUrl, appGroupURL: nil
         )
 
         #expect(!result)

@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import UniformTypeIdentifiers
+import CommonsLib
 import CommonsTestShared
 
 @testable import FileImportShareExtension
@@ -11,21 +12,44 @@ private let isLiveWebsiteTestsEnabled = false
 struct ShareViewModelTests {
     private static let remoteURLForTestFile = "https://localhost/test.txt"
 
+    private let mockFileManager: FileManagerProtocolMock!
+    private let mockUrlResourceChecker: URLResourceCheckerProtocolMock
+
     private var viewModel: ShareViewModel!
 
     init() async throws {
-        viewModel = ShareViewModel()
+        mockFileManager = FileManagerProtocolMock()
+        mockUrlResourceChecker = URLResourceCheckerProtocolMock()
+        viewModel = ShareViewModel(
+            fileManager: mockFileManager,
+            resourceChecker: mockUrlResourceChecker
+        )
     }
 
     @Test
     func importFiles_success() async {
-        let extensionContext = TestExtensionContext(
-            inputItems: [createTestExtensionItem(
-                with: TestFileUtil.createSampleFile()
-            )]
+        let fileUrl = URL(fileURLWithPath: "/mock/path/to/file.txt")
+        let fileUrl2 = URL(fileURLWithPath: "/mock/path/to/file2.txt")
+
+        let fileItem = ImportedFileItem(
+            fileUrl: fileUrl,
+            filename: fileUrl.lastPathComponent,
+            data: Data(),
+            typeIdentifier: .data
         )
 
-        let result = await viewModel.importFiles(extensionContext: extensionContext)
+        let fileItem2 = ImportedFileItem(
+            fileUrl: fileUrl2,
+            filename: fileUrl2.lastPathComponent,
+            data: Data(),
+            typeIdentifier: .data
+        )
+
+        mockFileManager.containerURLHandler = { _ in fileUrl }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
+
+        let result = await viewModel.importFiles([fileItem, fileItem2])
 
         #expect(result)
         #expect(Status.imported == viewModel.status)
@@ -33,18 +57,18 @@ struct ShareViewModelTests {
 
     @Test
     func importFiles_returnFalseWhenNoInputItems() async {
-        let extensionContext = TestExtensionContext(inputItems: [])
+        let fileUrl = URL(fileURLWithPath: "")
 
-        let result = await viewModel.importFiles(extensionContext: extensionContext)
+        let fileItem = ImportedFileItem(
+            fileUrl: fileUrl,
+            filename: "",
+            data: Data(),
+            typeIdentifier: .data
+        )
 
-        #expect(!result)
-        #expect(Status.failed == viewModel.status)
-    }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in false }
 
-    @Test
-    func importFiles_returnFalseWhenExtensionContextNil() async {
-
-        let result = await viewModel.importFiles(extensionContext: nil)
+        let result = await viewModel.importFiles([fileItem])
 
         #expect(!result)
         #expect(Status.failed == viewModel.status)
@@ -52,25 +76,18 @@ struct ShareViewModelTests {
 
     @Test
     func importFiles_returnFalseWhenInvalidInputItem() async {
-        let extensionContext = TestExtensionContext(inputItems: ["test"])
+        let fileUrl = URL(fileURLWithPath: "test")
 
-        let result = await viewModel.importFiles(extensionContext: extensionContext)
+        let fileItem = ImportedFileItem(
+            fileUrl: fileUrl,
+            filename: "",
+            data: Data(),
+            typeIdentifier: .data
+        )
 
-        #expect(!result)
-        #expect(Status.failed == viewModel.status)
-    }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in false }
 
-    @Test
-    func importFiles_returnFalseWhenInvalidItemProvider() async throws {
-        let provider = NSItemProvider(item: "InvalidObject" as NSString, typeIdentifier: UTType.data.identifier)
-
-        let extensionItem = NSExtensionItem()
-        extensionItem.attachments = [provider].compactMap { $0 }
-
-        let result = await viewModel
-            .importFiles(
-                extensionContext: TestExtensionContext(inputItems: [extensionItem])
-            )
+        let result = await viewModel.importFiles([fileItem])
 
         #expect(!result)
         #expect(Status.failed == viewModel.status)
@@ -78,12 +95,31 @@ struct ShareViewModelTests {
 
     @Test
     func cacheItem_success() async throws {
+        let fileUrl = URL(fileURLWithPath: "/mock/path/to/file.txt")
+        let fileUrl2 = URL(fileURLWithPath: "/mock/path/to/file2.txt")
+
+        let fileItem = ImportedFileItem(
+            fileUrl: fileUrl,
+            filename: fileUrl.lastPathComponent,
+            data: Data(),
+            typeIdentifier: .data
+        )
+
+        let fileItem2 = ImportedFileItem(
+            fileUrl: fileUrl2,
+            filename: fileUrl2.lastPathComponent,
+            data: Data(),
+            typeIdentifier: .data
+        )
+
+        mockFileManager.containerURLHandler = { _ in fileUrl }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
+
         let result = try await viewModel.cacheItem(
             itemIndex: 0,
             providerIndex: 0,
-            items: [createTestExtensionItem(
-                with: TestFileUtil.createSampleFile()
-            )]
+            items: [fileItem, fileItem2]
         )
 
         #expect(result)
@@ -113,114 +149,36 @@ struct ShareViewModelTests {
 
     @Test
     func cacheFileForProvider_success() async throws {
-        let temporaryFileURL = TestFileUtil.createSampleFile()
-        let provider = NSItemProvider(contentsOf: temporaryFileURL)
+        let fileItem = ImportedFileItem(
+            fileUrl: URL(fileURLWithPath: "/mock/path/to/file.txt"),
+            filename: "file.txt",
+            data: Data(),
+            typeIdentifier: .data
+        )
 
-        let result = try await viewModel.cacheFileForProvider(provider: provider)
+        mockFileManager.containerURLHandler = { _ in fileItem.fileUrl }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
+
+        let result = try await viewModel.cacheFileForProvider(fileItem: fileItem)
 
         #expect(result)
     }
 
-    @Test(.enabled(if: isLiveWebsiteTestsEnabled))
-    func cacheFileForProvider_successWithURL() async throws {
-        guard let url = URL(string: ShareViewModelTests.remoteURLForTestFile) else {
-            Issue.record("Unable to create URL object")
-            return
-        }
-
-        let provider = NSItemProvider(object: url as NSURL)
-
-        let result = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.url.identifier)
-
-        #expect(result.isValidURL())
-    }
-
-    @Test
-    func cacheFileForProvider_successWithData() async throws {
-        let temporaryFileURL = TestFileUtil.createSampleFile()
-
-        guard let provider = NSItemProvider(contentsOf: temporaryFileURL) else {
-            Issue.record("Unable to create NSItemProvider object")
-            return
-        }
-
-        let result = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.data.identifier)
-
-        #expect(result.isValidURL())
-    }
-
-    @Test
-    func cacheFileForProvider_returnFalseWhenProviderNil() async throws {
-        let result = try await viewModel.cacheFileForProvider(provider: nil)
-
-        #expect(!result)
-    }
-
-    @Test
-    func loadItem_throwInvalidItemDataErrorWhenInvalidItemForUrlIdentifier() async {
-        let provider = NSItemProvider(item: String() as NSSecureCoding, typeIdentifier: UTType.url.identifier)
-
-        do {
-            _ = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.url.identifier)
-            Issue.record("Expected 'invalidItemData'error")
-            return
-        } catch let error as FileImportError {
-            #expect(.invalidItemData == error)
-        } catch {
-            Issue.record("Unexpected error type: \(error)")
-            return
-        }
-    }
-
-    @Test
-    func loadItem_throwInvalidItemDataErrorWhenInvalidItemForDataIdentifier() async {
-        let invalidObject = "InvalidObject"
-        let provider = NSItemProvider(item: invalidObject as NSString, typeIdentifier: UTType.data.identifier)
-
-        do {
-            _ = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.data.identifier)
-            Issue.record("Expected 'invalidItemData' error")
-            return
-        } catch let error as FileImportError {
-            #expect(.invalidItemData == error)
-        } catch {
-            Issue.record("Unexpected error type: \(error)")
-            return
-        }
-    }
-
-    @Test
-    func loadItem_throwInvalidItemDataErrorWhenInvalidUrlForDataIdentifier() async {
-        guard let url = URL(string: "https://someUrl") else {
-            Issue.record("Unable to create URL object")
-            return
-        }
-
-        let provider = NSItemProvider(item: url as NSSecureCoding, typeIdentifier: UTType.data.identifier)
-
-        do {
-            _ = try await viewModel.loadItem(for: provider, typeIdentifier: UTType.data.identifier)
-            Issue.record("Expected 'loadError' error")
-            return
-        } catch let error as FileImportError {
-            switch error {
-            case .loadError:
-                #expect(true)
-            default:
-                Issue.record("Unexpected error type: \(error)")
-                return
-            }
-        } catch {
-            Issue.record("Unexpected error type: \(error)")
-            return
-        }
-    }
-
     @Test
     func cacheFileOnUrl_success() async {
-        let temporaryFileURL = TestFileUtil.createSampleFile()
+        let fileItem = ImportedFileItem(
+            fileUrl: URL(fileURLWithPath: "/mock/path/to/file.txt"),
+            filename: "file.txt",
+            data: Data(),
+            typeIdentifier: .data
+        )
 
-        let result = await viewModel.cacheFileOnUrl(temporaryFileURL)
+        mockFileManager.containerURLHandler = { _ in fileItem.fileUrl }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
+
+        let result = await viewModel.cacheFileOnUrl(fileItem.fileUrl)
 
         #expect(result)
     }
@@ -297,19 +255,5 @@ struct ShareViewModelTests {
         let provider = NSItemProvider(contentsOf: fileURL)
         extensionItem.attachments = [provider].compactMap { $0 }
         return extensionItem
-    }
-}
-
-/// Custom subclass of NSExtensionContext for testing
-final class TestExtensionContext: NSExtensionContext {
-    private let testInputItems: [Any]
-
-    init(inputItems: [Any]) {
-        self.testInputItems = inputItems
-        super.init()
-    }
-
-    override var inputItems: [Any] {
-        return testInputItems
     }
 }

@@ -7,47 +7,53 @@ import CommonsTestShared
 
 struct MimeTypeCacheTests {
 
+    private let mockFileManager: FileManagerProtocolMock!
+    private let mockFileUtil: FileUtilProtocolMock!
+
     private var mimeTypeCache: MimeTypeCacheProtocol!
     private var tempDirectory: URL!
 
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
-        mimeTypeCache = MimeTypeCache()
+        mockFileUtil = FileUtilProtocolMock()
+        mimeTypeCache = await MimeTypeCache(fileUtil: mockFileUtil)
+        mockFileManager = FileManagerProtocolMock()
     }
 
     @Test
+    @MainActor
     func getMimeType_setAndGetFromCache() async throws {
-        let fileUrl = TestFileUtil.createSampleFile()
-        let md5 = fileUrl.md5Hash()
+        let mockFileUrl = URL(fileURLWithPath: "/mock/path")
+        let md5 = "0cbc6611f5540bd0809a388dc95a615b"
         let expectedMimeType = "text/plain"
+
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _, _ in expectedMimeType }
 
         await mimeTypeCache.setMimeType(md5: md5, mimeType: expectedMimeType)
 
-        let mimeType = await mimeTypeCache.getMimeType(fileUrl: fileUrl)
+        let mimeType = await mimeTypeCache.getMimeType(fileUrl: mockFileUrl)
 
         #expect(expectedMimeType == mimeType)
-
-        try? FileManager.default.removeItem(at: fileUrl)
     }
 
     @Test
     func getMimeType_getMimetypeBeforeAndAfterCaching() async throws {
-        let fileUrl = TestFileUtil.createSampleFile(name: "image", withExtension: "png")
-        let md5 = fileUrl.md5Hash()
-        let expectedMimeType = await fileUrl.mimeType()
+        let mockFileUrl = URL(fileURLWithPath: "/mock/path")
+        let md5 = "0cbc6611f5540bd0809a388dc95a615b"
+        let expectedMimeType = "text/plain"
 
-        let initialCacheMiss = await mimeTypeCache.getMimeType(fileUrl: fileUrl)
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _, _ in expectedMimeType }
+
+        let initialCacheMiss = await mimeTypeCache.getMimeType(fileUrl: mockFileUrl)
         #expect(expectedMimeType == initialCacheMiss)
 
-        let mimeType = await mimeTypeCache.getMimeType(fileUrl: fileUrl)
+        let mimeType = await mimeTypeCache.getMimeType(fileUrl: mockFileUrl)
 
         #expect(expectedMimeType == mimeType)
 
         await mimeTypeCache.setMimeType(md5: md5, mimeType: expectedMimeType)
-        let cachedMimeType = await mimeTypeCache.getMimeType(fileUrl: fileUrl)
+        let cachedMimeType = await mimeTypeCache.getMimeType(fileUrl: mockFileUrl)
         #expect(expectedMimeType == cachedMimeType)
-
-        try? FileManager.default.removeItem(at: fileUrl)
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import LibdigidocLibSwift
+import CommonsLib
 import Testing
 
 @MainActor
