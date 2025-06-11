@@ -1,18 +1,23 @@
 import Foundation
 import OSLog
 import UtilsLib
+import CommonsLib
 
 @MainActor
 class ContentViewModel: ContentViewModelProtocol, ObservableObject {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ContentViewModel")
 
-    func getSharedFiles() -> [URL] {
+    func getSharedFiles(
+        fileManager: FileManagerProtocol = FileManager.default
+    ) -> [URL] {
         do {
             ContentViewModel.logger.debug("Checking for shared files...")
-            let sharedFolderURL = try Directories.getSharedFolder().validURL()
+            let sharedFolderURL = try Directories.getSharedFolder(fileManager: fileManager).validURL(
+                fileManager: fileManager
+            )
 
-            let contents = try FileManager.default.contentsOfDirectory(
+            let contents = try fileManager.contentsOfDirectory(
                 at: sharedFolderURL,
                 includingPropertiesForKeys: nil,
                 options: .skipsHiddenFiles)

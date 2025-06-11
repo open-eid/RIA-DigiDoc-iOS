@@ -38,20 +38,33 @@ actor ConfigurationCache {
         )
     }
 
-    static func getCachedFile(fileName: String, configDir: URL) throws -> URL {
+    static func getCachedFile(
+        fileName: String,
+        configDir: URL,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws -> URL {
         let configFile = configDir.appendingPathComponent(fileName)
 
-        guard FileManager.default.fileExists(atPath: configFile.path) else {
+        guard fileManager.fileExists(atPath: configFile.path) else {
             throw ConfigurationCacheError.fileNotFound
         }
         return configFile
     }
 
-    private static func cacheFile(fileName: String, data: Data, configDir: URL) async throws {
+    private static func cacheFile(
+        fileName: String,
+        data: Data,
+        configDir: URL,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) async throws {
         let configFile = configDir.appendingPathComponent(fileName)
 
         do {
-            try FileManager.default.createDirectory(at: configDir, withIntermediateDirectories: true)
+            try fileManager.createDirectory(
+                at: configDir,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
             try data.write(to: configFile)
         } catch {
             throw ConfigurationCacheError.unableToCacheFile(fileName)

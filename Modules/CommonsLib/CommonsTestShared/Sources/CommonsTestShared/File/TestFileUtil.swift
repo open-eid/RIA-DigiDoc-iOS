@@ -13,21 +13,24 @@ public struct TestFileUtil {
 
     public init() {}
 
-    public static func getTemporaryDirectory(subfolder: String) -> URL {
+    public static func getTemporaryDirectory(
+        subfolder: String,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) -> URL {
         var tempDirectory: URL
         if #available(iOS 16.0, *) {
-            tempDirectory = FileManager.default.temporaryDirectory
+            tempDirectory = fileManager.temporaryDirectory
                 .appending(path: bundleIdentifier, directoryHint: .isDirectory)
                 .appending(path: subfolder, directoryHint: .isDirectory)
         } else {
-            tempDirectory = FileManager.default.temporaryDirectory
+            tempDirectory = fileManager.temporaryDirectory
                 .appendingPathComponent(bundleIdentifier, isDirectory: true)
                 .appendingPathComponent(subfolder, isDirectory: true)
         }
 
         do {
-            if !FileManager.default.fileExists(atPath: tempDirectory.path) {
-                try FileManager.default.createDirectory(
+            if !fileManager.fileExists(atPath: tempDirectory.path) {
+                try fileManager.createDirectory(
                     at: tempDirectory,
                     withIntermediateDirectories: true,
                     attributes: nil
@@ -46,7 +49,8 @@ public struct TestFileUtil {
         name: String = "TestFile-\(UUID())",
         withExtension ext: String = "txt",
         contents: String? = "Test content",
-        subfolder: String = "TestFileUtil"
+        subfolder: String = "TestFileUtil",
+        fileManager: FileManagerProtocol = FileManager.default
     ) -> URL {
         var tempFileDirectory = getTemporaryDirectory(subfolder: subfolder)
 
@@ -60,12 +64,12 @@ public struct TestFileUtil {
                 .appendingPathExtension(ext)
         }
 
-        let isCreated = FileManager.default
+        let isCreated = fileManager
             .createFile(
                 atPath: tempFileDirectory.path,
                 contents: contents?.data(
                     using: .utf8
-                )
+                ), attributes: nil
             )
 
         if !isCreated {

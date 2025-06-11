@@ -111,7 +111,6 @@
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
 				Domain/Service/FileOpening/FileOpeningServiceProtocol.swift,
-				Errors/FileOpeningErrors.swift,
 				LibrarySetup.swift,
 				"Supporting files/Localizable.xcstrings",
 				Util/LanguageSettings.swift,
@@ -162,9 +161,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Error/FileImportError.swift,
+				Model/ImportedFileItem.swift,
 				Model/Status.swift,
 				UI/ShareView.swift,
 				UI/ShareViewController.swift,
+				ViewModel/Protocols/ShareViewModelProtocol.swift,
 				ViewModel/ShareViewModel.swift,
 			);
 			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;

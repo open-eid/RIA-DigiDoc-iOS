@@ -13,6 +13,8 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
 
+    private let fileManager: FileManagerProtocol
+
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
         folderURL: URL? = FileManager.default.urls(
@@ -21,7 +23,8 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
         ).first?.appendingPathComponent(
             Constants.Container.SignedContainerFolder,
             isDirectory: true
-        )
+        ),
+        fileManager: FileManagerProtocol = FileManager.default
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         if let folderURL = folderURL {
@@ -29,6 +32,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
         } else {
             self.folderURL = URL(fileURLWithPath: "")
         }
+        self.fileManager = fileManager
     }
 
     var filteredFiles: [FileItem] {
@@ -44,8 +48,6 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
     }
 
     func loadFiles() {
-        let fileManager = FileManager.default
-
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: folderURL,
@@ -68,7 +70,6 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
     }
 
     func deleteFile(at offsets: IndexSet) {
-        let fileManager = FileManager.default
         offsets.forEach { index in
             let file = filteredFiles[index]
             do {

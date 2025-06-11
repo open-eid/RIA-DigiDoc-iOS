@@ -14,22 +14,26 @@ struct URLExtensionsTests {
 
     private let mockMimetypeDecoder: MimeTypeDecoderProtocolMock!
 
+    private let mockFileManager: FileManagerProtocolMock!
+
     init() async throws {
         await UtilsLibAssembler.shared.initialize()
 
         mockFileUtil = FileUtilProtocolMock()
         mockMimetypeDecoder = MimeTypeDecoderProtocolMock()
+        mockFileManager = FileManagerProtocolMock()
     }
 
     @Test
     func mimetype_successWithRegularFile() async {
-        let tempFileURL = TestFileUtil.createSampleFile()
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
+        let mockFile = URL(fileURLWithPath: "/mock/path/text.txt")
+
+        mockFileUtil.getValidFileInAppHandler = { _, _ in
+            return mockFile
         }
 
-        let mimetype = await tempFileURL.mimeType(fileUtil: mockFileUtil)
+        let mimetype = await mockFile.mimeType(fileUtil: mockFileUtil)
 
         #expect(mimetype == "text/plain")
     }
@@ -41,7 +45,7 @@ struct URLExtensionsTests {
             with: ["testfile.txt": "Test content"],
             containerExtension: "zip")
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { @Sendable _, _ in
+        mockFileUtil.getMimeTypeFromZipFileHandler = { @Sendable _, _, _ in
             throw Archive.ArchiveError.unreadableArchive
         }
 
@@ -172,7 +176,7 @@ struct URLExtensionsTests {
     func validURL_returnValidURL() throws {
         let nonExistentFileLocation = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in
             return nonExistentFileLocation
         }
 
@@ -183,7 +187,7 @@ struct URLExtensionsTests {
 
     @Test
     func validURL_returnSameURLWhenFileFromAppGroup() throws {
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in
             return nil
         }
 
@@ -205,7 +209,7 @@ struct URLExtensionsTests {
 
     @Test
     func validURL_returnURLWhenFileFromiCloudDownloaded() throws {
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in nil }
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in nil }
         mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in true }
         mockFileUtil.isFileDownloadedFromiCloudHandler = { @Sendable _ in true }
 
@@ -221,7 +225,7 @@ struct URLExtensionsTests {
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _ in nil }
+        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in nil }
         mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in false }
 
         do {
@@ -238,69 +242,80 @@ struct URLExtensionsTests {
 
     @Test
     func isFolder_returnTrueWhenPathIsDirectory() throws {
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "TestFolder")
-        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+        let tempDirectoryURL = URL(fileURLWithPath: "/mock/path")
 
-        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
-        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
-
-        defer {
-            try? FileManager.default.removeItem(at: testFileURL)
+        mockFileManager.fileExistsAtPathHandler = { _, isDirectory in
+            if let dirPointer = isDirectory {
+                dirPointer.pointee = true
+            }
+            return true
         }
 
-        let result = tempDirectoryURL.isFolder()
+        let result = tempDirectoryURL.isFolder(fileManager: mockFileManager)
 
         #expect(result)
     }
 
     @Test
     func isFolder_returnFalseWhenPathIsFile() throws {
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "TestFolder")
-        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
 
-        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
-        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
-
-        defer {
-            try? FileManager.default.removeItem(at: testFileURL)
+        mockFileManager.fileExistsAtPathHandler = { _, isDirectory in
+            if let dirPointer = isDirectory {
+                dirPointer.pointee = false
+            }
+            return true
         }
 
-        let result = testFileURL.isFolder()
+        let result = tempFileURL.isFolder(fileManager: mockFileManager)
 
         #expect(!result)
     }
 
     @Test
     func folderContents_returnContentsWhenValidFolder() throws {
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: UUID().uuidString)
-        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+        let tempDirectoryURL = URL(fileURLWithPath: "/mock/path")
+        let testFileURL = tempDirectoryURL.appendingPathComponent("test.txt")
 
-        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
-        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
-
-        defer {
-            try? FileManager.default.removeItem(at: testFileURL)
+        mockFileManager.fileExistsAtPathHandler = { _, isDirectory in
+            if let dirPointer = isDirectory {
+                dirPointer.pointee = true
+            }
+            return true
         }
 
-        let result = try tempDirectoryURL.folderContents()
+        mockFileManager.contentsOfDirectoryAtHandler  = { _, _, _ in
+            return [
+                testFileURL,
+                URL(fileURLWithPath: "/mock/path/test2.txt")
+            ]
+        }
 
-        #expect(result.count == 1)
+        let result = try tempDirectoryURL.folderContents(fileManager: mockFileManager)
+
+        #expect(result.count == 2)
         #expect(testFileURL == result.first)
     }
 
     @Test
     func folderContents_returnEmptyWhenNotFolder() throws {
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: UUID().uuidString)
-        let testFileURL = tempDirectoryURL.appendingPathComponent("TestFile.txt")
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
 
-        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
-        FileManager.default.createFile(atPath: testFileURL.path, contents: Data("Test file".utf8))
-
-        defer {
-            try? FileManager.default.removeItem(at: testFileURL)
+        mockFileManager.fileExistsAtPathHandler = { _, isDirectory in
+            if let dirPointer = isDirectory {
+                dirPointer.pointee = false
+            }
+            return true
         }
 
-        let result = try testFileURL.folderContents()
+        mockFileManager.contentsOfDirectoryAtHandler  = { _, _, _ in
+            return [
+                tempFileURL,
+                URL(fileURLWithPath: "/mock/path/test2.txt")
+            ]
+        }
+
+        let result = try tempFileURL.folderContents(fileManager: mockFileManager)
 
         #expect(result.isEmpty)
     }

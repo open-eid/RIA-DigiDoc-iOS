@@ -10,20 +10,22 @@ public struct FileUtil: FileUtilProtocol {
 
     public func getMimeTypeFromZipFile(
         from zipFileURL: URL,
-        fileNameToFind: String
+        fileNameToFind: String,
+        fileManager: FileManagerProtocol = FileManager.default
     ) async throws -> String? {
         let archive = try Archive(url: zipFileURL, accessMode: .read)
 
         if let entry = archive.first(where: { $0.path.contains(fileNameToFind) }) {
-            let extractedFile = try await Directories.getTempDirectory(subfolder: Constants.Folder.Temp).validURL()
+            let extractedFile = try await Directories
+                .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager).validURL()
                 .appendingPathComponent(entry.path)
-            let fileManager = FileManager.default
 
             if fileManager.fileExists(atPath: extractedFile.path) {
                 try fileManager.removeItem(at: extractedFile)
             }
 
             _ = try archive.extract(entry, to: extractedFile)
+
             let mimetypeContent = try String(contentsOf: extractedFile)
             return mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         }
@@ -32,7 +34,10 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     // Check file path so its valid and is not modified by someone else
-    public func getValidFileInApp(currentURL: URL) throws -> URL? {
+    public func getValidFileInApp(
+        currentURL: URL,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws -> URL? {
         let directories: [FileManager.SearchPathDirectory] = [
             .applicationDirectory,
             .documentDirectory,
@@ -43,14 +48,14 @@ public struct FileUtil: FileUtilProtocol {
         ]
 
         for directory in directories {
-            guard let directoryURL = FileManager.default.urls(for: directory, in: .userDomainMask).first else {
+            guard let directoryURL = fileManager.urls(for: directory, in: .userDomainMask).first else {
                 continue
             }
 
             var subdirectoryURLs = [URL]()
 
             do {
-                subdirectoryURLs = try FileManager.default.contentsOfDirectory(
+                subdirectoryURLs = try fileManager.contentsOfDirectory(
                     at: directoryURL,
                     includingPropertiesForKeys: nil,
                     options: .skipsHiddenFiles
@@ -68,11 +73,11 @@ public struct FileUtil: FileUtilProtocol {
                 if FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
                     with: FilePath(stringLiteral: resolvedSubdirectoryPath)
                 ) ||
-                FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
-                    with: FilePath(
-                        stringLiteral: FileManager.default.temporaryDirectory.resolvingSymlinksInPath().path
-                    )
-                ) {
+                    FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
+                        with: FilePath(
+                            stringLiteral: fileManager.temporaryDirectory.resolvingSymlinksInPath().path
+                        )
+                    ) {
                     return resolvedCurrentUrl
                 }
             }
@@ -134,9 +139,13 @@ public struct FileUtil: FileUtilProtocol {
         return false
     }
 
-    public func downloadFileFromiCloud(fileURL: URL, completion: @escaping @Sendable (URL?) -> Void) {
+    public func downloadFileFromiCloud(
+        fileURL: URL,
+        fileManager: FileManagerProtocol = FileManager.default,
+        completion: @escaping @Sendable (URL?) -> Void
+    ) {
         do {
-            try FileManager.default.startDownloadingUbiquitousItem(at: fileURL)
+            try fileManager.startDownloadingUbiquitousItem(at: fileURL)
             FileUtil.logger.debug("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
 
             Task { @Sendable in
@@ -155,23 +164,32 @@ public struct FileUtil: FileUtilProtocol {
         }
     }
 
-    public func getAllFileURLs(from folderURL: URL) -> [URL] {
-        let fileManager = FileManager.default
+    public func getAllFileURLs(
+        from folderURL: URL,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) -> [URL] {
         do {
-            let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
+            let fileURLs = try fileManager.contentsOfDirectory(
+                at: folderURL,
+                includingPropertiesForKeys: nil,
+                options: []
+            )
             return fileURLs
         } catch {
             return []
         }
     }
 
-    public func removeSharedFiles(url: URL?) throws {
-        let sharedFilesFolder = try url ?? Directories.getSharedFolder()
+    public func removeSharedFiles(
+        url: URL?,
+        fileManager: FileManagerProtocol = FileManager.default
+    ) throws {
+        let sharedFilesFolder = try url ?? Directories.getSharedFolder(fileManager: fileManager)
 
-        let contents = try sharedFilesFolder.folderContents()
+        let contents = try sharedFilesFolder.folderContents(fileManager: fileManager)
 
         for fileURL in contents {
-            try FileManager.default.removeItem(at: fileURL)
+            try fileManager.removeItem(at: fileURL)
         }
     }
 }

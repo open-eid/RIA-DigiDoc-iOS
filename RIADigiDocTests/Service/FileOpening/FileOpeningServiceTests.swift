@@ -1,35 +1,48 @@
 import Foundation
 import Testing
 import LibdigidocLibSwift
+import CommonsLib
+import UtilsLib
 import CommonsTestShared
 
+@MainActor
 struct FileOpeningServiceTests {
+
+    private let mockFileManager: FileManagerProtocolMock!
+    private let mockFileInspector: FileInspectorProtocolMock
+
     private var service: FileOpeningServiceProtocol!
 
     init() async throws {
-        service = await FileOpeningService()
+        mockFileManager = FileManagerProtocolMock()
+        mockFileInspector = FileInspectorProtocolMock()
+
+        service = FileOpeningService(
+            fileInspector: mockFileInspector,
+            fileManager: mockFileManager
+        )
     }
 
     @Test
     func isFileSizeValid_success() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+
+        mockFileInspector.fileSizeHandler = { _ in 100 }
 
         let isValid = try await service.isFileSizeValid(url: tempFileURL)
-
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
 
         #expect(isValid)
     }
 
     @Test
     func isFileSizeValid_throwInvalidFileSizeErrorWhenFileSizeIsZero() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile(
-            name: "zeroByteFile",
-            withExtension: "txt",
-            contents: nil
-        )
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+
+        mockFileInspector.fileSizeHandler = { _ in
+            throw FileOpeningError.invalidFileSize
+        }
 
         do {
             _ = try await service.isFileSizeValid(url: tempFileURL)
@@ -50,37 +63,37 @@ struct FileOpeningServiceTests {
 
     @Test
     func getValidFiles_success() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
-
-        let tempFileURL2 = TestFileUtil.createSampleFile()
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+        let tempFileURL2 = tempURL.appendingPathComponent("test2.txt")
 
         let urls = [tempFileURL, tempFileURL2]
 
         let result: Result<[URL], Error> = .success(urls)
 
-        let validFiles = try await service.getValidFiles(result)
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL2] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
-            try? FileManager.default.removeItem(at: tempFileURL2)
-        }
+        let validFiles = try await service.getValidFiles(result)
 
         #expect(validFiles.count == 2)
     }
 
     @Test
     func getValidFiles_successWithDuplicateFiles() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let tempFileURL = tempURL.appendingPathComponent("test.txt")
 
         let urls = [tempFileURL, tempFileURL]
 
         let result: Result<[URL], Error> = .success(urls)
 
-        let validFiles = try await service.getValidFiles(result)
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
+        let validFiles = try await service.getValidFiles(result)
 
         #expect(validFiles.count == 2)
     }

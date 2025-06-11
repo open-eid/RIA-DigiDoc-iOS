@@ -18,10 +18,14 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     var signedContainer: SignedContainer = SignedContainer()
 
+    private let fileManager: FileManagerProtocol
+
     init(
-        sharedContainerViewModel: SharedContainerViewModelProtocol
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileManager: FileManagerProtocol = FileManager.default
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileManager = fileManager
     }
 
     func loadContainerData(signedContainer: SignedContainer?) async {
@@ -50,7 +54,8 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
         do {
             let savedFilesDirectory = try Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles
+                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                fileManager: fileManager
             )
 
             let filename = containerLocation.lastPathComponent.sanitized().isEmpty
@@ -58,8 +63,6 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 : containerLocation.lastPathComponent.sanitized()
 
             let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(filename)
-
-            let fileManager = FileManager.default
 
             if fileManager.fileExists(atPath: tempSavedFileLocation.path) {
                 do {
@@ -86,17 +89,14 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     func checkIfContainerFileExists(fileLocation: URL?) -> Bool {
         guard let file = fileLocation else { return false }
-        let fileManager = FileManager.default
-
         return fileManager.fileExists(atPath: file.path)
     }
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
-        let fileManager = FileManager.default
-
         do {
             let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles
+                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)
             SigningViewModel.logger.debug("Saved Files directory removed")

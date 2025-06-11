@@ -1,5 +1,4 @@
 import Foundation
-import LibdigidocLibSwift
 
 public enum FileOpeningError: Error {
     case unableToRetrieveFileSize
