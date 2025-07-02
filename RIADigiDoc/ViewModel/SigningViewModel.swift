@@ -46,6 +46,10 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         SigningViewModel.logger.debug("Container data loaded")
     }
 
+    func isSigned() -> Bool {
+        return !signatures.isEmpty
+    }
+
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
         guard let containerLocation = containerURL else {
             SigningViewModel.logger.error("Unable to get container to create copy for saving")

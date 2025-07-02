@@ -1,6 +1,55 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+      "shouldTranslate" : false
+    },
+    "Add signature" : {
+      "comment" : "Add signature button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add signature"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisa allkiri"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить подпись"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagasi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назад"
+          }
+        }
+      }
+    },
     "Certificate details" : {
       "comment" : "Title of Certificate Details view",
       "localizations" : {
@@ -20,6 +69,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Детали сертификата"
+          }
+        }
+      }
+    },
+    "Change container name" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change container name"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muuda ümbriku nime"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить имя контейнера"
           }
         }
       }
@@ -44,6 +117,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать файл"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sulge"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
           }
         }
       }
@@ -94,8 +189,33 @@
         }
       }
     },
+    "Container name" : {
+      "comment" : "Signing view container name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container name"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku nimi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Название контейнера"
+          }
+        }
+      }
+    },
     "Container signatures" : {
       "comment" : "Signing view container signatures title",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -113,30 +233,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подписи контейнера"
-          }
-        }
-      }
-    },
-    "Container: %@" : {
-      "comment" : "Signing view container name",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Container: %@"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ümbrik: %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Контейнер: %@"
           }
         }
       }
@@ -213,25 +309,26 @@
         }
       }
     },
-    "Error" : {
-      "comment" : "Title for error alerts",
+    "Encrypt" : {
+      "comment" : "Encrypt button",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error"
+            "value" : "Encrypt"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Viga"
+            "value" : "Krüpteeri"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ошибка"
+            "value" : "Зашифровать"
           }
         }
       }
@@ -332,6 +429,54 @@
         }
       }
     },
+    "File successfully added" : {
+      "comment" : "Toast message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File successfully added"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail edukalt lisatud"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл успешно добавлен"
+          }
+        }
+      }
+    },
+    "Files successfully added" : {
+      "comment" : "Toast message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files successfully added"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failid edukalt lisatud"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файлы успешно добавлены"
+          }
+        }
+      }
+    },
     "General error" : {
       "comment" : "General error",
       "localizations" : {
@@ -374,6 +519,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хэш значение подтверждения подлинности подписи"
+          }
+        }
+      }
+    },
+    "Help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abi"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помощь"
           }
         }
       }
@@ -472,6 +639,51 @@
         }
       }
     },
+    "Menu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüü"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меню"
+          }
+        }
+      }
+    },
+    "More options" : {
+      "comment" : "More options button name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More options"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veel valikuid"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расширить подпись"
+          }
+        }
+      }
+    },
     "No recent documents" : {
       "comment" : "Text for when no recent documents are found",
       "extractionState" : "manual",
@@ -492,6 +704,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Недавние документы отсутствуют"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teated"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления"
           }
         }
       }
@@ -611,6 +845,30 @@
         }
       }
     },
+    "Open file" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ava fail"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть файл"
+          }
+        }
+      }
+    },
     "Recent documents" : {
       "comment" : "Recent documents title",
       "extractionState" : "manual",
@@ -659,6 +917,54 @@
         }
       }
     },
+    "Remove file" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemalda fail"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить файл"
+          }
+        }
+      }
+    },
+    "Remove signature" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove signature"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemalda allkiri"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить подпись"
+          }
+        }
+      }
+    },
     "Save" : {
       "localizations" : {
         "en" : {
@@ -677,6 +983,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Save container" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta ümbrik"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраните контейнер"
+          }
+        }
+      }
+    },
+    "Save file" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta fail"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраните файл"
           }
         }
       }
@@ -701,6 +1055,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Искать контейнер"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seaded"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
           }
         }
       }
@@ -801,6 +1177,30 @@
         }
       }
     },
+    "Sign" : {
+      "comment" : "Sign button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjasta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подписать"
+          }
+        }
+      }
+    },
     "Signature details" : {
       "comment" : "Title for Signature Details view",
       "localizations" : {
@@ -843,6 +1243,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Формат подписи:"
+          }
+        }
+      }
+    },
+    "Signature is invalid" : {
+      "comment" : "Signature invalid status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature is invalid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri ei ole kehtiv"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись недействительна"
+          }
+        }
+      }
+    },
+    "Signature is unknown" : {
+      "comment" : "Signature unknown status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature is unknown"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on teadmata"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись неизвестная"
+          }
+        }
+      }
+    },
+    "Signature is valid" : {
+      "comment" : "Signature valid status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature is valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on kehtiv"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись действительна"
+          }
+        }
+      }
+    },
+    "Signature is valid non qscd" : {
+      "comment" : "Non-QSCD signature valid status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature is valid (Restrictions)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on kehtiv (Piirangud)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись действительна (Ограничения)"
+          }
+        }
+      }
+    },
+    "Signature is valid with warnings" : {
+      "comment" : "Signature valid status with warnings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature is valid (Warnings)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on kehtiv (Hoiatused)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись действительна (Предупреждения)"
           }
         }
       }
@@ -912,6 +1432,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Временной штамп подписи:"
+          }
+        }
+      }
+    },
+    "Signed %@ at %@" : {
+      "comment" : "Signed date and time",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed %@ at %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastatud %@ kell %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подписано %@ в %@"
           }
         }
       }
@@ -1010,6 +1554,7 @@
     },
     "Signing" : {
       "comment" : "Title for Signing view",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1027,6 +1572,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подписание"
+          }
+        }
+      }
+    },
+    "Tab" : {
+      "comment" : "Tab view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tab"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vahekaart"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вкладка"
           }
         }
       }

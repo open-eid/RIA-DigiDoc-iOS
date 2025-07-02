@@ -84,6 +84,13 @@ class AppAssembler {
         container.register(CertificateDetailViewModel.self) { _ in
             return CertificateDetailViewModel()
         }
+
+        container.register(SignatureUtilProtocol.self) { resolver in
+            guard let languageSettings = resolver.resolve(LanguageSettingsProtocol.self) else {
+                preconditionFailure("Unable to find LanguageSettings")
+            }
+            return SignatureUtil(languageSettings: languageSettings)
+        }
     }
 
     func resolve<T>(_: T.Type) -> T {

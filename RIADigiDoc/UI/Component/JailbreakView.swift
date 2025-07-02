@@ -4,13 +4,13 @@ struct JailbreakView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject var languageSettings: LanguageSettings
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     var body: some View {
         VStack {
             Spacer()
 
-            Text("This app cannot be used in jailbroken device")
+            Text(languageSettings.localized("This app cannot be used in jailbroken device"))
                 .foregroundStyle(theme.onSurface)
                 .font(typography.bodyLarge)
                 .padding()

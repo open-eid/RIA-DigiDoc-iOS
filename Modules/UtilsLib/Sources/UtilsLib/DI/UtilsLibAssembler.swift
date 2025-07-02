@@ -34,6 +34,10 @@ public struct UtilsLibAssembler {
         container.register(FileUtilProtocol.self) { _ in
             return FileUtil()
         }
+
+        container.register(NameUtilProtocol.self) { _ in
+            return NameUtil()
+        }
     }
 
     public func resolve<T>(_: T.Type) -> T {

@@ -8,14 +8,16 @@ class DateUtilTests {
     func getFormattedDateTime_successWithValidDateUTC() {
         let input = "1970-01-01T00:00:00Z"
         let isUTC = true
-        let expectedOutput = "01.01.1970 00:00:00 +0000"
+        let expectedDate = "01.01.1970"
+        let expectedTime = "00:00:00"
 
         let result = DateUtil.getFormattedDateTime(
             dateTimeString: input,
             isUTC: isUTC
         )
 
-        #expect(expectedOutput == result)
+        #expect(expectedDate == result.date)
+        #expect(expectedTime == result.time)
     }
 
     @Test
@@ -23,17 +25,27 @@ class DateUtilTests {
         let input = "1970-01-01T00:00:00Z"
         let isUTC = false
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy HH:mm:ss Z"
-        dateFormatter.timeZone = TimeZone.current
-        let expectedOutput = dateFormatter.string(from: Date(timeIntervalSince1970: 0))
+        let date = Date(timeIntervalSince1970: 0)
+
+        let expectedDateFormatter = DateFormatter()
+        expectedDateFormatter.dateFormat = "dd.MM.yyyy"
+        expectedDateFormatter.timeZone = TimeZone.current
+        expectedDateFormatter.locale = Locale.current
+        let expectedDate = expectedDateFormatter.string(from: date)
+
+        let expectedTimeFormatter = DateFormatter()
+        expectedTimeFormatter.dateFormat = "HH:mm:ss"
+        expectedTimeFormatter.timeZone = TimeZone.current
+        expectedTimeFormatter.locale = Locale.current
+        let expectedTime = expectedTimeFormatter.string(from: date)
 
         let result = DateUtil.getFormattedDateTime(
             dateTimeString: input,
             isUTC: isUTC
         )
 
-        #expect(expectedOutput == result)
+        #expect(expectedDate == result.date)
+        #expect(expectedTime == result.time)
     }
 
     @Test
@@ -41,21 +53,36 @@ class DateUtilTests {
         let input = "01/01/1970 00:00:00"
         let isUTC = true
         let inputFormat = "MM/dd/yyyy HH:mm:ss"
-        let outputFormat = "yyyy/MM/dd HH:mm:ss Z"
-        let expectedOutput = "1970/01/01 00:00:00 +0000"
+        let outputDateFormat = "yyyy/MM/dd"
+        let outputTimeFormat = "HH:mm:ss Z"
+
+        let expectedDateFormatter = DateFormatter()
+        expectedDateFormatter.dateFormat = outputDateFormat
+        expectedDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        expectedDateFormatter.locale = Locale.current
+
+        let expectedTimeFormatter = DateFormatter()
+        expectedTimeFormatter.dateFormat = outputTimeFormat
+        expectedTimeFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        expectedTimeFormatter.locale = Locale.current
+
+        let expectedDate = expectedDateFormatter.string(from: Date(timeIntervalSince1970: 0))
+        let expectedTime = expectedTimeFormatter.string(from: Date(timeIntervalSince1970: 0))
 
         let result = DateUtil.getFormattedDateTime(
             dateTimeString: input,
             isUTC: isUTC,
             inputDateFormat: inputFormat,
-            outputDateFormat: outputFormat
+            dateOutputFormat: outputDateFormat,
+            timeOutputFormat: outputTimeFormat
         )
 
-        #expect(expectedOutput == result)
+        #expect(expectedDate == result.date)
+        #expect(expectedTime == result.time)
     }
 
     @Test
-    func getFormattedDateTime_returnEmptyStringwithInvalidInputFormat() {
+    func getFormattedDateTime_returnEmptyTupleWithInvalidInputFormat() {
         let input = "01-01-1970 00:00:00"
         let isUTC = true
 
@@ -64,7 +91,7 @@ class DateUtilTests {
             isUTC: isUTC
         )
 
-        #expect(input == result)
+        #expect(result == ("", ""))
     }
 
     @Test
@@ -77,7 +104,8 @@ class DateUtilTests {
             isUTC: isUTC
         )
 
-        #expect(input == result)
+        #expect(result.date == "")
+        #expect(result.time == "")
     }
 
     @Test
@@ -90,6 +118,6 @@ class DateUtilTests {
             isUTC: isUTC
         )
 
-        #expect(input == result)
+        #expect(result == ("", ""))
     }
 }

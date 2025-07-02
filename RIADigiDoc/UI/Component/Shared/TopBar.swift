@@ -1,22 +1,24 @@
 import SwiftUI
 
 struct TopBarContainer<Content: View>: View {
-    var title: LocalizedStringKey?
+    @EnvironmentObject private var languageSettings: LanguageSettings
+
+    var title: String?
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
-    var leftIconAccessibility: LocalizedStringKey = "Back"
-    var onLeftClick: (() -> Void)?
+    var leftIconAccessibility: String = "Back"
+    var onLeftClick: (() -> Void)? = {}
 
     var rightPrimaryIcon: String = "ic_m3_help_48pt_wght400"
-    var rightPrimaryIconAccessibility: LocalizedStringKey = "Help"
-    var onRightPrimaryClick: (() -> Void)?
+    var rightPrimaryIconAccessibility: String = "Help"
+    var onRightPrimaryClick: (() -> Void)? = {}
 
     var rightSecondaryIcon: String = "ic_m3_settings_48pt_wght400"
-    var rightSecondaryIconAccessibility: LocalizedStringKey = "Settings"
+    var rightSecondaryIconAccessibility: String = "Settings"
     var onRightSecondaryClick: () -> Void = {}
 
     var extraButtonIcon: String = "ic_m3_notifications_48pt_wght400"
-    var extraButtonIconAccessibility: LocalizedStringKey = "Notifications"
+    var extraButtonIconAccessibility: String = "Notifications"
     var onExtraButtonClick: () -> Void = {}
     var showExtraButton: Bool = false
     var extraBadgeCount: Int = 0
@@ -26,7 +28,7 @@ struct TopBarContainer<Content: View>: View {
     let content: () -> Content
 
     var body: some View {
-        VStack(spacing: Dimensions.Padding.zeroPadding) {
+        VStack(spacing: Dimensions.Padding.ZeroPadding) {
             TopBar(
                 title: title,
                 leftIcon: leftIcon,
@@ -59,23 +61,24 @@ struct TopBarContainer<Content: View>: View {
 struct TopBar: View {
     @AppTheme private var theme
     @AppTypography private var typography
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
-    var title: LocalizedStringKey?
+    var title: String?
 
     var leftIcon: String
-    var leftIconAccessibility: LocalizedStringKey
+    var leftIconAccessibility: String
     var onLeftClick: () -> Void = {}
 
     var rightPrimaryIcon: String
-    var rightPrimaryIconAccessibility: LocalizedStringKey
+    var rightPrimaryIconAccessibility: String
     var onRightPrimaryClick: (() -> Void)?
 
     var rightSecondaryIcon: String
-    var rightSecondaryIconAccessibility: LocalizedStringKey
+    var rightSecondaryIconAccessibility: String
     var onRightSecondaryClick: () -> Void = {}
 
     var extraButtonIcon: String
-    var extraButtonIconAccessibility: LocalizedStringKey
+    var extraButtonIconAccessibility: String
     var onExtraButtonClick: () -> Void = {}
     var showExtraButton: Bool = false
     var extraBadgeCount: Int = 0
@@ -88,15 +91,15 @@ struct TopBar: View {
                 Image(leftIcon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: Dimensions.Icon.iconSizeXXS, height: Dimensions.Icon.iconSizeXXS)
+                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                     .foregroundStyle(theme.onBackground)
             }
             .accessibilityLabel(leftIconAccessibility)
 
             if let title = title {
                 Text(title)
-                    .foregroundStyle(theme.onBackground)
-                    .font(typography.headlineMedium)
+                    .foregroundStyle(theme.onSurface)
+                    .font(typography.titleLarge)
                     .padding(.leading, Dimensions.Padding.XSPadding)
                     .accessibilityAddTraits(.isHeader)
             }
@@ -111,11 +114,11 @@ struct TopBar: View {
                                 Image(extraButtonIcon)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: Dimensions.Icon.iconSizeXXS, height: Dimensions.Icon.iconSizeXXS)
+                                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                     .foregroundStyle(theme.background)
                                 if extraBadgeCount > 0 {
-                                    Text("\(extraBadgeCount)")
-                                        .frame(width: Dimensions.Icon.iconSizeXXS, height: Dimensions.Icon.iconSizeXXS)
+                                    Text(verbatim: "\(extraBadgeCount)")
+                                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                         .foregroundStyle(theme.background)
                                         .padding(Dimensions.Padding.XXSPadding)
                                         .background(Circle().fill(theme.onError))
@@ -131,7 +134,7 @@ struct TopBar: View {
                             Image(rightPrimaryIcon)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: Dimensions.Icon.iconSizeXXS, height: Dimensions.Icon.iconSizeXXS)
+                                .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                 .foregroundStyle(theme.onBackground)
                         }
                         .accessibilityLabel(rightPrimaryIconAccessibility)
@@ -141,14 +144,14 @@ struct TopBar: View {
                         Image(rightSecondaryIcon)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: Dimensions.Icon.iconSizeXXS, height: Dimensions.Icon.iconSizeXXS)
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onBackground)
                     }
                     .accessibilityLabel(rightSecondaryIconAccessibility)
                 }
             }
         }
-        .padding(Dimensions.Padding.MSPadding)
+        .padding(Dimensions.Padding.SPadding)
         .background(theme.background)
     }
 }

@@ -2,6 +2,20 @@ import SwiftUI
 
 enum AppColors {
 
+    // Yellow
+    static let Yellow800 = Color(hex: 0xFF83612d)
+
+    // Red
+    static let Red800 = Color(hex: 0xFF571e27)
+    static let Red500 = Color(hex: 0xFFad2a45)
+    static let Red50 = Color(hex: 0xFFf5ebed)
+
+    // Green
+    static let Green50 = Color(hex: 0xFFEAF8EA)
+    static let Green700 = Color(hex: 0xFF218123)
+
+    static let BlueBackground = Color(hex: 0xFF003168)
+
     static let light: ColorPalette = {
         let primary = Color(hex: 0xFF002048)
         let primaryContainer = Color(hex: 0xFF194178)

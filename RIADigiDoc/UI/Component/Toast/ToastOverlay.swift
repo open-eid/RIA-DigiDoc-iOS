@@ -12,13 +12,13 @@ struct ToastOverlay: View {
             if toast.isVisible, let message = toast.message {
                 Text(message)
                     .lineLimit(2)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.horizontal, Dimensions.Padding.SPadding)
+                    .padding(.vertical, Dimensions.Padding.MSPadding)
                     .background(theme.onBackground.opacity(0.9))
-                    .foregroundColor(theme.background)
-                    .cornerRadius(10)
-                    .shadow(radius: 4)
-                    .padding(.horizontal, 20)
+                    .foregroundStyle(theme.background)
+                    .cornerRadius(Dimensions.Corner.MSCornerRadius)
+                    .shadow(radius: Dimensions.Corner.XXSCornerRadius)
+                    .padding(.horizontal, Dimensions.Padding.SPadding)
                     .transition(
                         .asymmetric(
                             insertion: .move(edge: .bottom)
@@ -28,7 +28,7 @@ struct ToastOverlay: View {
                         )
                     )
                     .animation(.easeInOut(duration: 0.3), value: toast.isVisible)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, Dimensions.Padding.LPadding)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

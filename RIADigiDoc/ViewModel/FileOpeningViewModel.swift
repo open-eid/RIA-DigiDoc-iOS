@@ -10,7 +10,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     @Published var isNavigatingToNextView: Bool = false
 
     @Published var signedContainer: SignedContainer = SignedContainer()
-    @Published var errorMessage: AlertMessage?
+    @Published var errorMessage: ToastMessage?
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 
@@ -49,6 +49,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
                 throw FileOpeningError.noDataFiles
             }
 
+            sharedContainerViewModel.setAddedFilesCount(addedFiles: validFiles.count)
+
             sharedContainerViewModel.setSignedContainer(
                 signedContainer:
                     try await fileOpeningRepository.openOrCreateContainer(urls: validFiles))
@@ -65,6 +67,14 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         isNavigatingToNextView = true
     }
 
+    func showFileAddedMessage() async -> Bool {
+        return await sharedContainerViewModel.getSignedContainer()?.getSignatures().isEmpty ?? true
+    }
+
+    func addedFilesCount() -> Int {
+        return sharedContainerViewModel.getAddedFilesCount()
+    }
+
     func handleError() {
         errorMessage = nil
         isFileOpeningLoading = false
@@ -76,32 +86,32 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         FileOpeningViewModel.logger.error("\(ddeMessage)")
 
         if let dde = error as? DigiDocError {
-            errorMessage = createAlertMessage(for: dde)
+            errorMessage = createToastMessage(for: dde)
         } else {
-            errorMessage = AlertMessage(message: error.localizedDescription)
+            errorMessage = ToastMessage(message: error.localizedDescription)
         }
     }
 
-    private func createAlertMessage(for error: DigiDocError) -> AlertMessage {
+    private func createToastMessage(for error: DigiDocError) -> ToastMessage {
         switch error {
         case .initializationFailed:
-            return AlertMessage(message: NSLocalizedString("General error", comment: ""))
+            return ToastMessage(message: NSLocalizedString("General error", comment: ""))
         case .containerCreationFailed(let errorDetail),
              .containerOpeningFailed(let errorDetail),
              .containerSavingFailed(let errorDetail):
-            return AlertMessage(
+            return ToastMessage(
                 message: String(
                     format: NSLocalizedString("Failed to open container %@", comment: ""),
                     errorDetail.userInfo["fileName"] ?? "")
             )
         case .addingFilesToContainerFailed(let errorDetail):
-            return AlertMessage(
+            return ToastMessage(
                 message: String(
                     format: NSLocalizedString("Failed to open file %@", comment: ""),
                     errorDetail.userInfo["fileName"] ?? "")
             )
         case .alreadyInitialized:
-            return AlertMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
+            return ToastMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
         }
     }
 }

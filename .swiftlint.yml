@@ -3,6 +3,10 @@ excluded:
   - Modules/**/Mocks/*/*.swift
   - Extensions/**/Mocks/*/*.swift
   - SetupConfiguration/**/*.swift
+  - build
+  - SourcePackages
+  - .build
+  - "**/.build"
 
 opt_in_rules:
   - accessibility_label_for_image

@@ -2,7 +2,7 @@ import SwiftUI
 import UtilsLib
 
 struct RecentDocumentsView: View {
-    @EnvironmentObject var languageSettings: LanguageSettings
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
@@ -34,7 +34,7 @@ struct RecentDocumentsView: View {
                         viewModel.searchText = ""
                     }, label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
                             .accessibilityLabel(languageSettings.localized("Remove"))
                     })
                     .padding(.trailing, 8)
@@ -49,7 +49,7 @@ struct RecentDocumentsView: View {
                             languageSettings.localized("Document not found")
                     )
                     .font(.headline)
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
                     .padding()
                     Spacer()
                 } else {

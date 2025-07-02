@@ -6,7 +6,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject var languageSettings: LanguageSettings
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: ContentViewModel
 
@@ -22,9 +22,6 @@ struct ContentView: View {
         TopBarContainer(
             leftIcon: "ic_m3_menu_48pt_wght400",
             leftIconAccessibility: "Menu",
-            onLeftClick: {},
-            onRightPrimaryClick: {},
-            onRightSecondaryClick: {},
             content: {
             ScrollView {
                 VStack {
