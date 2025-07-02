@@ -3,7 +3,7 @@ import LibdigidocLibSwift
 
 struct MainSignatureView: View {
 
-    @EnvironmentObject var languageSettings: LanguageSettings
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: MainSignatureViewModel
 

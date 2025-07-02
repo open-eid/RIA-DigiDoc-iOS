@@ -5,22 +5,32 @@ public class DateUtil {
         dateTimeString: String,
         isUTC: Bool,
         inputDateFormat: String = "yyyy-MM-dd'T'HH:mm:ss'Z'",
-        outputDateFormat: String = "dd.MM.yyyy HH:mm:ss Z"
-    ) -> String {
+        dateOutputFormat: String = "dd.MM.yyyy",
+        timeOutputFormat: String = "HH:mm:ss"
+    ) -> (date: String, time: String) {
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = inputDateFormat
-        inputFormatter.locale = Locale.current
+        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
         inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
 
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = outputDateFormat
-        outputFormatter.locale = Locale.current
-        outputFormatter.timeZone = isUTC ? TimeZone(abbreviation: "UTC") : TimeZone.current
+        let outputDateFormatter = DateFormatter()
+        outputDateFormatter.dateFormat = dateOutputFormat
+        outputDateFormatter.locale = Locale.current
+        outputDateFormatter.timeZone = isUTC ? TimeZone(abbreviation: "UTC") : TimeZone.current
 
-        if let date = inputFormatter.date(from: dateTimeString) {
-            return outputFormatter.string(from: date)
+        let outputTimeFormatter = DateFormatter()
+        outputTimeFormatter.dateFormat = timeOutputFormat
+        outputTimeFormatter.locale = Locale.current
+        outputTimeFormatter.timeZone = isUTC ? TimeZone(abbreviation: "UTC") : TimeZone.current
+
+        guard let date = inputFormatter.date(from: dateTimeString) else {
+            return ("", "")
         }
-        return dateTimeString
+
+        let datePart = outputDateFormatter.string(from: date)
+        let timePart = outputTimeFormatter.string(from: date)
+
+        return (datePart, timePart)
     }
 
     public static let dateFormatter: DateFormatter = {

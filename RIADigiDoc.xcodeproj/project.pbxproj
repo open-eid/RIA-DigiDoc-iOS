@@ -104,17 +104,20 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DI/AppAssembler.swift,
-				Domain/Model/AlertMessage.swift,
+				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/FileItem.swift,
+				Domain/Model/ToastMessage.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
 				Domain/Service/FileOpening/FileOpeningServiceProtocol.swift,
 				LibrarySetup.swift,
 				"Supporting files/Localizable.xcstrings",
-				Util/LanguageSettings.swift,
-				Util/LanguageSettingsProtocol.swift,
+				Util/Language/LanguageSettings.swift,
+				Util/Language/LanguageSettingsProtocol.swift,
+				Util/Signature/SignatureUtil.swift,
+				Util/Signature/SignatureUtilProtocol.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/ContentViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
@@ -138,8 +141,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Supporting files/Localizable.xcstrings",
-				Util/LanguageSettings.swift,
-				Util/LanguageSettingsProtocol.swift,
+				Util/Language/LanguageSettings.swift,
+				Util/Language/LanguageSettingsProtocol.swift,
 			);
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 		};
@@ -173,8 +176,8 @@
 		DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Util/LanguageSettings.swift,
-				Util/LanguageSettingsProtocol.swift,
+				Util/Language/LanguageSettings.swift,
+				Util/Language/LanguageSettingsProtocol.swift,
 			);
 			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;
 		};

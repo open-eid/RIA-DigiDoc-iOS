@@ -7,7 +7,8 @@ import UtilsLib
 // swiftlint:disable:next blanket_disable_command
 // swiftlint:disable type_body_length file_length
 struct CertificateDetailView: View {
-    @EnvironmentObject var languageSettings: LanguageSettings
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: CertificateDetailViewModel
 
@@ -140,274 +141,278 @@ struct CertificateDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
-                Text(verbatim: "Subject Name")
-                    .font(.headline)
-                    .accessibilityHeading(.h1)
+        TopBarContainer(
+            title: languageSettings.localized("Certificate details"),
+            onLeftClick: { dismiss() },
+            content: {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 20) {
+                    Text(verbatim: "Subject Name")
+                        .font(.headline)
+                        .accessibilityHeading(.h1)
 
-                if !subjectCountryName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Country or Region")
-                                .font(.subheadline)
-                            Text(verbatim: subjectCountryName)
-                        }
-                    }
-                }
-
-                if !subjectOrganizationName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Organization")
-                                .font(.subheadline)
-                            Text(verbatim: subjectOrganizationName)
-                        }
-                    }
-                }
-
-                if !subjectOrganizationalUnitName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Organizational Unit")
-                                .font(.subheadline)
-                            Text(verbatim: subjectOrganizationalUnitName)
-                        }
-                    }
-                }
-
-                if !subjectCommonName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Common Name")
-                                .font(.subheadline)
-                            Text(verbatim: subjectCommonName)
-                        }
-                    }
-                }
-
-                if !subjectSurname.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Surname")
-                                .font(.subheadline)
-                            Text(verbatim: subjectSurname)
-                        }
-                    }
-                }
-
-                if !subjectGivenName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Given Name")
-                                .font(.subheadline)
-                            Text(verbatim: subjectGivenName)
-                        }
-                    }
-                }
-
-                if !subjectSerialNumber.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Serial number")
-                                .font(.subheadline)
-                            Text(verbatim: subjectSerialNumber)
-                        }
-                    }
-                }
-
-                Text(verbatim: "Issuer Name")
-                    .font(.headline)
-                    .accessibilityHeading(.h1)
-
-                if !issuerCountryName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Country or Region")
-                                .font(.subheadline)
-                            Text(verbatim: issuerCountryName)
-                        }
-                    }
-                }
-
-                if !issuerOrganizationName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Organization")
-                                .font(.subheadline)
-                            Text(verbatim: issuerOrganizationName)
-                        }
-                    }
-                }
-
-                if !issuerCommonName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Common Name")
-                                .font(.subheadline)
-                            Text(verbatim: issuerCommonName)
-                        }
-                    }
-                }
-
-                if !issuerOtherName.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Other name")
-                                .font(.subheadline)
-                            Text(verbatim: issuerOtherName)
-                        }
-                    }
-                }
-
-                if !issuerSerialNumber.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Serial Number")
-                                .font(.subheadline)
-                            Text(verbatim: issuerSerialNumber)
-                        }
-                    }
-                }
-
-                if !version.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Version")
-                                .font(.subheadline)
-                            Text(verbatim: version)
-                        }
-                    }
-                }
-
-                if !signatureAlgorithm.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Signature Algorithm")
-                                .font(.subheadline)
-                            Text(verbatim: signatureAlgorithm)
-                        }
-                    }
-                }
-
-                if !notValidBefore.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Not Valid Before")
-                                .font(.subheadline)
-                            Text(verbatim: notValidBefore)
-                        }
-                    }
-                }
-
-                if !notValidAfter.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Not Valid After")
-                                .font(.subheadline)
-                            Text(verbatim: notValidAfter)
-                        }
-                    }
-                }
-
-                Text(verbatim: "Public Key")
-                    .font(.headline)
-                    .accessibilityHeading(.h1)
-
-                if !publicKeyAlgorithm.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Algorithm")
-                                .font(.subheadline)
-                            Text(verbatim: publicKeyAlgorithm)
-                        }
-                    }
-                }
-
-                if !publicKey.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Public Key")
-                                .font(.subheadline)
-                            Text(verbatim: publicKey)
-                        }
-                    }
-                }
-
-                if !keyUsage.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Key Usage")
-                                .font(.subheadline)
-                            Text(verbatim: keyUsage)
-                        }
-                    }
-                }
-
-                if !signature.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Signature")
-                                .font(.subheadline)
-                            Text(verbatim: signature)
-                        }
-                    }
-                }
-
-                Group {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(verbatim: "Extensions")
-                            .font(.subheadline)
-                    }
-                }
-
-                if !extensions.isEmpty {
-                    ForEach(extensions, id: \.id) { extensionItem in
+                    if !subjectCountryName.isEmpty {
                         Group {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(verbatim: "Extension")
-
-                                Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
-                                        .padding(.leading, 16)
-                                    Text(verbatim: "ID: \(extensionItem.values)")
-                                        .padding(.leading, 16)
-                                }
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Country or Region")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectCountryName)
                             }
                         }
-                        .padding()
                     }
-                }
 
-                Text(verbatim: "Fingerprints")
-                    .font(.headline)
-                    .accessibilityHeading(.h1)
+                    if !subjectOrganizationName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Organization")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectOrganizationName)
+                            }
+                        }
+                    }
 
-                if !sha256Fingerprint.isEmpty {
+                    if !subjectOrganizationalUnitName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Organizational Unit")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectOrganizationalUnitName)
+                            }
+                        }
+                    }
+
+                    if !subjectCommonName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Common Name")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectCommonName)
+                            }
+                        }
+                    }
+
+                    if !subjectSurname.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Surname")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectSurname)
+                            }
+                        }
+                    }
+
+                    if !subjectGivenName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Given Name")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectGivenName)
+                            }
+                        }
+                    }
+
+                    if !subjectSerialNumber.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Serial number")
+                                    .font(.subheadline)
+                                Text(verbatim: subjectSerialNumber)
+                            }
+                        }
+                    }
+
+                    Text(verbatim: "Issuer Name")
+                        .font(.headline)
+                        .accessibilityHeading(.h1)
+
+                    if !issuerCountryName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Country or Region")
+                                    .font(.subheadline)
+                                Text(verbatim: issuerCountryName)
+                            }
+                        }
+                    }
+
+                    if !issuerOrganizationName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Organization")
+                                    .font(.subheadline)
+                                Text(verbatim: issuerOrganizationName)
+                            }
+                        }
+                    }
+
+                    if !issuerCommonName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Common Name")
+                                    .font(.subheadline)
+                                Text(verbatim: issuerCommonName)
+                            }
+                        }
+                    }
+
+                    if !issuerOtherName.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Other name")
+                                    .font(.subheadline)
+                                Text(verbatim: issuerOtherName)
+                            }
+                        }
+                    }
+
+                    if !issuerSerialNumber.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Serial Number")
+                                    .font(.subheadline)
+                                Text(verbatim: issuerSerialNumber)
+                            }
+                        }
+                    }
+
+                    if !version.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Version")
+                                    .font(.subheadline)
+                                Text(verbatim: version)
+                            }
+                        }
+                    }
+
+                    if !signatureAlgorithm.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Signature Algorithm")
+                                    .font(.subheadline)
+                                Text(verbatim: signatureAlgorithm)
+                            }
+                        }
+                    }
+
+                    if !notValidBefore.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Not Valid Before")
+                                    .font(.subheadline)
+                                Text(verbatim: notValidBefore)
+                            }
+                        }
+                    }
+
+                    if !notValidAfter.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Not Valid After")
+                                    .font(.subheadline)
+                                Text(verbatim: notValidAfter)
+                            }
+                        }
+                    }
+
+                    Text(verbatim: "Public Key")
+                        .font(.headline)
+                        .accessibilityHeading(.h1)
+
+                    if !publicKeyAlgorithm.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Algorithm")
+                                    .font(.subheadline)
+                                Text(verbatim: publicKeyAlgorithm)
+                            }
+                        }
+                    }
+
+                    if !publicKey.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Public Key")
+                                    .font(.subheadline)
+                                Text(verbatim: publicKey)
+                            }
+                        }
+                    }
+
+                    if !keyUsage.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Key Usage")
+                                    .font(.subheadline)
+                                Text(verbatim: keyUsage)
+                            }
+                        }
+                    }
+
+                    if !signature.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "Signature")
+                                    .font(.subheadline)
+                                Text(verbatim: signature)
+                            }
+                        }
+                    }
+
                     Group {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "SHA-256")
+                            Text(verbatim: "Extensions")
                                 .font(.subheadline)
-                            Text(verbatim: sha256Fingerprint)
+                        }
+                    }
+
+                    if !extensions.isEmpty {
+                        ForEach(extensions, id: \.id) { extensionItem in
+                            Group {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(verbatim: "Extension")
+
+                                    Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
+                                            .padding(.leading, 16)
+                                        Text(verbatim: "ID: \(extensionItem.values)")
+                                            .padding(.leading, 16)
+                                    }
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+
+                    Text(verbatim: "Fingerprints")
+                        .font(.headline)
+                        .accessibilityHeading(.h1)
+
+                    if !sha256Fingerprint.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "SHA-256")
+                                    .font(.subheadline)
+                                Text(verbatim: sha256Fingerprint)
+                            }
+                        }
+                    }
+
+                    if !sha1Fingerprint.isEmpty {
+                        Group {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(verbatim: "SHA-1")
+                                    .font(.subheadline)
+                                Text(verbatim: sha1Fingerprint)
+                            }
                         }
                     }
                 }
-
-                if !sha1Fingerprint.isEmpty {
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "SHA-1")
-                                .font(.subheadline)
-                            Text(verbatim: sha1Fingerprint)
-                        }
-                    }
-                }
+                .padding()
             }
-            .padding()
-        }
-        .navigationTitle(Text(languageSettings.localized("Certificate details")))
+        })
     }
 }
 

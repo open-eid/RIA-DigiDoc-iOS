@@ -1,6 +1,6 @@
 import Foundation
 
-struct AlertMessage: Identifiable {
+struct ToastMessage: Identifiable {
     let id = UUID()
     let message: String?
 }

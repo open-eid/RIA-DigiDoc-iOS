@@ -4,101 +4,107 @@ import Testing
 
 class NameUtilTests {
 
+    private let nameUtil: NameUtil
+
+    init() async throws {
+        nameUtil = NameUtil()
+    }
+
     @Test
-    func formatName_successWithSingleComponent() {
+    func formatName_successWithSingleComponent() async {
         let input = "Firstname"
         let expectedOutput = "Firstname"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithTwoComponents() {
+    func formatName_successWithTwoComponents() async {
         let input = "Firstname, Lastname"
         let expectedOutput = "Firstname, Lastname"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithThreeComponents() {
-        let input = "Firstname, Lastname, A123"
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+    func formatName_successWithThreeComponents() async {
+        let input = "Lastname, Firstname, A123"
+        let expectedOutput = "Firstname Lastname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithExtraSpaces() {
+    func formatName_successWithExtraSpaces() async {
         let input = "  Firstname  ,  Lastname  ,  A123  "
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithSlashes() {
+    func formatName_successWithSlashes() async {
         let input = "Firstname/, Lastname/, A123/"
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithMultipleSpaces() {
+    func formatName_successWithMultipleSpaces() async {
         let input = "  Firstname,   Lastname  ,   A123  "
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithIrregularSpacing() {
+    func formatName_successWithIrregularSpacing() async {
         let input = "  Firstname , Lastname , A123  "
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithExtraCommas() {
+    func formatName_successWithExtraCommas() async {
         let input = ",,Firstname, , Lastname,, Jr,,"
-        let expectedOutput = "Lastname, Firstname, Jr"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, Jr"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_successWithMixedFormattingIssues() {
+    func formatName_successWithMixedFormattingIssues() async {
         let input = " /Firstname/, /Lastname/, /A123/  "
-        let expectedOutput = "Lastname, Firstname, A123"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Lastname Firstname, A123"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_returnOriginalFormattedInputWithFourComponents() {
+    func formatName_returnOriginalFormattedInputWithFourComponents() async {
         let input = "Firstname, Lastname, A123, SomeOtherText"
-        let expectedOutput = "Firstname, Lastname, A123, SomeOtherText"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Firstname, Lastname, A123, Someothertext"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_returnOriginalFormattedInputWithMixedFormattingIssuesOverThreeComponents() {
+    func formatName_returnOriginalFormattedInputWithMixedFormattingIssuesOverThreeComponents() async {
         let input = " /Firstname/, /Lastname/, /A123/, /SomeOtherText/  "
-        let expectedOutput = "Firstname, Lastname, A123, SomeOtherText"
-        #expect(expectedOutput == NameUtil.formatName(input))
+        let expectedOutput = "Firstname, Lastname, A123, Someothertext"
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_returnEmptyStringWithEmptyStringInput() {
+    func formatName_returnEmptyStringWithEmptyStringInput() async {
         let input = ""
         let expectedOutput = ""
-        #expect(expectedOutput == NameUtil.formatName(input))
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_returnEmptyStringWithOnlySpacesInput() {
+    func formatName_returnEmptyStringWithOnlySpacesInput() async {
         let input = "     "
         let expectedOutput = ""
-        #expect(expectedOutput == NameUtil.formatName(input))
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 
     @Test
-    func formatName_returnEmptyStringWithOnlyCommasInput() {
+    func formatName_returnEmptyStringWithOnlyCommasInput() async {
         let input = ",,,, , ,"
         let expectedOutput = ""
-        #expect(expectedOutput == NameUtil.formatName(input))
+        #expect(expectedOutput == nameUtil.formatName(input))
     }
 }

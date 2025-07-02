@@ -8,4 +8,6 @@ public protocol SharedContainerViewModelProtocol: Sendable {
     func getSignedContainer() -> SignedContainer?
     func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?)
     func getFileOpeningResult() -> Result<[URL], Error>?
+    func setAddedFilesCount(addedFiles: Int)
+    func getAddedFilesCount() -> Int
 }
