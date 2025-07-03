@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -52,7 +53,7 @@ struct SignaturesListView: View {
         selectedSignature: .constant(signature),
         containerMimetype: .constant("application/vnd.etsi.asic-e+zip"),
         dataFilesCount: 1,
-        nameUtil: UtilsLibAssembler.shared.resolve(NameUtil.self),
-        signatureUtil: AppAssembler.shared.resolve(SignatureUtil.self)
+        nameUtil: Container.shared.nameUtil(),
+        signatureUtil: Container.shared.signatureUtil()
     )
 }

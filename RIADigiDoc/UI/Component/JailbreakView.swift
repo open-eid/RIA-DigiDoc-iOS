@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct JailbreakView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -22,4 +23,7 @@ struct JailbreakView: View {
 
 #Preview {
     JailbreakView()
+        .environmentObject(
+            Container.shared.languageSettings()
+        )
 }

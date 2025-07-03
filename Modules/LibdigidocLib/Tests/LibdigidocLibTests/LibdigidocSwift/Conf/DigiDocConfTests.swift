@@ -11,9 +11,6 @@ final class DigiDocConfTests {
     private let configurationProvider: ConfigurationProvider
 
     init() async throws {
-        await ConfigLibAssembler.shared.initialize()
-        await LibDigidocLibAssembler.shared.initialize()
-
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
     }
 

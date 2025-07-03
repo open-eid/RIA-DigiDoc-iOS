@@ -1,14 +1,24 @@
 import Foundation
+import FactoryKit
 import CommonsLib
 import UtilsLib
 
 actor ConfigurationCache {
 
+    private let fileManager: FileManagerProtocol
+
+    init(
+        fileManager: FileManagerProtocol
+    ) {
+        self.fileManager = fileManager
+    }
+
     static func cacheConfigurationFiles(
         confData: String,
         publicKey: String,
         signature: String,
-        configDir: URL
+        configDir: URL,
+        fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws {
         guard let confDataBytes = confData.data(using: .utf8) else {
             throw ConfigurationCacheError.invalidData("Invalid UTF-8 encoding for confData")
@@ -16,7 +26,8 @@ actor ConfigurationCache {
         try await cacheFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigJson,
             data: confDataBytes,
-            configDir: configDir
+            configDir: configDir,
+            fileManager: fileManager
         )
 
         guard let publicKeyBytes = publicKey.data(using: .utf8) else {
@@ -25,7 +36,8 @@ actor ConfigurationCache {
         try await cacheFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigPub,
             data: publicKeyBytes,
-            configDir: configDir
+            configDir: configDir,
+            fileManager: fileManager
         )
 
         guard let signatureBytes = signature.data(using: .utf8) else {
@@ -34,14 +46,15 @@ actor ConfigurationCache {
         try await cacheFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigRsa,
             data: signatureBytes,
-            configDir: configDir
+            configDir: configDir,
+            fileManager: fileManager
         )
     }
 
     static func getCachedFile(
         fileName: String,
         configDir: URL,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws -> URL {
         let configFile = configDir.appendingPathComponent(fileName)
 
@@ -55,7 +68,7 @@ actor ConfigurationCache {
         fileName: String,
         data: Data,
         configDir: URL,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) async throws {
         let configFile = configDir.appendingPathComponent(fileName)
 

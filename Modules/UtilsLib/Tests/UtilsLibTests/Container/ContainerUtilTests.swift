@@ -1,6 +1,8 @@
 import Foundation
 import Testing
 import CommonsTestShared
+import CommonsLibMocks
+
 @testable import UtilsLib
 
 struct ContainerUtilTests {
@@ -8,8 +10,6 @@ struct ContainerUtilTests {
     private let mockFileManager: FileManagerProtocolMock!
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-
         mockFileManager = FileManagerProtocolMock()
     }
 

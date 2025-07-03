@@ -1,20 +1,21 @@
 import Foundation
-import UtilsLib
 import Alamofire
+import UtilsLib
+import CommonsLib
 
 public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
 
     private let configurationLoader: ConfigurationLoaderProtocol
+    private let fileManager: FileManagerProtocol
 
     private var continuation: AsyncThrowingStream<ConfigurationProvider?, Error>?
 
-    @MainActor
     public init(
-        configurationLoader: ConfigurationLoaderProtocol = ConfigLibAssembler.shared.resolve(
-            ConfigurationLoaderProtocol.self
-        )
+        configurationLoader: ConfigurationLoaderProtocol,
+        fileManager: FileManagerProtocol
     ) {
         self.configurationLoader = configurationLoader
+        self.fileManager = fileManager
     }
 
     public func getConfiguration() async -> ConfigurationProvider? {
@@ -26,7 +27,7 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
     }
 
     public func getCentralConfiguration(cacheDir: URL?) async throws -> ConfigurationProvider? {
-        let configDir = try cacheDir ?? Directories.getConfigDirectory()
+        let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         try await configurationLoader.loadCentralConfiguration(cacheDir: configDir)
         return await getConfiguration()
@@ -38,7 +39,7 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
         ConfigurationProvider?,
         Error
     >? {
-        let configDir = try cacheDir ?? Directories.getConfigDirectory()
+        let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         try await configurationLoader.loadCentralConfiguration(cacheDir: configDir)
         return await getConfigurationUpdates()

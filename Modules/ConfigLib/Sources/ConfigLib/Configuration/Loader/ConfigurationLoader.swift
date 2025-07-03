@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import FactoryKit
 import CommonsLib
 import UtilsLib
 
@@ -16,21 +17,14 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     private let configurationProperties: ConfigurationPropertiesProtocol
     private let configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol
 
-    @MainActor
     private var fileManager: FileManagerProtocol
 
-    @MainActor
     public init(
-        centralConfigurationRepository: CentralConfigurationRepositoryProtocol = ConfigLibAssembler.shared.resolve(
-            CentralConfigurationRepositoryProtocol.self),
-        configurationProperty: ConfigurationProperty = ConfigLibAssembler.shared.resolve(ConfigurationProperty.self),
-        configurationProperties: ConfigurationPropertiesProtocol = ConfigLibAssembler.shared.resolve(
-            ConfigurationPropertiesProtocol.self
-        ),
-        configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol = ConfigLibAssembler.shared.resolve(
-            ConfigurationSignatureVerifierProtocol.self
-        ),
-        fileManager: FileManagerProtocol = FileManager.default
+        centralConfigurationRepository: CentralConfigurationRepositoryProtocol,
+        configurationProperty: ConfigurationProperty,
+        configurationProperties: ConfigurationPropertiesProtocol,
+        configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol,
+        fileManager: FileManagerProtocol
     ) {
         self.centralConfigurationRepository = centralConfigurationRepository
         self.configurationProperty = configurationProperty
@@ -43,10 +37,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func initConfiguration(cacheDir: URL) async throws {
         ConfigurationLoader.logger.debug("Initializing configuration")
 
-        try await MainActor.run {
-            if !fileManager.fileExists(atPath: cacheDir.path) {
-                try fileManager.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
-            }
+        if !fileManager.fileExists(atPath: cacheDir.path) {
+            try fileManager.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
         }
 
         try await loadCachedConfiguration(afterCentralCheck: false, cacheDir: cacheDir)
@@ -88,17 +80,16 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     public func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws {
-        let configDir = try cacheDir ?? Directories.getConfigDirectory()
+        let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         let confFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
         let publicKeyFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
         let signatureFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
 
-        let configFilesExist = await MainActor.run {
+        let configFilesExist =
             fileManager.fileExists(atPath: confFile.path) &&
             fileManager.fileExists(atPath: publicKeyFile.path) &&
             fileManager.fileExists(atPath: signatureFile.path)
-        }
 
         if configFilesExist {
             ConfigurationLoader.logger.debug("Initializing cached configuration")
@@ -159,7 +150,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     public func loadDefaultConfiguration(bundle: Bundle = Bundle.main, cacheDir: URL?) async throws {
-        let configDir = try cacheDir ?? Directories.getConfigDirectory()
+        let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         guard let confDataURL = bundle.url(
             forResource: CommonsLib.Constants.Configuration.DefaultConfigJson,
@@ -224,11 +215,12 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     public func loadCentralConfiguration(cacheDir: URL?) async throws {
-        let configDir = try cacheDir ?? Directories.getConfigDirectory()
+        let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         let cachedSignature = try ConfigurationCache.getCachedFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigRsa,
-            configDir: configDir
+            configDir: configDir,
+            fileManager: fileManager
         )
 
         let currentSignature = try Data(contentsOf: cachedSignature)

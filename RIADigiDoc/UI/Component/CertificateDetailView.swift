@@ -1,6 +1,7 @@
 import SwiftUI
 import X509
 import SwiftASN1
+import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -133,7 +134,7 @@ struct CertificateDetailView: View {
     }
 
     init(
-        viewModel: CertificateDetailViewModel = AppAssembler.shared.resolve(CertificateDetailViewModel.self),
+        viewModel: CertificateDetailViewModel = Container.shared.certificateDetailViewModel(),
         certificate: Data
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -436,4 +437,6 @@ struct CertificateDetailView: View {
         containerMimetype: "application/vnd.etsi.asic-e+zip",
         dataFilesCount: 1
     )
+    .environmentObject(
+        Container.shared.languageSettings())
 }

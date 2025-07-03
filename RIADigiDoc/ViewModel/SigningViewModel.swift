@@ -1,4 +1,5 @@
 import Foundation
+import FactoryKit
 import OSLog
 import LibdigidocLibSwift
 import CommonsLib
@@ -22,7 +23,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileManager = fileManager

@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import FactoryKit
 import CommonsLib
 
 public struct TestFileUtil {
@@ -15,7 +16,7 @@ public struct TestFileUtil {
 
     public static func getTemporaryDirectory(
         subfolder: String,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) -> URL {
         var tempDirectory: URL
         if #available(iOS 16.0, *) {
@@ -50,7 +51,7 @@ public struct TestFileUtil {
         withExtension ext: String = "txt",
         contents: String? = "Test content",
         subfolder: String = "TestFileUtil",
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) -> URL {
         var tempFileDirectory = getTemporaryDirectory(subfolder: subfolder)
 

@@ -1,4 +1,5 @@
 import Foundation
+import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
@@ -9,16 +10,14 @@ actor FileOpeningService: FileOpeningServiceProtocol {
 
     private let fileInspector: FileInspectorProtocol
 
-    @MainActor
     private let fileManager: FileManagerProtocol
 
-    @MainActor
     init(
-        fileUtil: FileUtilProtocol? = nil,
-        fileInspector: FileInspectorProtocol = FileInspector(),
-        fileManager: FileManagerProtocol = FileManager.default
+        fileUtil: FileUtilProtocol,
+        fileInspector: FileInspectorProtocol,
+        fileManager: FileManagerProtocol
     ) {
-        self.fileUtil = fileUtil ?? UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)
+        self.fileUtil = fileUtil
         self.fileInspector = fileInspector
         self.fileManager = fileManager
     }
@@ -27,7 +26,6 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         return try fileInspector.fileSize(for: url) > 0
     }
 
-    @MainActor
     func getValidFiles(
         _ result: Result<[URL], Error>
     ) async throws -> [URL] {
@@ -36,8 +34,8 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             var validFiles: [URL] = []
 
             for url in urls {
-                let validUrl = try url.validURL(fileManager: fileManager)
-                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl, fileManager: fileManager)
+                let validUrl = try url.validURL(fileUtil: fileUtil, fileManager: fileManager)
+                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl)
                 let requiresScopedAccess = try validFileUrl == nil && !fileUtil.isFileFromAppGroup(
                     url: validUrl,
                     appGroupURL: nil
@@ -70,7 +68,6 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         return try await SignedContainer.openOrCreate(dataFiles: dataFiles)
     }
 
-    @MainActor
     private func cacheFile(
         from sourceURL: URL,
     ) throws -> URL {

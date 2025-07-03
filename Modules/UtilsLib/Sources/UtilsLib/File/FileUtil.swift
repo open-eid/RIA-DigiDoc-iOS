@@ -2,22 +2,31 @@ import Foundation
 import OSLog
 import System
 import ZIPFoundation
+import FactoryKit
 import CommonsLib
 
 public struct FileUtil: FileUtilProtocol {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.UtilsLib", category: "FileUtil")
 
+    private let fileManager: FileManagerProtocol
+
+    public init(
+        fileManager: FileManagerProtocol
+    ) {
+        self.fileManager = fileManager
+    }
+
     public func getMimeTypeFromZipFile(
         from zipFileURL: URL,
-        fileNameToFind: String,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileNameToFind: String
     ) async throws -> String? {
         let archive = try Archive(url: zipFileURL, accessMode: .read)
 
         if let entry = archive.first(where: { $0.path.contains(fileNameToFind) }) {
-            let extractedFile = try await Directories
-                .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager).validURL()
+            let extractedFile = try Directories
+                .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
+                .validURL(fileUtil: self, fileManager: fileManager)
                 .appendingPathComponent(entry.path)
 
             if fileManager.fileExists(atPath: extractedFile.path) {
@@ -34,10 +43,7 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     // Check file path so its valid and is not modified by someone else
-    public func getValidFileInApp(
-        currentURL: URL,
-        fileManager: FileManagerProtocol = FileManager.default
-    ) throws -> URL? {
+    public func getValidFileInApp(currentURL: URL) throws -> URL? {
         let directories: [FileManager.SearchPathDirectory] = [
             .applicationDirectory,
             .documentDirectory,
@@ -87,7 +93,7 @@ public struct FileUtil: FileUtilProtocol {
 
     // Check if file is opened externally (outside of application)
     public func isFileFromAppGroup(url: URL, appGroupURL: URL? = nil) throws -> Bool {
-        let appGroupUrl = try appGroupURL ?? Directories.getSharedFolder()
+        let appGroupUrl = try appGroupURL ?? Directories.getSharedFolder(fileManager: fileManager)
         let resolvedAppGroupURL = appGroupUrl.deletingLastPathComponent().resolvingSymlinksInPath()
 
         let normalizedURL = FilePath(stringLiteral: url.resolvingSymlinksInPath().path).lexicallyNormalized()
@@ -141,7 +147,6 @@ public struct FileUtil: FileUtilProtocol {
 
     public func downloadFileFromiCloud(
         fileURL: URL,
-        fileManager: FileManagerProtocol = FileManager.default,
         completion: @escaping @Sendable (URL?) -> Void
     ) {
         do {
@@ -164,10 +169,7 @@ public struct FileUtil: FileUtilProtocol {
         }
     }
 
-    public func getAllFileURLs(
-        from folderURL: URL,
-        fileManager: FileManagerProtocol = FileManager.default
-    ) -> [URL] {
+    public func getAllFileURLs(from folderURL: URL) -> [URL] {
         do {
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: folderURL,
@@ -180,10 +182,7 @@ public struct FileUtil: FileUtilProtocol {
         }
     }
 
-    public func removeSharedFiles(
-        url: URL?,
-        fileManager: FileManagerProtocol = FileManager.default
-    ) throws {
+    public func removeSharedFiles(url: URL?) throws {
         let sharedFilesFolder = try url ?? Directories.getSharedFolder(fileManager: fileManager)
 
         let contents = try sharedFilesFolder.folderContents(fileManager: fileManager)

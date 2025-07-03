@@ -1,6 +1,7 @@
 import Foundation
-import CommonsTestShared
 import Testing
+import CommonsTestShared
+import CommonsLibMocks
 
 @MainActor
 class RecentDocumentsViewModelTests {
@@ -60,7 +61,8 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenNoFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: nil
+            folderURL: nil,
+            fileManager: mockFileManager
         )
 
         recentDocumentsViewModel.loadFiles()
@@ -74,7 +76,8 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenInvalidFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: URL(fileURLWithPath: "/invalid/path")
+            folderURL: URL(fileURLWithPath: "/invalid/path"),
+            fileManager: mockFileManager
         )
 
         recentDocumentsViewModel.loadFiles()
@@ -85,7 +88,6 @@ class RecentDocumentsViewModelTests {
     }
 
     @Test
-    @MainActor
     func filteredFiles_successWithFilteringContainerFiles() async {
         let date = Date()
         viewModel.files = [
@@ -115,7 +117,7 @@ class RecentDocumentsViewModelTests {
         let mockFileURLs = [URL(fileURLWithPath: "file1.asice"), URL(fileURLWithPath: "file2.bdoc")]
         let result: Result<[URL], Error> = .success(mockFileURLs)
 
-        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { _ in }
 
         viewModel.setChosenFiles(result)
 
@@ -131,29 +133,22 @@ class RecentDocumentsViewModelTests {
     }
 
     @Test
-    @MainActor
-    func deleteFile_success() async {
+    func deleteFile_success() {
         let file = tempFolderURL.appendingPathComponent("test1.asice")
 
-        var mockFiles: Set<URL> = [file]
+        let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
+        viewModel.files = [fileItem]
 
-        mockFileManager.removeItemHandler = { url in
-            guard mockFiles.contains(url) else {
-                throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError, userInfo: nil)
-            }
-            mockFiles.remove(url)
-        }
-
-        viewModel.files = [FileItem(name: "test1.asice", url: file, modifiedDate: Date())]
+        mockFileManager.removeItemHandler = { _ in }
 
         viewModel.deleteFile(at: IndexSet(integer: 0))
 
-        #expect(!viewModel.files.contains { $0.url == file })
-        #expect(!mockFiles.contains(file))
+        #expect(mockFileManager.removeItemCallCount == 1)
+        #expect(mockFileManager.removeItemArgValues.first == file)
+        #expect(viewModel.files.isEmpty)
     }
 
     @Test
-    @MainActor
     func deleteFile_filesNotChangedWhenUnableToDelete() async {
         let file = tempFolderURL.appendingPathComponent("test1.asice")
         viewModel.files = [FileItem(name: "test1.asice", url: file, modifiedDate: Date())]

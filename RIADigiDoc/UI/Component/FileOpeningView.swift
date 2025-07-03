@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 
 struct FileOpeningView: View {
@@ -9,7 +10,7 @@ struct FileOpeningView: View {
     @Binding var isNavigatingToNextView: Bool
 
     init(
-        viewModel: FileOpeningViewModel = AppAssembler.shared.resolve(FileOpeningViewModel.self),
+        viewModel: FileOpeningViewModel = Container.shared.fileOpeningViewModel(),
         isFileOpeningLoading: Binding<Bool>,
         isNavigatingToNextView: Binding<Bool>
     ) {
@@ -51,5 +52,10 @@ struct FileOpeningView: View {
 }
 
 #Preview {
-    FileOpeningView(isFileOpeningLoading: .constant(true), isNavigatingToNextView: .constant(false))
+    FileOpeningView(
+        isFileOpeningLoading: .constant(true),
+        isNavigatingToNextView: .constant(false)
+    )
+    .environmentObject(
+        Container.shared.languageSettings())
 }

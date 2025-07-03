@@ -68,7 +68,7 @@ struct MainSignatureViewModelTests {
     func setChosenFiles_success() async {
         let chosenFiles: Result<[URL], Error> = .success([URL(fileURLWithPath: "/path/to/file")])
 
-        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { _ in }
 
         viewModel.setChosenFiles(chosenFiles)
 
@@ -87,7 +87,7 @@ struct MainSignatureViewModelTests {
     func setChosenFiles_successWithError() async {
         let chosenFiles: Result<[URL], Error> = .failure(FileOpeningError.noDataFiles)
 
-        mockSharedContainerViewModel.setFileOpeningResultHandler = { @Sendable _ in }
+        mockSharedContainerViewModel.setFileOpeningResultHandler = { _ in }
 
         viewModel.setChosenFiles(chosenFiles)
 

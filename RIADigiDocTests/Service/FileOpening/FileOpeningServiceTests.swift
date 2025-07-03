@@ -1,29 +1,33 @@
 import Foundation
 import Testing
+import FactoryKit
+import FactoryTesting
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 import CommonsTestShared
+import CommonsLibMocks
+import UtilsLibMocks
 
-@MainActor
 struct FileOpeningServiceTests {
-
-    private let mockFileManager: FileManagerProtocolMock!
+    private let mockFileUtil: FileUtilProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
     private let mockFileInspector: FileInspectorProtocolMock
 
-    private var service: FileOpeningServiceProtocol!
+    private var service: FileOpeningServiceProtocol
 
-    init() async throws {
+    init() throws {
+        mockFileUtil = FileUtilProtocolMock()
         mockFileManager = FileManagerProtocolMock()
         mockFileInspector = FileInspectorProtocolMock()
 
         service = FileOpeningService(
+            fileUtil: mockFileUtil,
             fileInspector: mockFileInspector,
             fileManager: mockFileManager
         )
     }
 
-    @Test
     func isFileSizeValid_success() async throws {
         let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
         let tempFileURL = tempURL.appendingPathComponent("test.txt")
@@ -71,6 +75,8 @@ struct FileOpeningServiceTests {
 
         let result: Result<[URL], Error> = .success(urls)
 
+        mockFileUtil.getValidFileInAppHandler = { _ in tempURL }
+
         mockFileManager.urlsHandler = { _, _ in [tempURL] }
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL2] }
         mockFileInspector.fileSizeHandler = { _ in 100 }
@@ -88,6 +94,8 @@ struct FileOpeningServiceTests {
         let urls = [tempFileURL, tempFileURL]
 
         let result: Result<[URL], Error> = .success(urls)
+
+        mockFileUtil.getValidFileInAppHandler = { _ in tempURL }
 
         mockFileManager.urlsHandler = { _, _ in [tempURL] }
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL] }

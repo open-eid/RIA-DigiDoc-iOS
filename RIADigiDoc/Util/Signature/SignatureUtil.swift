@@ -1,8 +1,7 @@
 import SwiftUI
 import LibdigidocLibSwift
 
-@MainActor
-final class SignatureUtil: SignatureUtilProtocol {
+struct SignatureUtil: SignatureUtilProtocol {
     var languageSettings: LanguageSettingsProtocol
 
     init(languageSettings: LanguageSettingsProtocol) {

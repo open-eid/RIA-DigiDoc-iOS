@@ -1,20 +1,33 @@
 import Foundation
+import Testing
+import FactoryKit
+import FactoryTesting
 import LibdigidocLibSwift
 import CommonsLib
-import Testing
+import CommonsLibMocks
+import UtilsLibMocks
 
 @MainActor
 struct FileOpeningViewModelTests {
-    private var mockFileOpeningRepository: FileOpeningRepositoryProtocolMock!
-    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
-    private var viewModel: FileOpeningViewModel!
+    private var mockFileOpeningRepository: FileOpeningRepositoryProtocolMock
+    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
+    private var mockFileOpeningService: FileOpeningServiceProtocolMock
+    private var mockFileUtil: FileUtilProtocolMock
+    private var mockFileManager: FileManagerProtocolMock
+
+    private var viewModel: FileOpeningViewModel
 
     init() async throws {
         mockFileOpeningRepository = FileOpeningRepositoryProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        mockFileOpeningService = FileOpeningServiceProtocolMock()
+        mockFileUtil = FileUtilProtocolMock()
+        mockFileManager = FileManagerProtocolMock()
         viewModel = FileOpeningViewModel(
             fileOpeningRepository: mockFileOpeningRepository,
-            sharedContainerViewModel: mockSharedContainerViewModel
+            sharedContainerViewModel: mockSharedContainerViewModel,
+            fileUtil: mockFileUtil,
+            fileManager: mockFileManager
         )
     }
 
@@ -25,18 +38,29 @@ struct FileOpeningViewModelTests {
         let result: Result<[URL], Error> = .success(validURLs)
 
         mockSharedContainerViewModel.getFileOpeningResultHandler = {
+            print("getFileOpeningResultHandler called")
             return result
         }
 
-        mockSharedContainerViewModel.setSignedContainerHandler = { @Sendable _ in }
+        mockSharedContainerViewModel.setSignedContainerHandler = { _ in }
 
-        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
-            return validURLs
+        mockFileOpeningRepository.getValidFilesHandler = { _ in validURLs }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _ in signedContainer }
+
+        mockFileOpeningService.getValidFilesHandler = { _ in validURLs }
+
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
         }
 
-        mockFileOpeningRepository.openOrCreateContainerHandler = { @Sendable _ in
-            return signedContainer
-        }
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        mockFileManager.fileExistsHandler = { _ in true }
 
         await viewModel.handleFiles()
 
@@ -65,9 +89,19 @@ struct FileOpeningViewModelTests {
             return nil
         }
 
-        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
             return []
         }
+
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        mockFileManager.fileExistsHandler = { _ in true }
 
         await viewModel.handleFiles()
 
@@ -89,7 +123,7 @@ struct FileOpeningViewModelTests {
             return result
         }
 
-        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
             throw error
         }
 
@@ -113,9 +147,19 @@ struct FileOpeningViewModelTests {
             return result
         }
 
-        mockFileOpeningRepository.getValidFilesHandler = { @Sendable _ in
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
             return []
         }
+
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        mockFileManager.fileExistsHandler = { _ in true }
 
         await viewModel.handleFiles()
 

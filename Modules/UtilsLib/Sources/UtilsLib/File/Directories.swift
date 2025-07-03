@@ -1,10 +1,11 @@
 import Foundation
+import FactoryKit
 import CommonsLib
 
 public struct Directories {
     public static func getTempDirectory(
         subfolder: String,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws -> URL {
         var tempDirectory: URL
         if #available(iOS 16.0, *) {
@@ -36,7 +37,7 @@ public struct Directories {
     public static func getSharedFolder(
         appGroupIdentifier: String = Constants.Identifier.Group,
         subfolder: String = "Temp",
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws -> URL {
         guard let sharedContainerURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupIdentifier
@@ -60,7 +61,7 @@ public struct Directories {
 
     public static func getCacheDirectory(
         subfolder: String = "",
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws -> URL {
         var cacheDirectory: URL
         if #available(iOS 16.0, *) {
@@ -98,7 +99,7 @@ public struct Directories {
     }
 
     public static func getLibraryDirectory(
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) -> URL? {
         if let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first {
             return libraryDirectory
@@ -106,21 +107,21 @@ public struct Directories {
         return nil
     }
 
-    public static func getConfigDirectory(from directory: URL? = nil) throws -> URL {
-        let baseDirectory = try directory ?? getCacheDirectory()
+    public static func getConfigDirectory(from directory: URL? = nil, fileManager: FileManagerProtocol) throws -> URL {
+        let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
         return baseDirectory.appendingPathComponent(
             Constants.Configuration.CacheConfigFolder,
             conformingTo: .folder
         )
     }
 
-    public static func getTslCacheDirectory() -> URL? {
-        return getLibraryDirectory()
+    public static func getTslCacheDirectory(fileManager: FileManagerProtocol) -> URL? {
+        return getLibraryDirectory(fileManager: fileManager)
     }
 
     public static func getLibdigidocLogFile(
         from directory: URL?,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws -> URL? {
         let libdigidocppLogFile = "libdigidocpp.log"
 
@@ -139,7 +140,7 @@ public struct Directories {
             }
         }
 
-        let cacheDirectory = try getCacheDirectory()
+        let cacheDirectory = try getCacheDirectory(fileManager: fileManager)
         let fallbackLogsDirectory = cacheDirectory.appendingPathComponent("logs")
 
         if !fileManager.fileExists(atPath: fallbackLogsDirectory.path) {

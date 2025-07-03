@@ -10,27 +10,29 @@ actor LibrarySetup {
 
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
+    private let fileManager: FileManagerProtocol
 
-    @MainActor
     init(
-        configurationLoader: ConfigurationLoader? = nil,
-        configurationRepository: ConfigurationRepositoryProtocol? = nil
+        configurationLoader: ConfigurationLoaderProtocol,
+        configurationRepository: ConfigurationRepositoryProtocol,
+        fileManager: FileManagerProtocol
     ) {
-        self.configurationLoader = configurationLoader ?? ConfigLibAssembler.shared
-            .resolve(ConfigurationLoaderProtocol.self)
-        self.configurationRepository = configurationRepository ?? ConfigLibAssembler.shared
-            .resolve(ConfigurationRepositoryProtocol.self)
+        self.configurationLoader = configurationLoader
+        self.configurationRepository = configurationRepository
+        self.fileManager = fileManager
     }
 
     func setupLibraries() async {
         do {
             try DigiDocConf.observeConfigurationUpdates(configurationRepository: configurationRepository)
-            if let schemaDirectory = Directories.getLibraryDirectory() {
-                try TSLUtil.setupTSLFiles(destinationDir: schemaDirectory)
+            if let schemaDirectory = Directories.getLibraryDirectory(fileManager: fileManager) {
+                try TSLUtil.setupTSLFiles(destinationDir: schemaDirectory, fileManager: fileManager)
             } else {
                 LibrarySetup.logger.error("Unable to setup TSL files. Library directory does not exist")
             }
-            let configDirectory = try Directories.getCacheDirectory().appendingPathComponent(
+            let configDirectory = try Directories.getCacheDirectory(
+                fileManager: fileManager
+            ).appendingPathComponent(
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
             try await configurationLoader.initConfiguration(cacheDir: configDirectory)

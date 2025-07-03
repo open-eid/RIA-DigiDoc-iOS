@@ -5,6 +5,7 @@ import Testing
 import UtilsLib
 import CommonsLib
 import CommonsTestShared
+import CommonsLibMocks
 
 @MainActor
 struct SigningViewModelTests {
@@ -94,23 +95,10 @@ struct SigningViewModelTests {
             .appendingPathComponent(Constants.Folder.SavedFiles)
         let containerFile = cacheDirectory
             .appendingPathComponent(testFileName)
-        let sampleData = Data("Sample data".utf8)
-
-        var mockFileSystem: [URL: Data] = [containerFile: sampleData]
 
         mockFileManager.urlHandler = { _, _, _, _ in tempFolderURL }
-
         mockFileManager.fileExistsHandler = { _ in false }
-
-        mockFileManager.copyItemHandler = { src, dst in
-            guard let data = mockFileSystem[src] else {
-                throw NSError(domain: NSCocoaErrorDomain,
-                        code: NSFileNoSuchFileError,
-                        userInfo: [NSLocalizedDescriptionKey: "The file at path \(src) does not exist."]
-                )
-            }
-            mockFileSystem[dst] = data
-        }
+        mockFileManager.copyItemHandler = { _, _ in }
 
         let result = viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
 
@@ -120,7 +108,9 @@ struct SigningViewModelTests {
         }
 
         #expect(copyURL.isFileURL)
-        #expect(mockFileSystem[copyURL] == sampleData)
+        #expect(mockFileManager.copyItemCallCount == 1)
+        #expect(mockFileManager.copyItemArgValues.first?.srcURL == containerFile)
+        #expect(mockFileManager.copyItemArgValues.first?.dstURL == copyURL)
     }
 
     @Test
@@ -160,31 +150,12 @@ struct SigningViewModelTests {
             .appendingPathComponent(Constants.Folder.SavedFiles)
         let containerFile = cacheDirectory
             .appendingPathComponent(testFileName)
-        let sampleData = Data("Sample data".utf8)
 
-        var mockFileSystem: [URL: Data] = [containerFile: sampleData]
-
-        mockFileManager.urlHandler = { _, _, _, _ in
-            return tempFolderURL
-        }
-
+        mockFileManager.urlHandler = { _, _, _, _ in tempFolderURL }
         mockFileManager.fileExistsHandler = { path in
             return cacheDirectory.path == path
         }
-
-        mockFileManager.removeItemHandler = { url in
-            mockFileSystem.removeValue(forKey: url)
-        }
-
-        mockFileManager.copyItemHandler = { src, dst in
-            guard let data = mockFileSystem[src] else {
-                throw NSError(domain: NSCocoaErrorDomain,
-                        code: NSFileNoSuchFileError,
-                        userInfo: [NSLocalizedDescriptionKey: "The file at path \(src) does not exist."]
-                )
-            }
-            mockFileSystem[dst] = data
-        }
+        mockFileManager.copyItemHandler = { _, _ in }
 
         let result = viewModel.createCopyOfContainerForSaving(containerURL: containerFile)
 
@@ -194,7 +165,9 @@ struct SigningViewModelTests {
         }
 
         #expect(copyURL.isFileURL)
-        #expect(mockFileSystem[copyURL] == sampleData)
+        #expect(mockFileManager.copyItemCallCount == 1)
+        #expect(mockFileManager.copyItemArgValues.first?.srcURL == containerFile)
+        #expect(mockFileManager.copyItemArgValues.first?.dstURL == copyURL)
     }
 
     @Test

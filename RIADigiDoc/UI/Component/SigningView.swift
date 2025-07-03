@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -17,6 +18,8 @@ struct SigningView: View {
     @State private var selectedSignature: SignatureWrapper?
 
     @StateObject private var viewModel: SigningViewModel
+    private var sharedContainerViewModel: SharedContainerViewModelProtocol
+
     @State private var tempContainerURL: URL?
     @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
@@ -42,11 +45,15 @@ struct SigningView: View {
     }
 
     init(
-        viewModel: SigningViewModel = AppAssembler.shared.resolve(SigningViewModel.self)
+        viewModel: SigningViewModel = Container.shared.signingViewModel(),
+        nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
+        signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
+        sharedContainerViewModel: SharedContainerViewModelProtocol = Container.shared.sharedContainerViewModel()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        nameUtil = UtilsLibAssembler.shared.resolve(NameUtilProtocol.self)
-        signatureUtil = AppAssembler.shared.resolve(SignatureUtilProtocol.self)
+        self.nameUtil = nameUtil
+        self.signatureUtil = signatureUtil
+        self.sharedContainerViewModel = sharedContainerViewModel
     }
 
     var body: some View {
@@ -173,4 +180,7 @@ struct SigningView: View {
 
 #Preview {
     SigningView()
+        .environmentObject(
+            Container.shared.languageSettings()
+        )
 }

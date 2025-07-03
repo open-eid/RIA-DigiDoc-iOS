@@ -27,8 +27,7 @@ public:
 
     std::string TSLCache() const override {
         NSString *tslCachePath = currentConf.TSLCACHE;
-          NSLog(@"tslCachePath: %@", tslCachePath);
-      return tslCachePath.UTF8String;
+        return tslCachePath.UTF8String;
     }
 
     std::string TSLUrl() const override {

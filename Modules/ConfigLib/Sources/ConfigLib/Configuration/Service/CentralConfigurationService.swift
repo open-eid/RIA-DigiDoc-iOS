@@ -8,10 +8,9 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
     private let configurationProperty: ConfigurationProperty
     private let session: Session?
 
-    @MainActor
     public init(
         userAgent: String,
-        configurationProperty: ConfigurationProperty = ConfigLibAssembler.shared.resolve(ConfigurationProperty.self),
+        configurationProperty: ConfigurationProperty,
         session: Session? = nil
     ) {
         self.userAgent = userAgent

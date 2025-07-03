@@ -2,12 +2,16 @@ import UIKit
 import SwiftUI
 import OSLog
 import UniformTypeIdentifiers
+import FactoryKit
 
 class ShareViewController: UIViewController, Sendable {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ShareViewController")
 
-    let viewModel = ShareViewModel()
+    let viewModel = ShareViewModel(
+        fileManager: Container.shared.fileManager(),
+        resourceChecker: Container.shared.urlResourceChecker()
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -1,40 +1,13 @@
 import Foundation
 
-public class MimeTypeDecoder: MimeTypeDecoderProtocol {
+public struct MimeTypeDecoder: MimeTypeDecoderProtocol {
 
-    weak var delegate: MimeTypeDecoderProtocol?
-
-    var isDdoc: Bool = false
-
-    public init() {}
-
-    public func isElementFound(named elementName: String, attributes: [String: String]) -> Bool {
-        if elementName == "SignedDoc", attributes["format"] == "DIGIDOC-XML" {
-            return true
-        }
-
-        return false
-    }
-
-    public func handleFoundElement(named elementName: String) {
-        if elementName == "SignedDoc" {
-            isDdoc = true
-        }
-    }
-
-    public func parse(xmlData: Data) -> ContainerType {
-        let parserHandler = XMLParserHandler()
-        parserHandler.delegate = self
-
-        let parser = XMLParser(data: xmlData)
-        parser.delegate = parserHandler
-
-        let success = parser.parse()
-
-        if success && isDdoc {
-            return .ddoc
-        }
-
-        return .none
+    public func parse(xmlData: Data) async -> ContainerType {
+        await withCheckedContinuation { continuation in
+            let parser = XMLParser(data: xmlData)
+            let handler = XMLParserHandler(continuation: continuation)
+            parser.delegate = handler
+            parser.parse()
+        } ? .ddoc : .none
     }
 }

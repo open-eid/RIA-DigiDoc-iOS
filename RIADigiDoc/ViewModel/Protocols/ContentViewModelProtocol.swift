@@ -1,8 +1,9 @@
 import Foundation
 import CommonsLib
+import UtilsLib
 
 /// @mockable
 @MainActor
 public protocol ContentViewModelProtocol: Sendable {
-    func getSharedFiles(fileManager: FileManagerProtocol) -> [URL]
+    func getSharedFiles() -> [URL]
 }

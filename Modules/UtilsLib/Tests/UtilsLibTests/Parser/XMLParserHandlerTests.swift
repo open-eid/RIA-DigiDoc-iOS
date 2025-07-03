@@ -1,79 +1,84 @@
 import Foundation
 import Testing
+import CommonsTestShared
+import UtilsLibMocks
+
 @testable import UtilsLib
 
-final class XMLParserHandlerTests {
+import Foundation
 
-    let parserHandler: XMLParserHandler!
-    let mockDelegate: MimeTypeDecoderProtocolMock!
+struct XMLParserHandlerTests {
 
-    init() throws {
-        mockDelegate = MimeTypeDecoderProtocolMock()
-        parserHandler = XMLParserHandler()
-        parserHandler.delegate = mockDelegate
+    @Test
+    func xmlParserHandler_parser_successWithValidDdocFormat() async {
+        let xml = """
+        <?xml version="1.0"?>
+        <SignedDoc format="DIGIDOC-XML"></SignedDoc>
+        """
+        let data = Data(xml.utf8)
+
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let handler = XMLParserHandler(continuation: continuation)
+            let parser = XMLParser(data: data)
+            parser.delegate = handler
+            parser.parse()
+        }
+
+        #expect(result == true)
     }
 
     @Test
-    func parser_success() {
-        mockDelegate.isElementFoundHandler = { @Sendable _, _ in
-            return true
+    func xmlParserHandler_parser_returnFalseWithWrongSignedDocFormat() async {
+        let xml = """
+        <?xml version="1.0"?>
+        <SignedDoc format="WRONG-FORMAT"></SignedDoc>
+        """
+        let data = Data(xml.utf8)
+
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let handler = XMLParserHandler(continuation: continuation)
+            let parser = XMLParser(data: data)
+            parser.delegate = handler
+            parser.parse()
         }
 
-        let attributes = ["format": "DIGIDOC-XML"]
-        parserHandler
-            .parser(
-                XMLParser(),
-                didStartElement: "SignedDoc",
-                namespaceURI: nil,
-                qualifiedName: nil,
-                attributes: attributes
-            )
-
-        #expect(mockDelegate.isElementFoundCallCount == 1)
-        #expect(mockDelegate.isElementFoundArgValues.first?.elementName == "SignedDoc")
-        #expect(mockDelegate.isElementFoundArgValues.first?.attributes == attributes)
-
-        #expect(mockDelegate.handleFoundElementCallCount == 1)
-        #expect(mockDelegate.handleFoundElementArgValues.first == "SignedDoc")
+        #expect(result == false)
     }
 
     @Test
-    func parser_unknownElementNotFound() {
-        mockDelegate.isElementFoundHandler = { _, _ in
-            return false
+    func xmlParserHandler_parser_returnFalseWithNoSignedDocTag() async {
+        let xml = """
+        <?xml version="1.0"?>
+        <OtherTag></OtherTag>
+        """
+        let data = Data(xml.utf8)
+
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let handler = XMLParserHandler(continuation: continuation)
+            let parser = XMLParser(data: data)
+            parser.delegate = handler
+            parser.parse()
         }
 
-        parserHandler
-            .parser(
-                XMLParser(),
-                didStartElement: "UnknownElement",
-                namespaceURI: nil,
-                qualifiedName: nil,
-                attributes: [:]
-            )
-
-        #expect(mockDelegate.isElementFoundCallCount == 1)
-        #expect(mockDelegate.isElementFoundArgValues.first?.elementName == "UnknownElement")
-        #expect(mockDelegate.handleFoundElementArgValues.isEmpty)
+        #expect(result == false)
     }
 
     @Test
-    func parser_elementNotFoundWithEmptyAttributes() {
-        mockDelegate.isElementFoundHandler = { _, _ in
-            return false
+    func xmlParserHandler_parser_returnsFalseWhenXMLIsMalformed() async {
+        let xml = """
+        <?xml version="1.0"?>
+        <SignedDoc format="DIGIDOC-XML"
+        """
+
+        let data = Data(xml.utf8)
+
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            let handler = XMLParserHandler(continuation: continuation)
+            let parser = XMLParser(data: data)
+            parser.delegate = handler
+            parser.parse()
         }
 
-        parserHandler
-            .parser(
-                XMLParser(),
-                didStartElement: "SignedDoc",
-                namespaceURI: nil,
-                qualifiedName: nil,
-                attributes: [:]
-            )
-
-        #expect(mockDelegate.isElementFoundCallCount == 1)
-        #expect(mockDelegate.isElementFoundArgValues.first?.elementName == "SignedDoc")
-        #expect(mockDelegate.isElementFoundArgValues.first?.attributes == [:])
+        #expect(result == false)
     }
 }

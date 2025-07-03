@@ -13,16 +13,21 @@ let package = Package(
             targets: ["CommonsLib"]
         )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3))
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "CommonsLib"
+            name: "CommonsLib",
+            dependencies: [
+                .product(name: "FactoryKit", package: "Factory")
+            ]
         ),
         .testTarget(
             name: "CommonsLibTests",
             dependencies: ["CommonsLib"],
-            )
+        )
     ]
 )

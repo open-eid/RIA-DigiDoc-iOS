@@ -1,8 +1,11 @@
 import Foundation
 import Testing
 import UniformTypeIdentifiers
+import FactoryKit
+import FactoryTesting
 import CommonsLib
 import CommonsTestShared
+import CommonsLibMocks
 
 @testable import FileImportShareExtension
 
@@ -13,17 +16,16 @@ struct ShareViewModelTests {
     private static let remoteURLForTestFile = "https://localhost/test.txt"
 
     private let mockFileManager: FileManagerProtocolMock!
-    private let mockUrlResourceChecker: URLResourceCheckerProtocolMock
-
-    private var viewModel: ShareViewModel!
+    private let mockUrlResourceChecker: URLResourceCheckerProtocolMock!
+    private let viewModel: ShareViewModel!
 
     init() async throws {
-        mockFileManager = FileManagerProtocolMock()
-        mockUrlResourceChecker = URLResourceCheckerProtocolMock()
-        viewModel = ShareViewModel(
-            fileManager: mockFileManager,
-            resourceChecker: mockUrlResourceChecker
-        )
+        let fileManagerMock = FileManagerProtocolMock()
+        let urlResourceCheckerMock = URLResourceCheckerProtocolMock()
+
+        self.mockFileManager = fileManagerMock
+        self.mockUrlResourceChecker = urlResourceCheckerMock
+        self.viewModel = ShareViewModel(fileManager: fileManagerMock, resourceChecker: mockUrlResourceChecker)
     }
 
     @Test

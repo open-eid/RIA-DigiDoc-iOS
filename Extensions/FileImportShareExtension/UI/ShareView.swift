@@ -1,11 +1,24 @@
 import SwiftUI
+import FactoryKit
 
 struct ShareView: View {
     @ObservedObject var viewModel: ShareViewModel
     var statusChanged: (() -> Void)?
     var completeRequest: (() -> Void)?
 
-    var languageSettings = LanguageSettings()
+    var languageSettings: LanguageSettings
+
+    init(
+        viewModel: ShareViewModel = Container.shared.shareViewModel(),
+        statusChanged: (() -> Void)? = nil,
+        completeRequest: (() -> Void)? = nil,
+        languageSettings: LanguageSettings = LanguageSettings()
+    ) {
+        _viewModel = ObservedObject(wrappedValue: viewModel)
+        self.statusChanged = statusChanged
+        self.completeRequest = completeRequest
+        self.languageSettings = languageSettings
+    }
 
     var body: some View {
         VStack {
@@ -37,5 +50,5 @@ struct ShareView: View {
 }
 
 #Preview {
-    ShareView(viewModel: ShareViewModel()) {}
+    ShareView {}
 }

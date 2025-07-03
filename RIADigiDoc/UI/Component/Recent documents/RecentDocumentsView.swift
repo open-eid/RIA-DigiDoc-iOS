@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import UtilsLib
 
 struct RecentDocumentsView: View {
@@ -11,7 +12,7 @@ struct RecentDocumentsView: View {
     @StateObject private var viewModel: RecentDocumentsViewModel
 
     init(
-        viewModel: RecentDocumentsViewModel = AppAssembler.shared.resolve(RecentDocumentsViewModel.self)
+        viewModel: RecentDocumentsViewModel = Container.shared.recentDocumentsViewModel()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -89,4 +90,6 @@ struct RecentDocumentsView: View {
 
 #Preview {
     RecentDocumentsView()
+        .environmentObject(
+            Container.shared.languageSettings())
 }
