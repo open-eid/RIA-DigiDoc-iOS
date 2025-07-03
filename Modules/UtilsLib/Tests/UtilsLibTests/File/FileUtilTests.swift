@@ -1,8 +1,12 @@
 import Foundation
 import Testing
+import FactoryKit
+import FactoryTesting
+import ZIPFoundation
 import CommonsLib
 import CommonsTestShared
-import ZIPFoundation
+import CommonsLibMocks
+
 @testable import UtilsLib
 
 struct FileUtilTests {
@@ -11,12 +15,11 @@ struct FileUtilTests {
     private let fileUtil: FileUtilProtocol
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
         self.mockFileManager = FileManagerProtocolMock()
-        self.fileUtil = FileUtil()
+        self.fileUtil = FileUtil(fileManager: mockFileManager)
     }
 
-    @Test
+    @Test(.container)
     func getMimeTypeFromZipFile_returnCorrectMimeType() async throws {
         let asiceMimetype = CommonsLib.Constants.MimeType.Asice
         let zipFileURL = try TestContainerUtil.createMockContainer(
@@ -29,7 +32,12 @@ struct FileUtilTests {
 
         let fileNameToFind = "mimetype"
 
-        let mimeType = try await fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
+
+        let fileUtil = FileUtil(fileManager: Container.shared.fileManager())
+        let mimeType = try await fileUtil.getMimeTypeFromZipFile(
+            from: zipFileURL,
+            fileNameToFind: fileNameToFind
+        )
 
         #expect(asiceMimetype == mimeType)
     }
@@ -42,7 +50,10 @@ struct FileUtilTests {
 
         let fileNameToFind = "nonexistentfile.txt"
 
-        let mimeType = try await fileUtil.getMimeTypeFromZipFile(from: zipFileURL, fileNameToFind: fileNameToFind)
+        let mimeType = try await fileUtil.getMimeTypeFromZipFile(
+            from: zipFileURL,
+            fileNameToFind: fileNameToFind
+        )
 
         #expect(mimeType == nil)
 
@@ -53,8 +64,16 @@ struct FileUtilTests {
     func getValidFileInApp_returnFileURLWhenFileExistsInAppDirectory() async throws {
         let fileURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
 
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected valid shared container URL")
+            return
+        }
+
         mockFileManager.urlsHandler = { _, _ in [fileURL] }
-        mockFileManager.contentsOfDirectoryHandler = { _ in [fileURL.path] }
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [fileURL] }
 
         let result = try fileUtil.getValidFileInApp(currentURL: fileURL)
 
@@ -74,7 +93,11 @@ struct FileUtilTests {
     func getValidFileInApp_ContinueSearchAndReturnSameDirectoryURLWhenDirectoryAccessFails() async throws {
         let testDirectory = URL(fileURLWithPath:
                                     mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let fileURL = testDirectory.appendingPathComponent("testFile.txt")
         let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistent-\(UUID().uuidString)")
+
+        mockFileManager.urlsHandler = { _, _ in [testDirectory] }
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [fileURL] }
 
         let result = try fileUtil.getValidFileInApp(currentURL: nonExistentDirectory)
 
@@ -102,13 +125,14 @@ struct FileUtilTests {
 
     @Test
     func isFileFromAppGroup_returnFalseWhenFileOutsideAppGroup() async throws {
-        let mockFileUrl = URL(fileURLWithPath: "/mock/path")
+        let mockFileUrl = URL(fileURLWithPath: "/data/example/Documents/file.txt")
+        let mockAppGroupUrl = URL(fileURLWithPath: "/data/example/Library/GroupContainers/group.com.example")
 
         mockFileManager.containerURLHandler = { _ in mockFileUrl }
         mockFileManager.fileExistsHandler = { _ in true }
 
         let result = try fileUtil.isFileFromAppGroup(
-            url: mockFileUrl, appGroupURL: nil
+            url: mockFileUrl, appGroupURL: mockAppGroupUrl
         )
 
         #expect(!result)

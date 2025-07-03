@@ -1,7 +1,9 @@
 import Foundation
+import Testing
 import CommonsLib
 import CommonsTestShared
-import Testing
+import CommonsLibMocks
+
 @testable import UtilsLib
 
 struct DirectoriesTests {
@@ -9,8 +11,6 @@ struct DirectoriesTests {
     private let mockFileManager: FileManagerProtocolMock!
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-
         mockFileManager = FileManagerProtocolMock()
     }
 
@@ -167,55 +167,25 @@ struct DirectoriesTests {
 
     @Test
     func getCacheDirectory_doesNotRecreateExistingDirectory() async throws {
-        var mockedFileSystem: [String: [String]] = [:]
-
         let baseCacheURL = URL(fileURLWithPath: "/mock/cache")
-        let subfolder = "ExistingFolder"
-        let testFile = "ExistingFile"
+        let existingFolderURL = baseCacheURL
+            .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
+            .appendingPathComponent("existingFolder")
 
-        mockFileManager.urlsHandler = { directory, _ in
-            guard directory == .cachesDirectory else { return [] }
-            return [baseCacheURL]
+        mockFileManager.urlHandler = { _, _, _, _ in
+            return baseCacheURL
         }
 
-        mockFileManager.fileExistsAtPathHandler = { path, isDirectory in
-            let exists = mockedFileSystem.keys.contains(path)
-            if let dir = isDirectory {
-                dir.pointee = ObjCBool(exists)
-            }
-            return exists
+        mockFileManager.fileExistsHandler = { path in
+            return path == existingFolderURL.path
         }
 
-        let fullDirectoryPath = baseCacheURL.appendingPathComponent(subfolder).path
+        let result = try Directories.getCacheDirectory(
+            subfolder: "existingFolder",
+            fileManager: mockFileManager
+        )
 
-        mockedFileSystem[fullDirectoryPath] = [testFile]
-
-        mockFileManager.fileExistsAtPathHandler = { path, isDirectory in
-            let exists = mockedFileSystem.keys.contains(path)
-            if let dir = isDirectory {
-                dir.pointee = ObjCBool(exists)
-            }
-            return exists
-        }
-
-        mockFileManager.fileExistsHandler = { _ in true }
-
-        mockFileManager.contentsOfDirectoryHandler = { _ in
-            mockedFileSystem[fullDirectoryPath] ?? []
-        }
-
-        let dir1 = try Directories.getCacheDirectory(subfolder: subfolder, fileManager: mockFileManager)
-        let contents1 = try mockFileManager.contentsOfDirectory(atPath: dir1.path)
-
-        #expect(mockFileManager.fileExists(atPath: dir1.path))
-        #expect(contents1.count == 1 && contents1.contains(testFile))
-
-        let dir2 = try Directories.getCacheDirectory(subfolder: subfolder, fileManager: mockFileManager)
-        let contents2 = try mockFileManager.contentsOfDirectory(atPath: dir2.path)
-
-        #expect(mockFileManager.fileExists(atPath: dir2.path))
-        #expect(contents2.count == 1 && contents2.contains(testFile))
-
+        #expect(result.path == existingFolderURL.path)
         #expect(mockFileManager.createDirectoryCallCount == 0)
     }
 }

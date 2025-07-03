@@ -16,7 +16,7 @@ struct FileOpeningRepositoryTests {
     func isFileSizeValid_success() async throws {
         let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
 
-        mockFileOpeningService.isFileSizeValidHandler = { @Sendable _ in
+        mockFileOpeningService.isFileSizeValidHandler = { _ in
             return true
         }
 
@@ -35,7 +35,7 @@ struct FileOpeningRepositoryTests {
 
         let fileURLs = [tempFileURL, tempFileURL2]
 
-        mockFileOpeningService.getValidFilesHandler = { @Sendable _ in
+        mockFileOpeningService.getValidFilesHandler = { _ in
             return fileURLs
         }
 
@@ -63,7 +63,7 @@ struct FileOpeningRepositoryTests {
 
         let signedContainer = SignedContainer()
 
-        mockFileOpeningService.openOrCreateContainerHandler = { @Sendable _ in
+        mockFileOpeningService.openOrCreateContainerHandler = { _ in
             return signedContainer
         }
 

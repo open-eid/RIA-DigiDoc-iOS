@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
         .package(path: "../CommonsLib"),
         .package(path: "../CommonsLib/CommonsTestShared")
@@ -24,11 +24,22 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "UtilsLib",
-            dependencies: ["Swinject", "ZIPFoundation", "CommonsLib"]
+            dependencies: [
+                "ZIPFoundation",
+                "CommonsLib",
+                .product(name: "FactoryKit", package: "Factory")
+            ]
         ),
         .testTarget(
             name: "UtilsLibTests",
-            dependencies: ["UtilsLib", "Swinject", "CommonsLib", "CommonsTestShared"]
+            dependencies: [
+                "CommonsLib",
+                "CommonsTestShared",
+                .product(name: "UtilsLibMocks", package: "commonstestshared"),
+                .product(name: "CommonsLibMocks", package: "commonstestshared"),
+                .product(name: "ConfigLibMocks", package: "commonstestshared"),
+                .product(name: "FactoryTesting", package: "Factory")
+            ]
         )
     ]
 )

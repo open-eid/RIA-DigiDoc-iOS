@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct LoadingView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
@@ -29,4 +30,6 @@ struct LoadingView: View {
 
 #Preview {
     LoadingView()
+        .environmentObject(
+            Container.shared.languageSettings())
 }

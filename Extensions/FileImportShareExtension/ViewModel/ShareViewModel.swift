@@ -1,25 +1,26 @@
 import Foundation
 import OSLog
 import UniformTypeIdentifiers
+import FactoryKit
 import CommonsLib
 import UtilsLib
 import Alamofire
 
 @MainActor
-class ShareViewModel: NSObject, ShareViewModelProtocol, ObservableObject {
+class ShareViewModel: ShareViewModelProtocol, ObservableObject {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.FileImportShareExtension",
         category: "ShareViewController"
     )
 
-    @Published var status: Status = .processing
-
     private let fileManager: FileManagerProtocol
     private let resourceChecker: URLResourceCheckerProtocol
 
+    @Published var status: Status = .processing
+
     public init(
-        fileManager: FileManagerProtocol = FileManager.default,
-        resourceChecker: URLResourceCheckerProtocol = URLResourceChecker()
+        fileManager: FileManagerProtocol,
+        resourceChecker: URLResourceCheckerProtocol
     ) {
         self.fileManager = fileManager
         self.resourceChecker = resourceChecker

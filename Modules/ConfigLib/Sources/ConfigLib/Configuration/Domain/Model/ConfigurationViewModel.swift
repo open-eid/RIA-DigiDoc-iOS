@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 import UtilsLib
+import CommonsLib
 
 @MainActor
 class ConfigurationViewModel {
@@ -9,15 +10,20 @@ class ConfigurationViewModel {
     private(set) var configuration: ConfigurationProvider?
 
     private let repository: ConfigurationRepositoryProtocol
+    private let fileManager: FileManagerProtocol
 
-    init(repository: ConfigurationRepositoryProtocol) {
+    init(
+        repository: ConfigurationRepositoryProtocol,
+        fileManager: FileManagerProtocol
+    ) {
         self.repository = repository
+        self.fileManager = fileManager
     }
 
     func fetchConfiguration(lastUpdate: TimeInterval) async {
         do {
             guard let updates = try await repository.getCentralConfigurationUpdates(
-                cacheDir: Directories.getConfigDirectory()
+                cacheDir: Directories.getConfigDirectory(fileManager: fileManager)
             ) else {
                 ConfigurationViewModel.logger.error("No configuration updates available.")
                 return

@@ -1,4 +1,5 @@
 import Foundation
+import FactoryKit
 import OSLog
 import CommonsLib
 
@@ -24,7 +25,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
             Constants.Container.SignedContainerFolder,
             isDirectory: true
         ),
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         if let folderURL = folderURL {

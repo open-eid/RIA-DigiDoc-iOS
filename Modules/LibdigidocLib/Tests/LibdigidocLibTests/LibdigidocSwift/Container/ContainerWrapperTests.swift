@@ -5,6 +5,7 @@ import CommonsTestShared
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib
+import UtilsLibMocks
 
 @testable import LibdigidocLibSwift
 
@@ -15,10 +16,6 @@ final class ContainerWrapperTests {
     private let configurationProvider: ConfigurationProvider
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-        await ConfigLibAssembler.shared.initialize()
-        await LibDigidocLibAssembler.shared.initialize()
-
         tempFileURL = TestFileUtil.createSampleFile()
 
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()

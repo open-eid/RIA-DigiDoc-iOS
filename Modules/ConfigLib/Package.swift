@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
         .package(url: "https://github.com/TakeScoop/SwiftyRSA", exact: .init(1, 8, 0)),
         .package(path: "../CommonsLib"),
@@ -26,7 +26,8 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "ConfigLib",
-            dependencies: ["Swinject", "Alamofire", "CommonsLib", "SwiftyRSA", "UtilsLib"],
+            dependencies: ["Alamofire", "CommonsLib", "SwiftyRSA", "UtilsLib",
+                           .product(name: "FactoryKit", package: "Factory")],
             resources: [
                 .copy("Resources/config"),
                 .copy("Resources/tslFiles")
@@ -34,7 +35,13 @@ let package = Package(
         ),
         .testTarget(
             name: "ConfigLibTests",
-            dependencies: ["ConfigLib", "Swinject", "CommonsLib", "UtilsLib", "CommonsTestShared"]
+            dependencies: [
+                "CommonsLib",
+                "UtilsLib",
+                "CommonsTestShared",
+                .product(name: "ConfigLibMocks", package: "commonstestshared"),
+                .product(name: "FactoryTesting", package: "Factory")
+            ]
         )
     ]
 )

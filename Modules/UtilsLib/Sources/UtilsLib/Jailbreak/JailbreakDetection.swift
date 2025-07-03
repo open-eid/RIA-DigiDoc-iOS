@@ -1,4 +1,5 @@
 import UIKit
+import FactoryKit
 import CommonsLib
 
 public struct JailbreakDetection {
@@ -11,11 +12,15 @@ public struct JailbreakDetection {
         #endif
     }
 
-    public static func isDeviceJailbroken() async -> Bool {
+    public static func isDeviceJailbroken(
+        fileManager: FileManagerProtocol
+    ) async -> Bool {
         if isSimulator() { return false }
 
         let canOpenJailbreakURLs = await canOpenCommonJailbreakURLSchemes()
-        return canOpenJailbreakURLs || canAccessRestrictedAreas() || commonJailbreakFilesExist()
+        return canOpenJailbreakURLs ||
+            canAccessRestrictedAreas(fileManager: fileManager) ||
+            commonJailbreakFilesExist(fileManager: fileManager)
     }
 
     // Common jailbreak files and directories
@@ -37,7 +42,7 @@ public struct JailbreakDetection {
     ]
 
     private static func canAccessRestrictedAreas(
-        fileManager: FileManagerProtocol = FileManager.default,
+        fileManager: FileManagerProtocol
     ) -> Bool {
         let testPath = "/private/jailbreakTest"
         do {
@@ -50,7 +55,7 @@ public struct JailbreakDetection {
     }
 
     private static func commonJailbreakFilesExist(
-        fileManager: FileManagerProtocol = FileManager.default,
+        fileManager: FileManagerProtocol
     ) -> Bool {
         for path in commonJailbreakPaths where fileManager.fileExists(atPath: path) {
             return true

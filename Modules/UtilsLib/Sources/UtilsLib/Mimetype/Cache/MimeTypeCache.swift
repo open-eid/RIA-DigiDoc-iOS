@@ -1,13 +1,21 @@
 import Foundation
+import CommonsLib
 
 actor MimeTypeCache: MimeTypeCacheProtocol {
     private var cache: [String: MimeTypeCacheEntry] = [:]
 
     private let fileUtil: FileUtilProtocol
+    private let fileManager: FileManagerProtocol
+    private let mimetypeDecoder: MimeTypeDecoderProtocol
 
-    @MainActor
-    init(fileUtil: FileUtilProtocol = UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) {
+    init(
+        fileUtil: FileUtilProtocol,
+        fileManager: FileManagerProtocol,
+        mimetypeDecoder: MimeTypeDecoderProtocol
+    ) {
         self.fileUtil = fileUtil
+        self.fileManager = fileManager
+        self.mimetypeDecoder = mimetypeDecoder
     }
 
     func getMimeType(fileUrl: URL) async -> String {
@@ -16,7 +24,11 @@ actor MimeTypeCache: MimeTypeCacheProtocol {
         if let cachedEntry = cache[md5]?.mimeType {
             return cachedEntry
         } else {
-            let mimeType = await fileUrl.mimeType(fileUtil: fileUtil)
+            let mimeType = await fileUrl.mimeType(
+                fileUtil: fileUtil,
+                fileManager: fileManager,
+                mimeTypeDecoder: mimetypeDecoder
+            )
             setMimeType(md5: md5, mimeType: mimeType)
             return mimeType
         }

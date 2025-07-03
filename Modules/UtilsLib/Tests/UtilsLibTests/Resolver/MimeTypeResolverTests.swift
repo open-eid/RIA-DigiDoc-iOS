@@ -2,6 +2,7 @@ import Foundation
 import Testing
 import CommonsLib
 import CommonsTestShared
+import UtilsLibMocks
 
 @testable import UtilsLib
 
@@ -11,8 +12,6 @@ struct MimeTypeResolverTests {
     private var resolver: MimeTypeResolverProtocol!
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-
         mockMimeTypeCache = MimeTypeCacheProtocolMock()
         resolver = MimeTypeResolver(mimeTypeCache: mockMimeTypeCache)
     }
@@ -22,7 +21,7 @@ struct MimeTypeResolverTests {
         let fileUrl = TestFileUtil.createSampleFile(name: "image", withExtension: "png")
         let expectedMimeType = "image/png"
 
-        mockMimeTypeCache.getMimeTypeHandler = { @Sendable _ in
+        mockMimeTypeCache.getMimeTypeHandler = { _ in
             return expectedMimeType
         }
 

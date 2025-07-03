@@ -5,6 +5,9 @@ import CoreGraphics
 import Testing
 import CommonsLib
 import CommonsTestShared
+import CommonsLibMocks
+import UtilsLibMocks
+
 @testable import UtilsLib
 
 @MainActor
@@ -17,8 +20,6 @@ struct URLExtensionsTests {
     private let mockFileManager: FileManagerProtocolMock!
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-
         mockFileUtil = FileUtilProtocolMock()
         mockMimetypeDecoder = MimeTypeDecoderProtocolMock()
         mockFileManager = FileManagerProtocolMock()
@@ -29,7 +30,7 @@ struct URLExtensionsTests {
 
         let mockFile = URL(fileURLWithPath: "/mock/path/text.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { _, _ in
+        mockFileUtil.getValidFileInAppHandler = { _ in
             return mockFile
         }
 
@@ -45,7 +46,7 @@ struct URLExtensionsTests {
             with: ["testfile.txt": "Test content"],
             containerExtension: "zip")
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { @Sendable _, _, _ in
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
             throw Archive.ArchiveError.unreadableArchive
         }
 
@@ -93,7 +94,7 @@ struct URLExtensionsTests {
     }
 
     @Test
-    func isDdoc_success() {
+    func isDdoc_success() async {
         do {
             let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
@@ -103,11 +104,11 @@ struct URLExtensionsTests {
                 ],
                 containerExtension: "ddoc")
 
-            mockMimetypeDecoder.parseHandler = { @Sendable _ in
+            mockMimetypeDecoder.parseHandler = { _ in
                 return ContainerType.ddoc
             }
 
-            let isDdoc = mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
+            let isDdoc = await mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
 
             #expect(isDdoc)
         } catch {
@@ -117,7 +118,7 @@ struct URLExtensionsTests {
     }
 
     @Test
-    func isDdoc_returnFalseForUnknownContainer() {
+    func isDdoc_returnFalseForUnknownContainer() async {
         do {
             let mockContainer = try TestContainerUtil.createMockContainer(
                 with: ["ddoc":
@@ -127,11 +128,11 @@ struct URLExtensionsTests {
                 ],
                 containerExtension: "ddoc")
 
-            mockMimetypeDecoder.parseHandler = { @Sendable _ in
+            mockMimetypeDecoder.parseHandler = { _ in
                 return ContainerType.none
             }
 
-            let isDdoc = mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
+            let isDdoc = await mockContainer.isDdoc(mimeTypeDecoder: mockMimetypeDecoder)
 
             #expect(!isDdoc)
         } catch {
@@ -176,7 +177,7 @@ struct URLExtensionsTests {
     func validURL_returnValidURL() throws {
         let nonExistentFileLocation = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in
+        mockFileUtil.getValidFileInAppHandler = { _ in
             return nonExistentFileLocation
         }
 
@@ -187,18 +188,32 @@ struct URLExtensionsTests {
 
     @Test
     func validURL_returnSameURLWhenFileFromAppGroup() throws {
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in
+        mockFileUtil.getValidFileInAppHandler = { _ in
             return nil
         }
 
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+
         do {
-            let fileURL = try Directories.getSharedFolder().appendingPathComponent("testfolder").appendingPathComponent(
+            let fileURL = try Directories.getSharedFolder(
+                fileManager: mockFileManager
+            ).appendingPathComponent("testfolder").appendingPathComponent(
                 "testFile.txt"
             )
 
             let testURL = URL(fileURLWithPath: fileURL.path)
 
-            let result = try testURL.validURL(fileUtil: mockFileUtil)
+            let result = try testURL.validURL(
+                fileUtil: mockFileUtil,
+                fileManager: mockFileManager
+            )
 
             #expect(testURL == result)
         } catch {
@@ -209,9 +224,9 @@ struct URLExtensionsTests {
 
     @Test
     func validURL_returnURLWhenFileFromiCloudDownloaded() throws {
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in nil }
-        mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in true }
-        mockFileUtil.isFileDownloadedFromiCloudHandler = { @Sendable _ in true }
+        mockFileUtil.getValidFileInAppHandler = { _ in nil }
+        mockFileUtil.isFileFromiCloudHandler = { _ in true }
+        mockFileUtil.isFileDownloadedFromiCloudHandler = { _ in true }
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
@@ -225,8 +240,8 @@ struct URLExtensionsTests {
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { @Sendable _, _ in nil }
-        mockFileUtil.isFileFromiCloudHandler = { @Sendable _ in false }
+        mockFileUtil.getValidFileInAppHandler = { _ in nil }
+        mockFileUtil.isFileFromiCloudHandler = { _ in false }
 
         do {
             _ = try testURL.validURL(fileUtil: mockFileUtil)

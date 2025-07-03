@@ -5,13 +5,28 @@ import UniformTypeIdentifiers
 import OSLog
 import System
 import ZIPFoundation
+import FactoryKit
 import CommonsLib
+
+public func fileUtil() -> FileUtilProtocol {
+    Container.shared.fileUtil()
+}
+
+public func fileManager() -> FileManagerProtocol {
+    Container.shared.fileManager()
+}
+
+public func mimeTypeDecoder() -> MimeTypeDecoderProtocol {
+    Container.shared.mimeTypeDecoder()
+}
 
 extension URL {
 
-    @MainActor
-    public func mimeType(fileUtil: FileUtilProtocol =
-                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self)) async -> String {
+    public func mimeType(
+        fileUtil: FileUtilProtocol = fileUtil(),
+        fileManager: FileManagerProtocol = fileManager(),
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> String {
         let defaultMimeType = Constants.MimeType.Default
 
         do {
@@ -27,30 +42,37 @@ extension URL {
             }
         }
 
-        if isDdoc() {
+        if await isDdoc(mimeTypeDecoder: mimeTypeDecoder) {
             return Constants.MimeType.Ddoc
         }
 
         return mimeTypeForFileExtension() ?? defaultMimeType
     }
 
-    @MainActor
-    public func isContainer() async -> Bool {
-        let mimetype = await mimeType()
+    public func isContainer(
+        fileUtil: FileUtilProtocol = fileUtil(),
+        fileManager: FileManagerProtocol = fileManager(),
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> Bool {
+        let mimetype = await mimeType(
+            fileUtil: fileUtil,
+            fileManager: fileManager,
+            mimeTypeDecoder: mimeTypeDecoder
+        )
 
         if Constants.MimeType.SignatureContainers.contains(mimetype) {
             return true
         }
 
-        return isDdoc()
+        return await isDdoc(mimeTypeDecoder: mimeTypeDecoder)
     }
 
-    @MainActor
-    public func isDdoc(mimeTypeDecoder: MimeTypeDecoderProtocol =
-                        UtilsLibAssembler.shared.resolve(MimeTypeDecoderProtocol.self)) -> Bool {
+    public func isDdoc(
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> Bool {
         do {
             let xmlData = try Data(contentsOf: self)
-            let result = mimeTypeDecoder.parse(xmlData: xmlData)
+            let result = await mimeTypeDecoder.parse(xmlData: xmlData)
             return result == .ddoc
         } catch {
             return false
@@ -67,9 +89,16 @@ extension URL {
         }
     }
 
-    @MainActor
-    public func isPDF() async -> Bool {
-        let mimeType = await self.mimeType()
+    public func isPDF(
+        fileUtil: FileUtilProtocol = fileUtil(),
+        fileManager: FileManagerProtocol = fileManager(),
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> Bool {
+        let mimeType = await self.mimeType(
+            fileUtil: fileUtil,
+            fileManager: fileManager,
+            mimeTypeDecoder: mimeTypeDecoder
+        )
         return mimeType == Constants.MimeType.Pdf
     }
 
@@ -133,16 +162,16 @@ extension URL {
         return false
     }
 
-    @MainActor
-    public func validURL(fileUtil: FileUtilProtocol =
-                            UtilsLibAssembler.shared.resolve(FileUtilProtocol.self),
-                         fileManager: FileManagerProtocol = FileManager.default) throws -> URL {
+    public func validURL(
+        fileUtil: FileUtilProtocol = fileUtil(),
+        fileManager: FileManagerProtocol = fileManager()
+    ) throws -> URL {
         _ = self.startAccessingSecurityScopedResource()
 
         defer {
             self.stopAccessingSecurityScopedResource()
         }
-        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self, fileManager: fileManager)
+        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self)
 
         if let validFileURL = validFileInApp {
             return validFileURL
@@ -170,7 +199,7 @@ extension URL {
 
                 var fileLocationURL: URL?
 
-                fileUtil.downloadFileFromiCloud(fileURL: self, fileManager: fileManager) { downloadedFileUrl in
+                fileUtil.downloadFileFromiCloud(fileURL: self) { downloadedFileUrl in
                     if let fileUrl = downloadedFileUrl {
                         DispatchQueue.main.async {
                             fileLocationURL = fileUrl
@@ -210,7 +239,7 @@ extension URL {
     }
 
     public func isFolder(
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol = fileManager()
     ) -> Bool {
         var isDirectory: ObjCBool = false
         let exists = fileManager.fileExists(atPath: self.path, isDirectory: &isDirectory)
@@ -218,7 +247,7 @@ extension URL {
     }
 
     public func folderContents(
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol = fileManager()
     ) throws -> [URL] {
         if isFolder(fileManager: fileManager) {
             let fileURLs = try fileManager.contentsOfDirectory(at: self, includingPropertiesForKeys: nil, options: [])

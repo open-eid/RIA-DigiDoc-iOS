@@ -14,10 +14,6 @@ final class SignedContainerTests {
     private var signedContainer: SignedContainerProtocol!
 
     init() async throws {
-        await UtilsLibAssembler.shared.initialize()
-        await ConfigLibAssembler.shared.initialize()
-        await LibDigidocLibAssembler.shared.initialize()
-
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {

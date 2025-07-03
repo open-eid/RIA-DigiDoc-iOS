@@ -101,7 +101,9 @@ extension SettingsConfiguration {
     }
 
     private func saveFile(named fileName: String, content: String) throws {
-        let directory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        let components = ["Modules", "ConfigLib", "Sources", "ConfigLib", "Resources", "config"]
+        let baseURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        let directory = components.reduce(baseURL) { $0.appendingPathComponent($1) }
         let fileURL = directory.appendingPathComponent(fileName)
 
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

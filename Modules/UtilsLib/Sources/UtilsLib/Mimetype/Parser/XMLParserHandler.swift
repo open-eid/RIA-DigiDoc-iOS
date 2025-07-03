@@ -1,20 +1,33 @@
 import Foundation
 
 class XMLParserHandler: NSObject, XMLParserDelegate {
+    private var continuation: CheckedContinuation<Bool, Never>?
+    private var foundElement = false
 
-    weak var delegate: MimeTypeDecoderProtocol?
+    init(continuation: CheckedContinuation<Bool, Never>) {
+        self.continuation = continuation
+    }
 
-    // swiftlint:disable:next blanket_disable_command
-    // swiftlint:disable unused_parameter
-    public func parser(
-        _ parser: XMLParser,
-        didStartElement elementName: String,
-        namespaceURI: String?,
-        qualifiedName qName: String?,
-        attributes attributeDict: [String: String]
-    ) {
-        if delegate?.isElementFound(named: elementName, attributes: attributeDict) == true {
-            delegate?.handleFoundElement(named: elementName)
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI _: String?, qualifiedName _: String?, attributes attributeDict: [String: String]) {
+        if elementName == "SignedDoc", attributeDict["format"] == "DIGIDOC-XML" {
+            foundElement = true
+            continuation?.resume(returning: true)
+            continuation = nil
+            parser.abortParsing()
+        }
+    }
+
+    func parserDidEndDocument(_: XMLParser) {
+        if continuation != nil {
+            continuation?.resume(returning: foundElement)
+            continuation = nil
+        }
+    }
+
+    func parser(_: XMLParser, parseErrorOccurred _: Error) {
+        if continuation != nil {
+            continuation?.resume(returning: foundElement)
+            continuation = nil
         }
     }
 }

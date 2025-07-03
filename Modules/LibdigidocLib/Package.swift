@@ -11,7 +11,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Swinject/Swinject.git", exact: .init(2, 9, 1)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
@@ -34,12 +34,26 @@ let package = Package(
         ),
         .target(
             name: "LibdigidocLibSwift",
-            dependencies: ["LibdigidocLibObjC", "Swinject", "CommonsLib", "ConfigLib", "UtilsLib"],
+            dependencies: [
+                "LibdigidocLibObjC",
+                "CommonsLib",
+                "ConfigLib",
+                "UtilsLib",
+                .product(name: "FactoryKit", package: "Factory")
+            ],
             path: "Sources/LibdigidocSwift"
         ),
         .testTarget(
             name: "LibdigidocLibTests",
-            dependencies: ["LibdigidocLibSwift", "ConfigLib", "CommonsLib", "UtilsLib", "CommonsTestShared"]
+            dependencies: [
+                "LibdigidocLibSwift",
+                "ConfigLib",
+                "CommonsLib",
+                "UtilsLib",
+                "CommonsTestShared",
+                .product(name: "UtilsLibMocks", package: "commonstestshared"),
+                .product(name: "FactoryTesting", package: "Factory")
+            ]
         )
     ]
 )

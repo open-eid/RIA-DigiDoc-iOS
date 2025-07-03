@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -7,6 +8,7 @@ struct SignatureDetailView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: SignatureDetailViewModel
+    private var certificateDetailViewModel: CertificateDetailViewModel
 
     private let signature: SignatureWrapper
     private let containerMimetype: String
@@ -15,13 +17,15 @@ struct SignatureDetailView: View {
     private let nameUtil: NameUtilProtocol
 
     init(
-        viewModel: SignatureDetailViewModel = AppAssembler.shared.resolve(SignatureDetailViewModel.self),
+        viewModel: SignatureDetailViewModel = Container.shared.signatureDetailViewModel(),
+        certificateDetailViewModel: CertificateDetailViewModel = Container.shared.certificateDetailViewModel(),
         signature: SignatureWrapper,
         containerMimetype: String,
         dataFilesCount: Int,
-        nameUtil: NameUtilProtocol = UtilsLibAssembler.shared.resolve(NameUtilProtocol.self)
+        nameUtil: NameUtilProtocol = Container.shared.nameUtil()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.certificateDetailViewModel = certificateDetailViewModel
         self.signature = signature
         self.containerMimetype = containerMimetype
         self.dataFilesCount = dataFilesCount
@@ -247,5 +251,8 @@ struct SignatureDetailView: View {
         ),
         containerMimetype: "application/vnd.etsi.asic-e+zip",
         dataFilesCount: 1
+    )
+    .environmentObject(
+        Container.shared.languageSettings()
     )
 }

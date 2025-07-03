@@ -1,16 +1,17 @@
 import Foundation
+import FactoryKit
 import UtilsLib
 import CommonsLib
 
 public struct TSLUtil {
 
-    public static func setupTSLFiles(tsls: [String] = [], destinationDir: URL) throws {
+    public static func setupTSLFiles(tsls: [String] = [], destinationDir: URL, fileManager: FileManagerProtocol) throws {
         let tslFiles = !tsls.isEmpty ? tsls : Bundle.module.paths(
             forResourcesOfType: "xml",
             inDirectory: CommonsLib.Constants.Configuration.TslFilesFolder
         )
 
-        try createDirectoryIfNotExist(at: destinationDir)
+        try createDirectoryIfNotExist(at: destinationDir, fileManager: fileManager)
 
         for filePath in tslFiles {
             let fileName = (filePath as NSString).lastPathComponent
@@ -21,10 +22,16 @@ public struct TSLUtil {
                 from: filePath,
                 to: destinationDir.appendingPathComponent(
                     fileName
-                ).path
+                ).path,
+                fileManager: fileManager
             ) {
                 try copyTSL(from: filePath, to: destinationDir.appendingPathComponent(fileName).path)
-                try removeExistingETag(at: destinationDir.appendingPathComponent(fileName).path)
+                try removeExistingETag(
+                    at: destinationDir.appendingPathComponent(
+                        fileName
+                    ).path,
+                    fileManager: fileManager
+                )
             }
         }
     }
@@ -36,7 +43,7 @@ public struct TSLUtil {
     private static func shouldCopyTSL(
         from sourcePath: String,
         to destinationPath: String,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) -> Bool {
         if !fileManager.fileExists(atPath: destinationPath) {
             return true
@@ -62,7 +69,7 @@ public struct TSLUtil {
 
     private static func removeExistingETag(
         at filePath: String,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws {
         let eTagURL = URL(fileURLWithPath: filePath).appendingPathExtension("etag")
         if fileManager.fileExists(atPath: eTagURL.path) {
@@ -92,7 +99,7 @@ public struct TSLUtil {
 
     private static func createDirectoryIfNotExist(
         at url: URL,
-        fileManager: FileManagerProtocol = FileManager.default
+        fileManager: FileManagerProtocol
     ) throws {
         if !fileManager.fileExists(atPath: url.path) {
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)

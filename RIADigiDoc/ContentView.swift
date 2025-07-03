@@ -1,3 +1,4 @@
+import FactoryKit
 import SwiftUI
 import OSLog
 import UtilsLib
@@ -13,7 +14,7 @@ struct ContentView: View {
     @State private var openedUrls: [URL] = []
 
     init(
-        viewModel: ContentViewModel = AppAssembler.shared.resolve(ContentViewModel.self)
+        viewModel: ContentViewModel = Container.shared.contentViewModel()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -62,4 +63,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(
+            Container.shared.languageSettings()
+        )
 }

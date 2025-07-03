@@ -1,13 +1,18 @@
 import Foundation
 import OSLog
+import FactoryKit
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib
+import CommonsLib
 
 public struct DigiDocConf: DigiDocConfProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DigiDocConf")
 
-    @MainActor static let sharedInitializer = DigiDocInitializer()
+    @MainActor static let sharedInitializer = DigiDocInitializer(
+        configurationRepository: Container.shared.configurationRepository(),
+        fileManager: Container.shared.fileManager()
+    )
 
     public static func initDigiDoc(configuration: ConfigurationProvider? = nil) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
@@ -31,6 +36,7 @@ public actor DigiDocInitializer {
     private var initializationError: ErrorDetail?
 
     private let configurationRepository: ConfigurationRepositoryProtocol
+    private let fileManager: FileManagerProtocol
 
     private static let libdigidocppLogLevel = 4
 
@@ -38,11 +44,11 @@ public actor DigiDocInitializer {
 
     @MainActor
     init(
-        configurationRepository: ConfigurationRepositoryProtocol = ConfigLibAssembler.shared.resolve(
-            ConfigurationRepositoryProtocol.self
-        )
+        configurationRepository: ConfigurationRepositoryProtocol,
+        fileManager: FileManagerProtocol
     ) {
         self.configurationRepository = configurationRepository
+        self.fileManager = fileManager
     }
 
     func initializeDigiDoc(configuration: ConfigurationProvider? = nil) async throws {
@@ -113,14 +119,18 @@ public actor DigiDocInitializer {
 
     private func overrideLogFile() -> String {
         do {
-            return try Directories.getLibdigidocLogFile(from: Directories.getLibraryDirectory())?.path ?? ""
+            return try Directories
+                .getLibdigidocLogFile(
+                    from: Directories.getLibraryDirectory(fileManager: fileManager),
+                    fileManager: fileManager
+                )?.path ?? ""
         } catch {
             return ""
         }
     }
 
     private func overrideTSLCache() -> String {
-        return Directories.getTslCacheDirectory()?.path ?? ""
+        return Directories.getTslCacheDirectory(fileManager: fileManager)?.path ?? ""
     }
 
     private func overrideTSLUrl(conf: ConfigurationProvider) -> String {

@@ -1,8 +1,6 @@
 import Foundation
 
 /// @mockable
-public protocol MimeTypeDecoderProtocol: AnyObject {
-    func isElementFound(named elementName: String, attributes: [String: String]) -> Bool
-    func handleFoundElement(named elementName: String)
-    func parse(xmlData: Data) -> ContainerType
+public protocol MimeTypeDecoderProtocol: Sendable {
+    func parse(xmlData: Data) async -> ContainerType
 }

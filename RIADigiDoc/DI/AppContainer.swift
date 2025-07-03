@@ -1,0 +1,103 @@
+import Foundation
+import FactoryKit
+import ConfigLib
+import UtilsLib
+import CommonsLib
+
+extension Container {
+    var librarySetup: Factory<LibrarySetup> {
+        self {
+            LibrarySetup(
+                configurationLoader: self.configurationLoader(),
+                configurationRepository: self.configurationRepository(),
+                fileManager: self.fileManager()
+            )
+        }
+        .shared
+    }
+
+    var fileOpeningService: Factory<FileOpeningServiceProtocol> {
+        self {
+            FileOpeningService(
+                fileUtil: self.fileUtil(),
+                fileInspector: self.fileInspector(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    var fileOpeningRepository: Factory<FileOpeningRepositoryProtocol> {
+        self { FileOpeningRepository(fileOpeningService: self.fileOpeningService()) }
+            .shared
+    }
+
+    var sharedContainerViewModel: Factory<SharedContainerViewModelProtocol> {
+        self { SharedContainerViewModel() }
+            .shared
+    }
+
+    @MainActor
+    var mainSignatureViewModel: Factory<MainSignatureViewModel> {
+        self { @MainActor in MainSignatureViewModel(sharedContainerViewModel: self.sharedContainerViewModel()) }
+    }
+
+    @MainActor
+    var fileOpeningViewModel: Factory<FileOpeningViewModel> {
+        self {
+            @MainActor in FileOpeningViewModel(
+                fileOpeningRepository: self.fileOpeningRepository(),
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var signingViewModel: Factory<SigningViewModel> {
+        self {
+            @MainActor in SigningViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    var languageSettings: Factory<LanguageSettings> {
+        self { LanguageSettings() }
+    }
+
+    @MainActor
+    var contentViewModel: Factory<ContentViewModel> {
+        self {
+            @MainActor in ContentViewModel(
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var recentDocumentsViewModel: Factory<RecentDocumentsViewModel> {
+        self {
+            @MainActor in RecentDocumentsViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var signatureDetailViewModel: Factory<SignatureDetailViewModel> {
+        self { @MainActor in SignatureDetailViewModel() }
+    }
+
+    @MainActor
+    var certificateDetailViewModel: Factory<CertificateDetailViewModel> {
+        self { @MainActor in CertificateDetailViewModel() }
+    }
+
+    var signatureUtil: Factory<SignatureUtilProtocol> {
+        self { SignatureUtil(languageSettings: self.languageSettings()) }
+    }
+}

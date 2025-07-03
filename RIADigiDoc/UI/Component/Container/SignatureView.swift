@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
@@ -158,7 +159,7 @@ struct SignatureView: View {
             messageImprint: Data(),
             diagnosticsInfo: ""
         ),
-        nameUtil: UtilsLibAssembler.shared.resolve(NameUtilProtocol.self),
-        signatureUtil: AppAssembler.shared.resolve(SignatureUtilProtocol.self)
+        nameUtil: Container.shared.nameUtil(),
+        signatureUtil: Container.shared.signatureUtil()
     )
 }
