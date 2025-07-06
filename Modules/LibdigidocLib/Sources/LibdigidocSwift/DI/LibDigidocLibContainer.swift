@@ -6,7 +6,12 @@ extension Container {
     }
 
     public var signedContainer: Factory<SignedContainerProtocol> {
-        self { SignedContainer() }
+        self {
+            SignedContainer(
+                fileManager: self.fileManager(),
+                containerUtil: self.containerUtil()
+            )
+        }
     }
 
     public var containerWrapper: Factory<ContainerWrapperProtocol> {

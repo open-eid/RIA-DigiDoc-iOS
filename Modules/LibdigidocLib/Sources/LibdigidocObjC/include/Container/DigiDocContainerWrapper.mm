@@ -129,7 +129,7 @@ public:
 
     void save(NSString *url) {
         try {
-            container->save();
+            container->save(url.UTF8String);
         } catch(const digidoc::Exception &e) {
             std::vector<digidoc::Exception> causes = e.causes();
             @throw [[DigiDocExceptionWrapper alloc] init:

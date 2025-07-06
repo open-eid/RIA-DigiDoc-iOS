@@ -1,14 +1,22 @@
 import Foundation
-import LibdigidocLibSwift
 import Testing
+import LibdigidocLibSwift
 import CommonsTestShared
+import UtilsLibMocks
+import CommonsLibMocks
 
 struct FileOpeningRepositoryTests {
-    private var mockFileOpeningService: FileOpeningServiceProtocolMock!
-    private var repository: FileOpeningRepositoryProtocol!
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockContainerUtil: ContainerUtilProtocolMock
+    private let mockFileOpeningService: FileOpeningServiceProtocolMock!
+
+    private let repository: FileOpeningRepositoryProtocol!
 
     init() async throws {
+        mockFileManager = FileManagerProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
+
         repository = FileOpeningRepository(fileOpeningService: mockFileOpeningService)
     }
 
@@ -61,7 +69,10 @@ struct FileOpeningRepositoryTests {
 
         let fileURLs = [tempFileURL, tempFileURL2]
 
-        let signedContainer = SignedContainer()
+        let signedContainer = SignedContainer(
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
 
         mockFileOpeningService.openOrCreateContainerHandler = { _ in
             return signedContainer

@@ -19,6 +19,7 @@
 		DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922A2D285A1D00F2990A /* ConfigLib */; };
 		DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922C2D2C371200F2990A /* Alamofire */; };
 		DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4295B12D39D2F400415C71 /* ConfigLib */; };
+		DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */; };
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
@@ -111,8 +112,8 @@
 		DF1DE0582CCB18790068283D /* Exceptions for "RIADigiDoc" folder in "RIADigiDocTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Domain/Model/BottomSheetButton.swift,
 				DI/AppContainer.swift,
+				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/ToastMessage.swift,
@@ -291,6 +292,7 @@
 				DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */,
 				DF27565F2E078AEA000E4794 /* ConfigLibMocks in Frameworks */,
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
+				DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
@@ -481,6 +483,7 @@
 				DF27565E2E078AEA000E4794 /* ConfigLibMocks */,
 				DF2756602E078AEA000E4794 /* UtilsLibMocks */,
 				DF21FA7C2E0B74A400A4DC7A /* CommonsLibMocks */,
+				DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -866,6 +869,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -926,6 +930,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -970,7 +975,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1020,7 +1024,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1295,6 +1298,10 @@
 		DF4295B12D39D2F400415C71 /* ConfigLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ConfigLib;
+		};
+		DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LibdigidocLibSwiftMocks;
 		};
 		DF4E6D812D11DE7B00F6111A /* CommonsLib */ = {
 			isa = XCSwiftPackageProductDependency;

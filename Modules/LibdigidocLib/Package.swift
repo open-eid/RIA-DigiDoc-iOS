@@ -8,7 +8,8 @@ let package = Package(
         .library(
             name: "LibdigidocLib",
             targets: ["LibdigidocLibSwift"]
-        )
+        ),
+        .library(name: "LibdigidocLibSwiftMocks", targets: ["LibdigidocLibSwiftMocks"]),
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
@@ -43,15 +44,22 @@ let package = Package(
             ],
             path: "Sources/LibdigidocSwift"
         ),
+        .target(
+            name: "LibdigidocLibSwiftMocks",
+            dependencies: ["LibdigidocLibSwift"],
+            path: "Tests/Mocks/Generated"
+        ),
         .testTarget(
             name: "LibdigidocLibTests",
             dependencies: [
                 "LibdigidocLibSwift",
+                "LibdigidocLibSwiftMocks",
                 "ConfigLib",
                 "CommonsLib",
                 "UtilsLib",
                 "CommonsTestShared",
-                .product(name: "UtilsLibMocks", package: "commonstestshared"),
+                .product(name: "UtilsLibMocks", package: "utilslib"),
+                .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")
             ]
         )

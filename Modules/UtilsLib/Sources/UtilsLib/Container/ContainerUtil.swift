@@ -2,11 +2,17 @@ import Foundation
 import FactoryKit
 import CommonsLib
 
-public struct ContainerUtil {
-    public static func getSignatureContainerFile(
+public struct ContainerUtil: ContainerUtilProtocol {
+
+    let fileManager: FileManagerProtocol
+
+    init(fileManager: FileManagerProtocol = Container.shared.fileManager()) {
+        self.fileManager = fileManager
+    }
+
+    public func getSignatureContainerFile(
         for fileURL: URL,
-        in directory: URL,
-        fileManager: FileManagerProtocol = Container.shared.fileManager()
+        in directory: URL
     ) -> URL {
         let fileExtension = fileURL.pathExtension
         let baseName = fileURL.deletingPathExtension().lastPathComponent

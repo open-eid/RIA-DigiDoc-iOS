@@ -14,10 +14,14 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var containerName: String = CommonsLib.Constants.Container.DefaultName
     @Published var containerMimetype: String = "N/A"
     @Published var containerURL: URL?
+    @Published var errorMessage: String?
 
     let sharedContainerViewModel: SharedContainerViewModelProtocol
 
-    var signedContainer: SignedContainer = SignedContainer()
+    var signedContainer: SignedContainerProtocol = SignedContainer(
+        fileManager: Container.shared.fileManager(),
+        containerUtil: Container.shared.containerUtil()
+    )
 
     private let fileManager: FileManagerProtocol
 
@@ -29,7 +33,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.fileManager = fileManager
     }
 
-    func loadContainerData(signedContainer: SignedContainer?) async {
+    func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger.debug("Loading container data")
         guard let signedContainer else {
             SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")
@@ -107,6 +111,30 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             SigningViewModel.logger.debug("Saved Files directory removed")
         } catch {
             SigningViewModel.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
+        }
+    }
+
+    @discardableResult
+    public func renameContainer(to newName: String) async -> URL? {
+        do {
+            return try await signedContainer.renameContainer(to: newName)
+        } catch {
+            SigningViewModel.logger.error("Unable to rename container: \(error)")
+            if let digiDocError = error as? DigiDocError {
+                switch digiDocError {
+                case .containerRenamingFailed(let errorDetail),
+                        .containerSavingFailed(let errorDetail):
+                    errorMessage = String(
+                        format: NSLocalizedString("Failed to rename file %@", comment: ""),
+                        errorDetail.userInfo["fileName"] ?? ""
+                    )
+                default:
+                    errorMessage = "General error"
+                }
+            } else {
+                errorMessage = "General error"
+            }
+            return nil
         }
     }
 }

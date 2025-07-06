@@ -1,22 +1,25 @@
 import Foundation
+import CommonsLib
 
 extension String {
     public func sanitized() -> String {
-        var text = self
-
-        let characterSet: CharacterSet = CharacterSet.illegalCharacters
+        var forbidden = CharacterSet.illegalCharacters
             .union(.symbols)
             .union(.extraSymbols)
-            .union(.whitespacesAndNewlines)
+        forbidden.insert(charactersIn: "\n\r\t")
 
-        while text.hasPrefix(".") {
-            if text.count > 1 {
-                text.removeFirst()
-            } else {
-                text = text.replacingOccurrences(of: ".", with: "_")
+        var cleanName = self
+            .components(separatedBy: forbidden)
+            .joined()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        while cleanName.hasPrefix(".") {
+            cleanName.removeFirst()
+            if cleanName.isEmpty {
+                cleanName = "_"
             }
         }
 
-        return text.components(separatedBy: characterSet).joined()
+        return cleanName.isEmpty ? Constants.Container.DefaultName : cleanName
     }
 }

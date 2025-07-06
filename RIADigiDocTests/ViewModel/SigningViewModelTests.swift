@@ -6,6 +6,8 @@ import UtilsLib
 import CommonsLib
 import CommonsTestShared
 import CommonsLibMocks
+import UtilsLibMocks
+import LibdigidocLibSwiftMocks
 
 @MainActor
 struct SigningViewModelTests {
@@ -14,10 +16,13 @@ struct SigningViewModelTests {
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
     private let viewModel: SigningViewModel!
     private let mockFileManager: FileManagerProtocolMock!
+    private let mockContainerUtil: ContainerUtilProtocolMock!
 
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
+
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileManager: mockFileManager
@@ -26,11 +31,32 @@ struct SigningViewModelTests {
 
     @Test
     func loadContainerData_successWithNewFile() async throws {
-        let tempFile = TestFileUtil.createSampleFile()
-
-        let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [tempFile]
+        let signedContainer = SignedContainerProtocolMock()
+        let dataFileWrapper = DataFileWrapper(
+            fileId: "1",
+            fileName: "container.asice",
+            fileSize: 123,
+            mediaType: CommonsLib.Constants.MimeType.Asice
         )
+
+        let signatureWrapper = SignatureWrapper(
+            signingCert: Data(),
+            timestampCert: Data(),
+            ocspCert: Data(),
+            signatureId: "S1",
+            claimedSigningTime: "1970-01-01T00:00:00Z",
+            signatureMethod: "signature-method",
+            ocspProducedAt: "1970-01-01T00:00:00Z",
+            timeStampTime: "1970-01-01T00:00:00Z",
+            signedBy: "Test User",
+            trustedSigningTime: "1970-01-01T00:00:00Z",
+            format: "BES/time-stamp",
+            messageImprint: Data(),
+            diagnosticsInfo: ""
+        )
+
+        signedContainer.getDataFilesHandler = { [dataFileWrapper] }
+        signedContainer.getSignaturesHandler = { [signatureWrapper] }
 
         let containerDataFiles = await signedContainer.getDataFiles()
         let containerSignatures = await signedContainer.getSignatures()
@@ -39,10 +65,6 @@ struct SigningViewModelTests {
 
         let dataFiles = viewModel.dataFiles
         let signatures = viewModel.signatures
-
-        defer {
-            try? FileManager.default.removeItem(at: tempFile)
-        }
 
         #expect(containerDataFiles.count == dataFiles.count)
         #expect(containerSignatures.count == signatures.count)
@@ -224,5 +246,75 @@ struct SigningViewModelTests {
         }
 
         #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.path))
+    }
+
+    @Test
+    func renameContainer_success() async {
+        let expectedURL = URL(fileURLWithPath: "/tmp/renamed.asice")
+
+        let signedContainer = SignedContainerProtocolMock()
+
+        signedContainer.renameContainerHandler = { _ in expectedURL }
+
+        viewModel.signedContainer = signedContainer
+
+        let result = await viewModel.renameContainer(to: "renamed.asice")
+
+        #expect(result == expectedURL)
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func renameContainer_throwContainerRenamingFailedErrorAndSetLocalizedErrorMessage() async throws {
+        let fileName = "test.asice"
+        let signedContainer = SignedContainerProtocolMock()
+
+        signedContainer.renameContainerHandler = { _ in
+            throw DigiDocError.containerRenamingFailed(
+                ErrorDetail(message: "Error", userInfo: ["fileName": fileName])
+            )
+        }
+
+        viewModel.signedContainer = signedContainer
+
+        let result = await viewModel.renameContainer(to: "no:name")
+
+        guard let error = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
+        #expect(result == nil)
+        #expect(error.contains(fileName))
+    }
+
+    @Test
+    func renameContainer_throwUnknownDigiDocErrorAndSetGeneralError() async {
+        let signedContainer = SignedContainerProtocolMock()
+        signedContainer.renameContainerHandler = { _ in
+            throw DigiDocError.addingFilesToContainerFailed(ErrorDetail(message: "Some other error"))
+        }
+
+        viewModel.signedContainer = signedContainer
+
+        let result = await viewModel.renameContainer(to: "no:name")
+
+        #expect(result == nil)
+        #expect(viewModel.errorMessage == "General error")
+    }
+
+    @Test
+    func renameContainer_nonDigiDocError_setsGeneralError() async {
+        let signedContainer = SignedContainerProtocolMock()
+        signedContainer.renameContainerHandler = { _ in
+            throw NSError(domain: "OtherError", code: 123)
+        }
+
+        viewModel.signedContainer = signedContainer
+
+        let result = await viewModel.renameContainer(to: "Some name")
+
+        #expect(result == nil)
+        #expect(viewModel.errorMessage == "General error")
     }
 }

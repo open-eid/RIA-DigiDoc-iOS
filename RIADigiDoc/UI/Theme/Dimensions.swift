@@ -3,7 +3,9 @@ import SwiftUI
 enum Dimensions {
     enum Corner {
         static let XXSCornerRadius: CGFloat = 4
+        static let XSCornerRadius: CGFloat = 8
         static let MSCornerRadius: CGFloat = 12
+        static let MCornerRadius: CGFloat = 24
     }
 
     enum Height {
@@ -33,6 +35,7 @@ enum Dimensions {
         static let radius: CGFloat = Dimensions.Corner.XXSCornerRadius
         static let xOffset: CGFloat = 0
         static let yOffset: CGFloat = 4
-        static let opacity: Double = 0.15
+        static let SOpacity: Double = 0.15
+        static let LOpacity: Double = 0.7
     }
 }

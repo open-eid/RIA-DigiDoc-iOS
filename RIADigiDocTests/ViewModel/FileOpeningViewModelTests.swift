@@ -14,6 +14,7 @@ struct FileOpeningViewModelTests {
     private var mockFileOpeningService: FileOpeningServiceProtocolMock
     private var mockFileUtil: FileUtilProtocolMock
     private var mockFileManager: FileManagerProtocolMock
+    private let mockContainerUtil: ContainerUtilProtocolMock
 
     private var viewModel: FileOpeningViewModel
 
@@ -23,6 +24,8 @@ struct FileOpeningViewModelTests {
         mockFileOpeningService = FileOpeningServiceProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
         mockFileManager = FileManagerProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
+
         viewModel = FileOpeningViewModel(
             fileOpeningRepository: mockFileOpeningRepository,
             sharedContainerViewModel: mockSharedContainerViewModel,
@@ -34,7 +37,10 @@ struct FileOpeningViewModelTests {
     @Test
     func handleFiles_success() async throws {
         let validURLs = [URL(fileURLWithPath: "/path/to/validFile")]
-        let signedContainer = SignedContainer()
+        let signedContainer = SignedContainer(
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
         let result: Result<[URL], Error> = .success(validURLs)
 
         mockSharedContainerViewModel.getFileOpeningResultHandler = {

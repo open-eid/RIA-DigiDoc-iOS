@@ -11,7 +11,8 @@ let package = Package(
         .library(
             name: "CommonsLib",
             targets: ["CommonsLib"]
-        )
+        ),
+        .library(name: "CommonsLibMocks", targets: ["CommonsLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3))
@@ -24,6 +25,11 @@ let package = Package(
             dependencies: [
                 .product(name: "FactoryKit", package: "Factory")
             ]
+        ),
+        .target(
+            name: "CommonsLibMocks",
+            dependencies: ["CommonsLib"],
+            path: "Tests/Mocks/Generated"
         ),
         .testTarget(
             name: "CommonsLibTests",

@@ -26,4 +26,8 @@ extension Container {
     public var nameUtil: Factory<NameUtilProtocol> {
         self { NameUtil() }
     }
+
+    public var containerUtil: Factory<ContainerUtilProtocol> {
+        self { ContainerUtil() }
+    }
 }

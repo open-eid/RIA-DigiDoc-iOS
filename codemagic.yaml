@@ -74,16 +74,22 @@ workflows:
       - name: Setup dependencies
         script: |
           brew install swift-sh mockolo
-      - *get_app_version
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
           export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
           export TSL_FILES_DIRECTORY="$RESOURCES_DIRECTORY/tslFiles"
 
-          # Create config and TSL folders
+          # Create config, TSL folders and mock folders for each module
           mkdir -p $CONFIG_DIRECTORY
           mkdir -p $TSL_FILES_DIRECTORY
+
+          # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
+          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib; do
+            mock_dir="Modules/${module}/Tests/Mocks/Generated"
+            mkdir -p "$mock_dir"
+            echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
+          done
 
           # Remove current files in tslFiles.bundle
           echo "Removing current TSL files"
@@ -127,6 +133,7 @@ workflows:
           echo "Moving TSLs to app's TSL files directory"
           mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
           echo "Done moving TSLs"
+      - *get_app_version
       - name: Fetch default configuration
         script: |
           # Not running 'SetupConfiguration' for repo.ria as necessary files are already setup
@@ -158,12 +165,21 @@ workflows:
           agvtool new-version -all "$LATEST_BUILD_NUMBER"
       - name: Build RIA DigiDoc
         script: |
-          export OTHER_BUILD_FLAGS="OTHER_SWIFT_FLAGS=$buildParameters_input"
+          export OTHER_BUILD_FLAGS="OTHER_SWIFT_FLAGS=${{ inputs.buildParameters_input }}"
+          
+          # Skip fetching configuration for repo.ria as necessary files are already setup
+          REPO_RIA_CONF_FLAGS=""
+          if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
+            REPO_RIA_CONF_FLAGS="DEFAULT_CENTRAL_CONFIGURATION_URL='' DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=4 DEFAULT_CENTRAL_CONFIGURATION_TSL_URL=''"
+          fi
+          
+          ARCHIVE_FLAGS="$OTHER_BUILD_FLAGS $REPO_RIA_CONF_FLAGS"
+
           xcode-project build-ipa \
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
             --scheme "$XCODE_SCHEME" \
-            --archive-xcargs "$OTHER_BUILD_FLAGS" \
+            --archive-xcargs "$ARCHIVE_FLAGS" \
             --export-xcargs "$OTHER_BUILD_FLAGS"
       - name: Rename and move IPA
         script: |
@@ -221,14 +237,20 @@ workflows:
       - name: Setup dependencies
         script: |
           brew install swift-sh mockolo
-      - *get_app_version
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
           export TSL_FILES_DIRECTORY="$CONFIG_DIRECTORY/tslFiles.bundle"
 
-          # Create config and TSL folders
+          # Create TSL folder and mock folders for each module
           mkdir -p $TSL_FILES_DIRECTORY
+          
+          # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
+          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib; do
+            mock_dir="Modules/${module}/Tests/Mocks/Generated"
+            mkdir -p "$mock_dir"
+            echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
+          done
 
           # Remove current files in tslFiles.bundle
           echo "Removing current TSL files"
@@ -252,6 +274,7 @@ workflows:
           echo "Moving TSLs to app's TSL files directory"
           mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
           echo "Done moving TSLs"
+      - *get_app_version
       - name: Fetch default configuration
         script: |
           echo "Cleaning swift-sh cache"
