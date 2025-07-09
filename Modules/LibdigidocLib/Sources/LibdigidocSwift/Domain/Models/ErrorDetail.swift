@@ -6,7 +6,7 @@ public struct ErrorDetail: Sendable {
     public let code: Int
     public let userInfo: [String: String]
 
-    init(message: String = "", code: Int = 0, userInfo: [String: String] = [:]) {
+    public init(message: String = "", code: Int = 0, userInfo: [String: String] = [:]) {
         self.message = message
         self.code = code
         self.userInfo = userInfo

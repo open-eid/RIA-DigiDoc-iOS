@@ -5,6 +5,9 @@ import LibdigidocLibObjC
 import CommonsLib
 import ConfigLib
 import UtilsLib
+import UtilsLibMocks
+import CommonsLibMocks
+import LibdigidocLibSwiftMocks
 
 @testable import LibdigidocLibSwift
 
@@ -13,7 +16,15 @@ final class SignedContainerTests {
     private let configurationProvider: ConfigurationProvider
     private var signedContainer: SignedContainerProtocol!
 
+    private let mockFileManager: FileManagerProtocolMock!
+    private let mockContainerUtil: ContainerUtilProtocolMock!
+    private let mockContainerWrapper: ContainerWrapperProtocolMock!
+
     init() async throws {
+        mockFileManager = FileManagerProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
+        mockContainerWrapper = ContainerWrapperProtocolMock()
+
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
@@ -121,6 +132,162 @@ final class SignedContainerTests {
                 Issue.record("Unexpected error: \(error.localizedDescription)")
                 return
             }
+        }
+    }
+
+    @Test
+    func renameContainer_success() async throws {
+        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let newFileName = "renamed.asice"
+        let directoryURL = originalURL.deletingLastPathComponent()
+        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+
+        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+
+        mockContainerWrapper.saveHandler = { _ in true }
+
+        let container = SignedContainer(
+            containerFile: originalURL,
+            isExistingContainer: true,
+            container: mockContainerWrapper,
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        let result = try await container.renameContainer(to: newFileName)
+
+        #expect(mockFileManager.moveItemCallCount == 1)
+        #expect(mockFileManager.moveItemArgValues.first?.srcURL == originalURL)
+        #expect(mockFileManager.moveItemArgValues.first?.dstURL == uniqueFileURL)
+
+        #expect(result == uniqueFileURL)
+    }
+
+    @Test
+    func renameContainer_throwRenamingFailedErrorWithNilContainerFile() async {
+        let container = SignedContainer(
+            containerFile: nil,
+            isExistingContainer: false,
+            container: mockContainerWrapper,
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        do {
+            _ = try await container.renameContainer(to: "newName.asice")
+            Issue.record("Expected to throw DigiDocError.containerRenamingFailed")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .containerRenamingFailed(_):
+                #expect(true)
+            default:
+                Issue.record("Expected containerRenamingFailed error")
+                return
+            }
+        } catch {
+            Issue.record("Unexpected error type")
+            return
+        }
+    }
+
+    @Test
+    func renameContainer_returnURLWithDefaultNameWhenEmptyNewFileName() async throws {
+        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let emptyNewName = ""
+        let directoryURL = originalURL.deletingLastPathComponent()
+        let defaultFileName = CommonsLib.Constants.Container.DefaultName
+        let uniqueFileURL = directoryURL.appendingPathComponent("\(defaultFileName)_unique.asice")
+
+        mockContainerUtil.getSignatureContainerFileHandler = { url, _ in
+            #expect(url.lastPathComponent.starts(with: defaultFileName))
+            return uniqueFileURL
+        }
+
+        mockContainerWrapper.saveHandler = { _ in true }
+
+        let container = SignedContainer(
+            containerFile: originalURL,
+            isExistingContainer: false,
+            container: mockContainerWrapper,
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        let resultURL = try await container.renameContainer(to: emptyNewName)
+
+        #expect(mockFileManager.moveItemCallCount == 1)
+        #expect(mockFileManager.moveItemArgValues.first?.srcURL == originalURL)
+        #expect(mockFileManager.moveItemArgValues.first?.dstURL == uniqueFileURL)
+        #expect(resultURL == uniqueFileURL)
+    }
+
+    @Test
+    func renameContainer_expectErrorWhenMoveItemThrowsError() async {
+        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let newFileName = "renamed.asice"
+        let directoryURL = originalURL.deletingLastPathComponent()
+        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+
+        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+
+        mockFileManager.moveItemHandler = { _, _ in
+            throw NSError(domain: "TestDomain", code: 1, userInfo: nil)
+        }
+
+        mockContainerWrapper.saveHandler = { _ in false }
+
+        let container = SignedContainer(
+            containerFile: originalURL,
+            isExistingContainer: true,
+            container: mockContainerWrapper,
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        do {
+            _ = try await container.renameContainer(to: newFileName)
+            Issue.record("Expected to throw error from moveItem")
+            return
+        } catch {
+            #expect(true)
+        }
+    }
+
+    @Test
+    func renameContainer_throwSavingFailedWhenSaveReturnsFalse() async {
+        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let newFileName = "renamed.asice"
+        let directoryURL = originalURL.deletingLastPathComponent()
+        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+
+        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+
+        mockContainerWrapper.saveHandler = { _ in false }
+
+        let container = SignedContainer(
+            containerFile: originalURL,
+            isExistingContainer: true,
+            container: mockContainerWrapper,
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        do {
+            _ = try await container.renameContainer(to: newFileName)
+            Issue.record("Expected to throw DigiDocError.containerSavingFailed")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .containerSavingFailed(_):
+                #expect(true)
+            default:
+                Issue.record("Expected containerSavingFailed error")
+                return
+            }
+        } catch {
+            Issue.record("Unexpected error type")
+            return
         }
     }
 }

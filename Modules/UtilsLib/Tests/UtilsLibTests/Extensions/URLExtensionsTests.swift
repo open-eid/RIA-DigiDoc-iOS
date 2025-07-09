@@ -335,6 +335,42 @@ struct URLExtensionsTests {
         #expect(result.isEmpty)
     }
 
+    @Test
+    func standardizedPathURL_success() {
+        let url = URL(fileURLWithPath: "/tmp/folder/file.txt")
+        let standardized = url.standardizedPathURL
+        #expect(standardized.path == "/tmp/folder/file.txt")
+    }
+
+    @Test
+    func standardizedPathURL_removeRedundantSlashes() {
+        let url = URL(fileURLWithPath: "/tmp//folder///file.txt")
+        let standardized = url.standardizedPathURL
+        #expect(standardized.path == "/tmp/folder/file.txt")
+    }
+
+    @Test
+    func standardizedPathURL_resolveDotComponents() {
+        let url = URL(fileURLWithPath: "/tmp/folder/../file.txt")
+        let standardized = url.standardizedPathURL
+        #expect(standardized.path == "/tmp/file.txt")
+    }
+
+    @Test
+    func standardizedPathURL_trimTrailingSlashFromFile() {
+        let url = URL(fileURLWithPath: "/tmp/folder/file.txt/")
+        let standardized = url.standardizedPathURL
+        #expect(standardized.path == "/tmp/folder/file.txt")
+    }
+
+    @Test
+    func standardizedPathURL_emptyPathResolvesToCurrentDirectory() {
+        let url = URL(fileURLWithPath: "")
+        let standardized = url.standardizedPathURL
+        let expectedPath = FileManager.default.currentDirectoryPath
+        #expect(standardized.path == expectedPath)
+    }
+
     private func createTestPDF(at url: URL) -> URL {
         var pageSize = CGRect(x: 0, y: 0, width: 100, height: 100)
 

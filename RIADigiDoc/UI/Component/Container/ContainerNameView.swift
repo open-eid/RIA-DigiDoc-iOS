@@ -15,7 +15,7 @@ struct ContainerNameView: View {
 
     let icon: String
     let containerNameTitle: String
-    let name: String
+    @Binding var name: String
     let isEditContainerButtonShown: Bool
     let isEncryptButtonShown: Bool
     let showLeftActionButton: Bool
@@ -27,6 +27,7 @@ struct ContainerNameView: View {
     let onLeftActionButtonClick: () -> Void
     let onRightActionButtonClick: () -> Void
     let onSaveContainerButtonClick: () -> Void
+    let onRenameContainerButtonClick: () -> Void
 
     private var bottomSheetActions: [BottomSheetButton] {
         [
@@ -35,9 +36,7 @@ struct ContainerNameView: View {
                 icon: "ic_m3_edit_48pt_wght400",
                 title: languageSettings.localized("Change container name"),
                 accessibilityLabel: languageSettings.localized("Change container name").lowercased(),
-                onClick: {
-                    // TODO: Implement change container name action
-                }
+                onClick: onRenameContainerButtonClick
             ),
             BottomSheetButton(
                 icon: "ic_m3_download_48pt_wght400",
@@ -59,83 +58,85 @@ struct ContainerNameView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-            HStack(alignment: .center) {
-                Image(icon)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(theme.onPrimary)
-                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .padding(Dimensions.Padding.XSPadding)
-                    .background(theme.primary)
-                    .clipShape(Circle())
-                    .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                    Text(languageSettings.localized(containerNameTitle))
-                        .font(typography.labelMedium)
-                        .foregroundStyle(theme.onSurface)
-                    HStack {
-                        Text(name)
-                            .font(typography.titleMedium)
-                            .foregroundStyle(theme.onSurface)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .lineLimit(2)
-                            .multilineTextAlignment(TextAlignment.leading)
-                    }
-                }
-
-                Spacer()
-
-                Button(action: {
-                    showBottomSheetFromButton = true
-                }, label: {
-                    Image("ic_m3_more_vert_48pt_wght400")
+        ZStack {
+            VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                HStack(alignment: .center) {
+                    Image(icon)
                         .resizable()
                         .scaledToFit()
+                        .foregroundStyle(theme.onPrimary)
                         .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .foregroundStyle(theme.onBackground)
-                        .accessibilityLabel(languageSettings.localized("More options"))
-                })
-                .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
-            }
+                        .padding(Dimensions.Padding.XSPadding)
+                        .background(theme.primary)
+                        .clipShape(Circle())
+                        .accessibilityHidden(true)
 
-            if showLeftActionButton || showRightActionButton {
-                HStack {
+                    VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+                        Text(languageSettings.localized(containerNameTitle))
+                            .font(typography.labelMedium)
+                            .foregroundStyle(theme.onSurface)
+                        HStack {
+                            Text(name)
+                                .font(typography.titleMedium)
+                                .foregroundStyle(theme.onSurface)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(2)
+                                .multilineTextAlignment(TextAlignment.leading)
+                        }
+                    }
+
                     Spacer()
 
-                    if showLeftActionButton {
-                        Button(languageSettings.localized(leftActionButtonName)) {
-                            onLeftActionButtonClick()
-                        }
-                        .font(typography.labelLarge)
-                        .foregroundStyle(theme.primary)
-                        .accessibilityLabel(leftActionButtonAccessibilityLabel)
-                    }
-
-                    if showRightActionButton {
-                        Button(languageSettings.localized(rightActionButtonName)) {
-                            onRightActionButtonClick()
-                        }
-                        .font(typography.labelLarge)
-                        .foregroundStyle(theme.primary)
-                        .accessibilityLabel(rightActionButtonAccessibilityLabel)
-                    }
+                    Button(action: {
+                        showBottomSheetFromButton = true
+                    }, label: {
+                        Image("ic_m3_more_vert_48pt_wght400")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .foregroundStyle(theme.onBackground)
+                            .accessibilityLabel(languageSettings.localized("More options"))
+                    })
+                    .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
                 }
-                .padding(.trailing, Dimensions.Padding.MSPadding)
-                .padding(.top, Dimensions.Padding.MSPadding)
+
+                if showLeftActionButton || showRightActionButton {
+                    HStack {
+                        Spacer()
+
+                        if showLeftActionButton {
+                            Button(languageSettings.localized(leftActionButtonName)) {
+                                onLeftActionButtonClick()
+                            }
+                            .font(typography.labelLarge)
+                            .foregroundStyle(theme.primary)
+                            .accessibilityLabel(leftActionButtonAccessibilityLabel)
+                        }
+
+                        if showRightActionButton {
+                            Button(languageSettings.localized(rightActionButtonName)) {
+                                onRightActionButtonClick()
+                            }
+                            .font(typography.labelLarge)
+                            .foregroundStyle(theme.primary)
+                            .accessibilityLabel(rightActionButtonAccessibilityLabel)
+                        }
+                    }
+                    .padding(.trailing, Dimensions.Padding.MSPadding)
+                    .padding(.top, Dimensions.Padding.MSPadding)
+                }
             }
+            .padding(.horizontal, Dimensions.Padding.MSPadding)
+            .padding(.vertical, Dimensions.Padding.MPadding)
+            .background(theme.surfaceContainerHighest)
+            .cornerRadius(Dimensions.Corner.MSCornerRadius)
+            .padding(.top, Dimensions.Padding.MSPadding)
+            .onTapGesture {
+                showBottomSheetFromTap = true
+            }
+            .accessibilityAddTraits([.isButton])
+            .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
         }
-        .padding(.horizontal, Dimensions.Padding.MSPadding)
-        .padding(.vertical, Dimensions.Padding.MPadding)
-        .background(theme.surfaceContainerHighest)
-        .cornerRadius(Dimensions.Corner.MSCornerRadius)
-        .padding(.top, Dimensions.Padding.MSPadding)
-        .onTapGesture {
-            showBottomSheetFromTap = true
-        }
-        .accessibilityAddTraits([.isButton])
-        .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
     }
 }
 
@@ -143,7 +144,7 @@ struct ContainerNameView: View {
     ContainerNameView(
         icon: "ic_m3_stylus_note_48pt_wght400",
         containerNameTitle: "Container name",
-        name: "Test.asice",
+        name: .constant("Test.asice"),
         isEditContainerButtonShown: true,
         isEncryptButtonShown: false,
         showLeftActionButton: true,
@@ -154,7 +155,8 @@ struct ContainerNameView: View {
         rightActionButtonAccessibilityLabel: "Encrypt",
         onLeftActionButtonClick: {},
         onRightActionButtonClick: {},
-        onSaveContainerButtonClick: {}
+        onSaveContainerButtonClick: {},
+        onRenameContainerButtonClick: {}
     )
     .environmentObject(LanguageSettings())
 }

@@ -1,4 +1,5 @@
 import Foundation
+import FactoryKit
 import OSLog
 import LibdigidocLibSwift
 
@@ -7,7 +8,10 @@ class MainSignatureViewModel: MainSignatureViewModelProtocol, ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MainSignatureViewModel")
 
     @Published var isImporting = false
-    @Published var signedContainer: SignedContainer = SignedContainer()
+    @Published var signedContainer: SignedContainerProtocol = SignedContainer(
+        fileManager: Container.shared.fileManager(),
+        containerUtil: Container.shared.containerUtil()
+    )
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
 

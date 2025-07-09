@@ -11,12 +11,14 @@ let package = Package(
         .library(
             name: "UtilsLib",
             targets: ["UtilsLib"]
-        )
+        ),
+        .library(name: "UtilsLibMocks", targets: ["UtilsLibMocks"]),
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
         .package(path: "../CommonsLib"),
+        .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib/CommonsTestShared")
     ],
     targets: [
@@ -30,14 +32,19 @@ let package = Package(
                 .product(name: "FactoryKit", package: "Factory")
             ]
         ),
+        .target(
+            name: "UtilsLibMocks",
+            dependencies: ["UtilsLib"],
+            path: "Tests/Mocks/Generated"
+        ),
         .testTarget(
             name: "UtilsLibTests",
             dependencies: [
+                "UtilsLibMocks",
                 "CommonsLib",
                 "CommonsTestShared",
-                .product(name: "UtilsLibMocks", package: "commonstestshared"),
-                .product(name: "CommonsLibMocks", package: "commonstestshared"),
-                .product(name: "ConfigLibMocks", package: "commonstestshared"),
+                .product(name: "ConfigLibMocks", package: "configlib"),
+                .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")
             ]
         )

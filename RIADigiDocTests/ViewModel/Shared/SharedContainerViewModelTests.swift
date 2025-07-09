@@ -1,18 +1,29 @@
 import Foundation
-import LibdigidocLibSwift
 import Testing
+import LibdigidocLibSwift
+import CommonsLibMocks
+import UtilsLibMocks
 
 @MainActor
 struct SharedContainerViewModelTests {
-    private var viewModel: SharedContainerViewModel!
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockContainerUtil: ContainerUtilProtocolMock
+
+    private let viewModel: SharedContainerViewModel!
 
     init() async throws {
+        mockFileManager = FileManagerProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
+
         viewModel = SharedContainerViewModel()
     }
 
     @Test
     func setSignedContainer_success() async {
-        let signedContainer = SignedContainer()
+        let signedContainer = SignedContainer(
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
 
         viewModel.setSignedContainer(signedContainer: signedContainer)
         let result = viewModel.getSignedContainer()

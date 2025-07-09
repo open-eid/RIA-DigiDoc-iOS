@@ -381,6 +381,30 @@
         }
       }
     },
+    "Failed to rename file %@" : {
+      "comment" : "Error when renaming a container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to rename file %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili %@ ümbernimetamine ebaõnnestus"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось переименовать файл %@"
+          }
+        }
+      }
+    },
     "Failed to save file" : {
       "comment" : "Error message when unable to save file",
       "extractionState" : "manual",

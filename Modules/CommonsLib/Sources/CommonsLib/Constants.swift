@@ -32,7 +32,6 @@ public struct Constants {
 
     public struct Extension {
         public static let Pdf = "pdf"
-        public static let Default = "asice"
         public static let Asice = "asice"
         public static let Asics = "asics"
         public static let Ddoc = "ddoc"
@@ -41,6 +40,7 @@ public struct Constants {
         public static let Bdoc = "bdoc"
         public static let Edoc = "edoc"
         public static let Scs = "scs"
+        public static let Default = Asice
     }
 
     public struct Identifier {

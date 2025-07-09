@@ -1,6 +1,7 @@
 import SwiftUI
 import FactoryKit
 import LibdigidocLibSwift
+import CommonsLib
 import UtilsLib
 
 struct SigningView: View {
@@ -23,6 +24,8 @@ struct SigningView: View {
     @State private var tempContainerURL: URL?
     @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
+    @State private var showRenameDialog = false
+    @State private var newContainerName = Constants.Container.DefaultName
 
     private var containerFilesTitle: String {
         languageSettings.localized("Container files")
@@ -57,124 +60,179 @@ struct SigningView: View {
     }
 
     var body: some View {
-        TopBarContainer(
-            title: containerFilesTitle,
-            onLeftClick: { dismiss() },
-            content: {
-                VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                    VStack {
-                        ContainerNameView(
-                            icon: "ic_m3_stylus_note_48pt_wght400",
-                            containerNameTitle: containerNameTitle,
-                            name: viewModel.containerName,
-                            isEditContainerButtonShown: !viewModel.isSigned(),
-                            isEncryptButtonShown: !viewModel.isSigned(),
-                            showLeftActionButton: viewModel.isSigned(),
-                            showRightActionButton: viewModel.isSigned(),
-                            leftActionButtonName: languageSettings.localized("Sign"),
-                            rightActionButtonName: languageSettings.localized("Encrypt"),
-                            leftActionButtonAccessibilityLabel: languageSettings.localized("Sign"),
-                            rightActionButtonAccessibilityLabel: languageSettings.localized("Encrypt"),
-                            onLeftActionButtonClick: {},
-                            onRightActionButtonClick: {},
-                            onSaveContainerButtonClick: {
-                                Task {
-                                    tempContainerURL = viewModel.createCopyOfContainerForSaving(
-                                        containerURL: viewModel.containerURL
-                                    )
+        ZStack {
+            TopBarContainer(
+                title: containerFilesTitle,
+                onLeftClick: { dismiss() },
+                content: {
+                    VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+                        VStack {
+                            ContainerNameView(
+                                icon: "ic_m3_stylus_note_48pt_wght400",
+                                containerNameTitle: containerNameTitle,
+                                name: $viewModel.containerName,
+                                isEditContainerButtonShown: !viewModel.isSigned(),
+                                isEncryptButtonShown: !viewModel.isSigned(),
+                                showLeftActionButton: viewModel.isSigned(),
+                                showRightActionButton: viewModel.isSigned(),
+                                leftActionButtonName: languageSettings.localized("Sign"),
+                                rightActionButtonName: languageSettings.localized("Encrypt"),
+                                leftActionButtonAccessibilityLabel: languageSettings.localized("Sign"),
+                                rightActionButtonAccessibilityLabel: languageSettings.localized("Encrypt"),
+                                onLeftActionButtonClick: {},
+                                onRightActionButtonClick: {},
+                                onSaveContainerButtonClick: {
+                                    Task {
+                                        tempContainerURL = viewModel.createCopyOfContainerForSaving(
+                                            containerURL: viewModel.containerURL
+                                        )
 
-                                    if viewModel.checkIfContainerFileExists(fileLocation: tempContainerURL) {
-                                        isShowingFileSaver = true
+                                        if viewModel.checkIfContainerFileExists(fileLocation: tempContainerURL) {
+                                            isShowingFileSaver = true
+                                        }
+                                    }
+                                },
+                                onRenameContainerButtonClick: {
+                                    showRenameDialog = true
+                                }
+                            ).fileMover(isPresented: $isShowingFileSaver, file: tempContainerURL) { result in
+                                switch result {
+                                case .success:
+                                    isFileSaved = true
+                                    Toast.show(languageSettings.localized("File saved"))
+                                case .failure:
+                                    isFileSaved = false
+                                    Toast.show(languageSettings.localized("Failed to save file"))
+                                }
+                                isShowingFileSaver = false
+                                viewModel.removeSavedFilesDirectory()
+                            }
+
+                            if isSignedContainer {
+                                TabView(selectedTab: $selectedTab, titles: [
+                                    containerFilesTitle,
+                                    containerSignaturesTitle
+                                ]) {
+                                    if selectedTab == 0 {
+                                        DataFilesListView(
+                                            dataFiles: viewModel.dataFiles,
+                                            showRemoveFileButton: !viewModel.isSigned()
+                                        )
+                                    } else {
+                                        SignaturesListView(
+                                            signatures: viewModel.signatures,
+                                            selectedSignature: $selectedSignature,
+                                            containerMimetype: $viewModel.containerMimetype,
+                                            dataFilesCount: viewModel.dataFiles.count,
+                                            nameUtil: nameUtil,
+                                            signatureUtil: signatureUtil
+                                        )
+                                        .environmentObject(languageSettings)
                                     }
                                 }
-                            }
-                        ).fileMover(isPresented: $isShowingFileSaver, file: tempContainerURL) { result in
-                            switch result {
-                            case .success:
-                                isFileSaved = true
-                                Toast.show(languageSettings.localized("File saved"))
-                            case .failure:
-                                isFileSaved = false
-                                Toast.show(languageSettings.localized("Failed to save file"))
-                            }
-                            isShowingFileSaver = false
-                            viewModel.removeSavedFilesDirectory()
-                        }
+                            } else {
+                                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                                    Text(containerFilesTitle)
+                                        .foregroundStyle(theme.onSurfaceVariant)
+                                        .font(typography.labelLarge)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        if isSignedContainer {
-                            TabView(selectedTab: $selectedTab, titles: [
-                                containerFilesTitle,
-                                containerSignaturesTitle
-                            ]) {
-                                if selectedTab == 0 {
                                     DataFilesListView(
                                         dataFiles: viewModel.dataFiles,
                                         showRemoveFileButton: !viewModel.isSigned()
                                     )
-                                } else {
-                                    SignaturesListView(
-                                        signatures: viewModel.signatures,
-                                        selectedSignature: $selectedSignature,
-                                        containerMimetype: $viewModel.containerMimetype,
-                                        dataFilesCount: viewModel.dataFiles.count,
-                                        nameUtil: nameUtil,
-                                        signatureUtil: signatureUtil
-                                    )
-                                    .environmentObject(languageSettings)
                                 }
+                                .padding(.vertical, Dimensions.Padding.MPadding)
                             }
-                        } else {
-                            VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                                Text(containerFilesTitle)
-                                    .foregroundStyle(theme.onSurfaceVariant)
-                                    .font(typography.labelLarge)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(Dimensions.Padding.SPadding)
 
-                                DataFilesListView(
-                                    dataFiles: viewModel.dataFiles,
-                                    showRemoveFileButton: !viewModel.isSigned()
-                                )
-                            }
-                            .padding(.vertical, Dimensions.Padding.MPadding)
+                        if isSignedContainer {
+                            ShareButtonBottomBar(
+                                iconName: "ic_m3_ios_share_48pt_wght400",
+                                label: shareTitle,
+                                accessibilityLabel: shareTitle,
+                                onShare: {
+                                    // TODO: Implement sharing functionality
+                                }
+                            )
+                        } else {
+                            UnsignedBottomBarView(
+                                leftButtonIconName: "ic_m3_add_48pt_wght400",
+                                leftButtonLabel: "Add more files",
+                                leftButtonAccessibilityLabel: "Add more files",
+                                leftButtonAction: {
+                                    // TODO: Implement add more files functionality
+                                },
+
+                                rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
+                                rightButtonLabel: "Sign",
+                                rightButtonAccessibilityLabel: "Sign",
+                                rightButtonAction: {
+                                    // TODO: Implement signing functionality
+                                }
+                            )
                         }
                     }
-                    .padding(Dimensions.Padding.SPadding)
-
-                    if isSignedContainer {
-                        ShareButtonBottomBar(
-                            iconName: "ic_m3_ios_share_48pt_wght400",
-                            label: shareTitle,
-                            accessibilityLabel: shareTitle,
-                            onShare: {
-                                // TODO: Implement sharing functionality
-                            }
-                        )
-                    } else {
-                        UnsignedBottomBarView(
-                            leftButtonIconName: "ic_m3_add_48pt_wght400",
-                            leftButtonLabel: "Add more files",
-                            leftButtonAccessibilityLabel: "Add more files",
-                            leftButtonAction: {
-                                // TODO: Implement add more files functionality
-                            },
-
-                            rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
-                            rightButtonLabel: "Sign",
-                            rightButtonAccessibilityLabel: "Sign",
-                            rightButtonAction: {
-                                // TODO: Implement signing functionality
-                            }
-                        )
+                    .onAppear {
+                        Task {
+                            await viewModel.loadContainerData(
+                                signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
+                            )
+                        }
                     }
                 }
-                .onAppear {
-                    Task {
-                        await viewModel.loadContainerData(
-                            signedContainer: viewModel.sharedContainerViewModel.getSignedContainer()
-                        )
+            )
+
+            if showRenameDialog {
+                // Make the background darker to focus on the dialog
+                Color.black
+                    .opacity(Dimensions.Shadow.LOpacity)
+                    .ignoresSafeArea()
+
+                Dialog(
+                    icon: Image("ic_m3_edit_48pt_wght400"),
+                    title: languageSettings.localized("Change container name"),
+                    placeholder: viewModel.containerName,
+                    text: Binding<String>(
+                        get: {
+                            URL(fileURLWithPath: viewModel.containerName).deletingPathExtension().lastPathComponent
+                        },
+                        set: { newValue in
+                            let existingExtension = URL(fileURLWithPath: viewModel.containerName).pathExtension
+
+                            let newValueURL = URL(fileURLWithPath: newValue)
+
+                            let containerExtension = existingExtension.isEmpty ? Constants.Extension.Default : existingExtension
+
+                            newContainerName = newValueURL
+                                .appendingPathExtension(containerExtension)
+                                .lastPathComponent
+                        }),
+                    onConfirm: {
+                        showRenameDialog = false
+                        Task {
+                            let uniqueContainerName = await viewModel.renameContainer(to: newContainerName)
+                            defer { newContainerName = "" }
+
+                            if uniqueContainerName != nil {
+                                viewModel.containerName = uniqueContainerName?.lastPathComponent ?? viewModel.containerName
+                            }
+                        }
+                    },
+                    
+                    onCancel: {
+                        showRenameDialog = false
+                        newContainerName = ""
                     }
-                }
-            })
+                )
+            }
+        }
+        .animation(.easeInOut, value: showRenameDialog)
+        .onReceive(viewModel.$errorMessage) { error in
+            guard let error else { return }
+            Toast.show(languageSettings.localized(error))
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import CommonsLib
 @testable import UtilsLib
 
 class StringSanitizationTests {
@@ -7,7 +8,7 @@ class StringSanitizationTests {
     @Test
     func sanitized_removesIllegalCharacters() {
         let input = "\u{FFFF}\u{FFFE}\u{1F600}"
-        let expected = ""
+        let expected = Constants.Container.DefaultName
 
         #expect(expected == input.sanitized())
     }
@@ -21,7 +22,7 @@ class StringSanitizationTests {
     @Test
     func sanitized_extraSymbolsAndRTLCharacters() {
         let input = "½@%:^?[]'\"”’{}#&`\\~«»/´\u{200E}\u{200F}\u{202E}\u{202A}\u{202B}"
-        let expected = ""
+        let expected = Constants.Container.DefaultName
 
         #expect(expected == input.sanitized())
     }
@@ -29,7 +30,7 @@ class StringSanitizationTests {
     @Test
     func sanitized_removesWhitespaceAndNewlines() {
         let input = " Test  \n Data  \n  "
-        let expected = "TestData"
+        let expected = "Test   Data"
 
         #expect(expected == input.sanitized())
     }

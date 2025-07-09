@@ -16,35 +16,15 @@ extensions=(
   "FileImportShareExtension"
 )
 
-# Common destination directory for all mocks
-shared_mock_dir="Modules/CommonsLib/CommonsTestShared/Sources/CommonsTestShared/Mocks"
-mkdir -p "$shared_mock_dir"
-
 # Handle modules
 echo "\n\nGenerating mocks for modules"
 for module in "${modules[@]}"; do
   src_dir="Modules/${module}/Sources"
-  output_dir="${shared_mock_dir}/${module}Mocks/Generated"
+  output_dir="Modules/${module}/Tests/Mocks/Generated"
   output_file="${output_dir}/${module}+Mocks.swift"
 
+  mkdir -p "$output_dir"
   echo "\n\nGenerating mocks for $module...\n"
-
-  if [ "$module" == "LibdigidocLib" ]; then
-    output_dir="Modules/${module}/Tests/${module}Tests/Mocks/Generated"
-    mkdir -p "$output_dir"
-    output_file="${output_dir}/${module}+Mocks.swift"
-
-    echo "\n\nGenerating mocks for $module...\n"
-
-    mockolo \
-      -s "$src_dir" \
-      -d "$output_file" \
-      --enable-args-history \
-      --custom-imports "LibdigidocLibSwift" \
-      --logging-level 1
-
-    continue
-  fi
 
   # Set custom imports based on module
   case "$module" in
@@ -60,8 +40,8 @@ for module in "${modules[@]}"; do
       custom_imports=("CommonsLib" "UtilsLib")
       testable_imports=""
       ;;
-    "CommonsTestMocks")
-      custom_imports=()
+    "LibdigidocLib")
+      custom_imports=("LibdigidocLibSwift")
       testable_imports=""
       ;;
     *)

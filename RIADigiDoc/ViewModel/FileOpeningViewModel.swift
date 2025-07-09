@@ -10,7 +10,10 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     @Published var isFileOpeningLoading: Bool = false
     @Published var isNavigatingToNextView: Bool = false
 
-    @Published var signedContainer: SignedContainer = SignedContainer()
+    @Published var signedContainer: SignedContainerProtocol = SignedContainer(
+        fileManager: Container.shared.fileManager(),
+        containerUtil: Container.shared.containerUtil()
+    )
     @Published var errorMessage: ToastMessage?
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
@@ -93,11 +96,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
 
     private func createToastMessage(for error: DigiDocError) -> ToastMessage {
         switch error {
-        case .initializationFailed:
-            return ToastMessage(message: NSLocalizedString("General error", comment: ""))
         case .containerCreationFailed(let errorDetail),
-             .containerOpeningFailed(let errorDetail),
-             .containerSavingFailed(let errorDetail):
+                .containerOpeningFailed(let errorDetail),
+                .containerSavingFailed(let errorDetail):
             return ToastMessage(
                 message: String(
                     format: NSLocalizedString("Failed to open container %@", comment: ""),
@@ -111,6 +112,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             )
         case .alreadyInitialized:
             return ToastMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
+        default:
+            return ToastMessage(message: NSLocalizedString("General error", comment: ""))
         }
     }
 }

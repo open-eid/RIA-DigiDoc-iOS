@@ -22,6 +22,10 @@ public func mimeTypeDecoder() -> MimeTypeDecoderProtocol {
 
 extension URL {
 
+    public var standardizedPathURL: URL {
+        URL(fileURLWithPath: (path as NSString).standardizingPath)
+    }
+
     public func mimeType(
         fileUtil: FileUtilProtocol = fileUtil(),
         fileManager: FileManagerProtocol = fileManager(),

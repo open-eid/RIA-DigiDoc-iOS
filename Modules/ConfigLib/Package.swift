@@ -11,7 +11,8 @@ let package = Package(
         .library(
             name: "ConfigLib",
             targets: ["ConfigLib"]
-        )
+        ),
+        .library(name: "ConfigLibMocks", targets: ["ConfigLibMocks"]),
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
@@ -33,13 +34,18 @@ let package = Package(
                 .copy("Resources/tslFiles")
             ]
         ),
+        .target(
+            name: "ConfigLibMocks",
+            dependencies: ["ConfigLib"],
+            path: "Tests/Mocks/Generated"
+        ),
         .testTarget(
             name: "ConfigLibTests",
             dependencies: [
+                "ConfigLibMocks",
                 "CommonsLib",
                 "UtilsLib",
                 "CommonsTestShared",
-                .product(name: "ConfigLibMocks", package: "commonstestshared"),
                 .product(name: "FactoryTesting", package: "Factory")
             ]
         )

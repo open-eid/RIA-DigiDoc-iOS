@@ -183,11 +183,22 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     private func getDataFiles(from container: DigiDocContainer) -> [DataFileWrapper] {
-        return container.dataFiles.compactMap { dataFile in
-            DataFileWrapper(fileId: dataFile.fileId,
-                            fileName: dataFile.fileName,
-                            fileSize: dataFile.fileSize,
-                            mediaType: dataFile.mediaType)
+        guard let dataFiles = container.dataFiles as? NSArray else {
+            return []
+        }
+
+        return dataFiles.compactMap { item in
+            guard let dataFile = item as? DigiDocDataFile else {
+                ContainerWrapper.logger.error("Unexpected type: \(type(of: item))")
+                return nil
+            }
+
+            return DataFileWrapper(
+                fileId: dataFile.fileId,
+                fileName: dataFile.fileName,
+                fileSize: Int(dataFile.fileSize),
+                mediaType: dataFile.mediaType
+            )
         }
     }
 

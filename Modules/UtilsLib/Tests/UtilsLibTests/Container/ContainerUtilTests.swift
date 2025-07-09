@@ -9,8 +9,12 @@ struct ContainerUtilTests {
 
     private let mockFileManager: FileManagerProtocolMock!
 
+    private let containerUtil: ContainerUtil
+
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
+
+        containerUtil = ContainerUtil(fileManager: mockFileManager)
     }
 
     @Test
@@ -19,10 +23,9 @@ struct ContainerUtilTests {
         let uniqueFileName = "file-\(UUID().uuidString).txt"
         let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
 
-        let uniqueFileURL = ContainerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getSignatureContainerFile(
             for: fileURL,
-            in: tempDirectory,
-            fileManager: mockFileManager
+            in: tempDirectory
         )
 
         #expect(uniqueFileName == uniqueFileURL.lastPathComponent)
@@ -44,10 +47,9 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = ContainerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getSignatureContainerFile(
             for: fileURL,
-            in: tempDirectory,
-            fileManager: mockFileManager
+            in: tempDirectory
         )
 
         #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-1.txt")
@@ -70,10 +72,9 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = ContainerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getSignatureContainerFile(
             for: fileURL,
-            in: tempDirectory,
-            fileManager: mockFileManager
+            in: tempDirectory
         )
 
         #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-3.txt")
@@ -93,10 +94,9 @@ struct ContainerUtilTests {
             existingPaths.contains(path)
         }
 
-        let uniqueFileURL = ContainerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getSignatureContainerFile(
             for: fileURL,
-            in: tempDirectory,
-            fileManager: mockFileManager
+            in: tempDirectory
         )
 
         #expect(uniqueFileURL.lastPathComponent == "\(uniqueFileName)-1")
@@ -118,10 +118,9 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = ContainerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getSignatureContainerFile(
             for: fileURL,
-            in: tempDirectory,
-            fileManager: mockFileManager
+            in: tempDirectory
         )
 
         #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-1.txt")

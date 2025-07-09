@@ -7,4 +7,5 @@ public protocol SignedContainerProtocol: Sendable {
     func getContainerName() async -> String
     func getContainerMimetype() async -> String
     func getRawContainerFile() async -> URL?
+    @discardableResult func renameContainer(to newName: String) async throws -> URL
 }
