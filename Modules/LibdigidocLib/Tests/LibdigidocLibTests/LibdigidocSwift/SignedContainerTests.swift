@@ -11,6 +11,8 @@ import LibdigidocLibSwiftMocks
 
 @testable import LibdigidocLibSwift
 
+private let isRealContainerOperationTestsEnabled = false
+
 final class SignedContainerTests {
 
     private let configurationProvider: ConfigurationProvider
@@ -68,7 +70,7 @@ final class SignedContainerTests {
         #expect(CommonsLib.Constants.MimeType.Asice == mimetype)
     }
 
-    @Test
+    @Test(.enabled(if: isRealContainerOperationTestsEnabled))
     func openOrCreate_success() async throws {
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
 

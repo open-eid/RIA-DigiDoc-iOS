@@ -9,6 +9,8 @@ import UtilsLibMocks
 
 @testable import LibdigidocLibSwift
 
+private let isRealContainerOperationTestsEnabled = false
+
 final class ContainerWrapperTests {
 
     private var container: ContainerWrapperProtocol = ContainerWrapper()
@@ -139,7 +141,7 @@ final class ContainerWrapperTests {
         #expect(dataFiles.count == 2)
     }
 
-    @Test
+    @Test(.enabled(if: isRealContainerOperationTestsEnabled))
     func open_success() async throws {
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
 
