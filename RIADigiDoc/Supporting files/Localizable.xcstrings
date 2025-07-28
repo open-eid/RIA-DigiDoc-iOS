@@ -19,12 +19,6 @@
             "state" : "translated",
             "value" : "Lisa allkiri"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить подпись"
-          }
         }
       }
     },
@@ -40,12 +34,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tagasi"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Назад"
           }
         }
       }
@@ -63,12 +51,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaadi detailid"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Детали сертификата"
           }
         }
       }
@@ -88,12 +70,6 @@
             "state" : "translated",
             "value" : "Muuda ümbriku nime"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Изменить имя контейнера"
-          }
         }
       }
     },
@@ -112,12 +88,6 @@
             "state" : "translated",
             "value" : "Vali fail"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать файл"
-          }
         }
       }
     },
@@ -133,12 +103,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sulge"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрыть"
           }
         }
       }
@@ -157,12 +121,6 @@
             "state" : "translated",
             "value" : "Ümbriku failid"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файлы контейнера"
-          }
         }
       }
     },
@@ -179,12 +137,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku formaat:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Формат контейнера:"
           }
         }
       }
@@ -204,12 +156,6 @@
             "state" : "translated",
             "value" : "Ümbriku nimi"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Название контейнера"
-          }
         }
       }
     },
@@ -227,12 +173,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku allkirjad"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подписи контейнера"
           }
         }
       }
@@ -252,12 +192,6 @@
             "state" : "translated",
             "value" : "Failide laadimine ebaõnnestus"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить выбранные файлы"
-          }
         }
       }
     },
@@ -275,12 +209,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dokumenti ei leitud"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Документ не найден"
           }
         }
       }
@@ -300,12 +228,6 @@
             "state" : "translated",
             "value" : "Valmis"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Готово"
-          }
         }
       }
     },
@@ -323,12 +245,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зашифровать"
           }
         }
       }
@@ -348,12 +264,6 @@
             "state" : "translated",
             "value" : "Dokumendi %@ avamine ebaõnnestus"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось открыть контейнер %@"
-          }
         }
       }
     },
@@ -371,12 +281,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili %@ avamine ebaõnnestus"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось открыть файл %@"
           }
         }
       }
@@ -396,12 +300,6 @@
             "state" : "translated",
             "value" : "Faili %@ ümbernimetamine ebaõnnestus"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось переименовать файл %@"
-          }
         }
       }
     },
@@ -419,12 +317,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili salvestamine ebaõnnestus"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось сохранить файл"
           }
         }
       }
@@ -444,12 +336,6 @@
             "state" : "translated",
             "value" : "Fail salvestatud"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файл сохранен"
-          }
         }
       }
     },
@@ -467,12 +353,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fail edukalt lisatud"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файл успешно добавлен"
           }
         }
       }
@@ -492,12 +372,6 @@
             "state" : "translated",
             "value" : "Failid edukalt lisatud"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файлы успешно добавлены"
-          }
         }
       }
     },
@@ -514,12 +388,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Midagi läks valesti, proovi uuesti"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Что-то пошло не так, попробуйте снова"
           }
         }
       }
@@ -538,12 +406,6 @@
             "state" : "translated",
             "value" : "Allkirja sõnumilühend:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Хэш значение подтверждения подлинности подписи"
-          }
         }
       }
     },
@@ -559,12 +421,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abi"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Помощь"
           }
         }
       }
@@ -584,12 +440,6 @@
             "state" : "translated",
             "value" : "Tühja faili ei saa lisada ümbrikusse"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пустой файл нельзя добавить в контейнер"
-          }
         }
       }
     },
@@ -606,12 +456,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Libdigidocpp on juba initsialiseeritud"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Libdigidocpp уже инициализирована"
           }
         }
       },
@@ -631,12 +475,6 @@
             "state" : "translated",
             "value" : "Laen"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Загрузка"
-          }
         }
       }
     },
@@ -654,12 +492,6 @@
             "state" : "translated",
             "value" : "Logo"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Логотип"
-          }
         }
       }
     },
@@ -675,12 +507,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menüü"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Меню"
           }
         }
       }
@@ -698,12 +524,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veel valikuid"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Расширить подпись"
           }
         }
       }
@@ -723,12 +543,6 @@
             "state" : "translated",
             "value" : "Dokumendid puuduvad"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Недавние документы отсутствуют"
-          }
         }
       }
     },
@@ -744,12 +558,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teated"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уведомления"
           }
         }
       }
@@ -768,12 +576,6 @@
             "state" : "translated",
             "value" : "Kehtivuskinnituse sertifikaadi väljaandja:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Организация, выдавшая сертификат OCSP:"
-          }
         }
       }
     },
@@ -790,12 +592,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kehtivuskinnituse sertifikaat:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сертификат OCSP:"
           }
         }
       }
@@ -814,12 +610,6 @@
             "state" : "translated",
             "value" : "Kehtivuskinnituse aeg (UTC):"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Время подтверждения подлинности подписи (UTC):"
-          }
         }
       }
     },
@@ -837,12 +627,6 @@
             "state" : "translated",
             "value" : "Kehtivuskinnituse aeg:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Время подтверждения подлинности подписи:"
-          }
         }
       }
     },
@@ -856,12 +640,6 @@
           }
         },
         "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -884,12 +662,6 @@
             "state" : "translated",
             "value" : "Ava fail"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открыть файл"
-          }
         }
       }
     },
@@ -907,12 +679,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hiljutised dokumendid"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Недавние документы"
           }
         }
       }
@@ -932,12 +698,6 @@
             "state" : "translated",
             "value" : "Eemalda"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить"
-          }
         }
       }
     },
@@ -955,12 +715,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eemalda fail"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить файл"
           }
         }
       }
@@ -980,12 +734,6 @@
             "state" : "translated",
             "value" : "Eemalda allkiri"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить подпись"
-          }
         }
       }
     },
@@ -1001,12 +749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvesta"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сохранить"
           }
         }
       }
@@ -1026,12 +768,6 @@
             "state" : "translated",
             "value" : "Salvesta ümbrik"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сохраните контейнер"
-          }
         }
       }
     },
@@ -1049,12 +785,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvesta fail"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сохраните файл"
           }
         }
       }
@@ -1074,12 +804,6 @@
             "state" : "translated",
             "value" : "Otsi ümbrikku"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Искать контейнер"
-          }
         }
       }
     },
@@ -1095,12 +819,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seaded"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Настройки"
           }
         }
       }
@@ -1120,12 +838,6 @@
             "state" : "translated",
             "value" : "Fail on ajutisse kausta salvestatud. Impordi lõpetamiseks mine RIA DigiDoc rakendusse."
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Файл кэширован. Перейти к приложению RIA DigiDoc для завершения импорта"
-          }
         }
       }
     },
@@ -1143,12 +855,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili importimine ebaõnnestus"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось импортировать файл"
           }
         }
       }
@@ -1168,12 +874,6 @@
             "state" : "translated",
             "value" : "Laadin faile..."
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Импорт файлов..."
-          }
         }
       }
     },
@@ -1191,12 +891,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili import"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Импорт файла"
           }
         }
       }
@@ -1216,12 +910,6 @@
             "state" : "translated",
             "value" : "Allkirjasta"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подписать"
-          }
         }
       }
     },
@@ -1239,12 +927,6 @@
             "state" : "translated",
             "value" : "Allkirja detailid"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Детали подписи"
-          }
         }
       }
     },
@@ -1261,12 +943,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirja formaat:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Формат подписи:"
           }
         }
       }
@@ -1286,12 +962,6 @@
             "state" : "translated",
             "value" : "Allkiri ei ole kehtiv"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подпись недействительна"
-          }
         }
       }
     },
@@ -1309,12 +979,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkiri on teadmata"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подпись неизвестная"
           }
         }
       }
@@ -1334,12 +998,6 @@
             "state" : "translated",
             "value" : "Allkiri on kehtiv"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подпись действительна"
-          }
         }
       }
     },
@@ -1357,12 +1015,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkiri on kehtiv (Piirangud)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подпись действительна (Ограничения)"
           }
         }
       }
@@ -1382,12 +1034,6 @@
             "state" : "translated",
             "value" : "Allkiri on kehtiv (Hoiatused)"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подпись действительна (Предупреждения)"
-          }
         }
       }
     },
@@ -1404,12 +1050,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirja meetod:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Метод подписи:"
           }
         }
       }
@@ -1428,12 +1068,6 @@
             "state" : "translated",
             "value" : "Allkirja ajatempel (UTC):"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Временной штамп подписи (UTC):"
-          }
         }
       }
     },
@@ -1450,12 +1084,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirja ajatempel:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Временной штамп подписи:"
           }
         }
       }
@@ -1475,12 +1103,6 @@
             "state" : "translated",
             "value" : "Allkirjastatud %@ kell %@"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подписано %@ в %@"
-          }
         }
       }
     },
@@ -1497,12 +1119,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjastatud failide arv:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Количество подписанных файлов:"
           }
         }
       }
@@ -1521,12 +1137,6 @@
             "state" : "translated",
             "value" : "Allkirjastaja sertifikaadi väljaandja:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Организация, выдавшая сертификат подписавшего:"
-          }
         }
       }
     },
@@ -1544,12 +1154,6 @@
             "state" : "translated",
             "value" : "Allkirjastaja sertifikaat:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сертификат пользователя:"
-          }
         }
       }
     },
@@ -1566,12 +1170,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjastaja telefoni kellaaeg (UTC):"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Время на мобильном телефоне подписывающего (UTC):"
           }
         }
       }
@@ -1591,12 +1189,6 @@
             "state" : "translated",
             "value" : "Allkirjastamine"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подписание"
-          }
         }
       }
     },
@@ -1614,12 +1206,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vahekaart"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вкладка"
           }
         }
       }
@@ -1639,12 +1225,6 @@
             "state" : "translated",
             "value" : "Seda rakendust ei saa kasutada turvamata (ingl jailbroken) seadmes"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Данное приложение не может быть использовано на взломанном (джейлбрейк) устройстве"
-          }
         }
       }
     },
@@ -1662,12 +1242,6 @@
             "state" : "translated",
             "value" : "Ajatempliteenuse sertifikaadi väljaandja:"
           }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Издатель сертификата временного штампа:"
-          }
         }
       }
     },
@@ -1684,12 +1258,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajatempliteenuse sertifikaat:"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сертификат временного штампа:"
           }
         }
       }

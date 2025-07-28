@@ -550,7 +550,6 @@
 				en,
 				Base,
 				et,
-				ru,
 			);
 			mainGroup = DFDB14722CC97B0E00153876;
 			minimizedProjectReferenceProxies = 1;
