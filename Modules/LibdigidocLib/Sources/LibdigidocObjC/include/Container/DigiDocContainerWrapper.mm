@@ -48,6 +48,18 @@ public:
             digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
             digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];
 
+            std::vector<std::string> signerRoles = signature->signerRoles();
+            NSMutableArray* signerRolesList = [NSMutableArray arrayWithCapacity: signerRoles.size()];
+            for (auto const& signerRole: signerRoles) {
+                [signerRolesList addObject: [NSString stringWithUTF8String:signerRole.c_str()]];
+            }
+
+            digiDocSignature.roles = signerRolesList;
+            digiDocSignature.city = [NSString stringWithUTF8String:signature->city().c_str()];
+            digiDocSignature.state = [NSString stringWithUTF8String:signature->stateOrProvince().c_str()];
+            digiDocSignature.country = [NSString stringWithUTF8String:signature->countryName().c_str()];
+            digiDocSignature.zipCode = [NSString stringWithUTF8String:signature->postalCode().c_str()];
+
             digidoc::Signature::Validator validator(signature);
             digidoc::Signature::Validator::Status status = validator.status();
             digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];

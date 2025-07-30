@@ -15,6 +15,9 @@ struct SignatureView: View {
     let signature: SignatureWrapper
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
+    let showSignedDate: Bool
+    let showMoreOptionsButton: Bool
+    let showRole: Bool
 
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false
@@ -42,6 +45,26 @@ struct SignatureView: View {
         ]
     }
 
+    init(
+        containerMimetype: String,
+        dataFilesCount: Int,
+        signature: SignatureWrapper,
+        nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
+        signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
+        showSignedDate: Bool = true,
+        showMoreOptionsButton: Bool = true,
+        showRole: Bool = true
+    ) {
+        self.containerMimetype = containerMimetype
+        self.dataFilesCount = dataFilesCount
+        self.signature = signature
+        self.nameUtil = nameUtil
+        self.signatureUtil = signatureUtil
+        self.showSignedDate = showSignedDate
+        self.showMoreOptionsButton = showMoreOptionsButton
+        self.showRole = showRole
+    }
+
     var body: some View {
         let signedDate = DateUtil.getFormattedDateTime(
             dateTimeString: signature.trustedSigningTime,
@@ -63,17 +86,19 @@ struct SignatureView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
 
-                    Text(
-                        String(
-                            format: languageSettings.localized("Signed %@ at %@"),
-                            signedDate.date,
-                            signedDate.time
+                    if showSignedDate {
+                        Text(verbatim:
+                                String(
+                                    format: languageSettings.localized("Signed %@ at %@"),
+                                    signedDate.date,
+                                    signedDate.time
+                                )
                         )
-                    )
-                    .font(typography.bodyMedium)
-                    .foregroundStyle(theme.onSurfaceVariant)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.leading)
+                        .font(typography.bodyMedium)
+                        .foregroundStyle(theme.onSurfaceVariant)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
+                    }
 
                     ColoredSignedStatusText(
                         text: signatureUtil.getSignatureStatusText(status: signature.status),
@@ -81,21 +106,31 @@ struct SignatureView: View {
                     )
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
+
+                    if showRole && !signature.roles.isEmpty {
+                        Text(verbatim: signature.roles.joined(separator: " / "))
+                            .font(typography.bodyMedium)
+                            .foregroundStyle(theme.onSurface)
+                            .lineLimit(2)
+                            .truncationMode(.tail)
+                    }
                 }
 
                 Spacer()
 
-                Button(action: {
-                    showBottomSheetFromButton = true
-                }, label: {
-                    Image("ic_m3_more_vert_48pt_wght400")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .foregroundStyle(theme.onBackground)
-                        .accessibilityLabel(languageSettings.localized("More options"))
-                })
-                .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                if showMoreOptionsButton {
+                    Button(action: {
+                        showBottomSheetFromButton = true
+                    }, label: {
+                        Image("ic_m3_more_vert_48pt_wght400")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .foregroundStyle(theme.onBackground)
+                            .accessibilityLabel(languageSettings.localized("More options"))
+                    })
+                    .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                }
             }
             .padding(Dimensions.Padding.MSPadding)
         }
@@ -155,6 +190,11 @@ struct SignatureView: View {
             timeStampTime: "",
             signedBy: "Signer 1",
             trustedSigningTime: Date.now.formatted(),
+            roles: ["Role 1", "Role 2"],
+            city: "Test City",
+            state: "Test State",
+            country: "Test Country",
+            zipCode: "Test12345",
             format: "",
             messageImprint: Data(),
             diagnosticsInfo: ""
@@ -162,4 +202,5 @@ struct SignatureView: View {
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )
+    .environmentObject(LanguageSettings())
 }

@@ -8,6 +8,9 @@ import UtilsLib
 // swiftlint:disable:next blanket_disable_command
 // swiftlint:disable type_body_length file_length
 struct CertificateDetailView: View {
+    @AppTheme private var theme
+    @AppTypography private var typography
+
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var languageSettings: LanguageSettings
 
@@ -147,271 +150,261 @@ struct CertificateDetailView: View {
             onLeftClick: { dismiss() },
             content: {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
+                LazyVStack(alignment: .leading) {
                     Text(verbatim: "Subject Name")
-                        .font(.headline)
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.titleLarge.bold())
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                        .padding(.top, Dimensions.Padding.XSPadding)
                         .accessibilityHeading(.h1)
 
                     if !subjectCountryName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Country or Region")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectCountryName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Country or Region",
+                                value: subjectCountryName
+                            )
+                        )
                     }
 
                     if !subjectOrganizationName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Organization")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectOrganizationName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Organization",
+                                value: subjectOrganizationName
+                            )
+                        )
                     }
 
                     if !subjectOrganizationalUnitName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Organizational Unit")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectOrganizationalUnitName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Organizational Unit",
+                                value: subjectOrganizationalUnitName
+                            )
+                        )
                     }
 
                     if !subjectCommonName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Common Name")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectCommonName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Common Name",
+                                value: subjectCommonName
+                            )
+                        )
                     }
 
                     if !subjectSurname.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Surname")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectSurname)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Surname",
+                                value: subjectSurname
+                            )
+                        )
                     }
 
                     if !subjectGivenName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Given Name")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectGivenName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Given Name",
+                                value: subjectGivenName
+                            )
+                        )
                     }
 
                     if !subjectSerialNumber.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Serial number")
-                                    .font(.subheadline)
-                                Text(verbatim: subjectSerialNumber)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Serial number",
+                                value: subjectSerialNumber
+                            )
+                        )
                     }
 
                     Text(verbatim: "Issuer Name")
-                        .font(.headline)
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.titleLarge.bold())
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                        .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
 
                     if !issuerCountryName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Country or Region")
-                                    .font(.subheadline)
-                                Text(verbatim: issuerCountryName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Country or Region",
+                                value: issuerCountryName
+                            )
+                        )
                     }
 
                     if !issuerOrganizationName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Organization")
-                                    .font(.subheadline)
-                                Text(verbatim: issuerOrganizationName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Organization",
+                                value: issuerOrganizationName
+                            )
+                        )
                     }
 
                     if !issuerCommonName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Common Name")
-                                    .font(.subheadline)
-                                Text(verbatim: issuerCommonName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Common Name",
+                                value: issuerCommonName
+                            )
+                        )
                     }
 
                     if !issuerOtherName.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Other name")
-                                    .font(.subheadline)
-                                Text(verbatim: issuerOtherName)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Other name",
+                                value: issuerOtherName
+                            )
+                        )
                     }
 
                     if !issuerSerialNumber.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Serial Number")
-                                    .font(.subheadline)
-                                Text(verbatim: issuerSerialNumber)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Serial Number",
+                                value: issuerSerialNumber
+                            )
+                        )
                     }
 
                     if !version.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Version")
-                                    .font(.subheadline)
-                                Text(verbatim: version)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Version",
+                                value: version
+                            )
+                        )
                     }
 
                     if !signatureAlgorithm.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Signature Algorithm")
-                                    .font(.subheadline)
-                                Text(verbatim: signatureAlgorithm)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Signature Algorithm",
+                                value: signatureAlgorithm
+                            )
+                        )
                     }
 
                     if !notValidBefore.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Not Valid Before")
-                                    .font(.subheadline)
-                                Text(verbatim: notValidBefore)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Not Valid Before",
+                                value: notValidBefore
+                            )
+                        )
                     }
 
                     if !notValidAfter.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Not Valid After")
-                                    .font(.subheadline)
-                                Text(verbatim: notValidAfter)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Not Valid After",
+                                value: notValidAfter
+                            )
+                        )
                     }
 
                     Text(verbatim: "Public Key")
-                        .font(.headline)
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.titleLarge.bold())
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                        .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
 
                     if !publicKeyAlgorithm.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Algorithm")
-                                    .font(.subheadline)
-                                Text(verbatim: publicKeyAlgorithm)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Algorithm",
+                                value: publicKeyAlgorithm
+                            )
+                        )
                     }
 
                     if !publicKey.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Public Key")
-                                    .font(.subheadline)
-                                Text(verbatim: publicKey)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Public Key",
+                                value: publicKey
+                            )
+                        )
                     }
 
                     if !keyUsage.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Key Usage")
-                                    .font(.subheadline)
-                                Text(verbatim: keyUsage)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Key Usage",
+                                value: keyUsage
+                            )
+                        )
                     }
 
                     if !signature.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "Signature")
-                                    .font(.subheadline)
-                                Text(verbatim: signature)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "Signature",
+                                value: signature
+                            )
+                        )
                     }
 
-                    Group {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(verbatim: "Extensions")
-                                .font(.subheadline)
-                        }
-                    }
+
+                    Text(verbatim: "Extensions")
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.titleLarge.bold())
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                        .padding(.top, Dimensions.Padding.MPadding)
+                        .accessibilityHeading(.h2)
 
                     if !extensions.isEmpty {
                         ForEach(extensions, id: \.id) { extensionItem in
                             Group {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(verbatim: "Extension")
+                                Text(verbatim: "Extension")
+                                    .foregroundStyle(theme.onSurface)
+                                    .font(typography.bodyLarge.bold())
 
-                                    Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
+                                Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
 
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
-                                            .padding(.leading, 16)
-                                        Text(verbatim: "ID: \(extensionItem.values)")
-                                            .padding(.leading, 16)
-                                    }
+                                VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
+                                    Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
+                                    Text(verbatim: "ID: \(extensionItem.values)")
                                 }
+                                .padding(.leading, Dimensions.Padding.SPadding)
                             }
-                            .padding()
+                            .padding(Dimensions.Padding.XSPadding)
                         }
                     }
 
                     Text(verbatim: "Fingerprints")
-                        .font(.headline)
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.titleLarge.bold())
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                        .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
 
                     if !sha256Fingerprint.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "SHA-256")
-                                    .font(.subheadline)
-                                Text(verbatim: sha256Fingerprint)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "SHA-256",
+                                value: sha256Fingerprint
+                            )
+                        )
                     }
 
                     if !sha1Fingerprint.isEmpty {
-                        Group {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(verbatim: "SHA-1")
-                                    .font(.subheadline)
-                                Text(verbatim: sha1Fingerprint)
-                            }
-                        }
+                        SignerDetailView(
+                            signatureDataItem: SignatureDataItem(
+                                title: "SHA-1",
+                                value: sha1Fingerprint
+                            )
+                        )
                     }
                 }
-                .padding()
+                .padding(Dimensions.Padding.SPadding)
             }
         })
     }
@@ -430,6 +423,11 @@ struct CertificateDetailView: View {
             timeStampTime: "1970-01-01T00:00:00Z",
             signedBy: "Test User",
             trustedSigningTime: "1970-01-01T00:00:00Z",
+            roles: ["Role 1", "Role 2"],
+            city: "Test City",
+            state: "Test State",
+            country: "Test Country",
+            zipCode: "Test12345",
             format: "BES/time-stamp",
             messageImprint: Data(),
             diagnosticsInfo: ""

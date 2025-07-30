@@ -43,6 +43,11 @@ struct SignaturesListView: View {
         timeStampTime: "1970-01-01T00:00:00Z",
         signedBy: "Test User",
         trustedSigningTime: "1970-01-01T00:00:00Z",
+        roles: ["Role 1", "Role 2"],
+        city: "Test City",
+        state: "Test State",
+        country: "Test Country",
+        zipCode: "Test12345",
         format: "BES/time-stamp",
         messageImprint: Data(),
         diagnosticsInfo: ""

@@ -91,6 +91,24 @@
         }
       }
     },
+    "City title" : {
+      "comment" : "Role detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "City"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linn"
+          }
+        }
+      }
+    },
     "Close" : {
       "localizations" : {
         "en" : {
@@ -124,19 +142,20 @@
         }
       }
     },
-    "Container format:" : {
+    "Container format" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Container format:"
+            "value" : "Container format"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ümbriku formaat:"
+            "value" : "Ümbriku formaat"
           }
         }
       }
@@ -191,6 +210,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failide laadimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Country title" : {
+      "comment" : "Role details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Country"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riik"
           }
         }
       }
@@ -392,19 +429,20 @@
         }
       }
     },
-    "Hash value of signature:" : {
+    "Hash value of signature" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hash value of signature:"
+            "value" : "Hash value of signature"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirja sõnumilühend:"
+            "value" : "Allkirja sõnumilühend"
           }
         }
       }
@@ -562,70 +600,74 @@
         }
       }
     },
-    "OCSP Certificate issuer:" : {
+    "OCSP Certificate" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OCSP Certificate issuer:"
+            "value" : "OCSP Certificate"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kehtivuskinnituse sertifikaadi väljaandja:"
+            "value" : "Kehtivuskinnituse sertifikaat"
           }
         }
       }
     },
-    "OCSP Certificate:" : {
+    "OCSP Certificate issuer" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OCSP Certificate:"
+            "value" : "OCSP Certificate issuer"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kehtivuskinnituse sertifikaat:"
+            "value" : "Kehtivuskinnituse sertifikaadi väljaandja"
           }
         }
       }
     },
-    "OCSP time (UTC):" : {
+    "OCSP time" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OCSP time (UTC):"
+            "value" : "OCSP time"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kehtivuskinnituse aeg (UTC):"
+            "value" : "Kehtivuskinnituse aeg"
           }
         }
       }
     },
-    "OCSP time:" : {
+    "OCSP time (UTC)" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OCSP time:"
+            "value" : "OCSP time (UTC)"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kehtivuskinnituse aeg:"
+            "value" : "Kehtivuskinnituse aeg (UTC)"
           }
         }
       }
@@ -733,6 +775,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eemalda allkiri"
+          }
+        }
+      }
+    },
+    "Role title" : {
+      "comment" : "Role details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Role / resolution"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roll / resolutsioon"
           }
         }
       }
@@ -913,6 +973,96 @@
         }
       }
     },
+    "Signature detail invalid reason" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is an invalid signature or malformed digitally signed file. The signature is not valid."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See allkiri või allkirjastatud fail on vigane. Allkiri ei ole kehtiv."
+          }
+        }
+      }
+    },
+    "Signature detail non-qscd reason" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This e-Signature is not equivalent with handwritten signature and therefore can be used only in transactions where Qualified e-Signature is not required."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See e-allkiri ei ole käsitsi kirjutatud allkirjadega samaväärne ja seetõttu saab seda kasutada ainult tehingute puhul, kus kvalifitseeritud e-allkiri pole kohustuslik."
+          }
+        }
+      }
+    },
+    "Signature detail unknown reason" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature status is displayed \"unknown\" if you don't have all validity confirmation service certificates and/or certificate authority certificates installed into your computer.\nAdditional information: https://www.id.ee/en/article/digidoc4-client-error-ocsp-responder-is-not-trusted-no-certificate-for-this-responder-in-local-certstore"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja staatust kuvatakse \"teadmata\", kui Sinu arvutisse pole lisatud kõiki kehtivuskinnituse teenuse sertifikaate ja/või nende kontrolliks vajalikke sertifikaate.\nLisainfo: https://www.id.ee/artikkel/digidoc4-klient-viga-ocsp-responder-is-not-trusted-no-certificate-for-this-responder-in-local-certstore"
+          }
+        }
+      }
+    },
+    "Signature detail warning reason" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The signature is valid, but the container has a specific feature. Usually, this feature has arisen accidentally when containers were created. However, as it is not possible to edit a container without invalidating the signature, a warning is displayed.\nAdditional information: https://www.id.ee/en/article/digital-signing-and-electronic-signatures/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on kehtiv, aga ümbrikul on mingi eripära. Tavaliselt on selline eripära tekkinud ümbriku loomisel. Kuna ümbrikku ei ole võimalik muuta ilma, et allkiri kehtetuks muutuks, näidatakse selliste ümbrike puhul hoiatust.\nLisainfo: https://www.id.ee/artikkel/digitaalne-allkirjastamine-ja-elektroonilised-allkirjad"
+          }
+        }
+      }
+    },
+    "Signature detail weak reason" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The signature is technically correct, but it is based on the currently weak hash algorithm SHA-1, therefore it is not protected against forgery or alteration."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri on tehniliselt korrektne, kuid põhineb praeguseks nõrgaks hinnatud räsialgoritmil SHA-1, mistõttu ei ole see kaitstud võltsimise või muutmise eest."
+          }
+        }
+      }
+    },
     "Signature details" : {
       "comment" : "Title for Signature Details view",
       "localizations" : {
@@ -930,19 +1080,20 @@
         }
       }
     },
-    "Signature format:" : {
+    "Signature format" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signature format:"
+            "value" : "Signature format"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirja formaat:"
+            "value" : "Allkirja formaat"
           }
         }
       }
@@ -1037,53 +1188,56 @@
         }
       }
     },
-    "Signature method:" : {
+    "Signature method" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signature method:"
+            "value" : "Signature method"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirja meetod:"
+            "value" : "Allkirja meetod"
           }
         }
       }
     },
-    "Signature timestamp (UTC):" : {
+    "Signature timestamp" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signature timestamp (UTC):"
+            "value" : "Signature timestamp"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirja ajatempel (UTC):"
+            "value" : "Allkirja ajatempel"
           }
         }
       }
     },
-    "Signature timestamp:" : {
+    "Signature timestamp (UTC)" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signature timestamp:"
+            "value" : "Signature timestamp (UTC)"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirja ajatempel:"
+            "value" : "Allkirja ajatempel (UTC)"
           }
         }
       }
@@ -1106,70 +1260,110 @@
         }
       }
     },
-    "Signed file count:" : {
+    "Signed file count" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signed file count:"
+            "value" : "Signed file count"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirjastatud failide arv:"
+            "value" : "Allkirjastatud failide arv"
           }
         }
       }
     },
-    "Signer's certificate issuer:" : {
+    "Signer's Certificate" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signer's certificate issuer:"
+            "value" : "Signer's Certificate"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirjastaja sertifikaadi väljaandja:"
+            "value" : "Allkirjastaja sertifikaat"
           }
         }
       }
     },
-    "Signer's Certificate:" : {
+    "Signer's certificate issuer" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signer's Certificate:"
+            "value" : "Signer's certificate issuer"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirjastaja sertifikaat:"
+            "value" : "Allkirjastaja sertifikaadi väljaandja"
           }
         }
       }
     },
-    "Signer's mobile time:" : {
+    "Signer's mobile time" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signer's mobile time:"
+            "value" : "Signer's mobile time"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allkirjastaja telefoni kellaaeg (UTC):"
+            "value" : "Allkirjastaja telefoni kellaaeg (UTC)"
+          }
+        }
+      }
+    },
+    "Signers details title" : {
+      "comment" : "Signature detail title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri"
+          }
+        }
+      }
+    },
+    "Signers role and address title" : {
+      "comment" : "Signature detail role and address title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signer"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastaja"
           }
         }
       }
@@ -1192,6 +1386,24 @@
         }
       }
     },
+    "State title" : {
+      "comment" : "Role details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "State"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maakond"
+          }
+        }
+      }
+    },
     "Tab" : {
       "comment" : "Tab view",
       "extractionState" : "manual",
@@ -1206,6 +1418,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vahekaart"
+          }
+        }
+      }
+    },
+    "Technical information title" : {
+      "comment" : "Signature detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TECHNICAL INFORMATION"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TEHNILINE INFORMATSIOON"
           }
         }
       }
@@ -1228,36 +1458,56 @@
         }
       }
     },
-    "TS Certificate issuer:" : {
+    "TS Certificate" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TS Certificate issuer:"
+            "value" : "TS Certificate"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajatempliteenuse sertifikaadi väljaandja:"
+            "value" : "Ajatempliteenuse sertifikaat"
           }
         }
       }
     },
-    "TS Certificate:" : {
+    "TS Certificate issuer" : {
       "comment" : "Signature detail",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TS Certificate:"
+            "value" : "TS Certificate issuer"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajatempliteenuse sertifikaat:"
+            "value" : "Ajatempliteenuse sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "Zip code title" : {
+      "comment" : "Role details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zip code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postikood"
           }
         }
       }

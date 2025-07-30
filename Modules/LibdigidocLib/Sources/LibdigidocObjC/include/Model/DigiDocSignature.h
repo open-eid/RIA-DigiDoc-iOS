@@ -23,6 +23,12 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 @property (strong, nonatomic) NSData *messageImprint;
 @property (strong, nonatomic) NSString *trustedSigningTime;
 
+@property (strong, nonatomic) NSArray *roles;
+@property (strong, nonatomic) NSString *city;
+@property (strong, nonatomic) NSString *state;
+@property (strong, nonatomic) NSString *country;
+@property (strong, nonatomic) NSString *zipCode;
+
 @property (assign, nonatomic) DigiDocSignatureStatus status;
 @property (strong, nonatomic) NSString *diagnosticsInfo;
 

@@ -23,6 +23,12 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var messageImprint: Data
     public var trustedSigningTime: String
 
+    public var roles: [String]
+    public var city: String
+    public var state: String
+    public var country: String
+    public var zipCode: String
+
     public var status: SignatureStatus
     public var diagnosticsInfo: String
 
@@ -36,6 +42,11 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 timeStampTime: String,
                 signedBy: String,
                 trustedSigningTime: String,
+                roles: [String],
+                city: String,
+                state: String,
+                country: String,
+                zipCode: String,
                 status: SignatureStatus = .unknown,
                 format: String,
                 messageImprint: Data,
@@ -50,6 +61,11 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.timeStampTime = timeStampTime
         self.signedBy = signedBy
         self.trustedSigningTime = trustedSigningTime
+        self.roles = roles
+        self.city = city
+        self.state = state
+        self.country = country
+        self.zipCode = zipCode
         self.status = status
         self.format = format
         self.messageImprint = messageImprint
