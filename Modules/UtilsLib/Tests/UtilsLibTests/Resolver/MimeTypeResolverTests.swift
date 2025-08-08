@@ -8,8 +8,8 @@ import UtilsLibMocks
 
 struct MimeTypeResolverTests {
 
-    private var mockMimeTypeCache: MimeTypeCacheProtocolMock!
-    private var resolver: MimeTypeResolverProtocol!
+    private let mockMimeTypeCache: MimeTypeCacheProtocolMock!
+    private let resolver: MimeTypeResolverProtocol!
 
     init() async throws {
         mockMimeTypeCache = MimeTypeCacheProtocolMock()

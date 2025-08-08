@@ -41,7 +41,9 @@ extension Container {
                 configurationProperty: self.configurationProperty(),
                 configurationProperties: self.configurationProperties(),
                 configurationSignatureVerifier: self.configurationSignatureVerifier(),
-                fileManager: self.fileManager()
+                configurationCache: self.configurationCache(),
+                fileManager: self.fileManager(),
+                bundle: self.bundle()
             )
         }
         .shared
@@ -61,6 +63,14 @@ extension Container {
         self {
             @MainActor in ConfigurationViewModel(
                 repository: self.configurationRepository(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    var configurationCache: Factory<ConfigurationCacheProtocol> {
+        self {
+            ConfigurationCache(
                 fileManager: self.fileManager()
             )
         }

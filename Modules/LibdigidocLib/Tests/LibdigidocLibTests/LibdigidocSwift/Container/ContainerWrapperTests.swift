@@ -13,8 +13,8 @@ import CommonsLibMocks
 
 struct ContainerWrapperTests {
 
-    private var mockFileManager: FileManagerProtocolMock
-    private var mockContainer: ContainerWrapperProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockContainer: ContainerWrapperProtocolMock
     private let configurationProvider: ConfigurationProvider
 
     init() async throws {

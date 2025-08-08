@@ -14,7 +14,7 @@ struct FileOpeningServiceTests {
     private let mockFileManager: FileManagerProtocolMock
     private let mockFileInspector: FileInspectorProtocolMock
 
-    private var service: FileOpeningServiceProtocol
+    private let service: FileOpeningServiceProtocol
 
     init() throws {
         mockFileUtil = FileUtilProtocolMock()

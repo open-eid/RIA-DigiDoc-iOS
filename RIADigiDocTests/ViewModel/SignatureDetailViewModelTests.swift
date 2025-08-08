@@ -5,7 +5,7 @@ import CommonsTestShared
 @MainActor
 struct SignatureDetailViewModelTests {
 
-    private var viewModel: SignatureDetailViewModel!
+    private let viewModel: SignatureDetailViewModel!
 
     init() async throws {
         viewModel = SignatureDetailViewModel()
