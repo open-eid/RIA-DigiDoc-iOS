@@ -27,8 +27,13 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "ConfigLib",
-            dependencies: ["Alamofire", "CommonsLib", "SwiftyRSA", "UtilsLib",
-                           .product(name: "FactoryKit", package: "Factory")],
+            dependencies: [
+                "Alamofire",
+                "CommonsLib",
+                "SwiftyRSA",
+                "UtilsLib",
+                .product(name: "FactoryKit", package: "Factory")
+            ],
             resources: [
                 .copy("Resources/config"),
                 .copy("Resources/tslFiles")
@@ -46,7 +51,8 @@ let package = Package(
                 "CommonsLib",
                 "UtilsLib",
                 "CommonsTestShared",
-                .product(name: "FactoryTesting", package: "Factory")
+                .product(name: "FactoryTesting", package: "Factory"),
+                .product(name: "CommonsLibMocks", package: "commonslib")
             ]
         )
     ]

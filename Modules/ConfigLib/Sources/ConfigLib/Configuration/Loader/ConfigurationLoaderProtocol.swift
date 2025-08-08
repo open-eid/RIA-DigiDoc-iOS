@@ -1,4 +1,5 @@
 import Foundation
+import CommonsLib
 
 /// @mockable
 public protocol ConfigurationLoaderProtocol: Sendable {
@@ -8,7 +9,7 @@ public protocol ConfigurationLoaderProtocol: Sendable {
 
     func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws
 
-    func loadDefaultConfiguration(bundle: Bundle, cacheDir: URL?) async throws
+    func loadDefaultConfiguration(cacheDir: URL?) async throws
 
     func loadCentralConfiguration(cacheDir: URL?) async throws
 

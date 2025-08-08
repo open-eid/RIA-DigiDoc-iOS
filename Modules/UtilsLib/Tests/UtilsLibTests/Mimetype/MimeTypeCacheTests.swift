@@ -13,8 +13,7 @@ struct MimeTypeCacheTests {
     private let mockFileUtil: FileUtilProtocolMock!
     private let mockMimetypeDecoder: MimeTypeDecoderProtocolMock!
 
-    private var mimeTypeCache: MimeTypeCacheProtocol!
-    private var tempDirectory: URL!
+    private let mimeTypeCache: MimeTypeCacheProtocol!
 
     init() async throws {
         mockFileUtil = FileUtilProtocolMock()

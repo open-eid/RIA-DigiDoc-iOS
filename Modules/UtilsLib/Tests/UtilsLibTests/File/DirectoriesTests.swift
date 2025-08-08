@@ -10,6 +10,9 @@ struct DirectoriesTests {
 
     private let mockFileManager: FileManagerProtocolMock!
 
+    private var testLibraryDirectory: URL!
+    private var testCacheDirectory: URL!
+
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
     }
@@ -187,5 +190,56 @@ struct DirectoriesTests {
 
         #expect(result.path == existingFolderURL.path)
         #expect(mockFileManager.createDirectoryCallCount == 0)
+    }
+
+    @Test
+    func getLibraryDirectory_success() async throws {
+        let mockDirectory = URL(fileURLWithPath: "mock/library/directory")
+
+        mockFileManager.urlsHandler = { _, _ in
+            return [URL(fileURLWithPath: "mock/library/directory")]
+        }
+
+        let directory = Directories.getLibraryDirectory(fileManager: mockFileManager)
+
+        #expect(mockDirectory == directory)
+    }
+
+    @Test
+    func getLogsDirectory_primaryDirectoryExists() throws {
+        let mockDirectory = URL(fileURLWithPath: "/path/to/primary/directory")
+        let expectedDirectory = mockDirectory.appendingPathComponent("logs")
+
+        let trimmedExpectedDirectoryPath = expectedDirectory.path.hasPrefix("/") ? String(
+            expectedDirectory.path.dropFirst()
+        ) : expectedDirectory.path
+
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        mockFileManager.createDirectoryHandler = { _, _, _ in }
+
+        let logFilePath = try Directories.getLibdigidocLogFile(
+            from: mockDirectory,
+            fileManager: mockFileManager
+        )
+
+        let trimmedLogFilePath = expectedDirectory.path.hasPrefix("/") ? String(
+            expectedDirectory.path.dropFirst()
+        ) : expectedDirectory.path
+
+        #expect(logFilePath != nil)
+        #expect(trimmedExpectedDirectoryPath == trimmedLogFilePath)
+        #expect("libdigidocpp.log" == logFilePath?.lastPathComponent)
+    }
+
+    @Test
+    func getLogsDirectory_mainDirectoryDoesNotExistButFallbackDirectoryExists() async throws {
+
+        mockFileManager.fileExistsHandler = { _ in false }
+
+        let logFilePath = try Directories.getLibdigidocLogFile(from: nil, fileManager: mockFileManager)
+
+        #expect(logFilePath != nil)
+        #expect("libdigidocpp.log" == logFilePath?.lastPathComponent)
     }
 }

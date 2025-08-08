@@ -3,15 +3,26 @@ import Testing
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib
+import CommonsLib
+import ConfigLibMocks
+import CommonsLibMocks
 
 @testable import LibdigidocLibSwift
 
 final class DigiDocConfTests {
 
+    private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock
+    private let mockConfigurationLoader: ConfigurationLoaderProtocolMock
     private let configurationProvider: ConfigurationProvider
 
     init() async throws {
+        mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
+        mockConfigurationLoader = ConfigurationLoaderProtocolMock()
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
+
+        try DigiDocConf.observeConfigurationUpdates(configurationRepository: mockConfigurationRepository)
+
+        try await mockConfigurationLoader.initConfiguration(cacheDir: URL(fileURLWithPath: "/mock/path"))
     }
 
     @Test

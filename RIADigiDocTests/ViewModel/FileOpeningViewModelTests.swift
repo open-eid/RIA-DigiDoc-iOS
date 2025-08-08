@@ -9,14 +9,14 @@ import UtilsLibMocks
 
 @MainActor
 struct FileOpeningViewModelTests {
-    private var mockFileOpeningRepository: FileOpeningRepositoryProtocolMock
-    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
-    private var mockFileOpeningService: FileOpeningServiceProtocolMock
-    private var mockFileUtil: FileUtilProtocolMock
-    private var mockFileManager: FileManagerProtocolMock
+    private let mockFileOpeningRepository: FileOpeningRepositoryProtocolMock
+    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
+    private let mockFileOpeningService: FileOpeningServiceProtocolMock
+    private let mockFileUtil: FileUtilProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
     private let mockContainerUtil: ContainerUtilProtocolMock
 
-    private var viewModel: FileOpeningViewModel
+    private let viewModel: FileOpeningViewModel
 
     init() async throws {
         mockFileOpeningRepository = FileOpeningRepositoryProtocolMock()

@@ -8,7 +8,7 @@ import CommonsTestShared
 
 struct CertificateDetailViewModelTests {
 
-    private var viewModel: CertificateDetailViewModel!
+    private let viewModel: CertificateDetailViewModel!
 
     init() async throws {
         viewModel = CertificateDetailViewModel()

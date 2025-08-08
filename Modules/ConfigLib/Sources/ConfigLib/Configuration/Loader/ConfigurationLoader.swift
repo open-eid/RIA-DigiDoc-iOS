@@ -16,22 +16,28 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     private var configurationProperty: ConfigurationProperty
     private let configurationProperties: ConfigurationPropertiesProtocol
     private let configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol
+    private let configurationCache: ConfigurationCacheProtocol
 
     private var fileManager: FileManagerProtocol
+    private var bundle: BundleProtocol
 
     public init(
         centralConfigurationRepository: CentralConfigurationRepositoryProtocol,
         configurationProperty: ConfigurationProperty,
         configurationProperties: ConfigurationPropertiesProtocol,
         configurationSignatureVerifier: ConfigurationSignatureVerifierProtocol,
-        fileManager: FileManagerProtocol
+        configurationCache: ConfigurationCacheProtocol,
+        fileManager: FileManagerProtocol,
+        bundle: BundleProtocol?
     ) {
         self.centralConfigurationRepository = centralConfigurationRepository
         self.configurationProperty = configurationProperty
         self.configurationProperties = configurationProperties
         self.configurationSignatureVerifier = configurationSignatureVerifier
+        self.configurationCache = configurationCache
 
         self.fileManager = fileManager
+        self.bundle = bundle ?? Bundle.module
     }
 
     public func initConfiguration(cacheDir: URL) async throws {
@@ -63,7 +69,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func loadConfigurationProperty() async throws -> ConfigurationProperty {
         let properties = try await configurationProperties
             .getConfigurationProperties(
-                from: URL(fileURLWithPath: Bundle.module.path(
+                from: URL(fileURLWithPath: bundle.path(
                     forResource: Constants.Configuration.DefaultConfigurationPropertiesFileName,
                     ofType: "properties"
                 ) ?? "")
@@ -113,7 +119,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 "Using cached configuration version \(configurationProvider.metaInf.serial)"
             )
 
-            try await ConfigurationCache.cacheConfigurationFiles(
+            try await configurationCache.cacheConfigurationFiles(
                 confData: confFileContents,
                 publicKey: publicKeyContents,
                 signature: signatureContents,
@@ -145,11 +151,11 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             }
         } else {
             ConfigurationLoader.logger.debug("Cached configuration not found. Initializing default configuration")
-            try await loadDefaultConfiguration(bundle: Bundle.module, cacheDir: configDir)
+            try await loadDefaultConfiguration(cacheDir: configDir)
         }
     }
 
-    public func loadDefaultConfiguration(bundle: Bundle = Bundle.main, cacheDir: URL?) async throws {
+    public func loadDefaultConfiguration(cacheDir: URL?) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         guard let confDataURL = bundle.url(
@@ -185,7 +191,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             throw ConfigurationLoaderError.configurationVerificationFailed
         }
 
-        try await ConfigurationCache.cacheConfigurationFiles(
+        try await configurationCache.cacheConfigurationFiles(
             confData: confData,
             publicKey: publicKey,
             signature: signatureText,
@@ -217,10 +223,9 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func loadCentralConfiguration(cacheDir: URL?) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        let cachedSignature = try ConfigurationCache.getCachedFile(
+        let cachedSignature = try await configurationCache.getCachedFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigRsa,
-            configDir: configDir,
-            fileManager: fileManager
+            configDir: configDir
         )
 
         let currentSignature = try Data(contentsOf: cachedSignature)
@@ -259,7 +264,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 cachedSerial: configuration?.metaInf.serial ?? 0,
                 newSerial: centralConfigurationProvider.metaInf.serial
             ) {
-                try await ConfigurationCache.cacheConfigurationFiles(
+                try await configurationCache.cacheConfigurationFiles(
                     confData: centralConfig,
                     publicKey: centralPublicKey,
                     signature: centralSignature,

@@ -29,7 +29,12 @@ public struct TSLUtil {
                 ).path,
                 fileManager: fileManager
             ) {
-                try copyTSL(from: filePath, to: destinationDir.appendingPathComponent(fileName).path)
+                try copyTSL(
+                    from: filePath,
+                    to: destinationDir.appendingPathComponent(fileName).path,
+                    fileManager: fileManager
+                )
+
                 try removeExistingETag(
                     at: destinationDir.appendingPathComponent(
                         fileName
@@ -66,9 +71,12 @@ public struct TSLUtil {
         }
     }
 
-    private static func copyTSL(from sourcePath: String, to destinationPath: String) throws {
-        let data = try Data(contentsOf: URL(fileURLWithPath: sourcePath))
-        try data.write(to: URL(fileURLWithPath: destinationPath))
+    private static func copyTSL(
+        from sourcePath: String,
+        to destinationPath: String,
+        fileManager: FileManagerProtocol
+    ) throws {
+        try fileManager.copyItem(atPath: sourcePath, toPath: destinationPath)
     }
 
     private static func removeExistingETag(

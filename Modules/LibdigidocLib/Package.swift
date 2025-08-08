@@ -59,6 +59,7 @@ let package = Package(
                 "UtilsLib",
                 "CommonsTestShared",
                 .product(name: "UtilsLibMocks", package: "utilslib"),
+                .product(name: "ConfigLibMocks", package: "configlib"),
                 .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")
             ]
