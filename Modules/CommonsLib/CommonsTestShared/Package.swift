@@ -8,7 +8,7 @@ let package = Package(
     platforms: [.iOS(.v15)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(name: "CommonsTestShared", targets: ["CommonsTestShared"]),
+        .library(name: "CommonsTestShared", targets: ["CommonsTestShared"])
     ],
     dependencies: [
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),

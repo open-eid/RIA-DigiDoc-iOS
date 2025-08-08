@@ -17,14 +17,17 @@ struct SigningViewModelTests {
     private let viewModel: SigningViewModel!
     private let mockFileManager: FileManagerProtocolMock!
     private let mockContainerUtil: ContainerUtilProtocolMock!
+    private let mockFileUtil: FileUtilProtocolMock!
 
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
+        mockFileUtil = FileUtilProtocolMock()
 
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
+            fileUtil: mockFileUtil,
             fileManager: mockFileManager
         )
     }
@@ -32,6 +35,7 @@ struct SigningViewModelTests {
     @Test
     func loadContainerData_successWithNewFile() async throws {
         let signedContainer = SignedContainerProtocolMock()
+
         let dataFileWrapper = DataFileWrapper(
             fileId: "1",
             fileName: "container.asice",
@@ -63,42 +67,102 @@ struct SigningViewModelTests {
         signedContainer.getDataFilesHandler = { [dataFileWrapper] }
         signedContainer.getSignaturesHandler = { [signatureWrapper] }
 
-        let containerDataFiles = await signedContainer.getDataFiles()
-        let containerSignatures = await signedContainer.getSignatures()
+        #expect(viewModel.dataFiles.isEmpty)
+        #expect(viewModel.signatures.isEmpty)
 
         await viewModel.loadContainerData(signedContainer: signedContainer)
 
         let dataFiles = viewModel.dataFiles
         let signatures = viewModel.signatures
 
-        #expect(containerDataFiles.count == dataFiles.count)
-        #expect(containerSignatures.count == signatures.count)
+        #expect(dataFiles.count == 1)
+        #expect(dataFiles.first?.fileName == "container.asice")
+
+        #expect(signatures.count == 1)
+        #expect(signatures.first?.signatureId == "S1")
     }
 
-    // Enable when its possible to get configuration data from test website
-    @Test(.disabled())
+    @Test
     func loadContainerData_successWithExistingContainer() async throws {
-        let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
+        let mockSignedContainer = SignedContainerProtocolMock()
 
-        guard let exampleContainer = containerFile else {
-            Issue.record("Unable to get resource file")
-            return
-        }
-
-        let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [exampleContainer]
+        let newDataFileWrapper = DataFileWrapper(
+            fileId: "2",
+            fileName: "newfile.asice",
+            fileSize: 456,
+            mediaType: CommonsLib.Constants.MimeType.Asice
         )
 
-        let containerDataFiles = await signedContainer.getDataFiles()
-        let containerSignatures = await signedContainer.getSignatures()
+        let newSignatureWrapper = SignatureWrapper(
+            signingCert: Data(),
+            timestampCert: Data(),
+            ocspCert: Data(),
+            signatureId: "S2",
+            claimedSigningTime: "1980-01-01T00:00:00Z",
+            signatureMethod: "signature-method",
+            ocspProducedAt: "1980-01-01T00:00:00Z",
+            timeStampTime: "1980-01-01T00:00:00Z",
+            signedBy: "Another User",
+            trustedSigningTime: "1980-01-01T00:00:00Z",
+            roles: ["Role 1", "Role 2"],
+            city: "Test City",
+            state: "Test State",
+            country: "Test Country",
+            zipCode: "Test12345",
+            format: "BES/time-stamp",
+            messageImprint: Data(),
+            diagnosticsInfo: ""
+        )
 
-        await viewModel.loadContainerData(signedContainer: signedContainer)
+        mockSignedContainer.getDataFilesHandler = { [newDataFileWrapper] }
+        mockSignedContainer.getSignaturesHandler = { [newSignatureWrapper] }
+
+        viewModel.dataFiles = [
+            DataFileWrapper(
+                fileId: "1",
+                fileName: "oldfile.asice",
+                fileSize: 100,
+                mediaType: "application/vnd.asice"
+            )
+        ]
+
+        viewModel.signatures = [
+            SignatureWrapper(
+                signingCert: Data(),
+                timestampCert: Data(),
+                ocspCert: Data(),
+                signatureId: "S1",
+                claimedSigningTime: "1970-01-01T00:00:00Z",
+                signatureMethod: "old-method",
+                ocspProducedAt: "1970-01-01T00:00:00Z",
+                timeStampTime: "1970-01-01T00:00:00Z",
+                signedBy: "Old User",
+                trustedSigningTime: "1970-01-01T00:00:00Z",
+                roles: ["Role 1", "Role 2"],
+                city: "Test City",
+                state: "Test State",
+                country: "Test Country",
+                zipCode: "Test12345",
+                format: "Old Format",
+                messageImprint: Data(),
+                diagnosticsInfo: ""
+            )
+        ]
+
+        #expect(viewModel.dataFiles.count == 1)
+        #expect(viewModel.dataFiles.first?.fileName == "oldfile.asice")
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
         let dataFiles = viewModel.dataFiles
         let signatures = viewModel.signatures
 
-        #expect(containerDataFiles.count == dataFiles.count)
-        #expect(containerSignatures.count == signatures.count)
+        // Verify old data was replaced
+        #expect(dataFiles.count == 1)
+        #expect(dataFiles.first?.fileName == "newfile.asice")
+
+        #expect(signatures.count == 1)
+        #expect(signatures.first?.signatureId == "S2")
     }
 
     @Test
@@ -157,8 +221,8 @@ struct SigningViewModelTests {
 
         mockFileManager.copyItemHandler = { src, _ in
             throw NSError(domain: NSCocoaErrorDomain,
-                    code: NSFileNoSuchFileError,
-                    userInfo: [NSLocalizedDescriptionKey: "The file at path \(src) does not exist."]
+                          code: NSFileNoSuchFileError,
+                          userInfo: [NSLocalizedDescriptionKey: "The file at path \(src) does not exist."]
             )
         }
 
@@ -198,34 +262,6 @@ struct SigningViewModelTests {
     }
 
     @Test
-    func checkIfContainerFileExists_returnTrueIfFileExists() async throws {
-        let testDirectory = URL(fileURLWithPath: "/tmp")
-        let testFile = testDirectory.appendingPathComponent("testFile.asice")
-
-        mockFileManager.fileExistsHandler = { _ in true }
-
-        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: testFile)
-        #expect(containerFileExists)
-    }
-
-    @Test
-    func checkIfContainerFileExists_returnFalseIfFileDoesNotExist() async throws {
-        let testDirectory = URL(fileURLWithPath: "/tmp")
-        let nonExistentFile = testDirectory.appendingPathComponent("nonExistent.asice")
-
-        mockFileManager.fileExistsHandler = { _ in false }
-
-        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: nonExistentFile)
-        #expect(!containerFileExists)
-    }
-
-    @Test
-    func checkIfContainerFileExists_returnFalseWithNilInput() async {
-        let containerFileExists = viewModel.checkIfContainerFileExists(fileLocation: nil)
-        #expect(!containerFileExists)
-    }
-
-    @Test
     func removeSavedFilesDirectory_successWhenDirectoryExists() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp")
         let savedFilesDirectory = testDirectory.appendingPathComponent(Constants.Folder.SavedFiles)
@@ -258,10 +294,11 @@ struct SigningViewModelTests {
         let expectedURL = URL(fileURLWithPath: "/tmp/renamed.asice")
 
         let signedContainer = SignedContainerProtocolMock()
-
         signedContainer.renameContainerHandler = { _ in expectedURL }
 
-        viewModel.signedContainer = signedContainer
+        mockSharedContainerViewModel.getSignedContainerHandler = {
+            return signedContainer
+        }
 
         let result = await viewModel.renameContainer(to: "renamed.asice")
 
@@ -280,7 +317,9 @@ struct SigningViewModelTests {
             )
         }
 
-        viewModel.signedContainer = signedContainer
+        mockSharedContainerViewModel.getSignedContainerHandler = {
+            return signedContainer
+        }
 
         let result = await viewModel.renameContainer(to: "no:name")
 
@@ -300,7 +339,9 @@ struct SigningViewModelTests {
             throw DigiDocError.addingFilesToContainerFailed(ErrorDetail(message: "Some other error"))
         }
 
-        viewModel.signedContainer = signedContainer
+        mockSharedContainerViewModel.getSignedContainerHandler = {
+            return signedContainer
+        }
 
         let result = await viewModel.renameContainer(to: "no:name")
 
@@ -315,7 +356,9 @@ struct SigningViewModelTests {
             throw NSError(domain: "OtherError", code: 123)
         }
 
-        viewModel.signedContainer = signedContainer
+        mockSharedContainerViewModel.getSignedContainerHandler = {
+            return signedContainer
+        }
 
         let result = await viewModel.renameContainer(to: "Some name")
 

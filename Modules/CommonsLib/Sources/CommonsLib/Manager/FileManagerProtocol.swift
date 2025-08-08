@@ -114,15 +114,28 @@ public struct FileManagerWrapper: FileManagerProtocol {
         )
     }
 
-    public func createDirectory(at url: URL, withIntermediateDirectories createIntermediates: Bool, attributes: [FileAttributeKey: Any]?) throws {
-        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: createIntermediates, attributes: attributes)
+    public func createDirectory(
+        at url: URL,
+        withIntermediateDirectories createIntermediates: Bool,
+        attributes: [FileAttributeKey: Any]?
+    ) throws {
+        try FileManager.default
+            .createDirectory(at: url, withIntermediateDirectories: createIntermediates, attributes: attributes)
     }
 
-    public func createFile(atPath path: String, contents: Data?, attributes: [FileAttributeKey: any Sendable]?) -> Bool {
+    public func createFile(
+        atPath path: String,
+        contents: Data?,
+        attributes: [FileAttributeKey: any Sendable]?
+    ) -> Bool {
         FileManager.default.createFile(atPath: path, contents: contents, attributes: attributes)
     }
 
-    public func createFile(atPath path: String, contents data: Data?, attributes attr: [FileAttributeKey: Any]?) -> Bool {
+    public func createFile(
+        atPath path: String,
+        contents data: Data?,
+        attributes attr: [FileAttributeKey: Any]?
+    ) -> Bool {
         FileManager.default.createFile(atPath: path, contents: data, attributes: attr)
     }
 
@@ -150,7 +163,11 @@ public struct FileManagerWrapper: FileManagerProtocol {
         try FileManager.default.contentsOfDirectory(atPath: path)
     }
 
-    public func contentsOfDirectory(at url: URL, includingPropertiesForKeys keys: [URLResourceKey]?, options: FileManager.DirectoryEnumerationOptions) throws -> [URL] {
+    public func contentsOfDirectory(
+        at url: URL,
+        includingPropertiesForKeys keys: [URLResourceKey]?,
+        options: FileManager.DirectoryEnumerationOptions
+    ) throws -> [URL] {
         try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: keys, options: options)
     }
 
@@ -158,7 +175,12 @@ public struct FileManagerWrapper: FileManagerProtocol {
         FileManager.default.enumerator(atPath: path)
     }
 
-    public func enumerator(at url: URL, includingPropertiesForKeys keys: [URLResourceKey]?, options mask: FileManager.DirectoryEnumerationOptions, errorHandler handler: ((URL, any Error) -> Bool)?) -> FileManager.DirectoryEnumerator? {
+    public func enumerator(
+        at url: URL,
+        includingPropertiesForKeys keys: [URLResourceKey]?,
+        options mask: FileManager.DirectoryEnumerationOptions,
+        errorHandler handler: ((URL, any Error) -> Bool)?
+    ) -> FileManager.DirectoryEnumerator? {
         FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask, errorHandler: handler)
     }
 
@@ -205,11 +227,19 @@ public struct FileManagerWrapper: FileManagerProtocol {
         }
     }
 
-    public func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL] {
+    public func urls(
+        for directory: FileManager.SearchPathDirectory,
+        in domainMask: FileManager.SearchPathDomainMask
+    ) -> [URL] {
         FileManager.default.urls(for: directory, in: domainMask)
     }
 
-    public func url(for directory: FileManager.SearchPathDirectory, in domain: FileManager.SearchPathDomainMask, appropriateFor url: URL?, create: Bool) throws -> URL {
+    public func url(
+        for directory: FileManager.SearchPathDirectory,
+        in domain: FileManager.SearchPathDomainMask,
+        appropriateFor url: URL?,
+        create: Bool
+    ) throws -> URL {
         try FileManager.default.url(for: directory, in: domain, appropriateFor: url, create: create)
     }
 
@@ -222,7 +252,10 @@ public struct FileManagerWrapper: FileManagerProtocol {
         _ = try FileManager.default.trashItem(at: url, resultingItemURL: &resultItemURL)
     }
 
-    public func trashItem(at url: URL, resultingItemURL outResultingURL: AutoreleasingUnsafeMutablePointer<NSURL?>?) throws {
+    public func trashItem(
+        at url: URL,
+        resultingItemURL outResultingURL: AutoreleasingUnsafeMutablePointer<NSURL?>?
+    ) throws {
         try FileManager.default.trashItem(at: url, resultingItemURL: outResultingURL)
     }
 
@@ -242,7 +275,12 @@ public struct FileManagerWrapper: FileManagerProtocol {
         try FileManager.default.copyItem(atPath: srcPath, toPath: dstPath)
     }
 
-    public func replaceItem(at originalItemURL: URL, withItemAt newItemURL: URL, backupItemName: String?, options: FileManager.ItemReplacementOptions) throws {
+    public func replaceItem(
+        at originalItemURL: URL,
+        withItemAt newItemURL: URL,
+        backupItemName: String?,
+        options: FileManager.ItemReplacementOptions
+    ) throws {
         var resultItemURL: NSURL?
         try FileManager.default.replaceItem(
             at: originalItemURL,
@@ -253,7 +291,13 @@ public struct FileManagerWrapper: FileManagerProtocol {
         )
     }
 
-    public func replaceItem(at originalItemURL: URL, withItemAt newItemURL: URL, backupItemName: String?, options: FileManager.ItemReplacementOptions, resultingItemURL _: AutoreleasingUnsafeMutablePointer<NSURL?>?) throws {
+    public func replaceItem(
+        at originalItemURL: URL,
+        withItemAt newItemURL: URL,
+        backupItemName: String?,
+        options: FileManager.ItemReplacementOptions,
+        resultingItemURL _: AutoreleasingUnsafeMutablePointer<NSURL?>?
+    ) throws {
         var resultItemURL: NSURL?
         try FileManager.default.replaceItem(
             at: originalItemURL,

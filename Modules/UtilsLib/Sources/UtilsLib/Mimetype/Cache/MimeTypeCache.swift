@@ -26,7 +26,6 @@ actor MimeTypeCache: MimeTypeCacheProtocol {
         } else {
             let mimeType = await fileUrl.mimeType(
                 fileUtil: fileUtil,
-                fileManager: fileManager,
                 mimeTypeDecoder: mimetypeDecoder
             )
             setMimeType(md5: md5, mimeType: mimeType)

@@ -110,6 +110,12 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
                     format: NSLocalizedString("Failed to open file %@", comment: ""),
                     errorDetail.userInfo["fileName"] ?? "")
             )
+        case .containerDataFileSavingFailed(let errorDetail):
+            return ToastMessage(
+                message: String(
+                    format: NSLocalizedString("Failed to save file %@", comment: ""),
+                    errorDetail.userInfo["fileName"] ?? "")
+            )
         case .alreadyInitialized:
             return ToastMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
         default:

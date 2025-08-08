@@ -12,7 +12,7 @@ let package = Package(
             name: "ConfigLib",
             targets: ["ConfigLib"]
         ),
-        .library(name: "ConfigLibMocks", targets: ["ConfigLibMocks"]),
+        .library(name: "ConfigLibMocks", targets: ["ConfigLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),

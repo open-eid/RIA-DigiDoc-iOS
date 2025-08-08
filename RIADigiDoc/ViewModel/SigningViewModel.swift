@@ -16,20 +16,23 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var containerURL: URL?
     @Published var errorMessage: String?
 
-    let sharedContainerViewModel: SharedContainerViewModelProtocol
-
-    var signedContainer: SignedContainerProtocol = SignedContainer(
-        fileManager: Container.shared.fileManager(),
-        containerUtil: Container.shared.containerUtil()
-    )
-
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
+
+    private var loadedSignedContainer: SignedContainerProtocol?
+
+    var signedContainer: SignedContainerProtocol? {
+        loadedSignedContainer ?? sharedContainerViewModel.getSignedContainer()
+    }
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileUtil = fileUtil
         self.fileManager = fileManager
     }
 
@@ -40,7 +43,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             return
         }
 
-        self.signedContainer = signedContainer
+        self.loadedSignedContainer = signedContainer
 
         self.containerName = await signedContainer.getContainerName()
         self.dataFiles = await signedContainer.getDataFiles()
@@ -96,11 +99,6 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         }
     }
 
-    func checkIfContainerFileExists(fileLocation: URL?) -> Bool {
-        guard let file = fileLocation else { return false }
-        return fileManager.fileExists(atPath: file.path)
-    }
-
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
         do {
             let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
@@ -117,7 +115,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @discardableResult
     public func renameContainer(to newName: String) async -> URL? {
         do {
-            return try await signedContainer.renameContainer(to: newName)
+            return try await signedContainer?.renameContainer(to: newName)
         } catch {
             SigningViewModel.logger.error("Unable to rename container: \(error)")
             if let digiDocError = error as? DigiDocError {
@@ -135,6 +133,26 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 errorMessage = "General error"
             }
             return nil
+        }
+    }
+
+    func getDataFileURL(_ dataFile: DataFileWrapper) async -> Result<URL, Error> {
+        do {
+            let dataFileURL = try await signedContainer?.getDataFile(dataFile: dataFile)
+
+            guard fileUtil.fileExists(fileLocation: dataFileURL), let fileURL = dataFileURL else {
+                throw DigiDocError.containerDataFileSavingFailed(
+                    ErrorDetail(
+                        message: "Unable to save datafile",
+                        code: 0,
+                        userInfo: ["fileName": dataFileURL?.lastPathComponent ?? ""]
+                    )
+                )
+            }
+
+            return .success(fileURL)
+        } catch {
+            return .failure(error)
         }
     }
 }

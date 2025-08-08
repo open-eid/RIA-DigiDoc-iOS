@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addDataFile:(NSString *)url mimetype:(NSString *)mimetype completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 - (void)save:(NSString *)url completion:(void (^)(NSError * _Nullable error))completion;
+- (void)saveDataFile:(NSString *)fileId fileLocation:(NSURL *)fileLocation completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
 
 @end
 

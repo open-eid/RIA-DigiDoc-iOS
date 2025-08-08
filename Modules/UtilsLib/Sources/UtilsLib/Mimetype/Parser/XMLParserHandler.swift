@@ -8,7 +8,13 @@ class XMLParserHandler: NSObject, XMLParserDelegate {
         self.continuation = continuation
     }
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI _: String?, qualifiedName _: String?, attributes attributeDict: [String: String]) {
+    func parser(
+        _ parser: XMLParser,
+        didStartElement elementName: String,
+        namespaceURI _: String?,
+        qualifiedName _: String?,
+        attributes attributeDict: [String: String]
+    ) {
         if elementName == "SignedDoc", attributeDict["format"] == "DIGIDOC-XML" {
             foundElement = true
             continuation?.resume(returning: true)

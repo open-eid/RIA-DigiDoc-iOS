@@ -42,6 +42,11 @@ public struct FileUtil: FileUtilProtocol {
         return nil
     }
 
+    public func fileExists(fileLocation: URL?) -> Bool {
+        guard let file = fileLocation else { return false }
+        return fileManager.fileExists(atPath: file.path)
+    }
+
     // Check file path so its valid and is not modified by someone else
     public func getValidFileInApp(currentURL: URL) throws -> URL? {
         let directories: [FileManager.SearchPathDirectory] = [

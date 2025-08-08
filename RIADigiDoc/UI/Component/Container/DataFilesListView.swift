@@ -8,9 +8,12 @@ struct DataFilesListView: View {
     let dataFiles: [DataFileWrapper]
     let showRemoveFileButton: Bool
 
+    let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
+
     var body: some View {
         List(dataFiles, id: \.self) { dataFile in
             DataFilesView(
+                onSaveDataFileButtonClick: onSaveDataFileButtonClick,
                 dataFile: dataFile,
                 showRemoveFileButton: showRemoveFileButton
             )
@@ -37,6 +40,7 @@ struct DataFilesListView: View {
                 mediaType: "text/plain"
             )
         ],
-        showRemoveFileButton: true
+        showRemoveFileButton: true,
+        onSaveDataFileButtonClick: { _ in }
     )
 }

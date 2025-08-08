@@ -8,6 +8,7 @@ extension Container {
     public var signedContainer: Factory<SignedContainerProtocol> {
         self {
             SignedContainer(
+                container: self.containerWrapper(),
                 fileManager: self.fileManager(),
                 containerUtil: self.containerUtil()
             )
@@ -15,6 +16,6 @@ extension Container {
     }
 
     public var containerWrapper: Factory<ContainerWrapperProtocol> {
-        self { ContainerWrapper() }
+        self { ContainerWrapper(fileManager: self.fileManager()) }
     }
 }

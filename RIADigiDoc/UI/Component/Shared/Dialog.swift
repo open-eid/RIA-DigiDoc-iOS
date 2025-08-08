@@ -5,7 +5,7 @@ struct Dialog: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    var icon: Image?
+    var icon: String?
     var title: String
     var placeholder: String
     @Binding var text: String
@@ -15,7 +15,7 @@ struct Dialog: View {
     var body: some View {
         VStack(spacing: Dimensions.Padding.MPadding) {
             if let icon = icon {
-                icon
+                Image(icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
@@ -42,14 +42,15 @@ struct Dialog: View {
                         if !text.isEmpty {
                             Button(action: {
                                 text = ""
-                            }) {
+                            }, label: {
                                 Image("ic_m3_close_48pt_wght400")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                     .foregroundStyle(theme.onSurface)
                                     .padding(.trailing, Dimensions.Padding.XSPadding)
-                            }
+                                    .accessibilityLabel(languageSettings.localized("Close"))
+                            })
                         }
                     }
                 )

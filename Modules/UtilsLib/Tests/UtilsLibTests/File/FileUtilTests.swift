@@ -32,7 +32,6 @@ struct FileUtilTests {
 
         let fileNameToFind = "mimetype"
 
-
         let fileUtil = FileUtil(fileManager: Container.shared.fileManager())
         let mimeType = try await fileUtil.getMimeTypeFromZipFile(
             from: zipFileURL,
@@ -136,5 +135,33 @@ struct FileUtilTests {
         )
 
         #expect(!result)
+    }
+
+    @Test
+    func fileExists_returnTrueIfFileExists() async throws {
+        let testDirectory = URL(fileURLWithPath: "/tmp")
+        let testFile = testDirectory.appendingPathComponent("testFile.asice")
+
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        let containerFileExists = fileUtil.fileExists(fileLocation: testFile)
+        #expect(containerFileExists)
+    }
+
+    @Test
+    func fileExists_returnFalseIfFileDoesNotExist() async throws {
+        let testDirectory = URL(fileURLWithPath: "/tmp")
+        let nonExistentFile = testDirectory.appendingPathComponent("nonExistent.asice")
+
+        mockFileManager.fileExistsHandler = { _ in false }
+
+        let containerFileExists = fileUtil.fileExists(fileLocation: nonExistentFile)
+        #expect(!containerFileExists)
+    }
+
+    @Test
+    func fileExists_returnFalseWithNilInput() async {
+        let containerFileExists = fileUtil.fileExists(fileLocation: nil)
+        #expect(!containerFileExists)
     }
 }

@@ -7,20 +7,28 @@ import UtilsLib
 public actor ContainerWrapper: ContainerWrapperProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.LibdigidocLib", category: "ContainerWrapper")
 
+    private var containerURL: URL
     private var dataFiles: [DataFileWrapper]
     private var signatures: [SignatureWrapper]
     private var mediatype: String
+
+    private let fileManager: FileManagerProtocol
 
     @MainActor
     private let digiDocContainerWrapper: DigiDocContainerWrapper = DigiDocContainerWrapper()
 
     public init(
+        containerURL: URL = URL(fileURLWithPath: ""),
         dataFiles: [DataFileWrapper] = [],
         signatures: [SignatureWrapper] = [],
-        mediatype: String? = nil) {
+        mediatype: String? = nil,
+        fileManager: FileManagerProtocol
+    ) {
+        self.containerURL = containerURL
         self.dataFiles = dataFiles
         self.signatures = signatures
         self.mediatype = mediatype ?? CommonsLib.Constants.MimeType.Default
+        self.fileManager = fileManager
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
@@ -33,6 +41,61 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     public func getMimetype() async -> String {
         return await getContainer()?.mediatype ?? CommonsLib.Constants.MimeType.Container
+    }
+
+    @MainActor
+    public func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
+        let savedFilesDirectory = try Directories.getCacheDirectory(
+            subfolder: CommonsLib.Constants.Folder.SavedFiles,
+            fileManager: fileManager
+        )
+
+        var sanitizedFilename = dataFile.fileName.sanitized()
+        if sanitizedFilename.isEmpty {
+            sanitizedFilename = CommonsLib.Constants.Container.DefaultName
+        }
+
+        let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(sanitizedFilename)
+
+        let lock = NSLock()
+        return try await withCheckedThrowingContinuation { continuation in
+            ContainerWrapper.logger
+                .debug("Saving datafile '\(sanitizedFilename)' to temporary location \(tempSavedFileLocation)")
+            digiDocContainerWrapper.saveDataFile(dataFile.fileId,
+                                                 fileLocation: tempSavedFileLocation) { isSaved, error in
+                lock.lock()
+                defer { lock.unlock() }
+                if error != nil {
+                    if let error = error as NSError? {
+                        continuation.resume(
+                            throwing: DigiDocError.containerDataFileSavingFailed(
+                                ErrorDetail(
+                                    nsError: error,
+                                    extraInfo: ["fileName": tempSavedFileLocation.lastPathComponent]
+                                )
+                            )
+                        )
+                    }
+                    return
+                }
+
+                if isSaved {
+                    ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
+                    continuation.resume(returning: tempSavedFileLocation)
+                } else {
+                    ContainerWrapper.logger
+                        .error(
+                            "Failed to save file. \(error?.localizedDescription ?? "No error to display")"
+                        )
+                    continuation.resume(throwing: DigiDocError.containerDataFileSavingFailed(
+                        ErrorDetail(
+                            message: "Unable to save datafile",
+                            code: 0,
+                            userInfo: ["fileName": tempSavedFileLocation.lastPathComponent])
+                    ))
+                }
+            }
+        }
     }
 
     @MainActor
@@ -54,6 +117,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                     )
                 } else {
                     Task {
+                        await self.setContainerURL(file)
                         await self.updateContainer(digiDocContainer: container)
                         continuation.resume(returning: self)
                     }
@@ -80,6 +144,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                     )
                 } else {
                     Task {
+                        await self.setContainerURL(containerFile)
                         await self.updateContainer(digiDocContainer: container)
                         continuation.resume(returning: self)
                     }
@@ -180,6 +245,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         mediatype = digiDocContainer.mediatype
 
         return self
+    }
+
+    private func setContainerURL(_ url: URL) {
+        self.containerURL = url
     }
 
     private func getDataFiles(from container: DigiDocContainer) -> [DataFileWrapper] {

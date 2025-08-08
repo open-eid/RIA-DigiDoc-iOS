@@ -9,6 +9,8 @@ public protocol FileUtilProtocol: Sendable {
         fileNameToFind: String,
     ) async throws -> String?
 
+    func fileExists(fileLocation: URL?) -> Bool
+
     func getValidFileInApp(currentURL: URL) throws -> URL?
 
     func isFileFromAppGroup(url: URL, appGroupURL: URL?) throws -> Bool

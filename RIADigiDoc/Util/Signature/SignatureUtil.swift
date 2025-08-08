@@ -4,10 +4,6 @@ import LibdigidocLibSwift
 struct SignatureUtil: SignatureUtilProtocol {
     var languageSettings: LanguageSettingsProtocol
 
-    init(languageSettings: LanguageSettingsProtocol) {
-        self.languageSettings = languageSettings
-    }
-
     func getSignatureStatusText(status: SignatureStatus) -> String {
         switch status {
             case .valid:

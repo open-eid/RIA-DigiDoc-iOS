@@ -5,8 +5,6 @@ import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
-// swiftlint:disable:next blanket_disable_command
-// swiftlint:disable type_body_length file_length
 struct CertificateDetailView: View {
     @AppTheme private var theme
     @AppTypography private var typography
@@ -351,7 +349,6 @@ struct CertificateDetailView: View {
                             )
                         )
                     }
-
 
                     Text(verbatim: "Extensions")
                         .foregroundStyle(theme.onSurface)

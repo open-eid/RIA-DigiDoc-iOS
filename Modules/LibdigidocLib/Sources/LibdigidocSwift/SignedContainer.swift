@@ -19,7 +19,7 @@ public actor SignedContainer: SignedContainerProtocol {
     public init(
         containerFile: URL? = nil,
         isExistingContainer: Bool = false,
-        container: ContainerWrapperProtocol = ContainerWrapper(),
+        container: ContainerWrapperProtocol = Container.shared.containerWrapper(),
         fileManager: FileManagerProtocol,
         containerUtil: ContainerUtilProtocol
     ) {
@@ -102,6 +102,10 @@ public actor SignedContainer: SignedContainerProtocol {
 
         return uniqueFileURL
     }
+
+    public func getDataFile(dataFile: DataFileWrapper) async throws -> URL {
+        return try await container.saveDataFile(dataFile: dataFile)
+    }
 }
 
 extension SignedContainer {
@@ -160,7 +164,9 @@ extension SignedContainer {
     }
 
     private static func open(file: URL) async throws -> SignedContainer {
-        let container = try await ContainerWrapper().open(containerFile: file)
+        let container = try await ContainerWrapper(
+            fileManager: Container.shared.fileManager()
+        ).open(containerFile: file)
         return SignedContainer(
             containerFile: file,
             isExistingContainer: true,
@@ -174,7 +180,9 @@ extension SignedContainer {
         containerFile: URL,
         dataFiles: [URL]
     ) async throws -> SignedContainer {
-        let container = try await ContainerWrapper().create(file: containerFile)
+        let container = try await ContainerWrapper(
+            fileManager: Container.shared.fileManager()
+        ).create(file: containerFile)
 
         try await container.addDataFiles(dataFiles: dataFiles.compactMap { $0 })
 

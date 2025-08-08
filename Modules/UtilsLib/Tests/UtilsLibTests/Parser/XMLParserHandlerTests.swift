@@ -5,8 +5,6 @@ import UtilsLibMocks
 
 @testable import UtilsLib
 
-import Foundation
-
 struct XMLParserHandlerTests {
 
     @Test

@@ -181,7 +181,7 @@ final class SignedContainerTests {
             return
         } catch let error as DigiDocError {
             switch error {
-            case .containerRenamingFailed(_):
+            case .containerRenamingFailed:
                 #expect(true)
             default:
                 Issue.record("Expected containerRenamingFailed error")
@@ -281,7 +281,7 @@ final class SignedContainerTests {
             return
         } catch let error as DigiDocError {
             switch error {
-            case .containerSavingFailed(_):
+            case .containerSavingFailed:
                 #expect(true)
             default:
                 Issue.record("Expected containerSavingFailed error")
