@@ -4,8 +4,8 @@ import OSLog
 import LibdigidocLibSwift
 
 @MainActor
-class MainSignatureViewModel: MainSignatureViewModelProtocol, ObservableObject {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MainSignatureViewModel")
+class HomeViewModel: HomeViewModelProtocol, ObservableObject {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
 
     @Published var isImporting = false
     @Published var signedContainer: SignedContainerProtocol = SignedContainer(
@@ -23,7 +23,7 @@ class MainSignatureViewModel: MainSignatureViewModelProtocol, ObservableObject {
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
         if !isImportingValue && !isFileOpeningLoading {
-            MainSignatureViewModel.logger.info("User cancelled the file chooser")
+            HomeViewModel.logger.info("User cancelled the file chooser")
             return true
         }
 

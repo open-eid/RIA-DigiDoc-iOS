@@ -214,6 +214,24 @@
         }
       }
     },
+    "DigiDoc" : {
+      "comment" : "DigiDoc title on homesview",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        }
+      }
+    },
     "Country title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -528,6 +546,168 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Logo"
+          }
+        }
+      }
+    },
+    "Main home crypto description" : {
+      "comment" : "Main home crypto description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a file for encryption or decryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteerimiseks või dekrüpteerimiseks lisa fail"
+          }
+        }
+      }
+    },
+    "Main home crypto title" : {
+      "comment" : "Main home crypto title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crypto"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpto"
+          }
+        }
+      }
+    },
+    "Main home my eid description" : {
+      "comment" : "Main home my eid description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View or edit your eID details"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaata või muuda oma eID andmeid"
+          }
+        }
+      }
+    },
+    "Main home my eid title" : {
+      "comment" : "Main home my eid title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My eID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minu eID"
+          }
+        }
+      }
+    },
+    "Main home open document description" : {
+      "comment" : "Main home open document description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find the file or document you need"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leia vajalik fail või dokument"
+          }
+        }
+      }
+    },
+    "Main home open document title" : {
+      "comment" : "Main home open document title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failid"
+          }
+        }
+      }
+    },
+    "Main home signature description" : {
+      "comment" : "Main home signature description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add file for signature or verification"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamiseks või kontrollimiseks lisa fail"
+          }
+        }
+      }
+    },
+    "Main home signature title" : {
+      "comment" : "Main home signature title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri"
+          }
+        }
+      }
+    },
+    "Main home version %@" : {
+      "comment" : "Main home version",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "version %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "versioon %@"
           }
         }
       }

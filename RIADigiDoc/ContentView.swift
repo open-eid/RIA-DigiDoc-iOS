@@ -24,40 +24,33 @@ struct ContentView: View {
             leftIcon: "ic_m3_menu_48pt_wght400",
             leftIconAccessibility: "Menu",
             content: {
-            ScrollView {
-                VStack {
-                    Image(systemName: "globe")
-                        .imageScale(.large)
-                        .foregroundStyle(.tint)
-                        .accessibilityLabel(Text(verbatim: "Globe"))
-                    Text(verbatim: "Hello, world!")
-                        .foregroundStyle(theme.onBackground)
-                        .font(typography.bodyLarge)
+                VStack() {
+                    HomeView(externalFiles: $openedUrls)
+                
+                    Spacer()
                 }
-                .padding()
-
-                MainSignatureView(externalFiles: $openedUrls)
-            }
-            .onOpenURL { url in
-                openedUrls = [url]
-            }
-            .onAppear {
-                if scenePhase == .active {
-                    let sharedFiles = viewModel.getSharedFiles()
-                    if !sharedFiles.isEmpty {
-                        openedUrls = sharedFiles
+                .background(theme.surface)
+                .onOpenURL { url in
+                    openedUrls = [url]
+                }
+                .onAppear {
+                    if scenePhase == .active {
+                        let sharedFiles = viewModel.getSharedFiles()
+                        if !sharedFiles.isEmpty {
+                            openedUrls = sharedFiles
+                        }
+                    }
+                }
+                .onChange(of: scenePhase) { newPhase in
+                    if newPhase == .active {
+                        let sharedFiles = viewModel.getSharedFiles()
+                        if !sharedFiles.isEmpty {
+                            openedUrls = sharedFiles
+                        }
                     }
                 }
             }
-            .onChange(of: scenePhase) { newPhase in
-                if newPhase == .active {
-                    let sharedFiles = viewModel.getSharedFiles()
-                    if !sharedFiles.isEmpty {
-                        openedUrls = sharedFiles
-                    }
-                }
-            }
-        })
+        )
     }
 }
 
