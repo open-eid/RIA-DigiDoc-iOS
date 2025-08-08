@@ -58,6 +58,7 @@ extension Container {
         self {
             @MainActor in SigningViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileUtil: self.fileUtil(),
                 fileManager: self.fileManager()
             )
         }

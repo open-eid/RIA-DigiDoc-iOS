@@ -25,7 +25,7 @@ struct ExpandableButton: View {
                 withAnimation {
                     isExpanded.toggle()
                 }
-            }) {
+            }, label: {
                 HStack(spacing: Dimensions.Padding.XXSPadding) {
                     Image(isExpanded ? "ic_m3_arrow_down_48pt_wght400" : "ic_m3_keyboard_arrow_right_48pt_wght400")
                         .resizable()
@@ -43,7 +43,7 @@ struct ExpandableButton: View {
 
                     Spacer()
                 }
-            }
+            })
 
             if isExpanded {
                 Text(verbatim: detailText)

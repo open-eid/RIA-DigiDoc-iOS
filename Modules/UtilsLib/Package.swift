@@ -12,7 +12,7 @@ let package = Package(
             name: "UtilsLib",
             targets: ["UtilsLib"]
         ),
-        .library(name: "UtilsLibMocks", targets: ["UtilsLibMocks"]),
+        .library(name: "UtilsLibMocks", targets: ["UtilsLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),

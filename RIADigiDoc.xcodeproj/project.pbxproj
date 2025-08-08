@@ -129,6 +129,7 @@
 				Util/Signature/SignatureUtilProtocol.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/ContentViewModel.swift,
+				ViewModel/DataFilesViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/MainSignatureViewModel.swift,
 				ViewModel/Protocols/CertificateDetailViewModelProtocol.swift,

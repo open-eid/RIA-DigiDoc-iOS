@@ -16,6 +16,24 @@ class DigiDocContainerWrapperImpl {
 public:
     DigiDocContainerWrapperImpl() {};
 
+    BOOL saveDataFile(NSString *fileId, NSURL *fileLocation) {
+        try {
+            for (const digidoc::DataFile *dataFile : container->dataFiles()) {
+                NSString *containerFileId = [NSString stringWithUTF8String:dataFile->id().c_str()];
+                if ([fileId isEqualToString:containerFileId]) {
+                    dataFile->saveAs(fileLocation.path.UTF8String);
+                    return true;
+                }
+            }
+            return false;
+        } catch(const digidoc::Exception &e) {
+            std::vector<digidoc::Exception> causes = e.causes();
+            @throw [[DigiDocExceptionWrapper alloc] init:
+                        [[DigiDocException alloc] init:[NSString stringWithUTF8String:e.msg().c_str()] code:static_cast<NSInteger>(e.code()) causes:[ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]]
+            ];
+        }
+    }
+
     NSArray<DigiDocDataFile *>* getDataFiles() {
         NSMutableArray<DigiDocDataFile *> *datafiles = [[NSMutableArray alloc] init];
         for (const digidoc::DataFile *dataFile : container->dataFiles()) {
@@ -258,6 +276,24 @@ private:
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) {
                 completion(digidocException);
+            }
+        });
+    });
+}
+
+- (void)saveDataFile:(nonnull NSString *)fileId fileLocation:(NSURL *)fileLocation completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        BOOL isSaved = false;
+        NSError *digidocException = nil;
+        @try {
+            isSaved = _impl->saveDataFile(fileId, fileLocation);
+        } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
+            digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{NSLocalizedDescriptionKey: exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) {
+                completion(isSaved, digidocException);
             }
         });
     });

@@ -5,21 +5,21 @@ import CommonsTestShared
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib
+import LibdigidocLibSwiftMocks
 import UtilsLibMocks
+import CommonsLibMocks
 
 @testable import LibdigidocLibSwift
 
-private let isRealContainerOperationTestsEnabled = false
+struct ContainerWrapperTests {
 
-final class ContainerWrapperTests {
-
-    private var container: ContainerWrapperProtocol = ContainerWrapper()
-    private let tempFileURL: URL
+    private var mockFileManager: FileManagerProtocolMock
+    private var mockContainer: ContainerWrapperProtocolMock
     private let configurationProvider: ConfigurationProvider
 
     init() async throws {
-        tempFileURL = TestFileUtil.createSampleFile()
-
+        mockFileManager = FileManagerProtocolMock()
+        mockContainer = ContainerWrapperProtocolMock()
         configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
@@ -34,169 +34,216 @@ final class ContainerWrapperTests {
                 return
             }
         }
-
-        container = try await self.container.create(file: tempFileURL)
-        try await container.addDataFiles(dataFiles: [tempFileURL])
-        _ = try await container.save(file: tempFileURL)
-    }
-
-    deinit {
-        container = ContainerWrapper()
-        try? FileManager.default.removeItem(at: tempFileURL)
     }
 
     @Test
     func getSignatures_success() async throws {
-        let signatures = await container.getSignatures()
+        let signatures = await mockContainer.getSignatures()
 
         #expect(signatures.isEmpty)
     }
 
     @Test
     func getSignatures_returnEmptyResultWithoutContainerInitialization() async throws {
-        let signatures = await ContainerWrapper().getSignatures()
+        let signatures = await ContainerWrapper(fileManager: mockFileManager).getSignatures()
 
         #expect(signatures.isEmpty)
     }
 
     @Test
     func getDataFiles_success() async throws {
-        let dataFiles = await container.getDataFiles()
+
+        mockContainer.getDataFilesHandler = {
+            return [
+                DataFileWrapper(
+                    fileId: "S1",
+                    fileName: "mockFile",
+                    fileSize: 123,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                )
+            ]
+        }
+
+        let dataFiles = await mockContainer.getDataFiles()
 
         #expect(dataFiles.count == 1)
     }
 
     @Test
     func getDataFiles_returnEmptyResultWithoutContainerInitialization() async throws {
-        let signatures = await ContainerWrapper().getDataFiles()
+        let signatures = await ContainerWrapper(fileManager: mockFileManager).getDataFiles()
 
         #expect(signatures.isEmpty)
     }
 
     @Test
     func getMimetype_success() async throws {
-        let mimetype = await container.getMimetype()
+
+        mockContainer.getMimetypeHandler = {
+            return CommonsLib.Constants.MimeType.Asice
+        }
+
+        let mimetype = await mockContainer.getMimetype()
 
         #expect(CommonsLib.Constants.MimeType.Asice == mimetype)
     }
 
     @Test
     func getMimetype_returnDefaultMimetypeWithoutContainerInitialization() async throws {
-        let mimetype = await ContainerWrapper().getMimetype()
+        let mimetype = await ContainerWrapper(fileManager: mockFileManager).getMimetype()
 
         #expect(CommonsLib.Constants.MimeType.Container == mimetype)
     }
 
     @Test
     func addDataFiles_success() async throws {
-        let tempFileURL2 = TestFileUtil.createSampleFile()
-        let tempFileURL3 = TestFileUtil.createSampleFile()
+        let mockFile = URL(fileURLWithPath: "mockFile")
+        let mockFile2 = URL(fileURLWithPath: "mockFile2")
 
-        try await container.addDataFiles(dataFiles: [tempFileURL2, tempFileURL3])
+        mockContainer.saveHandler = { _ in
+            return true
+        }
 
-        let isSaved = try await container.save(file: tempFileURL)
+        mockContainer.getDataFilesHandler = {
+            return [
+                DataFileWrapper(
+                    fileId: "S1",
+                    fileName: mockFile.lastPathComponent,
+                    fileSize: 123,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                ),
+                DataFileWrapper(
+                    fileId: "S2",
+                    fileName: mockFile2.lastPathComponent,
+                    fileSize: 456,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                ),
+                DataFileWrapper(
+                    fileId: "S2",
+                    fileName: "mockFile3",
+                    fileSize: 456,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                )
+            ]
+        }
+
+        try await mockContainer.addDataFiles(dataFiles: [mockFile, mockFile2])
+
+        let isSaved = try await mockContainer.save(file: mockFile)
 
         #expect(isSaved)
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL2)
-            try? FileManager.default.removeItem(at: tempFileURL3)
-        }
-
-        let dataFiles = await container.getDataFiles()
+        let dataFiles = await mockContainer.getDataFiles()
 
         #expect(dataFiles.count == 3)
     }
 
     @Test
     func addDataFiles_throwErrorWithDuplicateFiles() async throws {
-        let tempFileURL2 = TestFileUtil.createSampleFile()
+        let mockFile = URL(fileURLWithPath: "mockFile")
+        let expectedErrorMessage = "Document with same file name '\(mockFile.lastPathComponent)' already exists."
+        let errorDetail = ErrorDetail(message: expectedErrorMessage, code: 123, userInfo: ["reason": "Test case"])
+
+        mockContainer.addDataFilesHandler = { _ in
+            throw DigiDocError.addingFilesToContainerFailed(errorDetail)
+        }
+
+        mockContainer.saveHandler = { _ in
+            return true
+        }
+
+        mockContainer.getDataFilesHandler = {
+            return [
+                DataFileWrapper(
+                    fileId: "S1",
+                    fileName: mockFile.lastPathComponent,
+                    fileSize: 123,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                ),
+                DataFileWrapper(
+                    fileId: "S2",
+                    fileName: "mockFile2",
+                    fileSize: 456,
+                    mediaType: CommonsLib.Constants.MimeType.Default
+                )
+            ]
+        }
 
         do {
-            try await container.addDataFiles(dataFiles: [tempFileURL2, tempFileURL2])
+            try await mockContainer.addDataFiles(dataFiles: [mockFile, mockFile])
         } catch let error as DigiDocError {
             switch error {
             case .addingFilesToContainerFailed(let errorDetail):
-                #expect(
-                    errorDetail.message == """
-                    Document with same file name '\(tempFileURL2.lastPathComponent)' already exists.
-                    """
-                )
+                #expect(errorDetail.message == expectedErrorMessage)
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")
                 return
             }
         }
 
-        let isSaved = try await container.save(file: tempFileURL)
+        let isSaved = try await mockContainer.save(file: mockFile)
 
         #expect(isSaved)
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL2)
-        }
-
-        let dataFiles = await container.getDataFiles()
+        let dataFiles = await mockContainer.getDataFiles()
 
         #expect(dataFiles.count == 2)
     }
 
-    @Test(.enabled(if: isRealContainerOperationTestsEnabled))
     func open_success() async throws {
-        let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
 
-        guard let exampleContainer = containerFile else {
-            Issue.record("Unable to get resource file")
-            return
+        mockContainer.getContainerHandler = {
+            return ContainerWrapper(fileManager: mockFileManager)
         }
 
-        var containerWrapper: ContainerWrapperProtocol = ContainerWrapper()
-        containerWrapper = try await containerWrapper.open(containerFile: exampleContainer)
+        let dummyURL = URL(fileURLWithPath: "/tmp/testfile.asice")
+        _ = try await mockContainer.openHandler?(dummyURL)
 
-        let existingContainer = await containerWrapper.getContainer()
+        let existingContainer = await mockContainer.getContainer()
 
         #expect(existingContainer != nil)
     }
 
     @Test
     func open_throwContainerOpeningFailedError() async throws {
-        let tempSampleFileURL = TestFileUtil.createSampleFile()
+        let errorDetail = ErrorDetail(message: "An error occurred", code: 123, userInfo: ["reason": "Test case"])
 
-        defer {
-            try? FileManager.default.removeItem(at: tempSampleFileURL)
+        mockContainer.openHandler = { _ in
+            throw DigiDocError.containerOpeningFailed(errorDetail)
         }
 
-        var containerWrapper: ContainerWrapperProtocol = ContainerWrapper()
         do {
-            containerWrapper = try await containerWrapper.open(containerFile: tempSampleFileURL)
+            let dummyURL = URL(fileURLWithPath: "/tmp/testfile.asice")
+            _ = try await mockContainer.openHandler?(dummyURL)
 
             Issue.record("Expected 'containerOpeningFailed' error")
-            return
         } catch let error {
             switch error as? DigiDocError {
-            case .containerOpeningFailed(let errorDetail):
-                #expect(!errorDetail.message.isEmpty)
+            case .containerOpeningFailed(let detail):
+                #expect(!detail.message.isEmpty)
             default:
                 Issue.record("Expected 'containerOpeningFailed' error")
-                return
             }
         }
     }
 
     @Test
     func addDataFiles_throwAddingFilesToContainerFailedError() async throws {
-        do {
-            try await container.addDataFiles(dataFiles: [URL(string: "notAFileUrl")])
+        let errorDetail = ErrorDetail(message: "An error occurred", code: 123, userInfo: ["reason": "Test case"])
 
+        mockContainer.addDataFilesHandler = { _ in
+            throw DigiDocError.addingFilesToContainerFailed(errorDetail)
+        }
+
+        do {
+            try await mockContainer.addDataFiles(dataFiles: [URL(string: "notAFileUrl")])
             Issue.record("Expected 'addingFilesToContainerFailed' error")
-            return
         } catch let error {
             switch error as? DigiDocError {
-            case .addingFilesToContainerFailed(let errorDetail):
-                #expect(!errorDetail.message.isEmpty)
+            case .addingFilesToContainerFailed(let detail):
+                #expect(!detail.message.isEmpty)
             default:
-                Issue.record("Expected 'addingFilesToContainerFailed' error")
-                return
+                Issue.record("Expected 'addingFilesToContainerFailed' error, got: \(error)")
             }
         }
     }

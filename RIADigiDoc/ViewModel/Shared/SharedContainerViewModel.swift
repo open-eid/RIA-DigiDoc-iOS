@@ -2,15 +2,15 @@ import Foundation
 import LibdigidocLibSwift
 
 class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObject {
-    private var signedContainer: SignedContainer?
+    private var signedContainer: SignedContainerProtocol?
     private var fileOpeningResult: Result<[URL], Error>?
     private var addedFilesCount: Int = 0
 
-    func setSignedContainer(signedContainer: SignedContainer?) {
+    func setSignedContainer(signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
     }
 
-    func getSignedContainer() -> SignedContainer? {
+    func getSignedContainer() -> SignedContainerProtocol? {
         return signedContainer
     }
 

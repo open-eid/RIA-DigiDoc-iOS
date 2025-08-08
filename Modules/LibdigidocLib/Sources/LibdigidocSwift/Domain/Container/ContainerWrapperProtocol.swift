@@ -10,4 +10,5 @@ public protocol ContainerWrapperProtocol: Sendable {
     func addDataFiles(dataFiles: [URL?]) async throws
     func save(file: URL) async throws -> Bool
     func getContainer() async -> ContainerWrapper?
+    func saveDataFile(dataFile: DataFileWrapper) async throws -> URL
 }

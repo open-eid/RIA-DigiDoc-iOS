@@ -9,6 +9,8 @@ struct DataFilesView: View {
     @State private var showBottomSheetFromButton = false
     @State private var showBottomSheetFromTap = false
 
+    let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
+
     private var bottomSheetActions: [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -23,9 +25,7 @@ struct DataFilesView: View {
                 icon: "ic_m3_download_48pt_wght400",
                 title: languageSettings.localized("Save file"),
                 accessibilityLabel: languageSettings.localized("Save file").lowercased(),
-                onClick: {
-                    // TODO: Implement save file action
-                }
+                onClick: { onSaveDataFileButtonClick(dataFile) }
             ),
             BottomSheetButton(
                 showButton: showRemoveFileButton,

@@ -64,7 +64,6 @@ struct SignerDetailView: View {
 
                     Spacer()
 
-
                     if let extraIcon = signatureDataItem.extraIcon {
                         Image(extraIcon)
                             .resizable()
@@ -81,7 +80,6 @@ struct SignerDetailView: View {
         }
     }
 }
-
 
 #Preview {
     SignerDetailView(

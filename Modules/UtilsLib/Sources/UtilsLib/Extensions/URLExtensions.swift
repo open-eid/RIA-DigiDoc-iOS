@@ -28,7 +28,6 @@ extension URL {
 
     public func mimeType(
         fileUtil: FileUtilProtocol = fileUtil(),
-        fileManager: FileManagerProtocol = fileManager(),
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
     ) async -> String {
         let defaultMimeType = Constants.MimeType.Default
@@ -55,12 +54,10 @@ extension URL {
 
     public func isContainer(
         fileUtil: FileUtilProtocol = fileUtil(),
-        fileManager: FileManagerProtocol = fileManager(),
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
     ) async -> Bool {
         let mimetype = await mimeType(
             fileUtil: fileUtil,
-            fileManager: fileManager,
             mimeTypeDecoder: mimeTypeDecoder
         )
 
@@ -95,12 +92,10 @@ extension URL {
 
     public func isPDF(
         fileUtil: FileUtilProtocol = fileUtil(),
-        fileManager: FileManagerProtocol = fileManager(),
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
     ) async -> Bool {
         let mimeType = await self.mimeType(
             fileUtil: fileUtil,
-            fileManager: fileManager,
             mimeTypeDecoder: mimeTypeDecoder
         )
         return mimeType == Constants.MimeType.Pdf

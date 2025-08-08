@@ -72,7 +72,10 @@ class StringSanitizationTests {
         }
     }
 
-    @Test("getURLFromText - return original string when no valid links", arguments: ["Test text", "http:::/bad_url", ""])
+    @Test(
+        "getURLFromText - return original string when no valid links",
+        arguments: ["Test text", "http:::/bad_url", ""]
+    )
     func getURLFromText_returnOriginalStringWhenNoLinks(input: String) throws {
         let attributed = input.getURLFromText()
         #expect(attributed != nil)

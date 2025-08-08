@@ -111,7 +111,8 @@ struct SignatureDetailView: View {
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Signature details"),
-            onLeftClick: { dismiss() },
+            onLeftClick: { dismiss()
+            },
             content: {
                 ScrollView {
                     SignatureView(
@@ -157,7 +158,11 @@ struct SignatureDetailView: View {
                                             )
                                         )
 
-                                        NavigationLink(destination: CertificateDetailView(certificate: signature.signingCert)) {
+                                        NavigationLink(
+                                            destination: CertificateDetailView(
+                                                certificate: signature.signingCert
+                                            )
+                                        ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
                                                     title: languageSettings.localized("Signer's Certificate"),
@@ -232,7 +237,11 @@ struct SignatureDetailView: View {
                                             )
                                         )
 
-                                        NavigationLink(destination: CertificateDetailView(certificate: signature.timestampCert)) {
+                                        NavigationLink(
+                                            destination: CertificateDetailView(
+                                                certificate: signature.timestampCert
+                                            )
+                                        ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
                                                     title: languageSettings.localized("TS Certificate"),
@@ -250,7 +259,11 @@ struct SignatureDetailView: View {
                                             )
                                         )
 
-                                        NavigationLink(destination: CertificateDetailView(certificate: signature.ocspCert)) {
+                                        NavigationLink(
+                                            destination: CertificateDetailView(
+                                                certificate: signature.ocspCert
+                                            )
+                                        ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
                                                     title: languageSettings.localized("OCSP Certificate"),

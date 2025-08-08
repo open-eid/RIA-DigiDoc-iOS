@@ -340,38 +340,37 @@
         }
       }
     },
-    "Failed to save file" : {
+    "Failed to save file %@" : {
       "comment" : "Error message when unable to save file",
-      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Failed to save file"
+            "value" : "Failed to save file %@"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Faili salvestamine ebaõnnestus"
+            "value" : "Faili %@ salvestamine ebaõnnestus"
           }
         }
       }
     },
-    "File saved" : {
+    "File %@ saved" : {
       "comment" : "Alert success message for file saving",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "File saved"
+            "value" : "File %@ saved"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fail salvestatud"
+            "value" : "Fail %@ salvestatud"
           }
         }
       }

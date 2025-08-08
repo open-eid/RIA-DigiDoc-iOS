@@ -5,7 +5,11 @@ import CommonsLib
 
 public struct TSLUtil {
 
-    public static func setupTSLFiles(tsls: [String] = [], destinationDir: URL, fileManager: FileManagerProtocol) throws {
+    public static func setupTSLFiles(
+        tsls: [String] = [],
+        destinationDir: URL,
+        fileManager: FileManagerProtocol
+    ) throws {
         let tslFiles = !tsls.isEmpty ? tsls : Bundle.module.paths(
             forResourcesOfType: "xml",
             inDirectory: CommonsLib.Constants.Configuration.TslFilesFolder

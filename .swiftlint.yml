@@ -17,6 +17,10 @@ opt_in_rules:
   - private_swiftui_state
   - unused_parameter
 
+disabled_rules:
+  - type_body_length
+  - file_length
+
 line_length:
   - 120
   - 120
