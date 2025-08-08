@@ -3,13 +3,13 @@ import Testing
 import CommonsLib
 
 @MainActor
-struct MainSignatureViewModelTests {
+struct HomeViewModelTests {
     private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
-    private var viewModel: MainSignatureViewModel!
+    private var viewModel: HomeViewModel!
 
     init() async throws {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
-        viewModel = MainSignatureViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
+        viewModel = HomeViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
     }
 
     @Test

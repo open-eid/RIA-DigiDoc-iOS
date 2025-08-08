@@ -37,8 +37,8 @@ extension Container {
     }
 
     @MainActor
-    var mainSignatureViewModel: Factory<MainSignatureViewModel> {
-        self { @MainActor in MainSignatureViewModel(sharedContainerViewModel: self.sharedContainerViewModel()) }
+    var homeViewModel: Factory<HomeViewModel> {
+        self { @MainActor in HomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel()) }
     }
 
     @MainActor

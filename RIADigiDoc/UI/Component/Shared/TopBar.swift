@@ -152,6 +152,6 @@ struct TopBar: View {
             }
         }
         .padding(Dimensions.Padding.SPadding)
-        .background(theme.background)
+        .background(theme.surface)
     }
 }
