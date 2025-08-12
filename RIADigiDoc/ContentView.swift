@@ -12,6 +12,11 @@ struct ContentView: View {
     @StateObject private var viewModel: ContentViewModel
 
     @State private var openedUrls: [URL] = []
+    @State private var showBottomSheetFromButton = false
+    
+    private var bottomSheetActions: [BottomSheetButton] {
+        HomeMenuBottomSheetActions.actions(languageSettings: languageSettings)
+    }
 
     init(
         viewModel: ContentViewModel = Container.shared.contentViewModel()
@@ -23,6 +28,9 @@ struct ContentView: View {
         TopBarContainer(
             leftIcon: "ic_m3_menu_48pt_wght400",
             leftIconAccessibility: "Menu",
+            onLeftClick: {
+                showBottomSheetFromButton = true
+            },
             content: {
                 VStack() {
                     HomeView(externalFiles: $openedUrls)
@@ -51,9 +59,11 @@ struct ContentView: View {
                 }
             }
         )
+        .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
     }
 }
 
+// MARK: - Preview
 #Preview {
     ContentView()
         .environmentObject(

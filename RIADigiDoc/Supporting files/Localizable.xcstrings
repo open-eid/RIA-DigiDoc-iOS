@@ -214,24 +214,6 @@
         }
       }
     },
-    "DigiDoc" : {
-      "comment" : "DigiDoc title on homesview",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "RIA DigiDoc"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "RIA DigiDoc"
-          }
-        }
-      }
-    },
     "Country title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -246,6 +228,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riik"
+          }
+        }
+      }
+    },
+    "DigiDoc" : {
+      "comment" : "DigiDoc title on homesview",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
           }
         }
       }
@@ -582,6 +582,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpto"
+          }
+        }
+      }
+    },
+    "Main home menu about" : {
+      "comment" : "Main home menu about",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About DigiDoc app"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc äpi kohta"
+          }
+        }
+      }
+    },
+    "Main home menu accessibility" : {
+      "comment" : "Main home menu accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääsetavuse info"
+          }
+        }
+      }
+    },
+    "Main home menu diagnostics" : {
+      "comment" : "Main home menu diagnostics",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostics"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostika"
           }
         }
       }
