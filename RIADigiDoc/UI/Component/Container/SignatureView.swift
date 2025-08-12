@@ -25,24 +25,12 @@ struct SignatureView: View {
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
 
     private var bottomSheetActions: [BottomSheetButton] {
-        [
-            BottomSheetButton(
-                icon: "ic_m3_edit_48pt_wght400",
-                title: languageSettings.localized("Signature details"),
-                accessibilityLabel: languageSettings.localized("Signature details").lowercased(),
-                onClick: {
-                    showDetail = true
-                }
-            ),
-            BottomSheetButton(
-                icon: "ic_m3_encrypted_48pt_wght400",
-                title: languageSettings.localized("Remove signature"),
-                accessibilityLabel: languageSettings.localized("Remove signature").lowercased(),
-                onClick: {
-                    // TODO: Implement remove signature action
-                }
-            )
-        ]
+        SignatureBottomSheetActions.actions(
+            languageSettings: languageSettings,
+            onDetailsButtonClick: {
+                showDetail = true
+            }
+        )
     }
 
     init(
