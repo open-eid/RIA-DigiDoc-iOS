@@ -232,4 +232,45 @@ final class ContainerWrapperTests {
             }
         }
     }
+
+    @Test
+    func saveDataFile_success() async throws {
+        let tempSampleFileURL = TestFileUtil.createSampleFile()
+
+        let testContainer = try await self.container.create(file: tempSampleFileURL)
+        try await testContainer.addDataFiles(dataFiles: [tempFileURL])
+        _ = try await testContainer.save(file: tempFileURL)
+
+        let containerDataFiles = await container.getDataFiles()
+
+        guard let dataFile = containerDataFiles.first else {
+            Issue.record("Unable to get datafile")
+            return
+        }
+
+        let savedFileURL = try await container.saveDataFile(dataFile: dataFile, FileManager.default.temporaryDirectory)
+
+        #expect(savedFileURL != nil)
+        #expect(savedFileURL.path.contains(dataFile.fileName))
+    }
+
+    @Test
+    func saveDataFile_throwErrorWhenInvalidDataFile() async {
+        let dataFile = DataFileWrapper(
+            fileId: "",
+            fileName: "datafile-\(UUID().uuidString)",
+            fileSize: 0,
+            mediaType: CommonsLib.Constants.Extension.Default)
+
+        do {
+            _ = try await container.saveDataFile(dataFile: dataFile, nil)
+            Issue.record("Expected an error")
+            return
+        } catch let error as DigiDocError {
+            #expect(error.localizedDescription.contains("Unable to save datafile"))
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+            return
+        }
+    }
 }

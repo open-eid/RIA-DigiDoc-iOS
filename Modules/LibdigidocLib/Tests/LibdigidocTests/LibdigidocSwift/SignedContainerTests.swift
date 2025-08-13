@@ -92,6 +92,19 @@ final class SignedContainerTests {
     }
 
     @Test
+    func getDataFile_success() async throws {
+        let dataFiles = await signedContainer.getDataFiles()
+
+        guard let dataFile = dataFiles.first else {
+            Issue.record("Unable to get datafile")
+            return
+        }
+
+        let containerDataFile = try await signedContainer.getDataFile(dataFile: dataFile, nil)
+        #expect(containerDataFile != nil)
+    }
+
+    @Test
     func openOrCreate_success() async throws {
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice")
 

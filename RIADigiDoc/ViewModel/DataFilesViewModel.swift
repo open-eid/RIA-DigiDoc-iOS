@@ -21,7 +21,9 @@ class DataFilesViewModel: ObservableObject {
 
     func saveDataFile(dataFile: DataFileWrapper) async -> URL? {
         do {
-            return try await sharedContainerViewModel.getSignedContainer()?.getDataFile(dataFile: dataFile)
+            return try await sharedContainerViewModel
+                .getSignedContainer()?
+                .getDataFile(dataFile: dataFile)
         } catch {
             DataFilesViewModel.logger.error(
                 "Unable to save datafile \(dataFile.fileName): \(error.localizedDescription)"
