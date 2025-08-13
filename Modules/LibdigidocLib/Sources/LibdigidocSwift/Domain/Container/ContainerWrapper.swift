@@ -59,8 +59,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
         let lock = NSLock()
         return try await withCheckedThrowingContinuation { continuation in
-            ContainerWrapper.logger
-                .debug("Saving datafile '\(sanitizedFilename)' to temporary location \(tempSavedFileLocation)")
+            ContainerWrapper.logger.debug(
+                "Saving datafile '\(sanitizedFilename)' to temporary location \(tempSavedFileLocation)"
+            )
+
             digiDocContainerWrapper.saveDataFile(dataFile.fileId,
                                                  fileLocation: tempSavedFileLocation) { isSaved, error in
                 lock.lock()
@@ -83,10 +85,9 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                     ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
                     continuation.resume(returning: tempSavedFileLocation)
                 } else {
-                    ContainerWrapper.logger
-                        .error(
-                            "Failed to save file. \(error?.localizedDescription ?? "No error to display")"
-                        )
+                    ContainerWrapper.logger.error(
+                        "Failed to save file. \(error?.localizedDescription ?? "No error to display")"
+                    )
                     continuation.resume(throwing: DigiDocError.containerDataFileSavingFailed(
                         ErrorDetail(
                             message: "Unable to save datafile",
