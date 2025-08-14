@@ -550,6 +550,132 @@
         }
       }
     },
+    "Main about 1 logo text" : {
+      "comment" : "Main about Estonia logo text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti tuleviku heaks"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti tuleviku heaks"
+          }
+        }
+      }
+    },
+    "Main about 2 logo text" : {
+      "comment" : "Main about Europe logo text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Euroopa Liit Euroopa Regionaalarengu Fond"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Euroopa Liit Euroopa Regionaalarengu Fond"
+          }
+        }
+      }
+    },
+    "Main about help center" : {
+      "comment" : "Main about help center",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID helpdesk"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-abikeskus"
+          }
+        }
+      }
+    },
+    "Main about info" : {
+      "comment" : "Main about info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estonian ID software is issued by the Estonian Information System Authority. If you have any questions, please contact:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti ID-tarkvara on välja antud Riigi Infosüsteemi Ameti poolt. Küsimuste korral pöördu:"
+          }
+        }
+      }
+    },
+    "Main about licenses title" : {
+      "comment" : "Main about licenses title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Additional licenses and components"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Täiendavad litsentsid ja komponendid"
+          }
+        }
+      }
+    },
+    "Main about ria digidoc title" : {
+      "comment" : "Main about ria digidoc title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        }
+      }
+    },
+    "Main about version title %@" : {
+      "comment" : "Main about version title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "version %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "versioon %@"
+          }
+        }
+      }
+    },
     "Main home crypto description" : {
       "comment" : "Main home crypto description",
       "extractionState" : "manual",
@@ -636,6 +762,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diagnostika"
+          }
+        }
+      }
+    },
+    "Main home menu help url" : {
+      "comment" : "Main home menu help url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/id-help/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/id-abikeskus/"
           }
         }
       }
@@ -918,6 +1062,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Open Button" : {
+      "comment" : "Open button text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ava"
           }
         }
       }

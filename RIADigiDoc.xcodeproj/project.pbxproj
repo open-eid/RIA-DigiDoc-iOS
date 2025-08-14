@@ -115,6 +115,7 @@
 				DI/AppContainer.swift,
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
+				Domain/Model/DependencyLicense.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/ToastMessage.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
