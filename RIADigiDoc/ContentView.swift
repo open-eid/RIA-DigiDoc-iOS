@@ -13,9 +13,15 @@ struct ContentView: View {
 
     @State private var openedUrls: [URL] = []
     @State private var showBottomSheetFromButton = false
+    @State private var navigateToInfo = false
 
     private var bottomSheetActions: [BottomSheetButton] {
-        HomeMenuBottomSheetActions.actions(languageSettings: languageSettings)
+        HomeMenuBottomSheetActions.actions(
+            languageSettings: languageSettings,
+            onInfoClick: {
+                navigateToInfo = true
+            }
+        )
     }
 
     init(
@@ -34,6 +40,11 @@ struct ContentView: View {
             content: {
                 VStack {
                     HomeView(externalFiles: $openedUrls)
+
+                    NavigationLink(
+                        destination: InfoView(),
+                        isActive: $navigateToInfo
+                    ) { }
 
                     Spacer()
                 }

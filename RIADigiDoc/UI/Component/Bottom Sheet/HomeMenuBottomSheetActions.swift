@@ -1,5 +1,8 @@
 struct HomeMenuBottomSheetActions {
-    static func actions(languageSettings: LanguageSettings) -> [BottomSheetButton] {
+    static func actions(
+        languageSettings: LanguageSettings,
+        onInfoClick: @escaping () -> Void,
+    ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
                 icon: "ic_m3_info_48pt_wght400",
@@ -7,9 +10,7 @@ struct HomeMenuBottomSheetActions {
                 accessibilityLabel: languageSettings.localized("Main home menu about").lowercased(),
                 showExtraIcon: true,
                 extraIcon: "ic_m3_arrow_right_48pt_wght400",
-                onClick: {
-                    // TODO: Implement about action
-                }
+                onClick: onInfoClick,
             ),
             BottomSheetButton(
                 icon: "ic_m3_accessibility_new_48pt_wght400",
