@@ -138,7 +138,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     func getDataFileURL(_ dataFile: DataFileWrapper) async -> Result<URL, Error> {
         do {
-            let dataFileURL = try await signedContainer?.getDataFile(dataFile: dataFile)
+            let dataFileURL = try await signedContainer?.saveDataFile(dataFile: dataFile)
 
             guard fileUtil.fileExists(fileLocation: dataFileURL), let fileURL = dataFileURL else {
                 throw DigiDocError.containerDataFileSavingFailed(

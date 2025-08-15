@@ -23,7 +23,7 @@ class DataFilesViewModel: ObservableObject {
         do {
             return try await sharedContainerViewModel
                 .getSignedContainer()?
-                .getDataFile(dataFile: dataFile)
+                .saveDataFile(dataFile: dataFile)
         } catch {
             DataFilesViewModel.logger.error(
                 "Unable to save datafile \(dataFile.fileName): \(error.localizedDescription)"

@@ -2,12 +2,12 @@ import SwiftUI
 
 struct ActionButton: View {
     @AppTheme private var theme
-    
+
     let title: String
     let description: String
     let assetImageName: String
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: Dimensions.Padding.SPadding) {
@@ -18,7 +18,7 @@ struct ActionButton: View {
             .padding(Dimensions.Padding.SPadding)
             .background(theme.surfaceContainerLow)
             .cornerRadius(Dimensions.Corner.MSCornerRadius)
-            
+
             // MARK: - Elevated Style
             .shadow(
                 color: Color.black.opacity(Dimensions.Shadow.SOpacity),
@@ -34,9 +34,9 @@ struct ActionButton: View {
 // MARK: - Asset Icon Component
 private struct AssetIconComponent: View {
     @AppTheme private var theme
-    
+
     let assetName: String
-    
+
     var body: some View {
         Image(assetName)
             .resizable()
@@ -54,16 +54,16 @@ private struct AssetIconComponent: View {
 private struct TextComponent: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     let title: String
     let description: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
             Text(title)
                 .font(typography.titleMedium)
                 .foregroundStyle(theme.onSurface)
-            
+
             Text(description)
                 .font(typography.bodyMedium)
                 .foregroundStyle(theme.onSurface)
@@ -73,7 +73,7 @@ private struct TextComponent: View {
 
 // MARK: - Preview
 #Preview {
-    VStack() {
+    VStack {
         ActionButton(
             title: "Add Document",
             description: "Do something",

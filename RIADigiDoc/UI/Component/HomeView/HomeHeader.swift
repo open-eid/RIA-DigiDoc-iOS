@@ -5,7 +5,7 @@ import FactoryKit
 struct HomeHeader: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     var body: some View {
         VStack(spacing: Dimensions.Padding.XXSPadding ) {
             LogoComponent()
@@ -21,15 +21,16 @@ private struct LogoComponent: View {
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
-    
+
     var body: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             Image("image_id_ee")
                 .resizable()
                 .scaledToFit()
                 .frame(width: Dimensions.Icon.IconSizeM)
-            
-            Text(languageSettings.localized("DigiDoc"))
+                .accessibilityLabel(languageSettings.localized("DigiDoc"))
+
+            Text(verbatim: languageSettings.localized("DigiDoc"))
                 .font(typography.displayMedium)
                 .foregroundStyle(theme.onSurface)
         }
@@ -41,14 +42,14 @@ private struct VersionComponent: View {
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
-    
+
     var body: some View {
         Text(String(
-                 format: languageSettings.localized("Main home version %@"),
-                 BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
-             ))
-            .font(typography.titleMedium)
-            .foregroundStyle(theme.onSurfaceVariant)
+            format: languageSettings.localized("Main home version %@"),
+            BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
+        ))
+        .font(typography.titleMedium)
+        .foregroundStyle(theme.onSurfaceVariant)
     }
 }
 
