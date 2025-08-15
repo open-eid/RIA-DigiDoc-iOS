@@ -13,7 +13,7 @@ struct ContentView: View {
 
     @State private var openedUrls: [URL] = []
     @State private var showBottomSheetFromButton = false
-    
+
     private var bottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(languageSettings: languageSettings)
     }
@@ -32,9 +32,9 @@ struct ContentView: View {
                 showBottomSheetFromButton = true
             },
             content: {
-                VStack() {
+                VStack {
                     HomeView(externalFiles: $openedUrls)
-                
+
                     Spacer()
                 }
                 .background(theme.surface)

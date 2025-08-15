@@ -29,7 +29,7 @@ struct HomeView: View {
         VStack {
             HomeHeader()
                 .padding(.bottom, Dimensions.Padding.LPadding)
-            
+
             VStack(spacing: Dimensions.Padding.SPadding) {
                 ActionButton(
                     title: languageSettings.localized("Main home open document title"),
@@ -54,7 +54,7 @@ struct HomeView: View {
                         isNavigatingToNextView: $isNavigatingToSigningView
                     )
                 }
-                
+
                 ActionButton(
                     title: languageSettings.localized("Main home signature title"),
                     description: languageSettings.localized("Main home signature description"),
@@ -72,12 +72,12 @@ struct HomeView: View {
                 ) {}
             }
             .padding(Dimensions.Padding.SPadding)
-            
+
             NavigationLink(
                 destination: SigningView(),
                 isActive: $isNavigatingToSigningView
             ) {}
-            
+
             Spacer()
         }
         .onChange(of: externalFiles) { extFiles in

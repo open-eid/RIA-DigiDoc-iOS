@@ -103,7 +103,7 @@ public actor SignedContainer: SignedContainerProtocol {
         return uniqueFileURL
     }
 
-    public func getDataFile(dataFile: DataFileWrapper) async throws -> URL {
+    public func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
         return try await container.saveDataFile(dataFile: dataFile)
     }
 }
