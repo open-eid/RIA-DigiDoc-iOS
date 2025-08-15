@@ -29,6 +29,8 @@ struct SigningView: View {
     @State private var showRenameDialog = false
     @State private var newContainerName = Constants.Container.DefaultName
 
+    @State private var showingShareSheet = false
+
     private var containerFilesTitle: String {
         languageSettings.localized("Container files")
     }
@@ -217,14 +219,14 @@ struct SigningView: View {
                         .padding(Dimensions.Padding.SPadding)
 
                         if isSignedContainer {
-                            ShareButtonBottomBar(
-                                iconName: "ic_m3_ios_share_48pt_wght400",
-                                label: shareTitle,
-                                accessibilityLabel: shareTitle,
-                                onShare: {
-                                    // TODO: Implement sharing functionality
-                                }
-                            )
+                            if let containerFile = viewModel.containerURL {
+                                ShareButtonBottomBar(
+                                    iconName: "ic_m3_ios_share_48pt_wght400",
+                                    label: shareTitle,
+                                    accessibilityLabel: shareTitle,
+                                    containerUrl: containerFile
+                                )
+                            }
                         } else {
                             UnsignedBottomBarView(
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
