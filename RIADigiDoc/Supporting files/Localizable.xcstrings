@@ -676,6 +676,456 @@
         }
       }
     },
+    "Main accessibility introduction" : {
+      "comment" : "Main accessibility introduction",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc is designed to comply with the WCAG 2.1 AA accessibility guidelines. This means that the RIA DigiDoc application has been developed using the principles that the application should be usable by the blind and people with visual, mobility, and strength impairments."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc on ehitatud nii, et see vastaks WCAG 2.1 AA juurdepääsetavuse suunistele. See tähendab, et RIA DigiDoc rakenduse arendamisel on kasutatud põhimõtteid, et see oleks kasutatav ilma nägemisvõimeta, piiratud nägemisvõimega, piiratud liikumisvõime või jõuga jms."
+          }
+        }
+      }
+    },
+    "Main accessibility introduction 2" : {
+      "comment" : "Main accessibility introduction 2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility can be improved by using built-in assistive tools on your smart device. You can find an overview of the main assistive tools below."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Juurdepääsetavust on võimalik parandada oma nutiseadmesse sisseehitatud abivahendeid kasutades. Alljärgnevalt ülevaade põhilistest abivahenditest."
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification introduction" : {
+      "comment" : "Main accessibility introduction screen magnification introduction",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you have enough vision to read the text, you can use the built-in assistive tools to view the screen more comfortably. Assistive tools make it possible to change the size of text, the main font, and the colours of the user interface and enlarge the screen by using the screen magnifier."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kui nägemisjääk teksti lugemiseks on piisav, on võimalik mugavamaks ekraani vaatamiseks kasutada nutiseadmesse sisseehitatud abivahendeid. Abivahendeid kasutades on võimalik muuta tekstide suurusi, peamist kirjatüüpi, kasutajaliidese värvilahendusi ning ekraani suurendada, kasutades ekraaniluupi."
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification screen tools" : {
+      "comment" : "Main accessibility introduction screen magnification screen tools",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tools to adjust screen colour and text size:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekraani värvi ja teksti suuruse reguleerimise abivahendid:"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification screen tools android" : {
+      "comment" : "Main accessibility introduction screen magnification screen tools android",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Android"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification screen tools android url" : {
+      "comment" : "Main accessibility introduction screen magnification screen tools android url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/11183305?hl=en&ref_topic=9079043"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/11183305?hl=en&ref_topic=9079043"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification screen tools ios" : {
+      "comment" : "Main accessibility introduction screen magnification screen tools ios",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification screen tools ios url" : {
+      "comment" : "Main accessibility introduction screen magnification screen tools ios url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/en-gb/guide/iphone/iph3e2e1fb0/ios"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/et-ee/guide/iphone/iph3e2e1fb0/ios"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification title" : {
+      "comment" : "Main accessibility introduction screen magnification title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen magnification and colour change"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekraani suurendus ja värvide muutmine"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification tools" : {
+      "comment" : "Main accessibility introduction screen magnification tools",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen magnification tools:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekraani suurendamise abivahendid:"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification tools android" : {
+      "comment" : "Main accessibility introduction screen magnification tools android",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magnification (Android, built in)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magnification (Android, sisseehitatud)"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification tools android url" : {
+      "comment" : "Main accessibility introduction screen magnification tools android url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/6006949?hl=en"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/6006949?hl=en"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification tools ios" : {
+      "comment" : "Main accessibility introduction screen magnification tools ios",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom (iOS, built in)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom (iOS, sisseehitatud)"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen magnification tools ios url" : {
+      "comment" : "Main accessibility introduction screen magnification tools ios url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/en-gb/guide/iphone/iph3e2e367e/ios"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/et-ee/guide/iphone/iph3e2e367e/ios"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction" : {
+      "comment" : "Main accessibility introduction screen reader introduction",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A screen reader is a program that converts the information on the screen of a smart device into a user-friendly output, for instance, into speech. In particular, it is a tool for the visually impaired."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekraanilugeja on programm, mille ülesandeks on muuta nutiseadme ekraanil kujutatavat informatsiooni kasutajale sobivaks väljundiks – näiteks kõneks. Eelkõige on see abivahend vaegnägijate jaoks."
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction 2" : {
+      "comment" : "Main accessibility introduction screen reader introduction 2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc has been built based on the principle that all types of visual content can be converted into user-friendly output. For example, the images are accompanied by textual descriptions. Furthermore, the arrangement and order of the structural elements consider the screen reader’s movement on the screen and allow the information to be consumed in a logical sequence."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc ehitamisel on arvestatud, et igat tüüpi visuaalset sisu oleks võimalik muuta kasutajale sobivaks väljundiks. Näiteks on piltidel küljes tekstilised kirjeldused, struktuursete elementide paigutus ja järjekord arvestab ekraanilugeja liikumist ekraanil ja võimaldab infot tarbida loogilises järjekorras."
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction android" : {
+      "comment" : "Main accessibility introduction screen reader introduction android",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talkback (Android, built in) "
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talkback (Android, sisseehitatud)"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction android url" : {
+      "comment" : "Main accessibility introduction screen reader introduction android url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/6007100?hl=en"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.google.com/accessibility/android/answer/6007100?hl=en"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction apps" : {
+      "comment" : "Main accessibility introduction screen reader introduction apps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The most common smart device screen readers:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levinumad nutiseadme ekraanilugejad:"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction ios" : {
+      "comment" : "Main accessibility introduction screen reader introduction ios",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver (iOS, built in)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver (iOS, sisseehitatud)"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader introduction ios url" : {
+      "comment" : "Main accessibility introduction screen reader introduction ios url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/en-gb/guide/iphone/iph3e2e415f/ios"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://support.apple.com/et-ee/guide/iphone/iph3e2e415f/ios"
+          }
+        }
+      }
+    },
+    "Main accessibility introduction screen reader title" : {
+      "comment" : "Main accessibility introduction screen reader title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen reader"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ekraanilugeja"
+          }
+        }
+      }
+    },
+    "Main accessibility more info" : {
+      "comment" : "Main accessibility more info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More information can be found on here: "
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rohkem infot leiab"
+          }
+        }
+      }
+    },
+    "Main accessibility more info url" : {
+      "comment" : "Language specific main accessibility more info url ",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/ligipaasetavuse-teatis/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/ligipaasetavuse-teatis/"
+          }
+        }
+      }
+    },
+    "Main accessibility title" : {
+      "comment" : "Accessibility view title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääsetavuse info"
+          }
+        }
+      }
+    },
     "Main home crypto description" : {
       "comment" : "Main home crypto description",
       "extractionState" : "manual",
