@@ -3,49 +3,66 @@ import SwiftUI
 struct ShareButtonBottomBar: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+
+    @State private var showingShareSheet = false
 
     let iconName: String
     let label: String
     let accessibilityLabel: String
-    let onShare: () -> Void
+    let containerUrl: URL
 
     var body: some View {
         HStack {
             Spacer()
 
-            Button(action: onShare) {
-                HStack(spacing: Dimensions.Padding.XSPadding) {
-                    Image(iconName)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(theme.onSurface)
-                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .accessibilityHidden(true)
-
-                    Text(label)
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.bodyLarge)
-                        .accessibilityHidden(true)
+            if #available(iOS 16.0, *) {
+                ShareLink(item: containerUrl) {
+                    ShareButton(
+                        iconName: iconName,
+                        label: label,
+                        accessibilityLabel: accessibilityLabel,
+                        onClick: {
+                            // ShareLink handles sharing
+                        }
+                    )
                 }
-                .padding(Dimensions.Padding.MSPadding)
-                .background(
-                    RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
-                        .fill(theme.surfaceContainerHigh)
-                        .shadow(
-                            color: theme.onBackground.opacity(Dimensions.Shadow.SOpacity),
-                            radius: Dimensions.Shadow.radius,
-                            x: Dimensions.Shadow.xOffset,
-                            y: Dimensions.Shadow.yOffset
-                        )
+            } else {
+                ShareButton(
+                    iconName: iconName,
+                    label: label,
+                    accessibilityLabel: accessibilityLabel,
+                    onClick: {
+                        showingShareSheet = true
+                    }
                 )
             }
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityIdentifier("signedContainerShareButton")
         }
         .padding(.horizontal, Dimensions.Padding.SPadding)
         .padding(.top, Dimensions.Padding.XSPadding)
         .padding(.bottom, Dimensions.Padding.SPadding)
+        .sheet(isPresented: $showingShareSheet) {
+            ShareSheet(items: [containerUrl])
+        }
         .accessibilityIdentifier("signedContainerContainer")
     }
+}
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    let activities: [UIActivity]? = nil
+
+    func makeUIViewController(context _: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: activities)
+    }
+
+    func updateUIViewController(_: UIActivityViewController, context _: Context) {}
+}
+
+#Preview {
+    ShareButtonBottomBar(
+        iconName: "ic_m3_ios_share_48pt_wght400",
+        label: "Share",
+        accessibilityLabel: "Share",
+        containerUrl: URL(fileURLWithPath: "")
+    )
 }
