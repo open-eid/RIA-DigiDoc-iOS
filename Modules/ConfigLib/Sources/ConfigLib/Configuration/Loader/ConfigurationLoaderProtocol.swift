@@ -17,5 +17,5 @@ public protocol ConfigurationLoaderProtocol: Sendable {
 
     func getConfiguration() async -> ConfigurationProvider?
 
-    func getConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>
+    func getConfigurationUpdates(replayLatest: Bool) async -> AsyncThrowingStream<ConfigurationProvider?, Error>
 }

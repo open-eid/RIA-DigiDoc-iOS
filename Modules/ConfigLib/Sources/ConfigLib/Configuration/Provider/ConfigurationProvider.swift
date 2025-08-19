@@ -4,10 +4,10 @@ import UtilsLib
 public struct ConfigurationProvider: Codable, Sendable {
 
     public struct MetaInf: Codable, Sendable {
-        let url: String
-        let date: String
-        let serial: Int
-        let version: Int
+        public let url: String
+        public let date: String
+        public let serial: Int
+        public let version: Int
 
         // swiftlint:disable:next nesting
         private enum CodingKeys: String, CodingKey {
@@ -41,6 +41,9 @@ public struct ConfigurationProvider: Codable, Sendable {
     public let ldapCerts: [String]
     public var configurationLastUpdateCheckDate: Date?
     public var configurationUpdateDate: Date?
+    public let cdoc2DefaultKeyserver: String
+    public let cdoc2UseKeyserver: Bool
+    public let cdoc2Conf: [String: [String: String]]
 
     private enum CodingKeys: String, CodingKey {
         case metaInf = "META-INF"
@@ -59,6 +62,9 @@ public struct ConfigurationProvider: Codable, Sendable {
         case ldapCerts = "LDAP-CERTS"
         case configurationLastUpdateCheckDate = "configurationLastUpdateCheckDate"
         case configurationUpdateDate = "configurationUpdateDate"
+        case cdoc2DefaultKeyserver = "CDOC2-DEFAULT-KEYSERVER"
+        case cdoc2UseKeyserver = "CDOC2-USE-KEYSERVER"
+        case cdoc2Conf = "CDOC2-CONF"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -84,6 +90,9 @@ public struct ConfigurationProvider: Codable, Sendable {
         try container.encode(sidV2RestUrl, forKey: .sidV2RestUrl)
         try container.encode(sidV2SkRestUrl, forKey: .sidV2SkRestUrl)
         try container.encode(certBundle, forKey: .certBundle)
+        try container.encode(cdoc2DefaultKeyserver, forKey: .cdoc2DefaultKeyserver)
+        try container.encode(cdoc2UseKeyserver, forKey: .cdoc2UseKeyserver)
+        try container.encode(cdoc2Conf, forKey: .cdoc2Conf)
     }
 
     public init(from decoder: Decoder) throws {
@@ -103,6 +112,9 @@ public struct ConfigurationProvider: Codable, Sendable {
         sidV2SkRestUrl = try container.decode(String.self, forKey: .sidV2SkRestUrl)
         certBundle = try container.decode([String].self, forKey: .certBundle)
         ldapCerts = try container.decode([String].self, forKey: .ldapCerts)
+        cdoc2DefaultKeyserver = try container.decode(String.self, forKey: .cdoc2DefaultKeyserver)
+        cdoc2UseKeyserver = try container.decode(Bool.self, forKey: .cdoc2UseKeyserver)
+        cdoc2Conf = try container.decode([String: [String: String]].self, forKey: .cdoc2Conf)
 
         let lastUpdateCheckString = try container.decodeIfPresent(
             String.self,
@@ -130,7 +142,10 @@ public struct ConfigurationProvider: Codable, Sendable {
         certBundle: [String],
         ldapCerts: [String],
         configurationLastUpdateCheckDate: Date?,
-        configurationUpdateDate: Date?
+        configurationUpdateDate: Date?,
+        cdoc2DefaultKeyserver: String,
+        cdoc2UseKeyserver: Bool,
+        cdoc2Conf: [String: [String: String]],
     ) {
         self.metaInf = metaInf
         self.sivaUrl = sivaUrl
@@ -148,5 +163,8 @@ public struct ConfigurationProvider: Codable, Sendable {
         self.ldapCerts = ldapCerts
         self.configurationLastUpdateCheckDate = configurationLastUpdateCheckDate
         self.configurationUpdateDate = configurationUpdateDate
+        self.cdoc2DefaultKeyserver = cdoc2DefaultKeyserver
+        self.cdoc2UseKeyserver = cdoc2UseKeyserver
+        self.cdoc2Conf = cdoc2Conf
     }
 }

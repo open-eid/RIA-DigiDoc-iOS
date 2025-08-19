@@ -1241,13 +1241,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "LAST CHECK:"
+            "value" : "LAST CHECK"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "VIIMATI KONTROLLITUD:"
+            "value" : "VIIMATI KONTROLLITUD"
           }
         }
       }
@@ -1277,13 +1277,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UPDATE DATE:"
+            "value" : "UPDATE DATE"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UUENDAMISE KUUPÄEV:"
+            "value" : "UUENDAMISE KUUPÄEV"
           }
         }
       }
@@ -1320,6 +1320,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktiveeri ühekordne logifaili genereerimine"
+          }
+        }
+      }
+    },
+    "Main diagnostics operating system ios %@" : {
+      "comment" : "Main diagnostics operating system ios",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iOS %@"
           }
         }
       }

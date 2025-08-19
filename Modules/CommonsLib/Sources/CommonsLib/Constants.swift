@@ -17,8 +17,8 @@ public struct Constants {
     }
 
     public struct MimeType {
-        public static let Asice = "application/vnd.etsi.asic-e+zip" // Also .bdoc, .edoc, .sce
-        public static let Asics = "application/vnd.etsi.asic-s+zip" // Also .scs
+        public static let Asice = "application/vnd.etsi.asic-e+zip"  // Also .bdoc, .edoc, .sce
+        public static let Asics = "application/vnd.etsi.asic-s+zip"  // Also .scs
         public static let Ddoc = "application/x-ddoc"
         public static let Bdoc = "application/vnd.bdoc-1.0"
         public static let Adoc = "application/vnd.lt.archyvai.adoc-2008"
@@ -52,6 +52,7 @@ public struct Constants {
         public static let Temp = "tempfiles"
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
+        public static let Logs = "logfiles"
     }
 
     public struct Configuration {
@@ -63,7 +64,8 @@ public struct Constants {
         public static let DefaultConfigJson = "\(CacheConfigFolder)/default-config.json"
         public static let DefaultConfigPub = "\(CacheConfigFolder)/default-config.pub"
         public static let DefaultConfigRsa = "\(CacheConfigFolder)/default-config.rsa"
-        public static let DefaultConfigurationPropertiesFileName = "\(CacheConfigFolder)/configuration"
+        public static let DefaultConfigurationPropertiesFileName =
+            "\(CacheConfigFolder)/configuration"
 
         public static let UpdateDatePropertyName = "configurationUpdateDate"
         public static let LastUpdateCheckDatePropertyName = "lastUpdateCheckDate"

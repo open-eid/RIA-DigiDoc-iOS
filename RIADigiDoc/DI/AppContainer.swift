@@ -1,8 +1,8 @@
-import Foundation
-import FactoryKit
-import ConfigLib
-import UtilsLib
 import CommonsLib
+import ConfigLib
+import FactoryKit
+import Foundation
+import UtilsLib
 
 extension Container {
     var librarySetup: Factory<LibrarySetup> {
@@ -38,13 +38,16 @@ extension Container {
 
     @MainActor
     var homeViewModel: Factory<HomeViewModel> {
-        self { @MainActor in HomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel()) }
+        self { @MainActor in
+            HomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
+        }
     }
 
     @MainActor
     var fileOpeningViewModel: Factory<FileOpeningViewModel> {
         self {
-            @MainActor in FileOpeningViewModel(
+            @MainActor in
+            FileOpeningViewModel(
                 fileOpeningRepository: self.fileOpeningRepository(),
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileUtil: self.fileUtil(),
@@ -56,7 +59,8 @@ extension Container {
     @MainActor
     var signingViewModel: Factory<SigningViewModel> {
         self {
-            @MainActor in SigningViewModel(
+            @MainActor in
+            SigningViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileOpeningService: self.fileOpeningService(),
                 mimeTypeCache: self.mimeTypeCache(),
@@ -73,7 +77,8 @@ extension Container {
     @MainActor
     var contentViewModel: Factory<ContentViewModel> {
         self {
-            @MainActor in ContentViewModel(
+            @MainActor in
+            ContentViewModel(
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager()
             )
@@ -83,9 +88,22 @@ extension Container {
     @MainActor
     var recentDocumentsViewModel: Factory<RecentDocumentsViewModel> {
         self {
-            @MainActor in RecentDocumentsViewModel(
+            @MainActor in
+            RecentDocumentsViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var diagnosticsViewModel: Factory<DiagnosticsViewModel> {
+        self { @MainActor in
+            DiagnosticsViewModel(
+                containerWrapper: self.containerWrapper(),
+                fileManager: self.fileManager(),
+                configurationLoader: self.configurationLoader(),
+                configurationRepository: self.configurationRepository()
             )
         }
     }
