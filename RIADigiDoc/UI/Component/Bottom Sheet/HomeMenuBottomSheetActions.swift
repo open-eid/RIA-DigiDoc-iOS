@@ -3,6 +3,7 @@ struct HomeMenuBottomSheetActions {
         languageSettings: LanguageSettings,
         onInfoClick: @escaping () -> Void,
         onAccessibilityClick: @escaping () -> Void,
+        onDiagnosticsClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -27,9 +28,7 @@ struct HomeMenuBottomSheetActions {
                 accessibilityLabel: languageSettings.localized("Main home menu diagnostics").lowercased(),
                 showExtraIcon: true,
                 extraIcon: "ic_m3_arrow_right_48pt_wght400",
-                onClick: {
-                    // TODO: Implement diagnostics action
-                }
+                onClick: onDiagnosticsClick
             )
         ]
     }
