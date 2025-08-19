@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
 - (DigiDocContainer *)getContainer;
 - (NSArray<DigiDocDataFile *> *)getDataFiles;
+- (NSString*)getVersion;
 - (NSArray<DigiDocSignature *> *)getSignatures;
 
 - (void)addDataFile:(NSString *)url mimetype:(NSString *)mimetype completion:(void (^)(BOOL success, NSError * _Nullable error))completion;

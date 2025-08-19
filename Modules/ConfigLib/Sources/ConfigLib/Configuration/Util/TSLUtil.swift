@@ -89,7 +89,7 @@ public struct TSLUtil {
         }
     }
 
-    private static func readSequenceNumber(from inputStreamURL: URL) throws -> Int {
+    public static func readSequenceNumber(from inputStreamURL: URL) throws -> Int {
         let parser = XMLParser(contentsOf: inputStreamURL)
         let tslSequenceNumberElement = "TSLSequenceNumber"
 

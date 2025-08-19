@@ -31,6 +31,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         self.fileManager = fileManager
     }
 
+    @MainActor
+    public func getVersion() async -> String {
+        return digiDocContainerWrapper.getVersion()
+    }
+
     public func getSignatures() async -> [SignatureWrapper] {
         return await getContainer()?.signatures ?? []
     }

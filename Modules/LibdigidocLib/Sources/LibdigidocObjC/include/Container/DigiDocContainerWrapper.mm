@@ -47,6 +47,10 @@ public:
 
         return datafiles;
     }
+    
+    NSString* getVersion() {
+        return [NSString stringWithUTF8String:digidoc::version().c_str()];
+    }
 
     NSArray<DigiDocSignature *>* getSignatures() {
         NSMutableArray<DigiDocSignature *> *signatures = [[NSMutableArray alloc] init];
@@ -240,6 +244,10 @@ private:
 
 - (NSArray<DigiDocDataFile *> *)getDataFiles; {
     return _impl->getDataFiles();
+}
+
+- (NSString *)getVersion {
+    return _impl->getVersion();
 }
 
 - (NSArray<DigiDocSignature *> *)getSignatures {

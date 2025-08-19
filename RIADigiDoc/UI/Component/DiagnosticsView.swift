@@ -1,5 +1,6 @@
-import SwiftUI
 import FactoryKit
+import SwiftUI
+import UtilsLib
 
 struct DiagnosticsView: View {
     @AppTheme private var theme
@@ -8,7 +9,23 @@ struct DiagnosticsView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var enableOneTimeLogGeneration = false // TODO: implement one time log generation logic
+    private let fileUtil: FileUtilProtocol
+
+    @State private var enableOneTimeLogGeneration = false  // TODO: implement one time log generation logic
+
+    @State private var tempDiagnosticsFileURL: URL?
+    @State private var isShowingFileSaver = false
+    @State private var isFileSaved: Bool = false
+
+    @StateObject private var viewModel: DiagnosticsViewModel
+
+    init(
+        viewModel: DiagnosticsViewModel = Container.shared.diagnosticsViewModel(),
+        fileUtil: FileUtilProtocol = Container.shared.fileUtil(),
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.fileUtil = fileUtil
+    }
 
     var body: some View {
         TopBarContainer(
@@ -21,17 +38,46 @@ struct DiagnosticsView: View {
                     VStack(
                         spacing: Dimensions.Padding.XXSPadding,
                         content: {
-                            DiagnosticsHeaderButtons()
+                            DiagnosticsHeaderButtons(
+                                onCheckUpdateClick: {
+                                    Task { await viewModel.updateConfiguration() }
+                                },
+                                onSaveDiagnosticsClick: {
+                                    Task {
+                                        tempDiagnosticsFileURL = await viewModel.createLogFile(
+                                            languageSettings: languageSettings
+                                        )
 
-                            OneTimeLogGenerationToggleSection(enableOneTimeLogGeneration: $enableOneTimeLogGeneration)
+                                        if fileUtil.fileExists(fileLocation: tempDiagnosticsFileURL) {
+                                            isShowingFileSaver = true
+                                        }
+                                    }
+                                }
+                            )
+
+                            OneTimeLogGenerationToggleSection(
+                                enableOneTimeLogGeneration: $enableOneTimeLogGeneration)
 
                             DiagnosticsSections()
+                                .environmentObject(viewModel)
                         }
                     )
                     .padding(Dimensions.Padding.SPadding)
+                    .background(
+                        FileSaverHandler(
+                            isPresented: $isShowingFileSaver,
+                            fileURL: tempDiagnosticsFileURL,
+                            languageSettings: languageSettings,
+                            onComplete: {
+                                viewModel.removeLogFilesDirectory()
+                            },
+                            isFileSaved: $isFileSaved
+                        )
+                    )
                 }
             }
-        ).background(theme.surface)
+        )
+        .background(theme.surface)
     }
 }
 

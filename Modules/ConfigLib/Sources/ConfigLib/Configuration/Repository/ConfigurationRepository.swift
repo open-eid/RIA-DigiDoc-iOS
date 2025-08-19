@@ -23,7 +23,7 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
     }
 
     public func getConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>? {
-        return await configurationLoader.getConfigurationUpdates()
+        return await configurationLoader.getConfigurationUpdates(replayLatest: true)
     }
 
     public func getCentralConfiguration(cacheDir: URL?) async throws -> ConfigurationProvider? {
@@ -47,7 +47,7 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
 
     public func observeConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>? {
 
-        let loaderStream = await configurationLoader.getConfigurationUpdates()
+        let loaderStream = await configurationLoader.getConfigurationUpdates(replayLatest: true)
 
         return AsyncThrowingStream { continuation in
             Task {

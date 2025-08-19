@@ -1,8 +1,8 @@
 import Foundation
 
-final class LanguageSettings: LanguageSettingsProtocol, ObservableObject {
+public final class LanguageSettings: LanguageSettingsProtocol, ObservableObject {
 
-    var currentLanguage: String {
+    public var currentLanguage: String {
         if #available(iOS 16, *) {
             Locale.current.language.languageCode?.identifier ?? "en"
         } else {
@@ -10,7 +10,7 @@ final class LanguageSettings: LanguageSettingsProtocol, ObservableObject {
         }
     }
 
-    func localized(_ key: String) -> String {
+    public func localized(_ key: String) -> String {
         let language = currentLanguage
         if let path = Bundle.main.path(forResource: language, ofType: "lproj"),
            let bundle = Bundle(path: path) {

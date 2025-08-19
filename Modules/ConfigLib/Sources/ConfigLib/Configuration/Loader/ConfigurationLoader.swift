@@ -1,16 +1,19 @@
+import CommonsLib
+import FactoryKit
 import Foundation
 import OSLog
-import FactoryKit
-import CommonsLib
 import UtilsLib
 
 public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ConfigurationLoader")
+    private static let logger = Logger(
+        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ConfigurationLoader")
 
     private var configuration: ConfigurationProvider?
 
-    private var continuation: AsyncThrowingStream<ConfigurationProvider?, Error>.Continuation?
+    public typealias ConfigStream = AsyncThrowingStream<ConfigurationProvider?, Error>
+    private var continuations: [UUID: ConfigStream.Continuation] = [:]
+    private var latestConfiguration: ConfigurationProvider?
 
     private let centralConfigurationRepository: CentralConfigurationRepositoryProtocol
     private var configurationProperty: ConfigurationProperty
@@ -44,7 +47,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         ConfigurationLoader.logger.debug("Initializing configuration")
 
         if !fileManager.fileExists(atPath: cacheDir.path) {
-            try fileManager.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
+            try fileManager.createDirectory(
+                at: cacheDir, withIntermediateDirectories: true, attributes: nil)
         }
 
         try await loadCachedConfiguration(afterCentralCheck: false, cacheDir: cacheDir)
@@ -67,12 +71,14 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
     @discardableResult
     public func loadConfigurationProperty() async throws -> ConfigurationProperty {
-        let properties = try await configurationProperties
+        let properties =
+            try await configurationProperties
             .getConfigurationProperties(
-                from: URL(fileURLWithPath: bundle.path(
-                    forResource: Constants.Configuration.DefaultConfigurationPropertiesFileName,
-                    ofType: "properties"
-                ) ?? "")
+                from: URL(
+                    fileURLWithPath: bundle.path(
+                        forResource: Constants.Configuration.DefaultConfigurationPropertiesFileName,
+                        ofType: "properties"
+                    ) ?? "")
             )
 
         await configurationProperty.update(
@@ -88,9 +94,12 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        let confFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = configDir.appendingPathComponent(
+            CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = configDir.appendingPathComponent(
+            CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = configDir.appendingPathComponent(
+            CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         let configFilesExist =
             fileManager.fileExists(atPath: confFile.path) &&
@@ -133,24 +142,28 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                     serial: configurationProvider.metaInf.serial
                 )
 
-                configurationProvider.configurationLastUpdateCheckDate = await configurationProperties
+                configurationProvider.configurationLastUpdateCheckDate =
+                    await configurationProperties
                     .getConfigurationLastCheckDate()
-                configurationProvider.configurationUpdateDate = await configurationProperties
+                configurationProvider.configurationUpdateDate =
+                    await configurationProperties
                     .getConfigurationUpdatedDate()
 
                 configuration = configurationProvider
-                updateConfiguration()
+                updateConfiguration(configurationProvider)
             } else {
                 let currentDate = Date()
-                configurationProvider.configurationUpdateDate = configurationProvider.configurationUpdateDate ??
-                    configuration?.configurationUpdateDate
+                configurationProvider.configurationUpdateDate =
+                    configurationProvider.configurationUpdateDate
+                    ?? configuration?.configurationUpdateDate
                 configurationProvider.configurationLastUpdateCheckDate = currentDate
                 await configurationProperties.setConfigurationLastCheckDate(date: currentDate)
                 configuration = configurationProvider
-                updateConfiguration()
+                updateConfiguration(configurationProvider)
             }
         } else {
-            ConfigurationLoader.logger.debug("Cached configuration not found. Initializing default configuration")
+            ConfigurationLoader.logger.debug(
+                "Cached configuration not found. Initializing default configuration")
             try await loadDefaultConfiguration(cacheDir: configDir)
         }
     }
@@ -158,27 +171,33 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func loadDefaultConfiguration(cacheDir: URL?) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        guard let confDataURL = bundle.url(
-            forResource: CommonsLib.Constants.Configuration.DefaultConfigJson,
-            withExtension: nil
-        ),
-        let confData = try? String(contentsOf: confDataURL) else {
+        guard
+            let confDataURL = bundle.url(
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigJson,
+                withExtension: nil
+            ),
+            let confData = try? String(contentsOf: confDataURL)
+        else {
             throw ConfigurationLoaderError.configurationNotFound
         }
 
-        guard let publicKeyURL = bundle.url(
-            forResource: CommonsLib.Constants.Configuration.DefaultConfigPub,
-            withExtension: nil
-        ),
-        let publicKey = try? String(contentsOf: publicKeyURL) else {
+        guard
+            let publicKeyURL = bundle.url(
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigPub,
+                withExtension: nil
+            ),
+            let publicKey = try? String(contentsOf: publicKeyURL)
+        else {
             throw ConfigurationLoaderError.publicKeyNotFound
         }
 
-        guard let signatureURL = bundle.url(
-            forResource: CommonsLib.Constants.Configuration.DefaultConfigRsa,
-            withExtension: nil
-        ),
-        let signatureBytes = try? Data(contentsOf: signatureURL) else {
+        guard
+            let signatureURL = bundle.url(
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigRsa,
+                withExtension: nil
+            ),
+            let signatureBytes = try? Data(contentsOf: signatureURL)
+        else {
             throw ConfigurationLoaderError.signatureNotFound
         }
 
@@ -186,7 +205,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         do {
             try configurationSignatureVerifier
-                .verifyConfigurationSignature(config: confData, publicKey: publicKey, signature: signatureText)
+                .verifyConfigurationSignature(
+                    config: confData, publicKey: publicKey, signature: signatureText)
         } catch {
             throw ConfigurationLoaderError.configurationVerificationFailed
         }
@@ -212,12 +232,14 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             serial: configurationProvider.metaInf.serial
         )
 
-        configurationProvider.configurationLastUpdateCheckDate = await configurationProperties
+        configurationProvider.configurationLastUpdateCheckDate =
+            await configurationProperties
             .getConfigurationLastCheckDate()
-        configurationProvider.configurationUpdateDate = await configurationProperties.getConfigurationUpdatedDate()
+        configurationProvider.configurationUpdateDate =
+            await configurationProperties.getConfigurationUpdatedDate()
 
         configuration = configurationProvider
-        updateConfiguration()
+        updateConfiguration(configurationProvider)
     }
 
     public func loadCentralConfiguration(cacheDir: URL?) async throws {
@@ -232,9 +254,10 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         _ = try await loadConfigurationProperty()
 
-        let centralSignature = try await centralConfigurationRepository.fetchSignature().trimmingCharacters(
-            in: .whitespaces
-        )
+        let centralSignature = try await centralConfigurationRepository.fetchSignature()
+            .trimmingCharacters(
+                in: .whitespaces
+            )
 
         if currentSignature != centralSignature.data(using: .utf8) {
             ConfigurationLoader.logger.debug("Found new configuration")
@@ -278,7 +301,13 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 )
 
                 configuration = centralConfigurationProvider
-                updateConfiguration()
+
+                configuration?.configurationLastUpdateCheckDate =
+                    await configurationProperties.getConfigurationLastCheckDate()
+                configuration?.configurationUpdateDate =
+                    await configurationProperties.getConfigurationUpdatedDate()
+
+                updateConfiguration(configuration)
             } else {
                 try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)
             }
@@ -291,7 +320,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     public func shouldCheckForUpdates() async throws -> Bool {
-        guard let lastExecutionDate = await configurationProperties.getConfigurationLastCheckDate() else {
+        guard let lastExecutionDate = await configurationProperties.getConfigurationLastCheckDate()
+        else {
             return true
         }
 
@@ -301,23 +331,42 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         return daysSinceLastUpdateCheck >= 4
     }
 
-    public func getConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error> {
-        return AsyncThrowingStream { continuation in
-            if self.continuation == nil {
-                self.continuation = continuation
+    public func getConfigurationUpdates(replayLatest: Bool = true) -> ConfigStream {
+        AsyncThrowingStream { continuation in
+            let token = UUID()
+            continuations[token] = continuation
+
+            if replayLatest, let config = latestConfiguration {
+                continuation.yield(config)
+            }
+
+            continuation.onTermination = { @Sendable _ in
+                Task { [weak self] in
+                    await self?.removeContinuation(token)
+                }
             }
         }
     }
 
-    private func updateConfiguration() {
-        if let continuation = continuation {
+    private func updateConfiguration(_ configuration: ConfigurationProvider?) {
+        latestConfiguration = configuration
+        for continuation in continuations.values {
             continuation.yield(configuration)
         }
     }
 
-    private func finishConfigurationUpdate() {
-        if let continuation = continuation {
-            continuation.finish()
+    private func finishConfigurationUpdate(with error: Error? = nil) {
+        for continuation in continuations.values {
+            if let error {
+                continuation.finish(throwing: error)
+            } else {
+                continuation.finish()
+            }
         }
+        continuations.removeAll()
+    }
+
+    private func removeContinuation(_ token: UUID) {
+        continuations[token] = nil
     }
 }
