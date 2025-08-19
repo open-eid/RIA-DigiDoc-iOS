@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var showBottomSheetFromButton = false
     @State private var navigateToAccessibility = false
     @State private var navigateToInfo = false
+    @State private var navigateToDiagnostics = false
 
     private var bottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
@@ -24,6 +25,9 @@ struct ContentView: View {
             },
             onAccessibilityClick: {
                 navigateToAccessibility = true
+            },
+            onDiagnosticsClick: {
+                navigateToDiagnostics = true
             }
         )
     }
@@ -46,13 +50,16 @@ struct ContentView: View {
                     HomeView(externalFiles: $openedUrls)
 
                     NavigationLink(
+                        destination: InfoView(),
+                        isActive: $navigateToInfo
+                    ) { }
+                    NavigationLink(
                         destination: AccessibilityView(),
                         isActive: $navigateToAccessibility
                     ) { }
-
                     NavigationLink(
-                        destination: InfoView(),
-                        isActive: $navigateToInfo
+                        destination: DiagnosticsView(),
+                        isActive: $navigateToDiagnostics
                     ) { }
 
                     Spacer()

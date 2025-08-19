@@ -1126,6 +1126,366 @@
         }
       }
     },
+    "Main diagnostics application version title" : {
+      "comment" : "Main diagnostics application version title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Application version:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rakenduse versioon:"
+          }
+        }
+      }
+    },
+    "Main diagnostics cdoc2 title" : {
+      "comment" : "Main diagnostics cdoc2 title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CDOC2:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CDOC2:"
+          }
+        }
+      }
+    },
+    "Main diagnostics central configuration title" : {
+      "comment" : "Main diagnostics central configuration title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Central configuration:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguratsiooni andmed:"
+          }
+        }
+      }
+    },
+    "Main diagnostics configuration check for update button" : {
+      "comment" : "Main diagnostics configuration check for update button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh configuration"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrolli värskendusi"
+          }
+        }
+      }
+    },
+    "Main diagnostics configuration last check date" : {
+      "comment" : "Main diagnostics configuration last check date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LAST CHECK:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VIIMATI KONTROLLITUD:"
+          }
+        }
+      }
+    },
+    "Main diagnostics configuration save diagnostics button" : {
+      "comment" : "Main diagnostics configuration save diagnostics button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save diagnostics"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta diagnostika"
+          }
+        }
+      }
+    },
+    "Main diagnostics configuration update date" : {
+      "comment" : "Main diagnostics configuration update date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UPDATE DATE:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UUENDAMISE KUUPÄEV:"
+          }
+        }
+      }
+    },
+    "Main diagnostics libraries title" : {
+      "comment" : "Main diagnostics libraries title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libraries:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teegid:"
+          }
+        }
+      }
+    },
+    "Main diagnostics logging switch" : {
+      "comment" : "Main diagnostics logging switch",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable one-time log generation"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiveeri ühekordne logifaili genereerimine"
+          }
+        }
+      }
+    },
+    "Main diagnostics operating system title" : {
+      "comment" : "Main diagnostics operating system title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OS:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operatsioonisüsteem:"
+          }
+        }
+      }
+    },
+    "Main diagnostics restart message" : {
+      "comment" : "Main diagnostics restart message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart RIA DigiDoc to activate logging."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logimise aktiveerimiseks taaskäivita RIA DigiDoc."
+          }
+        }
+      }
+    },
+    "Main diagnostics restart message read more" : {
+      "comment" : "Main diagnostics restart message read more",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read more here"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loe täpsemalt siit"
+          }
+        }
+      }
+    },
+    "Main diagnostics restart message restart now" : {
+      "comment" : "Main diagnostics restart message restart now",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart now?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taaskäivita rakendus?"
+          }
+        }
+      }
+    },
+    "main diagnostics restart message url" : {
+      "comment" : "main diagnostics restart message url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/log-file-generation-in-digidoc4-client/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/logifaili-genereerimine-digidoc4-kliendis/"
+          }
+        }
+      }
+    },
+    "Main diagnostics rpuuid custom" : {
+      "comment" : "Main diagnostics rpuuid custom",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "is set manually"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "käsitsi määratud"
+          }
+        }
+      }
+    },
+    "Main diagnostics rpuuid default" : {
+      "comment" : "Main diagnostics rpuuid default",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "is set by default"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vaikimisi määratud"
+          }
+        }
+      }
+    },
+    "Main diagnostics save log" : {
+      "comment" : "Main diagnostics save log",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save log"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta logifail"
+          }
+        }
+      }
+    },
+    "Main diagnostics title" : {
+      "comment" : "Main diagnostics title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostics"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostika"
+          }
+        }
+      }
+    },
+    "Main diagnostics tsl cache title" : {
+      "comment" : "Main diagnostics tsl cache title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TSL cache:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TSL puhver:"
+          }
+        }
+      }
+    },
+    "Main diagnostics urls title" : {
+      "comment" : "Main diagnostics urls title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URLs:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URLid:"
+          }
+        }
+      }
+    },
     "Main home crypto description" : {
       "comment" : "Main home crypto description",
       "extractionState" : "manual",
