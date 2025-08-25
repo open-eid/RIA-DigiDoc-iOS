@@ -292,4 +292,18 @@ final class SignedContainerTests {
             return
         }
     }
+
+    @Test
+    func getDataFile_success() async throws {
+        let dataFiles = await signedContainer.getDataFiles()
+
+        guard let dataFile = dataFiles.first else {
+            Issue.record("Unable to get datafile")
+            return
+        }
+
+        let containerDataFile = try await signedContainer.saveDataFile(dataFile: dataFile)
+        #expect(containerDataFile.isValidURL())
+        #expect(containerDataFile.lastPathComponent == dataFile.fileName)
+    }
 }

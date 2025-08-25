@@ -16,7 +16,7 @@ actor FileOpeningRepository: FileOpeningRepositoryProtocol {
         return try await fileOpeningService.getValidFiles(result)
     }
 
-    func openOrCreateContainer(urls: [URL]) async throws -> SignedContainer {
+    func openOrCreateContainer(urls: [URL]) async throws -> SignedContainerProtocol {
         return try await fileOpeningService.openOrCreateContainer(dataFiles: urls)
     }
 }

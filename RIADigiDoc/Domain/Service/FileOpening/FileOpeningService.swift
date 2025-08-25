@@ -64,7 +64,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         }
     }
 
-    func openOrCreateContainer(dataFiles: [URL]) async throws -> SignedContainer {
+    func openOrCreateContainer(dataFiles: [URL]) async throws -> SignedContainerProtocol {
         return try await SignedContainer.openOrCreate(dataFiles: dataFiles)
     }
 

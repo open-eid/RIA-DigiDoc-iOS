@@ -11,4 +11,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func getDataFileURL(_ dataFile: DataFileWrapper) async -> Result<URL, Error>
     func handleFileOpening(dataFile: DataFileWrapper) async
     func handleSaveFile(dataFile: DataFileWrapper) async
+    func isNestedContainer() -> Bool
 }
