@@ -171,13 +171,13 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                     try await openNestedContainer(fileURL: fileURL)
                 } catch {
                     SigningViewModel.logger.error("Failed to open nested container: \(error)")
-                    errorMessage = ("Failed to open file %@", [fileURL.lastPathComponent])
+                    errorMessage = ("Failed to open container %@", [dataFile.fileName])
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ("Failed to open file %@", [previewFile?.lastPathComponent ?? ""])
+            errorMessage = ("Failed to open file %@", [dataFile.fileName])
         }
     }
 

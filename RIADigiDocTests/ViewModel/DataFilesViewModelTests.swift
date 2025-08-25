@@ -35,11 +35,11 @@ struct DataFilesViewModelTests {
 
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSharedContainerViewModel.getSignedContainerHandler = { mockSignedContainer }
+        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
 
         mockSignedContainer.getDataFilesHandler = { [dataFile] }
 
-        mockSignedContainer.getDataFileHandler = { _ in fileURL }
+        mockSignedContainer.saveDataFileHandler = { _ in fileURL }
 
         guard let firstDataFile = await mockSignedContainer.getDataFiles().first else {
             Issue.record("Unable to get data file")
@@ -49,7 +49,7 @@ struct DataFilesViewModelTests {
         let result = await viewModel.saveDataFile(dataFile: firstDataFile)
 
         #expect(fileURL.lastPathComponent == result?.lastPathComponent)
-        #expect(mockSharedContainerViewModel.getSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
     }
 
     @Test
@@ -64,9 +64,9 @@ struct DataFilesViewModelTests {
 
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSharedContainerViewModel.getSignedContainerHandler = { mockSignedContainer }
+        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
         mockSignedContainer.getDataFilesHandler = { [] }
-        mockSignedContainer.getDataFileHandler = { _ in
+        mockSignedContainer.saveDataFileHandler = { _ in
             throw DigiDocError.containerDataFileSavingFailed(
                 ErrorDetail(
                     message: "File does not exist",
@@ -79,7 +79,7 @@ struct DataFilesViewModelTests {
         let result = await viewModel.saveDataFile(dataFile: dataFile)
 
         #expect(result == nil)
-        #expect(mockSharedContainerViewModel.getSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
     }
 
     @Test

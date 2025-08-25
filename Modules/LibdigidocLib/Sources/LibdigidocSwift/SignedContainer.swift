@@ -114,7 +114,7 @@ extension SignedContainer {
     public static func openOrCreate(
         dataFiles: [URL],
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil()
-    ) async throws -> SignedContainer {
+    ) async throws -> SignedContainerProtocol {
         logger.debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
             logger.error("Unable to create or open container. First datafile is nil")
@@ -163,7 +163,7 @@ extension SignedContainer {
         }
     }
 
-    private static func open(file: URL) async throws -> SignedContainer {
+    private static func open(file: URL) async throws -> SignedContainerProtocol {
         let container = try await ContainerWrapper(
             fileManager: Container.shared.fileManager()
         ).open(containerFile: file)
@@ -179,7 +179,7 @@ extension SignedContainer {
     private static func create(
         containerFile: URL,
         dataFiles: [URL]
-    ) async throws -> SignedContainer {
+    ) async throws -> SignedContainerProtocol {
         let container = try await ContainerWrapper(
             fileManager: Container.shared.fileManager()
         ).create(file: containerFile)

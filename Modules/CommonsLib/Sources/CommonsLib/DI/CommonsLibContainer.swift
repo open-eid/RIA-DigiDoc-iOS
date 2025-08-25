@@ -16,7 +16,7 @@ public extension Container {
         self { URLResourceChecker() }
     }
 
-    var bundle: Factory<BundleProtocol> {
+    var bundle: Factory<BundleProtocol?> {
         self { Bundle.main }
     }
 }

@@ -13,20 +13,26 @@ import LibdigidocLibSwiftMocks
 struct SigningViewModelTests {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModelTests")
 
-    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
-    private let viewModel: SigningViewModel!
-    private let mockFileManager: FileManagerProtocolMock!
-    private let mockContainerUtil: ContainerUtilProtocolMock!
-    private let mockFileUtil: FileUtilProtocolMock!
+    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
+    private let viewModel: SigningViewModel
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockContainerUtil: ContainerUtilProtocolMock
+    private let mockFileUtil: FileUtilProtocolMock
+    private let mockFileOpeningService: FileOpeningServiceProtocolMock
+    private let mockMimeTypeCache: MimeTypeCacheProtocolMock
 
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
+        mockFileOpeningService = FileOpeningServiceProtocolMock()
+        mockMimeTypeCache = MimeTypeCacheProtocolMock()
 
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
+            fileOpeningService: mockFileOpeningService,
+            mimeTypeCache: mockMimeTypeCache,
             fileUtil: mockFileUtil,
             fileManager: mockFileManager
         )
@@ -293,12 +299,10 @@ struct SigningViewModelTests {
     func renameContainer_success() async {
         let expectedURL = URL(fileURLWithPath: "/tmp/renamed.asice")
 
-        let signedContainer = SignedContainerProtocolMock()
-        signedContainer.renameContainerHandler = { _ in expectedURL }
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.renameContainerHandler = { _ in expectedURL }
 
-        mockSharedContainerViewModel.getSignedContainerHandler = {
-            return signedContainer
-        }
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
         let result = await viewModel.renameContainer(to: "renamed.asice")
 
@@ -309,60 +313,291 @@ struct SigningViewModelTests {
     @Test
     func renameContainer_throwContainerRenamingFailedErrorAndSetLocalizedErrorMessage() async throws {
         let fileName = "test.asice"
-        let signedContainer = SignedContainerProtocolMock()
+        let mockSignedContainer = SignedContainerProtocolMock()
 
-        signedContainer.renameContainerHandler = { _ in
+        mockSignedContainer.renameContainerHandler = { _ in
             throw DigiDocError.containerRenamingFailed(
                 ErrorDetail(message: "Error", userInfo: ["fileName": fileName])
             )
         }
 
-        mockSharedContainerViewModel.getSignedContainerHandler = {
-            return signedContainer
-        }
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
         let result = await viewModel.renameContainer(to: "no:name")
 
-        guard let error = viewModel.errorMessage else {
+        guard let (errorKey, args) = viewModel.errorMessage else {
             Issue.record("Expected error message to not be empty")
             return
         }
 
         #expect(result == nil)
-        #expect(error.contains(fileName))
+        #expect(!errorKey.isEmpty)
+        #expect(args.contains(fileName))
     }
 
     @Test
     func renameContainer_throwUnknownDigiDocErrorAndSetGeneralError() async {
-        let signedContainer = SignedContainerProtocolMock()
-        signedContainer.renameContainerHandler = { _ in
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.renameContainerHandler = { _ in
             throw DigiDocError.addingFilesToContainerFailed(ErrorDetail(message: "Some other error"))
         }
 
-        mockSharedContainerViewModel.getSignedContainerHandler = {
-            return signedContainer
-        }
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
         let result = await viewModel.renameContainer(to: "no:name")
 
+        guard let (errorKey, args) = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
         #expect(result == nil)
-        #expect(viewModel.errorMessage == "General error")
+        #expect(errorKey == "General error")
+        #expect(args == [])
     }
 
     @Test
     func renameContainer_nonDigiDocError_setsGeneralError() async {
-        let signedContainer = SignedContainerProtocolMock()
-        signedContainer.renameContainerHandler = { _ in
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.renameContainerHandler = { _ in
             throw NSError(domain: "OtherError", code: 123)
         }
 
-        mockSharedContainerViewModel.getSignedContainerHandler = {
-            return signedContainer
-        }
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
         let result = await viewModel.renameContainer(to: "Some name")
 
+        guard let (errorKey, args) = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
         #expect(result == nil)
-        #expect(viewModel.errorMessage == "General error")
+        #expect(errorKey == "General error")
+        #expect(args == [])
+    }
+
+    @Test
+    func handleFileOpening_successSettingPreviewFileForRegularFile() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+
+        let mimeType = CommonsLib.Constants.MimeType.Default
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockFileOpeningService.openOrCreateContainerHandler = { _ in mockSignedContainer }
+
+        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.handleFileOpening(dataFile: testDataFile)
+
+        #expect(viewModel.previewFile?.lastPathComponent == "test.txt")
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func handleFileOpening_successOpeningNestedContainer() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        let mockNestedSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+
+        let mimeType = CommonsLib.Constants.MimeType.Asice
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: mimeType
+        )
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.asice" }
+        mockNestedSignedContainer.getContainerNameHandler = { "mockNestedSignedContainer.asice" }
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockFileOpeningService.openOrCreateContainerHandler = { _ in mockNestedSignedContainer }
+
+        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let currentSignedContainerName = await viewModel.signedContainer?.getContainerName()
+        let mockSignedContainerName = await mockSignedContainer.getContainerName()
+
+        // Check that current container is the main container (not nested)
+        #expect(currentSignedContainerName == mockSignedContainerName)
+
+        mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
+
+        await viewModel.handleFileOpening(dataFile: testDataFile)
+
+        let updatedSignedContainerName = await viewModel.signedContainer?.getContainerName()
+        let mockNestedSignedContainerName = await mockNestedSignedContainer.getContainerName()
+
+        #expect(viewModel.previewFile == nil)
+        #expect(viewModel.errorMessage == nil)
+
+        // Check that current container is nested container (not main)
+        #expect(updatedSignedContainerName == mockNestedSignedContainerName)
+    }
+
+    @Test
+    func handleFileOpening_throwErrorWhenSettingPreviewFileForRegularFile() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+
+        let mimeType = CommonsLib.Constants.MimeType.Default
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: mimeType
+        )
+
+        mockSignedContainer.saveDataFileHandler = { _ in
+            throw DigiDocError.containerDataFileSavingFailed(
+                ErrorDetail(
+                    message: "Unable to save datafile",
+                    code: 0,
+                    userInfo: ["fileName": testFile.lastPathComponent]
+            ))
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.handleFileOpening(dataFile: testDataFile)
+
+        guard let (errorKey, args) = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
+        #expect(viewModel.previewFile == nil)
+        #expect(errorKey == "Failed to open file %@")
+        #expect(args == [testDataFile.fileName])
+    }
+
+    @Test
+    func handleFileOpening_throwErrorWhenOpeningNestedContainer() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+
+        let mimeType = CommonsLib.Constants.MimeType.Asice
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        mockFileOpeningService.openOrCreateContainerHandler = { _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot open container. Container file is nil"))
+        }
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.asice" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.handleFileOpening(dataFile: testDataFile)
+
+        guard let (errorKey, args) = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
+        let currentSignedContainerName = await viewModel.signedContainer?.getContainerName()
+        let mockSignedContainerName = await mockSignedContainer.getContainerName()
+
+        #expect(viewModel.previewFile == nil)
+        #expect(errorKey == "Failed to open container %@")
+        #expect(args == [testDataFile.fileName])
+        #expect(currentSignedContainerName == mockSignedContainerName)
+    }
+
+    @Test
+    func handleSaveFile_success() async throws {
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: CommonsLib.Constants.MimeType.Default
+        )
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        await viewModel.handleSaveFile(dataFile: testDataFile)
+
+        #expect(viewModel.selectedDataFile == testFile)
+        #expect(viewModel.isShowingFileSaver == true)
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func handleSaveFile_throwErrorWhenSavingDataFile() async throws {
+        let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testDataFile = DataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: CommonsLib.Constants.MimeType.Default
+        )
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        mockSignedContainer.saveDataFileHandler = { _ in
+            throw DigiDocError.containerDataFileSavingFailed(
+                ErrorDetail(
+                    message: "Unable to save datafile",
+                    code: 0,
+                    userInfo: ["fileName": testFile.lastPathComponent]
+            ))
+        }
+
+        await viewModel.handleSaveFile(dataFile: testDataFile)
+
+        guard let (errorKey, args) = viewModel.errorMessage else {
+            Issue.record("Expected error message to not be empty")
+            return
+        }
+
+        #expect(viewModel.selectedDataFile == nil)
+        #expect(viewModel.isShowingFileSaver == false)
+        #expect(errorKey == "Failed to save file %@")
+        #expect(args == [testFile.lastPathComponent])
     }
 }

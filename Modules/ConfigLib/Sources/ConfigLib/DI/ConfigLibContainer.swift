@@ -43,7 +43,7 @@ extension Container {
                 configurationSignatureVerifier: self.configurationSignatureVerifier(),
                 configurationCache: self.configurationCache(),
                 fileManager: self.fileManager(),
-                bundle: Bundle.module
+                bundle: self.bundle() ?? Bundle.module
             )
         }
         .shared
