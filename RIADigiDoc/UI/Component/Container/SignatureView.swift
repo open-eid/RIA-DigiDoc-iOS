@@ -18,6 +18,7 @@ struct SignatureView: View {
     let showSignedDate: Bool
     let showMoreOptionsButton: Bool
     let showRole: Bool
+    var showRemoveSignatureButton: Bool
 
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false
@@ -27,6 +28,7 @@ struct SignatureView: View {
     private var bottomSheetActions: [BottomSheetButton] {
         SignatureBottomSheetActions.actions(
             languageSettings: languageSettings,
+            showRemoveSignatureButton: showRemoveSignatureButton,
             onDetailsButtonClick: {
                 showDetail = true
             }
@@ -41,7 +43,8 @@ struct SignatureView: View {
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
         showSignedDate: Bool = true,
         showMoreOptionsButton: Bool = true,
-        showRole: Bool = true
+        showRole: Bool = true,
+        showRemoveSignatureButton: Bool = true
     ) {
         self.containerMimetype = containerMimetype
         self.dataFilesCount = dataFilesCount
@@ -51,6 +54,7 @@ struct SignatureView: View {
         self.showSignedDate = showSignedDate
         self.showMoreOptionsButton = showMoreOptionsButton
         self.showRole = showRole
+        self.showRemoveSignatureButton = showRemoveSignatureButton
     }
 
     var body: some View {

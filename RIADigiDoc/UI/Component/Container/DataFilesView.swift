@@ -9,12 +9,14 @@ struct DataFilesView: View {
     @State private var showBottomSheetFromButton = false
     @State private var showBottomSheetFromTap = false
 
+    let onOpenFileButtonClick: (DataFileWrapper) -> Void
     let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
 
     private var bottomSheetActions: [BottomSheetButton] {
         DataFileBottomSheetActions.actions(
             languageSettings: languageSettings,
             showRemoveFileButton: showRemoveFileButton,
+            onOpenFileButtonClick: { onOpenFileButtonClick(dataFile) },
             onSaveFileButtonClick: { onSaveDataFileButtonClick(dataFile) }
         )
     }

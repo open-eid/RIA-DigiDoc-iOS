@@ -44,11 +44,13 @@ struct SignatureDetailView: View {
             key = "Signature detail non-qscd reason"
         case .unknown:
             key = "Signature detail unknown reason"
-        default:
+        case .invalid:
             key = "Signature detail invalid reason"
+        default:
+            key = ""
         }
 
-        return languageSettings.localized(key)
+        return key.isEmpty ? "" : languageSettings.localized(key)
     }
 
     var timeStampTime: String {
@@ -111,8 +113,7 @@ struct SignatureDetailView: View {
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Signature details"),
-            onLeftClick: { dismiss()
-            },
+            onLeftClick: { dismiss() },
             content: {
                 ScrollView {
                     SignatureView(
@@ -124,23 +125,24 @@ struct SignatureDetailView: View {
                         showRole: false
                     )
 
-                    if let attributed = warningText.getURLFromText() {
-                        Text(attributed)
-                            .foregroundStyle(theme.onSurface)
-                            .font(typography.bodyLarge)
-                            .padding(.vertical, Dimensions.Padding.XSPadding)
-                    } else {
-                        Text(verbatim: warningText)
-                            .foregroundStyle(theme.onSurface)
-                            .font(typography.bodyLarge)
-                            .padding(.vertical, Dimensions.Padding.XSPadding)
-                    }
+                    if !warningText.isEmpty {
+                        Group {
+                            if let attributed = warningText.getURLFromText() {
+                                Text(attributed)
+                            } else {
+                                Text(verbatim: warningText)
+                            }
+                        }
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.bodyLarge)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
 
-                    ExpandableButton(
-                        title: languageSettings.localized("Technical information title"),
-                        detailText: signature.diagnosticsInfo
-                    )
-                    .padding(.vertical, Dimensions.Padding.SPadding)
+                        ExpandableButton(
+                            title: languageSettings.localized("Technical information title"),
+                            detailText: signature.diagnosticsInfo
+                        )
+                        .padding(.vertical, Dimensions.Padding.SPadding)
+                    }
 
                     VStack(alignment: .leading) {
                         TabView(

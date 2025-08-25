@@ -1,7 +1,7 @@
 import Foundation
 
 /// @mockable
-public protocol SignedContainerProtocol: Sendable {
+public protocol SignedContainerProtocol: Sendable, AnyObject {
     func getDataFiles() async -> [DataFileWrapper]
     func getSignatures() async -> [SignatureWrapper]
     func getContainerName() async -> String

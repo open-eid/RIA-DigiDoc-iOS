@@ -11,6 +11,7 @@ struct SignaturesListView: View {
     @Binding var selectedSignature: SignatureWrapper?
     @Binding var containerMimetype: String
     var dataFilesCount: Int
+    var showRemoveSignatureButton: Bool
 
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
@@ -23,7 +24,8 @@ struct SignaturesListView: View {
                     dataFilesCount: dataFilesCount,
                     signature: signature,
                     nameUtil: nameUtil,
-                    signatureUtil: signatureUtil
+                    signatureUtil: signatureUtil,
+                    showRemoveSignatureButton: showRemoveSignatureButton
                 )
             }
         }
@@ -58,6 +60,7 @@ struct SignaturesListView: View {
         selectedSignature: .constant(signature),
         containerMimetype: .constant("application/vnd.etsi.asic-e+zip"),
         dataFilesCount: 1,
+        showRemoveSignatureButton: true,
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )

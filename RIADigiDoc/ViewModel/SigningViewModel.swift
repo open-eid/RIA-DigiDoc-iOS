@@ -14,42 +14,48 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var containerName: String = CommonsLib.Constants.Container.DefaultName
     @Published var containerMimetype: String = "N/A"
     @Published var containerURL: URL?
-    @Published var errorMessage: String?
+    @Published var previewFile: URL?
+    @Published var selectedDataFile: URL?
+    @Published var isShowingFileSaver = false
+    @Published private(set) var errorMessage: (String, [String])?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    private let fileOpeningService: FileOpeningServiceProtocol
+    private let mimeTypeCache: MimeTypeCacheProtocol
     private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
 
-    private var loadedSignedContainer: SignedContainerProtocol?
-
-    var signedContainer: SignedContainerProtocol? {
-        loadedSignedContainer ?? sharedContainerViewModel.getSignedContainer()
-    }
+    @Published private(set) var signedContainer: SignedContainerProtocol?
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileOpeningService: FileOpeningServiceProtocol,
+        mimeTypeCache: MimeTypeCacheProtocol,
         fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileOpeningService = fileOpeningService
+        self.mimeTypeCache = mimeTypeCache
         self.fileUtil = fileUtil
         self.fileManager = fileManager
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger.debug("Loading container data")
-        guard let signedContainer else {
+        let openedContainer = signedContainer ?? sharedContainerViewModel.currentContainer()
+        guard let openedContainer else {
             SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")
             return
         }
 
-        self.loadedSignedContainer = signedContainer
+        self.signedContainer = openedContainer
 
-        self.containerName = await signedContainer.getContainerName()
-        self.dataFiles = await signedContainer.getDataFiles()
-        self.signatures = await signedContainer.getSignatures()
-        self.containerMimetype = await signedContainer.getContainerMimetype()
-        self.containerURL = await signedContainer.getRawContainerFile()
+        self.containerName = await openedContainer.getContainerName()
+        self.dataFiles = await openedContainer.getDataFiles()
+        self.signatures = await openedContainer.getSignatures()
+        self.containerMimetype = await openedContainer.getContainerMimetype()
+        self.containerURL = await openedContainer.getRawContainerFile()
 
         SigningViewModel.logger.debug("Container data loaded")
     }
@@ -122,15 +128,12 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 switch digiDocError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = String(
-                        format: NSLocalizedString("Failed to rename file %@", comment: ""),
-                        errorDetail.userInfo["fileName"] ?? ""
-                    )
+                    errorMessage = ("Failed to rename file %@", [errorDetail.userInfo["fileName"] ?? ""])
                 default:
-                    errorMessage = "General error"
+                    errorMessage = ("General error", [])
                 }
             } else {
-                errorMessage = "General error"
+                errorMessage = ("General error", [])
             }
             return nil
         }
@@ -154,5 +157,66 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         } catch {
             return .failure(error)
         }
+    }
+
+    func handleFileOpening(dataFile: DataFileWrapper) async {
+        let result = await getDataFileURL(dataFile)
+
+        switch result {
+        case .success(let fileURL):
+            let mimeType = await mimeTypeCache.getMimeType(fileUrl: fileURL)
+
+            if Constants.MimeType.SignatureContainers.contains(mimeType) {
+                do {
+                    try await openNestedContainer(fileURL: fileURL)
+                } catch {
+                    SigningViewModel.logger.error("Failed to open nested container: \(error)")
+                    errorMessage = ("Failed to open file %@", [fileURL.lastPathComponent])
+                }
+            } else {
+                previewFile = fileURL
+            }
+        case .failure:
+            errorMessage = ("Failed to open file %@", [previewFile?.lastPathComponent ?? ""])
+        }
+    }
+
+    func handleSaveFile(dataFile: DataFileWrapper) async {
+        let result = await getDataFileURL(dataFile)
+
+        switch result {
+        case .success(let fileURL):
+            selectedDataFile = fileURL
+            isShowingFileSaver = true
+
+        case .failure:
+            errorMessage = ("Failed to save file %@", [dataFile.fileName])
+            isShowingFileSaver = false
+        }
+    }
+
+    func isNestedContainer() -> Bool {
+        return sharedContainerViewModel.isNestedContainer(
+            sharedContainerViewModel.currentContainer()
+        )
+    }
+
+    func handleBackButton() async -> Bool {
+        if sharedContainerViewModel.containers().count > 1 {
+            sharedContainerViewModel.removeLastContainer()
+            let currentContainer = sharedContainerViewModel.currentContainer()
+            sharedContainerViewModel.setSignedContainer(currentContainer)
+            await loadContainerData(signedContainer: currentContainer)
+            return false
+        } else {
+            sharedContainerViewModel.clearContainers()
+            return true
+        }
+    }
+
+    private func openNestedContainer(fileURL: URL) async throws {
+        let container = try await fileOpeningService.openOrCreateContainer(dataFiles: [fileURL])
+        sharedContainerViewModel.setSignedContainer(container)
+        await loadContainerData(signedContainer: container)
     }
 }
