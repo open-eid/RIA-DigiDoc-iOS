@@ -63,8 +63,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                 "Saving datafile '\(sanitizedFilename)' to temporary location \(tempSavedFileLocation)"
             )
 
-            digiDocContainerWrapper.saveDataFile(dataFile.fileId,
-                                                 fileLocation: tempSavedFileLocation) { isSaved, error in
+            digiDocContainerWrapper.saveDataFile(
+                dataFile.fileId,
+                fileLocation: tempSavedFileLocation
+            ) { isSaved, error in
                 lock.lock()
                 defer { lock.unlock() }
                 if error != nil {

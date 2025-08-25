@@ -22,7 +22,7 @@ class DataFilesViewModel: ObservableObject {
     func saveDataFile(dataFile: DataFileWrapper) async -> URL? {
         do {
             return try await sharedContainerViewModel
-                .getSignedContainer()?
+                .currentContainer()?
                 .saveDataFile(dataFile: dataFile)
         } catch {
             DataFilesViewModel.logger.error(

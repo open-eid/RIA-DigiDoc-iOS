@@ -4,6 +4,24 @@
     "%lld" : {
       "shouldTranslate" : false
     },
+    "Add more files" : {
+      "comment" : "Add more files button in signature view and crypto view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add more files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisa veel faile"
+          }
+        }
+      }
+    },
     "Add signature" : {
       "comment" : "Add signature button",
       "extractionState" : "manual",
@@ -137,7 +155,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ümbriku failid"
+            "value" : "Ümbriku sisu"
           }
         }
       }
@@ -192,6 +210,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku allkirjad"
+          }
+        }
+      }
+    },
+    "Container signing" : {
+      "comment" : "Signing view container files title (unsigned)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container signing"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku allkirjastamine"
           }
         }
       }
@@ -2084,6 +2120,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seaded"
+          }
+        }
+      }
+    },
+    "Share" : {
+      "comment" : "Share button in signing and crypto view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jaga"
           }
         }
       }

@@ -1,4 +1,5 @@
 import SwiftUI
+import QuickLook
 import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
@@ -16,23 +17,22 @@ struct SigningView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab = 0
-    @State private var selectedDataFile: URL?
 
     @State private var selectedSignature: SignatureWrapper?
 
     @StateObject private var viewModel: SigningViewModel
-    private var sharedContainerViewModel: SharedContainerViewModelProtocol
 
     @State private var tempContainerURL: URL?
-    @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
     @State private var showRenameDialog = false
     @State private var newContainerName = Constants.Container.DefaultName
 
     @State private var showingShareSheet = false
 
-    private var containerFilesTitle: String {
-        languageSettings.localized("Container files")
+    private var containerTitle: String {
+        !isContainerSigned && !isNestedContainer ?
+        languageSettings.localized("Container signing") :
+        containerFilesTitle
     }
 
     private var containerNameTitle: String {
@@ -43,6 +43,10 @@ struct SigningView: View {
         languageSettings.localized("Container signatures")
     }
 
+    private var containerFilesTitle: String {
+        languageSettings.localized("Container files")
+    }
+
     private var shareTitle: String {
         languageSettings.localized("Share")
     }
@@ -51,26 +55,57 @@ struct SigningView: View {
         viewModel.signatures.count > 0
     }
 
+    private var closeIcon: String {
+        !isNestedContainer ? "ic_m3_close_48pt_wght400" :
+        "ic_m3_arrow_back_ios_48pt_wght400"
+    }
+
+    private var signLabel: String {
+        languageSettings.localized("Sign")
+    }
+
+    private var encryptLabel: String {
+        languageSettings.localized("Encrypt")
+    }
+
+    private var addMoreFilesLabel: String {
+        languageSettings.localized("Add more files")
+    }
+
+    private var isContainerSigned: Bool {
+        viewModel.isSigned()
+    }
+
+    private var isNestedContainer: Bool {
+        viewModel.isNestedContainer()
+    }
+
     init(
         viewModel: SigningViewModel = Container.shared.signingViewModel(),
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
-        fileUtil: FileUtilProtocol = Container.shared.fileUtil(),
-        sharedContainerViewModel: SharedContainerViewModelProtocol = Container.shared.sharedContainerViewModel()
+        fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.nameUtil = nameUtil
         self.signatureUtil = signatureUtil
         self.fileUtil = fileUtil
-        self.sharedContainerViewModel = sharedContainerViewModel
     }
 
     var body: some View {
         ZStack {
             TopBarContainer(
-                title: containerFilesTitle,
-                onLeftClick: { dismiss()
- },
+                title: containerTitle,
+                leftIcon: closeIcon,
+                leftIconAccessibility:
+                    languageSettings.localized(closeIcon).lowercased(),
+                onLeftClick: {
+                    Task {
+                        if await viewModel.handleBackButton() {
+                            dismiss()
+                        }
+                    }
+                },
                 content: {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
                         VStack {
@@ -78,23 +113,27 @@ struct SigningView: View {
                                 icon: "ic_m3_stylus_note_48pt_wght400",
                                 containerNameTitle: containerNameTitle,
                                 name: $viewModel.containerName,
-                                isEditContainerButtonShown: !viewModel.isSigned(),
-                                isEncryptButtonShown: !viewModel.isSigned(),
-                                showLeftActionButton: viewModel.isSigned(),
-                                showRightActionButton: viewModel.isSigned(),
-                                leftActionButtonName: languageSettings.localized("Sign"),
-                                rightActionButtonName: languageSettings.localized("Encrypt"),
-                                leftActionButtonAccessibilityLabel: languageSettings.localized("Sign"),
-                                rightActionButtonAccessibilityLabel: languageSettings.localized("Encrypt"),
-                                onLeftActionButtonClick: {},
-                                onRightActionButtonClick: {},
+                                isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
+                                isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
+                                showLeftActionButton: isContainerSigned && !isNestedContainer,
+                                showRightActionButton: isContainerSigned && !isNestedContainer,
+                                leftActionButtonName: signLabel,
+                                rightActionButtonName: encryptLabel,
+                                leftActionButtonAccessibilityLabel: signLabel.lowercased(),
+                                rightActionButtonAccessibilityLabel: encryptLabel.lowercased(),
+                                onLeftActionButtonClick: {
+                                    // TODO: Implement signing functionality
+                                },
+                                onRightActionButtonClick: {
+                                    // TODO: Implement encrypt functionality
+                                },
                                 onSaveContainerButtonClick: {
                                     tempContainerURL = viewModel.createCopyOfContainerForSaving(
                                         containerURL: viewModel.containerURL
                                     )
 
                                     if fileUtil.fileExists(fileLocation: tempContainerURL) {
-                                        isShowingFileSaver = true
+                                        viewModel.isShowingFileSaver = true
                                     }
                                 },
                                 onRenameContainerButtonClick: {
@@ -103,7 +142,7 @@ struct SigningView: View {
                             )
                             .background(
                                 FileSaverHandler(
-                                    isPresented: $isShowingFileSaver,
+                                    isPresented: $viewModel.isShowingFileSaver,
                                     fileURL: tempContainerURL,
                                     languageSettings: languageSettings,
                                     onComplete: {
@@ -121,34 +160,22 @@ struct SigningView: View {
                                     if selectedTab == 0 {
                                         DataFilesListView(
                                             dataFiles: viewModel.dataFiles,
-                                            showRemoveFileButton: !viewModel.isSigned(),
+                                            showRemoveFileButton: !isContainerSigned && !isNestedContainer,
+                                            onOpenFileButtonClick: { dataFile in
+                                                Task {
+                                                    await viewModel.handleFileOpening(dataFile: dataFile)
+                                                }
+                                            },
                                             onSaveDataFileButtonClick: { dataFile in
                                                 Task {
-                                                    let result = await viewModel.getDataFileURL(dataFile)
-
-                                                    await MainActor.run {
-                                                        switch result {
-                                                        case .success(let fileURL):
-                                                            selectedDataFile = fileURL
-                                                            isShowingFileSaver = true
-
-                                                        case .failure:
-                                                            let message = String(
-                                                                format: languageSettings
-                                                                    .localized("Failed to save file %@"),
-                                                                dataFile.fileName
-                                                            )
-                                                            isShowingFileSaver = false
-                                                            Toast.show(message)
-                                                        }
-                                                    }
+                                                    await viewModel.handleSaveFile(dataFile: dataFile)
                                                 }
                                             }
                                         )
                                         .background(
                                             FileSaverHandler(
-                                                isPresented: $isShowingFileSaver,
-                                                fileURL: selectedDataFile,
+                                                isPresented: $viewModel.isShowingFileSaver,
+                                                fileURL: viewModel.selectedDataFile,
                                                 languageSettings: languageSettings,
                                                 onComplete: {
                                                     viewModel.removeSavedFilesDirectory()
@@ -156,12 +183,14 @@ struct SigningView: View {
                                                 isFileSaved: $isFileSaved
                                             )
                                         )
+                                        .quickLookPreview($viewModel.previewFile)
                                     } else {
                                         SignaturesListView(
                                             signatures: viewModel.signatures,
                                             selectedSignature: $selectedSignature,
                                             containerMimetype: $viewModel.containerMimetype,
                                             dataFilesCount: viewModel.dataFiles.count,
+                                            showRemoveSignatureButton: !isNestedContainer,
                                             nameUtil: nameUtil,
                                             signatureUtil: signatureUtil
                                         )
@@ -170,41 +199,29 @@ struct SigningView: View {
                                 }
                             } else {
                                 VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                                    Text(containerFilesTitle)
+                                    Text(verbatim: languageSettings.localized("Container files"))
                                         .foregroundStyle(theme.onSurfaceVariant)
                                         .font(typography.labelLarge)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
                                     DataFilesListView(
                                         dataFiles: viewModel.dataFiles,
-                                        showRemoveFileButton: !viewModel.isSigned(),
+                                        showRemoveFileButton: !isContainerSigned && !isNestedContainer,
+                                        onOpenFileButtonClick: { dataFile in
+                                            Task {
+                                                await viewModel.handleFileOpening(dataFile: dataFile)
+                                            }
+                                        },
                                         onSaveDataFileButtonClick: { dataFile in
                                             Task {
-                                                let result = await viewModel.getDataFileURL(dataFile)
-
-                                                await MainActor.run {
-                                                    switch result {
-                                                    case .success(let fileURL):
-                                                        selectedDataFile = fileURL
-                                                        isShowingFileSaver = true
-
-                                                    case .failure:
-                                                        let message = String(
-                                                            format: languageSettings
-                                                                .localized("Failed to save file %@"),
-                                                            dataFile.fileName
-                                                        )
-                                                        isShowingFileSaver = false
-                                                        Toast.show(message)
-                                                    }
-                                                }
+                                                await viewModel.handleSaveFile(dataFile: dataFile)
                                             }
                                         }
                                     )
                                     .background(
                                         FileSaverHandler(
-                                            isPresented: $isShowingFileSaver,
-                                            fileURL: selectedDataFile,
+                                            isPresented: $viewModel.isShowingFileSaver,
+                                            fileURL: viewModel.selectedDataFile,
                                             languageSettings: languageSettings,
                                             onComplete: {
                                                 viewModel.removeSavedFilesDirectory()
@@ -212,6 +229,7 @@ struct SigningView: View {
                                             isFileSaved: $isFileSaved
                                         )
                                     )
+                                    .quickLookPreview($viewModel.previewFile)
                                 }
                                 .padding(.vertical, Dimensions.Padding.MPadding)
                             }
@@ -230,15 +248,15 @@ struct SigningView: View {
                         } else {
                             UnsignedBottomBarView(
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
-                                leftButtonLabel: "Add more files",
-                                leftButtonAccessibilityLabel: "Add more files",
+                                leftButtonLabel: addMoreFilesLabel,
+                                leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
                                 leftButtonAction: {
                                     // TODO: Implement add more files functionality
                                 },
 
                                 rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
-                                rightButtonLabel: "Sign",
-                                rightButtonAccessibilityLabel: "Sign",
+                                rightButtonLabel: signLabel,
+                                rightButtonAccessibilityLabel: signLabel.lowercased(),
                                 rightButtonAction: {
                                     // TODO: Implement signing functionality
                                 }
@@ -275,7 +293,7 @@ struct SigningView: View {
                             let newValueURL = URL(fileURLWithPath: newValue)
 
                             let containerExtension =
-                                existingExtension.isEmpty ? Constants.Extension.Default : existingExtension
+                            existingExtension.isEmpty ? Constants.Extension.Default : existingExtension
 
                             newContainerName = newValueURL
                                 .appendingPathExtension(containerExtension)
@@ -289,11 +307,10 @@ struct SigningView: View {
 
                             if uniqueContainerName != nil {
                                 viewModel.containerName =
-                                    uniqueContainerName?.lastPathComponent ?? viewModel.containerName
+                                uniqueContainerName?.lastPathComponent ?? viewModel.containerName
                             }
                         }
                     },
-
                     onCancel: {
                         showRenameDialog = false
                         newContainerName = ""
@@ -304,7 +321,11 @@ struct SigningView: View {
         .animation(.easeInOut, value: showRenameDialog)
         .onReceive(viewModel.$errorMessage) { error in
             guard let error else { return }
-            Toast.show(languageSettings.localized(error))
+            let (key, args) = error
+            Toast.show(String(
+                format: languageSettings.localized(key),
+                args.joined(separator: ", "))
+            )
         }
     }
 }

@@ -2,6 +2,7 @@ struct DataFileBottomSheetActions {
     static func actions(
         languageSettings: LanguageSettings,
         showRemoveFileButton: Bool,
+        onOpenFileButtonClick: @escaping () -> Void,
         onSaveFileButtonClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
 
@@ -10,9 +11,7 @@ struct DataFileBottomSheetActions {
                 icon: "ic_m3_edit_48pt_wght400",
                 title: languageSettings.localized("Open file"),
                 accessibilityLabel: languageSettings.localized("Open file").lowercased(),
-                onClick: {
-                    // TODO: Implement open‑file action
-                }
+                onClick: onOpenFileButtonClick
             ),
             BottomSheetButton(
                 icon: "ic_m3_download_48pt_wght400",

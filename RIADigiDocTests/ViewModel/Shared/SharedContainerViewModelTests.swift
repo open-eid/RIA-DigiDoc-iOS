@@ -26,7 +26,7 @@ struct SharedContainerViewModelTests {
         )
 
         viewModel.setSignedContainer(signedContainer: signedContainer)
-        let result = viewModel.getSignedContainer()
+        let result = viewModel.currentContainer()
 
         let signedContainerName = await signedContainer.getContainerName()
         let containerName = await result?.getContainerName()
@@ -37,7 +37,7 @@ struct SharedContainerViewModelTests {
     @Test
     func setSignedContainer_returnNilWhenSignedContainerNotExist() {
         viewModel.setSignedContainer(signedContainer: nil)
-        let result = viewModel.getSignedContainer()
+        let result = viewModel.currentContainer()
 
         #expect(result == nil)
     }

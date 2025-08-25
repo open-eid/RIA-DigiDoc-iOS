@@ -9,4 +9,6 @@ public protocol SigningViewModelProtocol: Sendable {
     func removeSavedFilesDirectory(savedFilesDirectory: URL?)
     @discardableResult func renameContainer(to newName: String) async -> URL?
     func getDataFileURL(_ dataFile: DataFileWrapper) async -> Result<URL, Error>
+    func handleFileOpening(dataFile: DataFileWrapper) async
+    func handleSaveFile(dataFile: DataFileWrapper) async
 }

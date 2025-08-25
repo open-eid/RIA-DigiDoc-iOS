@@ -31,40 +31,32 @@ struct HomeView: View {
                 .padding(.bottom, Dimensions.Padding.LPadding)
 
             VStack(spacing: Dimensions.Padding.SPadding) {
-                ActionButton(
+                SigningImportButton(
                     title: languageSettings.localized("Main home open document title"),
                     description: languageSettings.localized("Main home open document description"),
                     assetImageName: "ic_m3_attach_file_48pt_wght400",
-                ) {
-                    viewModel.isImporting = true
-                }
-                .fileImporter(
-                    isPresented: $viewModel.isImporting,
-                    allowedContentTypes: [.item],
-                    allowsMultipleSelection: true
-                ) { result in
-                    isFileOpeningLoading = true
-                    viewModel.isImporting = false
-                    self.viewModel.setChosenFiles(result)
-                }
-                .fullScreenCover(isPresented: $isFileOpeningLoading) {
-                    FileOpeningView(
-                        viewModel: fileOpeningViewModel,
-                        isFileOpeningLoading: $isFileOpeningLoading,
-                        isNavigatingToNextView: $isNavigatingToSigningView
-                    )
-                }
+                    isFileOpeningLoading: $isFileOpeningLoading,
+                    isNavigatingToNextView: $isNavigatingToSigningView,
+                    viewModel: viewModel,
+                    fileOpeningViewModel: fileOpeningViewModel
+                )
 
-                ActionButton(
+                SigningImportButton(
                     title: languageSettings.localized("Main home signature title"),
                     description: languageSettings.localized("Main home signature description"),
                     assetImageName: "ic_m3_stylus_note_48pt_wght400",
-                ) {}
+                    isFileOpeningLoading: $isFileOpeningLoading,
+                    isNavigatingToNextView: $isNavigatingToSigningView,
+                    viewModel: viewModel,
+                    fileOpeningViewModel: fileOpeningViewModel
+                )
+
                 ActionButton(
                     title: languageSettings.localized("Main home crypto title"),
                     description: languageSettings.localized("Main home crypto description"),
                     assetImageName: "ic_m3_encrypted_48pt_wght400",
                 ) {}
+
                 ActionButton(
                     title: languageSettings.localized("Main home my eid title"),
                     description: languageSettings.localized("Main home my eid description"),

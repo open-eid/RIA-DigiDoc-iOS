@@ -54,11 +54,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             sharedContainerViewModel.setAddedFilesCount(addedFiles: validFiles.count)
 
             sharedContainerViewModel.setSignedContainer(
-                signedContainer:
-                    try await fileOpeningRepository.openOrCreateContainer(urls: validFiles))
+                try await fileOpeningRepository.openOrCreateContainer(urls: validFiles))
             FileOpeningViewModel.logger.debug("Signed container set successfully")
             handleLoadingSuccess()
-
         } catch {
             handleError(error)
         }
@@ -70,7 +68,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     }
 
     func showFileAddedMessage() async -> Bool {
-        return await sharedContainerViewModel.getSignedContainer()?.getSignatures().isEmpty ?? true
+        return await sharedContainerViewModel.currentContainer()?.getSignatures().isEmpty ?? true
     }
 
     func addedFilesCount() -> Int {
