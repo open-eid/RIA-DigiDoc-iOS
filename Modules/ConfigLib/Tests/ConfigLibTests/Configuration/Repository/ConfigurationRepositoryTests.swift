@@ -39,7 +39,7 @@ struct ConfigurationRepositoryTests {
             continuation.finish()
         }
 
-        mockConfigurationLoader.getConfigurationUpdatesHandler = { stream }
+        mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
         let resultStream = await repository.getConfigurationUpdates()
 
@@ -100,7 +100,7 @@ struct ConfigurationRepositoryTests {
         }
 
         mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
-        mockConfigurationLoader.getConfigurationUpdatesHandler = { stream }
+        mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
         let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: mockCacheDir)
 
@@ -130,7 +130,7 @@ struct ConfigurationRepositoryTests {
         }
 
         mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
-        mockConfigurationLoader.getConfigurationUpdatesHandler = { stream }
+        mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
         let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: nil)
 
@@ -160,7 +160,7 @@ struct ConfigurationRepositoryTests {
             continuation.finish(throwing: NSError(domain: "TestError", code: 1))
         }
 
-        mockConfigurationLoader.getConfigurationUpdatesHandler = { stream }
+        mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
         let observedStream = await repository.observeConfigurationUpdates()
 

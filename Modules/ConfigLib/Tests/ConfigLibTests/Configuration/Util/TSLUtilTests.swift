@@ -1,15 +1,18 @@
+import CommonsLibMocks
+import CommonsTestShared
 import Foundation
 import Testing
-import CommonsLibMocks
 
 @testable import ConfigLib
 
 struct TSLUtilTests {
 
-    let mockFileManager: FileManagerProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
+    private let tslUtil: TSLUtilProtocol
 
     init() async throws {
-        mockFileManager = FileManagerProtocolMock()
+        self.mockFileManager = FileManagerProtocolMock()
+        self.tslUtil = TSLUtil(fileManager: mockFileManager)
     }
 
     @Test
@@ -31,10 +34,9 @@ struct TSLUtilTests {
 
         let destinationDir = URL(fileURLWithPath: "/mock/test/destination")
 
-        try TSLUtil.setupTSLFiles(
+        try tslUtil.setupTSLFiles(
             tsls: fileNamePaths,
             destinationDir: destinationDir,
-            fileManager: mockFileManager
         )
 
         #expect(mockFileManager.copyItemAtPathCallCount == 2)
@@ -52,12 +54,28 @@ struct TSLUtilTests {
 
         let destinationDir = URL(fileURLWithPath: "/mock/destination")
 
-        try TSLUtil.setupTSLFiles(
+        try tslUtil.setupTSLFiles(
             tsls: fileNamePath,
             destinationDir: destinationDir,
-            fileManager: mockFileManager
         )
 
         #expect(mockFileManager.copyItemAtPathCallCount == 0)
+    }
+
+    @Test func readSequenceNumber_success() async throws {
+        let fileContents = "<root><TSLSequenceNumber>123</TSLSequenceNumber></root>"
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "tslfiles")
+        try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
+        let fileName = "test-\(UUID().uuidString).xml"
+        let fileURL = tempDirectoryURL.appendingPathComponent(fileName)
+
+        try fileContents.write(to: fileURL, atomically: true, encoding: .utf8)
+
+        defer {
+            try? FileManager.default.removeItem(at: fileURL)
+        }
+
+        let sequenceNumber = try tslUtil.readSequenceNumber(from: fileURL)
+        #expect(sequenceNumber == 123)
     }
 }

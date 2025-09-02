@@ -15,7 +15,7 @@ final class BundleUtilTests {
     }
 
     @Test
-    func getBundleShortVersionString() {
+    func getBundleShortVersionString_success() {
         if let appBundle = Bundle(identifier: "ee.ria.digidoc") {
             let bundleShortVersionString = BundleUtil.getBundleShortVersionString(bundle: appBundle)
 
@@ -35,7 +35,7 @@ final class BundleUtilTests {
     }
 
     @Test
-    func getBundleVersion() {
+    func getBundleVersion_success() {
         if let appBundle = Bundle(identifier: "ee.ria.digidoc") {
             let bundleVersion = BundleUtil.getBundleVersion(bundle: appBundle)
 

@@ -42,7 +42,7 @@ let package = Package(
         .target(
             name: "ConfigLibMocks",
             dependencies: ["ConfigLib"],
-            path: "Tests/Mocks/Generated"
+            path: "Tests/Mocks"
         ),
         .testTarget(
             name: "ConfigLibTests",

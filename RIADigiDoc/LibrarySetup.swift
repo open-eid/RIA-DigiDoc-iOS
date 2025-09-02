@@ -11,22 +11,25 @@ actor LibrarySetup {
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let fileManager: FileManagerProtocol
+    private let tslUtil: TSLUtilProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
-        fileManager: FileManagerProtocol
+        fileManager: FileManagerProtocol,
+        tslUtil: TSLUtilProtocol,
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
         self.fileManager = fileManager
+        self.tslUtil = tslUtil
     }
 
     func setupLibraries() async {
         do {
             try DigiDocConf.observeConfigurationUpdates(configurationRepository: configurationRepository)
             if let schemaDirectory = Directories.getLibraryDirectory(fileManager: fileManager) {
-                try TSLUtil.setupTSLFiles(destinationDir: schemaDirectory, fileManager: fileManager)
+                try tslUtil.setupTSLFiles(tsls: [], destinationDir: schemaDirectory)
             } else {
                 LibrarySetup.logger.error("Unable to setup TSL files. Library directory does not exist")
             }

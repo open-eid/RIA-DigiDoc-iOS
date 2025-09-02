@@ -75,4 +75,12 @@ extension Container {
             )
         }
     }
+
+    public var tslUtil: Factory<TSLUtilProtocol> {
+        self {
+            TSLUtil(
+                fileManager: self.fileManager()
+            )
+        }
+    }
 }
