@@ -10,7 +10,8 @@ extension Container {
             LibrarySetup(
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),
-                fileManager: self.fileManager()
+                fileManager: self.fileManager(),
+                tslUtil: self.tslUtil()
             )
         }
         .shared
@@ -103,7 +104,8 @@ extension Container {
                 containerWrapper: self.containerWrapper(),
                 fileManager: self.fileManager(),
                 configurationLoader: self.configurationLoader(),
-                configurationRepository: self.configurationRepository()
+                configurationRepository: self.configurationRepository(),
+                tslUtil: self.tslUtil()
             )
         }
     }

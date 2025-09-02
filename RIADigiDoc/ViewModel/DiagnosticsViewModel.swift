@@ -25,23 +25,25 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
     private let fileManager: FileManagerProtocol
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
+    private let tslUtil: TSLUtilProtocol
 
     init(
         containerWrapper: ContainerWrapperProtocol,
         fileManager: FileManagerProtocol,
         configurationLoader: ConfigurationLoaderProtocol,
-        configurationRepository: ConfigurationRepositoryProtocol
+        configurationRepository: ConfigurationRepositoryProtocol,
+        tslUtil: TSLUtilProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
+        self.tslUtil = tslUtil
 
         Task {
             await fetchAsyncContent()
+            try await observeConfigurationUpdates()
         }
-
-        observeConfigurationUpdates()
     }
 
     // MARK: - Fetching content
@@ -132,12 +134,13 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
                 guard fileName.hasSuffix(".xml") else { continue }
 
                 do {
-                    let sequenceNumber = try TSLUtil.readSequenceNumber(from: fileURL)
+                    let sequenceNumber = try tslUtil.readSequenceNumber(from: fileURL)
 
                     filesWithSequenceNumber.append("\(fileName) (\(sequenceNumber))")
                 } catch {
                     DiagnosticsViewModel.logger.error(
                         "Failed to parse \(fileURL): \(error.localizedDescription)")
+                    filesWithSequenceNumber.append(fileName)
                 }
             }
 
@@ -156,35 +159,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         let lastCheckLabel = languageSettings.localized(
             "Main diagnostics configuration last check date")
 
-        let updateDate: String
-        if let configurationUpdateDate = config.configurationUpdateDate {
-            let updateDateTime =
-                DateUtil
-                .getFormattedDateTime(
-                    dateTimeString: DateUtil.configurationDateFormatter.string(
-                        from: configurationUpdateDate),
-                    isUTC: false,
-                    inputDateFormat: "yyyy-MM-dd HH:mm:ss"
-                )
-            updateDate = "\(updateDateTime.date) \(updateDateTime.time)"
-        } else {
-            updateDate = "-"
-        }
-
-        let lastUpdateCheckDate: String
-        if let configurationLastUpdateCheckDate = config.configurationLastUpdateCheckDate {
-            let updateDateTime =
-                DateUtil
-                .getFormattedDateTime(
-                    dateTimeString: DateUtil.configurationDateFormatter.string(
-                        from: configurationLastUpdateCheckDate),
-                    isUTC: false,
-                    inputDateFormat: "yyyy-MM-dd HH:mm:ss"
-                )
-            lastUpdateCheckDate = "\(updateDateTime.date) \(updateDateTime.time)"
-        } else {
-            lastUpdateCheckDate = "-"
-        }
+        let updateDate = formattedDateTimeString(config.configurationUpdateDate)
+        let lastUpdateCheckDate = formattedDateTimeString(config.configurationLastUpdateCheckDate)
 
         let lines: [(label: String, value: String)] = [
             ("DATE", config.metaInf.date),
@@ -196,6 +172,17 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         ]
 
         centralConfigurationSectionContent = lines.map { "\($0.label): \($0.value)" }
+    }
+
+    private func formattedDateTimeString(_ date: Date?) -> String {
+        guard let date = date else { return "-" }
+        let dateTimeString = DateUtil.configurationDateFormatter.string(from: date)
+        let dateTime = DateUtil.getFormattedDateTime(
+            dateTimeString: dateTimeString,
+            isUTC: false,
+            inputDateFormat: "yyyy-MM-dd HH:mm:ss"
+        )
+        return "\(dateTime.date) \(dateTime.time)"
     }
 
     // MARK: - Create Log File
@@ -221,11 +208,10 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         return nil
     }
 
-    func removeLogFilesDirectory(savedFilesDirectory: URL? = nil) {
+    func removeLogFilesDirectory() {
         do {
             let directory =
-                try savedFilesDirectory ??
-                Directories.getCacheDirectory(
+                try Directories.getCacheDirectory(
                     subfolder: CommonsLib.Constants.Folder.Logs,
                     fileManager: fileManager
                 )
@@ -287,16 +273,14 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     // MARK: - Observer
 
-    public func observeConfigurationUpdates() {
-        Task {
-            guard let configStream = await configurationRepository.observeConfigurationUpdates()
-            else {
-                DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
-                return
-            }
-            for try await config in configStream {
-                configuration = config
-            }
+    public func observeConfigurationUpdates() async throws {
+        guard let configStream = await configurationRepository.observeConfigurationUpdates()
+        else {
+            DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
+            return
+        }
+        for try await config in configStream {
+            configuration = config
         }
     }
 }

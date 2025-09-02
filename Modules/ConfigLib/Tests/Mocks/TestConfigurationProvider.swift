@@ -1,4 +1,5 @@
 import Foundation
+
 @testable import ConfigLib
 
 public class TestConfigurationProvider {
@@ -20,8 +21,19 @@ public class TestConfigurationProvider {
         sidV2SkRestUrl: String = "https://sidv2skrest.someUrl.abc",
         certBundle: [String] = ["certBundle1", "certBundle2"],
         ldapCerts: [String] = ["ldapCert1", "ldapCert2"],
-        configurationLastUpdateCheckDate: Date? = Date(),
-        configurationUpdateDate: Date? = Date()
+        configurationLastUpdateCheckDate: Date? = Calendar(
+            identifier: .gregorian)
+            .date(from: DateComponents(year: 2025, month: 9, day: 2, hour: 15, minute: 22, second: 28)
+        ),
+        configurationUpdateDate: Date? = Calendar(
+            identifier: .gregorian)
+            .date(from: DateComponents(year: 2025, month: 9, day: 2, hour: 15, minute: 22, second: 28)
+        ),
+        cdoc2DefaultKeyserver: String = "https://cdoc2DefaultKeyserver.someUrl.abc",
+        cdoc2UseKeyserver: Bool = false,
+        cdoc2Conf: [String: [String: String]] = [
+            "00000000-0000-0000-0000-000000000000": ["name": "test"]
+        ]
     ) -> ConfigurationProvider {
         let metaInf = ConfigurationProvider.MetaInf(
             url: metaInfUrl,
@@ -46,7 +58,10 @@ public class TestConfigurationProvider {
             certBundle: certBundle,
             ldapCerts: ldapCerts,
             configurationLastUpdateCheckDate: configurationLastUpdateCheckDate,
-            configurationUpdateDate: configurationUpdateDate
+            configurationUpdateDate: configurationUpdateDate,
+            cdoc2DefaultKeyserver: cdoc2DefaultKeyserver,
+            cdoc2UseKeyserver: cdoc2UseKeyserver,
+            cdoc2Conf: cdoc2Conf
         )
     }
 }

@@ -20,5 +20,5 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
     // MARK: Actions
     func updateConfiguration() async
     func createLogFile(languageSettings: LanguageSettingsProtocol, directory: URL?) async -> URL?
-    func removeLogFilesDirectory(savedFilesDirectory: URL?)
+    func removeLogFilesDirectory()
 }

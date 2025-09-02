@@ -1,5 +1,5 @@
-import Foundation
 import ConfigLib
+import Foundation
 
 public struct TestConfigurationProviderUtil {
 
@@ -27,7 +27,10 @@ public struct TestConfigurationProviderUtil {
             certBundle: [],
             ldapCerts: [],
             configurationLastUpdateCheckDate: Date(),
-            configurationUpdateDate: Date()
+            configurationUpdateDate: Date(),
+            cdoc2DefaultKeyserver: "https://cdoc2DefaultKeyserver.example.abc",
+            cdoc2UseKeyserver: false,
+            cdoc2Conf: [:],
         )
     }
 }
