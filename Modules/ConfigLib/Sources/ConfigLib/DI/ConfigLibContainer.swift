@@ -1,4 +1,5 @@
 import Foundation
+import CommonsLib
 import FactoryKit
 
 extension Container {
@@ -43,7 +44,7 @@ extension Container {
                 configurationSignatureVerifier: self.configurationSignatureVerifier(),
                 configurationCache: self.configurationCache(),
                 fileManager: self.fileManager(),
-                bundle: self.bundle() ?? Bundle.module
+                bundle: self.bundle()
             )
         }
         .shared
@@ -81,6 +82,14 @@ extension Container {
             TSLUtil(
                 fileManager: self.fileManager()
             )
+        }
+    }
+
+    public var bundle: Factory<BundleProtocol?> {
+        self {
+            // Use Bundle.main in tests as Bundle.module might not be available
+            let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            return isRunningTests ? Bundle.main : Bundle.module
         }
     }
 }
