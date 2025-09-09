@@ -1,5 +1,6 @@
-import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
+import SwiftUI
 
 struct RoleDetailsView: View {
     @AppTheme private var theme
@@ -91,5 +92,5 @@ struct RoleDetailsView: View {
             diagnosticsInfo: ""
         )
     )
-    .environmentObject(LanguageSettings())
+    .environmentObject(Container.shared.languageSettings())
 }

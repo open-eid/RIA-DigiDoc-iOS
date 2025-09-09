@@ -1,6 +1,5 @@
 struct ContainerNameBottomSheetActions {
     static func actions(
-        languageSettings: LanguageSettings,
         isEditContainerButtonShown: Bool,
         isEncryptButtonShown: Bool,
         onRenameContainerButtonClick: @escaping () -> Void,
@@ -10,21 +9,21 @@ struct ContainerNameBottomSheetActions {
             BottomSheetButton(
                 showButton: isEditContainerButtonShown,
                 icon: "ic_m3_edit_48pt_wght400",
-                title: languageSettings.localized("Change container name"),
-                accessibilityLabel: languageSettings.localized("Change container name").lowercased(),
+                title: "Change container name",
+                accessibilityLabel: "Change container name",
                 onClick: onRenameContainerButtonClick
             ),
             BottomSheetButton(
                 icon: "ic_m3_download_48pt_wght400",
-                title: languageSettings.localized("Save container"),
-                accessibilityLabel: languageSettings.localized("Save container").lowercased(),
+                title: "Save container",
+                accessibilityLabel: "Save container",
                 onClick: onSaveContainerButtonClick
             ),
             BottomSheetButton(
                 showButton: isEncryptButtonShown,
                 icon: "ic_m3_encrypted_48pt_wght400",
-                title: languageSettings.localized("Encrypt"),
-                accessibilityLabel: languageSettings.localized("Encrypt").lowercased(),
+                title: "Encrypt",
+                accessibilityLabel: "Encrypt",
                 showExtraIcon: true,
                 onClick: {
                     // TODO: Implement encrypt action

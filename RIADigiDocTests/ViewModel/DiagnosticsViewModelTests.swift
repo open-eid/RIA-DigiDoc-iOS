@@ -13,9 +13,6 @@ import UtilsLibMocks
 
 @MainActor
 final class DiagnosticsViewModelTests {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DiagnosticsViewModelTests")
-
     private let viewModel: DiagnosticsViewModel!
 
     private let mockContainerWrapper: ContainerWrapperProtocolMock!

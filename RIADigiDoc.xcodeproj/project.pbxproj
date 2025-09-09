@@ -118,6 +118,8 @@
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/ToastMessage.swift,
+				Domain/Preferences/DataStore.swift,
+				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
@@ -134,11 +136,13 @@
 				ViewModel/DiagnosticsViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/HomeViewModel.swift,
+				ViewModel/LanguageChooserViewModel.swift,
 				ViewModel/Protocols/CertificateDetailViewModelProtocol.swift,
 				ViewModel/Protocols/ContentViewModelProtocol.swift,
 				ViewModel/Protocols/DiagnosticsViewModelProtocol.swift,
 				ViewModel/Protocols/FileOpeningViewModelProtocol.swift,
 				ViewModel/Protocols/HomeViewModelProtocol.swift,
+				ViewModel/Protocols/LanguageChooserViewModelProtocol.swift,
 				ViewModel/Protocols/RecentDocumentsViewModelProtocol.swift,
 				ViewModel/Protocols/Shared/SharedContainerViewModelProtocol.swift,
 				ViewModel/Protocols/SignatureDetailViewModelProtocol.swift,
@@ -153,6 +157,8 @@
 		DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Preferences/DataStore.swift,
+				Domain/Preferences/DataStoreProtocol.swift,
 				"Supporting files/Localizable.xcstrings",
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
@@ -190,6 +196,8 @@
 		DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Preferences/DataStore.swift,
+				Domain/Preferences/DataStoreProtocol.swift,
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
 			);

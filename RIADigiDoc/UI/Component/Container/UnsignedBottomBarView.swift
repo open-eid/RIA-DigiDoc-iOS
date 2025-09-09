@@ -1,3 +1,4 @@
+import FactoryKit
 import SwiftUI
 
 struct UnsignedBottomBarView: View {
@@ -78,5 +79,5 @@ struct UnsignedBottomBarView: View {
         rightButtonAccessibilityLabel: "Sign",
         rightButtonAction: {}
     )
-        .environmentObject(LanguageSettings())
+        .environmentObject(Container.shared.languageSettings())
 }

@@ -27,7 +27,6 @@ struct SignatureView: View {
 
     private var bottomSheetActions: [BottomSheetButton] {
         SignatureBottomSheetActions.actions(
-            languageSettings: languageSettings,
             showRemoveSignatureButton: showRemoveSignatureButton,
             onDetailsButtonClick: {
                 showDetail = true
@@ -93,7 +92,9 @@ struct SignatureView: View {
                     }
 
                     ColoredSignedStatusText(
-                        text: signatureUtil.getSignatureStatusText(status: signature.status),
+                        text: languageSettings.localized(
+                            signatureUtil.getSignatureStatusText(status: signature.status)
+                        ),
                         status: signature.status
                     )
                     .fixedSize(horizontal: false, vertical: true)
@@ -194,5 +195,5 @@ struct SignatureView: View {
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )
-    .environmentObject(LanguageSettings())
+    .environmentObject(Container.shared.languageSettings())
 }

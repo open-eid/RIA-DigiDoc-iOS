@@ -1,3 +1,4 @@
+import FactoryKit
 import SwiftUI
 
 struct ContainerNameView: View {
@@ -31,7 +32,6 @@ struct ContainerNameView: View {
 
     private var bottomSheetActions: [BottomSheetButton] {
         ContainerNameBottomSheetActions.actions(
-            languageSettings: languageSettings,
             isEditContainerButtonShown: isEditContainerButtonShown,
             isEncryptButtonShown: isEncryptButtonShown,
             onRenameContainerButtonClick: onRenameContainerButtonClick,
@@ -140,5 +140,5 @@ struct ContainerNameView: View {
         onSaveContainerButtonClick: {},
         onRenameContainerButtonClick: {}
     )
-    .environmentObject(LanguageSettings())
+    .environmentObject(Container.shared.languageSettings())
 }
