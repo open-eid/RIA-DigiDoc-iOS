@@ -23,7 +23,6 @@ struct ContentView: View {
 
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
-            languageSettings: languageSettings,
             onInfoClick: {
                 navigateToInfo = true
             },
@@ -38,7 +37,6 @@ struct ContentView: View {
 
     private var settingsBottomSheetActions: [BottomSheetButton] {
         SettingsMenuBottomSheetActions.actions(
-            languageSettings: languageSettings,
             onLanguageChooserClick: {
                 navigateToLanguageChooser = true
             }

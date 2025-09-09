@@ -1,7 +1,9 @@
 import Foundation
 
 /// @mockable
+@MainActor
 public protocol LanguageSettingsProtocol: Sendable {
-    var currentLanguage: String { get }
+    func getSelectedLanguage() -> String
+    func setSelectedLanguage(newLanguageCode: String)
     func localized(_ key: String) -> String
 }

@@ -12,7 +12,7 @@ struct ShareView: View {
         viewModel: ShareViewModel = Container.shared.shareViewModel(),
         statusChanged: (() -> Void)? = nil,
         completeRequest: (() -> Void)? = nil,
-        languageSettings: LanguageSettings = LanguageSettings()
+        languageSettings: LanguageSettings = LanguageSettings(dataStore: DataStore())
     ) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
         self.statusChanged = statusChanged

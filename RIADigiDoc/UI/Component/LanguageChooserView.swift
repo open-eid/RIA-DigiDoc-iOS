@@ -6,7 +6,18 @@ struct LanguageChooserView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedLanguage: String = "et"
+    @StateObject private var viewModel: LanguageChooserViewModel
+
+    init(
+        viewModel: LanguageChooserViewModel = Container.shared.languageChooserViewModel()
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private let supportedLanguages: [SupportedLanguage] = [
+        SupportedLanguage(code: "et", titleKey: "Init lang locale et"),
+        SupportedLanguage(code: "en", titleKey: "Init lang locale en")
+    ]
 
     var body: some View {
         TopBarContainer(
@@ -18,25 +29,14 @@ struct LanguageChooserView: View {
                 VStack(
                     spacing: Dimensions.Padding.ZeroPadding,
                     content: {
-                        LanguageOptionRow(
-                            title: languageSettings.localized("Init lang locale et"),
-                            isSelected: selectedLanguage == "et",
-                            onTap: {
-                                selectedLanguage = "et"
-                            }
-                        )
-
-                        Divider()
-
-                        LanguageOptionRow(
-                            title: languageSettings.localized("Init lang locale en"),
-                            isSelected: selectedLanguage == "en",
-                            onTap: {
-                                selectedLanguage = "en"
-                            }
-                        )
-
-                        Divider()
+                        ForEach(supportedLanguages, id: \.code) { language in
+                            LanguageOptionRow(
+                                title: languageSettings.localized(language.titleKey),
+                                isSelected: viewModel.selectedLanguage == language.code,
+                                onTap: { viewModel.selectLanguage(code: language.code) }
+                            )
+                            Divider()
+                        }
 
                         Spacer()
                     }
@@ -44,10 +44,14 @@ struct LanguageChooserView: View {
             }
         )
         .background(theme.surface)
-        .onAppear {
-            selectedLanguage = languageSettings.currentLanguage
-        }
     }
+}
+
+// MARK: - Supporting Types
+
+private struct SupportedLanguage {
+    let code: String
+    let titleKey: String
 }
 
 // MARK: - Preview

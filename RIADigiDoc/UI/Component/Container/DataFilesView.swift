@@ -14,7 +14,6 @@ struct DataFilesView: View {
 
     private var bottomSheetActions: [BottomSheetButton] {
         DataFileBottomSheetActions.actions(
-            languageSettings: languageSettings,
             showRemoveFileButton: showRemoveFileButton,
             onOpenFileButtonClick: { onOpenFileButtonClick(dataFile) },
             onSaveFileButtonClick: { onSaveDataFileButtonClick(dataFile) }

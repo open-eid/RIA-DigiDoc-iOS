@@ -1,3 +1,4 @@
+import FactoryKit
 import SwiftUI
 
 struct BottomSheet: View {
@@ -25,31 +26,35 @@ struct BottomSheet: View {
 
             ForEach(actions) { item in
                 if item.showButton {
-                    Button(action: {
-                        item.onClick()
-                        dismiss()
-                    }, label: {
-                        HStack {
-                            Image(item.icon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                                .foregroundStyle(theme.onSurface)
-                                .accessibilityLabel(item.accessibilityLabel)
-
-                            Text(item.title)
-                                .foregroundStyle(theme.onSurface)
-                                .font(typography.bodyLarge)
-
-                            Spacer()
-
-                            if item.showExtraIcon {
-                                Image(item.extraIcon)
+                    Button(
+                        action: {
+                            item.onClick()
+                            dismiss()
+                        },
+                        label: {
+                            HStack {
+                                Image(item.icon)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                     .foregroundStyle(theme.onSurface)
                                     .accessibilityLabel(item.accessibilityLabel)
+
+                                Text(languageSettings.localized(item.title))
+                                    .foregroundStyle(theme.onSurface)
+                                    .font(typography.bodyLarge)
+
+                                Spacer()
+
+                                if item.showExtraIcon {
+                                    Image(item.extraIcon)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                                        .foregroundStyle(theme.onSurface)
+                                        .accessibilityLabel(
+                                            languageSettings.localized(item.accessibilityLabel).lowercased()
+                                        )
                             }
                         }
                         .foregroundStyle(theme.onSurface)
@@ -179,5 +184,5 @@ extension View {
     ]
     Button("Show Sheet") {}
         .bottomSheet(isPresented: .constant(true), actions: sheetActions)
-        .environmentObject(LanguageSettings())
+        .environmentObject(Container.shared.languageSettings())
 }

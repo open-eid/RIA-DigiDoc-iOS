@@ -71,8 +71,13 @@ extension Container {
         }
     }
 
+    @MainActor
     var languageSettings: Factory<LanguageSettings> {
-        self { LanguageSettings() }
+        self { @MainActor in LanguageSettings(dataStore: self.dataStore()) }.singleton
+    }
+
+    var dataStore: Factory<DataStore> {
+        self { DataStore() }.singleton
     }
 
     @MainActor
@@ -111,6 +116,13 @@ extension Container {
     }
 
     @MainActor
+    var languageChooserViewModel: Factory<LanguageChooserViewModel> {
+        self { @MainActor in
+            LanguageChooserViewModel(languageSettings: self.languageSettings())
+        }
+    }
+
+    @MainActor
     var signatureDetailViewModel: Factory<SignatureDetailViewModel> {
         self { @MainActor in SignatureDetailViewModel() }
     }
@@ -121,6 +133,6 @@ extension Container {
     }
 
     var signatureUtil: Factory<SignatureUtilProtocol> {
-        self { SignatureUtil(languageSettings: self.languageSettings()) }
+        self { SignatureUtil() }
     }
 }

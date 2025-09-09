@@ -28,6 +28,7 @@ struct FileOpeningServiceTests {
         )
     }
 
+    @Test
     func isFileSizeValid_success() async throws {
         let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
         let tempFileURL = tempURL.appendingPathComponent("test.txt")
