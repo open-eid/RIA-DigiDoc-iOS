@@ -516,6 +516,42 @@
         }
       }
     },
+    "Init lang locale en" : {
+      "comment" : "Init lang locale en",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In English"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In English"
+          }
+        }
+      }
+    },
+    "Init lang locale et" : {
+      "comment" : "Init lang locale et",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti keel"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti keel"
+          }
+        }
+      }
+    },
     "Invalid file size" : {
       "comment" : "When trying adding 0 byte file to container",
       "extractionState" : "manual",
@@ -1774,6 +1810,60 @@
         }
       }
     },
+    "Main settings menu advanced" : {
+      "comment" : "Main settings menu advanced",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Täpsemad seaded"
+          }
+        }
+      }
+    },
+    "Main settings menu appearance" : {
+      "comment" : "Main settings menu appearance",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Välimus"
+          }
+        }
+      }
+    },
+    "Main settings menu language" : {
+      "comment" : "Main settings menu language",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language selection"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keelevalik"
+          }
+        }
+      }
+    },
     "Menu" : {
       "localizations" : {
         "en" : {
@@ -1786,6 +1876,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menüü"
+          }
+        }
+      }
+    },
+    "Menu language" : {
+      "comment" : "Menu language",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keel"
+          }
+        }
+      }
+    },
+    "Menu language selected" : {
+      "comment" : "Menu language selected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language selected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keel valitud"
           }
         }
       }

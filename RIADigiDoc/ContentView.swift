@@ -12,12 +12,16 @@ struct ContentView: View {
     @StateObject private var viewModel: ContentViewModel
 
     @State private var openedUrls: [URL] = []
-    @State private var showBottomSheetFromButton = false
+    @State private var showHomeMenuBottomSheetFromButton = false
+    @State private var showSettingsBottomSheetFromButton = false
+
     @State private var navigateToAccessibility = false
     @State private var navigateToInfo = false
     @State private var navigateToDiagnostics = false
 
-    private var bottomSheetActions: [BottomSheetButton] {
+    @State private var navigateToLanguageChooser = false
+
+    private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
             languageSettings: languageSettings,
             onInfoClick: {
@@ -28,6 +32,15 @@ struct ContentView: View {
             },
             onDiagnosticsClick: {
                 navigateToDiagnostics = true
+            }
+        )
+    }
+
+    private var settingsBottomSheetActions: [BottomSheetButton] {
+        SettingsMenuBottomSheetActions.actions(
+            languageSettings: languageSettings,
+            onLanguageChooserClick: {
+                navigateToLanguageChooser = true
             }
         )
     }
@@ -43,7 +56,10 @@ struct ContentView: View {
             leftIcon: "ic_m3_menu_48pt_wght400",
             leftIconAccessibility: "Menu",
             onLeftClick: {
-                showBottomSheetFromButton = true
+                showHomeMenuBottomSheetFromButton = true
+            },
+            onRightSecondaryClick: {
+                showSettingsBottomSheetFromButton = true
             },
             content: {
                 VStack {
@@ -60,6 +76,11 @@ struct ContentView: View {
                     NavigationLink(
                         destination: DiagnosticsView(),
                         isActive: $navigateToDiagnostics
+                    ) { }
+
+                    NavigationLink(
+                        destination: LanguageChooserView(),
+                        isActive: $navigateToLanguageChooser
                     ) { }
 
                     Spacer()
@@ -86,7 +107,9 @@ struct ContentView: View {
                 }
             }
         )
-        .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+        .bottomSheet(isPresented: $showHomeMenuBottomSheetFromButton, actions: homeMenuBottomSheetActions)
+        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
+
     }
 }
 
