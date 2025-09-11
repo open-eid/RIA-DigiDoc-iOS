@@ -7,17 +7,17 @@ class LanguageChooserViewModel: LanguageChooserViewModelProtocol, ObservableObje
 
     @Published var selectedLanguage: String = "en"
 
-    private let langaugeSettings: LanguageSettingsProtocol
+    private let languageSettings: LanguageSettingsProtocol
 
     init(
         languageSettings: LanguageSettingsProtocol
     ) {
-        self.langaugeSettings = languageSettings
+        self.languageSettings = languageSettings
         selectedLanguage = languageSettings.getSelectedLanguage()
     }
 
     func selectLanguage(code: String) {
         selectedLanguage = code
-        langaugeSettings.setSelectedLanguage(newLanguageCode: code)
+        languageSettings.setSelectedLanguage(newLanguageCode: code)
     }
 }
