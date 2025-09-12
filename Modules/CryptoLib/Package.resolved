@@ -1,0 +1,51 @@
+{
+  "originHash" : "93b043a393bf342a93982b60b88f3abc764a2e7ead93ce2d3e20bb868e6ddfe5",
+  "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
+        "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "asn1decoder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/filom/ASN1Decoder",
+      "state" : {
+        "revision" : "7e1523662c69d019a3299bbfb22fb824141dd1f6",
+        "version" : "1.10.0"
+      }
+    },
+    {
+      "identity" : "factory",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hmlongco/Factory",
+      "state" : {
+        "revision" : "ccc898f21992ebc130bc04cc197460a5ae230bcf",
+        "version" : "2.5.3"
+      }
+    },
+    {
+      "identity" : "swiftyrsa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/TakeScoop/SwiftyRSA",
+      "state" : {
+        "revision" : "6521919ad0e99dff927685f142d8136479acb452",
+        "version" : "1.8.0"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation",
+      "state" : {
+        "revision" : "02b6abe5f6eef7e3cbd5f247c5cc24e246efcfe0",
+        "version" : "0.9.19"
+      }
+    }
+  ],
+  "version" : 3
+}
