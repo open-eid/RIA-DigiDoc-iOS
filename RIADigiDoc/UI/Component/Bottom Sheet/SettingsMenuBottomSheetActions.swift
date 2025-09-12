@@ -1,6 +1,7 @@
 struct SettingsMenuBottomSheetActions {
     static func actions(
-        onLanguageChooserClick: @escaping () -> Void
+        onLanguageChooserClick: @escaping () -> Void,
+        onThemeChooserClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -17,7 +18,7 @@ struct SettingsMenuBottomSheetActions {
                 accessibilityLabel: "Main settings menu appearance",
                 showExtraIcon: true,
                 extraIcon: "ic_m3_arrow_right_48pt_wght400",
-                onClick: {} // TODO: implement appearance on click
+                onClick: onThemeChooserClick,
             ),
             BottomSheetButton(
                 icon: "ic_m3_tune_48pt_wght400",
