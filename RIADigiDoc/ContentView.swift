@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var navigateToDiagnostics = false
 
     @State private var navigateToLanguageChooser = false
+    @State private var navigateToThemeChooser = false
 
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
@@ -39,6 +40,9 @@ struct ContentView: View {
         SettingsMenuBottomSheetActions.actions(
             onLanguageChooserClick: {
                 navigateToLanguageChooser = true
+            },
+            onThemeChooserClick: {
+                navigateToThemeChooser = true
             }
         )
     }
@@ -79,6 +83,10 @@ struct ContentView: View {
                     NavigationLink(
                         destination: LanguageChooserView(),
                         isActive: $navigateToLanguageChooser
+                    ) { }
+                    NavigationLink(
+                        destination: ThemeChooserView(),
+                        isActive: $navigateToThemeChooser
                     ) { }
 
                     Spacer()

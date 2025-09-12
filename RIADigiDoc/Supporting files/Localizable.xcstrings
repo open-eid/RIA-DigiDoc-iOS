@@ -1864,6 +1864,60 @@
         }
       }
     },
+    "Main settings theme dark" : {
+      "comment" : "Main settings theme dark",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tume"
+          }
+        }
+      }
+    },
+    "Main settings theme light" : {
+      "comment" : "Main settings theme light",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hele"
+          }
+        }
+      }
+    },
+    "Main settings theme system" : {
+      "comment" : "Main settings theme system",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System default"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Süsteemi vaikeseade"
+          }
+        }
+      }
+    },
     "Menu" : {
       "localizations" : {
         "en" : {
@@ -1912,6 +1966,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keel valitud"
+          }
+        }
+      }
+    },
+    "Menu theme" : {
+      "comment" : "Menu theme for accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teema"
+          }
+        }
+      }
+    },
+    "Menu theme selected" : {
+      "comment" : "Menu theme selected for accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme selected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teema valitud"
           }
         }
       }
