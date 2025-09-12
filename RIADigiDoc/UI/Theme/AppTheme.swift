@@ -5,6 +5,6 @@ struct AppTheme: DynamicProperty {
     @Environment(\.colorScheme) private var colorScheme
 
     var wrappedValue: ColorPalette {
-        Theme.palette(for: colorScheme)
+        Theme.getCurrentColorPalette(for: colorScheme)
     }
 }

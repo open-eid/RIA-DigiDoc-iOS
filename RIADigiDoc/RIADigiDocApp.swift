@@ -7,7 +7,10 @@ import CommonsLib
 
 @main
 struct RIADigiDocApp: App {
-    @AppStorage("colorScheme") private var colorScheme: Int = 2
+    @AppStorage(Theme.key) private var colorSchemeRawValue: Int = Theme.system.rawValue
+    var currentTheme: Theme {
+        Theme(rawValue: colorSchemeRawValue) ?? .system
+    }
 
     @StateObject private var languageSettings: LanguageSettings
     @State private var isSetupComplete = false
@@ -31,6 +34,7 @@ struct RIADigiDocApp: App {
             if isJailbroken {
                 JailbreakView()
                     .environment(\.typography, Typography.current())
+                    .preferredColorScheme(currentTheme.colorScheme)
             } else if isSetupComplete {
                 NavigationView {
                     ContentView()
@@ -39,6 +43,7 @@ struct RIADigiDocApp: App {
                 .environmentObject(languageSettings)
                 .environment(\.typography, Typography.current())
                 .overlay(ToastOverlay())
+                .preferredColorScheme(currentTheme.colorScheme)
             } else {
                 LaunchScreenView()
                     .onAppear {
@@ -56,6 +61,7 @@ struct RIADigiDocApp: App {
                             }
                         }
                     }
+                    .preferredColorScheme(currentTheme.colorScheme)
             }
         }
     }
