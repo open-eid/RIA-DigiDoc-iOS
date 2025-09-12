@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
 		DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF21FA7D2E0B74A400A4DC7A /* CommonsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF21FA7C2E0B74A400A4DC7A /* CommonsLibMocks */; };
 		DF27565F2E078AEA000E4794 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF27565E2E078AEA000E4794 /* ConfigLibMocks */; };
@@ -95,6 +96,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1A438FCF2E7224CE00546B86 /* GenerateMocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = GenerateMocks.sh; sourceTree = "<group>"; };
+		1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TSLXMLDownloader.py; sourceTree = "<group>"; };
+		1A438FDD2E73049500546B86 /* build-openldap.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap.sh"; sourceTree = "<group>"; };
+		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
 		DF17B64D2CE26949009B1E17 /* UtilsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UtilsLib; sourceTree = "<group>"; };
 		DF3E4A862CE2C54600137235 /* CommonsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsLib; sourceTree = "<group>"; };
 		DF3E4A872CE2C5B500137235 /* LibdigidocLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LibdigidocLib; sourceTree = "<group>"; };
@@ -287,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
+				1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
@@ -323,9 +329,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A438FD12E7224CE00546B86 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				1A438FDD2E73049500546B86 /* build-openldap.sh */,
+				1A438FCF2E7224CE00546B86 /* GenerateMocks.sh */,
+				1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
 				DF67D4F92D28531600F09EB9 /* ConfigLib */,
 				DF17B64D2CE26949009B1E17 /* UtilsLib */,
 				DF3E4A862CE2C54600137235 /* CommonsLib */,
@@ -352,6 +369,7 @@
 		DFDB14722CC97B0E00153876 = {
 			isa = PBXGroup;
 			children = (
+				1A438FD12E7224CE00546B86 /* scripts */,
 				DFDB147D2CC97B0E00153876 /* RIADigiDoc */,
 				DFDB148F2CC97B1000153876 /* RIADigiDocTests */,
 				DFDB14992CC97B1000153876 /* RIADigiDocUITests */,
@@ -463,6 +481,7 @@
 				DF3E922A2D285A1D00F2990A /* ConfigLib */,
 				DF3E922C2D2C371200F2990A /* Alamofire */,
 				DF9AFE912E00D30A0062C64D /* FactoryKit */,
+				1A438FD82E72CF1900546B86 /* CryptoLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -531,7 +550,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
@@ -571,6 +590,7 @@
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 				DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */,
+				1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -884,6 +904,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
@@ -944,6 +965,7 @@
 				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
@@ -1220,6 +1242,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/filom/ASN1Decoder";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.0;
+			};
+		};
 		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-certificates.git";
@@ -1255,6 +1285,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1A438FD82E72CF1900546B86 /* CryptoLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CryptoLib;
+		};
 		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonsTestShared;

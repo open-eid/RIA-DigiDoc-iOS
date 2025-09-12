@@ -10,6 +10,7 @@ modules=(
   "ConfigLib"
   "LibdigidocLib"
   "UtilsLib"
+  "CryptoLib"
 )
 
 extensions=(
@@ -42,6 +43,10 @@ for module in "${modules[@]}"; do
       ;;
     "LibdigidocLib")
       custom_imports=("LibdigidocLibSwift")
+      testable_imports=""
+      ;;
+    "CryptoLib")
+      custom_imports=("CryptoLibSwift")
       testable_imports=""
       ;;
     *)

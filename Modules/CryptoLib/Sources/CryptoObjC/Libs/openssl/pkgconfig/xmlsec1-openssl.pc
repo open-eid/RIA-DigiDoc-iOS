@@ -1,0 +1,12 @@
+prefix=/Library/libdigidocpp.iphoneos
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: xmlsec1-openssl
+Version: 1.3.7
+Description: XML Security Library implements XML Signature and XML Encryption standards
+Requires: libxml-2.0 >= 2.8.0 
+Cflags:  -D__XMLSEC_FUNCTION__=__func__ -DXMLSEC_NO_XSLT=1 -DXMLSEC_NO_FTP=1 -DXMLSEC_NO_HTTP=1 -DXMLSEC_NO_MD5=1 -DXMLSEC_NO_RIPEMD160=1 -DXMLSEC_NO_GOST=1 -DXMLSEC_NO_GOST2012=1 -DXMLSEC_NO_CRYPTO_DYNAMIC_LOADING=1 -I${prefix}/include/xmlsec1    -I/Library/libdigidocpp.iphoneos/include -DXMLSEC_CRYPTO_OPENSSL=1
+Cflags.private: -DXMLSEC_STATIC
+Libs: -L${exec_prefix}/lib -lxmlsec1-openssl -lxmlsec1    -L/Library/libdigidocpp.iphoneos/lib -lcrypto 
