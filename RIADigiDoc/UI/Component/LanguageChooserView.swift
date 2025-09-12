@@ -1,11 +1,14 @@
 import FactoryKit
 import SwiftUI
 
-struct LanguageChooserView: View {
-    @AppTheme private var theme
-    @EnvironmentObject private var languageSettings: LanguageSettings
-    @Environment(\.dismiss) private var dismiss
+struct SupportedLanguage: Identifiable, Equatable, Hashable {
+    let code: String
+    let titleKey: String
+    var id: String { code }
+}
 
+struct LanguageChooserView: View {
+    @EnvironmentObject private var languageSettings: LanguageSettings
     @StateObject private var viewModel: LanguageChooserViewModel
 
     init(
@@ -20,38 +23,23 @@ struct LanguageChooserView: View {
     ]
 
     var body: some View {
-        TopBarContainer(
+        RadioButtonChooserView<SupportedLanguage>(
             title: languageSettings.localized("Main settings menu language"),
-            onLeftClick: {
-                dismiss()
+            options: supportedLanguages,
+            isSelected: { languageOption in
+                languageOption.code == viewModel.selectedLanguage
             },
-            content: {
-                VStack(
-                    spacing: Dimensions.Padding.ZeroPadding,
-                    content: {
-                        ForEach(supportedLanguages, id: \.code) { language in
-                            LanguageOptionRow(
-                                title: languageSettings.localized(language.titleKey),
-                                isSelected: viewModel.selectedLanguage == language.code,
-                                onTap: { viewModel.selectLanguage(code: language.code) }
-                            )
-                            Divider()
-                        }
-
-                        Spacer()
-                    }
-                )
+            titleKey: { languageOption in languageOption.titleKey },
+            onSelect: { languageOption in viewModel.selectLanguage(code: languageOption.code) },
+            accessibilityLabel: { languageOption, isSelected in
+                let title = languageSettings.localized(languageOption.titleKey)
+                let selected = isSelected
+                ? languageSettings.localized("Menu language selected")
+                : languageSettings.localized("Menu language")
+                return "\(title) \(selected)"
             }
         )
-        .background(theme.surface)
     }
-}
-
-// MARK: - Supporting Types
-
-private struct SupportedLanguage {
-    let code: String
-    let titleKey: String
 }
 
 // MARK: - Preview
