@@ -1,7 +1,7 @@
 import FactoryKit
 import SwiftUI
 
-struct LanguageOptionRow: View {
+struct RadioButtonRow<T: Equatable>: View {
     @AppTheme private var theme
     @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTypography private var typography
@@ -9,14 +9,7 @@ struct LanguageOptionRow: View {
     let title: String
     let isSelected: Bool
     let onTap: () -> Void
-
-    private var accessibilityLabel: String {
-        if isSelected {
-            return "\(title) \(languageSettings.localized("Menu language selected"))"
-        } else {
-            return "\(languageSettings.localized("Menu language")) \(title)"
-        }
-    }
+    let accessibilityLabel: String
 
     var body: some View {
         Button(action: onTap) {
@@ -40,18 +33,4 @@ struct LanguageOptionRow: View {
         }
         .buttonStyle(.plain)
     }
-}
-
-// MARK: - Preview
-#Preview {
-    VStack {
-        LanguageOptionRow(
-            title: "Eesti keel", isSelected: true, onTap: {}
-        )
-        Divider()
-        LanguageOptionRow(
-            title: "In English", isSelected: false, onTap: {}
-        )
-    }
-    .environmentObject(Container.shared.languageSettings())
 }
