@@ -32,11 +32,11 @@ struct LanguageChooserView: View {
             titleKey: { languageOption in languageOption.titleKey },
             onSelect: { languageOption in viewModel.selectLanguage(code: languageOption.code) },
             accessibilityLabel: { languageOption, isSelected in
-                isSelected
-                ? "\(languageSettings.localized(languageOption.titleKey)) "
-                + "\(languageSettings.localized("Menu language selected"))"
-                : "\(languageSettings.localized("Menu language")) "
-                + "\(languageSettings.localized(languageOption.titleKey))"
+                let title = languageSettings.localized(languageOption.titleKey)
+                let selected = isSelected
+                ? languageSettings.localized("Menu language selected")
+                : languageSettings.localized("Menu language")
+                return "\(title) \(selected)"
             }
         )
     }

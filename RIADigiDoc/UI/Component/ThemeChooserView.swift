@@ -26,11 +26,11 @@ struct ThemeChooserView: View {
             titleKey: { themeOption in themeOption.titleKey },
             onSelect: { themeOption in Theme.set(themeOption.themeKey) },
             accessibilityLabel: { themeOption, isSelected in
-                isSelected
-                ? "\(languageSettings.localized(themeOption.titleKey)) "
-                + "\(languageSettings.localized("Menu theme selected"))"
-                : "\(languageSettings.localized(themeOption.titleKey)) "
-                + "\(languageSettings.localized("Menu theme"))"
+                let title = languageSettings.localized(themeOption.titleKey)
+                let selected = isSelected
+                ? languageSettings.localized("Menu theme selected")
+                : languageSettings.localized("Menu theme")
+                return "\(title) \(selected)"
             }
         )
     }
