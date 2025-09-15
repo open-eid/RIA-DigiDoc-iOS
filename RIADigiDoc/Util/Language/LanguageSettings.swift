@@ -20,11 +20,9 @@ public final class LanguageSettings: LanguageSettingsProtocol, ObservableObject 
         return selectedLanguage
     }
 
-    public func setSelectedLanguage(newLanguageCode: String) {
+    public func setSelectedLanguage(newLanguageCode: String) async {
         selectedLanguage = newLanguageCode
-        Task {
-            await dataStore.setSelectedLanguage(newLanguageCode: newLanguageCode)
-        }
+        await dataStore.setSelectedLanguage(newLanguageCode: newLanguageCode)
     }
 
     public func localized(_ key: String) -> String {

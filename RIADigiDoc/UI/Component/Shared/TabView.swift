@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct TabView<Content: View>: View {
     @AppTheme private var theme
@@ -40,4 +41,5 @@ struct TabView<Content: View>: View {
     TabView(selectedTab: .constant(0), titles: ["Tab 1", "Tab 2"]) {
         EmptyView()
     }
+    .environmentObject(Container.shared.themeSettings())
 }

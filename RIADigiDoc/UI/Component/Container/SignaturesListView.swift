@@ -64,4 +64,6 @@ struct SignaturesListView: View {
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

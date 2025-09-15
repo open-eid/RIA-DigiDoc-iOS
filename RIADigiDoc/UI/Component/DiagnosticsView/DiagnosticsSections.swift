@@ -52,7 +52,6 @@ struct DiagnosticsSections: View {
 // MARK: - Preview
 #Preview {
     DiagnosticsSections()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

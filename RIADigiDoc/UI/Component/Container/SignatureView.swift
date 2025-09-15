@@ -196,4 +196,5 @@ struct SignatureView: View {
         signatureUtil: Container.shared.signatureUtil()
     )
     .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

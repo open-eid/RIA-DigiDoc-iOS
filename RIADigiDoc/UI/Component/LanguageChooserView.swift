@@ -24,7 +24,9 @@ struct LanguageChooserView: View {
                 languageOption.code == viewModel.selectedLanguage
             },
             titleKey: { languageOption in languageOption.titleKey },
-            onSelect: { languageOption in viewModel.selectLanguage(code: languageOption.code) },
+            onSelect: { languageOption in
+                Task {await viewModel.selectLanguage(code: languageOption.code)}
+            },
             accessibilityLabel: { languageOption, isSelected in
                 let title = languageSettings.localized(languageOption.titleKey)
                 let selected = isSelected
@@ -40,4 +42,5 @@ struct LanguageChooserView: View {
 #Preview {
     LanguageChooserView()
         .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

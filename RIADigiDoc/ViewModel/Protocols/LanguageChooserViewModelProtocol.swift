@@ -5,5 +5,5 @@ public protocol LanguageChooserViewModelProtocol: Sendable {
     var selectedLanguage: String { get }
 
     // MARK: Actions
-    func selectLanguage(code: String)
+    func selectLanguage(code: String) async
 }

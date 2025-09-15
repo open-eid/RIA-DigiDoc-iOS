@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ThemeChooserView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
+    @EnvironmentObject private var themeSettings: ThemeSettings
 
     private let supportedThemes: [SupportedTheme] = [
         SupportedTheme(themeKey: Theme.system, titleKey: "Main settings theme system"),
@@ -15,10 +16,12 @@ struct ThemeChooserView: View {
             title: languageSettings.localized("Main settings menu appearance"),
             options: supportedThemes,
             isSelected: { themeOption in
-                themeOption.themeKey == Theme.currentSetting()
+                themeOption.themeKey == themeSettings.getSelectedTheme()
             },
             titleKey: { themeOption in themeOption.titleKey },
-            onSelect: { themeOption in Theme.set(themeOption.themeKey) },
+            onSelect: { themeOption in
+                Task {await themeSettings.setSelectedTheme(themeOption.themeKey)}
+            },
             accessibilityLabel: { themeOption, isSelected in
                 let title = languageSettings.localized(themeOption.titleKey)
                 let selected = isSelected
@@ -34,4 +37,5 @@ struct ThemeChooserView: View {
 #Preview {
     ThemeChooserView()
         .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

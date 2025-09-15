@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct ActionButton: View {
     @AppTheme private var theme
@@ -79,6 +80,7 @@ private struct TextComponent: View {
             description: "Do something",
             assetImageName: "ic_m3_attach_file_48pt_wght400",
         ) {}
+            .environmentObject(Container.shared.themeSettings())
     }
     .padding()
 }

@@ -34,7 +34,6 @@ struct InfoHeaderLogoComponent: View {
 // MARK: - Preview
 #Preview {
     InfoHeaderLogoComponent()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

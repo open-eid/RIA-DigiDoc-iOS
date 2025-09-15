@@ -79,5 +79,6 @@ struct UnsignedBottomBarView: View {
         rightButtonAccessibilityLabel: "Sign",
         rightButtonAction: {}
     )
-        .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

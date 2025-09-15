@@ -57,7 +57,6 @@ struct SingleLicenseButton: View {
             url: URL(string: "https://github.com/Alamofire/Alamofire/blob/master/LICENSE")
         ),
     )
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

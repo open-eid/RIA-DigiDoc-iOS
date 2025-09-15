@@ -432,6 +432,6 @@ struct CertificateDetailView: View {
         containerMimetype: "application/vnd.etsi.asic-e+zip",
         dataFilesCount: 1
     )
-    .environmentObject(
-        Container.shared.languageSettings())
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

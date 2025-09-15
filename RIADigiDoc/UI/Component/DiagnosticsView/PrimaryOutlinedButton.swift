@@ -38,18 +38,17 @@ struct PrimaryOutlinedButton: View {
 // MARK: - Preview
 #Preview {
     VStack(spacing: Dimensions.Padding.XSPadding) {
-            PrimaryOutlinedButton(
-                text: "button without icon",
-                assetImageName: nil,
-                action: {}
-            )
-            PrimaryOutlinedButton(
-                text: "button with icon",
-                assetImageName: "ic_m3_download_48pt_wght400",
-                action: {}
-            )
-        }
-        .environmentObject(
-            Container.shared.languageSettings()
+        PrimaryOutlinedButton(
+            text: "button without icon",
+            assetImageName: nil,
+            action: {}
         )
+        PrimaryOutlinedButton(
+            text: "button with icon",
+            assetImageName: "ic_m3_download_48pt_wght400",
+            action: {}
+        )
+    }
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

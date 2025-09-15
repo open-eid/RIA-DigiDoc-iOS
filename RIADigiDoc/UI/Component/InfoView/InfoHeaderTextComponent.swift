@@ -31,7 +31,6 @@ struct InfoHeaderTextComponent: View {
 // MARK: - Preview
 #Preview {
     InfoHeaderTextComponent()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

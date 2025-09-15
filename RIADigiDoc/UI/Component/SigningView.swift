@@ -332,7 +332,6 @@ struct SigningView: View {
 
 #Preview {
     SigningView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

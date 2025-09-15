@@ -16,7 +16,7 @@ final class LanguageChooserViewModelTests {
 
     @Test
     func selectLanguage_success() async throws {
-        viewModel.selectLanguage(code: "en")
+        await viewModel.selectLanguage(code: "en")
         #expect(mockLanguageSettings.setSelectedLanguageCallCount == 1)
     }
 }

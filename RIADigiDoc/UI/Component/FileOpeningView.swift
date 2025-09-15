@@ -56,6 +56,6 @@ struct FileOpeningView: View {
         isFileOpeningLoading: .constant(true),
         isNavigatingToNextView: .constant(false)
     )
-    .environmentObject(
-        Container.shared.languageSettings())
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

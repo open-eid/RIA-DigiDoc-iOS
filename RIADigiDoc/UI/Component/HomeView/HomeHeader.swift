@@ -56,7 +56,6 @@ private struct VersionComponent: View {
 // MARK: - Preview
 #Preview {
     HomeHeader()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

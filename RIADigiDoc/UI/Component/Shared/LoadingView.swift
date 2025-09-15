@@ -30,6 +30,6 @@ struct LoadingView: View {
 
 #Preview {
     LoadingView()
-        .environmentObject(
-            Container.shared.languageSettings())
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

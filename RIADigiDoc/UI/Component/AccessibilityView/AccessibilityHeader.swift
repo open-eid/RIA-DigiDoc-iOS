@@ -32,7 +32,7 @@ struct AccessibilityHeader: View {
 // MARK: - Preview
 #Preview {
     AccessibilityHeader()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
+
 }

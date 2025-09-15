@@ -90,6 +90,6 @@ struct RecentDocumentsView: View {
 
 #Preview {
     RecentDocumentsView()
-        .environmentObject(
-            Container.shared.languageSettings())
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

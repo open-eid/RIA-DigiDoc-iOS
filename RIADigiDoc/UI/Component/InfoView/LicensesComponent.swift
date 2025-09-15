@@ -30,7 +30,6 @@ struct LicensesComponent: View {
 // MARK: - Preview
 #Preview {
     LicensesComponent()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

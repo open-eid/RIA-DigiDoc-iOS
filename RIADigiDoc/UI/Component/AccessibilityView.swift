@@ -34,7 +34,6 @@ struct AccessibilityView: View {
 // MARK: - Preview
 #Preview {
     AccessibilityView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

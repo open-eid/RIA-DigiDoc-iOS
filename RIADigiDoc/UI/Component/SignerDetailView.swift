@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct SignatureDataItem {
     let title: String
@@ -90,4 +91,5 @@ struct SignerDetailView: View {
                 extraIcon: "ic_m3_arrow_right_48pt_wght400"
             )
     )
+    .environmentObject(Container.shared.themeSettings())
 }
