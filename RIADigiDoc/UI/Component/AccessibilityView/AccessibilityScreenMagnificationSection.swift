@@ -90,7 +90,6 @@ struct AccessibilityScreenMagnificationSection: View {
 // MARK: - Preview
 #Preview {
     AccessibilityScreenMagnificationSection()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

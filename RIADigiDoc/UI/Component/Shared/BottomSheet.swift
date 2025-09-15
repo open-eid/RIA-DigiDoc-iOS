@@ -185,4 +185,5 @@ extension View {
     Button("Show Sheet") {}
         .bottomSheet(isPresented: .constant(true), actions: sheetActions)
         .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

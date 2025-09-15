@@ -76,6 +76,11 @@ extension Container {
         self { @MainActor in LanguageSettings(dataStore: self.dataStore()) }.singleton
     }
 
+    @MainActor
+    var themeSettings: Factory<ThemeSettings> {
+        self { @MainActor in ThemeSettings(dataStore: self.dataStore()) }.singleton
+    }
+
     var dataStore: Factory<DataStore> {
         self { DataStore() }.singleton
     }

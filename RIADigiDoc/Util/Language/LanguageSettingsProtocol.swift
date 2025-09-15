@@ -4,6 +4,6 @@ import Foundation
 @MainActor
 public protocol LanguageSettingsProtocol: Sendable {
     func getSelectedLanguage() -> String
-    func setSelectedLanguage(newLanguageCode: String)
+    func setSelectedLanguage(newLanguageCode: String) async
     func localized(_ key: String) -> String
 }

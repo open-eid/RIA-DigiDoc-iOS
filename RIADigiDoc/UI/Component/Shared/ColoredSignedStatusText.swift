@@ -2,7 +2,6 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct ColoredSignedStatusText: View {
-    @AppTheme private var theme
     @AppTypography private var typography
 
     let text: String

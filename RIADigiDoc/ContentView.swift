@@ -122,7 +122,6 @@ struct ContentView: View {
 // MARK: - Preview
 #Preview {
     ContentView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

@@ -93,4 +93,5 @@ struct RoleDetailsView: View {
         )
     )
     .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

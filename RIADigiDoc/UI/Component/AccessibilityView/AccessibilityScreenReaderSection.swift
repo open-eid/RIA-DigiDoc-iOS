@@ -64,7 +64,6 @@ struct AccessibilityScreenReaderSection: View {
 // MARK: - Preview
 #Preview {
     AccessibilityScreenReaderSection()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

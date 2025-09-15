@@ -32,7 +32,6 @@ struct InfoView: View {
 // MARK: - Preview
 #Preview {
     InfoView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

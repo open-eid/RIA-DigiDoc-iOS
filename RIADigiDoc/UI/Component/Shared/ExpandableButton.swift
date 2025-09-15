@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct ExpandableButton: View {
     @AppTheme private var theme
@@ -60,4 +61,5 @@ struct ExpandableButton: View {
         title: "Technical information",
         detailText: "Technical information about signature"
     )
+    .environmentObject(Container.shared.themeSettings())
 }

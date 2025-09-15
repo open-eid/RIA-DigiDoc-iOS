@@ -84,7 +84,6 @@ struct DiagnosticsView: View {
 // MARK: - Preview
 #Preview {
     DiagnosticsView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

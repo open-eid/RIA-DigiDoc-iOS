@@ -60,4 +60,6 @@ extension DiagnosticsSingleSection {
             content: "Line 1"
         )
     }
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

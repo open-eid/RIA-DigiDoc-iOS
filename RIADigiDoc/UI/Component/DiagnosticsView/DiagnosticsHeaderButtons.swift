@@ -31,7 +31,6 @@ struct DiagnosticsHeaderButtons: View {
         onCheckUpdateClick: {},
         onSaveDiagnosticsClick: {},
     )
-    .environmentObject(
-        Container.shared.languageSettings()
-    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

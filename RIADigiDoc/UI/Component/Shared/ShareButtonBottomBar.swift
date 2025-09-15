@@ -1,4 +1,5 @@
 import SwiftUI
+import FactoryKit
 
 struct ShareButtonBottomBar: View {
     @AppTheme private var theme
@@ -65,4 +66,5 @@ struct ShareSheet: UIViewControllerRepresentable {
         accessibilityLabel: "Share",
         containerUrl: URL(fileURLWithPath: "")
     )
+    .environmentObject(Container.shared.themeSettings())
 }

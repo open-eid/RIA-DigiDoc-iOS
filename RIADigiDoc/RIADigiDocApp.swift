@@ -7,9 +7,9 @@ import CommonsLib
 
 @main
 struct RIADigiDocApp: App {
-    @AppStorage("colorScheme") private var colorScheme: Int = 2
-
     @StateObject private var languageSettings: LanguageSettings
+    @StateObject private var themeSettings: ThemeSettings
+
     @State private var isSetupComplete = false
     @State private var isJailbroken: Bool = false
 
@@ -20,42 +20,54 @@ struct RIADigiDocApp: App {
 
     init() {
         _languageSettings = StateObject(wrappedValue: Container.shared.languageSettings())
+        _themeSettings = StateObject(wrappedValue: Container.shared.themeSettings())
+
         self.configurationProperty = Container.shared.configurationProperty()
         self.configurationLoader = Container.shared.configurationLoader()
         self.fileManager = Container.shared.fileManager()
         self.librarySetup = Container.shared.librarySetup()
     }
 
+    private func onLaunchScreenViewAppear() {
+        Task {
+            if await JailbreakDetection.isDeviceJailbroken(fileManager: fileManager) {
+                await MainActor.run {
+                    self.isJailbroken = true
+                }
+                return
+            }
+
+            await librarySetup.setupLibraries()
+            await MainActor.run {
+                self.isSetupComplete = true
+            }
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
+            let currentTheme = themeSettings.getSelectedTheme()
+
             if isJailbroken {
                 JailbreakView()
                     .environment(\.typography, Typography.current())
+                    .environmentObject(themeSettings)
+                    .preferredColorScheme(currentTheme.colorScheme)
             } else if isSetupComplete {
                 NavigationView {
                     ContentView()
                 }
                 .navigationViewStyle(StackNavigationViewStyle())
-                .environmentObject(languageSettings)
                 .environment(\.typography, Typography.current())
+                .environmentObject(languageSettings)
+                .environmentObject(themeSettings)
                 .overlay(ToastOverlay())
+                .preferredColorScheme(currentTheme.colorScheme)
             } else {
                 LaunchScreenView()
-                    .onAppear {
-                        Task {
-                            if await JailbreakDetection.isDeviceJailbroken(fileManager: fileManager) {
-                                await MainActor.run {
-                                    self.isJailbroken = true
-                                }
-                                return
-                            }
-
-                            await librarySetup.setupLibraries()
-                            await MainActor.run {
-                                self.isSetupComplete = true
-                            }
-                        }
-                    }
+                    .onAppear {onLaunchScreenViewAppear()}
+                    .environmentObject(themeSettings)
+                    .preferredColorScheme(currentTheme.colorScheme)
             }
         }
     }

@@ -135,6 +135,8 @@
 				Util/Language/LanguageSettingsProtocol.swift,
 				Util/Signature/SignatureUtil.swift,
 				Util/Signature/SignatureUtilProtocol.swift,
+				Util/Theme/ThemeSettings.swift,
+				Util/Theme/ThemeSettingsProtocol.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/ContentViewModel.swift,
 				ViewModel/DataFilesViewModel.swift,

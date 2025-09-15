@@ -1,5 +1,6 @@
 import SwiftUI
 import LibdigidocLibSwift
+import FactoryKit
 
 struct DataFilesListView: View {
     @AppTheme private var theme
@@ -46,4 +47,5 @@ struct DataFilesListView: View {
         onOpenFileButtonClick: { _ in },
         onSaveDataFileButtonClick: { _ in }
     )
+    .environmentObject(Container.shared.themeSettings())
 }

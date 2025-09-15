@@ -41,7 +41,6 @@ struct InfoHeaderHelpButton: View {
 // MARK: - Preview
 #Preview {
     InfoHeaderHelpButton()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

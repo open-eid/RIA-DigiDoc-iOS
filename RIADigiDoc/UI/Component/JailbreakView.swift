@@ -23,7 +23,6 @@ struct JailbreakView: View {
 
 #Preview {
     JailbreakView()
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

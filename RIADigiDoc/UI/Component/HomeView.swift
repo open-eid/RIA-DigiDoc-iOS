@@ -85,7 +85,6 @@ struct HomeView: View {
 
 #Preview {
     HomeView(externalFiles: .constant([]))
-        .environmentObject(
-            Container.shared.languageSettings()
-        )
+        .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

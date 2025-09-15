@@ -16,8 +16,8 @@ class LanguageChooserViewModel: LanguageChooserViewModelProtocol, ObservableObje
         selectedLanguage = languageSettings.getSelectedLanguage()
     }
 
-    func selectLanguage(code: String) {
+    func selectLanguage(code: String) async {
         selectedLanguage = code
-        languageSettings.setSelectedLanguage(newLanguageCode: code)
+        await languageSettings.setSelectedLanguage(newLanguageCode: code)
     }
 }

@@ -141,4 +141,5 @@ struct ContainerNameView: View {
         onRenameContainerButtonClick: {}
     )
     .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

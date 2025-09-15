@@ -30,4 +30,5 @@ struct OneTimeLogGenerationToggleSection: View {
 #Preview {
     OneTimeLogGenerationToggleSection(enableOneTimeLogGeneration: .constant(false))
         .environmentObject(Container.shared.languageSettings())
+        .environmentObject(Container.shared.themeSettings())
 }

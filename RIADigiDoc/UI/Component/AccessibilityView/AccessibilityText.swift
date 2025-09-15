@@ -48,7 +48,7 @@ struct AccessibilityText: View {
                 isUrl: true
             )
         }
-    ).environmentObject(
-        Container.shared.languageSettings()
     )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

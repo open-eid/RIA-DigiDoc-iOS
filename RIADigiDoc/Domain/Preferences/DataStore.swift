@@ -7,7 +7,7 @@ public final actor DataStore: DataStoreProtocol {
         self.defaults = defaults
     }
 
-    // MARK: - Public Methods
+    // MARK: - Language Methods
 
     public func getSelectedLanguage() async -> String {
         return defaults.string(forKey: Keys.selectedLanguage) ?? DefaultValues.language
@@ -15,6 +15,16 @@ public final actor DataStore: DataStoreProtocol {
 
     public func setSelectedLanguage(newLanguageCode: String) async {
         defaults.set(newLanguageCode, forKey: Keys.selectedLanguage)
+    }
+
+    // MARK: - Theme Methods
+
+    public func getSelectedTheme() async -> Int {
+        return defaults.integer(forKey: Keys.selectedTheme)
+    }
+
+    public func setSelectedTheme(_ rawValue: Int) async {
+        defaults.set(rawValue, forKey: Keys.selectedTheme)
     }
 
     // MARK: - Constants
@@ -25,5 +35,6 @@ public final actor DataStore: DataStoreProtocol {
 
     private enum Keys {
         static let selectedLanguage = "selectedLanguage"
+        static let selectedTheme = "selectedTheme"
     }
 }
