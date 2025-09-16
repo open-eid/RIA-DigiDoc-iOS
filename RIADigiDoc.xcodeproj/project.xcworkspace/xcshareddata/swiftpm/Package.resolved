@@ -1,5 +1,5 @@
 {
-  "originHash" : "98cee51152819b03cefd6d7fb68ebebf6fdccad673a68af7f9d34d237fb2e205",
+  "originHash" : "f7fbfa7350fed99ab2a46f2f0f1415b1da063630199fb0f30e843edb0c9932aa",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "asn1decoder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/filom/ASN1Decoder.git",
+      "state" : {
+        "revision" : "7e1523662c69d019a3299bbfb22fb824141dd1f6",
+        "version" : "1.10.0"
       }
     },
     {
