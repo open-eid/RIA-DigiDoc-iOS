@@ -8,6 +8,7 @@ struct SignaturesListView: View {
     @AppTypography private var typography
 
     let signatures: [SignatureWrapper]
+    let timestamps: [SignatureWrapper]
     @Binding var selectedSignature: SignatureWrapper?
     @Binding var containerMimetype: String
     var dataFilesCount: Int
@@ -18,6 +19,17 @@ struct SignaturesListView: View {
 
     var body: some View {
         List {
+            ForEach(timestamps) { timestamp in
+                SignatureView(
+                    containerMimetype: containerMimetype,
+                    dataFilesCount: dataFilesCount,
+                    signature: timestamp,
+                    isTimestamp: true,
+                    nameUtil: nameUtil,
+                    signatureUtil: signatureUtil,
+                    showRemoveSignatureButton: showRemoveSignatureButton
+                )
+            }
             ForEach(signatures) { signature in
                 SignatureView(
                     containerMimetype: containerMimetype,
@@ -57,6 +69,7 @@ struct SignaturesListView: View {
 
     SignaturesListView(
         signatures: [signature],
+        timestamps: [signature],
         selectedSignature: .constant(signature),
         containerMimetype: .constant("application/vnd.etsi.asic-e+zip"),
         dataFilesCount: 1,

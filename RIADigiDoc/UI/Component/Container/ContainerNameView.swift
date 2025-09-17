@@ -10,9 +10,7 @@ struct ContainerNameView: View {
     @State private var showBottomSheetFromTap = false
     @State private var tempContainerURL: URL?
     @State private var isShowingFileSaver = false
-    @State private var alertMessage: String?
     @State private var isFileSaved: Bool = false
-    @State private var showAlert: Bool = false
 
     let icon: String
     let containerNameTitle: String

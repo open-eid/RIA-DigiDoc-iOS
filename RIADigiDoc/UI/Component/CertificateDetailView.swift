@@ -135,10 +135,9 @@ struct CertificateDetailView: View {
     }
 
     init(
-        viewModel: CertificateDetailViewModel = Container.shared.certificateDetailViewModel(),
         certificate: Data
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.certificateDetailViewModel())
         self.certificate = certificate
     }
 

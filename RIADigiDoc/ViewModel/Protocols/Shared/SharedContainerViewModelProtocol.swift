@@ -12,6 +12,7 @@ public protocol SharedContainerViewModelProtocol: Sendable {
 
     func currentContainer() -> SignedContainerProtocol?
     func isNestedContainer(_ container: SignedContainerProtocol?) -> Bool
+    func setIsSivaConfirmed(_ isConfirmed: Bool)
     func containers() -> [SignedContainerProtocol]
     @discardableResult func removeLastContainer() -> SignedContainerProtocol?
     func clearContainers()

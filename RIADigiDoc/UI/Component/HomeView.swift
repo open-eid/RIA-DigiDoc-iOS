@@ -9,11 +9,25 @@ struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
     private var fileOpeningViewModel: FileOpeningViewModel
 
+    @State private var isImporting = false
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
     @State private var isNavigatingToRecentDocumentsView = false
 
+    @State private var showFilesBottomSheet: Bool = false
+    @State private var showSignatureBottomSheet: Bool = false
+
     @Binding private var externalFiles: [URL]
+
+    private var filesBottomSheetActions: [BottomSheetButton] {
+        HomeViewBottomSheetActions.actions(
+            onOpenFilesClick: {
+                isImporting = true
+            }, onRecentDocumentsClick: {
+                isNavigatingToRecentDocumentsView = true
+            }
+        )
+    }
 
     init(
         viewModel: HomeViewModel = Container.shared.homeViewModel(),
@@ -37,9 +51,12 @@ struct HomeView: View {
                     assetImageName: "ic_m3_attach_file_48pt_wght400",
                     isFileOpeningLoading: $isFileOpeningLoading,
                     isNavigatingToNextView: $isNavigatingToSigningView,
+                    showBottomSheet: $showFilesBottomSheet,
+                    isImporting: $isImporting,
                     viewModel: viewModel,
                     fileOpeningViewModel: fileOpeningViewModel
                 )
+                .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
 
                 SigningImportButton(
                     title: languageSettings.localized("Main home signature title"),
@@ -47,9 +64,12 @@ struct HomeView: View {
                     assetImageName: "ic_m3_stylus_note_48pt_wght400",
                     isFileOpeningLoading: $isFileOpeningLoading,
                     isNavigatingToNextView: $isNavigatingToSigningView,
+                    showBottomSheet: $showSignatureBottomSheet,
+                    isImporting: $isImporting,
                     viewModel: viewModel,
                     fileOpeningViewModel: fileOpeningViewModel
                 )
+                .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 
                 ActionButton(
                     title: languageSettings.localized("Main home crypto title"),
@@ -68,6 +88,11 @@ struct HomeView: View {
             NavigationLink(
                 destination: SigningView(),
                 isActive: $isNavigatingToSigningView
+            ) {}
+
+            NavigationLink(
+                destination: RecentDocumentsView(),
+                isActive: $isNavigatingToRecentDocumentsView
             ) {}
 
             Spacer()

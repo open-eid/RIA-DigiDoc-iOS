@@ -4,6 +4,6 @@ import Foundation
 @MainActor
 public protocol FileOpeningViewModelProtocol: Sendable {
     func handleFiles() async
-    func handleLoadingSuccess() async
+    func handleLoadingSuccess(isSivaConfirmed: Bool) async
     func handleError() async
 }

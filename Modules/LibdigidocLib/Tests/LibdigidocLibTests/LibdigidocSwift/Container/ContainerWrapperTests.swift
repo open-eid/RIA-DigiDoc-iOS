@@ -156,11 +156,11 @@ struct ContainerWrapperTests {
 
     func open_success() async throws {
         let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [dataFileURLs.first ?? URL(fileURLWithPath: "")]
+            dataFiles: [dataFileURLs.first ?? URL(fileURLWithPath: "")], isSivaConfirmed: true
         )
 
-        _ = try await containerWrapper
-            .open(containerFile: signedContainer.getRawContainerFile() ?? URL(fileURLWithPath: ""))
+        _ = try await containerWrapper.open(containerFile: signedContainer.getRawContainerFile() ??
+                  URL(fileURLWithPath: ""), isSivaConfirmed: true)
 
         let existingContainer = await containerWrapper.getContainer()
 
@@ -171,7 +171,7 @@ struct ContainerWrapperTests {
     func open_throwContainerOpeningFailedError() async throws {
         do {
             let dummyURL = URL(fileURLWithPath: "/tmp/testfile.asice")
-            _ = try await containerWrapper.open(containerFile: dummyURL)
+            _ = try await containerWrapper.open(containerFile: dummyURL, isSivaConfirmed: true)
 
             Issue.record("Expected 'containerOpeningFailed' error")
         } catch let error {

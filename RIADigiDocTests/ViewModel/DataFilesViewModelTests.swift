@@ -39,7 +39,7 @@ struct DataFilesViewModelTests {
 
         mockSignedContainer.getDataFilesHandler = { [dataFile] }
 
-        mockSignedContainer.saveDataFileHandler = { _ in fileURL }
+        mockSignedContainer.saveDataFileHandler = { _, _ in fileURL }
 
         guard let firstDataFile = await mockSignedContainer.getDataFiles().first else {
             Issue.record("Unable to get data file")
@@ -66,7 +66,7 @@ struct DataFilesViewModelTests {
 
         mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
         mockSignedContainer.getDataFilesHandler = { [] }
-        mockSignedContainer.saveDataFileHandler = { _ in
+        mockSignedContainer.saveDataFileHandler = { _, _ in
             throw DigiDocError.containerDataFileSavingFailed(
                 ErrorDetail(
                     message: "File does not exist",

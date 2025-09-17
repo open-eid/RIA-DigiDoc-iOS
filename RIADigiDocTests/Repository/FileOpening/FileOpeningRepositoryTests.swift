@@ -8,7 +8,8 @@ import CommonsLibMocks
 struct FileOpeningRepositoryTests {
     private let mockFileManager: FileManagerProtocolMock
     private let mockContainerUtil: ContainerUtilProtocolMock
-    private let mockFileOpeningService: FileOpeningServiceProtocolMock!
+    private let mockFileOpeningService: FileOpeningServiceProtocolMock
+    private let mockSivaService: SivaServiceProtocolMock
 
     private let repository: FileOpeningRepositoryProtocol!
 
@@ -16,8 +17,11 @@ struct FileOpeningRepositoryTests {
         mockFileManager = FileManagerProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
+        mockSivaService = SivaServiceProtocolMock()
 
-        repository = FileOpeningRepository(fileOpeningService: mockFileOpeningService)
+        repository = FileOpeningRepository(
+            fileOpeningService: mockFileOpeningService, sivaService: mockSivaService
+        )
     }
 
     @Test
@@ -74,17 +78,19 @@ struct FileOpeningRepositoryTests {
             containerUtil: mockContainerUtil
         )
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _ in
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
             return signedContainer
         }
 
-        let result = try await repository.openOrCreateContainer(urls: fileURLs)
+        let result = try await repository.openOrCreateContainer(
+            urls: fileURLs, isSivaConfirmed: true
+        )
 
         let signedContainerName = await signedContainer.getContainerName()
         let resultContainerName = await result.getContainerName()
 
         #expect(signedContainerName == resultContainerName)
         #expect(mockFileOpeningService.openOrCreateContainerCallCount == 1)
-        #expect(mockFileOpeningService.openOrCreateContainerArgValues.first == fileURLs)
+        #expect(mockFileOpeningService.openOrCreateContainerArgValues.first?.dataFiles == fileURLs)
     }
 }

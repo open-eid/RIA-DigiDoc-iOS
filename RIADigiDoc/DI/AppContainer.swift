@@ -28,7 +28,12 @@ extension Container {
     }
 
     var fileOpeningRepository: Factory<FileOpeningRepositoryProtocol> {
-        self { FileOpeningRepository(fileOpeningService: self.fileOpeningService()) }
+        self {
+            FileOpeningRepository(
+                fileOpeningService: self.fileOpeningService(),
+                sivaService: self.sivaService()
+            )
+        }
             .shared
     }
 
@@ -50,6 +55,7 @@ extension Container {
             @MainActor in
             FileOpeningViewModel(
                 fileOpeningRepository: self.fileOpeningRepository(),
+                sivaRepository: self.sivaRepository(),
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager()
@@ -66,7 +72,8 @@ extension Container {
                 fileOpeningService: self.fileOpeningService(),
                 mimeTypeCache: self.mimeTypeCache(),
                 fileUtil: self.fileUtil(),
-                fileManager: self.fileManager()
+                fileManager: self.fileManager(),
+                sivaRepository: self.sivaRepository()
             )
         }
     }
@@ -139,5 +146,21 @@ extension Container {
 
     var signatureUtil: Factory<SignatureUtilProtocol> {
         self { SignatureUtil() }
+    }
+
+    var sivaService: Factory<SivaServiceProtocol> {
+        self {
+            SivaService(
+                mimeTypeResolver: self.mimeTypeResolver(),
+                fileManager: self.fileManager(),
+                containerUtil: self.containerUtil()
+            )
+        }
+    }
+
+    var sivaRepository: Factory<SivaRepositoryProtocol> {
+        self {
+            SivaRepository(sivaService: self.sivaService())
+        }
     }
 }

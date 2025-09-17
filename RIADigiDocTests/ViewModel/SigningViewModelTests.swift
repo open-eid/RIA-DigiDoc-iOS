@@ -20,6 +20,7 @@ struct SigningViewModelTests {
     private let mockFileUtil: FileUtilProtocolMock
     private let mockFileOpeningService: FileOpeningServiceProtocolMock
     private let mockMimeTypeCache: MimeTypeCacheProtocolMock
+    private let mockSivaRepository: SivaRepositoryProtocolMock
 
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
@@ -28,13 +29,15 @@ struct SigningViewModelTests {
         mockFileUtil = FileUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
         mockMimeTypeCache = MimeTypeCacheProtocolMock()
+        mockSivaRepository = SivaRepositoryProtocolMock()
 
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileOpeningService: mockFileOpeningService,
             mimeTypeCache: mockMimeTypeCache,
             fileUtil: mockFileUtil,
-            fileManager: mockFileManager
+            fileManager: mockFileManager,
+            sivaRepository: mockSivaRepository
         )
     }
 
@@ -394,15 +397,15 @@ struct SigningViewModelTests {
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _ in mockSignedContainer }
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in mockSignedContainer }
 
-        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
 
         mockFileUtil.fileExistsHandler = { _ in true }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        await viewModel.handleFileOpening(dataFile: testDataFile)
+        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
         #expect(viewModel.previewFile?.lastPathComponent == "test.txt")
         #expect(viewModel.errorMessage == nil)
@@ -429,9 +432,9 @@ struct SigningViewModelTests {
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _ in mockNestedSignedContainer }
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in mockNestedSignedContainer }
 
-        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
 
         mockFileUtil.fileExistsHandler = { _ in true }
 
@@ -445,7 +448,7 @@ struct SigningViewModelTests {
 
         mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
 
-        await viewModel.handleFileOpening(dataFile: testDataFile)
+        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
         let updatedSignedContainerName = await viewModel.signedContainer?.getContainerName()
         let mockNestedSignedContainerName = await mockNestedSignedContainer.getContainerName()
@@ -472,7 +475,7 @@ struct SigningViewModelTests {
             mediaType: mimeType
         )
 
-        mockSignedContainer.saveDataFileHandler = { _ in
+        mockSignedContainer.saveDataFileHandler = { _, _ in
             throw DigiDocError.containerDataFileSavingFailed(
                 ErrorDetail(
                     message: "Unable to save datafile",
@@ -483,7 +486,7 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        await viewModel.handleFileOpening(dataFile: testDataFile)
+        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
         guard let (errorKey, args) = viewModel.errorMessage else {
             Issue.record("Expected error message to not be empty")
@@ -512,11 +515,11 @@ struct SigningViewModelTests {
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
 
-        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
 
         mockFileUtil.fileExistsHandler = { _ in true }
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _ in
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
             throw DigiDocError.containerOpeningFailed(
                 ErrorDetail(
                     message: "Cannot open container. Container file is nil"))
@@ -526,7 +529,7 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        await viewModel.handleFileOpening(dataFile: testDataFile)
+        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
         guard let (errorKey, args) = viewModel.errorMessage else {
             Issue.record("Expected error message to not be empty")
@@ -555,7 +558,7 @@ struct SigningViewModelTests {
         )
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
-        mockSignedContainer.saveDataFileHandler = { _ in testFile }
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
         mockFileUtil.fileExistsHandler = { _ in true }
 
         await viewModel.handleSaveFile(dataFile: testDataFile)
@@ -579,7 +582,7 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        mockSignedContainer.saveDataFileHandler = { _ in
+        mockSignedContainer.saveDataFileHandler = { _, _ in
             throw DigiDocError.containerDataFileSavingFailed(
                 ErrorDetail(
                     message: "Unable to save datafile",

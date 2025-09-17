@@ -7,6 +7,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
     private var fileOpeningResult: Result<[URL], Error>?
     private var addedFilesCount: Int = 0
     private var nestedContainers: [SignedContainerProtocol] = []
+    private var isSivaConfirmed: Bool = true
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
@@ -52,6 +53,10 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
     func isNestedContainer(_ container: SignedContainerProtocol?) -> Bool {
         guard let container else { return false }
         return nestedContainers.count > 1 && currentContainer().map { $0 === container } == true
+    }
+
+    func setIsSivaConfirmed(_ isConfirmed: Bool) {
+        isSivaConfirmed = isConfirmed
     }
 
     func containers() -> [SignedContainerProtocol] {

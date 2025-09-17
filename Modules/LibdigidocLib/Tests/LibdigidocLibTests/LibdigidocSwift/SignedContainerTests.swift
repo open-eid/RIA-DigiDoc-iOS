@@ -47,7 +47,7 @@ final class SignedContainerTests {
             try? FileManager.default.removeItem(at: tempFileURL)
         }
 
-        signedContainer = try await SignedContainer.openOrCreate(dataFiles: [tempFileURL])
+        signedContainer = try await SignedContainer.openOrCreate(dataFiles: [tempFileURL], isSivaConfirmed: true)
     }
 
     @Test
@@ -80,7 +80,7 @@ final class SignedContainerTests {
         }
 
         let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [exampleContainer]
+            dataFiles: [exampleContainer], isSivaConfirmed: true
         )
 
         await #expect(signedContainer.getContainerMimetype() == CommonsLib.Constants.MimeType.Asice)
@@ -89,7 +89,7 @@ final class SignedContainerTests {
     @Test
     func openOrCreateContainer_throwContainerCreationFailedErrorWithNoDatafiles() async throws {
         do {
-            _ = try await SignedContainer.openOrCreate(dataFiles: [])
+            _ = try await SignedContainer.openOrCreate(dataFiles: [], isSivaConfirmed: true)
             Issue.record("Expected containerCreationFailed error")
             return
         } catch let error as DigiDocError {
@@ -123,7 +123,7 @@ final class SignedContainerTests {
         }
 
         do {
-            _ = try await SignedContainer.openOrCreate(dataFiles: [notExistingContainerLocation])
+            _ = try await SignedContainer.openOrCreate(dataFiles: [notExistingContainerLocation], isSivaConfirmed: true)
             Issue.record("Expected 'addingFilesToContainerFailed' error")
             return
         } catch let error as DigiDocError {

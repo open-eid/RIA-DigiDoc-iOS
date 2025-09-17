@@ -13,6 +13,7 @@ struct SignatureView: View {
     let dataFilesCount: Int
 
     let signature: SignatureWrapper
+    let isTimestamp: Bool
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
     let showSignedDate: Bool
@@ -38,6 +39,7 @@ struct SignatureView: View {
         containerMimetype: String,
         dataFilesCount: Int,
         signature: SignatureWrapper,
+        isTimestamp: Bool = false,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
         showSignedDate: Bool = true,
@@ -48,6 +50,7 @@ struct SignatureView: View {
         self.containerMimetype = containerMimetype
         self.dataFilesCount = dataFilesCount
         self.signature = signature
+        self.isTimestamp = isTimestamp
         self.nameUtil = nameUtil
         self.signatureUtil = signatureUtil
         self.showSignedDate = showSignedDate
@@ -64,7 +67,7 @@ struct SignatureView: View {
 
         VStack {
             HStack {
-                Image("ic_m3_stylus_note_48pt_wght400")
+                Image(isTimestamp ? "ic_m3_approval_48dp_wght400" : "ic_m3_stylus_note_48pt_wght400")
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
@@ -73,7 +76,7 @@ struct SignatureView: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
-                    StyledNameText(name: nameUtil.formatName(signature.signedBy))
+                    StyledNameText(name: nameUtil.formatName(signature.signedBy), allCaps: isTimestamp)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
 
@@ -153,6 +156,7 @@ struct SignatureView: View {
             NavigationLink(
                 destination: SignatureDetailView(
                     signature: signature,
+                    isTimestamp: isTimestamp,
                     containerMimetype: containerMimetype,
                     dataFilesCount: dataFilesCount
                 ),

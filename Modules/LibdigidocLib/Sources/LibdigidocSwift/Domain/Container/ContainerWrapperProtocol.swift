@@ -7,9 +7,15 @@ public protocol ContainerWrapperProtocol: Sendable {
     func getDataFiles() async -> [DataFileWrapper]
     func getMimetype() async -> String
     func create(file: URL) async throws -> ContainerWrapper
-    func open(containerFile: URL) async throws -> ContainerWrapper
+    func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
     func addDataFiles(dataFiles: [URL?]) async throws
     func save(file: URL) async throws -> Bool
     func getContainer() async -> ContainerWrapper?
-    func saveDataFile(dataFile: DataFileWrapper) async throws -> URL
+    func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
+}
+
+extension ContainerWrapperProtocol {
+    func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
+        try await saveDataFile(dataFile: dataFile, to: nil)
+    }
 }
