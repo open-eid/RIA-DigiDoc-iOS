@@ -49,8 +49,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     @MainActor
-    public func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
-        let savedFilesDirectory = try Directories.getCacheDirectory(
+    public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
+        let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
             subfolder: CommonsLib.Constants.Folder.SavedFiles,
             fileManager: fileManager
         )
@@ -135,11 +135,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     @MainActor
-    public func open(containerFile: URL) async throws -> ContainerWrapper {
+    public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
         let lock = NSLock()
         return try await withCheckedThrowingContinuation { continuation in
             ContainerWrapper.logger.debug("Opening container file '\(containerFile.lastPathComponent)'")
-            digiDocContainerWrapper.open(containerFile.path, validateOnline: true) { container, error in
+            digiDocContainerWrapper.open(containerFile.path, validateOnline: isSivaConfirmed) { container, error in
                 lock.lock()
                 defer { lock.unlock() }
                 if let error = error as NSError? {

@@ -129,7 +129,9 @@ struct FileOpeningServiceTests {
         let tempFileURL2 = TestFileUtil.createSampleFile()
         let urls = [tempFileURL, tempFileURL2]
 
-        let container = try await service.openOrCreateContainer(dataFiles: urls)
+        let container = try await service.openOrCreateContainer(
+            dataFiles: urls, isSivaConfirmed: true
+        )
 
         defer {
             try? FileManager.default.removeItem(at: tempFileURL)
@@ -146,7 +148,9 @@ struct FileOpeningServiceTests {
         let emptyURLs: [URL] = []
 
         do {
-            _ = try await service.openOrCreateContainer(dataFiles: emptyURLs)
+            _ = try await service.openOrCreateContainer(
+                dataFiles: emptyURLs, isSivaConfirmed: true
+            )
             Issue.record("Expected 'containerCreationFailed' error")
             return
         } catch let error {

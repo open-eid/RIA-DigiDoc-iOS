@@ -6,8 +6,9 @@ struct SigningImportButton: View {
     let assetImageName: String
     @Binding var isFileOpeningLoading: Bool
     @Binding var isNavigatingToNextView: Bool
+    @Binding var showBottomSheet: Bool
 
-    @State private var isImporting: Bool = false
+    @Binding var isImporting: Bool
     @ObservedObject var viewModel: HomeViewModel
     var fileOpeningViewModel: FileOpeningViewModel
 
@@ -17,7 +18,7 @@ struct SigningImportButton: View {
             description: description,
             assetImageName: assetImageName
         ) {
-            isImporting = true
+            showBottomSheet = true
         }
         .fileImporter(
             isPresented: $isImporting,

@@ -23,6 +23,8 @@ public struct Constants {
         public static let Bdoc = "application/vnd.bdoc-1.0"
         public static let Adoc = "application/vnd.lt.archyvai.adoc-2008"
         public static let SignatureContainers = [Asice, Asics, Ddoc, Bdoc, Adoc]
+        public static let SivaContainers = [Ddoc, Asics]
+        public static let UnsignableContainers = [Adoc, Ddoc, Asics]
 
         public static let Pdf = "application/pdf"
 
@@ -41,6 +43,10 @@ public struct Constants {
         public static let Edoc = "edoc"
         public static let Scs = "scs"
         public static let Default = Asice
+
+        public static let AsicsContainers = [Asics, Scs]
+
+        public static let UnsignableContainerExtensions = [Adoc, Ddoc] + AsicsContainers
     }
 
     public struct Identifier {

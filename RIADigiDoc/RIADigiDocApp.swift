@@ -61,7 +61,10 @@ struct RIADigiDocApp: App {
                 .environment(\.typography, Typography.current())
                 .environmentObject(languageSettings)
                 .environmentObject(themeSettings)
-                .overlay(ToastOverlay())
+                .overlay(
+                    ToastOverlay()
+                        .environmentObject(themeSettings)
+                )
                 .preferredColorScheme(currentTheme.colorScheme)
             } else {
                 LaunchScreenView()

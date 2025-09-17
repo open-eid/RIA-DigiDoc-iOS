@@ -17,6 +17,7 @@ struct SignatureDetailView: View {
     private var certificateDetailViewModel: CertificateDetailViewModel
 
     private let signature: SignatureWrapper
+    private let isTimestamp: Bool
     private let containerMimetype: String
     private let dataFilesCount: Int
 
@@ -51,6 +52,10 @@ struct SignatureDetailView: View {
         }
 
         return key.isEmpty ? "" : languageSettings.localized(key)
+    }
+
+    var signerName: String {
+        return nameUtil.formatName(signature.signedBy)
     }
 
     var timeStampTime: String {
@@ -94,16 +99,17 @@ struct SignatureDetailView: View {
     }
 
     init(
-        viewModel: SignatureDetailViewModel = Container.shared.signatureDetailViewModel(),
         certificateDetailViewModel: CertificateDetailViewModel = Container.shared.certificateDetailViewModel(),
         signature: SignatureWrapper,
+        isTimestamp: Bool = false,
         containerMimetype: String,
         dataFilesCount: Int,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil()
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.signatureDetailViewModel())
         self.certificateDetailViewModel = certificateDetailViewModel
         self.signature = signature
+        self.isTimestamp = isTimestamp
         self.containerMimetype = containerMimetype
         self.dataFilesCount = dataFilesCount
 
@@ -120,6 +126,7 @@ struct SignatureDetailView: View {
                         containerMimetype: containerMimetype,
                         dataFilesCount: dataFilesCount,
                         signature: signature,
+                        isTimestamp: isTimestamp,
                         showSignedDate: false,
                         showMoreOptionsButton: false,
                         showRole: false
@@ -168,7 +175,7 @@ struct SignatureDetailView: View {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
                                                     title: languageSettings.localized("Signer's Certificate"),
-                                                    value: nameUtil.formatName(signature.signedBy),
+                                                    value: isTimestamp ? signerName.uppercased() : signerName,
                                                     extraIcon: "ic_m3_expand_content_48pt_wght400",
                                                 )
                                             )

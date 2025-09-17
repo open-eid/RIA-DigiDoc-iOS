@@ -13,6 +13,7 @@ public actor SignedContainer: SignedContainerProtocol {
     private var containerFile: URL?
     private let isExistingContainer: Bool
     private let container: ContainerWrapperProtocol
+    private let timestamps: [SignatureWrapper]
     private let fileManager: FileManagerProtocol
     private let containerUtil: ContainerUtilProtocol
 
@@ -20,12 +21,14 @@ public actor SignedContainer: SignedContainerProtocol {
         containerFile: URL? = nil,
         isExistingContainer: Bool = false,
         container: ContainerWrapperProtocol = Container.shared.containerWrapper(),
+        timestamps: [SignatureWrapper] = [],
         fileManager: FileManagerProtocol,
         containerUtil: ContainerUtilProtocol
     ) {
         self.containerFile = containerFile
         self.isExistingContainer = isExistingContainer
         self.container = container
+        self.timestamps = timestamps
         self.fileManager = fileManager
         self.containerUtil = containerUtil
     }
@@ -38,6 +41,10 @@ public actor SignedContainer: SignedContainerProtocol {
         return await container.getSignatures()
     }
 
+    public func getTimestamps() async -> [SignatureWrapper] {
+        return timestamps
+    }
+
     public func getContainerName() async -> String {
         return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }
@@ -48,6 +55,14 @@ public actor SignedContainer: SignedContainerProtocol {
 
     public func getRawContainerFile() async -> URL? {
         return containerFile
+    }
+
+    public func isExistingContainer() async -> Bool {
+        return isExistingContainer
+    }
+
+    public func isSigned() async -> Bool {
+        return await !container.getSignatures().isEmpty
     }
 
     @discardableResult
@@ -103,8 +118,35 @@ public actor SignedContainer: SignedContainerProtocol {
         return uniqueFileURL
     }
 
-    public func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
-        return try await container.saveDataFile(dataFile: dataFile)
+    public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
+        return try await container.saveDataFile(dataFile: dataFile, to: directory)
+    }
+
+    public func getNestedTimestampedContainer() async throws -> SignedContainer? {
+        guard await getContainerMimetype() == CommonsLib.Constants.MimeType.Asics else { return nil }
+        let dataFiles = await getDataFiles()
+        guard dataFiles.count == 1, let dataFile = dataFiles.first else { return nil }
+
+        guard let containerFile = containerFile else { return nil }
+
+        let containerDataFilesDir = try containerUtil.getContainerDataFilesDir(containerFile: containerFile)
+
+        let nestedTimestampedFile = try await saveDataFile(dataFile: dataFile, to: containerDataFilesDir)
+
+        let nestedContainer = try await ContainerWrapper(
+            fileManager: Container.shared.fileManager()
+        ).open(containerFile: nestedTimestampedFile, isSivaConfirmed: true)
+
+        let timestamps = await container.getSignatures()
+
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: true,
+            container: nestedContainer,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
     }
 }
 
@@ -113,7 +155,8 @@ extension SignedContainer {
     @MainActor
     public static func openOrCreate(
         dataFiles: [URL],
-        containerUtil: ContainerUtilProtocol = Container.shared.containerUtil()
+        containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
+        isSivaConfirmed: Bool
     ) async throws -> SignedContainerProtocol {
         logger.debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
@@ -156,17 +199,17 @@ extension SignedContainer {
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
             SignedContainer.logger.debug("Opening existing container")
-            return try await open(file: containerFile)
+            return try await open(file: containerFile, isSivaConfirmed: isSivaConfirmed)
         } else {
             SignedContainer.logger.debug("Creating a new container")
             return try await create(containerFile: containerFile, dataFiles: dataFiles)
         }
     }
 
-    private static func open(file: URL) async throws -> SignedContainerProtocol {
+    private static func open(file: URL, isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
         let container = try await ContainerWrapper(
             fileManager: Container.shared.fileManager()
-        ).open(containerFile: file)
+        ).open(containerFile: file, isSivaConfirmed: isSivaConfirmed)
         return SignedContainer(
             containerFile: file,
             isExistingContainer: true,

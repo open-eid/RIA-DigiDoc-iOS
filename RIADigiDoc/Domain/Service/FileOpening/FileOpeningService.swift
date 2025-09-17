@@ -64,8 +64,8 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         }
     }
 
-    func openOrCreateContainer(dataFiles: [URL]) async throws -> SignedContainerProtocol {
-        return try await SignedContainer.openOrCreate(dataFiles: dataFiles)
+    func openOrCreateContainer(dataFiles: [URL], isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
+        return try await SignedContainer.openOrCreate(dataFiles: dataFiles, isSivaConfirmed: isSivaConfirmed)
     }
 
     private func cacheFile(

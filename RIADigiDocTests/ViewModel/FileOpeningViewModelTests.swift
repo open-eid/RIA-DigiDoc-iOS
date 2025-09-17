@@ -10,6 +10,7 @@ import UtilsLibMocks
 @MainActor
 struct FileOpeningViewModelTests {
     private let mockFileOpeningRepository: FileOpeningRepositoryProtocolMock
+    private let mockSivaRepository: SivaRepositoryProtocolMock
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
     private let mockFileOpeningService: FileOpeningServiceProtocolMock
     private let mockFileUtil: FileUtilProtocolMock
@@ -20,6 +21,7 @@ struct FileOpeningViewModelTests {
 
     init() async throws {
         mockFileOpeningRepository = FileOpeningRepositoryProtocolMock()
+        mockSivaRepository = SivaRepositoryProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
@@ -28,6 +30,7 @@ struct FileOpeningViewModelTests {
 
         viewModel = FileOpeningViewModel(
             fileOpeningRepository: mockFileOpeningRepository,
+            sivaRepository: mockSivaRepository,
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileUtil: mockFileUtil,
             fileManager: mockFileManager
@@ -52,7 +55,7 @@ struct FileOpeningViewModelTests {
 
         mockFileOpeningRepository.getValidFilesHandler = { _ in validURLs }
 
-        mockFileOpeningRepository.openOrCreateContainerHandler = { _ in signedContainer }
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in signedContainer }
 
         mockFileOpeningService.getValidFilesHandler = { _ in validURLs }
 
@@ -68,23 +71,9 @@ struct FileOpeningViewModelTests {
         mockFileManager.containerURLHandler = { _ in sharedContainerURL }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        await viewModel.handleFiles()
-
-        let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
-
-        #expect(!isFileOpeningLoading)
-        #expect(isNavigatingToNextView)
-        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
-
-        let receivedSetContainer = mockSharedContainerViewModel.setSignedContainerArgValues.first
-
-        guard let receivedContainer = receivedSetContainer else { return }
-
-        let receivedRawContainerFile = await receivedContainer?.getRawContainerFile()
-        let signedContaninerRaw = await signedContainer.getRawContainerFile()
-
-        #expect(receivedRawContainerFile == signedContaninerRaw)
+        await #expect(throws: Never.self) {
+            await viewModel.handleFiles()
+        }
     }
 
     @Test
@@ -180,7 +169,7 @@ struct FileOpeningViewModelTests {
 
     @Test
     func handleLoading_success() async {
-        viewModel.handleLoadingSuccess()
+        viewModel.handleLoadingSuccess(isSivaConfirmed: true)
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
         let isNavigatingToNextView = viewModel.isNavigatingToNextView

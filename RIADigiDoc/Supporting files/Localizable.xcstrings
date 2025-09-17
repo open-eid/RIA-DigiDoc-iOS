@@ -56,6 +56,24 @@
         }
       }
     },
+    "Cancel" : {
+      "comment" : "Cancel button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tühista"
+          }
+        }
+      }
+    },
     "Certificate details" : {
       "comment" : "Title of Certificate Details view",
       "localizations" : {
@@ -1450,24 +1468,6 @@
         }
       }
     },
-    "Main diagnostics restart message read more" : {
-      "comment" : "Main diagnostics restart message read more",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Read more here"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loe täpsemalt siit"
-          }
-        }
-      }
-    },
     "Main diagnostics restart message restart now" : {
       "comment" : "Main diagnostics restart message restart now",
       "extractionState" : "manual",
@@ -2203,6 +2203,9 @@
         }
       }
     },
+    "No" : {
+
+    },
     "No recent documents" : {
       "comment" : "Text for when no recent documents are found",
       "extractionState" : "manual",
@@ -2358,6 +2361,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ava fail"
+          }
+        }
+      }
+    },
+    "Read more here" : {
+      "comment" : "Main diagnostics restart message read more",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read more here"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loe täpsemalt siit"
           }
         }
       }
@@ -3059,6 +3080,42 @@
         }
       }
     },
+    "Siva message" : {
+      "comment" : "SiVa message on file opening",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This type of signed document will be transmitted to the Digital Signature Validation Service SiVa to verify the validity of the digital signature. Read more information about transmitted data to Digital Signature Validation Service on the id.ee website. \nDo you want to continue?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seda tüüpi allkirjastatud dokument edastatakse digitaalallkirjade kehtivuse kontrollimiseks valideerimisteenusele SiVa. Digitaalallkirjade kehtivuse kontrollimisel edastatud andmete kohta loe lähemalt id.ee veebilehelt. \nKas soovid jätkata?"
+          }
+        }
+      }
+    },
+    "Siva message url" : {
+      "comment" : "URL that user can open in browser to read more about sending containers to SiVa",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/data-protection-conditions-for-the-id-software-of-the-national-information-system-authority/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/riigi-infosusteemi-ameti-id-tarkvara-andmekaitsetingimused/"
+          }
+        }
+      }
+    },
     "State title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -3166,6 +3223,9 @@
           }
         }
       }
+    },
+    "Yes" : {
+
     },
     "Zip code title" : {
       "comment" : "Role details",
