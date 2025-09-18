@@ -5,10 +5,26 @@ struct LanguageChooserView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @StateObject private var viewModel: LanguageChooserViewModel
 
+    @State private var showSettingsBottomSheetFromButton = false
+    @State private var navigateToThemeChooser = false
+    @State private var navigateToAdvancedSettings = false
+
     init(
         viewModel: LanguageChooserViewModel = Container.shared.languageChooserViewModel()
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    private var settingsBottomSheetActions: [BottomSheetButton] {
+        SettingsMenuBottomSheetActions.actions(
+            currentPage: .language,
+            onThemeChooserClick: {
+                navigateToThemeChooser = true
+            },
+            onAdvancedSettingsClick: {
+                navigateToAdvancedSettings = true
+            }
+        )
     }
 
     private let supportedLanguages: [SupportedLanguage] = [
@@ -33,8 +49,21 @@ struct LanguageChooserView: View {
                 ? languageSettings.localized("Menu language selected")
                 : languageSettings.localized("Menu language")
                 return "\(title) \(selected)"
+            },
+            onRightSecondaryClick: {
+                showSettingsBottomSheetFromButton = true
             }
         )
+        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
+
+        NavigationLink(
+            destination: ThemeChooserView(),
+            isActive: $navigateToThemeChooser
+        ) { }
+        NavigationLink(
+            destination: AdvancedSettingsView(),
+            isActive: $navigateToAdvancedSettings
+        ) { }
     }
 }
 

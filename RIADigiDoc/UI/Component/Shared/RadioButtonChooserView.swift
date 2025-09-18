@@ -12,6 +12,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
     let titleKey: (T) -> String
     let onSelect: (T) -> Void
     let accessibilityLabel: (T, Bool) -> String
+    let onRightSecondaryClick: () -> Void
 
     var body: some View {
         TopBarContainer(
@@ -19,6 +20,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
             onLeftClick: {
                 dismiss()
             },
+            onRightSecondaryClick: onRightSecondaryClick,
             content: {
                 VStack(
                     spacing: Dimensions.Padding.ZeroPadding,

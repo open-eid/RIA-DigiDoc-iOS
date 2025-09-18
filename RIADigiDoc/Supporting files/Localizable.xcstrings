@@ -91,6 +91,42 @@
         }
       }
     },
+    "Checkbox checked" : {
+      "comment" : "Checkbox checked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "checked"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "valitud"
+          }
+        }
+      }
+    },
+    "Checkbox unchecked" : {
+      "comment" : "Checkbox unchecked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unchecked"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "valimata"
+          }
+        }
+      }
+    },
     "Choose file" : {
       "comment" : "Button to choose a file to sign or validate",
       "extractionState" : "manual",
@@ -1810,6 +1846,60 @@
         }
       }
     },
+    "Main settings ask role and address title" : {
+      "comment" : "Main settings ask role and address title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask role and address info on signing"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Küsi rolli ja aadressi igal allkirjastamisel"
+          }
+        }
+      }
+    },
+    "Main settings crypto services title" : {
+      "comment" : "Main settings crypto services title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encryption settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteerimisseaded"
+          }
+        }
+      }
+    },
+    "Main settings general title" : {
+      "comment" : "Main settings general title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Üldine"
+          }
+        }
+      }
+    },
     "Main settings menu advanced" : {
       "comment" : "Main settings menu advanced",
       "extractionState" : "manual",
@@ -1864,6 +1954,60 @@
         }
       }
     },
+    "Main settings proxy title" : {
+      "comment" : "Main settings proxy title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proxy"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proksi"
+          }
+        }
+      }
+    },
+    "Main settings signing services title" : {
+      "comment" : "Main settings signing services title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing services"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamisteenused"
+          }
+        }
+      }
+    },
+    "Main settings system settings title" : {
+      "comment" : "Main settings system settings title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Süsteemiseaded"
+          }
+        }
+      }
+    },
     "Main settings theme dark" : {
       "comment" : "Main settings theme dark",
       "extractionState" : "manual",
@@ -1914,6 +2058,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Süsteemi vaikeseade"
+          }
+        }
+      }
+    },
+    "Main settings use default settings button title" : {
+      "comment" : "Main settings use default settings button title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use default settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taasta algseaded"
+          }
+        }
+      }
+    },
+    "Main settings validation services title" : {
+      "comment" : "Main settings validation services title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validation services"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valideerimisteenused"
           }
         }
       }
