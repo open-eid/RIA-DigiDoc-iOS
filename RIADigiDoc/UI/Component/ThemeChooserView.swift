@@ -5,6 +5,22 @@ struct ThemeChooserView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @EnvironmentObject private var themeSettings: ThemeSettings
 
+    @State private var showSettingsBottomSheetFromButton = false
+    @State private var navigateToLanguageChooser = false
+    @State private var navigateToAdvancedSettings = false
+
+    private var settingsBottomSheetActions: [BottomSheetButton] {
+        SettingsMenuBottomSheetActions.actions(
+            currentPage: .theme,
+            onLanguageChooserClick: {
+                navigateToLanguageChooser = true
+            },
+            onAdvancedSettingsClick: {
+                navigateToAdvancedSettings = true
+            }
+        )
+    }
+
     private let supportedThemes: [SupportedTheme] = [
         SupportedTheme(themeKey: Theme.system, titleKey: "Main settings theme system"),
         SupportedTheme(themeKey: Theme.light, titleKey: "Main settings theme light"),
@@ -28,8 +44,21 @@ struct ThemeChooserView: View {
                 ? languageSettings.localized("Menu theme selected")
                 : languageSettings.localized("Menu theme")
                 return "\(title) \(selected)"
+            },
+            onRightSecondaryClick: {
+                showSettingsBottomSheetFromButton = true
             }
         )
+        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
+
+        NavigationLink(
+            destination: LanguageChooserView(),
+            isActive: $navigateToLanguageChooser
+        ) { }
+        NavigationLink(
+            destination: AdvancedSettingsView(),
+            isActive: $navigateToAdvancedSettings
+        ) { }
     }
 }
 

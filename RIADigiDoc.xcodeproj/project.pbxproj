@@ -125,6 +125,7 @@
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/FileItem.swift,
+				Domain/Model/SettingsMenuBottomSheetPages.swift,
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,

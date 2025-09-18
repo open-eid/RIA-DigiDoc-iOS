@@ -21,6 +21,7 @@ struct ContentView: View {
 
     @State private var navigateToLanguageChooser = false
     @State private var navigateToThemeChooser = false
+    @State private var navigateToAdvancedSettings = false
 
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
@@ -43,6 +44,9 @@ struct ContentView: View {
             },
             onThemeChooserClick: {
                 navigateToThemeChooser = true
+            },
+            onAdvancedSettingsClick: {
+                navigateToAdvancedSettings = true
             }
         )
     }
@@ -64,32 +68,38 @@ struct ContentView: View {
                 showSettingsBottomSheetFromButton = true
             },
             content: {
-                VStack {
-                    HomeView(externalFiles: $openedUrls)
+                ScrollView {
+                    VStack {
+                        HomeView(externalFiles: $openedUrls)
 
-                    NavigationLink(
-                        destination: InfoView(),
-                        isActive: $navigateToInfo
-                    ) { }
-                    NavigationLink(
-                        destination: AccessibilityView(),
-                        isActive: $navigateToAccessibility
-                    ) { }
-                    NavigationLink(
-                        destination: DiagnosticsView(),
-                        isActive: $navigateToDiagnostics
-                    ) { }
+                        NavigationLink(
+                            destination: InfoView(),
+                            isActive: $navigateToInfo
+                        ) { }
+                        NavigationLink(
+                            destination: AccessibilityView(),
+                            isActive: $navigateToAccessibility
+                        ) { }
+                        NavigationLink(
+                            destination: DiagnosticsView(),
+                            isActive: $navigateToDiagnostics
+                        ) { }
 
-                    NavigationLink(
-                        destination: LanguageChooserView(),
-                        isActive: $navigateToLanguageChooser
-                    ) { }
-                    NavigationLink(
-                        destination: ThemeChooserView(),
-                        isActive: $navigateToThemeChooser
-                    ) { }
+                        NavigationLink(
+                            destination: LanguageChooserView(),
+                            isActive: $navigateToLanguageChooser
+                        ) { }
+                        NavigationLink(
+                            destination: ThemeChooserView(),
+                            isActive: $navigateToThemeChooser
+                        ) { }
+                        NavigationLink(
+                            destination: AdvancedSettingsView(),
+                            isActive: $navigateToAdvancedSettings
+                        ) { }
 
-                    Spacer()
+                        Spacer()
+                    }
                 }
                 .background(theme.surface)
                 .onOpenURL { url in
