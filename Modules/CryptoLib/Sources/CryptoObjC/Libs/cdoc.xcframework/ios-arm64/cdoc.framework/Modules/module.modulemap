@@ -1,0 +1,17 @@
+framework module cdoc {
+  header "CDoc.h"
+  header "CDocReader.h"
+  header "CDocWriter.h"
+  header "Configuration.h"
+  header "Exports.h"
+  header "Io.h"
+  header "Recipient.h"
+  header "Lock.h"
+  header "CryptoBackend.h"
+  header "NetworkBackend.h"
+  header "PKCS11Backend.h"
+  header "ILogger.h"
+  header "ConsoleLogger.h"
+  export *
+  requires cplusplus
+}

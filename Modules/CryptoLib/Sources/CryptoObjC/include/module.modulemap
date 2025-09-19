@@ -1,0 +1,5 @@
+module CryptoObjC {
+    umbrella header "AbstractSmartTokenObjC.h"
+    export *
+}
+

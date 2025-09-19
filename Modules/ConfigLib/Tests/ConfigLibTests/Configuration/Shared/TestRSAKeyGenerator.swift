@@ -1,10 +1,13 @@
 import Foundation
+import OSLog
 import Testing
 import Security
 @testable import ConfigLib
 
 struct TestRSAKeyGenerator {
 
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TestRSAKeyGenerator")
+    
     static func generateKeyPair() -> (publicKeyPEM: String, privateKey: SecKey)? {
         let attributes: [CFString: Any] = [
             kSecAttrKeyType: kSecAttrKeyTypeRSA,
@@ -14,12 +17,12 @@ struct TestRSAKeyGenerator {
         var error: Unmanaged<CFError>?
         guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error),
               let publicKey = SecKeyCopyPublicKey(privateKey) else {
-            print("Key generation error: \(String(describing: error?.takeRetainedValue()))")
+            TestRSAKeyGenerator.logger.error("Key generation error: \(String(describing: error?.takeRetainedValue()))")
             return nil
         }
 
         guard let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? else {
-            print("Public key export error: \(String(describing: error?.takeRetainedValue()))")
+            TestRSAKeyGenerator.logger.error("Public key export error: \(String(describing: error?.takeRetainedValue()))")
             return nil
         }
 
@@ -39,7 +42,7 @@ struct TestRSAKeyGenerator {
 
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(privateKey, algorithm, messageData as CFData, &error) else {
-            print("Signing error: \(String(describing: error?.takeRetainedValue()))")
+            TestRSAKeyGenerator.logger.error("Signing error: \(String(describing: error?.takeRetainedValue()))")
             return nil
         }
 
