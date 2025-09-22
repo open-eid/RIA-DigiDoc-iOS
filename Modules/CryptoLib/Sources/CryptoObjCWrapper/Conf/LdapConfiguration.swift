@@ -4,7 +4,7 @@ import CommonsLib
 public struct LdapConfiguration {
     @MainActor static public var ldapPersonURLS = [URL(string: "ldaps://esteid.ldap.sk.ee")]
     @MainActor static public var ldapCorpURL = URL(string: "ldaps://k3.ldap.sk.ee")
-    
+
     private let fileManager: FileManagerProtocol
 
     public init(

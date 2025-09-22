@@ -5,19 +5,19 @@ public class SmartToken: NSObject, AbstractSmartToken {
     public func getCertificate() async throws -> Data {
         return Data()
     }
-    
-    public func decrypt(_ data: Data) throws -> Data {
+
+    public func decrypt(_: Data) throws -> Data {
         return Data()
     }
-    
-    public func derive(_ data: Data) throws -> Data {
+
+    public func derive(_: Data) throws -> Data {
         return Data()
     }
-    
-    public func authenticate(_ data: Data) throws -> Data {
+
+    public func authenticate(_: Data) throws -> Data {
         return Data()
     }
-    
+
     public func getCertificateSync() throws -> Data {
         return Data()
     }

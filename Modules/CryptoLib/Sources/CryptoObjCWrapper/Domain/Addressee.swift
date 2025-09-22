@@ -12,8 +12,8 @@ import Foundation
 
     init(cert: Data, x509: X509Certificate?) {
         data = cert
-        let cn = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
-        let split = cn.split(separator: ",").map { String($0) }
+        let commonName = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
+        let split = commonName.split(separator: ",").map { String($0) }
         if split.count > 1 {
             surname = split[0]
             givenName = split[1]
@@ -21,10 +21,10 @@ import Foundation
         } else {
             surname = nil
             givenName = nil
-            identifier = cn
+            identifier = commonName
         }
         serialNumber = x509?.subject(oid: .serialNumber)?.joined(separator: ",")
-        certType = x509?.certType() ?? .UnknownType
+        certType = x509?.certType() ?? .unknownType
         validTo = x509?.notAfter
     }
 
@@ -34,12 +34,13 @@ import Foundation
 
     public override func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? Addressee else { return false }
-        return
+        return (
             data == other.data &&
             identifier == other.identifier &&
             givenName == other.givenName &&
             surname == other.surname &&
             certType == other.certType &&
             validTo == other.validTo
+        )
     }
 }
