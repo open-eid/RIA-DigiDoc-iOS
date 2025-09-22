@@ -98,58 +98,25 @@ public class OpenLdap {
         addressees: [Addressee],
         totalAddressees: Int
     ) {
-        if url.scheme?.lowercased() == "ldaps" {
-            guard configureTLS(url: url, certificatePath: certificatePath) else { return ([], 0) }
+        if !configureTLSIfNeeded(url, certificatePath) {
+            return ([], 0)
         }
 
         var ldap: LDAP?
         let host: String = getLDAPHostUrlString(from: url)
-        var ldapReturnCode = ldap_initialize(&ldap, host)
-        defer {
-            if let ldap = ldap { ldap_destroy(ldap) }
-        }
-        guard ldapReturnCode == LDAP_SUCCESS else {
-            OpenLdap.logger.error("Failed to initialize LDAP: \(String(cString: ldap_err2string(ldapReturnCode)))")
+        var ldapReturnCode: Int32 = -1
+        var ldapVersion: Int32 = -1
+        ldap = initializeLDAPConnection(&ldapReturnCode, &ldapVersion, &ldap, host)
+        if ldap == nil {
             return ([], 0)
         }
-
-        var ldapVersion = LDAP_VERSION3
-        ldapReturnCode = ldap_set_option(
-            ldap,
-            LDAP_OPT_PROTOCOL_VERSION,
-            &ldapVersion
-        )
-        guard ldapReturnCode == LDAP_SUCCESS else {
-            OpenLdap.logger.error(
-                "ldap_set_option(PROTOCOL_VERSION) failed: \(String(cString: ldap_err2string(ldapReturnCode)))"
-            )
-            return ([], 0)
-        }
-
         let filter: String = getFilter(identityCode: identityCode)
 
         var msgId: Int32 = 0
         OpenLdap.logger.debug("Searching from LDAP. Url: \(url) \(filter)")
         var attr = Array("userCertificate;binary".utf8CString)
         var distinguishedName = getDistinguishedName(from: url)
-        ldapReturnCode = attr.withUnsafeMutableBufferPointer { attr in var attrs = [attr.baseAddress, nil]
-            return attrs
-                .withUnsafeMutableBufferPointer { attrs in
-                    ldap_search_ext(
-                        ldap,
-                        distinguishedName,
-                        LDAP_SCOPE_SUBTREE,
-                        filter,
-                        attrs.baseAddress,
-                        0,
-                        nil,
-                        nil,
-                        nil,
-                        0,
-                        &msgId
-                    )
-                }
-        }
+        ldapReturnCode = getLdapReturnCode(&attr, ldap, distinguishedName, filter, &msgId)
 
         guard ldapReturnCode == LDAP_SUCCESS else {
             OpenLdap.logger.error("ldap_search_ext failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
@@ -168,7 +135,7 @@ public class OpenLdap {
             }
             switch ldapReturnCode {
             case Int32(LDAP_RES_SEARCH_ENTRY):
-                let addressees = attributes(ldap: ldap!, msg: msg!)
+                let addressees = attributes(ldap: ldap, msg: msg)
                 result.append(contentsOf: addressees)
                 totalAddressees += 1
             case Int32(LDAP_RES_SEARCH_RESULT):
@@ -184,6 +151,75 @@ public class OpenLdap {
         ldap_abandon_ext(ldap, msgId, nil, nil)
 
         return (addressees: result, totalAddressees: totalAddressees)
+    }
+
+    static private func getLdapReturnCode(
+        _ attr: inout [Int8],
+        _ ldap: OpenLdap.LDAP?,
+        _ distinguishedName: String,
+        _ filter: String,
+        _ msgId: inout Int32
+    ) -> Int32 {
+        return attr.withUnsafeMutableBufferPointer { attr in var attrs = [attr.baseAddress, nil]
+            return attrs
+                .withUnsafeMutableBufferPointer { attrs in
+                    ldap_search_ext(
+                        ldap,
+                        distinguishedName,
+                        LDAP_SCOPE_SUBTREE,
+                        filter,
+                        attrs.baseAddress,
+                        0,
+                        nil,
+                        nil,
+                        nil,
+                        0,
+                        &msgId
+                    )
+                }
+        }
+    }
+
+    static private func configureTLSIfNeeded(_ url: URL, _ certificatePath: String?) -> Bool {
+        if url.scheme?.lowercased() == "ldaps" {
+            guard configureTLS(url: url, certificatePath: certificatePath) else { return false }
+        }
+
+        return true
+    }
+
+    static private func initializeLDAPConnection(
+        _ ldapReturnCode: inout Int32,
+        _ ldapVersion: inout Int32,
+        _ ldap: inout OpaquePointer?,
+        _ host: String
+    ) -> LDAP? {
+        ldapReturnCode = ldap_initialize(&ldap, host)
+        defer {
+            if let ldap = ldap { ldap_destroy(ldap) }
+        }
+
+        guard ldapReturnCode == LDAP_SUCCESS else {
+            let returnCode = ldapReturnCode
+            OpenLdap.logger.error("Failed to initialize LDAP: \(String(cString: ldap_err2string(returnCode)))")
+            return nil
+        }
+
+        ldapVersion = LDAP_VERSION3
+        ldapReturnCode = ldap_set_option(
+            ldap,
+            LDAP_OPT_PROTOCOL_VERSION,
+            &ldapVersion
+        )
+        guard ldapReturnCode == LDAP_SUCCESS else {
+            let returnCode = ldapReturnCode
+            OpenLdap.logger.error(
+                "ldap_set_option(PROTOCOL_VERSION) failed: \(String(cString: ldap_err2string(returnCode)))"
+            )
+            return nil
+        }
+
+        return ldap
     }
 
     static private func configureTLS(url _: URL, certificatePath: String?) -> Bool {
@@ -272,7 +308,7 @@ public class OpenLdap {
         return true
     }
 
-    static private func attributes(ldap: LDAP, msg: LDAPMessage) -> [Addressee] {
+    static private func attributes(ldap: LDAP?, msg: LDAPMessage?) -> [Addressee] {
         var result = [Addressee]()
         var message = ldap_first_message(ldap, msg)
         while let currentMessage = message {
@@ -305,7 +341,7 @@ public class OpenLdap {
         return result
     }
 
-    static private func values(ldap: LDAP, msg: LDAPMessage, tag: String) -> [Addressee] {
+    static private func values(ldap: LDAP?, msg: LDAPMessage, tag: String) -> [Addressee] {
         var result = [Addressee]()
         guard let bvals = ldap_get_values_len(ldap, msg, tag) else {
             return result
