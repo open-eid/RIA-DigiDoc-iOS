@@ -11,6 +11,8 @@ struct AdvancedSettingsView: View {
 
     @State private var checkedAskRoleAndAddress: Bool = false
 
+    @State private var navigateToSigningServicesSettings = false
+
     @State private var showSettingsBottomSheetFromButton = false
     @State private var navigateToLanguageChooser = false
     @State private var navigateToThemeChooser = false
@@ -56,8 +58,14 @@ struct AdvancedSettingsView: View {
                         ) {
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings signing services title"),
-                                onClick: {}
+                                onClick: {
+                                    navigateToSigningServicesSettings = true
+                                }
                             )
+                            NavigationLink(
+                                destination: SigningServicesSettingsView(),
+                                isActive: $navigateToSigningServicesSettings
+                            ) { }
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings validation services title"),
                                 onClick: {}

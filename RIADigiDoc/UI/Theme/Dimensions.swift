@@ -39,4 +39,8 @@ enum Dimensions {
         static let SOpacity: Double = 0.15
         static let LOpacity: Double = 0.7
     }
+
+    enum Duration {
+        static let focusAnimation: CGFloat = 0.1
+    }
 }
