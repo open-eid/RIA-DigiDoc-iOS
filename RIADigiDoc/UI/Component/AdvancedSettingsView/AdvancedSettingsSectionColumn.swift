@@ -13,6 +13,8 @@ struct AdvancedSettingsSectionColumn<Content: View>: View {
             alignment: .leading,
             spacing: Dimensions.Padding.ZeroPadding) {
                 Text(title)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                     .font(typography.titleLarge)
                     .foregroundStyle(theme.onSurfaceVariant)
                     .padding(.vertical, Dimensions.Padding.SPadding)

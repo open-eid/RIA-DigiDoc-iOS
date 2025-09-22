@@ -181,6 +181,24 @@
         }
       }
     },
+    "Clear text" : {
+      "comment" : "Clear text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear text"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tühjenda tekst"
+          }
+        }
+      }
+    },
     "Close" : {
       "localizations" : {
         "en" : {
@@ -566,6 +584,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abi"
+          }
+        }
+      }
+    },
+    "Hide password" : {
+      "comment" : "Hide password",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peida parooli"
           }
         }
       }
@@ -1882,6 +1918,42 @@
         }
       }
     },
+    "Main settings default access title" : {
+      "comment" : "Main settings default access title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use default access"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta vaikimisi määratud ligipääsu"
+          }
+        }
+      }
+    },
+    "Main settings default manual access title" : {
+      "comment" : "Main settings default manual access title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use manually configured access"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta käsitsi määratud ligipääsu"
+          }
+        }
+      }
+    },
     "Main settings general title" : {
       "comment" : "Main settings general title",
       "extractionState" : "manual",
@@ -1954,6 +2026,24 @@
         }
       }
     },
+    "Main settings mobile id and smart id title" : {
+      "comment" : "Main settings mobile id and smart id title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mobile-ID and Smart-ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mobiil-ID ja Smart-ID"
+          }
+        }
+      }
+    },
     "Main settings proxy title" : {
       "comment" : "Main settings proxy title",
       "extractionState" : "manual",
@@ -1968,6 +2058,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proksi"
+          }
+        }
+      }
+    },
+    "Main settings relying party title" : {
+      "comment" : "Main settings relying party title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access to mobile-ID and Smart-ID service"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääs mobiil-ID ja Smart-ID teenusele"
           }
         }
       }
@@ -2058,6 +2166,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Süsteemi vaikeseade"
+          }
+        }
+      }
+    },
+    "Main settings timestamp cert add certificate button" : {
+      "comment" : "Main settings timestamp cert add certificate button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisa sertifikaat"
+          }
+        }
+      }
+    },
+    "Main settings timestamp cert not added" : {
+      "comment" : "Main settings timestamp cert not added",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate not added"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaati ei ole lisatud"
+          }
+        }
+      }
+    },
+    "Main settings timestamp cert title" : {
+      "comment" : "Main settings timestamp cert title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time-Stamping service SSL certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempliteenuse SSL sertifikaat"
+          }
+        }
+      }
+    },
+    "Main settings timestamp services title" : {
+      "comment" : "Main settings timestamp services title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time-Stamping service"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempliteenus"
+          }
+        }
+      }
+    },
+    "Main settings tsa url title" : {
+      "comment" : "Main settings tsa url title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access to Time-Stamping service"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääs ajatempliteenusele"
           }
         }
       }
@@ -2365,6 +2563,42 @@
         }
       }
     },
+    "Radiobutton selected" : {
+      "comment" : "Radiobutton selected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "selected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "valitud"
+          }
+        }
+      }
+    },
+    "Radiobutton unselected" : {
+      "comment" : "Radiobutton unselected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unselected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "valimata"
+          }
+        }
+      }
+    },
     "Read more here" : {
       "comment" : "Main diagnostics restart message read more",
       "extractionState" : "manual",
@@ -2645,6 +2879,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili import"
+          }
+        }
+      }
+    },
+    "Show password" : {
+      "comment" : "Show password",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Näita parooli"
           }
         }
       }

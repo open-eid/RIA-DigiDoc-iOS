@@ -20,12 +20,10 @@ struct RadioButtonRow<T: Equatable>: View {
                     .multilineTextAlignment(.leading)
 
                 Spacer()
-
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
-                    .resizable()
-                    .foregroundStyle(isSelected ? theme.primary : theme.onSurfaceVariant)
-                    .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)
-                    .accessibilityLabel(accessibilityLabel)
+                RadioButton(
+                    isChecked: isSelected,
+                    accessibilityLabel: accessibilityLabel
+                )
             }
             .padding(.horizontal, Dimensions.Padding.SPadding)
             .padding(.vertical, Dimensions.Padding.SPadding)
