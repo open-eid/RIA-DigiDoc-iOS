@@ -1,30 +1,26 @@
 import Foundation
 
 public final actor DataStore: DataStoreProtocol {
-    private let defaults: UserDefaults
-
-    public init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-    }
+    public init() {}
 
     // MARK: - Language Methods
 
     public func getSelectedLanguage() async -> String {
-        return defaults.string(forKey: Keys.selectedLanguage) ?? DefaultValues.language
+        UserDefaults.standard.string(forKey: Keys.selectedLanguage) ?? DefaultValues.language
     }
 
     public func setSelectedLanguage(newLanguageCode: String) async {
-        defaults.set(newLanguageCode, forKey: Keys.selectedLanguage)
+        UserDefaults.standard.set(newLanguageCode, forKey: Keys.selectedLanguage)
     }
 
     // MARK: - Theme Methods
 
     public func getSelectedTheme() async -> Int {
-        return defaults.integer(forKey: Keys.selectedTheme)
+        return UserDefaults.standard.integer(forKey: Keys.selectedTheme)
     }
 
     public func setSelectedTheme(_ rawValue: Int) async {
-        defaults.set(rawValue, forKey: Keys.selectedTheme)
+        UserDefaults.standard.set(rawValue, forKey: Keys.selectedTheme)
     }
 
     // MARK: - Constants

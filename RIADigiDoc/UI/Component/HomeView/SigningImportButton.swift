@@ -10,7 +10,6 @@ struct SigningImportButton: View {
 
     @Binding var isImporting: Bool
     @ObservedObject var viewModel: HomeViewModel
-    var fileOpeningViewModel: FileOpeningViewModel
 
     var body: some View {
         ActionButton(
@@ -45,7 +44,6 @@ struct SigningImportButton: View {
         }
         .fullScreenCover(isPresented: $isFileOpeningLoading) {
             FileOpeningView(
-                viewModel: fileOpeningViewModel,
                 isFileOpeningLoading: $isFileOpeningLoading,
                 isNavigatingToNextView: $isNavigatingToNextView
             )

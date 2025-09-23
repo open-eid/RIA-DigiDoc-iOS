@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let packageRoot = #filePath
@@ -55,7 +55,11 @@ let package = Package(
             ],
             path: "Sources/CryptoSwift",
             swiftSettings: [
-                .interoperabilityMode(.Cxx)
+                .interoperabilityMode(.Cxx),
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("SendableByDefault"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
             ]
         ),
         .target(

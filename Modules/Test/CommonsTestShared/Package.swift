@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -8,10 +8,14 @@ let package = Package(
     platforms: [.iOS(.v15)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(name: "CommonsTestShared", targets: ["CommonsTestShared"])
+        .library(
+            name: "CommonsTestShared",
+            targets: ["CommonsTestShared"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
         .package(path: "../CommonsLib")
     ],
     targets: [
@@ -19,9 +23,19 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "CommonsTestShared",
-            dependencies: ["ZIPFoundation", "CommonsLib"],
+            dependencies: [
+                "ZIPFoundation",
+                "Alamofire",
+                "CommonsLib"
+            ],
             resources: [
                 .process("Resources/example.asice")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("SendableByDefault"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
             ]
         )
     ]
