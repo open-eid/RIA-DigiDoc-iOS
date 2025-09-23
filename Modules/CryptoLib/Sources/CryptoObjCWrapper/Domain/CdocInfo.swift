@@ -14,10 +14,16 @@ import Foundation
         }
         let delegate = CdocParserDelegate()
         parser.externalEntityResolvingPolicy = .never
-        parser.delegate = delegate;
+        parser.delegate = delegate
         guard parser.parse() else {
             NSLog("Error: Failed to parse XML")
-            throw parser.parserError!
+            throw parser.parserError ?? NSError(
+                domain: XMLParser.errorDomain,
+                code: XMLParser.ErrorCode.internalError.rawValue,
+                userInfo: [
+                    NSLocalizedDescriptionKey: "Unknown parsing error"
+                ]
+            )
         }
         format = delegate.format
         addressees = delegate.addressees
@@ -29,39 +35,49 @@ class CdocParserDelegate: NSObject, XMLParserDelegate {
     public var format = String()
     public var addressees: [Addressee] = []
     public var dataFiles: [CryptoDataFile] = []
-    var data: String? = nil
+    var data: String?
     var attr = String()
 
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String: String]) {
+    func parser(
+        _: XMLParser,
+        didStartElement elementName: String,
+        namespaceURI _: String?,
+        qualifiedName _: String?,
+        attributes attributeDict: [String: String]
+    ) {
         switch elementName {
         case "ds:X509Certificate":
             data = String()
-        case "denc:EncryptionProperty" where attributeDict["Name"] == "orig_file" || attributeDict["Name"] == "DocumentFormat":
+        case "denc:EncryptionProperty"
+            where (attributeDict["Name"] == "orig_file"
+                   || attributeDict["Name"] == "DocumentFormat"
+            ):
             attr = attributeDict["Name"] ?? ""
             data = String()
         default: break
         }
     }
 
-    func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if data != nil {
-            data! += string
+    func parser(_: XMLParser, foundCharacters string: String) {
+        if var currentData = data {
+            currentData += string
+            data = currentData
         }
     }
 
-    func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        guard data != nil else { return }
+    func parser(_: XMLParser, didEndElement elementName: String, namespaceURI _: String?, qualifiedName _: String?) {
+        guard let currentData = data else { return }
         switch (elementName, attr) {
         case ("ds:X509Certificate", _):
-            if let data = Data(base64Encoded: data!, options: .ignoreUnknownCharacters) {
-                addressees.append(Addressee(cert: data))
+            if let dataFromBase64 = Data(base64Encoded: currentData, options: .ignoreUnknownCharacters) {
+                addressees.append(Addressee(cert: dataFromBase64))
             }
         case ("denc:EncryptionProperty", "orig_file"):
-            if let filename = data!.split(separator: "|").first {
+            if let filename = currentData.split(separator: "|").first {
                 dataFiles.append(CryptoDataFile(filename: String(filename)))
             }
         case ("denc:EncryptionProperty", "DocumentFormat"):
-            format = data!
+            format = currentData
         default: break
         }
         data = nil

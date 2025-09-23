@@ -7,7 +7,7 @@ import Security
 struct TestRSAKeyGenerator {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TestRSAKeyGenerator")
-    
+
     static func generateKeyPair() -> (publicKeyPEM: String, privateKey: SecKey)? {
         let attributes: [CFString: Any] = [
             kSecAttrKeyType: kSecAttrKeyTypeRSA,
@@ -22,7 +22,9 @@ struct TestRSAKeyGenerator {
         }
 
         guard let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) as Data? else {
-            TestRSAKeyGenerator.logger.error("Public key export error: \(String(describing: error?.takeRetainedValue()))")
+            TestRSAKeyGenerator.logger.error(
+                "Public key export error: \(String(describing: error?.takeRetainedValue()))"
+            )
             return nil
         }
 
