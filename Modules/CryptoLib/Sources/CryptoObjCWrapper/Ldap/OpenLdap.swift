@@ -115,7 +115,7 @@ public class OpenLdap {
         var msgId: Int32 = 0
         OpenLdap.logger.debug("Searching from LDAP. Url: \(url) \(filter)")
         var attr = Array("userCertificate;binary".utf8CString)
-        var distinguishedName = getDistinguishedName(from: url)
+        let distinguishedName = getDistinguishedName(from: url)
         ldapReturnCode = getLdapReturnCode(&attr, ldap, distinguishedName, filter, &msgId)
 
         guard ldapReturnCode == LDAP_SUCCESS else {

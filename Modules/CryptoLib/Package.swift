@@ -40,7 +40,7 @@ let package = Package(
             path: "Sources/CryptoObjC",
             publicHeadersPath: "include",
             cxxSettings: [
-                .unsafeFlags(["-std=c++17"])
+                .unsafeFlags(["-std=c++20"])
             ]
         ),
         .target(
