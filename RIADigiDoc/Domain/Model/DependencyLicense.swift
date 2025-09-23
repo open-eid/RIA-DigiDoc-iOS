@@ -69,6 +69,11 @@ struct DependencyLicenses {
                 name: "ZipFoundation",
                 license: "MIT licence",
                 url: URL(string: "https://github.com/weichsel/ZIPFoundation/blob/development/LICENSE")
+            ),
+            DependencyLicense(
+                name: "zlib",
+                license: "zlib License",
+                url: URL(string: "https://zlib.net/zlib_license.html")
             )
         ]
     }
