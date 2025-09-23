@@ -23,11 +23,10 @@ struct FileOpeningView: View {
     }
 
     init(
-        viewModel: FileOpeningViewModel = Container.shared.fileOpeningViewModel(),
         isFileOpeningLoading: Binding<Bool>,
         isNavigatingToNextView: Binding<Bool>
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.fileOpeningViewModel())
         _isFileOpeningLoading = isFileOpeningLoading
         _isNavigatingToNextView = isNavigatingToNextView
     }

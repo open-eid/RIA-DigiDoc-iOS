@@ -17,8 +17,9 @@ extension Container {
         .shared
     }
 
+    @MainActor
     var fileOpeningService: Factory<FileOpeningServiceProtocol> {
-        self {
+        self { @MainActor in
             FileOpeningService(
                 fileUtil: self.fileUtil(),
                 fileInspector: self.fileInspector(),
@@ -27,8 +28,9 @@ extension Container {
         }
     }
 
+    @MainActor
     var fileOpeningRepository: Factory<FileOpeningRepositoryProtocol> {
-        self {
+        self { @MainActor in
             FileOpeningRepository(
                 fileOpeningService: self.fileOpeningService(),
                 sivaService: self.sivaService()
@@ -88,8 +90,9 @@ extension Container {
         self { @MainActor in ThemeSettings(dataStore: self.dataStore()) }.singleton
     }
 
+    @MainActor
     var dataStore: Factory<DataStore> {
-        self { DataStore() }.singleton
+        self { @MainActor in DataStore() }.singleton
     }
 
     @MainActor
@@ -148,8 +151,9 @@ extension Container {
         self { SignatureUtil() }
     }
 
+    @MainActor
     var sivaService: Factory<SivaServiceProtocol> {
-        self {
+        self { @MainActor in
             SivaService(
                 mimeTypeResolver: self.mimeTypeResolver(),
                 fileManager: self.fileManager(),
@@ -158,8 +162,9 @@ extension Container {
         }
     }
 
+    @MainActor
     var sivaRepository: Factory<SivaRepositoryProtocol> {
-        self {
+        self { @MainActor in
             SivaRepository(sivaService: self.sivaService())
         }
     }

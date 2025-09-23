@@ -8,23 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
-		DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
-		DF21FA7D2E0B74A400A4DC7A /* CommonsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF21FA7C2E0B74A400A4DC7A /* CommonsLibMocks */; };
-		DF27565F2E078AEA000E4794 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF27565E2E078AEA000E4794 /* ConfigLibMocks */; };
-		DF2756612E078AEA000E4794 /* UtilsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF2756602E078AEA000E4794 /* UtilsLibMocks */; };
-		DF2756632E078AF9000E4794 /* CommonsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF2756622E078AF9000E4794 /* CommonsLibMocks */; };
-		DF2756652E078AF9000E4794 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF2756642E078AF9000E4794 /* ConfigLibMocks */; };
-		DF2756672E078AF9000E4794 /* UtilsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF2756662E078AF9000E4794 /* UtilsLibMocks */; };
+		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
 		DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922A2D285A1D00F2990A /* ConfigLib */; };
 		DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E922C2D2C371200F2990A /* Alamofire */; };
 		DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4295B12D39D2F400415C71 /* ConfigLib */; };
+		DF4652362E82B7C100335BA3 /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF4652352E82B7C100335BA3 /* CommonsTestShared */; };
 		DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */; };
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
 		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
+		DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
 		DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE912E00D30A0062C64D /* FactoryKit */; };
 		DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE932E00D7A00062C64D /* FactoryTesting */; };
 		DF9AFE992E0358C20062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE982E0358C20062C64D /* FactoryKit */; };
@@ -33,8 +29,11 @@
 		DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE3E2D1495EC001D951B /* CommonsLib */; };
 		DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE402D1495EE001D951B /* UtilsLib */; };
 		DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5A2D14C4C2001D951B /* Alamofire */; };
-		DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
-		DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE6C2D15113A001D951B /* CommonsTestShared */; };
+		DFAABCF92E82AE1E00906874 /* CommonsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABCF82E82AE1E00906874 /* CommonsLibMocks */; };
+		DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABCFB2E82AEA900906874 /* UtilsLibMocks */; };
+		DFAABCFE2E82AF0900906874 /* CommonsLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABCFD2E82AF0900906874 /* CommonsLibMocks */; };
+		DFAABD002E82AF0900906874 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABCFF2E82AF0900906874 /* ConfigLibMocks */; };
+		DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD042E82B1AB00906874 /* Alamofire */; };
 		DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F12B2CF020C200185A7F /* CommonsLib */; };
 		DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F1302CF0217C00185A7F /* CommonsLib */; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
@@ -111,6 +110,7 @@
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
 		DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileImportShareExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DFCF22F82E83512D0015AE6B /* CommonsTestShared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsTestShared; sourceTree = "<group>"; };
 		DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RIADigiDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RIADigiDocUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -291,14 +291,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */,
 				DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */,
-				DFA3EE5D2D14C9B7001D951B /* Alamofire in Frameworks */,
-				DF2756672E078AF9000E4794 /* UtilsLibMocks in Frameworks */,
-				DFA3EE6D2D15113A001D951B /* CommonsTestShared in Frameworks */,
-				DF2756632E078AF9000E4794 /* CommonsLibMocks in Frameworks */,
+				DFAABCF92E82AE1E00906874 /* CommonsLibMocks in Frameworks */,
 				DF9AFE9B2E0358C70062C64D /* FactoryTesting in Frameworks */,
+				DF4652362E82B7C100335BA3 /* CommonsTestShared in Frameworks */,
 				DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */,
-				DF2756652E078AF9000E4794 /* ConfigLibMocks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,16 +319,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DF21FA7D2E0B74A400A4DC7A /* CommonsLibMocks in Frameworks */,
+				DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */,
 				DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */,
-				DF27565F2E078AEA000E4794 /* ConfigLibMocks in Frameworks */,
+				DFAABD002E82AF0900906874 /* ConfigLibMocks in Frameworks */,
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
+				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
+				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
+				DFAABCFE2E82AF0900906874 /* CommonsLibMocks in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
-				DF2756612E078AEA000E4794 /* UtilsLibMocks in Frameworks */,
-				DF0B681C2D0779EF00A5457C /* CommonsTestShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +359,7 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				DFCF22F92E83512D0015AE6B /* Test */,
 				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
 				DF67D4F92D28531600F09EB9 /* ConfigLib */,
 				DF17B64D2CE26949009B1E17 /* UtilsLib */,
@@ -374,6 +374,14 @@
 			children = (
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DFCF22F92E83512D0015AE6B /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				DFCF22F82E83512D0015AE6B /* CommonsTestShared */,
+			);
+			path = Test;
 			sourceTree = "<group>";
 		};
 		DFD24C382CD1B718004C1D2E /* Frameworks */ = {
@@ -461,11 +469,9 @@
 				DFA3EE3E2D1495EC001D951B /* CommonsLib */,
 				DFA3EE402D1495EE001D951B /* UtilsLib */,
 				DFA3EE5C2D14C9B7001D951B /* Alamofire */,
-				DFA3EE6C2D15113A001D951B /* CommonsTestShared */,
 				DF9AFE9A2E0358C70062C64D /* FactoryTesting */,
-				DF2756622E078AF9000E4794 /* CommonsLibMocks */,
-				DF2756642E078AF9000E4794 /* ConfigLibMocks */,
-				DF2756662E078AF9000E4794 /* UtilsLibMocks */,
+				DFAABCF82E82AE1E00906874 /* CommonsLibMocks */,
+				DF4652352E82B7C100335BA3 /* CommonsTestShared */,
 			);
 			productName = FileImportShareExtensionTest;
 			productReference = DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */;
@@ -529,10 +535,12 @@
 				DF0B681B2D0779EF00A5457C /* CommonsTestShared */,
 				DF4295B12D39D2F400415C71 /* ConfigLib */,
 				DF9AFE932E00D7A00062C64D /* FactoryTesting */,
-				DF27565E2E078AEA000E4794 /* ConfigLibMocks */,
-				DF2756602E078AEA000E4794 /* UtilsLibMocks */,
-				DF21FA7C2E0B74A400A4DC7A /* CommonsLibMocks */,
 				DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */,
+				DFAABCFB2E82AEA900906874 /* UtilsLibMocks */,
+				DFAABCFD2E82AF0900906874 /* CommonsLibMocks */,
+				DFAABCFF2E82AF0900906874 /* ConfigLibMocks */,
+				DFAABD042E82B1AB00906874 /* Alamofire */,
+				DFAABD0A2E82B45700906874 /* CommonsTestShared */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -568,8 +576,8 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1620;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
 					DF4E43C02D0BA38600967997 = {
@@ -604,7 +612,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
-				DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */,
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 				DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */,
@@ -686,7 +693,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        #\"$SWIFTLINT_CMD\"\n        echo \"\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint for '${CONFIGURATION}' configuration.\"\nfi\n";
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        \"$SWIFTLINT_CMD\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint for '${CONFIGURATION}' configuration.\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -927,6 +934,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
@@ -988,6 +996,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objcxx;
@@ -1007,9 +1016,11 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
@@ -1036,6 +1047,8 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
@@ -1056,9 +1069,11 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
@@ -1085,6 +1100,8 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
@@ -1112,6 +1129,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
@@ -1140,6 +1158,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
@@ -1260,13 +1279,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Modules/CommonsLib/CommonsTestShared;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1319,36 +1331,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonsTestShared;
 		};
-		DF21FA7C2E0B74A400A4DC7A /* CommonsLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = CommonsLibMocks;
-		};
-		DF27565E2E078AEA000E4794 /* ConfigLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = ConfigLibMocks;
-		};
-		DF2756602E078AEA000E4794 /* UtilsLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = UtilsLibMocks;
-		};
-		DF2756622E078AF9000E4794 /* CommonsLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = CommonsLibMocks;
-		};
-		DF2756642E078AF9000E4794 /* ConfigLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = ConfigLibMocks;
-		};
-		DF2756662E078AF9000E4794 /* UtilsLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
-			productName = UtilsLibMocks;
-		};
 		DF3E4A7E2CE269C900137235 /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
@@ -1369,6 +1351,10 @@
 		DF4295B12D39D2F400415C71 /* ConfigLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ConfigLib;
+		};
+		DF4652352E82B7C100335BA3 /* CommonsTestShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsTestShared;
 		};
 		DF477F462E1B2E9900164471 /* LibdigidocLibSwiftMocks */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1429,9 +1415,29 @@
 			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
-		DFA3EE6C2D15113A001D951B /* CommonsTestShared */ = {
+		DFAABCF82E82AE1E00906874 /* CommonsLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DF0B681A2D0779EF00A5457C /* XCLocalSwiftPackageReference "Modules/CommonsLib/CommonsTestShared" */;
+			productName = CommonsLibMocks;
+		};
+		DFAABCFB2E82AEA900906874 /* UtilsLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UtilsLibMocks;
+		};
+		DFAABCFD2E82AF0900906874 /* CommonsLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonsLibMocks;
+		};
+		DFAABCFF2E82AF0900906874 /* ConfigLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLibMocks;
+		};
+		DFAABD042E82B1AB00906874 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DFAABD0A2E82B45700906874 /* CommonsTestShared */ = {
+			isa = XCSwiftPackageProductDependency;
 			productName = CommonsTestShared;
 		};
 		DFB1F12B2CF020C200185A7F /* CommonsLib */ = {

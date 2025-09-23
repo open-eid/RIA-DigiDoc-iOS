@@ -55,10 +55,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
             fileManager: fileManager
         )
 
-        var sanitizedFilename = dataFile.fileName.sanitized()
-        if sanitizedFilename.isEmpty {
-            sanitizedFilename = CommonsLib.Constants.Container.DefaultName
-        }
+        let sanitizedFilename = {
+            let name = dataFile.fileName.sanitized()
+            return name.isEmpty ? CommonsLib.Constants.Container.DefaultName : name
+        }()
 
         let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(sanitizedFilename)
 
@@ -124,10 +124,18 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                         )
                     )
                 } else {
+                    let datafiles = ContainerWrapper.getDataFiles(from: container)
+                    let signatures = ContainerWrapper.getSignatures(from: container)
+                    let mediatype = container.mediatype
+
                     Task {
-                        await self.setContainerURL(file)
-                        await self.updateContainer(digiDocContainer: container)
-                        continuation.resume(returning: self)
+                        let updatedContainer = await self.updateContainer(
+                            datafiles: datafiles,
+                            signatures: signatures,
+                            mediaType: mediatype
+                        )
+
+                        continuation.resume(returning: updatedContainer)
                     }
                 }
             }
@@ -151,10 +159,18 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                         )
                     )
                 } else {
+                    let datafiles = ContainerWrapper.getDataFiles(from: container)
+                    let signatures = ContainerWrapper.getSignatures(from: container)
+                    let mediatype = container.mediatype
+
                     Task {
-                        await self.setContainerURL(containerFile)
-                        await self.updateContainer(digiDocContainer: container)
-                        continuation.resume(returning: self)
+                        let updatedContainer = await self.updateContainer(
+                            datafiles: datafiles,
+                            signatures: signatures,
+                            mediaType: mediatype
+                        )
+
+                        continuation.resume(returning: updatedContainer)
                     }
                 }
             }
@@ -226,10 +242,18 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
         guard let container = digiDocContainer else { return nil }
 
-        return await updateContainer(digiDocContainer: container)
+        let datafiles = ContainerWrapper.getDataFiles(from: container)
+        let signatures = ContainerWrapper.getSignatures(from: container)
+        let mediatype = container.mediatype
+
+        return await updateContainer(
+            datafiles: datafiles,
+            signatures: signatures,
+            mediaType: mediatype
+        )
     }
 
-    private func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
+    private static func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
         switch status {
         case .Valid:
             return .valid
@@ -247,10 +271,14 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     @discardableResult
-    private func updateContainer(digiDocContainer: DigiDocContainer) -> ContainerWrapper {
-        dataFiles = getDataFiles(from: digiDocContainer)
-        signatures = getSignatures(from: digiDocContainer)
-        mediatype = digiDocContainer.mediatype
+    private func updateContainer(
+        datafiles: [DataFileWrapper],
+        signatures: [SignatureWrapper],
+        mediaType: String?
+    ) async -> ContainerWrapper {
+        self.dataFiles = datafiles
+        self.signatures = signatures
+        self.mediatype = mediaType ?? Constants.MimeType.Container
 
         return self
     }
@@ -259,7 +287,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         self.containerURL = url
     }
 
-    private func getDataFiles(from container: DigiDocContainer) -> [DataFileWrapper] {
+    private static func getDataFiles(from container: DigiDocContainer) -> [DataFileWrapper] {
         guard let dataFiles = container.dataFiles as? NSArray else {
             return []
         }
@@ -279,7 +307,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         }
     }
 
-    private func getSignatures(from container: DigiDocContainer) -> [SignatureWrapper] {
+    private static func getSignatures(from container: DigiDocContainer) -> [SignatureWrapper] {
         return container.signatures.compactMap { signature in
             SignatureWrapper(
                 signingCert: signature.signingCert,

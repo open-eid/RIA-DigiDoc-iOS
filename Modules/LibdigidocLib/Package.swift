@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -16,7 +16,7 @@ let package = Package(
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
-        .package(path: "../CommonsLib/CommonsTestShared")
+        .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
         .binaryTarget(
@@ -42,7 +42,13 @@ let package = Package(
                 "UtilsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
-            path: "Sources/LibdigidocSwift"
+            path: "Sources/LibdigidocSwift",
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("SendableByDefault"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
+            ]
         ),
         .target(
             name: "LibdigidocLibSwiftMocks",

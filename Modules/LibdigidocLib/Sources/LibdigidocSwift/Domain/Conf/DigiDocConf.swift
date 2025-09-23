@@ -161,22 +161,16 @@ public actor DigiDocInitializer {
         conf digiDocConf: DigiDocConfig,
         digidocConfWrapper: DigiDocConfWrapper = DigiDocConfWrapper()
     ) async throws {
-
-        var errorDetail: ErrorDetail?
-
         let lock = NSLock()
         let isInitialized: Bool = try await withCheckedThrowingContinuation { continuation in
             digidocConfWrapper.initWithConf(digiDocConf) { success, error in
                 lock.lock()
                 defer { lock.unlock() }
                 if let error = error as NSError? {
-                    errorDetail = ErrorDetail(nsError: error)
-                    continuation
-                        .resume(
-                            throwing: DigiDocError.initializationFailed(
-                                errorDetail ?? ErrorDetail()
-                            )
-                        )
+                    let errorDetail = ErrorDetail(nsError: error)
+                    continuation.resume(
+                        throwing: DigiDocError.initializationFailed(errorDetail)
+                    )
                 } else {
                     continuation.resume(returning: success)
                 }
@@ -184,7 +178,9 @@ public actor DigiDocInitializer {
         }
 
         guard isInitialized, DigiDocConfWrapper.sharedInstance() != nil else {
-            throw DigiDocError.initializationFailed(errorDetail ?? ErrorDetail())
+            throw DigiDocError.initializationFailed(
+                ErrorDetail(message: "Unable to initialize Libdigidocpp with configuration")
+            )
         }
     }
 }

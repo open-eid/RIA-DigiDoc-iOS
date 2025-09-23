@@ -53,8 +53,7 @@ struct HomeView: View {
                     isNavigatingToNextView: $isNavigatingToSigningView,
                     showBottomSheet: $showFilesBottomSheet,
                     isImporting: $isImporting,
-                    viewModel: viewModel,
-                    fileOpeningViewModel: fileOpeningViewModel
+                    viewModel: viewModel
                 )
                 .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
 
@@ -66,8 +65,7 @@ struct HomeView: View {
                     isNavigatingToNextView: $isNavigatingToSigningView,
                     showBottomSheet: $showSignatureBottomSheet,
                     isImporting: $isImporting,
-                    viewModel: viewModel,
-                    fileOpeningViewModel: fileOpeningViewModel
+                    viewModel: viewModel
                 )
                 .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 

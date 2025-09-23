@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -19,7 +19,7 @@ let package = Package(
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
         .package(path: "../CommonsLib"),
         .package(path: "../ConfigLib"),
-        .package(path: "../CommonsLib/CommonsTestShared")
+        .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -30,6 +30,12 @@ let package = Package(
                 "ZIPFoundation",
                 "CommonsLib",
                 .product(name: "FactoryKit", package: "Factory")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("SendableByDefault"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
             ]
         ),
         .target(
@@ -40,6 +46,7 @@ let package = Package(
         .testTarget(
             name: "UtilsLibTests",
             dependencies: [
+                "UtilsLib",
                 "UtilsLibMocks",
                 "CommonsLib",
                 "CommonsTestShared",

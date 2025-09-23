@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -20,7 +20,7 @@ let package = Package(
         .package(url: "https://github.com/TakeScoop/SwiftyRSA", exact: .init(1, 8, 0)),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
-        .package(path: "../CommonsLib/CommonsTestShared")
+        .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -37,6 +37,12 @@ let package = Package(
             resources: [
                 .copy("Resources/config"),
                 .copy("Resources/tslFiles")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("SendableByDefault"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances")
             ]
         ),
         .target(
@@ -47,6 +53,7 @@ let package = Package(
         .testTarget(
             name: "ConfigLibTests",
             dependencies: [
+                "ConfigLib",
                 "ConfigLibMocks",
                 "CommonsLib",
                 "UtilsLib",
