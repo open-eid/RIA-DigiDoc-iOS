@@ -11,11 +11,11 @@ internal import SwiftECC
 
 extension ECPublicKey {
     convenience init?(domain: Domain, point: Data) throws {
-        guard let w = try? domain.decodePoint(Bytes(point)) else { return nil }
-        try self.init(domain: domain, w: w)
+        guard let decodePoint = try? domain.decodePoint(Bytes(point)) else { return nil }
+        try self.init(domain: domain, w: decodePoint)
     }
 
-    func x963Representation() throws -> Bytes  {
+    func x963Representation() throws -> Bytes {
         return try domain.encodePoint(w)
     }
 }

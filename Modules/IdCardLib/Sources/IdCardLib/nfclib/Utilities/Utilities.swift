@@ -19,7 +19,7 @@ func convertBytesToX509Certificate(_ data: Data) throws -> SecCertificate {
     guard let certificate = SecCertificateCreateWithData(nil, data as CFData) else {
         throw CertificateConversionError.creationFailed
     }
-    
+
     return certificate
 }
 

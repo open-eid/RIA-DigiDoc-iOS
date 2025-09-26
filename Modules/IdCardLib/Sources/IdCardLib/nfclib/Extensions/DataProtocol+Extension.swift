@@ -20,12 +20,12 @@ extension DataProtocol where Self.Index == Int {
     }
 
     func removePadding() throws -> SubSequence {
-        var i = endIndex
-        while i != startIndex {
-            formIndex(before: &i)
-            if self[i] == 0x80 {
-                return self[startIndex..<i]
-            } else if self[i] != 0x00 {
+        var index = endIndex
+        while index != startIndex {
+            formIndex(before: &index)
+            if self[index] == 0x80 {
+                return self[startIndex..<index]
+            } else if self[index] != 0x00 {
                 throw IdCardInternalError.dataPaddingError
             }
         }
@@ -33,7 +33,7 @@ extension DataProtocol where Self.Index == Int {
     }
 }
 
-extension DataProtocol where Self.Index == Int, Self : MutableDataProtocol {
+extension DataProtocol where Self.Index == Int, Self: MutableDataProtocol {
     init?(hex: String) {
         guard hex.count.isMultiple(of: 2) else { return nil }
         let chars = hex.map { $0 }
@@ -50,10 +50,10 @@ extension DataProtocol where Self.Index == Int, Self : MutableDataProtocol {
         return self + padding
     }
 
-    public static func ^ (x: Self, y: Self) -> Self {
-        var result = x
-        for i in 0..<result.count {
-            result[i] ^= y[i]
+    public static func ^ (xVal: Self, yVal: Self) -> Self {
+        var result = xVal
+        for index in 0..<result.count {
+            result[index] ^= yVal[index]
         }
         return result
     }
@@ -61,18 +61,18 @@ extension DataProtocol where Self.Index == Int, Self : MutableDataProtocol {
     static func ^ <D: Collection>(lhs: Self, rhs: D) -> Self where D.Element == Self.Element {
         precondition(lhs.count == rhs.count, "XOR operands must have equal length")
         var result = lhs
-        for i in 0..<result.count {
-            result[result.index(result.startIndex, offsetBy: i)] ^= rhs[rhs.index(rhs.startIndex, offsetBy: i)]
+        for index in 0..<result.count {
+            result[result.index(result.startIndex, offsetBy: index)] ^= rhs[rhs.index(rhs.startIndex, offsetBy: index)]
         }
         return result
     }
 
     mutating func increment() -> Self {
-        var i = endIndex
-        while i != startIndex {
-            formIndex(before: &i)
-            self[i] += 1
-            if self[i] != 0 {
+        var index = endIndex
+        while index != startIndex {
+            formIndex(before: &index)
+            self[index] += 1
+            if self[index] != 0 {
                 break
             }
         }
@@ -82,14 +82,14 @@ extension DataProtocol where Self.Index == Int, Self : MutableDataProtocol {
     func leftShiftOneBit() -> Self {
         var shifted = Self(repeating: 0x00, count: count)
         let last = index(before: endIndex)
-        var i = startIndex
-        while i < last {
-            shifted[i] = self[i] << 1
-            let next = index(after: i)
+        var iVal = startIndex
+        while iVal < last {
+            shifted[iVal] = self[iVal] << 1
+            let next = index(after: iVal)
             if (self[next] & 0x80) != 0 {
-                shifted[i] += 0x01
+                shifted[iVal] += 0x01
             }
-            i = next
+            iVal = next
         }
         shifted[last] = self[last] << 1
         return shifted

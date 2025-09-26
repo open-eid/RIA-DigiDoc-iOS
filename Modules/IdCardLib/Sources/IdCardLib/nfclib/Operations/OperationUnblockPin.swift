@@ -30,7 +30,7 @@ class OperationUnblockPin: NSObject {
     private let connection = NFCConnection()
     private var continuation: CheckedContinuation<Void, Error>?
 
-    public func startReading(CAN: String, codeType: CodeType, puk: String, newPin: String) async throws -> Void {
+    public func startReading(CAN: String, codeType: CodeType, puk: String, newPin: String) async throws {
 
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -84,10 +84,9 @@ extension OperationUnblockPin: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) { }
+    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }
-

@@ -13,7 +13,7 @@ struct ProgressBar {
         self.currentStep = currentStep
         self.totalSteps = totalSteps
     }
-    
+
     func generate() -> String {
         if currentStep > 0 {
             return (0..<totalSteps).map { $0 < currentStep ? "🔵" : "⚪️" }.joined(separator: " ")

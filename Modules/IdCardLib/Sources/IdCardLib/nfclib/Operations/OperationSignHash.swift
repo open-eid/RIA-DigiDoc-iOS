@@ -60,7 +60,7 @@ class OperationSignHash: NSObject {
 
 extension OperationSignHash: @MainActor NFCTagReaderSessionDelegate {
     func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-     
+
         Task { @MainActor in
             do {
                 updateAlertMessage(step: 1)
@@ -82,10 +82,9 @@ extension OperationSignHash: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) { }
+    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }
-

@@ -38,9 +38,9 @@ class OperationReadCertificate: NSObject {
     private let nfcMessage: String = "Palun asetage oma ID-kaart vastu nutiseadet."
     private let connection = NFCConnection()
     private var continuation: CheckedContinuation<SecCertificate, Error>?
-    
+
     public func startReading(CAN: String, certUsage: CertificateUsage) async throws -> SecCertificate {
-        
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -48,7 +48,7 @@ class OperationReadCertificate: NSObject {
                 continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
                 return
             }
-            
+
             self.CAN = CAN
             self.certUsage = certUsage
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
@@ -65,7 +65,7 @@ extension OperationReadCertificate: NFCTagReaderSessionDelegate {
             defer {
                 self.session = nil
             }
-            
+
             guard let certUsage else {
                 continuation?.resume(throwing: ReadCertificateError.certificateUsageNotSpecified)
                 session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
@@ -98,13 +98,12 @@ extension OperationReadCertificate: NFCTagReaderSessionDelegate {
             }
         }
     }
-    
-    nonisolated func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) { }
-    
-    nonisolated func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+
+    nonisolated func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+
+    nonisolated func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         Task { @MainActor in
             self.session = nil
         }
     }
 }
-

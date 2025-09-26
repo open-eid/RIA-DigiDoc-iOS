@@ -20,7 +20,7 @@ func hashLengthFromInt(_ intValue: Int) -> HashLength? {
 
 func sha(hashLength: HashLength, data: Data) -> Data? {
     var hash: [UInt8]
-    
+
     switch hashLength {
     case .bits256:
         hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
@@ -38,6 +38,6 @@ func sha(hashLength: HashLength, data: Data) -> Data? {
             _ = CC_SHA512(dataBytes.baseAddress, CC_LONG(data.count), &hash)
         }
     }
-    
+
     return Data(hash)
 }

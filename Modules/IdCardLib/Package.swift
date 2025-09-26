@@ -16,7 +16,7 @@ let package = Package(
         .package(url: "https://github.com/leif-ibsen/Digest.git", exact: .init(1, 13, 0)),
         .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
         .package(url: "https://github.com/apple/swift-certificates.git", exact: .init(1, 7, 0)),
-        .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
+        .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0))
     ],
     targets: [
         .target(
@@ -27,7 +27,7 @@ let package = Package(
                 "ASN1",
                 "BigInt",
                 "Digest",
-                "SwiftECC",
+                "SwiftECC"
             ],
             path: "Sources/IdCardLib/nfclib",
             swiftSettings: [
@@ -39,4 +39,3 @@ let package = Package(
         )
     ]
 )
-

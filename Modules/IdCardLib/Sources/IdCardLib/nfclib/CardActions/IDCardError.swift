@@ -30,8 +30,9 @@ enum IdCardInternalError: Error {
          multipleTagsDetected,
          couldNotVerifyChipsMAC,
          cancelledByUser,
-         sessionInvalidated
-    
+         sessionInvalidated,
+         notSupportedAlgorithm
+
     func getIdCardError() -> IdCardError {
         switch self {
         case .missingRESTag,
@@ -54,7 +55,8 @@ enum IdCardInternalError: Error {
                 .multipleTagsDetected,
                 .couldNotVerifyChipsMAC,
                 .cancelledByUser,
-                .sessionInvalidated:
+                .sessionInvalidated,
+                .notSupportedAlgorithm:
             return .sessionError
         case .canAuthenticationFailed:
             return .wrongCAN

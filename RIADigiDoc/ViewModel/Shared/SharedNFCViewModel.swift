@@ -4,4 +4,3 @@ import nfclib
 @MainActor
 class SharedNFCViewModel: SharedNFCViewModelProtocol, ObservableObject {
 }
-

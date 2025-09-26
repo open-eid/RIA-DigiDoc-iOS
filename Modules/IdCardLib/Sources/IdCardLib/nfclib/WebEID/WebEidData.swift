@@ -13,7 +13,7 @@ public final class WebEidData: Sendable {
     public let algorithm: String
     public let signature: String
 
-    init(unverifiedCertificate: String, 
+    init(unverifiedCertificate: String,
          algorithm: String,
          signature: String,
          signingCertificate: String) {
@@ -36,4 +36,3 @@ public final class WebEidData: Sendable {
         """
     }
 }
-

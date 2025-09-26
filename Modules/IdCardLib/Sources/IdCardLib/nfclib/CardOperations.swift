@@ -50,7 +50,12 @@ public protocol CardOperations {
     ///   - origin: A `String` representing the origin of the authentication request.
     /// - Returns: A `WebEidData` object containing the result of the authentication.
     /// - Throws: An error if the authentication fails.
-    func loadWebEIDAuthenticationData(CAN: String, pin1: String, challenge: String, origin: String) async throws -> WebEidData
+    func loadWebEIDAuthenticationData(
+        CAN: String,
+        pin1: String,
+        challenge: String,
+        origin: String
+    ) async throws -> WebEidData
 
     /// Performs a signing operation using the provided hash and PIN.
     ///

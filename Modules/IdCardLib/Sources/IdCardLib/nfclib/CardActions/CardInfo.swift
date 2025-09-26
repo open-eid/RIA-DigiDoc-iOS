@@ -5,7 +5,13 @@ public struct CardInfo: Sendable {
     public var citizenship: String
     public var dateOfExpiry: String
 
-    public init(givenName: String = "", surname: String = "", personalCode: String = "", citizenship: String = "", dateOfExpiry: String = "") {
+    public init(
+        givenName: String = "",
+        surname: String = "",
+        personalCode: String = "",
+        citizenship: String = "",
+        dateOfExpiry: String = ""
+    ) {
         self.givenName = givenName
         self.surname = surname
         self.personalCode = personalCode

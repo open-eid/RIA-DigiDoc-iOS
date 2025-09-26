@@ -31,14 +31,14 @@ class OperationAuthenticateWithWebEID: NSObject {
 
     private var session: NFCTagReaderSession?
     private var continuation: CheckedContinuation<WebEidData, Error>?
-    
+
     init(CAN: String, pin1: String, challenge: String, origin: String) {
         self.CAN = CAN
         self.pin1 = pin1
         self.challenge = challenge
         self.origin = origin
     }
-    
+
     public func startReading() async throws -> WebEidData {
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -133,7 +133,7 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                             unverifiedCertificate: certBytes.base64EncodedString(),
                             algorithm: authCertificateSignatureAlgorithmInfo.name,
                             signature: authResult.base64EncodedString(),
-                            signingCertificate:  signingCertificateBytes.base64EncodedString()
+                            signingCertificate: signingCertificateBytes.base64EncodedString()
                         )
                         continuation?.resume(returning: webEidData)
                         session.alertMessage = "Andmed loetud"
@@ -176,12 +176,13 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
 
     func getAlgorithmNameTypeAndLength(from key: SecKey) -> (algorithm: String, keyLength: Int)? {
         // Get the algorithm type from the key
-        if let algorithmAttributes = SecKeyCopyAttributes(key) as? [String: Any], let algorithmType = algorithmAttributes[kSecAttrKeyType as String] as? String {
-            
+        if let algorithmAttributes = SecKeyCopyAttributes(key) as? [String: Any], let algorithmType =
+            algorithmAttributes[kSecAttrKeyType as String] as? String {
+
             // Get the algorithm name based on the type
             var algorithmName = ""
             var keyLength = 0
-            
+
             switch algorithmType {
             case String(kSecAttrKeyTypeRSA):
                 algorithmName = rsaAlgorithmName
@@ -192,16 +193,16 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
             default:
                 algorithmName = unknownAlgorithmName
             }
-            
+
             return (algorithm: algorithmName, keyLength: keyLength)
         } else {
             return nil
         }
     }
-    
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) { }
-    
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+
+    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+
+    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 
@@ -221,4 +222,3 @@ struct SignatureAlgorithmInfo {
     let name: String
     let bitSize: Int
 }
-

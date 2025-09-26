@@ -55,11 +55,9 @@ extension OperationReadPublicData: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
+    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) { }
-
-    func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }
