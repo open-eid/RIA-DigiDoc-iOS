@@ -1,4 +1,5 @@
 import Foundation
+import CommonsLib
 
 public final actor DataStore: DataStoreProtocol {
     public init() {}
@@ -39,7 +40,45 @@ public final actor DataStore: DataStoreProtocol {
     }
 
     public func setValidationServiceOption(_ option: ServicesSettingsOption) async {
-            UserDefaults.standard.set(option.rawValue, forKey: Keys.validationServiceOption)
+        UserDefaults.standard.set(option.rawValue, forKey: Keys.validationServiceOption)
+    }
+
+    // MARK: - TSA URL Methods
+
+    public func getTSAUrl() async -> String {
+        return UserDefaults.standard.string(forKey: Keys.tsaUrl) ?? DefaultValues.tsaUrl
+    }
+
+    public func setTSAUrl(tsaUrl: String) async {
+        UserDefaults.standard.set(tsaUrl, forKey: Keys.tsaUrl)
+    }
+
+    public func getTSAUrlOption() async -> ServicesSettingsOption {
+        let raw = UserDefaults.standard.integer(forKey: Keys.tsaUrlOption)
+        return ServicesSettingsOption(rawValue: raw) ?? ServicesSettingsOption.defaultSetting
+    }
+
+    public func setTSAUrlOption(_ option: ServicesSettingsOption) async {
+        UserDefaults.standard.set(option.rawValue, forKey: Keys.tsaUrlOption)
+    }
+
+    // MARK: - Relying Party UUID Methods
+
+    public func getRelyingPartyUUID() async -> String {
+        return UserDefaults.standard.string(forKey: Keys.relyingPartyUUID) ?? DefaultValues.relyingPartyUUID
+    }
+
+    public func setRelyingPartyUUID(relyingPartyUUID: String) async {
+        UserDefaults.standard.set(relyingPartyUUID, forKey: Keys.relyingPartyUUID)
+    }
+
+    public func getRelyingPartyOption() async -> ServicesSettingsOption {
+        let raw = UserDefaults.standard.integer(forKey: Keys.relyingPartyOption)
+        return ServicesSettingsOption(rawValue: raw) ?? ServicesSettingsOption.defaultSetting
+    }
+
+    public func setRelyingPartyOption(_ option: ServicesSettingsOption) async {
+        UserDefaults.standard.set(option.rawValue, forKey: Keys.relyingPartyOption)
     }
 
     // MARK: - Constants
@@ -47,6 +86,8 @@ public final actor DataStore: DataStoreProtocol {
     private enum DefaultValues {
         static let language = "en"
         static let validationServiceURL = ""
+        static let relyingPartyUUID = CommonsLib.Constants.Configuration.RelyingPartyUUID
+        static let tsaUrl = ""
     }
 
     private enum Keys {
@@ -54,5 +95,9 @@ public final actor DataStore: DataStoreProtocol {
         static let selectedTheme = "selectedTheme"
         static let validationServiceURL = "validationServiceURL"
         static let validationServiceOption = "validationServiceOption"
+        static let tsaUrl = "tsaUrl"
+        static let tsaUrlOption = "tsaUrlOption"
+        static let relyingPartyUUID = "relyingPartyUUID"
+        static let relyingPartyOption = "relyingPartyOption"
     }
 }

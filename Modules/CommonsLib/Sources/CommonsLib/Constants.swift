@@ -60,10 +60,12 @@ public struct Constants {
         public static let SavedFiles = "savedfiles"
         public static let Logs = "logfiles"
         public static let SivaCert = "sivacert"
+        public static let TSACert = "tsacert"
     }
 
     public struct FileBaseName {
             public static let SiVaCert = "siva_cert"
+            public static let TSACert = "tsa_cert"
         }
 
     public struct Configuration {
@@ -85,5 +87,7 @@ public struct Constants {
         public static let TslFilesFolder = "tslFiles"
 
         public static let DefaultTimeout = 5.0
+
+        public static let RelyingPartyUUID = "00000000-0000-0000-0000-000000000000"
     }
 }

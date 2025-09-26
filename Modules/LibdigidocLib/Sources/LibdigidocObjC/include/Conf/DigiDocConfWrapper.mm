@@ -14,6 +14,8 @@ private:
     DigiDocConfig *currentConf;
     inline static std::string _sivaUrl;
     inline static NSData* _sivaCert = nil;
+    inline static std::string _tsUrl;
+    inline static NSData* _tsCert = nil;
 
 public:
     DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
@@ -38,11 +40,33 @@ public:
 
     std::vector<digidoc::X509Cert> TSCerts() const override {
         NSMutableArray<NSString *> *certBundle = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
+        
+        if (_tsCert != nil && [_tsCert length] > 0) {
+            NSString *tsCert = [_tsCert base64EncodedStringWithOptions:0];
+            [certBundle addObject:tsCert];
+        }
+        
         return stringsToX509Certs(certBundle);
     }
-
+    
+    void addTSCert(NSData * cert) {
+        _tsCert = cert;
+    }
+    
     std::string TSUrl() const override {
-        return currentConf.TSAURL.UTF8String;
+        if (!_tsUrl.empty()) {
+            return _tsUrl;
+        }
+        
+        if (currentConf && currentConf.TSAURL) {
+            return std::string([currentConf.TSAURL UTF8String]);
+        }
+        
+        return "";
+    }
+    
+    void setTSUrl(std::string &tsaUrl) {
+        _tsUrl = tsaUrl;
     }
     
     void setSiVaUrl(std::string &sivaUrl) {
@@ -156,6 +180,24 @@ public:
             currentConf->addSiVaCert(cert);
         }
     }
+    
+    static void setTSUrl(std::string &tsaUrl) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setTSUrl(tsaUrl);
+        }
+    }
+    
+    static void addTSCert(NSData *cert) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->addTSCert(cert);
+        }
+    }
 };
 
 @implementation DigiDocConfWrapper {
@@ -202,6 +244,17 @@ public:
 - (void)addSiVaCert:(NSData *)cert {
     if (!cert) return;
     _impl->addSiVaCert(cert);
+}
+
+- (void)setTSUrl:(NSString *)url {
+    if (!url) return;
+    std::string tsUrl = std::string([url UTF8String]);
+    _impl->setTSUrl(tsUrl);
+}
+
+- (void)addTSCert:(NSData *)cert {
+    if (!cert) return;
+    _impl->addTSCert(cert);
 }
 
 + (nullable DigiDocConfWrapper *)sharedInstance {

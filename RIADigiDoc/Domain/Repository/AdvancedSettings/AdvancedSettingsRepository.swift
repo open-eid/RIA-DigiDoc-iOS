@@ -17,7 +17,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
 
     // MARK: - Loading Certificate
 
-    func loadCertificate(
+    func getCertificate(
         certificateFolder: String,
         certificateBaseName: String,
     ) async -> Data? {
@@ -28,7 +28,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
                         certificateBaseName: certificateBaseName
                     )
             else { return nil }
-            return try await loadCertificateContent(certFileURL: certFileURL)
+            return try await getCertificateContent(certFileURL: certFileURL)
         } catch {
             await AdvancedSettingsRepository.logger.error("Unable to load certificate: \(error)")
             return nil
@@ -56,7 +56,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
         }
     }
 
-    private func loadCertificateContent(certFileURL: URL) async throws -> Data? {
+    private func getCertificateContent(certFileURL: URL) async throws -> Data? {
         let certDataRaw = try Data(contentsOf: certFileURL)
         var certData = certDataRaw
         if let der = await CertificateUtil.pemToDerData(fromPEM: certDataRaw) {
@@ -99,7 +99,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
             }
             try fileManager.copyItem(at: url, to: destinationURL)
 
-            let certData = try await loadCertificateContent(certFileURL: url)
+            let certData = try await getCertificateContent(certFileURL: url)
 
             return certData
         } catch {

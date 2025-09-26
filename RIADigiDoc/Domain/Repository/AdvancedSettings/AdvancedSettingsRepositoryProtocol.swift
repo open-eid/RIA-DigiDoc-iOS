@@ -2,7 +2,7 @@ import Foundation
 
 /// @mockable
 public protocol AdvancedSettingsRepositoryProtocol: Sendable {
-    func loadCertificate(
+    func getCertificate(
         certificateFolder: String,
         certificateBaseName: String,
     ) async -> Data?

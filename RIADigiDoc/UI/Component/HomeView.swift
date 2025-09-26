@@ -23,7 +23,8 @@ struct HomeView: View {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
                 isImporting = true
-            }, onRecentDocumentsClick: {
+            },
+            onRecentDocumentsClick: {
                 isNavigatingToRecentDocumentsView = true
             }
         )

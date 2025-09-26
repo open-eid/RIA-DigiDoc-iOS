@@ -5,6 +5,7 @@ import Foundation
 import UtilsLib
 
 extension Container {
+    @MainActor
     var librarySetup: Factory<LibrarySetup> {
         self { @MainActor in
             LibrarySetup(
@@ -164,6 +165,27 @@ extension Container {
                 dataStore: self.dataStore(),
                 fileManager: self.fileManager(),
                 advancedSettingsRepository: self.advancedSettingsRepository()
+            )
+        }
+    }
+
+    @MainActor
+    var timeStampSettingsViewModel: Factory<TimeStampSettingsViewModel> {
+        self { @MainActor in
+            TimeStampSettingsViewModel(
+                configurationRepository: self.configurationRepository(),
+                dataStore: self.dataStore(),
+                fileManager: self.fileManager(),
+                advancedSettingsRepository: self.advancedSettingsRepository()
+            )
+        }
+    }
+
+    @MainActor
+    var mobileIDSmartIDSettingsViewModel: Factory<MobileIDSmartIDSettingsViewModel> {
+        self { @MainActor in
+            MobileIDSmartIDSettingsViewModel(
+                dataStore: self.dataStore()
             )
         }
     }

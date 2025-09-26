@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateConfiguration:(DigiDocConfig *)conf;
 - (void)setSiVaUrl:(NSString *)url;
 - (void)addSiVaCert:(NSData *)cert;
+- (void)setTSUrl:(NSString *)url;
+- (void)addTSCert:(NSData *)cert;
 + (nullable DigiDocConfWrapper *)sharedInstance;
 
 @end

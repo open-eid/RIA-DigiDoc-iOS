@@ -43,10 +43,10 @@ struct SigningServicesSettingsView: View {
                         ],
                         content: {
                             if selectedTab == 0 {
-                                TimeStampServicesSettings()
+                                TimeStampSettings()
                                     .padding(.horizontal, Dimensions.Padding.SPadding)
                             } else {
-                                MobileIDAndSmartIDServicesSettings()
+                                MobileIDSmartIDSettings()
                                     .padding(.horizontal, Dimensions.Padding.SPadding)
                             }
                         }

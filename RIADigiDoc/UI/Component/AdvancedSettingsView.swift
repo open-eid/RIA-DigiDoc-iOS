@@ -76,7 +76,7 @@ struct AdvancedSettingsView: View {
                                 }
                             )
                             NavigationLink(
-                                destination: ValidationSettings(),
+                                destination: ValidationSettingsView(),
                                 isActive: $navigateToValidationSettings
                             ) { }
                             AdvancedSettingsLinkRow(
