@@ -17,7 +17,9 @@ public struct DigiDocConf: DigiDocConfProtocol {
     public static func initDigiDoc(
         configuration: ConfigurationProvider? = nil,
         sivaUrl: String? = nil,
-        sivaCert: Data? = nil
+        sivaCert: Data? = nil,
+        tsaUrl: String? = nil,
+        tsCert: Data? = nil
     ) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
 
@@ -27,6 +29,14 @@ public struct DigiDocConf: DigiDocConfProtocol {
 
         if let sivaCert = sivaCert {
             await addSiVaCert(sivaCert)
+        }
+
+        if let tsaUrl = tsaUrl {
+            await setTSUrl(tsaUrl)
+        }
+
+        if let tsCert = tsCert {
+            await addTSCert(tsCert)
         }
     }
 
@@ -49,6 +59,14 @@ public struct DigiDocConf: DigiDocConfProtocol {
 
     public static func addSiVaCert(_ cert: Data) async {
         DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
+    }
+
+    public static func setTSUrl(_ url: String) async {
+        DigiDocConfWrapper.sharedInstance()?.setTSUrl(url)
+    }
+
+    public static func addTSCert(_ cert: Data) async {
+        DigiDocConfWrapper.sharedInstance()?.addTSCert(cert)
     }
 }
 

@@ -13,4 +13,16 @@ public protocol DataStoreProtocol: Sendable {
     func setValidationServiceURL(validationServiceURL: String) async
     func getValidationServiceOption() async -> ServicesSettingsOption
     func setValidationServiceOption(_ option: ServicesSettingsOption) async
+
+    // MARK: - TSA URL Methods
+    func getTSAUrl() async -> String
+    func setTSAUrl(tsaUrl: String) async
+    func getTSAUrlOption() async -> ServicesSettingsOption
+    func setTSAUrlOption(_ option: ServicesSettingsOption) async
+
+    // MARK: - Relying Party UUID Methods
+    func getRelyingPartyUUID() async -> String
+    func setRelyingPartyUUID(relyingPartyUUID: String) async
+    func getRelyingPartyOption() async -> ServicesSettingsOption
+    func setRelyingPartyOption(_ option: ServicesSettingsOption) async
 }

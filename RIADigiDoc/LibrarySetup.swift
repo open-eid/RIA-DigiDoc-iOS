@@ -48,7 +48,9 @@ actor LibrarySetup {
             LibrarySetup.logger.debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
                 sivaUrl: getSiVaUrl(),
-                sivaCert: loadSiVaCert()
+                sivaCert: getSiVaCert(),
+                tsaUrl: getTSUrl(),
+                tsCert: getTSCert()
             )
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
         } catch let error {
@@ -67,10 +69,21 @@ actor LibrarySetup {
         return await dataStore.getValidationServiceURL()
     }
 
-    func loadSiVaCert() async -> Data? {
-        return await advancedSettingsRepository.loadCertificate(
+    func getSiVaCert() async -> Data? {
+        return await advancedSettingsRepository.getCertificate(
             certificateFolder: CommonsLib.Constants.Folder.SivaCert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert,
+        )
+    }
+
+    func getTSUrl() async -> String? {
+        return await dataStore.getTSAUrl()
+    }
+
+    func getTSCert() async -> Data? {
+        return await advancedSettingsRepository.getCertificate(
+            certificateFolder: CommonsLib.Constants.Folder.TSACert,
+            certificateBaseName: CommonsLib.Constants.FileBaseName.TSACert,
         )
     }
 }

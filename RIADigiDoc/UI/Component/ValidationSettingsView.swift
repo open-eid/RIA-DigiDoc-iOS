@@ -1,7 +1,7 @@
 import SwiftUI
 import FactoryKit
 
-struct ValidationSettings: View {
+struct ValidationSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
@@ -138,7 +138,7 @@ struct ValidationSettings: View {
 // MARK: - Preview
 
 #Preview {
-    ValidationSettings()
+    ValidationSettingsView()
         .environmentObject(Container.shared.languageSettings())
         .environmentObject(Container.shared.themeSettings())
 }
