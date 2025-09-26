@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A2D04BB2E8583A600A7269B /* nfclib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A2D04BA2E8583A600A7269B /* nfclib */; };
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
+		1A95E79B2E8575B200F07E49 /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
@@ -95,6 +97,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1A1548DE2E85801500DC2339 /* IdCardLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IdCardLib; sourceTree = "<group>"; };
 		1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphonesimulator.sh"; sourceTree = "<group>"; };
 		1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphoneos.sh"; sourceTree = "<group>"; };
 		1A438FCF2E7224CE00546B86 /* GenerateMocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = GenerateMocks.sh; sourceTree = "<group>"; };
@@ -165,10 +168,12 @@
 				ViewModel/Protocols/LanguageChooserViewModelProtocol.swift,
 				ViewModel/Protocols/RecentDocumentsViewModelProtocol.swift,
 				ViewModel/Protocols/Shared/SharedContainerViewModelProtocol.swift,
+				ViewModel/Protocols/Shared/SharedNFCViewModelProtocol.swift,
 				ViewModel/Protocols/SignatureDetailViewModelProtocol.swift,
 				ViewModel/Protocols/SigningViewModelProtocol.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
+				ViewModel/Shared/SharedNFCViewModel.swift,
 				ViewModel/SignatureDetailViewModel.swift,
 				ViewModel/SigningViewModel.swift,
 			);
@@ -304,6 +309,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A2D04BB2E8583A600A7269B /* nfclib in Frameworks */,
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
 				1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
@@ -319,6 +325,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A95E79B2E8575B200F07E49 /* CommonsTestShared in Frameworks */,
 				DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */,
 				DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */,
 				DFAABD002E82AF0900906874 /* ConfigLibMocks in Frameworks */,
@@ -359,6 +366,7 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				1A1548DE2E85801500DC2339 /* IdCardLib */,
 				DFCF22F92E83512D0015AE6B /* Test */,
 				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
 				DF67D4F92D28531600F09EB9 /* ConfigLib */,
@@ -506,6 +514,7 @@
 				DF3E922C2D2C371200F2990A /* Alamofire */,
 				DF9AFE912E00D30A0062C64D /* FactoryKit */,
 				1A438FD82E72CF1900546B86 /* CryptoLib */,
+				1A2D04BA2E8583A600A7269B /* nfclib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -616,6 +625,8 @@
 				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 				DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */,
 				1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */,
+				1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */,
+				1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -679,7 +690,7 @@
 		DFED7A602CC9A42A00D8BCA9 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -691,7 +702,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        \"$SWIFTLINT_CMD\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint for '${CONFIGURATION}' configuration.\"\nfi\n";
 			showEnvVarsInLog = 0;
@@ -1024,8 +1035,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NFCReaderUsageDescription = "This app uses NFC to scan ID-cards";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1077,8 +1090,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RIADigiDoc/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "RIA DigiDoc";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NFCReaderUsageDescription = "This app uses NFC to scan ID-cards";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1280,6 +1295,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/leif-ibsen/BigInt";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.21.0;
+			};
+		};
+		1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/leif-ibsen/SwiftECC";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.0;
+			};
+		};
 		1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/filom/ASN1Decoder";
@@ -1292,8 +1323,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-certificates.git";
 			requirement = {
-				kind = exactVersion;
-				version = 1.7.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.7.0;
 			};
 		};
 		DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */ = {
@@ -1323,6 +1354,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1A2D04BA2E8583A600A7269B /* nfclib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = nfclib;
+		};
 		1A438FD82E72CF1900546B86 /* CryptoLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CryptoLib;
