@@ -11,7 +11,6 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/leif-ibsen/ASN1.git", exact: .init(2, 7, 0)),
         .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 21, 0)),
         .package(url: "https://github.com/leif-ibsen/Digest.git", exact: .init(1, 13, 0)),
         .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
@@ -24,7 +23,6 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftASN1", package: "swift-asn1"),
                 .product(name: "X509", package: "swift-certificates"),
-                "ASN1",
                 "BigInt",
                 "Digest",
                 "SwiftECC"
