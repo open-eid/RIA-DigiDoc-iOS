@@ -1,10 +1,3 @@
-//
-//  DataProtocol+Extension.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 30.11.2023.
-//
-
 import Foundation
 internal import SwiftECC
 

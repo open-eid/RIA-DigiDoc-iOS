@@ -1,10 +1,3 @@
-//
-//  NFCConnection.swift
-//  nfclib
-//
-//  Created by Timo Kallaste on 20.12.2023.
-//
-
 import Foundation
 @preconcurrency import CoreNFC
 import BigInt

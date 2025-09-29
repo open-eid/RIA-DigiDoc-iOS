@@ -1,10 +1,3 @@
-//
-//  TKBERTLVRecord+Extensions.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 30.11.2023.
-//
-
 import CryptoTokenKit
 internal import SwiftECC
 

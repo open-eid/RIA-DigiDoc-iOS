@@ -1,10 +1,3 @@
-//
-//  OperationReadPublicData.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 30.11.2023.
-//
-
 import Foundation
 import CoreNFC
 import CommonCrypto

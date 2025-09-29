@@ -1,10 +1,3 @@
-//
-//  WebEidData.swift
-//  nfc-lib
-//
-//  Created by Riivo Ehrlich on 15.12.2023.
-//
-
 import Foundation
 
 public final class WebEidData: Sendable {

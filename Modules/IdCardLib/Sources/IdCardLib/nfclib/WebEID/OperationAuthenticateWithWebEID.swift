@@ -1,10 +1,3 @@
-//
-//  OperationAuthenticateWithWebEID.swift
-//  nfc-lib
-//
-//  Created by Riivo Ehrlich on 12.12.2023.
-//
-
 import Foundation
 import CoreNFC
 import CommonCrypto

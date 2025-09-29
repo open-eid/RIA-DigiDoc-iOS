@@ -1,10 +1,3 @@
-//
-//  OperationSignHash.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 03.12.2023.
-//
-
 import Foundation
 import CoreNFC
 import CommonCrypto

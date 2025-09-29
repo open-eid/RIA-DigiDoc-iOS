@@ -1,10 +1,3 @@
-//
-//  OperationReadCertificate.swift
-//  nfc-lib
-//
-//  Created by Riivo Ehrlich on 07.12.2023.
-//
-
 import Foundation
 import CoreNFC
 import CommonCrypto

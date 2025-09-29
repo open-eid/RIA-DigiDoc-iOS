@@ -1,11 +1,4 @@
-//
-//  nfclib.h
-//  nfclib
-//
-//  Created by Timo Kallaste on 14.11.2023.
-//
-
-#import <Foundation/Foundation.h>
+import <Foundation/Foundation.h>
 
 //! Project version number for nfc_lib.
 FOUNDATION_EXPORT double nfc_libVersionNumber;

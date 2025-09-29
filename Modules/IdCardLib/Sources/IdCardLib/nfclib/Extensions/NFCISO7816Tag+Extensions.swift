@@ -1,10 +1,3 @@
-//
-//  NFCISO7816Tag+Extensions.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 30.11.2023.
-//
-
 import CoreNFC
 import CryptoTokenKit
 

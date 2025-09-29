@@ -1,10 +1,3 @@
-//
-//  CardOperations.swift
-//  nfclib
-//
-//  Created by Timo Kallaste on 31.01.2024.
-//
-
 /// `CardOperations` protocol
 ///
 /// This protocol defines a set of operations for interacting with a card,

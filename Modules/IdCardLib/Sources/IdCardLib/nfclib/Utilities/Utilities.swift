@@ -1,10 +1,3 @@
-//
-//  Utilities.swift
-//  nfc-lib
-//
-//  Created by Timo Kallaste on 30.11.2023.
-//
-
 import Foundation
 internal import SwiftECC
 import CommonCrypto
