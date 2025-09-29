@@ -12,6 +12,8 @@ enum AuthenticateWithWebEidError: Error {
     case failedToDetermineAlgorithm
     case failedToHashData
     case failedToMapAlgorithm
+    case failedCertificateExpired
+    case failedCertificateNotYetValid
 }
 
 @MainActor
@@ -85,8 +87,26 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                     updateAlertMessage(step: 3)
                     let certBytes = try await cardCommands.readAuthenticationCertificate()
                     let authCertificate = try convertBytesToX509Certificate(certBytes)
-                    let authCertificateSignatureAlgorithmInfo = try getAlgorithmInfoFromCertificate(authCertificate)
+                    
+                    // assuming authCertificate is `Certificate` from Swift-Certificates
+                    let certificate = try Certificate(authCertificate)
+                    let notAfter = certificate.notValidAfter
+                    let notBefore = certificate.notValidBefore
 
+                    guard Date() >= notBefore else {
+                        let errorMessage = "Sertifikaat pole veel kehtiv"
+                        session.invalidate(errorMessage: errorMessage)
+                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateNotYetValid)
+                        return
+                    }
+
+                    guard Date() <= notAfter else {
+                        let errorMessage = "Sertifikaat on aegunud"
+                        session.invalidate(errorMessage: errorMessage)
+                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateExpired)
+                        return
+                    }
+                    
                     guard let publicKey = SecCertificateCopyKey(authCertificate) else {
                         // TODO: Failed to process public key, handle error
                         let errorMessage = "Andmete lugemine ebaõnnestus"
@@ -106,9 +126,8 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                     guard let hashLength = hashLengthFromInt(keyAlgorithmData.keyLength),
                           let originData = origin.data(using: .utf8),
                           let challengeData = challenge.data(using: .utf8),
-                          let signatureHashLenght = hashLengthFromInt(authCertificateSignatureAlgorithmInfo.bitSize),
-                          let originHash = sha(hashLength: signatureHashLenght, data: originData),
-                          let challengeHash = sha(hashLength: signatureHashLenght, data: challengeData),
+                          let originHash = sha(hashLength: hashLength, data: originData),
+                          let challengeHash = sha(hashLength: hashLength, data: challengeData),
                           let webEidHash = sha(hashLength: hashLength, data: originHash + challengeHash)
                     else {
                         let errorMessage = "Andmete lugemine ebaõnnestus"
@@ -124,7 +143,7 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
 
                         let webEidData = WebEidData(
                             unverifiedCertificate: certBytes.base64EncodedString(),
-                            algorithm: authCertificateSignatureAlgorithmInfo.name,
+                            algorithm: keyAlgorithmData.algorithm,
                             signature: authResult.base64EncodedString(),
                             signingCertificate: signingCertificateBytes.base64EncodedString()
                         )

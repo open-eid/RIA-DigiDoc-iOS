@@ -8,6 +8,7 @@ import BigInt
 @MainActor final class OperationReadPublicData: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
+    // TODO: Use a proper message that is localised
     private let nfcMessage: String = "Palun asetage oma ID-kaart vastu nutiseadet."
     private let connection = NFCConnection()
     private var continuation: CheckedContinuation<CardInfo, Error>?

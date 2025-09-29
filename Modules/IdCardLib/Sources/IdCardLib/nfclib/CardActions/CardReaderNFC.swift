@@ -1,3 +1,26 @@
+//
+//  CardReaderNFC.swift
+//  nfclib
+//
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
 import CoreNFC
 import CommonCrypto
 import CryptoTokenKit
@@ -172,43 +195,44 @@ class CardReaderNFC: CardReader {
         }
     }
 
-    private func getDO87(_ apdu: NFCISO7816APDU, _ DO87: inout Data) throws {
+    private func getDO87(_ apdu: NFCISO7816APDU, _ DO87: Data) throws -> Data {
         if let data = apdu.data, !data.isEmpty {
             let ivValue = try AES.CBC(key: ksEnc).encrypt(SSC)
             let encData = try AES.CBC(key: ksEnc, ivVal: ivValue).encrypt(data.addPadding())
-            DO87 = TLV(tag: 0x87, bytes: [0x01] + encData).data
+            return TLV(tag: 0x87, bytes: [0x01] + encData).data
         } else {
-            DO87 = Data()
+            return Data()
         }
     }
 
-    private func getDO97(_ apdu: NFCISO7816APDU, _ DO97: inout Data) {
+    private func getDO97(_ apdu: NFCISO7816APDU, _ DO97: Data) throws -> Data {
         if apdu.expectedResponseLength > 0 {
-            DO97 = TLV(
+            return TLV(
                 tag: 0x97,
                 bytes: [UInt8(
                     apdu.expectedResponseLength == 256 ? 0 : apdu.expectedResponseLength
                 )]
             ).data
         } else {
-            DO97 = Data()
+            return Data()
         }
     }
 
     private func getTLVs(
         _ response: Data,
-        _ tlvEnc: inout TKTLVRecord?,
-        _ tlvRes: inout TKTLVRecord?,
-        _ tlvMac: inout TKTLVRecord?
-    ) {
+        _ tlvEnc: TKTLVRecord?,
+        _ tlvRes: TKTLVRecord?,
+        _ tlvMac: TKTLVRecord?
+    ) throws -> (tlvEnc: TKTLVRecord?, tlvRes: TKTLVRecord?, tlvMac: TKTLVRecord?) {
         for tlv in TLV.sequenceOfRecords(from: response) ?? [] {
             switch tlv.tag {
-            case 0x87: tlvEnc = tlv
-            case 0x99: tlvRes = tlv
-            case 0x8E: tlvMac = tlv
+            case 0x87: return (tlv, tlvRes, tlvMac)
+            case 0x99: return (tlvEnc, tlv, tlvMac)
+            case 0x8E: return (tlvEnc, tlvRes, tlv)
             default: print("Unknown tag")
             }
         }
+        return (tlvEnc, tlvRes, tlvMac)
     }
 
     func transmit(_ apduData: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
@@ -218,9 +242,9 @@ class CardReaderNFC: CardReader {
         }
         _ = SSC.increment()
         var DO87: Data = Data()
-        try getDO87(apdu, &DO87)
+        DO87 = try getDO87(apdu, DO87)
         var DO97: Data = Data()
-        getDO97(apdu, &DO97)
+        DO97 = try getDO97(apdu, DO97)
         let cmdHeader: Bytes = [apdu.instructionClass | 0x0C, apdu.instructionCode, apdu.p1Parameter, apdu.p2Parameter]
         let MValue = cmdHeader.addPadding() + DO87 + DO97
         let NValue = SSC + MValue
@@ -238,7 +262,7 @@ class CardReaderNFC: CardReader {
         var tlvEnc: TKTLVRecord?
         var tlvRes: TKTLVRecord?
         var tlvMac: TKTLVRecord?
-        getTLVs(response, &tlvEnc, &tlvRes, &tlvMac)
+        (tlvEnc, tlvRes, tlvMac) = try getTLVs(response, tlvEnc, tlvRes, tlvMac)
         guard let tlvRes else {
             throw IdCardInternalError.missingRESTag
         }
