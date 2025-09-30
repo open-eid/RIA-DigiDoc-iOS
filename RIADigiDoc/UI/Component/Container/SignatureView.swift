@@ -81,13 +81,7 @@ struct SignatureView: View {
                         .multilineTextAlignment(.leading)
 
                     if showSignedDate {
-                        Text(verbatim:
-                                String(
-                                    format: languageSettings.localized("Signed %@ at %@"),
-                                    signedDate.date,
-                                    signedDate.time
-                                )
-                        )
+                        Text(verbatim: languageSettings.localized("Signed at", [signedDate.date, signedDate.time]))
                         .font(typography.bodyMedium)
                         .foregroundStyle(theme.onSurfaceVariant)
                         .fixedSize(horizontal: false, vertical: true)

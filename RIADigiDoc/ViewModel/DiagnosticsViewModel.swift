@@ -65,14 +65,12 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
     }
 
     private func fetchVersionContent() {
-        self.versionSectionContent =
-            BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
+        self.versionSectionContent = BundleUtil.getAppVersion()
     }
 
     private func fetchOsSectionContent(languageSettings: LanguageSettingsProtocol) {
-        self.osSectionContent = String(
-            format: languageSettings.localized("Main diagnostics operating system ios %@"),
-            SystemUtil.getOSVersion()
+        self.osSectionContent = languageSettings.localized(
+            "Main diagnostics operating system ios", [SystemUtil.getOSVersion()]
         )
     }
 

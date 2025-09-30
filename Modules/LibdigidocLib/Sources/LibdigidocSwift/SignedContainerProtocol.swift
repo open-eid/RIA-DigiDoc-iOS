@@ -15,6 +15,8 @@ public protocol SignedContainerProtocol: Sendable, AnyObject {
     ) async throws -> URL
     func isExistingContainer() async -> Bool
     func getNestedTimestampedContainer() async throws -> SignedContainerProtocol?
+    func getSignaturesStatusCount() async -> [SignatureStatus: Int]
+    func isEmptyFileInContainer() async -> Bool
 }
 
 extension SignedContainerProtocol {

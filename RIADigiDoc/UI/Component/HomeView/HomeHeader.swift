@@ -44,10 +44,10 @@ private struct VersionComponent: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
 
     var body: some View {
-        Text(String(
-            format: languageSettings.localized("Main home version %@"),
-            BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
-        ))
+        Text(verbatim: languageSettings.localized(
+            "Main home version",
+            [BundleUtil.getAppVersion()])
+        )
         .font(typography.titleMedium)
         .foregroundStyle(theme.onSurfaceVariant)
     }

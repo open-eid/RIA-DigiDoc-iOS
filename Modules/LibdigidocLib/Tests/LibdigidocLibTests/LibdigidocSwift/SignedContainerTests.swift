@@ -437,6 +437,25 @@ final class SignedContainerTests {
     }
 
     @Test
+    func getSignaturesStatusCount_success() async throws {
+        mockContainerWrapper.getSignaturesHandler = {[
+            MockSignatureWrapper.mockSignatureWrapper(),
+            MockSignatureWrapper.mockSignatureWrapper(signatureId: "S2"),
+            MockSignatureWrapper.mockSignatureWrapper(signatureId: "S3", status: .unknown)
+        ]}
+
+        let signaturesStatusCount = await signedContainer.getSignaturesStatusCount()
+
+        let validSignaturesCount = signaturesStatusCount[.valid]
+        let unknownSignaturesCount = signaturesStatusCount[.unknown]
+        let invalidSignaturesCount = signaturesStatusCount[.invalid]
+
+        #expect(validSignaturesCount == 2)
+        #expect(unknownSignaturesCount == 1)
+        #expect(invalidSignaturesCount == 0)
+    }
+
+    @Test
     func getNestedTimestampedContainer_throwErrorWhenGetContainerDataFilesDirThrowsError() async {
         mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asics }
 
@@ -479,5 +498,35 @@ final class SignedContainerTests {
         await #expect(throws: URLError.self) {
             _ = try await signedContainer.getNestedTimestampedContainer()
         }
+    }
+
+    @Test
+    func isEmptyFileInContainer_returnTrue() async throws {
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper(
+                fileName: "mockFile.txt",
+                fileSize: 0,
+                mediaType: Constants.MimeType.Default
+            )]
+        }
+
+        let isEmptyFileInContainer = await signedContainer.isEmptyFileInContainer()
+
+        #expect(isEmptyFileInContainer)
+    }
+
+    @Test
+    func isEmptyFileInContainer_returnFalse() async throws {
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper(
+                fileName: "mockFile.txt",
+                fileSize: 123,
+                mediaType: Constants.MimeType.Default
+            )]
+        }
+
+        let isEmptyFileInContainer = await signedContainer.isEmptyFileInContainer()
+
+        #expect(!isEmptyFileInContainer)
     }
 }

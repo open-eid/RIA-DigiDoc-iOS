@@ -16,4 +16,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func isSignButtonShown(signedContainer: SignedContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isEncryptButtonShown(signedContainer: SignedContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isTimestampedContainer() async -> Bool
+    func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType]
 }

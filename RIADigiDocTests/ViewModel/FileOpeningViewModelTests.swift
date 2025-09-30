@@ -101,7 +101,7 @@ struct FileOpeningViewModelTests {
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
         let isNavigatingToNextView = viewModel.isNavigatingToNextView
-        let errorMessage = viewModel.errorMessage?.message
+        let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)
@@ -125,7 +125,7 @@ struct FileOpeningViewModelTests {
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
         let isNavigatingToNextView = viewModel.isNavigatingToNextView
-        let errorMessage = viewModel.errorMessage?.message
+        let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)
@@ -159,7 +159,7 @@ struct FileOpeningViewModelTests {
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
         let isNavigatingToNextView = viewModel.isNavigatingToNextView
-        let errorMessage = viewModel.errorMessage?.message
+        let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToNextView)

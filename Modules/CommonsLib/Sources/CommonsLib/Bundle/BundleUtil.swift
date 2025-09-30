@@ -22,4 +22,8 @@ public struct BundleUtil {
         logger.debug("Bundle version from info.plist: \(appVersion)")
         return appVersion
     }
+
+    public static func getAppVersion(bundle: Bundle = Bundle.main) -> String {
+        return "\(getBundleShortVersionString(bundle: bundle)).\(getBundleVersion(bundle: bundle))"
+    }
 }

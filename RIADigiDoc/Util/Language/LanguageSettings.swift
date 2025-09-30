@@ -25,12 +25,14 @@ public final class LanguageSettings: LanguageSettingsProtocol, ObservableObject 
         await dataStore.setSelectedLanguage(newLanguageCode: newLanguageCode)
     }
 
-    public func localized(_ key: String) -> String {
-        if let path = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj"),
-           let bundle = Bundle(path: path) {
-            return NSLocalizedString(key, tableName: nil, bundle: bundle, comment: "")
+    public func localized(_ key: String, _ args: [CVarArg] = []) -> String {
+        guard let path = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
+            return key
         }
-        return key
+
+        let format = bundle.localizedString(forKey: key, value: nil, table: nil)
+        return String.localizedStringWithFormat(format, args)
     }
 
     // MARK: - Constants

@@ -2,7 +2,7 @@ import CommonsLib
 import SwiftUI
 import FactoryKit
 
-struct MobileIDSmartIDSettings: View {
+struct MobileIDSmartIDSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
@@ -51,7 +51,7 @@ struct MobileIDSmartIDSettings: View {
 // MARK: - Preview
 
 #Preview {
-    TimeStampSettings()
+    MobileIDSmartIDSettingsView()
         .environmentObject(Container.shared.languageSettings())
         .environmentObject(Container.shared.themeSettings())
 }

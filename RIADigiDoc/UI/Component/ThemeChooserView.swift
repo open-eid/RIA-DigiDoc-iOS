@@ -2,63 +2,43 @@ import FactoryKit
 import SwiftUI
 
 struct ThemeChooserView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var languageSettings: LanguageSettings
     @EnvironmentObject private var themeSettings: ThemeSettings
 
-    @State private var showSettingsBottomSheetFromButton = false
-    @State private var navigateToLanguageChooser = false
-    @State private var navigateToAdvancedSettings = false
-
-    private var settingsBottomSheetActions: [BottomSheetButton] {
-        SettingsMenuBottomSheetActions.actions(
-            currentPage: .theme,
-            onLanguageChooserClick: {
-                navigateToLanguageChooser = true
-            },
-            onAdvancedSettingsClick: {
-                navigateToAdvancedSettings = true
-            }
-        )
-    }
-
     private let supportedThemes: [SupportedTheme] = [
-        SupportedTheme(themeKey: Theme.system, titleKey: "Main settings theme system"),
-        SupportedTheme(themeKey: Theme.light, titleKey: "Main settings theme light"),
-        SupportedTheme(themeKey: Theme.dark, titleKey: "Main settings theme dark")
+        SupportedTheme(themeKey: .system, titleKey: "Main settings theme system"),
+        SupportedTheme(themeKey: .light, titleKey: "Main settings theme light"),
+        SupportedTheme(themeKey: .dark, titleKey: "Main settings theme dark")
     ]
 
     var body: some View {
-        RadioButtonChooserView<SupportedTheme>(
+        TopBarContainer(
             title: languageSettings.localized("Main settings menu appearance"),
-            options: supportedThemes,
-            isSelected: { themeOption in
-                themeOption.themeKey == themeSettings.getSelectedTheme()
+            onLeftClick: {
+                dismiss()
             },
-            titleKey: { themeOption in themeOption.titleKey },
-            onSelect: { themeOption in
-                Task {await themeSettings.setSelectedTheme(themeOption.themeKey)}
-            },
-            accessibilityLabel: { themeOption, isSelected in
-                let title = languageSettings.localized(themeOption.titleKey)
-                let selected = isSelected
-                ? languageSettings.localized("Menu theme selected")
-                : languageSettings.localized("Menu theme")
-                return "\(title) \(selected)"
-            },
-            onRightSecondaryClick: {
-                showSettingsBottomSheetFromButton = true
+            excludeDestinations: [.theme],
+            content: {
+                RadioButtonChooserView<SupportedTheme>(
+                    options: supportedThemes,
+                    isSelected: { themeOption in
+                        themeOption.themeKey == themeSettings.getSelectedTheme()
+                    },
+                    titleKey: { themeOption in themeOption.titleKey },
+                    onSelect: { themeOption in
+                        Task {await themeSettings.setSelectedTheme(themeOption.themeKey)}
+                    },
+                    accessibilityLabel: { themeOption, isSelected in
+                        let title = languageSettings.localized(themeOption.titleKey)
+                        let selected = isSelected
+                        ? languageSettings.localized("Menu theme selected")
+                        : languageSettings.localized("Menu theme")
+                        return "\(title) \(selected)"
+                    }
+                )
             }
         )
-        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
-
-        NavigationLink(
-            destination: LanguageChooserView(),
-            isActive: $navigateToLanguageChooser
-        ) { }
-        NavigationLink(
-            destination: AdvancedSettingsView(),
-            isActive: $navigateToAdvancedSettings
-        ) { }
     }
 }
 

@@ -136,9 +136,10 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         FileOpeningViewModel.logger.error("\(ddeMessage)")
 
         if let dde = error as? DigiDocError {
+            FileOpeningViewModel.logger.error("\(dde)")
             errorMessage = createToastMessage(for: dde)
         } else {
-            errorMessage = ToastMessage(message: error.localizedDescription)
+            errorMessage = ToastMessage(key: error.localizedDescription)
         }
     }
 
@@ -157,27 +158,15 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         case .containerCreationFailed(let errorDetail),
                 .containerOpeningFailed(let errorDetail),
                 .containerSavingFailed(let errorDetail):
-            return ToastMessage(
-                message: String(
-                    format: NSLocalizedString("Failed to open container %@", comment: ""),
-                    errorDetail.userInfo["fileName"] ?? "")
-            )
+            return ToastMessage(key: "Failed to open container", args: [errorDetail.userInfo["fileName"] ?? ""])
         case .addingFilesToContainerFailed(let errorDetail):
-            return ToastMessage(
-                message: String(
-                    format: NSLocalizedString("Failed to open file %@", comment: ""),
-                    errorDetail.userInfo["fileName"] ?? "")
-            )
+            return ToastMessage(key: "Failed to open file", args: [errorDetail.userInfo["fileName"] ?? ""])
         case .containerDataFileSavingFailed(let errorDetail):
-            return ToastMessage(
-                message: String(
-                    format: NSLocalizedString("Failed to save file %@", comment: ""),
-                    errorDetail.userInfo["fileName"] ?? "")
-            )
+            return ToastMessage(key: "Failed to save file", args: [errorDetail.userInfo["fileName"] ?? ""])
         case .alreadyInitialized:
-            return ToastMessage(message: NSLocalizedString("Libdigidocpp is already initialized", comment: ""))
+            return ToastMessage(key: "Libdigidocpp is already initialized")
         default:
-            return ToastMessage(message: NSLocalizedString("General error", comment: ""))
+            return ToastMessage(key: "General error")
         }
     }
 }

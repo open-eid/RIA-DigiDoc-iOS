@@ -11,20 +11,6 @@ struct SigningServicesSettingsView: View {
     @State private var selectedTab: Int = 0
 
     @State private var showSettingsBottomSheetFromButton = false
-    @State private var navigateToLanguageChooser = false
-    @State private var navigateToThemeChooser = false
-
-    private var settingsBottomSheetActions: [BottomSheetButton] {
-        SettingsMenuBottomSheetActions.actions(
-            currentPage: .advanced,
-            onLanguageChooserClick: {
-                navigateToLanguageChooser = true
-            },
-            onThemeChooserClick: {
-                navigateToThemeChooser = true
-            },
-        )
-    }
 
     var body: some View {
         TopBarContainer(
@@ -33,6 +19,7 @@ struct SigningServicesSettingsView: View {
             onRightSecondaryClick: {
                 showSettingsBottomSheetFromButton = true
             },
+            excludeDestinations: [.advanced],
             content: {
                 VStack(spacing: Dimensions.Padding.ZeroPadding) {
                     TabView(
@@ -43,10 +30,10 @@ struct SigningServicesSettingsView: View {
                         ],
                         content: {
                             if selectedTab == 0 {
-                                TimeStampSettings()
+                                TimeStampSettingsView()
                                     .padding(.horizontal, Dimensions.Padding.SPadding)
                             } else {
-                                MobileIDSmartIDSettings()
+                                MobileIDSmartIDSettingsView()
                                     .padding(.horizontal, Dimensions.Padding.SPadding)
                             }
                         }
@@ -55,16 +42,6 @@ struct SigningServicesSettingsView: View {
             }
         )
         .background(theme.surface)
-        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
-
-        NavigationLink(
-            destination: LanguageChooserView(),
-            isActive: $navigateToLanguageChooser
-        ) { }
-        NavigationLink(
-            destination: ThemeChooserView(),
-            isActive: $navigateToThemeChooser
-        ) { }
     }
 }
 

@@ -20,6 +20,7 @@ struct SigningViewModelTests {
     private let mockFileUtil: FileUtilProtocolMock
     private let mockFileOpeningService: FileOpeningServiceProtocolMock
     private let mockMimeTypeCache: MimeTypeCacheProtocolMock
+    private let mimeTypeDecoder: MimeTypeDecoderProtocolMock
     private let mockSivaRepository: SivaRepositoryProtocolMock
 
     init() async throws {
@@ -29,12 +30,14 @@ struct SigningViewModelTests {
         mockFileUtil = FileUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
         mockMimeTypeCache = MimeTypeCacheProtocolMock()
+        mimeTypeDecoder = MimeTypeDecoderProtocolMock()
         mockSivaRepository = SivaRepositoryProtocolMock()
 
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileOpeningService: mockFileOpeningService,
             mimeTypeCache: mockMimeTypeCache,
+            mimeTypeDecoder: mimeTypeDecoder,
             fileUtil: mockFileUtil,
             fileManager: mockFileManager,
             sivaRepository: mockSivaRepository
@@ -435,7 +438,7 @@ struct SigningViewModelTests {
         }
 
         #expect(viewModel.previewFile == nil)
-        #expect(errorKey == "Failed to open file %@")
+        #expect(errorKey == "Failed to open file")
         #expect(args == [testDataFile.fileName])
     }
 
@@ -481,7 +484,7 @@ struct SigningViewModelTests {
         let mockSignedContainerName = await mockSignedContainer.getContainerName()
 
         #expect(viewModel.previewFile == nil)
-        #expect(errorKey == "Failed to open container %@")
+        #expect(errorKey == "Failed to open container")
         #expect(args == [testDataFile.fileName])
         #expect(currentSignedContainerName == mockSignedContainerName)
     }
@@ -574,7 +577,7 @@ struct SigningViewModelTests {
 
         #expect(viewModel.selectedDataFile == nil)
         #expect(viewModel.isShowingFileSaver == false)
-        #expect(errorKey == "Failed to save file %@")
+        #expect(errorKey == "Failed to save file")
         #expect(args == [testFile.lastPathComponent])
     }
 
@@ -858,5 +861,84 @@ struct SigningViewModelTests {
 
         #expect(!isTimestampedContainer)
         #expect(mockSivaRepository.isTimestampedContainerCallCount == 2)
+    }
+
+    @Test
+    func getContainerNotifications_returnEmptyFileNotification() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isEmptyFileInContainerHandler = { true }
+
+        let notifications = await viewModel.getContainerNotifications(container: mockSignedContainer)
+
+        #expect(notifications.count == 1)
+        #expect(notifications.first == .emptyFile)
+    }
+
+    @Test
+    func getContainerNotifications_returnUnsupportedContainerNotification() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isEmptyFileInContainerHandler = {
+            return false
+        }
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
+            return Constants.MimeType.Ddoc
+        }
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.ddoc")
+        }
+
+        let notifications = await viewModel.getContainerNotifications(container: mockSignedContainer)
+
+        #expect(notifications.count == 1)
+        #expect(notifications.first == .unsupportedContainer)
+    }
+
+    @Test
+    func getContainerNotifications_returnUnknownSignaturesNotification() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isEmptyFileInContainerHandler = { false }
+        mockSignedContainer.getSignaturesStatusCountHandler = { [.unknown: 5, .invalid: 0] }
+
+        let notifications = await viewModel.getContainerNotifications(container: mockSignedContainer)
+
+        #expect(notifications.count == 1)
+        #expect(notifications.first == .unknownSignatures(count: 5))
+    }
+
+    @Test
+    func getContainerNotifications_returnInvalidSignaturesNotification() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isEmptyFileInContainerHandler = { false }
+        mockSignedContainer.getSignaturesStatusCountHandler = { [.unknown: 0, .invalid: 3] }
+
+        let notifications = await viewModel.getContainerNotifications(container: mockSignedContainer)
+
+        #expect(notifications.count == 1)
+        #expect(notifications.first == .invalidSignatures(count: 3))
+    }
+
+    @Test
+    func getContainerNotifications_returnMultipleConditionsNotifications() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isEmptyFileInContainerHandler = { true }
+        mockSignedContainer.getSignaturesStatusCountHandler = { [.unknown: 2, .invalid: 3] }
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
+            return Constants.MimeType.Ddoc
+        }
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.ddoc")
+        }
+
+        let notifications = await viewModel.getContainerNotifications(container: mockSignedContainer)
+
+        #expect(notifications.count == 4)
+        #expect(notifications ==
+                [
+                    .emptyFile,
+                    .unsupportedContainer,
+                    .unknownSignatures(count: 2),
+                    .invalidSignatures(count: 3)
+                ]
+        )
     }
 }

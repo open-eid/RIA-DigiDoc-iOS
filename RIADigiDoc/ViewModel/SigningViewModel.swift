@@ -19,11 +19,13 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var selectedDataFile: URL?
     @Published var isShowingFileSaver = false
     @Published var isTimestampedContainer = false
+    @Published private(set) var containerNotifications: [ContainerNotificationType] = []
     @Published private(set) var errorMessage: (String, [String])?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
     private let mimeTypeCache: MimeTypeCacheProtocol
+    private let mimeTypeDecoder: MimeTypeDecoderProtocol
     private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
     private let sivaRepository: SivaRepositoryProtocol
@@ -34,6 +36,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         sharedContainerViewModel: SharedContainerViewModelProtocol,
         fileOpeningService: FileOpeningServiceProtocol,
         mimeTypeCache: MimeTypeCacheProtocol,
+        mimeTypeDecoder: MimeTypeDecoderProtocol,
         fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol,
         sivaRepository: SivaRepositoryProtocol
@@ -41,6 +44,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileOpeningService = fileOpeningService
         self.mimeTypeCache = mimeTypeCache
+        self.mimeTypeDecoder = mimeTypeDecoder
         self.fileUtil = fileUtil
         self.fileManager = fileManager
         self.sivaRepository = sivaRepository
@@ -64,7 +68,29 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.containerURL = await openedContainer.getRawContainerFile()
         self.isTimestampedContainer = await isTimestampedContainer()
 
+        self.containerNotifications = await getContainerNotifications(container: openedContainer)
+
         SigningViewModel.logger.debug("Container data loaded")
+    }
+
+    func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
+        let signatureCounts = await container.getSignaturesStatusCount()
+
+        let unknownSignaturesCount = signatureCounts[.unknown] ?? 0
+        let invalidSignaturesCount = signatureCounts[.invalid] ?? 0
+
+        let isEmptyFileInContainer = await container.isEmptyFileInContainer()
+        let isUnsupportedContainer = await Constants.MimeType.Ddoc == container.getRawContainerFile()?.mimeType(
+            fileUtil: fileUtil,
+            mimeTypeDecoder: mimeTypeDecoder
+        )
+
+        return [
+            isEmptyFileInContainer ? .emptyFile : nil,
+            isUnsupportedContainer ? .unsupportedContainer : nil,
+            unknownSignaturesCount > 0 ? .unknownSignatures(count: unknownSignaturesCount) : nil,
+            invalidSignaturesCount > 0 ? .invalidSignatures(count: invalidSignaturesCount) : nil
+        ].compactMap { $0 }
     }
 
     func isSigned() -> Bool {
@@ -135,7 +161,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 switch digiDocError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = ("Failed to rename file %@", [errorDetail.userInfo["fileName"] ?? ""])
+                    errorMessage = ("Failed to rename file", [errorDetail.userInfo["fileName"] ?? ""])
                 default:
                     errorMessage = ("General error", [])
                 }
@@ -182,13 +208,13 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
                     SigningViewModel.logger.error("Failed to open nested container: \(error)")
-                    errorMessage = ("Failed to open container %@", [dataFile.fileName])
+                    errorMessage = ("Failed to open container", [dataFile.fileName])
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ("Failed to open file %@", [dataFile.fileName])
+            errorMessage = ("Failed to open file", [dataFile.fileName])
         }
     }
 
@@ -201,7 +227,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             isShowingFileSaver = true
 
         case .failure:
-            errorMessage = ("Failed to save file %@", [dataFile.fileName])
+            errorMessage = ("Failed to save file", [dataFile.fileName])
             isShowingFileSaver = false
         }
     }
@@ -213,7 +239,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ("Failed to open container %@", [dataFile.fileName])
+            errorMessage = ("Failed to open container", [dataFile.fileName])
             return false
         }
     }
@@ -243,11 +269,12 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     ) async -> Bool {
         let mimetype = await signedContainer?.getContainerMimetype() ?? Constants.MimeType.Container
         let name = await signedContainer?.getContainerName() ?? Constants.Container.DefaultName
+        let isEmptyFileInContainer = await signedContainer?.isEmptyFileInContainer() ?? false
 
         return signedContainer != nil &&
         (!Constants.MimeType.UnsignableContainers.contains(mimetype)) &&
         (!Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension)) &&
-        !isNestedContainer
+        !isNestedContainer && !isEmptyFileInContainer
     }
 
     func isEncryptButtonShown(

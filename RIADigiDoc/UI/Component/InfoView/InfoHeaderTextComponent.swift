@@ -13,10 +13,10 @@ struct InfoHeaderTextComponent: View {
             Text(languageSettings.localized("Main about ria digidoc title"))
                 .font(typography.titleLarge)
                 .foregroundStyle(theme.onSurface)
-            Text(String(
-                 format: languageSettings.localized("Main about version title %@"),
-                 BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
-             ))
+            Text(verbatim: languageSettings.localized(
+                "Main about version title",
+                [BundleUtil.getAppVersion()]
+            ))
                 .font(typography.bodyMedium)
                 .foregroundStyle(theme.onSurfaceVariant)
             Text(languageSettings.localized("Main about info"))

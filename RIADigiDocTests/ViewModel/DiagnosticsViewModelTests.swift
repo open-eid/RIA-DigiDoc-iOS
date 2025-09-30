@@ -118,9 +118,9 @@ final class DiagnosticsViewModelTests {
     }
 
     private func setupLocalizedHandler(for mockLanguageSettings: LanguageSettingsProtocolMock) {
-        mockLanguageSettings.localizedHandler = { key in
+        mockLanguageSettings.localizedHandler = { key, _ in
             switch key {
-            case "Main diagnostics operating system ios %@": return "iOS: %@"
+            case "Main diagnostics operating system ios": return "iOS: "
             case "Main diagnostics configuration last check date": return "LAST CHECK"
             case "Main diagnostics configuration update date": return "UPDATE DATE"
             default: return key

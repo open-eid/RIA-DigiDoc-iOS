@@ -77,7 +77,8 @@ struct FileOpeningView: View {
 
     @MainActor
     private func handleFileOpening() async {
-        if viewModel.errorMessage == nil {
+        let errorMessage = viewModel.errorMessage
+        if errorMessage == nil {
             isFileOpeningLoading = viewModel.isFileOpeningLoading
             isNavigatingToNextView = viewModel.isNavigatingToNextView
 
@@ -93,7 +94,7 @@ struct FileOpeningView: View {
                 Toast.show(message)
             }
         } else {
-            Toast.show(languageSettings.localized(viewModel.errorMessage?.message ?? "General error"))
+            Toast.show(languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? []))
             viewModel.handleError()
             isFileOpeningLoading = viewModel.isFileOpeningLoading
             isNavigatingToNextView = viewModel.isNavigatingToNextView
