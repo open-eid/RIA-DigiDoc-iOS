@@ -27,7 +27,7 @@ import BigInt
 import CryptoTokenKit
 
 @MainActor
-class NFCConnection {
+public class NFCConnection {
     func setup(_ session: NFCTagReaderSession, tags: [NFCTag]) async throws -> NFCISO7816Tag {
         if tags.count > 1 {
             session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")

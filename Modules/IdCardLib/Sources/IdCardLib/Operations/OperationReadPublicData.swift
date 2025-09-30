@@ -28,7 +28,7 @@ import CryptoTokenKit
 internal import SwiftECC
 import BigInt
 
-@MainActor final class OperationReadPublicData: NSObject {
+@MainActor final public class OperationReadPublicData: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
     // TODO: Use a proper message that is localised
@@ -54,7 +54,7 @@ import BigInt
 }
 
 extension OperationReadPublicData: @MainActor NFCTagReaderSessionDelegate {
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task {
             do {
                 session.alertMessage = "Hoidke ID-kaarti vastu nutiseadet kuni andmeid loetakse."
@@ -72,9 +72,9 @@ extension OperationReadPublicData: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }

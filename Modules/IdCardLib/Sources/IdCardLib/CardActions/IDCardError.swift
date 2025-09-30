@@ -28,7 +28,7 @@ public enum IdCardError: Error {
          sessionError
 }
 
-enum IdCardInternalError: Error {
+public enum IdCardInternalError: Error {
     case missingRESTag,
          missingMACTag,
          invalidMACValue,
@@ -56,7 +56,7 @@ enum IdCardInternalError: Error {
          sessionInvalidated,
          notSupportedAlgorithm
 
-    func getIdCardError() -> IdCardError {
+    public func getIdCardError() -> IdCardError {
         switch self {
         case .missingRESTag,
                 .missingMACTag,
@@ -93,7 +93,7 @@ enum IdCardInternalError: Error {
     }
 }
 
-struct PinError: Error {
+public struct PinError: Error {
     let msg: String
     let remainingCount: Int
 }

@@ -30,7 +30,7 @@ import BigInt
 import CryptoKit
 
 @MainActor
-class OperationSignHash: NSObject {
+public class OperationSignHash: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
     private var PIN: String = ""
@@ -75,7 +75,7 @@ class OperationSignHash: NSObject {
 }
 
 extension OperationSignHash: @MainActor NFCTagReaderSessionDelegate {
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
 
         Task { @MainActor in
             do {
@@ -98,9 +98,9 @@ extension OperationSignHash: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }

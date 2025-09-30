@@ -37,7 +37,7 @@ public enum ReadCertificateError: Error {
     case general
 }
 
-enum CertificateUsage {
+public enum CertificateUsage {
     case auth
     case sign
 }
@@ -47,7 +47,7 @@ extension NFCTagReaderSession: @unchecked @retroactive Sendable {}
 extension NFCTag: @unchecked @retroactive Sendable {}
 
 @MainActor
-class OperationReadCertificate: NSObject {
+public class OperationReadCertificate: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
     private var certUsage: CertificateUsage!
@@ -76,7 +76,7 @@ class OperationReadCertificate: NSObject {
 }
 
 extension OperationReadCertificate: NFCTagReaderSessionDelegate {
-    nonisolated func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    nonisolated public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
             defer {
                 self.session = nil
@@ -115,9 +115,9 @@ extension OperationReadCertificate: NFCTagReaderSessionDelegate {
         }
     }
 
-    nonisolated func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+    nonisolated public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    nonisolated func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    nonisolated public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         Task { @MainActor in
             self.session = nil
         }

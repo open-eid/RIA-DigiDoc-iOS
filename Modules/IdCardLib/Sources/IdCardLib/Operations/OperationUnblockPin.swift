@@ -36,7 +36,7 @@ public enum UnblockPINError: Error {
 }
 
 @MainActor
-class OperationUnblockPin: NSObject {
+public class OperationUnblockPin: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
     private var codeType: CodeType?
@@ -68,7 +68,7 @@ class OperationUnblockPin: NSObject {
 }
 
 extension OperationUnblockPin: @MainActor NFCTagReaderSessionDelegate {
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor [weak self] in
             guard let self else { return }
             defer {
@@ -100,9 +100,9 @@ extension OperationUnblockPin: @MainActor NFCTagReaderSessionDelegate {
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 }

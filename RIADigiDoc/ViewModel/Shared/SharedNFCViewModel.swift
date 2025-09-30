@@ -1,27 +1,104 @@
 import Foundation
+import Foundation
+import Security
+import CoreNFC
 import nfclib
 
 @MainActor
 class SharedNFCViewModel: SharedNFCViewModelProtocol, ObservableObject {
-    let cardOperator = Operator()
-    @Published var cardInfo: CardInfo?
-    @Published var webEidData: WebEidData?
-    @Published var authCert: String?
-    @Published var signingCert: String?
-    @Published var signingResult: String?
-    @Published var hashedData: Data?
-    @Published var hashedDataString: String?
-    
-    func readSigningCertificate(can: String) async {
+    public func isNFCSupported() -> Bool {
+        NFCTagReaderSession.readingAvailable
+    }
+
+    public func readPublicInfo(CAN: String) async throws -> CardInfo {
         do {
-            let cert = try await cardOperator.readSigningCertificate(CAN: can)
-            guard let certSummary = SecCertificateCopySubjectSummary(cert) as? String else {
-                self.signingCert = "Failed!"
-                return
-            }
-            self.signingCert = "summary: \(certSummary)"
+            let result = try await OperationReadPublicData().startReading(CAN: CAN)
+            return result
         } catch {
-            // Handle error here
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func readAuthenticationCertificate(CAN: String) async throws -> SecCertificate {
+        do {
+            let cert = try await OperationReadCertificate().startReading(CAN: CAN, certUsage: .auth)
+            return cert
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func readSigningCertificate(CAN: String) async throws -> SecCertificate {
+        do {
+            let cert = try await OperationReadCertificate().startReading(CAN: CAN, certUsage: .sign)
+            return cert
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func loadWebEIDAuthenticationData(
+        CAN: String,
+        pin1: String,
+        challenge: String,
+        origin: String
+    ) async throws -> WebEidData {
+        do {
+            let webEidData = try await OperationAuthenticateWithWebEID(
+                CAN: CAN,
+                pin1: pin1,
+                challenge: challenge,
+                origin: origin
+            ).startReading()
+            return webEidData
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func sign(CAN: String, hash: Data, pin2: String) async throws -> Data {
+        do {
+            let signature = try await OperationSignHash().startSigning(CAN: CAN, PIN2: pin2, hash: hash)
+            return signature
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func unblockPin1(CAN: String, puk: String, newCode: String) async throws {
+        do {
+            try await OperationUnblockPin().startReading(CAN: CAN, codeType: .pin1, puk: puk, newPin: newCode)
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
+    public func unblockPin2(CAN: String, puk: String, newCode: String) async throws {
+        do {
+            try await OperationUnblockPin().startReading(CAN: CAN, codeType: .pin2, puk: puk, newPin: newCode)
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
         }
     }
 }

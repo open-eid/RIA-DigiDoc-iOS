@@ -30,7 +30,7 @@ import BigInt
 import Security
 internal import X509
 
-enum AuthenticateWithWebEidError: Error {
+public enum AuthenticateWithWebEidError: Error {
     case failedToReadPublicKey
     case failedToDetermineAlgorithm
     case failedToHashData
@@ -40,7 +40,7 @@ enum AuthenticateWithWebEidError: Error {
 }
 
 @MainActor
-class OperationAuthenticateWithWebEID: NSObject {
+public class OperationAuthenticateWithWebEID: NSObject {
     private let CAN: String
     private let pin1: String
     private let challenge: String
@@ -50,7 +50,7 @@ class OperationAuthenticateWithWebEID: NSObject {
     private var session: NFCTagReaderSession?
     private var continuation: CheckedContinuation<WebEidData, Error>?
 
-    init(CAN: String, pin1: String, challenge: String, origin: String) {
+    public init(CAN: String, pin1: String, challenge: String, origin: String) {
         self.CAN = CAN
         self.pin1 = pin1
         self.challenge = challenge
@@ -93,7 +93,7 @@ class OperationAuthenticateWithWebEID: NSObject {
 }
 
 extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegate {
-    func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor [weak self] in
             guard let self else { return }
             defer {
@@ -188,7 +188,7 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
         }
     }
 
-    func getAlgorithmNameTypeAndLength(from key: SecKey) -> (algorithm: String, keyLength: Int)? {
+    public func getAlgorithmNameTypeAndLength(from key: SecKey) -> (algorithm: String, keyLength: Int)? {
         // Get the algorithm type from the key
         if let algorithmAttributes = SecKeyCopyAttributes(key) as? [String: Any], let algorithmType =
             algorithmAttributes[kSecAttrKeyType as String] as? String {
@@ -214,13 +214,13 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
         }
     }
 
-    func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
+    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
         self.session = nil
     }
 
-    func mapToAlgorithm(algorithm: String, bitLength: Int) -> String? {
+    public func mapToAlgorithm(algorithm: String, bitLength: Int) -> String? {
         switch algorithm {
         case ecAlgorithmName:
             return "ES\(bitLength)"
@@ -232,7 +232,7 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
     }
 }
 
-struct SignatureAlgorithmInfo {
+public struct SignatureAlgorithmInfo {
     let name: String
     let bitSize: Int
 }
