@@ -12,7 +12,7 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
@@ -106,81 +106,71 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                 updateAlertMessage(step: 2)
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: CAN)
 
-                do {
-                    updateAlertMessage(step: 3)
-                    let certBytes = try await cardCommands.readAuthenticationCertificate()
-                    let authCertificate = try convertBytesToX509Certificate(certBytes)
-                    
-                    // assuming authCertificate is `Certificate` from Swift-Certificates
-                    let certificate = try Certificate(authCertificate)
-                    let notAfter = certificate.notValidAfter
-                    let notBefore = certificate.notValidBefore
+                updateAlertMessage(step: 3)
+                let certBytes = try await cardCommands.readAuthenticationCertificate()
+                let authCertificate = try convertBytesToX509Certificate(certBytes)
 
-                    guard Date() >= notBefore else {
-                        let errorMessage = "Sertifikaat pole veel kehtiv"
-                        session.invalidate(errorMessage: errorMessage)
-                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateNotYetValid)
-                        return
-                    }
+                // assuming authCertificate is `Certificate` from Swift-Certificates
+                let certificate = try Certificate(authCertificate)
+                let notAfter = certificate.notValidAfter
+                let notBefore = certificate.notValidBefore
 
-                    guard Date() <= notAfter else {
-                        let errorMessage = "Sertifikaat on aegunud"
-                        session.invalidate(errorMessage: errorMessage)
-                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateExpired)
-                        return
-                    }
-                    
-                    guard let publicKey = SecCertificateCopyKey(authCertificate) else {
-                        // TODO: Failed to process public key, handle error
-                        let errorMessage = "Andmete lugemine ebaõnnestus"
-                        session.invalidate(errorMessage: errorMessage)
-                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedToReadPublicKey)
-                        return
-                    }
-
-                    guard let keyAlgorithmData = getAlgorithmNameTypeAndLength(from: publicKey) else {
-                        // TODO: Implement error handling
-                        let errorMessage = "Andmete lugemine ebaõnnestus"
-                        session.invalidate(errorMessage: errorMessage)
-                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedToDetermineAlgorithm)
-                        return
-                    }
-
-                    guard let hashLength = hashLengthFromInt(keyAlgorithmData.keyLength),
-                          let originData = origin.data(using: .utf8),
-                          let challengeData = challenge.data(using: .utf8),
-                          let originHash = sha(hashLength: hashLength, data: originData),
-                          let challengeHash = sha(hashLength: hashLength, data: challengeData),
-                          let webEidHash = sha(hashLength: hashLength, data: originHash + challengeHash)
-                    else {
-                        let errorMessage = "Andmete lugemine ebaõnnestus"
-                        session.invalidate(errorMessage: errorMessage)
-                        continuation?.resume(throwing: AuthenticateWithWebEidError.failedToHashData)
-                        return
-                    }
-
-                    do {
-                        updateAlertMessage(step: 4)
-                        let authResult = try await cardCommands.authenticate(for: webEidHash, withPin1: pin1)
-                        let signingCertificateBytes = try await cardCommands.readSignatureCertificate()
-
-                        let webEidData = WebEidData(
-                            unverifiedCertificate: certBytes.base64EncodedString(),
-                            algorithm: keyAlgorithmData.algorithm,
-                            signature: authResult.base64EncodedString(),
-                            signingCertificate: signingCertificateBytes.base64EncodedString()
-                        )
-                        continuation?.resume(returning: webEidData)
-                        session.alertMessage = "Andmed loetud"
-                        session.invalidate()
-                    } catch {
-                        session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
-                        continuation?.resume(throwing: error)
-                    }
-                } catch {
-                    session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
-                    continuation?.resume(throwing: error)
+                guard Date() >= notBefore else {
+                    let errorMessage = "Sertifikaat pole veel kehtiv"
+                    session.invalidate(errorMessage: errorMessage)
+                    continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateNotYetValid)
+                    return
                 }
+
+                guard Date() <= notAfter else {
+                    let errorMessage = "Sertifikaat on aegunud"
+                    session.invalidate(errorMessage: errorMessage)
+                    continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateExpired)
+                    return
+                }
+
+                guard let publicKey = SecCertificateCopyKey(authCertificate) else {
+                    // TODO: Failed to process public key, handle error
+                    let errorMessage = "Andmete lugemine ebaõnnestus"
+                    session.invalidate(errorMessage: errorMessage)
+                    continuation?.resume(throwing: AuthenticateWithWebEidError.failedToReadPublicKey)
+                    return
+                }
+
+                guard let keyAlgorithmData = getAlgorithmNameTypeAndLength(from: publicKey) else {
+                    // TODO: Implement error handling
+                    let errorMessage = "Andmete lugemine ebaõnnestus"
+                    session.invalidate(errorMessage: errorMessage)
+                    continuation?.resume(throwing: AuthenticateWithWebEidError.failedToDetermineAlgorithm)
+                    return
+                }
+
+                guard let hashLength = hashLengthFromInt(keyAlgorithmData.keyLength),
+                      let originData = origin.data(using: .utf8),
+                      let challengeData = challenge.data(using: .utf8),
+                      let originHash = sha(hashLength: hashLength, data: originData),
+                      let challengeHash = sha(hashLength: hashLength, data: challengeData),
+                      let webEidHash = sha(hashLength: hashLength, data: originHash + challengeHash)
+                else {
+                    let errorMessage = "Andmete lugemine ebaõnnestus"
+                    session.invalidate(errorMessage: errorMessage)
+                    continuation?.resume(throwing: AuthenticateWithWebEidError.failedToHashData)
+                    return
+                }
+
+                updateAlertMessage(step: 4)
+                let authResult = try await cardCommands.authenticate(for: webEidHash, withPin1: pin1)
+                let signingCertificateBytes = try await cardCommands.readSignatureCertificate()
+
+                let webEidData = WebEidData(
+                    unverifiedCertificate: certBytes.base64EncodedString(),
+                    algorithm: keyAlgorithmData.algorithm,
+                    signature: authResult.base64EncodedString(),
+                    signingCertificate: signingCertificateBytes.base64EncodedString()
+                )
+                continuation?.resume(returning: webEidData)
+                session.alertMessage = "Andmed loetud"
+                session.invalidate()
             } catch {
                 session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
                 continuation?.resume(throwing: error)

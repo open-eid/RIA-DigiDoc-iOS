@@ -12,7 +12,7 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
@@ -195,7 +195,7 @@ class CardReaderNFC: CardReader {
         }
     }
 
-    private func getDO87(_ apdu: NFCISO7816APDU, _ DO87: Data) throws -> Data {
+    private func getDO87(_ apdu: NFCISO7816APDU) throws -> Data {
         if let data = apdu.data, !data.isEmpty {
             let ivValue = try AES.CBC(key: ksEnc).encrypt(SSC)
             let encData = try AES.CBC(key: ksEnc, ivVal: ivValue).encrypt(data.addPadding())
@@ -205,7 +205,7 @@ class CardReaderNFC: CardReader {
         }
     }
 
-    private func getDO97(_ apdu: NFCISO7816APDU, _ DO97: Data) throws -> Data {
+    private func getDO97(_ apdu: NFCISO7816APDU) throws -> Data {
         if apdu.expectedResponseLength > 0 {
             return TLV(
                 tag: 0x97,
@@ -220,19 +220,16 @@ class CardReaderNFC: CardReader {
 
     private func getTLVs(
         _ response: Data,
-        _ tlvEnc: TKTLVRecord?,
-        _ tlvRes: TKTLVRecord?,
-        _ tlvMac: TKTLVRecord?
     ) throws -> (tlvEnc: TKTLVRecord?, tlvRes: TKTLVRecord?, tlvMac: TKTLVRecord?) {
         for tlv in TLV.sequenceOfRecords(from: response) ?? [] {
             switch tlv.tag {
-            case 0x87: return (tlv, tlvRes, tlvMac)
-            case 0x99: return (tlvEnc, tlv, tlvMac)
-            case 0x8E: return (tlvEnc, tlvRes, tlv)
+            case 0x87: return (tlv, nil, nil)
+            case 0x99: return (nil, tlv, nil)
+            case 0x8E: return (nil, nil, tlv)
             default: print("Unknown tag")
             }
         }
-        return (tlvEnc, tlvRes, tlvMac)
+        return (nil, nil, nil)
     }
 
     func transmit(_ apduData: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
@@ -242,9 +239,9 @@ class CardReaderNFC: CardReader {
         }
         _ = SSC.increment()
         var DO87: Data = Data()
-        DO87 = try getDO87(apdu, DO87)
+        DO87 = try getDO87(apdu)
         var DO97: Data = Data()
-        DO97 = try getDO97(apdu, DO97)
+        DO97 = try getDO97(apdu)
         let cmdHeader: Bytes = [apdu.instructionClass | 0x0C, apdu.instructionCode, apdu.p1Parameter, apdu.p2Parameter]
         let MValue = cmdHeader.addPadding() + DO87 + DO97
         let NValue = SSC + MValue
@@ -262,7 +259,7 @@ class CardReaderNFC: CardReader {
         var tlvEnc: TKTLVRecord?
         var tlvRes: TKTLVRecord?
         var tlvMac: TKTLVRecord?
-        (tlvEnc, tlvRes, tlvMac) = try getTLVs(response, tlvEnc, tlvRes, tlvMac)
+        (tlvEnc, tlvRes, tlvMac) = try getTLVs(response)
         guard let tlvRes else {
             throw IdCardInternalError.missingRESTag
         }

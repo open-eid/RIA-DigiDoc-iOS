@@ -1,5 +1,4 @@
 import Foundation
-import Foundation
 import Security
 import CoreNFC
 import nfclib
