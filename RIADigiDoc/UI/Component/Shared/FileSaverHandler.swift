@@ -29,16 +29,10 @@ struct FileSaverHandler: View {
         switch result {
         case .success:
             isFileSaved = true
-            resultMessage = String(
-                format: languageSettings.localized("File %@ saved"),
-                fileURL.lastPathComponent
-            )
+            resultMessage = languageSettings.localized("File saved", [fileURL.lastPathComponent])
         case .failure:
             isFileSaved = false
-            resultMessage = String(
-                format: languageSettings.localized("Failed to save file %@"),
-                fileURL.lastPathComponent
-            )
+            resultMessage = languageSettings.localized("Failed to save file", [fileURL.lastPathComponent])
         }
 
         Toast.show(resultMessage)

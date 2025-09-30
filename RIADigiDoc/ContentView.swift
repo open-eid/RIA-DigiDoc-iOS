@@ -19,10 +19,6 @@ struct ContentView: View {
     @State private var navigateToInfo = false
     @State private var navigateToDiagnostics = false
 
-    @State private var navigateToLanguageChooser = false
-    @State private var navigateToThemeChooser = false
-    @State private var navigateToAdvancedSettings = false
-
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
             onInfoClick: {
@@ -33,20 +29,6 @@ struct ContentView: View {
             },
             onDiagnosticsClick: {
                 navigateToDiagnostics = true
-            }
-        )
-    }
-
-    private var settingsBottomSheetActions: [BottomSheetButton] {
-        SettingsMenuBottomSheetActions.actions(
-            onLanguageChooserClick: {
-                navigateToLanguageChooser = true
-            },
-            onThemeChooserClick: {
-                navigateToThemeChooser = true
-            },
-            onAdvancedSettingsClick: {
-                navigateToAdvancedSettings = true
             }
         )
     }
@@ -64,9 +46,6 @@ struct ContentView: View {
             onLeftClick: {
                 showHomeMenuBottomSheetFromButton = true
             },
-            onRightSecondaryClick: {
-                showSettingsBottomSheetFromButton = true
-            },
             content: {
                 ScrollView {
                     VStack {
@@ -83,19 +62,6 @@ struct ContentView: View {
                         NavigationLink(
                             destination: DiagnosticsView(),
                             isActive: $navigateToDiagnostics
-                        ) { }
-
-                        NavigationLink(
-                            destination: LanguageChooserView(),
-                            isActive: $navigateToLanguageChooser
-                        ) { }
-                        NavigationLink(
-                            destination: ThemeChooserView(),
-                            isActive: $navigateToThemeChooser
-                        ) { }
-                        NavigationLink(
-                            destination: AdvancedSettingsView(),
-                            isActive: $navigateToAdvancedSettings
                         ) { }
 
                         Spacer()
@@ -124,8 +90,6 @@ struct ContentView: View {
             }
         )
         .bottomSheet(isPresented: $showHomeMenuBottomSheetFromButton, actions: homeMenuBottomSheetActions)
-        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
-
     }
 }
 

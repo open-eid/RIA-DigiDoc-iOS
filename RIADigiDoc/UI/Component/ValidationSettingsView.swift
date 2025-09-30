@@ -12,20 +12,6 @@ struct ValidationSettingsView: View {
 
     // MARK: - Bottom sheet navigation
     @State private var showSettingsBottomSheetFromButton = false
-    @State private var navigateToLanguageChooser = false
-    @State private var navigateToThemeChooser = false
-
-    private var settingsBottomSheetActions: [BottomSheetButton] {
-        SettingsMenuBottomSheetActions.actions(
-            currentPage: .advanced,
-            onLanguageChooserClick: {
-                navigateToLanguageChooser = true
-            },
-            onThemeChooserClick: {
-                navigateToThemeChooser = true
-            },
-        )
-    }
 
     @StateObject private var viewModel: ValidationSettingsViewModel
 
@@ -40,6 +26,7 @@ struct ValidationSettingsView: View {
             onRightSecondaryClick: {
                 showSettingsBottomSheetFromButton = true
             },
+            excludeDestinations: [.advanced],
             content: {
                 VStack(spacing: Dimensions.Padding.ZeroPadding) {
                     AdvancedSettingsSectionColumn(
@@ -90,7 +77,6 @@ struct ValidationSettingsView: View {
             }
         )
         .background(theme.surface)
-        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
@@ -122,16 +108,6 @@ struct ValidationSettingsView: View {
                 isActive: $navigateToCertificateView,
             ) { }
         }
-
-        // MARK: - Bottom sheet navigation links
-        NavigationLink(
-            destination: LanguageChooserView(),
-            isActive: $navigateToLanguageChooser
-        ) { }
-        NavigationLink(
-            destination: ThemeChooserView(),
-            isActive: $navigateToThemeChooser
-        ) { }
     }
 }
 

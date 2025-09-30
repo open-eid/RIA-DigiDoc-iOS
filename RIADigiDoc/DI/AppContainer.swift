@@ -76,6 +76,7 @@ extension Container {
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileOpeningService: self.fileOpeningService(),
                 mimeTypeCache: self.mimeTypeCache(),
+                mimeTypeDecoder: self.mimeTypeDecoder(),
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager(),
                 sivaRepository: self.sivaRepository()

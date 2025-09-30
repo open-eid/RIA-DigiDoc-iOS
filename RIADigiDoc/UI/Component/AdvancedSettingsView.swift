@@ -9,26 +9,10 @@ struct AdvancedSettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @State private var navigateToSigningServicesSettings: Bool = false
     @State private var checkedAskRoleAndAddress: Bool = false
 
-    @State private var navigateToSigningServicesSettings = false
     @State private var navigateToValidationSettings = false
-
-    @State private var showSettingsBottomSheetFromButton = false
-    @State private var navigateToLanguageChooser = false
-    @State private var navigateToThemeChooser = false
-
-    private var settingsBottomSheetActions: [BottomSheetButton] {
-        SettingsMenuBottomSheetActions.actions(
-            currentPage: .advanced,
-            onLanguageChooserClick: {
-                navigateToLanguageChooser = true
-            },
-            onThemeChooserClick: {
-                navigateToThemeChooser = true
-            },
-        )
-    }
 
     var body: some View {
         TopBarContainer(
@@ -36,9 +20,7 @@ struct AdvancedSettingsView: View {
             onLeftClick: {
                 dismiss()
             },
-            onRightSecondaryClick: {
-                showSettingsBottomSheetFromButton = true
-            },
+            excludeDestinations: [.advanced],
             content: {
                 ScrollView {
                     VStack(spacing: Dimensions.Padding.ZeroPadding) {
@@ -106,16 +88,6 @@ struct AdvancedSettingsView: View {
             }
         )
         .background(theme.surface)
-        .bottomSheet(isPresented: $showSettingsBottomSheetFromButton, actions: settingsBottomSheetActions)
-
-        NavigationLink(
-            destination: LanguageChooserView(),
-            isActive: $navigateToLanguageChooser
-        ) { }
-        NavigationLink(
-            destination: ThemeChooserView(),
-            isActive: $navigateToThemeChooser
-        ) { }
     }
 }
 

@@ -1,7 +1,7 @@
 import SwiftUI
 import FactoryKit
 
-struct TimeStampSettings: View {
+struct TimeStampSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
@@ -94,7 +94,7 @@ struct TimeStampSettings: View {
 // MARK: - Preview
 
 #Preview {
-    TimeStampSettings()
+    TimeStampSettingsView()
         .environmentObject(Container.shared.languageSettings())
         .environmentObject(Container.shared.themeSettings())
 }

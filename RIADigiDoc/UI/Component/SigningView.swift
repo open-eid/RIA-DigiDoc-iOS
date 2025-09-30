@@ -34,6 +34,8 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
+    @State private var isNavigatingToContainerNotificationsView = false
+
     private var containerTitle: String {
         !isContainerSigned && !isNestedContainer ?
         languageSettings.localized("Container signing") :
@@ -109,6 +111,11 @@ struct SigningView: View {
                             dismiss()
                         }
                     }
+                },
+                showExtraButton: !viewModel.containerNotifications.isEmpty,
+                extraBadgeCount: viewModel.containerNotifications.count,
+                onExtraButtonClick: {
+                    isNavigatingToContainerNotificationsView = true
                 },
                 content: {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
@@ -319,6 +326,13 @@ struct SigningView: View {
                     }
                 )
             }
+
+            NavigationLink(
+                destination: ContainerNotificationsView(
+                    notifications: viewModel.containerNotifications
+                ),
+                isActive: $isNavigatingToContainerNotificationsView
+            ) {}
         }
         .animation(.easeInOut, value: showRenameDialog)
         .onReceive(viewModel.$errorMessage) { error in

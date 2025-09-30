@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
 		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
-		1A95E79B2E8575B200F07E49 /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
+		DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
@@ -128,6 +128,7 @@
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/FileItem.swift,
+				Domain/Model/Notification/ContainerNotificationType.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Model/SettingsMenuBottomSheetPages.swift,
 				Domain/Model/SupportedLanguage.swift,
@@ -338,7 +339,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A95E79B2E8575B200F07E49 /* CommonsTestShared in Frameworks */,
+				DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */,
 				DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */,
 				DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */,
 				DFAABD002E82AF0900906874 /* ConfigLibMocks in Frameworks */,
@@ -379,8 +380,8 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				1A1548DE2E85801500DC2339 /* IdCardLib */,
 				DFCF22F92E83512D0015AE6B /* Test */,
+				1A1548DE2E85801500DC2339 /* IdCardLib */,
 				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
 				DF67D4F92D28531600F09EB9 /* ConfigLib */,
 				DF17B64D2CE26949009B1E17 /* UtilsLib */,

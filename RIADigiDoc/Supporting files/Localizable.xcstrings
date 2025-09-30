@@ -268,6 +268,24 @@
         }
       }
     },
+    "Container notifications" : {
+      "comment" : "Container notifications view title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container notifications"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku teavitused"
+          }
+        }
+      }
+    },
     "Container signatures" : {
       "comment" : "Signing view container signatures title",
       "extractionState" : "manual",
@@ -394,6 +412,24 @@
         }
       }
     },
+    "Empty file in container" : {
+      "comment" : "Empty file message in container notifications",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An empty file is attached to the envelope. Remove the empty file from the container to sign."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbrikule on lisatud tühi fail. Allkirjastamiseks eemalda ümbrikust tühi fail."
+          }
+        }
+      }
+    },
     "Encrypt" : {
       "comment" : "Encrypt button",
       "extractionState" : "manual",
@@ -412,7 +448,7 @@
         }
       }
     },
-    "Failed to open container %@" : {
+    "Failed to open container" : {
       "comment" : "Error message when unable to create a new container",
       "extractionState" : "manual",
       "localizations" : {
@@ -430,7 +466,7 @@
         }
       }
     },
-    "Failed to open file %@" : {
+    "Failed to open file" : {
       "comment" : "Error when adding a datafile to container",
       "extractionState" : "manual",
       "localizations" : {
@@ -448,7 +484,7 @@
         }
       }
     },
-    "Failed to rename file %@" : {
+    "Failed to rename file" : {
       "comment" : "Error when renaming a container",
       "extractionState" : "manual",
       "localizations" : {
@@ -466,8 +502,9 @@
         }
       }
     },
-    "Failed to save file %@" : {
+    "Failed to save file" : {
       "comment" : "Error message when unable to save file",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -483,7 +520,7 @@
         }
       }
     },
-    "File %@ saved" : {
+    "File saved" : {
       "comment" : "Alert success message for file saving",
       "extractionState" : "manual",
       "localizations" : {
@@ -660,6 +697,48 @@
         }
       }
     },
+    "Invalid signature %d" : {
+      "comment" : "Invalid signature message in container notificatins",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d invalid signature"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d invalid signatures"
+                }
+              }
+            }
+          }
+        },
+        "et" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d allkiri ei kehti"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d allkirja ei kehti"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Libdigidocpp is already initialized" : {
       "comment" : "Meant to be shown in logging only",
       "localizations" : {
@@ -820,7 +899,7 @@
         }
       }
     },
-    "Main about version title %@" : {
+    "Main about version title" : {
       "comment" : "Main about version title",
       "extractionState" : "manual",
       "localizations" : {
@@ -1450,7 +1529,7 @@
         }
       }
     },
-    "Main diagnostics operating system ios %@" : {
+    "Main diagnostics operating system ios" : {
       "comment" : "Main diagnostics operating system ios",
       "extractionState" : "manual",
       "localizations" : {
@@ -1864,7 +1943,7 @@
         }
       }
     },
-    "Main home version %@" : {
+    "Main home version" : {
       "comment" : "Main home version",
       "extractionState" : "manual",
       "localizations" : {
@@ -3311,7 +3390,7 @@
         }
       }
     },
-    "Signed %@ at %@" : {
+    "Signed at" : {
       "comment" : "Signed date and time",
       "extractionState" : "manual",
       "localizations" : {
@@ -3595,6 +3674,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajatempliteenuse sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "Unknown signature" : {
+      "comment" : "Unknown signature message in container notifications",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d unknown signature"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d unknown signatures"
+                }
+              }
+            }
+          }
+        },
+        "et" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d allkiri on teadmata"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d allkirja on teadmata"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Unsupported container" : {
+      "comment" : "Unsupported container message in container notifications, like DDOC",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The current file is a DigiDoc container that is not supported officially any longer. You are not allowed to add or remove signatures to this container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tegemist on vanas formaadis DigiDoc ümbrikuga. Sellele ümbrikule ei saa allkirja lisada ega eemaldada."
+          }
+        }
+      }
+    },
+    "Valid signature %d" : {
+      "comment" : "Used as an announcement with VoiceOver",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d valid signature"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d valid signatures"
+                }
+              }
+            }
+          }
+        },
+        "et" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d kehtiv allkiri"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d kehtivat allkirja"
+                }
+              }
+            }
           }
         }
       }

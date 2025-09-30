@@ -65,6 +65,29 @@ public actor SignedContainer: SignedContainerProtocol {
         return await !container.getSignatures().isEmpty
     }
 
+    public func getSignaturesStatusCount() async -> [SignatureStatus: Int] {
+        var counts: [SignatureStatus: Int] = [
+            .valid: 0,
+            .unknown: 0,
+            .invalid: 0
+        ]
+
+        let signatures = await getSignatures()
+
+        for signature in signatures {
+            let status = signature.status
+            counts[status, default: 0] += 1
+        }
+
+        return counts
+    }
+
+    public func isEmptyFileInContainer() async -> Bool {
+        await getDataFiles().contains { dataFile in
+            dataFile.fileSize == 0
+        }
+    }
+
     @discardableResult
     public func renameContainer(to newName: String) async throws -> URL {
 
