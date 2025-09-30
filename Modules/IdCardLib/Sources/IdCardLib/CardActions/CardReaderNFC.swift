@@ -221,15 +221,18 @@ class CardReaderNFC: CardReader {
     private func getTLVs(
         _ response: Data,
     ) throws -> (tlvEnc: TKTLVRecord?, tlvRes: TKTLVRecord?, tlvMac: TKTLVRecord?) {
+        var tlvEnc: TKTLVRecord?
+        var tlvRes: TKTLVRecord?
+        var tlvMac: TKTLVRecord?
         for tlv in TLV.sequenceOfRecords(from: response) ?? [] {
             switch tlv.tag {
-            case 0x87: return (tlv, nil, nil)
-            case 0x99: return (nil, tlv, nil)
-            case 0x8E: return (nil, nil, tlv)
+            case 0x87: tlvEnc = tlv
+            case 0x99: tlvRes = tlv
+            case 0x8E: tlvMac = tlv
             default: print("Unknown tag")
             }
         }
-        return (nil, nil, nil)
+        return (tlvEnc, tlvRes, tlvMac)
     }
 
     func transmit(_ apduData: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
