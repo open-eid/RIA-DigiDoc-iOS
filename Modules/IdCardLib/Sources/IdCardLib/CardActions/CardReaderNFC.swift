@@ -257,10 +257,7 @@ class CardReaderNFC: CardReader {
             data: send,
             leByte: 256
         )
-        var tlvEnc: TKTLVRecord?
-        var tlvRes: TKTLVRecord?
-        var tlvMac: TKTLVRecord?
-        (tlvEnc, tlvRes, tlvMac) = try getTLVs(response)
+        let (tlvEnc, tlvRes, tlvMac) = try getTLVs(response)
         guard let tlvRes else {
             throw IdCardInternalError.missingRESTag
         }
