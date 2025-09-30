@@ -242,8 +242,7 @@ class CardReaderNFC: CardReader {
         }
         _ = SSC.increment()
         let DO87 = try getDO87(apdu)
-        var DO97: Data = Data()
-        DO97 = try getDO97(apdu)
+        let DO97 = try getDO97(apdu)
         let cmdHeader: Bytes = [apdu.instructionClass | 0x0C, apdu.instructionCode, apdu.p1Parameter, apdu.p2Parameter]
         let MValue = cmdHeader.addPadding() + DO87 + DO97
         let NValue = SSC + MValue
