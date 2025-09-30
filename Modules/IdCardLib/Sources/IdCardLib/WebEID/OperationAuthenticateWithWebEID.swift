@@ -1,3 +1,26 @@
+//
+//  OperationAuthenticateWithWebEID.swift
+//  nfclib
+//
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
 import Foundation
 import CoreNFC
 import CommonCrypto
@@ -159,30 +182,9 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                     continuation?.resume(throwing: error)
                 }
             } catch {
+                session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
                 continuation?.resume(throwing: error)
             }
-            session.invalidate(errorMessage: "Andmete lugemine ebaõnnestus")
-        }
-    }
-
-    func getAlgorithmInfoFromCertificate(_ secCertificate: SecCertificate) throws -> SignatureAlgorithmInfo {
-        let certificate = try Certificate(secCertificate)
-
-        switch certificate.signatureAlgorithm {
-        case .ecdsaWithSHA256:
-            return SignatureAlgorithmInfo(name: "ES256", bitSize: 256)
-        case .ecdsaWithSHA384:
-            return SignatureAlgorithmInfo(name: "ES384", bitSize: 384)
-        case .ecdsaWithSHA512:
-            return SignatureAlgorithmInfo(name: "ES512", bitSize: 512)
-        case .sha256WithRSAEncryption:
-            return SignatureAlgorithmInfo(name: "RS256", bitSize: 256)
-        case .sha384WithRSAEncryption:
-            return SignatureAlgorithmInfo(name: "RS384", bitSize: 384)
-        case .sha512WithRSAEncryption:
-            return SignatureAlgorithmInfo(name: "RS512", bitSize: 512)
-        default:
-            throw AuthenticateWithWebEidError.failedToMapAlgorithm
         }
     }
 

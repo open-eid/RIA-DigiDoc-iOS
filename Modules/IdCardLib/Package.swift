@@ -27,7 +27,7 @@ let package = Package(
                 "Digest",
                 "SwiftECC"
             ],
-            path: "Sources/IdCardLib/nfclib",
+            path: "Sources/IdCardLib",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency"),
                 .enableUpcomingFeature("SendableByDefault"),
