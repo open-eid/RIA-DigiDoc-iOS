@@ -6,8 +6,8 @@ let package = Package(
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "nfclib",
-            targets: ["nfclib"]
+            name: "IdCardLib",
+            targets: ["IdCardLib"]
         )
     ],
     dependencies: [
@@ -19,7 +19,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "nfclib",
+            name: "IdCardLib",
             dependencies: [
                 .product(name: "SwiftASN1", package: "swift-asn1"),
                 .product(name: "X509", package: "swift-certificates"),

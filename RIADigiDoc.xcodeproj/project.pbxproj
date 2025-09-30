@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A2D04BB2E8583A600A7269B /* nfclib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A2D04BA2E8583A600A7269B /* nfclib */; };
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
+		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
 		1A95E79B2E8575B200F07E49 /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
@@ -309,13 +309,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A2D04BB2E8583A600A7269B /* nfclib in Frameworks */,
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
 				1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
 				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
+				1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */,
 				DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */,
 				DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */,
 			);
@@ -514,7 +514,7 @@
 				DF3E922C2D2C371200F2990A /* Alamofire */,
 				DF9AFE912E00D30A0062C64D /* FactoryKit */,
 				1A438FD82E72CF1900546B86 /* CryptoLib */,
-				1A2D04BA2E8583A600A7269B /* nfclib */,
+				1A5026EC2E8BFCF400C184D7 /* IdCardLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -1354,13 +1354,13 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1A2D04BA2E8583A600A7269B /* nfclib */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = nfclib;
-		};
 		1A438FD82E72CF1900546B86 /* CryptoLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CryptoLib;
+		};
+		1A5026EC2E8BFCF400C184D7 /* IdCardLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = IdCardLib;
 		};
 		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
 			isa = XCSwiftPackageProductDependency;

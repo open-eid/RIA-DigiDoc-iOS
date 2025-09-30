@@ -1,7 +1,7 @@
 import Foundation
 import Security
 import CoreNFC
-import nfclib
+import IdCardLib
 
 @MainActor
 class SharedNFCViewModel: SharedNFCViewModelProtocol, ObservableObject {
