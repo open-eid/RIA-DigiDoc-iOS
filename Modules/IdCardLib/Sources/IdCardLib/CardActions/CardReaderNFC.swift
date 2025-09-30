@@ -241,8 +241,7 @@ class CardReaderNFC: CardReader {
             throw IdCardInternalError.invalidAPDU
         }
         _ = SSC.increment()
-        var DO87: Data = Data()
-        DO87 = try getDO87(apdu)
+        let DO87 = try getDO87(apdu)
         var DO97: Data = Data()
         DO97 = try getDO97(apdu)
         let cmdHeader: Bytes = [apdu.instructionClass | 0x0C, apdu.instructionCode, apdu.p1Parameter, apdu.p2Parameter]
