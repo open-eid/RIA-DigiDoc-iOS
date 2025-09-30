@@ -608,6 +608,8 @@
 		<string>Roboto-Regular.ttf</string>
 		<string>Roboto-SemiBold.ttf</string>
 	</array>
+	<key>NFCReaderUsageDescription</key>
+	<string>This app uses NFC to scan ID-cards</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>

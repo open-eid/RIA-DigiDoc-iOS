@@ -1,5 +1,5 @@
 {
-  "originHash" : "c7187eb291c954da869851014ef01cb3473377e709f50bf96daa8d56247d5b51",
+  "originHash" : "fd71a11f3173d1e37092d7b7b95a63720a8ad0766723b566376c1d068e726d49",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -11,12 +11,39 @@
       }
     },
     {
+      "identity" : "asn1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/ASN1",
+      "state" : {
+        "revision" : "e38d1b8b43d8b53ffadde9836f34289176bb7a0c",
+        "version" : "2.7.0"
+      }
+    },
+    {
       "identity" : "asn1decoder",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/filom/ASN1Decoder.git",
       "state" : {
         "revision" : "7e1523662c69d019a3299bbfb22fb824141dd1f6",
         "version" : "1.10.0"
+      }
+    },
+    {
+      "identity" : "bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/BigInt",
+      "state" : {
+        "revision" : "afb70a0038bfbba845271b60fa9a58d5840f8017",
+        "version" : "1.21.0"
+      }
+    },
+    {
+      "identity" : "digest",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/Digest",
+      "state" : {
+        "revision" : "95ba89b494aaff5f3cd2933c03b9a890323dbf2c",
+        "version" : "1.13.0"
       }
     },
     {
@@ -33,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-asn1.git",
       "state" : {
-        "revision" : "ae33e5941bb88d88538d0a6b19ca0b01e6c76dcf",
-        "version" : "1.3.1"
+        "revision" : "f70225981241859eb4aa1a18a75531d26637c8cc",
+        "version" : "1.4.0"
       }
     },
     {
@@ -53,6 +80,15 @@
       "state" : {
         "revision" : "ff0f781cf7c6a22d52957e50b104f5768b50c779",
         "version" : "3.10.0"
+      }
+    },
+    {
+      "identity" : "swiftecc",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/SwiftECC",
+      "state" : {
+        "revision" : "85c529c9c56b649a8d8edcef60aab3925ab0f69f",
+        "version" : "5.5.0"
       }
     },
     {

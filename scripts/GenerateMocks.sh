@@ -46,7 +46,7 @@ for module in "${modules[@]}"; do
       testable_imports=""
       ;;
     "CryptoLib")
-      custom_imports=("CryptoLibSwift")
+      custom_imports=("CryptoSwift")
       testable_imports=""
       ;;
     *)
