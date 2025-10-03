@@ -35,8 +35,8 @@ struct MobileIDAndSmartIDServicesSettings: View {
                     )
                 }
             )
+            Spacer()
         }
-        Spacer()
     }
 }
 

@@ -1900,6 +1900,42 @@
         }
       }
     },
+    "Main settings cert issued to title" : {
+      "comment" : "Main settings cert issued to title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Issued to:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kellele väljastatud:"
+          }
+        }
+      }
+    },
+    "Main settings cert valid to title" : {
+      "comment" : "Main settings cert valid to title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valid to:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtib kuni:"
+          }
+        }
+      }
+    },
     "Main settings crypto services title" : {
       "comment" : "Main settings crypto services title",
       "extractionState" : "manual",
@@ -2098,6 +2134,60 @@
         }
       }
     },
+    "Main settings siva certificate title" : {
+      "comment" : "Main settings siva certificate title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital Signature Validation Service SiVa SSL certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valideerimisteenuse SiVa SSL sertifikaat"
+          }
+        }
+      }
+    },
+    "Main settings siva service title" : {
+      "comment" : "Main settings siva service title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access to Digital Signature Validation Service SiVa"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääs valideerimisteenusele SiVa"
+          }
+        }
+      }
+    },
+    "Main settings siva service url" : {
+      "comment" : "Main settings siva service url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SiVa service URL"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SiVa valideerimisteenuse URL"
+          }
+        }
+      }
+    },
     "Main settings system settings title" : {
       "comment" : "Main settings system settings title",
       "extractionState" : "manual",
@@ -2202,6 +2292,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaati ei ole lisatud"
+          }
+        }
+      }
+    },
+    "Main settings timestamp cert show certificate button" : {
+      "comment" : "Main settings timestamp cert show certificate button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Näita sertifikaati"
           }
         }
       }
@@ -2400,9 +2508,6 @@
           }
         }
       }
-    },
-    "No" : {
-
     },
     "No recent documents" : {
       "comment" : "Text for when no recent documents are found",
@@ -3475,9 +3580,6 @@
           }
         }
       }
-    },
-    "Yes" : {
-
     },
     "Zip code title" : {
       "comment" : "Role details",
