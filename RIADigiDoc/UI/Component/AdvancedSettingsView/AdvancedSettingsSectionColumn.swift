@@ -6,12 +6,28 @@ struct AdvancedSettingsSectionColumn<Content: View>: View {
     @AppTypography private var typography
 
     var title: String
+    var isScrollable: Bool = true
+
     @ViewBuilder var content: () -> Content
 
     var body: some View {
+        Group {
+            if isScrollable {
+                ScrollView {
+                    columnContent()
+                }
+            } else {
+                columnContent()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func columnContent() -> some View {
         VStack(
             alignment: .leading,
-            spacing: Dimensions.Padding.ZeroPadding) {
+            spacing: Dimensions.Padding.ZeroPadding,
+            content: {
                 Text(title)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
@@ -21,6 +37,7 @@ struct AdvancedSettingsSectionColumn<Content: View>: View {
 
                 content()
             }
+        )
     }
 }
 

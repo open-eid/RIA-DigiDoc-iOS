@@ -28,42 +28,20 @@ struct TimeStampServicesSettings: View {
                     selectedOption = .manualSetting
                 },
                 content: {
-                    manualCardContent
+                    AdvancedSettingsManualCardContent(
+                        textFieldTitle: languageSettings.localized("Main settings tsa url title"),
+                        textFieldText: $manualAccess,
+                        certificateInfoHeader: languageSettings.localized("Main settings timestamp cert title"),
+                        showCertificateInfo: true,
+                        certificateIssuedTo: "",
+                        certificateValidTo: "",
+                        onShowCertificatePressed: {},
+                        onAddCertificatePressed: {}
+                    )
                 }
             )
+            Spacer()
         }
-
-        Spacer()
-    }
-
-    @ViewBuilder
-    private var manualCardContent: some View {
-        FloatingLabelTextField(
-            title: languageSettings.localized("Main settings tsa url title"),
-            text: $manualAccess,
-        )
-        VStack(
-            alignment: .leading,
-            content: {
-                Text(languageSettings.localized("Main settings timestamp cert title"))
-                    .font(typography.bodyLarge)
-                    .foregroundStyle(theme.onSurface)
-                Text(languageSettings.localized("Main settings timestamp cert not added"))
-                    .font(typography.bodyMedium)
-                    .foregroundStyle(theme.onSurfaceVariant)
-            }
-        )
-        .frame(maxWidth: .infinity, alignment: .leading)
-        Button(
-            action: {},
-            label: {
-                Text(languageSettings.localized("Main settings timestamp cert add certificate button"))
-                    .font(typography.labelLarge)
-                    .foregroundStyle(theme.primary)
-                    .padding(.horizontal, Dimensions.Padding.MSPadding)
-            }
-        )
-        .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 

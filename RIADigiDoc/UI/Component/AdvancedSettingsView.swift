@@ -12,6 +12,7 @@ struct AdvancedSettingsView: View {
     @State private var checkedAskRoleAndAddress: Bool = false
 
     @State private var navigateToSigningServicesSettings = false
+    @State private var navigateToValidationServicesSettings = false
 
     @State private var showSettingsBottomSheetFromButton = false
     @State private var navigateToLanguageChooser = false
@@ -43,7 +44,8 @@ struct AdvancedSettingsView: View {
                     VStack(spacing: Dimensions.Padding.ZeroPadding) {
 
                         AdvancedSettingsSectionColumn(
-                            title: languageSettings.localized("Main settings general title")
+                            title: languageSettings.localized("Main settings general title"),
+                            isScrollable: false
                         ) {
                             AdvancedSettingsCheckboxRow(
                                 label: languageSettings.localized("Main settings ask role and address title"),
@@ -54,7 +56,8 @@ struct AdvancedSettingsView: View {
                         Divider().padding(.vertical, Dimensions.Padding.SPadding)
 
                         AdvancedSettingsSectionColumn(
-                            title: languageSettings.localized("Main settings system settings title")
+                            title: languageSettings.localized("Main settings system settings title"),
+                            isScrollable: false
                         ) {
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings signing services title"),
@@ -68,8 +71,14 @@ struct AdvancedSettingsView: View {
                             ) { }
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings validation services title"),
-                                onClick: {}
+                                onClick: {
+                                    navigateToValidationServicesSettings = true
+                                }
                             )
+                            NavigationLink(
+                                destination: ValidationServicesSettings(),
+                                isActive: $navigateToValidationServicesSettings
+                            ) { }
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings crypto services title"),
                                 onClick: {}
