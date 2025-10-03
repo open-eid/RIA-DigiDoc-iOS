@@ -59,7 +59,12 @@ public struct Constants {
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
         public static let Logs = "logfiles"
+        public static let SivaCert = "sivacert"
     }
+
+    public struct FileBaseName {
+            public static let SiVaCert = "siva_cert"
+        }
 
     public struct Configuration {
         public static let CachedConfigJson = "active-config.json"

@@ -1900,6 +1900,24 @@
         }
       }
     },
+    "Main settings cert expired" : {
+      "comment" : "Main settings cert expired",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aegunud"
+          }
+        }
+      }
+    },
     "Main settings cert issued to title" : {
       "comment" : "Main settings cert issued to title",
       "extractionState" : "manual",

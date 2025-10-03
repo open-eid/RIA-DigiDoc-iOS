@@ -12,6 +12,8 @@ class DigiDocConfCurrent: public digidoc::ConfCurrent {
 
 private:
     DigiDocConfig *currentConf;
+    inline static std::string _sivaUrl;
+    inline static NSData* _sivaCert = nil;
 
 public:
     DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
@@ -42,6 +44,10 @@ public:
     std::string TSUrl() const override {
         return currentConf.TSAURL.UTF8String;
     }
+    
+    void setSiVaUrl(std::string &sivaUrl) {
+        _sivaUrl = sivaUrl;
+    }
 
     std::string ocsp(const std::string &issuer) const override {
         NSString *ocspIssuer = [NSString stringWithCString:issuer.c_str() encoding:[NSString defaultCStringEncoding]];
@@ -54,6 +60,10 @@ public:
     }
 
     std::string verifyServiceUri() const override {
+        if (!_sivaUrl.empty()) {
+            return _sivaUrl;
+        }
+        
         return currentConf.SIVAURL.UTF8String;
     }
 
@@ -61,7 +71,17 @@ public:
         NSMutableArray<NSString*> *certs = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         NSString *sivaFileName = [defaults stringForKey:@"kSivaFileCertName"];
+        
+        if (_sivaCert != nil && [_sivaCert length] > 0) {
+            NSString *sivaCert = [_sivaCert base64EncodedStringWithOptions:0];
+            [certs addObject:sivaCert];
+        }
+        
         return stringsToX509Certs(certs);
+    }
+    
+    void addSiVaCert(NSData * cert) {
+        _sivaCert = cert;
     }
 
     static Conf* instance() {
@@ -118,6 +138,24 @@ public:
         DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(newConfig);
         digidoc::Conf::init(newCurrentConf);
     }
+    
+    static void setSiVaUrl(std::string &sivaUrl) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setSiVaUrl(sivaUrl);
+        }
+    }
+    
+    static void addSiVaCert(NSData *cert) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->addSiVaCert(cert);
+        }
+    }
 };
 
 @implementation DigiDocConfWrapper {
@@ -153,6 +191,17 @@ public:
 
 - (void)updateConfiguration:(DigiDocConfig *)conf {
     _impl->updateConfiguration(conf);
+}
+
+- (void)setSiVaUrl:(NSString *)url {
+    if (!url) return;
+    std::string sivaUrl = std::string([url UTF8String]);
+    _impl->setSiVaUrl(sivaUrl);
+}
+
+- (void)addSiVaCert:(NSData *)cert {
+    if (!cert) return;
+    _impl->addSiVaCert(cert);
 }
 
 + (nullable DigiDocConfWrapper *)sharedInstance {

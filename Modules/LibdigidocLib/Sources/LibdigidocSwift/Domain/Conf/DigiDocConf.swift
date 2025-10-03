@@ -14,8 +14,20 @@ public struct DigiDocConf: DigiDocConfProtocol {
         fileManager: Container.shared.fileManager()
     )
 
-    public static func initDigiDoc(configuration: ConfigurationProvider? = nil) async throws {
+    public static func initDigiDoc(
+        configuration: ConfigurationProvider? = nil,
+        sivaUrl: String? = nil,
+        sivaCert: Data? = nil
+    ) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
+
+        if let sivaUrl = sivaUrl {
+            await setSiVaUrl(sivaUrl)
+        }
+
+        if let sivaCert = sivaCert {
+            await addSiVaCert(sivaCert)
+        }
     }
 
     public static func observeConfigurationUpdates(configurationRepository: ConfigurationRepositoryProtocol) throws {
@@ -28,6 +40,15 @@ public struct DigiDocConf: DigiDocConfProtocol {
                 try await sharedInitializer.overrideConfiguration(newConfig: config)
             }
         }
+    }
+
+    public static func setSiVaUrl(_ url: String) async {
+        if url.isEmpty { return }
+        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(url)
+    }
+
+    public static func addSiVaCert(_ cert: Data) async {
+        DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
     }
 }
 

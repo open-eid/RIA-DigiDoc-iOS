@@ -176,11 +176,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     private func formattedDateTimeString(_ date: Date?) -> String {
         guard let date = date else { return "-" }
-        let dateTimeString = DateUtil.configurationDateFormatter.string(from: date)
         let dateTime = DateUtil.getFormattedDateTime(
-            dateTimeString: dateTimeString,
+            date: date,
             isUTC: false,
-            inputDateFormat: "yyyy-MM-dd HH:mm:ss"
         )
         return "\(dateTime.date) \(dateTime.time)"
     }

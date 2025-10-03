@@ -8,29 +8,46 @@ public class DateUtil {
         dateOutputFormat: String = "dd.MM.yyyy",
         timeOutputFormat: String = "HH:mm:ss"
     ) -> (date: String, time: String) {
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = inputDateFormat
-        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
-        inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
-
-        let outputDateFormatter = DateFormatter()
-        outputDateFormatter.dateFormat = dateOutputFormat
-        outputDateFormatter.locale = Locale.current
-        outputDateFormatter.timeZone = isUTC ? TimeZone(abbreviation: "UTC") : TimeZone.current
-
-        let outputTimeFormatter = DateFormatter()
-        outputTimeFormatter.dateFormat = timeOutputFormat
-        outputTimeFormatter.locale = Locale.current
-        outputTimeFormatter.timeZone = isUTC ? TimeZone(abbreviation: "UTC") : TimeZone.current
-
+        let inputFormatter = outputDateFormatter(format: inputDateFormat, isUTC: true)
         guard let date = inputFormatter.date(from: dateTimeString) else {
             return ("", "")
         }
 
-        let datePart = outputDateFormatter.string(from: date)
-        let timePart = outputTimeFormatter.string(from: date)
+        return getFormattedDateTime(
+            date: date,
+            isUTC: isUTC,
+            dateOutputFormat: dateOutputFormat,
+            timeOutputFormat: timeOutputFormat
+        )
+    }
 
-        return (datePart, timePart)
+    public static func getFormattedDateTime(
+        date: Date,
+        isUTC: Bool,
+        dateOutputFormat: String = "dd.MM.yyyy",
+        timeOutputFormat: String = "HH:mm:ss"
+    ) -> (date: String, time: String) {
+
+        let dateFormatter = outputDateFormatter(format: dateOutputFormat, isUTC: isUTC)
+        let timeFormatter = outputDateFormatter(format: timeOutputFormat, isUTC: isUTC)
+
+        return (
+            dateFormatter.string(from: date),
+            timeFormatter.string(from: date)
+        )
+    }
+
+    private static func outputDateFormatter(
+        format: String,
+        isUTC: Bool = false
+    ) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = isUTC
+        ? TimeZone(abbreviation: "UTC")
+        : TimeZone.current
+        return formatter
     }
 
     public static let dateFormatter: DateFormatter = {
