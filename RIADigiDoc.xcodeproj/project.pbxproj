@@ -128,12 +128,15 @@
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/FileItem.swift,
+				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Model/SettingsMenuBottomSheetPages.swift,
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
+				Domain/Repository/AdvancedSettings/AdvancedSettingsRepository.swift,
+				Domain/Repository/AdvancedSettings/AdvancedSettingsRepositoryProtocol.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
 				Domain/Repository/Siva/SivaRepository.swift,
@@ -147,6 +150,7 @@
 				UI/Theme/AppColors.swift,
 				UI/Theme/Model/ColorPalette.swift,
 				UI/Theme/Theme.swift,
+				Util/Certificate/CertificateUtil.swift,
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
 				Util/Signature/SignatureUtil.swift,
@@ -171,17 +175,20 @@
 				ViewModel/Protocols/Shared/SharedNFCViewModelProtocol.swift,
 				ViewModel/Protocols/SignatureDetailViewModelProtocol.swift,
 				ViewModel/Protocols/SigningViewModelProtocol.swift,
+				ViewModel/Protocols/ValidationSettingsViewModelProtocol.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
 				ViewModel/Shared/SharedNFCViewModel.swift,
 				ViewModel/SignatureDetailViewModel.swift,
 				ViewModel/SigningViewModel.swift,
+				ViewModel/ValidationSettingsViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
 		};
 		DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				"Supporting files/Localizable.xcstrings",
@@ -221,6 +228,7 @@
 		DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Util/Language/LanguageSettings.swift,

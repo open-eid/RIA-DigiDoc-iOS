@@ -6,12 +6,14 @@ import UtilsLib
 
 extension Container {
     var librarySetup: Factory<LibrarySetup> {
-        self {
+        self { @MainActor in
             LibrarySetup(
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),
                 fileManager: self.fileManager(),
-                tslUtil: self.tslUtil()
+                tslUtil: self.tslUtil(),
+                dataStore: self.dataStore(),
+                advancedSettingsRepository: self.advancedSettingsRepository()
             )
         }
         .shared
@@ -145,6 +147,25 @@ extension Container {
     @MainActor
     var certificateDetailViewModel: Factory<CertificateDetailViewModel> {
         self { @MainActor in CertificateDetailViewModel() }
+    }
+
+    @MainActor
+    var advancedSettingsRepository: Factory<AdvancedSettingsRepositoryProtocol> {
+        self { @MainActor in
+            AdvancedSettingsRepository(fileManager: self.fileManager())
+        }
+    }
+
+    @MainActor
+    var validationSettingsViewModel: Factory<ValidationSettingsViewModel> {
+        self { @MainActor in
+            ValidationSettingsViewModel(
+                configurationRepository: self.configurationRepository(),
+                dataStore: self.dataStore(),
+                fileManager: self.fileManager(),
+                advancedSettingsRepository: self.advancedSettingsRepository()
+            )
+        }
     }
 
     var signatureUtil: Factory<SignatureUtilProtocol> {
