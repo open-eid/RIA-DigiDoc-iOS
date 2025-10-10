@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import CommonsLib
 import CommonsTestShared
 import CommonsLibMocks
 
@@ -124,5 +125,75 @@ struct ContainerUtilTests {
         )
 
         #expect(uniqueFileURL.lastPathComponent == "\(fileURL.deletingPathExtension().lastPathComponent)-1.txt")
+    }
+
+    @Test
+    func getSignatureContainersDir_success() throws {
+        let cachesDir = URL(fileURLWithPath: "/mock/cache")
+        let expectedDir = cachesDir.appendingPathComponent(Constants.Container.SignedContainerFolder)
+
+        mockFileManager.urlHandler = { directory, _, _, _ in
+            #expect(directory == .cachesDirectory)
+            return cachesDir
+        }
+        mockFileManager.createDirectoryHandler = { _, _, _ in }
+
+        let signatureContainersDir = try containerUtil.getSignatureContainersDir()
+
+        #expect(signatureContainersDir.path == expectedDir.path)
+    }
+
+    @Test
+    func getSignatureContainersDir_throwErrorWhenCreatingContainerDoesNotSucceed() throws {
+        let cachesDir = URL(fileURLWithPath: "/mock/cache")
+
+        mockFileManager.urlHandler = { directory, _, _, _ in
+            #expect(directory == .cachesDirectory)
+            return cachesDir
+        }
+        mockFileManager.createDirectoryHandler = { _, _, _ in
+            throw URLError(.unknown)
+        }
+
+        #expect(throws: URLError.self) {
+            _ = try containerUtil.getSignatureContainersDir()
+        }
+    }
+
+    @Test
+    func getContainerDataFilesDir_returnDirectoryWhenFileInSignatureDirAndUseCacheDir() throws {
+        let cachesDir = URL(fileURLWithPath: "/mock/cache")
+        let signatureDir = cachesDir.appendingPathComponent(Constants.Container.SignedContainerFolder)
+        let containerFile = signatureDir.appendingPathComponent("file.asice")
+        let expectedDataDir = cachesDir.appendingPathComponent("file.asice-data-files")
+
+        mockFileManager.urlHandler = { _, _, _, _ in cachesDir }
+        mockFileManager.urlsHandler = { _, _ in [cachesDir] }
+        mockFileManager.fileExistsHandler = { _ in false }
+
+        mockFileManager.createDirectoryHandler = { _, _, _ in }
+
+        let containerDataFilesDir = try containerUtil.getContainerDataFilesDir(containerFile: containerFile)
+
+        #expect(containerDataFilesDir.path == expectedDataDir.path)
+    }
+
+    @Test
+    func getContainerDataFilesDir_returnDirectoryWhenOutsideSignatureDirAndUseContainerParentDir() throws {
+        let cachesDir = URL(fileURLWithPath: "/mock/cache")
+
+        let containerDir = URL(fileURLWithPath: "/some/other")
+        let containerFile = containerDir.appendingPathComponent("otherfile.asice")
+        let expectedDataDir = containerDir.appendingPathComponent("otherfile.asice-data-files")
+
+        mockFileManager.urlsHandler = { _, _ in [cachesDir] }
+
+        mockFileManager.fileExistsHandler = { _ in false }
+
+        mockFileManager.createDirectoryHandler = { _, _, _ in }
+
+        let containerDataFilesDir = try containerUtil.getContainerDataFilesDir(containerFile: containerFile)
+
+        #expect(containerDataFilesDir.path == expectedDataDir.path)
     }
 }

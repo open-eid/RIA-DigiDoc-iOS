@@ -45,33 +45,14 @@ struct SigningViewModelTests {
     func loadContainerData_successWithNewFile() async throws {
         let signedContainer = SignedContainerProtocolMock()
 
-        let dataFileWrapper = DataFileWrapper(
+        let dataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
             fileName: "container.asice",
             fileSize: 123,
             mediaType: CommonsLib.Constants.MimeType.Asice
         )
 
-        let signatureWrapper = SignatureWrapper(
-            signingCert: Data(),
-            timestampCert: Data(),
-            ocspCert: Data(),
-            signatureId: "S1",
-            claimedSigningTime: "1970-01-01T00:00:00Z",
-            signatureMethod: "signature-method",
-            ocspProducedAt: "1970-01-01T00:00:00Z",
-            timeStampTime: "1970-01-01T00:00:00Z",
-            signedBy: "Test User",
-            trustedSigningTime: "1970-01-01T00:00:00Z",
-            roles: ["Role 1", "Role 2"],
-            city: "Test City",
-            state: "Test State",
-            country: "Test Country",
-            zipCode: "Test12345",
-            format: "BES/time-stamp",
-            messageImprint: Data(),
-            diagnosticsInfo: ""
-        )
+        let signatureWrapper = MockSignatureWrapper.mockSignatureWrapper()
 
         signedContainer.getDataFilesHandler = { [dataFileWrapper] }
         signedContainer.getSignaturesHandler = { [signatureWrapper] }
@@ -95,39 +76,20 @@ struct SigningViewModelTests {
     func loadContainerData_successWithExistingContainer() async throws {
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        let newDataFileWrapper = DataFileWrapper(
+        let newDataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "2",
             fileName: "newfile.asice",
             fileSize: 456,
             mediaType: CommonsLib.Constants.MimeType.Asice
         )
 
-        let newSignatureWrapper = SignatureWrapper(
-            signingCert: Data(),
-            timestampCert: Data(),
-            ocspCert: Data(),
-            signatureId: "S2",
-            claimedSigningTime: "1980-01-01T00:00:00Z",
-            signatureMethod: "signature-method",
-            ocspProducedAt: "1980-01-01T00:00:00Z",
-            timeStampTime: "1980-01-01T00:00:00Z",
-            signedBy: "Another User",
-            trustedSigningTime: "1980-01-01T00:00:00Z",
-            roles: ["Role 1", "Role 2"],
-            city: "Test City",
-            state: "Test State",
-            country: "Test Country",
-            zipCode: "Test12345",
-            format: "BES/time-stamp",
-            messageImprint: Data(),
-            diagnosticsInfo: ""
-        )
+        let newSignatureWrapper = MockSignatureWrapper.mockSignatureWrapper(signatureId: "S2")
 
         mockSignedContainer.getDataFilesHandler = { [newDataFileWrapper] }
         mockSignedContainer.getSignaturesHandler = { [newSignatureWrapper] }
 
         viewModel.dataFiles = [
-            DataFileWrapper(
+            MockDataFileWrapper.mockDataFileWrapper(
                 fileId: "1",
                 fileName: "oldfile.asice",
                 fileSize: 100,
@@ -135,28 +97,7 @@ struct SigningViewModelTests {
             )
         ]
 
-        viewModel.signatures = [
-            SignatureWrapper(
-                signingCert: Data(),
-                timestampCert: Data(),
-                ocspCert: Data(),
-                signatureId: "S1",
-                claimedSigningTime: "1970-01-01T00:00:00Z",
-                signatureMethod: "old-method",
-                ocspProducedAt: "1970-01-01T00:00:00Z",
-                timeStampTime: "1970-01-01T00:00:00Z",
-                signedBy: "Old User",
-                trustedSigningTime: "1970-01-01T00:00:00Z",
-                roles: ["Role 1", "Role 2"],
-                city: "Test City",
-                state: "Test State",
-                country: "Test Country",
-                zipCode: "Test12345",
-                format: "Old Format",
-                messageImprint: Data(),
-                diagnosticsInfo: ""
-            )
-        ]
+        viewModel.signatures = [ MockSignatureWrapper.mockSignatureWrapper() ]
 
         #expect(viewModel.dataFiles.count == 1)
         #expect(viewModel.dataFiles.first?.fileName == "oldfile.asice")
@@ -388,7 +329,7 @@ struct SigningViewModelTests {
 
         let mimeType = CommonsLib.Constants.MimeType.Default
 
-        let testDataFile = DataFileWrapper(
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
             fileName: testFile.lastPathComponent,
             fileSize: 123,
@@ -420,7 +361,7 @@ struct SigningViewModelTests {
 
         let mimeType = CommonsLib.Constants.MimeType.Asice
 
-        let testDataFile = DataFileWrapper(
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
             fileName: testFile.lastPathComponent,
             fileSize: 123,
@@ -468,7 +409,7 @@ struct SigningViewModelTests {
 
         let mimeType = CommonsLib.Constants.MimeType.Default
 
-        let testDataFile = DataFileWrapper(
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
             fileName: testFile.lastPathComponent,
             fileSize: 123,
@@ -481,7 +422,7 @@ struct SigningViewModelTests {
                     message: "Unable to save datafile",
                     code: 0,
                     userInfo: ["fileName": testFile.lastPathComponent]
-            ))
+                ))
         }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
@@ -506,7 +447,7 @@ struct SigningViewModelTests {
 
         let mimeType = CommonsLib.Constants.MimeType.Asice
 
-        let testDataFile = DataFileWrapper(
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
             fileName: testFile.lastPathComponent,
             fileSize: 123,
@@ -546,14 +487,49 @@ struct SigningViewModelTests {
     }
 
     @Test
+    func handleFileOpening_cancelOpeningContainerWhenDdocCancel() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.ddoc")
+
+        let mimeType = CommonsLib.Constants.MimeType.Ddoc
+
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "1",
+            fileName: testFile.lastPathComponent,
+            fileSize: 123,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot open container. Container file is nil"))
+        }
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.ddoc" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: false)
+
+        #expect(mockFileOpeningService.openOrCreateContainerCallCount == 0)
+        #expect(mockMimeTypeCache.getMimeTypeCallCount == 1)
+    }
+
+    @Test
     func handleSaveFile_success() async throws {
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        let testDataFile = DataFileWrapper(
-            fileId: "1",
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileName: testFile.lastPathComponent,
-            fileSize: 123,
             mediaType: CommonsLib.Constants.MimeType.Default
         )
 
@@ -573,10 +549,8 @@ struct SigningViewModelTests {
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        let testDataFile = DataFileWrapper(
-            fileId: "1",
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileName: testFile.lastPathComponent,
-            fileSize: 123,
             mediaType: CommonsLib.Constants.MimeType.Default
         )
 
@@ -588,7 +562,7 @@ struct SigningViewModelTests {
                     message: "Unable to save datafile",
                     code: 0,
                     userInfo: ["fileName": testFile.lastPathComponent]
-            ))
+                ))
         }
 
         await viewModel.handleSaveFile(dataFile: testDataFile)
@@ -602,5 +576,287 @@ struct SigningViewModelTests {
         #expect(viewModel.isShowingFileSaver == false)
         #expect(errorKey == "Failed to save file %@")
         #expect(args == [testFile.lastPathComponent])
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnTrue() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asics")
+
+        let mimeType = CommonsLib.Constants.MimeType.Asics
+
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileName: testFile.lastPathComponent,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in true }
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.asics" }
+
+        mockSivaRepository.isSivaConfirmationNeededHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isSivaConfirmationNeeded = await viewModel.isSivaConfirmationNeeded(dataFile: testDataFile)
+
+        #expect(isSivaConfirmationNeeded)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnFalse() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asice")
+
+        let mimeType = CommonsLib.Constants.MimeType.Asice
+
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileName: testFile.lastPathComponent,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in false }
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.asice" }
+
+        mockSivaRepository.isSivaConfirmationNeededHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isSivaConfirmationNeeded = await viewModel.isSivaConfirmationNeeded(dataFile: testDataFile)
+
+        #expect(!isSivaConfirmationNeeded)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnFalseWhenDataFileSavingDidNotSucceed() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asice")
+
+        let mimeType = CommonsLib.Constants.MimeType.Asice
+
+        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileName: testFile.lastPathComponent,
+            mediaType: mimeType
+        )
+
+        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
+
+        mockSignedContainer.saveDataFileHandler = { _, _ in testFile }
+
+        mockFileUtil.fileExistsHandler = { _ in false }
+
+        mockSignedContainer.getContainerNameHandler = { "mockSignedContainer.asice" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isSivaConfirmationNeeded = await viewModel.isSivaConfirmationNeeded(dataFile: testDataFile)
+
+        #expect(!isSivaConfirmationNeeded)
+        #expect(mockSivaRepository.isSivaConfirmationNeededCallCount == 0)
+    }
+
+    @Test
+    func isNestedContainer_returnTrue() async {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in true }
+
+        let isNestedContainer = viewModel.isNestedContainer()
+
+        #expect(isNestedContainer)
+    }
+
+    @Test
+    func isNestedContainer_returnFalse() async {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+
+        let isNestedContainer = viewModel.isNestedContainer()
+
+        #expect(!isNestedContainer)
+    }
+
+    @Test
+    func isSignButtonShown_returnTrueWithSignableContainer() async {
+        let container = SignedContainerProtocolMock()
+        container.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        container.getContainerNameHandler = { "mockContainer.asice" }
+
+        let isSignButtonShown = await viewModel.isSignButtonShown(
+            signedContainer: container,
+            isNestedContainer: false
+        )
+
+        #expect(isSignButtonShown)
+    }
+
+    @Test
+    func isSignButtonShown_returnFalseWithUnsignableContainer() async {
+        let container = SignedContainerProtocolMock()
+        container.getContainerMimetypeHandler = { Constants.MimeType.Ddoc }
+        container.getContainerNameHandler = { "mockContainer.ddoc" }
+
+        let isSignButtonShown = await viewModel.isSignButtonShown(
+            signedContainer: container,
+            isNestedContainer: false
+        )
+
+        #expect(!isSignButtonShown)
+    }
+
+    @Test
+    func isSignButtonShown_returnFalseWithNestedContainer() async {
+        let container = SignedContainerProtocolMock()
+        container.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+        container.getContainerNameHandler = { "mockContainer.asice" }
+
+        let isSignButtonShown = await viewModel.isSignButtonShown(
+            signedContainer: container,
+            isNestedContainer: true
+        )
+
+        #expect(!isSignButtonShown)
+    }
+
+    @Test
+    func isSignButtonShown_returnFalseWhenContainerIsNil() async {
+        let isSignButtonShown = await viewModel.isSignButtonShown(
+            signedContainer: nil,
+            isNestedContainer: false
+        )
+
+        #expect(!isSignButtonShown)
+    }
+
+    @Test
+    func isEncryptButtonShown_returnTrueWithExistingContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isExistingContainerHandler = { true }
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
+            signedContainer: mockSignedContainer,
+            isNestedContainer: false
+        )
+
+        #expect(isEncryptButtonShown)
+    }
+
+    @Test
+    func isEncryptButtonShown_returnTrueWithSignedContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isExistingContainerHandler = { false }
+
+        mockSignedContainer.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper()]
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
+            signedContainer: mockSignedContainer,
+            isNestedContainer: false
+        )
+
+        #expect(isEncryptButtonShown)
+    }
+
+    @Test
+    func isEncryptButtonShown_notSignedOrExisting_returnFalseWhenContainerIsNotSignedOrExisting() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isExistingContainerHandler = { false }
+        mockSignedContainer.getSignaturesHandler = { [] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
+            signedContainer: mockSignedContainer,
+            isNestedContainer: false
+        )
+
+        #expect(!isEncryptButtonShown)
+    }
+
+    @Test
+    func isEncryptButtonShown_returnFalseWithNestedContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.isExistingContainerHandler = { true }
+        mockSignedContainer.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper()]
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
+            signedContainer: mockSignedContainer,
+            isNestedContainer: true
+        )
+
+        #expect(!isEncryptButtonShown)
+    }
+
+    @Test
+    func isEncryptButtonShown_returnFalseIfContainerNil() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper()]
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
+            signedContainer: nil,
+            isNestedContainer: false
+        )
+
+        #expect(!isEncryptButtonShown)
+    }
+
+    @Test
+    func isTimestampedContainer_returnFalseIfContainerIsNil() async {
+        let isTimestampedContainer = await viewModel.isTimestampedContainer()
+        #expect(!isTimestampedContainer)
+        #expect(mockSivaRepository.isTimestampedContainerCallCount == 0)
+    }
+
+    @Test
+    func isTimestampedContainer_returnTrue() async {
+        let container = SignedContainerProtocolMock()
+        mockSivaRepository.isTimestampedContainerHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: container)
+
+        let isTimestampedContainer = await viewModel.isTimestampedContainer()
+
+        #expect(isTimestampedContainer)
+        #expect(mockSivaRepository.isTimestampedContainerCallCount == 2)
+        #expect(mockSivaRepository.isTimestampedContainerArgValues.first === container)
+    }
+
+    @Test
+    func isTimestampedContainer_returnFalse() async {
+        let container = SignedContainerProtocolMock()
+        mockSivaRepository.isTimestampedContainerHandler = { _ in false }
+
+        await viewModel.loadContainerData(signedContainer: container)
+
+        let isTimestampedContainer = await viewModel.isTimestampedContainer()
+
+        #expect(!isTimestampedContainer)
+        #expect(mockSivaRepository.isTimestampedContainerCallCount == 2)
     }
 }

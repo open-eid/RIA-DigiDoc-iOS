@@ -64,13 +64,12 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     }
 
     func handleSivaConfirmation() async {
-        sharedContainerViewModel.setIsSivaConfirmed(true)
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
             let container = try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
             if await container.getContainerMimetype() == Constants.MimeType.Asics {
-                try await handleAsicsSivaConfirmation()
+                try await handleAsicsSivaConfirmation(parentContainer: container)
             } else {
                 sharedContainerViewModel.setSignedContainer(container)
             }
@@ -82,49 +81,34 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     }
 
     func handleSivaCancellation() async {
-        sharedContainerViewModel.setIsSivaConfirmed(false)
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         let fileMimetype = await files.first?.mimeType()
 
-        if fileMimetype != nil {
-            if fileMimetype == Constants.MimeType.Ddoc {
-                handleError()
-            } else if fileMimetype == Constants.MimeType.Asics {
-                do {
-                    let container = try await fileOpeningRepository
-                        .openOrCreateContainer(urls: files, isSivaConfirmed: false)
-                    sharedContainerViewModel.setSignedContainer(container)
-                    FileOpeningViewModel.logger.debug("Asics signed container set successfully")
-                    handleLoadingSuccess(isSivaConfirmed: false)
-                } catch {
-                    handleError()
-                }
-            } else {
+        guard let mimetype = fileMimetype else {
+            handleError()
+            return
+        }
+
+        if mimetype == Constants.MimeType.Ddoc {
+            handleError()
+        } else if mimetype == Constants.MimeType.Asics {
+            do {
+                let container = try await fileOpeningRepository
+                    .openOrCreateContainer(urls: files, isSivaConfirmed: false)
+                sharedContainerViewModel.setSignedContainer(container)
+                FileOpeningViewModel.logger.debug("Asics signed container set successfully")
+                handleLoadingSuccess(isSivaConfirmed: false)
+            } catch {
                 handleError()
             }
-        }
-    }
-
-    private func handleAsicsSivaConfirmation() async throws {
-        let parentContainer = try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
-        if await sivaRepository.isTimestampedContainer(signedContainer: parentContainer) {
-            let nestedTimestampedContainer = try await sivaRepository
-                .getTimestampedContainer(parentContainer: parentContainer)
-            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
         } else {
-            sharedContainerViewModel.setSignedContainer(parentContainer)
+            handleError()
         }
-    }
-
-    func handleLoadingSuccess(isSivaConfirmed: Bool) {
-        self.isSivaConfirmed = isSivaConfirmed
-        isFileOpeningLoading = false
-        isNavigatingToNextView = true
     }
 
     func showFileAddedMessage() async -> Bool {
-        return await sharedContainerViewModel.currentContainer()?.getSignatures().isEmpty ?? true
+        return await sharedContainerViewModel.currentContainer()?.getSignatures().isEmpty ?? false
     }
 
     func addedFilesCount() -> Int {
@@ -138,14 +122,13 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     }
 
     func isSivaConfirmationNeeded() async -> Bool {
-        do {
-            return try await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
-        } catch {
-            FileOpeningViewModel.logger
-                .error("Unable to check if SiVa confirmation is needed. \(error)")
-            handleError(error)
-            return false
-        }
+        return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
+    }
+
+    private func handleLoadingSuccess(isSivaConfirmed: Bool) {
+        self.isSivaConfirmed = isSivaConfirmed
+        isFileOpeningLoading = false
+        isNavigatingToNextView = true
     }
 
     private func handleError(_ error: Error) {
@@ -156,6 +139,16 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(message: error.localizedDescription)
+        }
+    }
+
+    private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
+        if await sivaRepository.isTimestampedContainer(signedContainer: parentContainer) {
+            let nestedTimestampedContainer = try await sivaRepository
+                .getTimestampedContainer(parentContainer: parentContainer)
+            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
+        } else {
+            sharedContainerViewModel.setSignedContainer(parentContainer)
         }
     }
 

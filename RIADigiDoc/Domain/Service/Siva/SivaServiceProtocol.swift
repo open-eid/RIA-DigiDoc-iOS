@@ -3,7 +3,7 @@ import LibdigidocLibSwift
 
 /// @mockable
 public protocol SivaServiceProtocol: Sendable {
-    func isSivaConfirmationNeeded(files: [URL]) async throws -> Bool
+    func isSivaConfirmationNeeded(files: [URL]) async -> Bool
     func isTimestampedContainer(signedContainer: SignedContainerProtocol) async -> Bool
     func getTimestampedContainer(
         parentContainer: SignedContainerProtocol

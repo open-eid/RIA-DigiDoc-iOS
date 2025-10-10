@@ -27,26 +27,7 @@ struct ContainerWrapperTests {
     private let mockSignature: SignatureWrapper
 
     init() async throws {
-        mockSignature = SignatureWrapper(
-            signingCert: Data(),
-            timestampCert: Data(),
-            ocspCert: Data(),
-            signatureId: "S1",
-            claimedSigningTime: "1970-01-01T00:00:00Z",
-            signatureMethod: "signature-method",
-            ocspProducedAt: "1970-01-01T00:00:00Z",
-            timeStampTime: "1970-01-01T00:00:00Z",
-            signedBy: "Test User",
-            trustedSigningTime: "1970-01-01T00:00:00Z",
-            roles: ["Role 1", "Role 2"],
-            city: "Test City",
-            state: "Test State",
-            country: "Test Country",
-            zipCode: "Test12345",
-            format: "BES/time-stamp",
-            messageImprint: Data(),
-            diagnosticsInfo: ""
-        )
+        mockSignature = MockSignatureWrapper.mockSignatureWrapper()
 
         let mockContainerURL = URL(fileURLWithPath: "/tmp/path")
 
@@ -219,7 +200,7 @@ struct ContainerWrapperTests {
 
     @Test
     func saveDataFile_throwErrorWhenInvalidDataFile() async {
-        let dataFile = DataFileWrapper(
+        let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "",
             fileName: "datafile-\(UUID().uuidString)",
             fileSize: 0,

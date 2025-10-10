@@ -122,7 +122,7 @@ public actor SignedContainer: SignedContainerProtocol {
         return try await container.saveDataFile(dataFile: dataFile, to: directory)
     }
 
-    public func getNestedTimestampedContainer() async throws -> SignedContainer? {
+    public func getNestedTimestampedContainer() async throws -> SignedContainerProtocol? {
         guard await getContainerMimetype() == CommonsLib.Constants.MimeType.Asics else { return nil }
         let dataFiles = await getDataFiles()
         guard dataFiles.count == 1, let dataFile = dataFiles.first else { return nil }
@@ -134,7 +134,7 @@ public actor SignedContainer: SignedContainerProtocol {
         let nestedTimestampedFile = try await saveDataFile(dataFile: dataFile, to: containerDataFilesDir)
 
         let nestedContainer = try await ContainerWrapper(
-            fileManager: Container.shared.fileManager()
+            fileManager: fileManager
         ).open(containerFile: nestedTimestampedFile, isSivaConfirmed: true)
 
         let timestamps = await container.getSignatures()

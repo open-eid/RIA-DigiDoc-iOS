@@ -4,8 +4,10 @@ import FactoryKit
 import FactoryTesting
 import LibdigidocLibSwift
 import CommonsLib
+import CommonsTestShared
 import CommonsLibMocks
 import UtilsLibMocks
+import LibdigidocLibSwiftMocks
 
 @MainActor
 struct FileOpeningViewModelTests {
@@ -46,10 +48,7 @@ struct FileOpeningViewModelTests {
         )
         let result: Result<[URL], Error> = .success(validURLs)
 
-        mockSharedContainerViewModel.getFileOpeningResultHandler = {
-            print("getFileOpeningResultHandler called")
-            return result
-        }
+        mockSharedContainerViewModel.getFileOpeningResultHandler = { result }
 
         mockSharedContainerViewModel.setSignedContainerHandler = { _ in }
 
@@ -168,27 +167,313 @@ struct FileOpeningViewModelTests {
     }
 
     @Test
-    func handleLoading_success() async {
-        viewModel.handleLoadingSuccess(isSivaConfirmed: true)
+    func handleSivaConfirmation_successWithNonSivaContainer() async throws {
+        let container = SignedContainerProtocolMock()
+        container.getContainerMimetypeHandler = { Constants.MimeType.Pdf }
 
-        let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, isSivaConfirmed in
+            #expect(isSivaConfirmed)
+            return container
+        }
 
-        #expect(!isFileOpeningLoading)
-        #expect(isNavigatingToNextView)
+        await viewModel.handleSivaConfirmation()
+
+        let rawContainerFile = await container.getRawContainerFile()
+
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        if let count = mockSharedContainerViewModel.setAddedFilesCountArgValues.first {
+            #expect(count >= 0)
+        }
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        await #expect(
+            (mockSharedContainerViewModel.setSignedContainerArgValues.first as? SignedContainer)?
+                .getRawContainerFile() == rawContainerFile
+        )
+
+        #expect(viewModel.isSivaConfirmed)
+        #expect(viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
     }
 
     @Test
-    func handleError_success() async {
+    func handleSivaConfirmation_successWithAsicsContainer() async throws {
+        let mockMainSignedContainer = SignedContainerProtocolMock()
+        let mockNestedSignedContainer = SignedContainerProtocolMock()
+        mockMainSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
+        mockSivaRepository.isTimestampedContainerHandler = { _ in true }
+        mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
+
+        await viewModel.handleSivaConfirmation()
+
+        #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(viewModel.isSivaConfirmed)
+        #expect(viewModel.isNavigatingToNextView)
+    }
+
+    @Test
+    func handleSivaConfirmation_successWithNonTimestampedAsicsContainer() async throws {
+        let mockMainSignedContainer = SignedContainerProtocolMock()
+        let mockNestedSignedContainer = SignedContainerProtocolMock()
+        mockMainSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
+        mockSivaRepository.isTimestampedContainerHandler = { _ in false }
+        mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
+
+        await viewModel.handleSivaConfirmation()
+
+        #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(viewModel.isSivaConfirmed)
+        #expect(viewModel.isNavigatingToNextView)
+    }
+
+    @Test
+    func handleSivaConfirmation_handleErrorWhenContainerCreationFailedErrorThrown() async {
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerCreationFailed(
+                ErrorDetail(message: "Cannot create or open container")
+            )
+        }
+
+        await viewModel.handleSivaConfirmation()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(!viewModel.isNavigatingToNextView)
+    }
+
+    @Test
+    func handleSivaCancellation_handleDdocCancelling() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Ddoc],
+            containerExtension: Constants.Extension.Ddoc
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Ddoc }
+
+        await viewModel.handleFiles()
+
+        await viewModel.handleSivaCancellation()
+
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(!viewModel.isSivaConfirmed)
+        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
+    }
+
+    @Test
+    func handleSivaCancellation_successWithAsicsContainer() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Asics],
+            containerExtension: Constants.Extension.Asics
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asics }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, confirmed in
+            #expect(!confirmed)
+            return mockSignedContainer
+        }
+
+        await viewModel.handleFiles()
+
+        await viewModel.handleSivaCancellation()
+
+        let rawContainerFile = await mockSignedContainer.getRawContainerFile()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        await #expect(
+            (mockSharedContainerViewModel.setSignedContainerArgValues.first as? SignedContainer)?
+                .getRawContainerFile() == rawContainerFile
+        )
+        #expect(!viewModel.isSivaConfirmed)
+        #expect(viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
+    }
+
+    @Test
+    func handleSivaCancellation_handleErrorWhenAsicsContainerOpeningDidNotSucceed() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Asics],
+            containerExtension: Constants.Extension.Asics
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asics }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot create or open container."
+                )
+            )
+        }
+
+        await viewModel.handleFiles()
+
+        await viewModel.handleSivaCancellation()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(!viewModel.isSivaConfirmed)
+        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
+    }
+
+    @Test
+    func handleSivaCancellation_handleErrorWithNonSivaContainer() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Asice],
+            containerExtension: Constants.Extension.Asice
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asice }
+
+        await viewModel.handleFiles()
+
+        await viewModel.handleSivaCancellation()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(!viewModel.isSivaConfirmed)
+        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
+    }
+
+    @Test
+    func handleSivaCancellation_handleErrorWhenNoFileAndMimetype() async {
+        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in nil }
+
+        await viewModel.handleSivaCancellation()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(!viewModel.isSivaConfirmed)
+        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isFileOpeningLoading)
+    }
+
+    @Test
+    func showFileAddedMessage_returnFalseIfNoContainer() async {
+        mockSharedContainerViewModel.currentContainerHandler = { nil }
+
+        let showFileAddedMessage = await viewModel.showFileAddedMessage()
+
+        #expect(!showFileAddedMessage)
+        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
+    }
+
+    @Test
+    func showFileAddedMessage_returnFalseWhenContainerIsSigned() async {
+        let container = SignedContainerProtocolMock()
+        container.getSignaturesHandler = {[
+            MockSignatureWrapper.mockSignatureWrapper(signatureId: "1"),
+            MockSignatureWrapper.mockSignatureWrapper(signatureId: "2")
+        ]}
+
+        mockSharedContainerViewModel.currentContainerHandler = { container }
+
+        let showFileAddedMessage = await viewModel.showFileAddedMessage()
+
+        #expect(!showFileAddedMessage)
+        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
+    }
+
+    @Test
+    func showFileAddedMessage_returnTrueWhenContainerIsNotSigned() async {
+        let container = SignedContainerProtocolMock()
+        container.getSignaturesHandler = { [] }
+        mockSharedContainerViewModel.currentContainerHandler = { container }
+
+        let showFileAddedMessage = await viewModel.showFileAddedMessage()
+
+        #expect(showFileAddedMessage)
+        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
+    }
+
+    @Test
+    func addedFilesCount_successWhenFilesAreAddedToContainer() {
+        mockSharedContainerViewModel.getAddedFilesCountHandler = { 5 }
+
+        let addedFilesCount = viewModel.addedFilesCount()
+
+        #expect(addedFilesCount == 5)
+        #expect(mockSharedContainerViewModel.getAddedFilesCountCallCount == 1)
+    }
+
+    @Test
+    func handleError_success() {
         viewModel.handleError()
 
-        let errorMessage = viewModel.errorMessage
+        #expect(viewModel.errorMessage == nil)
+        #expect(!viewModel.isFileOpeningLoading)
+        #expect(!viewModel.isNavigatingToNextView)
+    }
 
-        let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+    @Test
+    func isSivaConfirmationNeeded_returnsTrue() async {
+        mockFileOpeningRepository.isSivaConfirmationNeededHandler = { _ in true }
 
-        #expect(errorMessage == nil)
-        #expect(!isFileOpeningLoading)
-        #expect(!isNavigatingToNextView)
+        let isSivaConfirmationNeeded = await viewModel.isSivaConfirmationNeeded()
+
+        #expect(isSivaConfirmationNeeded)
+        #expect(mockFileOpeningRepository.isSivaConfirmationNeededCallCount == 1)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnsFalse() async {
+        mockFileOpeningRepository.isSivaConfirmationNeededHandler = { _ in false }
+
+        let isSivaConfirmationNeeded = await viewModel.isSivaConfirmationNeeded()
+
+        #expect(!isSivaConfirmationNeeded)
+        #expect(mockFileOpeningRepository.isSivaConfirmationNeededCallCount == 1)
     }
 }

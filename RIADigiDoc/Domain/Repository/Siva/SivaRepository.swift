@@ -13,8 +13,8 @@ actor SivaRepository: SivaRepositoryProtocol {
         self.sivaService = sivaService
     }
 
-    func isSivaConfirmationNeeded(files: [URL]) async throws -> Bool {
-        try await sivaService.isSivaConfirmationNeeded(files: files)
+    func isSivaConfirmationNeeded(files: [URL]) async -> Bool {
+        await sivaService.isSivaConfirmationNeeded(files: files)
     }
 
     func isTimestampedContainer(signedContainer: SignedContainerProtocol) async -> Bool {
