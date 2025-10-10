@@ -26,7 +26,7 @@ struct DataFilesViewModelTests {
     @Test
     func saveDataFile_success() async throws {
         let fileURL = URL(fileURLWithPath: "/mock/path/test.txt")
-        let dataFile = DataFileWrapper(
+        let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "D1",
             fileName: fileURL.lastPathComponent,
             fileSize: 1,
@@ -55,7 +55,7 @@ struct DataFilesViewModelTests {
     @Test
     func saveDataFile_returnNilWhenDataFileDoesNotExist() async throws {
         let nonExistingFileURL = URL(fileURLWithPath: "/mock/path/nonexistent.txt")
-        let dataFile = DataFileWrapper(
+        let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "D1",
             fileName: nonExistingFileURL.lastPathComponent,
             fileSize: 1,

@@ -53,7 +53,7 @@ let package = Package(
         .target(
             name: "LibdigidocLibSwiftMocks",
             dependencies: ["LibdigidocLibSwift"],
-            path: "Tests/Mocks/Generated"
+            path: "Tests/Mocks"
         ),
         .testTarget(
             name: "LibdigidocLibTests",

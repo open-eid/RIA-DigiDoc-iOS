@@ -93,4 +93,61 @@ struct FileOpeningRepositoryTests {
         #expect(mockFileOpeningService.openOrCreateContainerCallCount == 1)
         #expect(mockFileOpeningService.openOrCreateContainerArgValues.first?.dataFiles == fileURLs)
     }
+
+    @Test
+    func openOrCreateContainer_throwErrorWhenFileOpeningDidNotSucceed() async throws {
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/test.txt")
+        let tempFileURL2 = URL(fileURLWithPath: "/mock/path/test2.txt")
+
+        let fileURLs = [tempFileURL, tempFileURL2]
+
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(message: "Unable to open container")
+            )
+        }
+
+        do {
+            _ = try await repository.openOrCreateContainer(urls: fileURLs, isSivaConfirmed: true)
+            Issue.record("Expected DigiDocError.containerOpeningFailed but no error was thrown")
+            return
+        } catch let error as DigiDocError {
+            if case .containerOpeningFailed = error {
+                #expect(true)
+            } else {
+                Issue.record("Unexpected DigiDocError case: \(error)")
+                return
+            }
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+            return
+        }
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnTrue() async {
+        let testFiles = [URL(fileURLWithPath: "/tmp/file1.pdf"), URL(fileURLWithPath: "/tmp/file2.pdf")]
+        mockSivaService.isSivaConfirmationNeededHandler = { files in
+            #expect(files == testFiles)
+            return true
+        }
+
+        let isSivaConfirmationNeeded = await repository.isSivaConfirmationNeeded(files: testFiles)
+
+        #expect(isSivaConfirmationNeeded)
+        #expect(mockSivaService.isSivaConfirmationNeededCallCount == 1)
+        #expect(mockSivaService.isSivaConfirmationNeededArgValues.first == testFiles)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnFalse() async {
+        let testFiles = [URL(fileURLWithPath: "/tmp/file1.pdf"), URL(fileURLWithPath: "/tmp/file2.pdf")]
+        mockSivaService.isSivaConfirmationNeededHandler = { _ in false }
+
+        let isSivaConfirmationNeeded = await repository.isSivaConfirmationNeeded(files: testFiles)
+
+        #expect(!isSivaConfirmationNeeded)
+        #expect(mockSivaService.isSivaConfirmationNeededCallCount == 1)
+        #expect(mockSivaService.isSivaConfirmationNeededArgValues.first == testFiles)
+    }
 }

@@ -28,7 +28,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 26
     inputs:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
@@ -155,7 +155,7 @@ workflows:
           xcode-project run-tests \
             --project RIADigiDoc.xcodeproj \
             --scheme AllTests \
-            --device "iPhone 16"
+            --device "iPhone 17"
         when:
           condition: ${{ inputs.enableTests_input }}
       - name: Increment build number
@@ -233,7 +233,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 26
     scripts:
       - name: Setup dependencies
         script: |
@@ -291,7 +291,7 @@ workflows:
             xcode-project run-tests \
                 --project RIADigiDoc.xcodeproj \
                 --scheme AllTests \
-                --device "iPhone 16"
+                --device "iPhone 17"
       - name: Increment build number
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number $APP_STORE_APP_ID)

@@ -61,7 +61,7 @@ struct FileUtilTests {
 
     @Test
     func getValidFileInApp_returnFileURLWhenFileExistsInAppDirectory() async throws {
-        let fileURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let fileURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
 
         guard let sharedContainerURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
@@ -90,8 +90,7 @@ struct FileUtilTests {
 
     @Test
     func getValidFileInApp_ContinueSearchAndReturnSameDirectoryURLWhenDirectoryAccessFails() async throws {
-        let testDirectory = URL(fileURLWithPath:
-                                    mockFileManager.temporaryDirectory.resolvingSymlinksInPath().path + "/tmp")
+        let testDirectory = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
         let fileURL = testDirectory.appendingPathComponent("testFile.txt")
         let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistent-\(UUID().uuidString)")
 

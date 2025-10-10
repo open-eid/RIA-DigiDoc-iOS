@@ -54,6 +54,7 @@ public struct ContainerUtil: ContainerUtilProtocol {
             ContainerUtil.logger.debug("Directories created or already exist for \(signedContainersDirectory.path)")
         } catch {
             ContainerUtil.logger.error("Unable to create signature containers dir: \(error.localizedDescription)")
+            throw error
         }
 
         return signedContainersDirectory

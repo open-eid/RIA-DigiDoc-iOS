@@ -22,7 +22,7 @@ actor FileOpeningRepository: FileOpeningRepositoryProtocol {
         return try await fileOpeningService.openOrCreateContainer(dataFiles: urls, isSivaConfirmed: isSivaConfirmed)
     }
 
-    func isSivaConfirmationNeeded(files: [URL]) async throws -> Bool {
-        return try await sivaService.isSivaConfirmationNeeded(files: files)
+    func isSivaConfirmationNeeded(files: [URL]) async -> Bool {
+        return await sivaService.isSivaConfirmationNeeded(files: files)
     }
 }

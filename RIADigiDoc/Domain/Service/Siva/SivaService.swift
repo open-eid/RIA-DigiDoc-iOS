@@ -20,7 +20,7 @@ actor SivaService: SivaServiceProtocol {
         self.containerUtil = containerUtil
     }
 
-    func isSivaConfirmationNeeded(files: [URL]) async throws -> Bool {
+    func isSivaConfirmationNeeded(files: [URL]) async -> Bool {
         if files.count != 1 {
             return false
         }

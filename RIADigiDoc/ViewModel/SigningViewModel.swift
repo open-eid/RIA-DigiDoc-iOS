@@ -211,12 +211,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
         switch result {
         case .success(let fileURL):
-            do {
-                return try await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
-            } catch {
-                return false
-            }
-
+            return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
             errorMessage = ("Failed to open container %@", [dataFile.fileName])
             return false
@@ -259,7 +254,8 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         signedContainer: SignedContainerProtocol?,
         isNestedContainer: Bool,
     ) async -> Bool {
-        let isExistingContainer = await signedContainer?.isExistingContainer() ?? false
+        guard let container = signedContainer else { return false }
+        let isExistingContainer = await container.isExistingContainer()
         return (isExistingContainer || isSigned()) && !isNestedContainer
     }
 

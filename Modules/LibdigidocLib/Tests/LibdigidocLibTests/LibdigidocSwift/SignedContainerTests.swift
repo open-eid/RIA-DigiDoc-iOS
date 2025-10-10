@@ -41,17 +41,24 @@ final class SignedContainerTests {
             }
         }
 
-        let tempFileURL = TestFileUtil.createSampleFile()
+        let tempFileURL = URL(fileURLWithPath: "/mock/path/mockFile.txt")
 
-        defer {
-            try? FileManager.default.removeItem(at: tempFileURL)
-        }
-
-        signedContainer = try await SignedContainer.openOrCreate(dataFiles: [tempFileURL], isSivaConfirmed: true)
+        signedContainer = SignedContainer(
+            containerFile: tempFileURL,
+            isExistingContainer: false,
+            container: mockContainerWrapper,
+            timestamps: [],
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
     }
 
     @Test
     func getDataFiles_success() async throws {
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper()]
+        }
+
         let dataFiles = await signedContainer.getDataFiles()
 
         #expect(dataFiles.count == 1)
@@ -65,6 +72,10 @@ final class SignedContainerTests {
 
     @Test
     func getContainerMimetype_success() async throws {
+        mockContainerWrapper.getMimetypeHandler = {
+            return CommonsLib.Constants.MimeType.Asice
+        }
+
         let mimetype = await signedContainer.getContainerMimetype()
         #expect(!mimetype.isEmpty)
         #expect(CommonsLib.Constants.MimeType.Asice == mimetype)
@@ -295,6 +306,14 @@ final class SignedContainerTests {
 
     @Test
     func getDataFile_success() async throws {
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper()]
+        }
+
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
+            return URL(fileURLWithPath: "/tmp/mockFile.txt")
+        }
+
         let dataFiles = await signedContainer.getDataFiles()
 
         guard let dataFile = dataFiles.first else {
@@ -303,7 +322,162 @@ final class SignedContainerTests {
         }
 
         let containerDataFile = try await signedContainer.saveDataFile(dataFile: dataFile)
+        print(containerDataFile)
         #expect(containerDataFile.isValidURL())
         #expect(containerDataFile.lastPathComponent == dataFile.fileName)
+    }
+
+    @Test
+    func getTimestamps_success() async {
+        let timestamp = MockSignatureWrapper.mockSignatureWrapper()
+
+        let signedContainerWithTimestamp = SignedContainer(
+            containerFile: URL(fileURLWithPath: "/mock/path/container.asics"),
+            isExistingContainer: false,
+            container: mockContainerWrapper,
+            timestamps: [timestamp],
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        let timestamps = await signedContainerWithTimestamp.getTimestamps()
+
+        #expect(timestamps.count == 1)
+        #expect(timestamps.first == timestamp)
+    }
+
+    @Test
+    func isExistingContainer_returnTrue() async {
+        let existingSignedContainer = SignedContainer(
+            containerFile: URL(fileURLWithPath: "/mock/path/container.asics"),
+            isExistingContainer: true,
+            container: mockContainerWrapper,
+            timestamps: [],
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        #expect(await existingSignedContainer.isExistingContainer())
+    }
+
+    @Test
+    func isExistingContainer_returnFalse() async {
+        let existingSignedContainer = SignedContainer(
+            containerFile: URL(fileURLWithPath: "/mock/path/container.asics"),
+            isExistingContainer: false,
+            container: mockContainerWrapper,
+            timestamps: [],
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+
+        #expect(await !existingSignedContainer.isExistingContainer())
+    }
+
+    @Test
+    func getNestedTimestampedContainer_success() async throws {
+        let testContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
+        let mockContainerDataFilesDirURL = URL(fileURLWithPath: "/mock/datafiles")
+        mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asics }
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper(
+                fileName: testContainer.lastPathComponent,
+                mediaType: Constants.MimeType.Asice
+            )]
+        }
+
+        mockContainerUtil.getContainerDataFilesDirHandler = { _ in
+            mockContainerDataFilesDirURL
+        }
+
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
+            testContainer
+        }
+
+        mockContainerWrapper.getSignaturesHandler = { [ MockSignatureWrapper.mockSignatureWrapper() ] }
+
+        let nestedContainer = try await signedContainer.getNestedTimestampedContainer()
+
+        #expect(await nestedContainer?.getTimestamps().count == 1)
+        #expect(await nestedContainer?.isExistingContainer() == true)
+        #expect(await nestedContainer?.getContainerMimetype() == Constants.MimeType.Asice)
+    }
+
+    @Test
+    func getNestedTimestampedContainer_returnNilWhenContainerNotAsics() async throws {
+        mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asice }
+
+        let nestedContainer = try await signedContainer.getNestedTimestampedContainer()
+
+        #expect(nestedContainer == nil)
+    }
+
+    @Test
+    func getNestedTimestampedContainer_returnNilWhenMoreThanOneDataFiles() async throws {
+        mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asics }
+
+        mockContainerWrapper.getDataFilesHandler = {
+            [
+                MockDataFileWrapper.mockDataFileWrapper(
+                    fileName: "mockContainer1.ddoc",
+                    mediaType: Constants.MimeType.Ddoc
+                ),
+                MockDataFileWrapper.mockDataFileWrapper(
+                    fileId: "2",
+                    fileName: "mockContainer2.ddoc",
+                    fileSize: 456,
+                    mediaType: Constants.MimeType.Ddoc
+                )
+            ]
+        }
+
+        let nestedContainer = try await signedContainer.getNestedTimestampedContainer()
+
+        #expect(nestedContainer == nil)
+    }
+
+    @Test
+    func getNestedTimestampedContainer_throwErrorWhenGetContainerDataFilesDirThrowsError() async {
+        mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asics }
+
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper(
+                fileName: "mockContainer1.ddoc",
+                mediaType: Constants.MimeType.Ddoc
+            )]
+        }
+
+        mockContainerUtil.getContainerDataFilesDirHandler = { _ in
+            throw URLError(.fileDoesNotExist)
+        }
+
+        await #expect(throws: URLError.self) {
+            _ = try await signedContainer.getNestedTimestampedContainer()
+        }
+    }
+
+    @Test
+    func getNestedTimestampedContainer_throwErrorWhenSaveDataFileThrowsError() async {
+        let mockContainerDataFilesDirURL = URL(fileURLWithPath: "/mock/datafiles")
+        mockContainerWrapper.getMimetypeHandler = { Constants.MimeType.Asics }
+
+        mockContainerWrapper.getDataFilesHandler = {
+            [MockDataFileWrapper.mockDataFileWrapper(
+                fileName: "mockContainer1.ddoc",
+                mediaType: Constants.MimeType.Ddoc
+            )]
+        }
+
+        mockContainerUtil.getContainerDataFilesDirHandler = { _ in
+            mockContainerDataFilesDirURL
+        }
+
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
+            throw URLError(.fileDoesNotExist)
+        }
+
+        await #expect(throws: URLError.self) {
+            _ = try await signedContainer.getNestedTimestampedContainer()
+        }
     }
 }
