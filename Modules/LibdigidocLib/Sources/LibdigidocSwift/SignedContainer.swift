@@ -94,6 +94,18 @@ public actor SignedContainer: SignedContainerProtocol {
         return signatures.contains(where: { $0.format.lowercased().contains("cades") })
     }
 
+    public func isXades() async -> Bool {
+        let containerMimetype = await getContainerMimetype().lowercased()
+        let signatures = await getSignatures()
+
+        if containerMimetype.caseInsensitiveCompare(Constants.MimeType.Asics.lowercased()) == .orderedSame,
+           signatures.contains(where: { $0.format.lowercased().contains("bes") }) {
+            return true
+        }
+
+        return false
+    }
+
     @discardableResult
     public func renameContainer(to newName: String) async throws -> URL {
 
@@ -151,7 +163,11 @@ public actor SignedContainer: SignedContainerProtocol {
 
     public func getNestedTimestampedContainer() async throws -> SignedContainerProtocol? {
         let isCades = await isCades()
-        guard await getContainerMimetype() == CommonsLib.Constants.MimeType.Asics && !isCades else { return nil }
+        let isXades = await isXades()
+
+        guard await getContainerMimetype() == CommonsLib.Constants.MimeType.Asics &&
+                !isCades && !isXades else { return nil }
+
         let dataFiles = await getDataFiles()
         guard dataFiles.count == 1, let dataFile = dataFiles.first else { return nil }
 

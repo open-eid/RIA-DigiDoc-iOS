@@ -391,7 +391,9 @@ final class SignedContainerTests {
             testContainer
         }
 
-        mockContainerWrapper.getSignaturesHandler = { [ MockSignatureWrapper.mockSignatureWrapper() ] }
+        mockContainerWrapper.getSignaturesHandler = {
+            [ MockSignatureWrapper.mockSignatureWrapper(format: "TimeStampToken") ]
+        }
 
         let nestedContainer = try await signedContainer.getNestedTimestampedContainer()
 

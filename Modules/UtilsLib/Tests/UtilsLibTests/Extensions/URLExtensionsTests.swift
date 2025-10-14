@@ -405,6 +405,40 @@ struct URLExtensionsTests {
         #expect(!isCades)
     }
 
+    @Test
+    func isXades_successReturningTrue() async throws {
+        let mockFile = URL(fileURLWithPath: "/mock/path/signatures.xml")
+
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: [mockFile.lastPathComponent: "Test content"],
+            containerExtension: "asics")
+
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in
+            return mockFile
+        }
+
+        defer {
+            try? FileManager.default.removeItem(at: mockContainer)
+        }
+
+        let isXades = await mockContainer.isXades(fileUtil: mockFileUtil)
+
+        #expect(isXades)
+    }
+
+    @Test
+    func isXades_successReturningFalse() async {
+        let mockContainer = URL(fileURLWithPath: "/mock/path/regularContainer.asice")
+
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in
+            return nil
+        }
+
+        let isXades = await mockContainer.isXades(fileUtil: mockFileUtil)
+
+        #expect(!isXades)
+    }
+
     private func createTestPDF(at url: URL) -> URL {
         var pageSize = CGRect(x: 0, y: 0, width: 100, height: 100)
 

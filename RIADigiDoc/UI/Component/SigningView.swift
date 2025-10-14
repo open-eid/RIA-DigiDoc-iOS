@@ -166,22 +166,7 @@ struct SigningView: View {
                             )
                             .onChange(of: viewModel.isNestedContainer()) { _ in
                                 Task {
-                                    let shouldShowSignButton = await viewModel
-                                        .isSignButtonShown(
-                                            signedContainer: viewModel.signedContainer,
-                                            isNestedContainer: isNestedContainer
-                                        )
-
-                                    let shouldShowEncryptButton = await viewModel
-                                        .isEncryptButtonShown(
-                                            signedContainer: viewModel.signedContainer,
-                                            isNestedContainer: isNestedContainer
-                                        )
-
-                                    await MainActor.run {
-                                        isSignButtonShown = shouldShowSignButton
-                                        isEncryptButtonShown = shouldShowEncryptButton
-                                    }
+                                    await updateSignAndEncryptButtonVisibility()
                                 }
                             }
 
@@ -208,8 +193,7 @@ struct SigningView: View {
                                             selectedSignature: $selectedSignature,
                                             containerMimetype: $viewModel.containerMimetype,
                                             dataFilesCount: viewModel.dataFiles.count,
-                                            showRemoveSignatureButton:
-                                                !isNestedContainer && !viewModel.isCadesContainer,
+                                            showRemoveSignatureButton: viewModel.isSignatureRemoveButtonShown(),
                                             nameUtil: nameUtil,
                                             signatureUtil: signatureUtil
                                         )
@@ -282,6 +266,8 @@ struct SigningView: View {
                             await viewModel.loadContainerData(
                                 signedContainer: viewModel.signedContainer
                             )
+
+                            await updateSignAndEncryptButtonVisibility()
                         }
                     }
                     .onDisappear {
@@ -350,6 +336,25 @@ struct SigningView: View {
                 format: languageSettings.localized(key),
                 args.joined(separator: ", "))
             )
+        }
+    }
+
+    private func updateSignAndEncryptButtonVisibility() async {
+        let shouldShowSignButton = await viewModel
+            .isSignButtonShown(
+                signedContainer: viewModel.signedContainer,
+                isNestedContainer: isNestedContainer
+            )
+
+        let shouldShowEncryptButton = await viewModel
+            .isEncryptButtonShown(
+                signedContainer: viewModel.signedContainer,
+                isNestedContainer: isNestedContainer
+            )
+
+        await MainActor.run {
+            isSignButtonShown = shouldShowSignButton
+            isEncryptButtonShown = shouldShowEncryptButton
         }
     }
 }

@@ -271,6 +271,21 @@ extension URL {
         return false
     }
 
+    public func isXades(
+        fileUtil: FileUtilProtocol = fileUtil()
+    ) async -> Bool {
+        do {
+            if try isZipFile(),
+               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "signatures.xml") != nil {
+                return true
+            }
+        } catch {
+            return false
+        }
+
+        return false
+    }
+
     // Check if file is zip format
     private func isZipFile() throws -> Bool {
         guard let fileHandle = FileHandle(forReadingAtPath: self.path) else { return false }
