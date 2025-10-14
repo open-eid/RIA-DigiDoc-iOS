@@ -22,6 +22,7 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
     private let dataStore: DataStoreProtocol
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+    private let certificateUtil: CertificateUtilProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -29,12 +30,14 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
         configurationRepository: ConfigurationRepositoryProtocol,
         dataStore: DataStoreProtocol,
         fileManager: FileManagerProtocol,
-        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
+        certificateUtil: CertificateUtilProtocol
     ) {
         self.configurationRepository = configurationRepository
         self.dataStore = dataStore
         self.fileManager = fileManager
         self.advancedSettingsRepository = advancedSettingsRepository
+        self.certificateUtil = certificateUtil
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -51,7 +54,7 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
 
     // MARK: - Init helpers
 
-    private func initializeSettings() async {
+    public func initializeSettings() async {
         await ensureConfigurationLoaded()
         await loadSettings()
         await loadSiVaCert()
@@ -100,17 +103,16 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
 
     // MARK: - SiVa Cert Info Getters
 
-    public func getSiVaCertIssuer(testCert: Data? = nil) -> String {
-        guard let cert = testCert ?? sivaCertData else { return "" }
-        return CertificateUtil.getSubjectAttribute(cert: cert, attribute: .RDNAttributeType.commonName)
+    public func getSiVaCertIssuer() -> String {
+        guard let cert = sivaCertData else { return "" }
+        return certificateUtil.getSubjectAttribute(cert: cert, attribute: .RDNAttributeType.commonName)
     }
 
     public func getSiVaCertNotValidAfter(
-        expiredLabel: String,
-        testCert: Data? = nil
+        expiredLabel: String
     ) -> String {
-        guard let cert = testCert ?? sivaCertData else { return "" }
-        return CertificateUtil.getNotValidAfterWithExpiredLabel(
+        guard let cert = sivaCertData else { return "" }
+        return certificateUtil.getNotValidAfterWithExpiredLabel(
             cert: cert,
             expiredLabel: expiredLabel
         )
@@ -131,7 +133,7 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
 
     // MARK: - Observer
 
-    private func observeConfigurationUpdates() async {
+    public func observeConfigurationUpdates() async {
         guard !Task.isCancelled else {
             return
         }

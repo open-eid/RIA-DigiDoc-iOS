@@ -12,4 +12,38 @@ public class TestCertificateUtil {
         // swiftlint:enable line_length
         return Data(base64Encoded: cert) ?? Data()
     }
+
+    public static func getSampleCertificateWithHeaders() -> Data? {
+        let certString = """
+            -----BEGIN CERTIFICATE-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7VX
+            GqR7wJ8Z2Q1NxF3mP9K5L8M3nR6tY4uI7oP2qS8vW1X2Y3
+            -----END CERTIFICATE-----
+            """
+        return certString.data(using: .utf8)
+    }
+
+    public static func createSampleCertFile(
+        subfolder: String = "TestFileUtil"
+    ) -> URL {
+        let testCertContent = """
+            -----BEGIN CERTIFICATE-----
+            MIIGGzCCBQOgAwIBAgIQDmRuJmtGcd4j6HiqQzw0hzANBgkqhkiG9w0BAQsFADBZ
+            MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMTMwMQYDVQQDEypE
+            aWdpQ2VydCBHbG9iYWwgRzIgVExTIFJTQSBTSEEyNTYgMjAyMCBDQTEwHhcNMjMw
+            ODMxMDAwMDAwWhcNMjQwOTMwMjM1OTU5WjBXMQswCQYDVQQGEwJFRTEQMA4GA1UE
+            BxMHVGFsbGlubjEhMB8GA1UECgwYUmlpZ2kgSW5mb3PDvHN0ZWVtaSBBbWV0MRMw
+            EQYDVQQDDAoqLmVlc3RpLmVlMHYwEA4wwTczmHuqYY2qxYh6WUzR
+            yaKSeng9fe8ZVZdjOwmCa9ZdgjQYMZbDezMt+oRp2Q==
+            -----END CERTIFICATE-----
+            """
+        let sampleFileURL = TestFileUtil.createSampleFile(
+            name: "cert-\(UUID().uuidString)",
+            withExtension: "cer",
+            contents: testCertContent,
+            subfolder: subfolder
+        )
+
+        return sampleFileURL
+    }
 }

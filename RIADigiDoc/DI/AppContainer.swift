@@ -84,6 +84,10 @@ extension Container {
         }
     }
 
+    public var certificateUtil: Factory<CertificateUtilProtocol> {
+        self { @MainActor in CertificateUtil() }
+    }
+
     @MainActor
     var languageSettings: Factory<LanguageSettings> {
         self { @MainActor in LanguageSettings(dataStore: self.dataStore()) }.singleton
@@ -155,7 +159,10 @@ extension Container {
     @MainActor
     var advancedSettingsRepository: Factory<AdvancedSettingsRepositoryProtocol> {
         self { @MainActor in
-            AdvancedSettingsRepository(fileManager: self.fileManager())
+            AdvancedSettingsRepository(
+                fileManager: self.fileManager(),
+                certificateUtil: self.certificateUtil()
+            )
         }
     }
 
@@ -166,7 +173,8 @@ extension Container {
                 configurationRepository: self.configurationRepository(),
                 dataStore: self.dataStore(),
                 fileManager: self.fileManager(),
-                advancedSettingsRepository: self.advancedSettingsRepository()
+                advancedSettingsRepository: self.advancedSettingsRepository(),
+                certificateUtil: self.certificateUtil()
             )
         }
     }
@@ -178,7 +186,8 @@ extension Container {
                 configurationRepository: self.configurationRepository(),
                 dataStore: self.dataStore(),
                 fileManager: self.fileManager(),
-                advancedSettingsRepository: self.advancedSettingsRepository()
+                advancedSettingsRepository: self.advancedSettingsRepository(),
+                certificateUtil: self.certificateUtil()
             )
         }
     }

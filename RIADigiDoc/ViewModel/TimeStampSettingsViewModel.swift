@@ -24,6 +24,7 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
     private let dataStore: DataStoreProtocol
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+    private let certificateUtil: CertificateUtilProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -33,12 +34,14 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         configurationRepository: ConfigurationRepositoryProtocol,
         dataStore: DataStoreProtocol,
         fileManager: FileManagerProtocol,
-        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
+        certificateUtil: CertificateUtilProtocol
     ) {
         self.configurationRepository = configurationRepository
         self.dataStore = dataStore
         self.fileManager = fileManager
         self.advancedSettingsRepository = advancedSettingsRepository
+        self.certificateUtil = certificateUtil
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -106,14 +109,14 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
 
     public func getTSACertIssuer() -> String {
         guard let cert = tsaCertData else { return "" }
-        return CertificateUtil.getSubjectAttribute(cert: cert, attribute: .RDNAttributeType.commonName)
+        return certificateUtil.getSubjectAttribute(cert: cert, attribute: .RDNAttributeType.commonName)
     }
 
     public func getTSACertNotValidAfter(
         expiredLabel: String,
     ) -> String {
         guard let cert = tsaCertData else { return "" }
-        return CertificateUtil.getNotValidAfterWithExpiredLabel(
+        return certificateUtil.getNotValidAfterWithExpiredLabel(
             cert: cert,
             expiredLabel: expiredLabel
         )

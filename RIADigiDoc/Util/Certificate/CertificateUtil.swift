@@ -4,10 +4,12 @@ import SwiftASN1
 import X509
 import UtilsLib
 
-public class CertificateUtil {
+public struct CertificateUtil: CertificateUtilProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CertificateUtil")
 
-    public static func pemToDerData(fromPEM pem: Data) -> Data? {
+    public init() {}
+
+    public func pemToDerData(fromPEM pem: Data) -> Data? {
         guard let pemString = String(data: pem, encoding: .utf8) else { return nil }
         let lines = pemString.components(separatedBy: .newlines)
         let base64Lines = lines.filter { !$0.hasPrefix("---") && !$0.isEmpty }
@@ -16,7 +18,7 @@ public class CertificateUtil {
         return Data(base64Encoded: base64String)
     }
 
-    public static func getSubjectAttribute(cert: Data, attribute: ASN1ObjectIdentifier) -> String {
+    public func getSubjectAttribute(cert: Data, attribute: ASN1ObjectIdentifier) -> String {
         do {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
 
@@ -32,7 +34,7 @@ public class CertificateUtil {
         }
     }
 
-    public static func getNotValidAfterWithExpiredLabel(cert: Data, expiredLabel: String) -> String {
+    public func getNotValidAfterWithExpiredLabel(cert: Data, expiredLabel: String) -> String {
         do {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
             let notValidAfterDate = certificate.notValidAfter
