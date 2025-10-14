@@ -263,7 +263,7 @@ struct FileOpeningViewModelTests {
         mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Ddoc }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
 
         await viewModel.handleFiles()
 
@@ -295,7 +295,7 @@ struct FileOpeningViewModelTests {
         mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asics }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
 
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, confirmed in
             #expect(!confirmed)
@@ -336,7 +336,7 @@ struct FileOpeningViewModelTests {
         mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asics }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
 
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in
             throw DigiDocError.containerOpeningFailed(
@@ -374,7 +374,7 @@ struct FileOpeningViewModelTests {
         mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in Constants.MimeType.Asice }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
 
         await viewModel.handleFiles()
 
@@ -389,7 +389,7 @@ struct FileOpeningViewModelTests {
 
     @Test
     func handleSivaCancellation_handleErrorWhenNoFileAndMimetype() async {
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in nil }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
 
         await viewModel.handleSivaCancellation()
 

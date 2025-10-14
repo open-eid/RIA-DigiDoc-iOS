@@ -4,10 +4,10 @@ import CommonsLib
 
 /// @mockable
 public protocol FileUtilProtocol: Sendable {
-    func getMimeTypeFromZipFile(
+    func getFileFromZipFile(
         from zipFileURL: URL,
         fileNameToFind: String,
-    ) async throws -> String?
+    ) async throws -> URL?
 
     func fileExists(fileLocation: URL?) -> Bool
 

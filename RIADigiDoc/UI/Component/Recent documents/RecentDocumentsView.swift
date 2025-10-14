@@ -61,7 +61,7 @@ struct RecentDocumentsView: View {
                         }, label: {
                             RecentDocumentFileRow(file: file)
                         })
-                        .buttonStyle(PlainButtonStyle())
+                        .buttonStyle(.plain)
                     }
                     .onDelete(perform: viewModel.deleteFile)
                 }

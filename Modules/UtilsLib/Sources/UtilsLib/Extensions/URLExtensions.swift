@@ -33,11 +33,12 @@ extension URL {
         let defaultMimeType = Constants.MimeType.Default
 
         do {
-            if try isZipFile(), let mimetype = try await fileUtil.getMimeTypeFromZipFile(
+            if try isZipFile(), let mimetypeFile = try await fileUtil.getFileFromZipFile(
                 from: self,
                 fileNameToFind: "mimetype"
             ) {
-                return mimetype
+                let mimetypeContent = try String(contentsOf: mimetypeFile)
+                return mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
             if let mimeType = mimeTypeForFileExtension() {
@@ -253,6 +254,21 @@ extension URL {
             return fileURLs
         }
         return []
+    }
+
+    public func isCades(
+        fileUtil: FileUtilProtocol = fileUtil(),
+    ) async -> Bool {
+        do {
+            if try isZipFile(),
+               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "p7s") != nil {
+                return true
+            }
+        } catch {
+            return false
+        }
+
+        return false
     }
 
     // Check if file is zip format

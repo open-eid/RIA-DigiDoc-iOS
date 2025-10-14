@@ -52,7 +52,7 @@ struct ContainerNotificationsView: View {
         case .xadesFile:
             return "XAdES" // TODO: Add XAdES message
         case .cadesFile:
-            return "CAdES" // TODO: Add CAdES message
+            return languageSettings.localized("Cades message")
         case .unknownSignatures(let count):
             return languageSettings.localized("Unknown signature", [count])
         case .invalidSignatures(let count):

@@ -10,6 +10,7 @@ struct SivaServiceTests {
     private let mockMimetypeResolver: MimeTypeResolverProtocolMock
     private let mockFileManager: FileManagerProtocolMock
     private let mockContainerUtil: ContainerUtilProtocolMock
+    private let mockFileUtil: FileUtilProtocolMock
 
     private let service: SivaServiceProtocol
 
@@ -17,11 +18,13 @@ struct SivaServiceTests {
         mockMimetypeResolver = MimeTypeResolverProtocolMock()
         mockFileManager = FileManagerProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
+        mockFileUtil = FileUtilProtocolMock()
 
         service = SivaService(
             mimeTypeResolver: mockMimetypeResolver,
             fileManager: mockFileManager,
-            containerUtil: mockContainerUtil
+            containerUtil: mockContainerUtil,
+            fileUtil: mockFileUtil
         )
     }
 

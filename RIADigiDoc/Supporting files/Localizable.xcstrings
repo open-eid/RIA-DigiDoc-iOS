@@ -56,6 +56,24 @@
         }
       }
     },
+    "Cades message" : {
+      "comment" : "Container notifications view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This container contains CAdES signature. You are not allowed to add or remove signatures to this container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tegemist on CAdES allkirja sisaldava ümbrikuga. Sellele ümbrikule ei saa allkirja lisada ega eemaldada."
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Cancel button",
       "extractionState" : "manual",

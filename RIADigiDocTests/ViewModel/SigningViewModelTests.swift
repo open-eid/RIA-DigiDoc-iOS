@@ -880,9 +880,7 @@ struct SigningViewModelTests {
         mockSignedContainer.isEmptyFileInContainerHandler = {
             return false
         }
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
-            return Constants.MimeType.Ddoc
-        }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
         mockSignedContainer.getRawContainerFileHandler = {
             URL(fileURLWithPath: "/mock/path/mockContainer.ddoc")
         }
@@ -922,9 +920,7 @@ struct SigningViewModelTests {
         let mockSignedContainer = SignedContainerProtocolMock()
         mockSignedContainer.isEmptyFileInContainerHandler = { true }
         mockSignedContainer.getSignaturesStatusCountHandler = { [.unknown: 2, .invalid: 3] }
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
-            return Constants.MimeType.Ddoc
-        }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
         mockSignedContainer.getRawContainerFileHandler = {
             URL(fileURLWithPath: "/mock/path/mockContainer.ddoc")
         }

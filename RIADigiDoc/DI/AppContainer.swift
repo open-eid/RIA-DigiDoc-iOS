@@ -201,7 +201,8 @@ extension Container {
             SivaService(
                 mimeTypeResolver: self.mimeTypeResolver(),
                 fileManager: self.fileManager(),
-                containerUtil: self.containerUtil()
+                containerUtil: self.containerUtil(),
+                fileUtil: self.fileUtil()
             )
         }
     }

@@ -33,12 +33,15 @@ struct FileUtilTests {
         let fileNameToFind = "mimetype"
 
         let fileUtil = FileUtil(fileManager: Container.shared.fileManager())
-        let mimeType = try await fileUtil.getMimeTypeFromZipFile(
+        let fileFromZip = try #require(await fileUtil.getFileFromZipFile(
             from: zipFileURL,
             fileNameToFind: fileNameToFind
-        )
+        ))
 
-        #expect(asiceMimetype == mimeType)
+        let mimetypeContent = try String(contentsOf: fileFromZip)
+        let mimetype = mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+
+        #expect(asiceMimetype == mimetype)
     }
 
     @Test
@@ -49,7 +52,7 @@ struct FileUtilTests {
 
         let fileNameToFind = "nonexistentfile.txt"
 
-        let mimeType = try await fileUtil.getMimeTypeFromZipFile(
+        let mimeType = try await fileUtil.getFileFromZipFile(
             from: zipFileURL,
             fileNameToFind: fileNameToFind
         )

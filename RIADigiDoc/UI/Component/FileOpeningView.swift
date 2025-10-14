@@ -82,11 +82,10 @@ struct FileOpeningView: View {
             isFileOpeningLoading = viewModel.isFileOpeningLoading
             isNavigatingToNextView = viewModel.isNavigatingToNextView
 
-            let shouldShowFileAddedMessage = await viewModel.showFileAddedMessage()
-
             let isSivaConfirmed = viewModel.isSivaConfirmed
+            let showFileAddedMessage = await viewModel.showFileAddedMessage()
 
-            if isSivaConfirmed && shouldShowFileAddedMessage {
+            if isSivaConfirmed && showFileAddedMessage {
                 let message = viewModel.addedFilesCount() > 1
                 ? languageSettings.localized("Files successfully added")
                 : languageSettings.localized("File successfully added")
