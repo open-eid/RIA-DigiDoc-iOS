@@ -126,7 +126,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
     private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
         let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
         let isCades = await parentContainer.isCades()
-        if isTimestampedContainer && !isCades {
+        let isXades = await parentContainer.isXades()
+        if isTimestampedContainer && !isCades && !isXades {
             let nestedTimestampedContainer = try await sivaRepository
                 .getTimestampedContainer(parentContainer: parentContainer)
             sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)

@@ -18,8 +18,10 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var previewFile: URL?
     @Published var selectedDataFile: URL?
     @Published var isShowingFileSaver = false
+    @Published var showSignatureRemoveButton = false
     @Published var isTimestampedContainer = false
     @Published var isCadesContainer = false
+    @Published var isXadesContainer = false
     @Published private(set) var containerNotifications: [ContainerNotificationType] = []
     @Published private(set) var errorMessage: (String, [String])?
 
@@ -69,6 +71,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.containerURL = await openedContainer.getRawContainerFile()
         self.isTimestampedContainer = await isTimestampedContainer()
         self.isCadesContainer = await openedContainer.isCades()
+        self.isXadesContainer = await openedContainer.isXades()
 
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
@@ -91,6 +94,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             isEmptyFileInContainer ? .emptyFile : nil,
             isUnsupportedContainer ? .unsupportedContainer : nil,
             isCadesContainer ? .cadesFile : nil,
+            isXadesContainer ? .xadesFile : nil,
             unknownSignaturesCount > 0 ? .unknownSignatures(count: unknownSignaturesCount) : nil,
             invalidSignaturesCount > 0 ? .invalidSignatures(count: invalidSignaturesCount) : nil
         ].compactMap { $0 }
@@ -286,7 +290,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         return signedContainer != nil &&
         (!Constants.MimeType.UnsignableContainers.contains(mimetype)) &&
         (!Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension)) &&
-        !isNestedContainer && !isEmptyFileInContainer && !isCadesContainer
+        !isNestedContainer && !isEmptyFileInContainer && !isCadesContainer && !isXadesContainer
     }
 
     func isEncryptButtonShown(
@@ -298,8 +302,12 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         return (isExistingContainer || isSigned()) && !isNestedContainer
     }
 
+    func isSignatureRemoveButtonShown() -> Bool {
+        return !isNestedContainer() && !isCadesContainer && !isXadesContainer
+    }
+
     func isTimestampedContainer() async -> Bool {
-        guard let container = signedContainer else {
+        guard let container = signedContainer, await !container.isXades() else {
             return false
         }
 
@@ -309,7 +317,16 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     private func openNestedContainer(fileURL: URL, isSivaConfirmed: Bool) async throws {
         let container = try await fileOpeningService
             .openOrCreateContainer(dataFiles: [fileURL], isSivaConfirmed: isSivaConfirmed)
-        sharedContainerViewModel.setSignedContainer(container)
-        await loadContainerData(signedContainer: container)
+        let isXades = await container.isXades()
+        let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: container)
+        if isSivaConfirmed && isTimestampedContainer && !isXades {
+            let nestedTimestampedContainer = try await sivaRepository
+                .getTimestampedContainer(parentContainer: container)
+            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
+            await loadContainerData(signedContainer: nestedTimestampedContainer)
+        } else {
+            sharedContainerViewModel.setSignedContainer(container)
+            await loadContainerData(signedContainer: container)
+        }
     }
 }

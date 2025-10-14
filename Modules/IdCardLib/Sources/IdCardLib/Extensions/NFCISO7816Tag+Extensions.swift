@@ -26,7 +26,7 @@ import CryptoTokenKit
 import OSLog
 
 extension NFCISO7816Tag {
-    
+
     func sendCommand(
         cls: UInt8,
         ins: UInt8,
@@ -62,7 +62,7 @@ extension NFCISO7816Tag {
             return data
         }
     }
-    
+
     func sendCommand(
         cls: UInt8,
         ins: UInt8,
@@ -77,7 +77,6 @@ extension NFCISO7816Tag {
         return try await sendCommand(cls: cls, ins: ins, p1Byte: p1Byte, p2Byte: p2Byte, data: data, leByte: leByte)
     }
 
-    
     func sendPaceCommand(records: [TKTLVRecord], tagExpected: TKTLVTag) async throws -> TKBERTLVRecord {
         let request = TKBERTLVRecord(tag: 0x7c, records: records)
         do {

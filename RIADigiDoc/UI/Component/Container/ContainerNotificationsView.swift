@@ -50,7 +50,7 @@ struct ContainerNotificationsView: View {
     private func message(for notification: ContainerNotificationType) -> String {
         switch notification {
         case .xadesFile:
-            return "XAdES" // TODO: Add XAdES message
+            return languageSettings.localized("Xades message")
         case .cadesFile:
             return languageSettings.localized("Cades message")
         case .unknownSignatures(let count):

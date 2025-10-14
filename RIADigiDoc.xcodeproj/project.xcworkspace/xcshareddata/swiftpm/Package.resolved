@@ -1,5 +1,5 @@
 {
-  "originHash" : "9e094ac92fcc627d17e7bf2255770e63d530139ae0032f323d350b9e3e36c188",
+  "originHash" : "5cfdacc6dc3e2f080c69617c473a32e3cc20075d8db1ab8dee4ee4d5581b33b0",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -40,7 +40,7 @@
     {
       "identity" : "digest",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leif-ibsen/Digest",
+      "location" : "https://github.com/leif-ibsen/Digest.git",
       "state" : {
         "revision" : "95ba89b494aaff5f3cd2933c03b9a890323dbf2c",
         "version" : "1.13.0"

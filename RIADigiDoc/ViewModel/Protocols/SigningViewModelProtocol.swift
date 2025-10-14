@@ -15,6 +15,7 @@ public protocol SigningViewModelProtocol: Sendable {
     func isSivaConfirmationNeeded(dataFile: DataFileWrapper) async -> Bool
     func isSignButtonShown(signedContainer: SignedContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isEncryptButtonShown(signedContainer: SignedContainerProtocol?, isNestedContainer: Bool) async -> Bool
+    func isSignatureRemoveButtonShown() -> Bool
     func isTimestampedContainer() async -> Bool
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType]
 }

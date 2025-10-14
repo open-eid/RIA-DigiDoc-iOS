@@ -18,6 +18,7 @@ public protocol SignedContainerProtocol: Sendable, AnyObject {
     func getSignaturesStatusCount() async -> [SignatureStatus: Int]
     func isEmptyFileInContainer() async -> Bool
     func isCades() async -> Bool
+    func isXades() async -> Bool
 }
 
 extension SignedContainerProtocol {

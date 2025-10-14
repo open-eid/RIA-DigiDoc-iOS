@@ -3798,6 +3798,24 @@
         }
       }
     },
+    "Xades message" : {
+      "comment" : "Container notifications view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This ASICS container contains XADES signature. You are not allowed to add or remove signatures to this container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tegemist on XADES allkirja sisalduva ASICS ümbrikuga. Sellele ümbrikule ei saa allkirja lisada ega eemaldada."
+          }
+        }
+      }
+    },
     "Zip code title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
