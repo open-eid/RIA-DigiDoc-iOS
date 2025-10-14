@@ -33,44 +33,10 @@ final class DiagnosticsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
 
         mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
-
-        mockConfigurationRepository.observeConfigurationUpdatesHandler = { [mockConfigProvider] in
-            guard let mockConfig = mockConfigProvider else {
-                return AsyncThrowingStream { continuation in
-                    continuation.yield(nil)
-                    continuation.finish(throwing: DecodingError.valueNotFound(
-                        Int.self,
-                        DecodingError.Context(
-                            codingPath: [],
-                            debugDescription: "Expected a non-nil mockConfigProvider value"
-                        )
-                    )
-                    )
-                }
-            }
-
-            return await DiagnosticsViewModelTests
-                .mockAsyncStream(configProvider: mockConfig)
-        }
-
-        mockConfigurationRepository.getCentralConfigurationUpdatesHandler = { [mockConfigProvider] _ async throws in
-            guard let mockConfig = mockConfigProvider else {
-                return AsyncThrowingStream { continuation in
-                    continuation.yield(nil)
-                    continuation.finish(throwing: DecodingError.valueNotFound(
-                        Int.self,
-                        DecodingError.Context(
-                            codingPath: [],
-                            debugDescription: "Expected a non-nil mockConfigProvider value"
-                        )
-                    )
-                    )
-                }
-            }
-
-            return await DiagnosticsViewModelTests
-                .mockAsyncStream(configProvider: mockConfig)
-        }
+        TestConfigurationSetup.configureMocks(
+            configurationRepository: mockConfigurationRepository,
+            configProvider: mockConfigProvider
+        )
 
         viewModel = DiagnosticsViewModel(
             containerWrapper: mockContainerWrapper,

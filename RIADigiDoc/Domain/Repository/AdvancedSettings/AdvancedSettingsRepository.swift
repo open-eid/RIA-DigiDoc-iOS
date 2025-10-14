@@ -8,11 +8,14 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "AdvancedSettingsRepository")
 
     private let fileManager: FileManagerProtocol
+    private let certificateUtil: CertificateUtilProtocol
 
     init(
         fileManager: FileManagerProtocol,
+        certificateUtil: CertificateUtilProtocol
     ) {
         self.fileManager = fileManager
+        self.certificateUtil = certificateUtil
     }
 
     // MARK: - Loading Certificate
@@ -59,7 +62,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
     private func getCertificateContent(certFileURL: URL) async throws -> Data? {
         let certDataRaw = try Data(contentsOf: certFileURL)
         var certData = certDataRaw
-        if let der = await CertificateUtil.pemToDerData(fromPEM: certDataRaw) {
+        if let der = await certificateUtil.pemToDerData(fromPEM: certDataRaw) {
             certData = der
         }
         return certData
@@ -78,14 +81,6 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
                 fileManager: fileManager
             )
 
-            if !fileManager.fileExists(atPath: certCacheDirectory.path) {
-                try fileManager.createDirectory(
-                    at: certCacheDirectory,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-            }
-
             try removeAllCertFiles(certCacheDirectory: certCacheDirectory)
 
             let sourceExtension = url.pathExtension
@@ -94,14 +89,9 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
                 "\(certificateBaseName).\(extensionToUse)"
             )
 
-            if fileManager.fileExists(atPath: destinationURL.path) {
-                try fileManager.removeItem(at: destinationURL)
-            }
             try fileManager.copyItem(at: url, to: destinationURL)
 
-            let certData = try await getCertificateContent(certFileURL: url)
-
-            return certData
+            return try await getCertificateContent(certFileURL: destinationURL)
         } catch {
             await AdvancedSettingsRepository.logger.error("Unable to import certificate: \(error)")
             return nil

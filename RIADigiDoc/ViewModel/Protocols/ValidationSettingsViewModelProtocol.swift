@@ -9,15 +9,20 @@ public protocol ValidationSettingsViewModelProtocol: Sendable {
     var isImportingCert: Bool { get }
     var isLoading: Bool { get }
 
+    // MARK: - Init helpers
+    func initializeSettings() async
+
     // MARK: - Saving
     func saveSettings() async
 
     // MARK: - SiVa Cert Info Getters
-    func getSiVaCertIssuer(testCert: Data?) -> String
-    func getSiVaCertNotValidAfter(expiredLabel: String, testCert: Data?) -> String
+    func getSiVaCertIssuer() -> String
+    func getSiVaCertNotValidAfter(expiredLabel: String) -> String
 
     // MARK: - SiVa Cert Import
     func importSiVaCert(from url: URL) async
 
+    // MARK: - Observer
+    func observeConfigurationUpdates() async throws
     func removeObservers() async
 }

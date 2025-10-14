@@ -10,9 +10,6 @@ struct ValidationSettingsView: View {
     // MARK: - Navigation
     @State private var navigateToCertificateView = false
 
-    // MARK: - Bottom sheet navigation
-    @State private var showSettingsBottomSheetFromButton = false
-
     @StateObject private var viewModel: ValidationSettingsViewModel
 
     init() {
@@ -24,9 +21,6 @@ struct ValidationSettingsView: View {
             title: languageSettings.localized("Main settings validation services title"),
             onLeftClick: {
                 dismiss()
-            },
-            onRightSecondaryClick: {
-                showSettingsBottomSheetFromButton = true
             },
             excludeDestinations: [.advanced],
             content: {

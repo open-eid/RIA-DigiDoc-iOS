@@ -153,6 +153,7 @@
 				UI/Theme/Model/ColorPalette.swift,
 				UI/Theme/Theme.swift,
 				Util/Certificate/CertificateUtil.swift,
+				Util/Certificate/CertificateUtilProtocol.swift,
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
 				Util/Signature/SignatureUtil.swift,
