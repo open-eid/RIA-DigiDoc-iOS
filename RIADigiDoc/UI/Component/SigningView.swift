@@ -162,17 +162,25 @@ struct SigningView: View {
                                     isFileSaved: $isFileSaved
                                 )
                             )
-                            .task {
-                                isSignButtonShown = await viewModel
-                                    .isSignButtonShown(
-                                        signedContainer: viewModel.signedContainer,
-                                        isNestedContainer: isNestedContainer
-                                    )
-                                isEncryptButtonShown = await viewModel
-                                    .isEncryptButtonShown(
-                                        signedContainer: viewModel.signedContainer,
-                                        isNestedContainer: isNestedContainer
-                                    )
+                            .onChange(of: viewModel.isNestedContainer()) { _ in
+                                Task {
+                                    let shouldShowSignButton = await viewModel
+                                        .isSignButtonShown(
+                                            signedContainer: viewModel.signedContainer,
+                                            isNestedContainer: isNestedContainer
+                                        )
+
+                                    let shouldShowEncryptButton = await viewModel
+                                        .isEncryptButtonShown(
+                                            signedContainer: viewModel.signedContainer,
+                                            isNestedContainer: isNestedContainer
+                                        )
+
+                                    await MainActor.run {
+                                        isSignButtonShown = shouldShowSignButton
+                                        isEncryptButtonShown = shouldShowEncryptButton
+                                    }
+                                }
                             }
 
                             if isSignedContainer {
@@ -198,7 +206,8 @@ struct SigningView: View {
                                             selectedSignature: $selectedSignature,
                                             containerMimetype: $viewModel.containerMimetype,
                                             dataFilesCount: viewModel.dataFiles.count,
-                                            showRemoveSignatureButton: !isNestedContainer,
+                                            showRemoveSignatureButton:
+                                                !isNestedContainer && !viewModel.isCadesContainer,
                                             nameUtil: nameUtil,
                                             signatureUtil: signatureUtil
                                         )
@@ -212,20 +221,14 @@ struct SigningView: View {
                                         .font(typography.labelLarge)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                                    DataFilesListView(
-                                        dataFiles: viewModel.dataFiles,
-                                        showRemoveFileButton: !isContainerSigned && !isNestedContainer,
-                                        onOpenFileButtonClick: { dataFile in
-                                            Task {
-                                                await viewModel
-                                                    .handleFileOpening(dataFile: dataFile, isSivaConfirmed: true)
-                                            }
-                                        },
-                                        onSaveDataFileButtonClick: { dataFile in
-                                            Task {
-                                                await viewModel.handleSaveFile(dataFile: dataFile)
-                                            }
-                                        }
+                                    DataFilesSection(
+                                        viewModel: viewModel,
+                                        isContainerSigned: isContainerSigned,
+                                        isNestedContainer: isNestedContainer,
+                                        selectedDataFile: $selectedDataFile,
+                                        showSivaMessage: $showSivaMessage,
+                                        isFileSaved: $isFileSaved,
+                                        languageSettings: languageSettings
                                     )
                                     .background(
                                         FileSaverHandler(

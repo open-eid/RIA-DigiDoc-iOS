@@ -46,7 +46,7 @@ struct URLExtensionsTests {
             with: ["testfile.txt": "Test content"],
             containerExtension: "zip")
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in
             throw Archive.ArchiveError.unreadableArchive
         }
 
@@ -369,6 +369,40 @@ struct URLExtensionsTests {
         let standardized = url.standardizedPathURL
         let expectedPath = FileManager.default.currentDirectoryPath
         #expect(standardized.path == expectedPath)
+    }
+
+    @Test
+    func isCades_successReturningTrue() async throws {
+        let mockFile = URL(fileURLWithPath: "/mock/path/testFile.p7s")
+
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: [mockFile.lastPathComponent: "Test content"],
+            containerExtension: "asice")
+
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in
+            return mockFile
+        }
+
+        defer {
+            try? FileManager.default.removeItem(at: mockContainer)
+        }
+
+        let isCades = await mockContainer.isCades(fileUtil: mockFileUtil)
+
+        #expect(isCades)
+    }
+
+    @Test
+    func isCades_successReturningFalse() async {
+        let mockContainer = URL(fileURLWithPath: "/mock/path/regularContainer.asice")
+
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in
+            return nil
+        }
+
+        let isCades = await mockContainer.isCades(fileUtil: mockFileUtil)
+
+        #expect(!isCades)
     }
 
     private func createTestPDF(at url: URL) -> URL {

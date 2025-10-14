@@ -17,10 +17,10 @@ public struct FileUtil: FileUtilProtocol {
         self.fileManager = fileManager
     }
 
-    public func getMimeTypeFromZipFile(
+    public func getFileFromZipFile(
         from zipFileURL: URL,
         fileNameToFind: String
-    ) async throws -> String? {
+    ) async throws -> URL? {
         let archive = try Archive(url: zipFileURL, accessMode: .read)
 
         if let entry = archive.first(where: { $0.path.contains(fileNameToFind) }) {
@@ -35,8 +35,7 @@ public struct FileUtil: FileUtilProtocol {
 
             _ = try archive.extract(entry, to: extractedFile)
 
-            let mimetypeContent = try String(contentsOf: extractedFile)
-            return mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            return extractedFile
         }
 
         return nil

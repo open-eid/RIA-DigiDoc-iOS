@@ -102,8 +102,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             } catch {
                 handleError()
             }
-        } else {
-            handleError()
         }
     }
 
@@ -125,6 +123,18 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
     }
 
+    private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
+        let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
+        let isCades = await parentContainer.isCades()
+        if isTimestampedContainer && !isCades {
+            let nestedTimestampedContainer = try await sivaRepository
+                .getTimestampedContainer(parentContainer: parentContainer)
+            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
+        } else {
+            sharedContainerViewModel.setSignedContainer(parentContainer)
+        }
+    }
+
     private func handleLoadingSuccess(isSivaConfirmed: Bool) {
         self.isSivaConfirmed = isSivaConfirmed
         isFileOpeningLoading = false
@@ -140,16 +150,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)
-        }
-    }
-
-    private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
-        if await sivaRepository.isTimestampedContainer(signedContainer: parentContainer) {
-            let nestedTimestampedContainer = try await sivaRepository
-                .getTimestampedContainer(parentContainer: parentContainer)
-            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
-        } else {
-            sharedContainerViewModel.setSignedContainer(parentContainer)
         }
     }
 

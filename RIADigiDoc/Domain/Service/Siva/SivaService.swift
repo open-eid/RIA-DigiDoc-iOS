@@ -9,15 +9,18 @@ actor SivaService: SivaServiceProtocol {
     private let mimeTypeResolver: MimeTypeResolverProtocol
     private let fileManager: FileManagerProtocol
     private let containerUtil: ContainerUtilProtocol
+    private let fileUtil: FileUtilProtocol
 
     init(
         mimeTypeResolver: MimeTypeResolverProtocol,
         fileManager: FileManagerProtocol,
-        containerUtil: ContainerUtilProtocol
+        containerUtil: ContainerUtilProtocol,
+        fileUtil: FileUtilProtocol
     ) {
         self.mimeTypeResolver = mimeTypeResolver
         self.fileManager = fileManager
         self.containerUtil = containerUtil
+        self.fileUtil = fileUtil
     }
 
     func isSivaConfirmationNeeded(files: [URL]) async -> Bool {
@@ -29,9 +32,11 @@ actor SivaService: SivaServiceProtocol {
 
         let mimetype = await mimeTypeResolver.mimeType(url: file)
 
+        let isCades = await file.isCades(fileUtil: fileUtil)
+
         return Constants.MimeType.SivaContainers.contains(mimetype) || (
             Constants.MimeType.Pdf == mimetype && file.isSignedPDF()
-        )
+        ) || isCades
     }
 
     func isTimestampedContainer(signedContainer: SignedContainerProtocol) async -> Bool {

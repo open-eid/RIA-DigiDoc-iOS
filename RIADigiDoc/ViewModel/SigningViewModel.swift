@@ -19,6 +19,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var selectedDataFile: URL?
     @Published var isShowingFileSaver = false
     @Published var isTimestampedContainer = false
+    @Published var isCadesContainer = false
     @Published private(set) var containerNotifications: [ContainerNotificationType] = []
     @Published private(set) var errorMessage: (String, [String])?
 
@@ -67,6 +68,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.containerMimetype = await openedContainer.getContainerMimetype()
         self.containerURL = await openedContainer.getRawContainerFile()
         self.isTimestampedContainer = await isTimestampedContainer()
+        self.isCadesContainer = await openedContainer.isCades()
 
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
@@ -88,6 +90,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         return [
             isEmptyFileInContainer ? .emptyFile : nil,
             isUnsupportedContainer ? .unsupportedContainer : nil,
+            isCadesContainer ? .cadesFile : nil,
             unknownSignaturesCount > 0 ? .unknownSignatures(count: unknownSignaturesCount) : nil,
             invalidSignaturesCount > 0 ? .invalidSignatures(count: invalidSignaturesCount) : nil
         ].compactMap { $0 }
@@ -209,6 +212,15 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 } catch {
                     SigningViewModel.logger.error("Failed to open nested container: \(error)")
                     errorMessage = ("Failed to open container", [dataFile.fileName])
+                    if error.localizedDescription.contains("Online validation disabled") {
+                        SigningViewModel.logger.error(
+                            "Unable to open container '\([dataFile.fileName])'. Sending to SiVa not allowed."
+                        )
+                        errorMessage = nil
+                    } else {
+                        SigningViewModel.logger.error("Failed to open nested container: \(error)")
+                        errorMessage = ("Failed to open container", [dataFile.fileName])
+                    }
                 }
             } else {
                 previewFile = fileURL
@@ -274,7 +286,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         return signedContainer != nil &&
         (!Constants.MimeType.UnsignableContainers.contains(mimetype)) &&
         (!Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension)) &&
-        !isNestedContainer && !isEmptyFileInContainer
+        !isNestedContainer && !isEmptyFileInContainer && !isCadesContainer
     }
 
     func isEncryptButtonShown(

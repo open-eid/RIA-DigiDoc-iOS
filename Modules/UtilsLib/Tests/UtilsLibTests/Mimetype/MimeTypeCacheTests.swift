@@ -33,7 +33,7 @@ struct MimeTypeCacheTests {
         let md5 = "0cbc6611f5540bd0809a388dc95a615b"
         let expectedMimeType = "text/plain"
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in expectedMimeType }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in mockFileUrl }
 
         await mimeTypeCache.setMimeType(md5: md5, mimeType: expectedMimeType)
 
@@ -48,7 +48,7 @@ struct MimeTypeCacheTests {
         let md5 = "0cbc6611f5540bd0809a388dc95a615b"
         let expectedMimeType = "text/plain"
 
-        mockFileUtil.getMimeTypeFromZipFileHandler = { _, _ in expectedMimeType }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in mockFileUrl }
 
         let initialCacheMiss = await mimeTypeCache.getMimeType(fileUrl: mockFileUrl)
         #expect(expectedMimeType == initialCacheMiss)
