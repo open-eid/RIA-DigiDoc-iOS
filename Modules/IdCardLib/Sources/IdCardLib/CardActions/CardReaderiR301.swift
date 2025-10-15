@@ -12,7 +12,7 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
@@ -69,16 +69,32 @@ class CardReaderiR301: CardReader {
             return Int(dwReaders)
         }
 
-        let connectResult = SCardConnect(contextHandle, mszReaders, DWORD(SCARD_SHARE_SHARED),
-                                         DWORD(SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1), &cardHandle, &pioSendPci.dwProtocol)
+        let connectResult = SCardConnect(
+            contextHandle,
+            mszReaders,
+            DWORD(SCARD_SHARE_SHARED),
+            DWORD(
+                SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1
+            ),
+            &cardHandle,
+            &pioSendPci.dwProtocol
+        )
         guard connectResult == SCARD_S_SUCCESS else {
             throw IdCardInternalError.readerProcessFailed
         }
 
         var atrSize: DWORD = 32
         var dwStatus: DWORD = 0
-        atr = try Bytes(unsafeUninitializedCapacity: Int(atrSize)) { [cardHandle] buffer, initializedCount in
-            guard SCardStatus(cardHandle, nil, nil, &dwStatus, nil, buffer.baseAddress, &atrSize) == SCARD_S_SUCCESS else {
+        atr = try Bytes(unsafeUninitializedCapacity: Int(atrSize)) {[cardHandle] buffer, initializedCount in
+            guard SCardStatus(
+                cardHandle,
+                nil,
+                nil,
+                &dwStatus,
+                nil,
+                buffer.baseAddress,
+                &atrSize
+            ) == SCARD_S_SUCCESS else {
                 CardReaderiR301.logger.error("ID-CARD: Failed to get card status")
                 throw IdCardInternalError.readerProcessFailed
             }
@@ -91,12 +107,21 @@ class CardReaderiR301: CardReader {
             throw IdCardInternalError.readerProcessFailed
         }
     }
-    
+
     func transmit(_ apdu: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
         CardReaderiR301.logger.debug("ID-CARD Transmitting: \(apdu.hex)")
         var responseSize: DWORD = 512
         var response = try Bytes(unsafeUninitializedCapacity: Int(responseSize)) { buffer, initializedCount in
-            guard SCardTransmit(cardHandle, &pioSendPci, apdu, DWORD(apdu.count), nil, buffer.baseAddress, &responseSize) == SCARD_S_SUCCESS else {
+            guard SCardTransmit(
+                cardHandle,
+                &pioSendPci,
+                apdu,
+                DWORD(apdu.count),
+                nil,
+                buffer.baseAddress,
+                &responseSize
+            ) == SCARD_S_SUCCESS
+            else {
                 CardReaderiR301.logger.error("ID-CARD: Failed to send APDU data")
                 throw IdCardInternalError.readerProcessFailed
             }
@@ -107,8 +132,8 @@ class CardReaderiR301: CardReader {
             throw IdCardInternalError.readerProcessFailed
         }
         CardReaderiR301.logger.debug("ID-CARD Response: \(response.hex)")
-        let sw = UInt16(response[response.count - 2], response[response.count - 1])
+        let swVal = UInt16(response[response.count - 2], response[response.count - 1])
         response.removeLast(2)
-        return (response, sw)
+        return (response, swVal)
     }
 }

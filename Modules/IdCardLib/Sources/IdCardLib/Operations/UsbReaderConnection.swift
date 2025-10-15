@@ -30,12 +30,12 @@ public protocol UsbReaderConnectionDelegate: AnyObject {
 }
 
 public enum UsbReaderStatus {
-    case Initial
-    case ReaderNotConnected
-    case ReaderRestarted
-    case ReaderConnected
-    case CardConnected(CardCommands)
-    case ReaderProcessFailed
+    case sInitial
+    case sReaderNotConnected
+    case sReaderRestarted
+    case sReaderConnected
+    case sCardConnected(CardCommands)
+    case sReaderProcessFailed
 }
 
 @MainActor
@@ -46,12 +46,11 @@ public class UsbReaderConnection {
     public weak var delegate: UsbReaderConnectionDelegate?
     fileprivate var handle: SCARDCONTEXT = 0
     private var handler = UsbReaderInterfaceHandler()
-    private var status: UsbReaderStatus = .Initial
+    private var status: UsbReaderStatus = .sInitial
 
     private init() {
     }
-    
-    
+
     public func startDiscoveringReaders() {
         guard handle == 0 else {
             UsbReaderConnection.logger.error("ID-CARD: Reader discovery is already running")
@@ -63,7 +62,7 @@ public class UsbReaderConnection {
         UsbReaderConnection.logger.debug("ID-CARD: Started reader discovery: \(self.handle)")
     }
 
-    public func stopDiscoveringReaders(with status: UsbReaderStatus = .Initial) {
+    public func stopDiscoveringReaders(with status: UsbReaderStatus = .sInitial) {
         UsbReaderConnection.logger.debug("ID-CARD: Stopping reader discovery")
         self.status = status
         FtDidEnterBackground(1)
@@ -91,27 +90,28 @@ private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDel
         readerInterface.setDelegate(self)
     }
 
-    func readerInterfaceDidChange(_ attached: Bool, bluetoothID: String?) {
+    func readerInterfaceDidChange(_ attached: Bool, bluetoothID _: String?) {
         UsbReaderInterfaceHandler.logger.debug("ID-CARD attached: \(attached)")
-        UsbReaderConnection.shared.updateStatus(attached ? .ReaderConnected : .ReaderNotConnected)
+        UsbReaderConnection.shared.updateStatus(attached ? .sReaderConnected : .sReaderNotConnected)
     }
 
     func cardInterfaceDidDetach(_ attached: Bool) {
         UsbReaderInterfaceHandler.logger.debug("ID-CARD: Card (interface) attached: \(attached)")
         do {
             guard attached, let reader = try CardReaderiR301(contextHandle: UsbReaderConnection.shared.handle) else {
-                return UsbReaderConnection.shared.updateStatus(.ReaderConnected)
+                return UsbReaderConnection.shared.updateStatus(.sReaderConnected)
             }
-            if let handler: CardCommands = Idemia(reader: reader, atr: reader.atr) ?? (try? Thales(reader: reader, atr: reader.atr)) {
-                UsbReaderConnection.shared.updateStatus(.CardConnected(handler))
+            if let handler: CardCommands = Idemia(reader: reader, atr: reader.atr)
+                ?? (try? Thales(reader: reader, atr: reader.atr)) {
+                UsbReaderConnection.shared.updateStatus(.sCardConnected(handler))
             }
         } catch {
             UsbReaderInterfaceHandler.logger.debug("ID-CARD: Unable to power on card")
-            UsbReaderConnection.shared.updateStatus(.ReaderProcessFailed)
+            UsbReaderConnection.shared.updateStatus(.sReaderProcessFailed)
         }
     }
 
-    func didGetBattery(_ battery: Int) {
+    func didGetBattery(_: Int) {
         // Implement if needed
     }
 

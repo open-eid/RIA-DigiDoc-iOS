@@ -3,7 +3,7 @@ import OSLog
 
 @objc public class CdocInfo: NSObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CdocInfo")
-    
+
     @objc public let format: String
     @objc public let addressees: [Addressee]
     @objc public let dataFiles: [CryptoDataFile]

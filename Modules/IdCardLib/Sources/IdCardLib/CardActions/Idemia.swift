@@ -59,7 +59,7 @@ class Idemia: CardCommandsInternal {
         }
         self.reader = reader
     }
-    
+
     required init?(reader: CardReader, aid: Bytes) {
         guard aid == kAID else {
             return nil

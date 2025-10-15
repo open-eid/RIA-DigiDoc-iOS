@@ -127,13 +127,19 @@ class CardReaderNFC: CardReader {
         // Mapping
         let nonceS = BInt(magnitude: nonce)
         let mappingBasePoint = ECPublicKey(privateKey: try ECPrivateKey(domain: domain, s: nonceS)) // S*G
-        CardReaderNFC.logger.debug("Card Key x: \(mappingBasePoint.w.x.asMagnitudeBytes().toHex), y: \(mappingBasePoint.w.y.asMagnitudeBytes().toHex)")
+        // swiftlint:disable line_length
+        CardReaderNFC.logger.debug("Card Key x: \(mappingBasePoint.w.x.asMagnitudeBytes().toHex, privacy: .public), y: \(mappingBasePoint.w.y.asMagnitudeBytes().toHex, privacy: .public)")
+        // swiftlint:enable line_length
         let sharedSecretH = try domain.multiplyPoint(cardPubKey.w, terminalPrivKey.s)
-        CardReaderNFC.logger.debug("Shared Secret x: \(sharedSecretH.x.asMagnitudeBytes().toHex), y: \(sharedSecretH.y.asMagnitudeBytes().toHex)")
+        // swiftlint:disable line_length
+        CardReaderNFC.logger.debug("Shared Secret x: \(sharedSecretH.x.asMagnitudeBytes().toHex, privacy: .public), y: \(sharedSecretH.y.asMagnitudeBytes().toHex, privacy: .public)")
+        // swiftlint:enable line_length
         let mappedPoint = try domain.addPoints(mappingBasePoint.w, sharedSecretH) // MAP G = (S*G) + H
 
         // Ephemeral data
-        CardReaderNFC.logger.debug("Mapped point x: \(mappedPoint.x.asMagnitudeBytes().toHex), y: \(mappedPoint.y.asMagnitudeBytes().toHex)")
+        // swiftlint:disable line_length
+        CardReaderNFC.logger.debug("Mapped point x: \(mappedPoint.x.asMagnitudeBytes().toHex, privacy: .public), y: \(mappedPoint.y.asMagnitudeBytes().toHex, privacy: .public)")
+        // swiftlint:enable line_length
         let mappedDomain = try Domain.instance(
             name: domain.name + " Mapped",
             p: domain.p,
@@ -299,7 +305,6 @@ class CardReaderNFC: CardReader {
     }
 }
 
-
 // MARK: - Extensions
 
 extension DataProtocol {
@@ -314,19 +319,18 @@ extension DataProtocol {
     }
 
     func removePadding() throws -> SubSequence {
-        var i = endIndex
-        while i != startIndex {
-            formIndex(before: &i)
-            if self[i] == 0x80 {
-                return self[startIndex..<i]
-            } else if self[i] != 0x00 {
+        var index = endIndex
+        while index != startIndex {
+            formIndex(before: &index)
+            if self[index] == 0x80 {
+                return self[startIndex..<index]
+            } else if self[index] != 0x00 {
                 throw IdCardInternalError.failedToRemovePadding
             }
         }
         throw IdCardInternalError.failedToRemovePadding
     }
 }
-
 
 extension UInt16 {
     init(_ p1Byte: UInt8, _ p2Byte: UInt8) {

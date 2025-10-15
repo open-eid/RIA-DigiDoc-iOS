@@ -10,7 +10,7 @@ public class SmartToken: AbstractSmartToken {
         self.card = card
         self.pin1 = pin1
     }
-    
+
     func blocking<Data>(_ body: @escaping @Sendable () async throws -> Data) throws -> Data {
         let semaphore = DispatchSemaphore(value: 0)
         var result: Result<Data, Error>!
@@ -28,11 +28,11 @@ public class SmartToken: AbstractSmartToken {
         semaphore.wait()
         return try result.get()
     }
-    
+
     public func getCertificate() throws -> Data {
         try blocking { try await self.getCertificate() }
     }
-    
+
     public func getCertificate() async throws -> Data {
         return try await self.card.readAuthenticationCertificate()
     }
@@ -49,4 +49,3 @@ public class SmartToken: AbstractSmartToken {
         try blocking { try await self.card.authenticate(for: data, withPin1: self.pin1) }
     }
 }
-

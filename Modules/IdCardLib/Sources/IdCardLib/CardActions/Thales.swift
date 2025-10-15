@@ -50,7 +50,7 @@ class Thales: CardCommandsInternal {
         }
         self.reader = reader
     }
-    
+
     required init?(reader: CardReader, aid: Bytes) {
         guard aid == Thales.kAIDGlobal else {
             return nil
