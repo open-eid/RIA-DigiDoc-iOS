@@ -26,19 +26,19 @@ public struct ConfigurationProvider: Codable, Sendable {
     }
 
     public let metaInf: MetaInf
-    public let sivaUrl: String
-    public let tslUrl: String
-    public let tslCerts: [String]
-    public let tsaUrl: String
-    public let ocspUrls: [String: String]
-    public let ldapPersonUrl: String
-    public let ldapCorpUrl: String
-    public let midRestUrl: String
-    public let midSkRestUrl: String
-    public let sidV2RestUrl: String
-    public let sidV2SkRestUrl: String
-    public let certBundle: [String]
-    public let ldapCerts: [String]
+    public let sivaUrl: URL
+    public let tslUrl: URL
+    public let tslCerts: [Data]
+    public let tsaUrl: URL
+    public let ocspIssuers: [String: String]
+    public let ldapPersonUrl: URL
+    public let ldapCorpUrl: URL
+    public let midRestUrl: URL
+    public let midSkRestUrl: URL
+    public let sidV2RestUrl: URL
+    public let sidV2SkRestUrl: URL
+    public let certBundle: [Data]
+    public let ldapCerts: [Data]
     public var configurationLastUpdateCheckDate: Date?
     public var configurationUpdateDate: Date?
     public let cdoc2DefaultKeyserver: String
@@ -51,7 +51,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         case tslUrl = "TSL-URL"
         case tslCerts = "TSL-CERTS"
         case tsaUrl = "TSA-URL"
-        case ocspUrls = "OCSP-URL-ISSUER"
+        case ocspIssuers = "OCSP-URL-ISSUER"
         case ldapPersonUrl = "LDAP-PERSON-URL"
         case ldapCorpUrl = "LDAP-CORP-URL"
         case midRestUrl = "MID-PROXY-URL"
@@ -82,7 +82,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         try container.encode(tslUrl, forKey: .tslUrl)
         try container.encode(tslCerts, forKey: .tslCerts)
         try container.encode(tsaUrl, forKey: .tsaUrl)
-        try container.encode(ocspUrls, forKey: .ocspUrls)
+        try container.encode(ocspIssuers, forKey: .ocspIssuers)
         try container.encode(ldapPersonUrl, forKey: .ldapPersonUrl)
         try container.encode(ldapCorpUrl, forKey: .ldapCorpUrl)
         try container.encode(midRestUrl, forKey: .midRestUrl)
@@ -99,19 +99,19 @@ public struct ConfigurationProvider: Codable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         metaInf = try container.decode(MetaInf.self, forKey: .metaInf)
-        sivaUrl = try container.decode(String.self, forKey: .sivaUrl)
-        tslUrl = try container.decode(String.self, forKey: .tslUrl)
-        tslCerts = try container.decode([String].self, forKey: .tslCerts)
-        tsaUrl = try container.decode(String.self, forKey: .tsaUrl)
-        ocspUrls = try container.decode([String: String].self, forKey: .ocspUrls)
-        ldapPersonUrl = try container.decode(String.self, forKey: .ldapPersonUrl)
-        ldapCorpUrl = try container.decode(String.self, forKey: .ldapCorpUrl)
-        midRestUrl = try container.decode(String.self, forKey: .midRestUrl)
-        midSkRestUrl = try container.decode(String.self, forKey: .midSkRestUrl)
-        sidV2RestUrl = try container.decode(String.self, forKey: .sidV2RestUrl)
-        sidV2SkRestUrl = try container.decode(String.self, forKey: .sidV2SkRestUrl)
-        certBundle = try container.decode([String].self, forKey: .certBundle)
-        ldapCerts = try container.decode([String].self, forKey: .ldapCerts)
+        sivaUrl = try container.decode(URL.self, forKey: .sivaUrl)
+        tslUrl = try container.decode(URL.self, forKey: .tslUrl)
+        tslCerts = try container.decode([Data].self, forKey: .tslCerts)
+        tsaUrl = try container.decode(URL.self, forKey: .tsaUrl)
+        ocspIssuers = try container.decode([String: String].self, forKey: .ocspIssuers)
+        ldapPersonUrl = try container.decode(URL.self, forKey: .ldapPersonUrl)
+        ldapCorpUrl = try container.decode(URL.self, forKey: .ldapCorpUrl)
+        midRestUrl = try container.decode(URL.self, forKey: .midRestUrl)
+        midSkRestUrl = try container.decode(URL.self, forKey: .midSkRestUrl)
+        sidV2RestUrl = try container.decode(URL.self, forKey: .sidV2RestUrl)
+        sidV2SkRestUrl = try container.decode(URL.self, forKey: .sidV2SkRestUrl)
+        certBundle = try container.decode([Data].self, forKey: .certBundle)
+        ldapCerts = try container.decode([Data].self, forKey: .ldapCerts)
         cdoc2DefaultKeyserver = try container.decode(String.self, forKey: .cdoc2DefaultKeyserver)
         cdoc2UseKeyserver = try container.decode(Bool.self, forKey: .cdoc2UseKeyserver)
         cdoc2Conf = try container.decode([String: [String: String]].self, forKey: .cdoc2Conf)
@@ -128,19 +128,19 @@ public struct ConfigurationProvider: Codable, Sendable {
 
     public init(
         metaInf: MetaInf,
-        sivaUrl: String,
-        tslUrl: String,
-        tslCerts: [String],
-        tsaUrl: String,
-        ocspUrls: [String: String],
-        ldapPersonUrl: String,
-        ldapCorpUrl: String,
-        midRestUrl: String,
-        midSkRestUrl: String,
-        sidV2RestUrl: String,
-        sidV2SkRestUrl: String,
-        certBundle: [String],
-        ldapCerts: [String],
+        sivaUrl: URL,
+        tslUrl: URL,
+        tslCerts: [Data],
+        tsaUrl: URL,
+        ocspIssuers: [String: String],
+        ldapPersonUrl: URL,
+        ldapCorpUrl: URL,
+        midRestUrl: URL,
+        midSkRestUrl: URL,
+        sidV2RestUrl: URL,
+        sidV2SkRestUrl: URL,
+        certBundle: [Data],
+        ldapCerts: [Data],
         configurationLastUpdateCheckDate: Date?,
         configurationUpdateDate: Date?,
         cdoc2DefaultKeyserver: String,
@@ -152,7 +152,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         self.tslUrl = tslUrl
         self.tslCerts = tslCerts
         self.tsaUrl = tsaUrl
-        self.ocspUrls = ocspUrls
+        self.ocspIssuers = ocspIssuers
         self.ldapPersonUrl = ldapPersonUrl
         self.ldapCorpUrl = ldapCorpUrl
         self.midRestUrl = midRestUrl

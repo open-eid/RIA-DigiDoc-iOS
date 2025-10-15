@@ -22,7 +22,9 @@ struct ValidationSettingsView: View {
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Main settings validation services title"),
-            onLeftClick: { dismiss() },
+            onLeftClick: {
+                dismiss()
+            },
             onRightSecondaryClick: {
                 showSettingsBottomSheetFromButton = true
             },
@@ -80,6 +82,7 @@ struct ValidationSettingsView: View {
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
+                await viewModel.removeObservers()
             }
         }
         .fileImporter(

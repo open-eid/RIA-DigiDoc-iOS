@@ -19,7 +19,7 @@ struct ConfigurationViewModelTests {
         mockFileManager = FileManagerProtocolMock()
         mockRepository = ConfigurationRepositoryProtocolMock()
         viewModel = await ConfigurationViewModel(repository: mockRepository, fileManager: mockFileManager)
-        mockConfigProvider = TestConfigurationProvider.mockConfigurationProvider()
+        mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
     }
 
     @Test
@@ -38,7 +38,7 @@ struct ConfigurationViewModelTests {
 
     @Test
     func fetchConfiguration_successUpdatingConfigurationWhenBeforeLastUpdateTime() async throws {
-        let configProvider = TestConfigurationProvider.mockConfigurationProvider(configurationUpdateDate: nil)
+        let configProvider = try TestConfigurationProvider.mockConfigurationProvider(configurationUpdateDate: nil)
 
         mockRepository.getCentralConfigurationUpdatesHandler = { _ in
             return mockAsyncStream(configProvider: configProvider)

@@ -10,27 +10,27 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 
 @interface DigiDocSignature : NSObject
 
-@property (strong, nonatomic) NSData *signingCert;
-@property (strong, nonatomic) NSData *timestampCert;
-@property (strong, nonatomic) NSData *ocspCert;
-@property (strong, nonatomic) NSString *signatureId;
-@property (strong, nonatomic) NSString *claimedSigningTime;
-@property (strong, nonatomic) NSString *signatureMethod;
-@property (strong, nonatomic) NSString *ocspProducedAt;
-@property (strong, nonatomic) NSString *timeStampTime;
-@property (strong, nonatomic) NSString *signedBy;
-@property (strong, nonatomic) NSString *format;
-@property (strong, nonatomic) NSData *messageImprint;
-@property (strong, nonatomic) NSString *trustedSigningTime;
+@property (nonatomic, strong) NSData *signingCert;
+@property (nonatomic, strong) NSData *timestampCert;
+@property (nonatomic, strong) NSData *ocspCert;
+@property (nonatomic, strong) NSString *signatureId;
+@property (nonatomic, strong) NSString *claimedSigningTime;
+@property (nonatomic, strong) NSString *signatureMethod;
+@property (nonatomic, strong) NSString *ocspProducedAt;
+@property (nonatomic, strong) NSString *timeStampTime;
+@property (nonatomic, strong) NSString *signedBy;
+@property (nonatomic, strong) NSString *format;
+@property (nonatomic, strong) NSData *messageImprint;
+@property (nonatomic, strong) NSString *trustedSigningTime;
 
-@property (strong, nonatomic) NSArray *roles;
-@property (strong, nonatomic) NSString *city;
-@property (strong, nonatomic) NSString *state;
-@property (strong, nonatomic) NSString *country;
-@property (strong, nonatomic) NSString *zipCode;
+@property (nonatomic, strong) NSArray *roles;
+@property (nonatomic, strong) NSString *city;
+@property (nonatomic, strong) NSString *state;
+@property (nonatomic, strong) NSString *country;
+@property (nonatomic, strong) NSString *zipCode;
 
-@property (assign, nonatomic) DigiDocSignatureStatus status;
-@property (strong, nonatomic) NSString *diagnosticsInfo;
+@property (nonatomic, assign) DigiDocSignatureStatus status;
+@property (nonatomic, strong) NSString *diagnosticsInfo;
 
 @end
 

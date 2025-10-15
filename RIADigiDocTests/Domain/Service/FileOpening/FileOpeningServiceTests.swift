@@ -125,17 +125,27 @@ struct FileOpeningServiceTests {
 
     @Test
     func openOrCreateContainer_success() async throws {
+        let fileOpeningService = FileOpeningService(
+            fileUtil: mockFileUtil,
+            fileInspector: mockFileInspector,
+            fileManager: Container.shared.fileManager()
+        )
         let tempFileURL = TestFileUtil.createSampleFile()
         let tempFileURL2 = TestFileUtil.createSampleFile()
         let urls = [tempFileURL, tempFileURL2]
 
-        let container = try await service.openOrCreateContainer(
+        let container = try await fileOpeningService.openOrCreateContainer(
             dataFiles: urls, isSivaConfirmed: true
         )
+
+        let rawContainerFile = await container.getRawContainerFile()
 
         defer {
             try? FileManager.default.removeItem(at: tempFileURL)
             try? FileManager.default.removeItem(at: tempFileURL2)
+            if let rawContainerFile {
+                try? FileManager.default.removeItem(at: rawContainerFile)
+            }
         }
 
         let containerName = await container.getContainerName()

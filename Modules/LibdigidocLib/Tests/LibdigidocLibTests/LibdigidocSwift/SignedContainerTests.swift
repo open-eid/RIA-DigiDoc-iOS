@@ -27,7 +27,7 @@ final class SignedContainerTests {
         mockContainerUtil = ContainerUtilProtocolMock()
         mockContainerWrapper = ContainerWrapperProtocolMock()
 
-        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
+        configurationProvider = try TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
             try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
@@ -115,7 +115,7 @@ final class SignedContainerTests {
     }
 
     @Test
-    func openOrCreateContainer_throwAddingFilesToContainerFailedErrorWhenFileDoesNotExist() async throws {
+    func openOrCreateContainer_throwContainerCreationFailedErrorWhenFileDoesNotExist() async throws {
         let notExistingFile = "notExistingFile.txt"
         var notExistingContainerUrl: URL?
         if #available(iOS 16.0, *) {
@@ -139,8 +139,13 @@ final class SignedContainerTests {
             return
         } catch let error as DigiDocError {
             switch error {
-            case .addingFilesToContainerFailed(let errorDetail):
-                #expect(notExistingContainerLocation.lastPathComponent == errorDetail.userInfo["fileName"])
+            case .containerCreationFailed(let errorDetail):
+                #expect(
+                    notExistingContainerUrl?
+                        .deletingPathExtension()
+                        .appendingPathExtension(Constants.Extension.Asice).lastPathComponent == errorDetail
+                        .userInfo["fileName"]
+                )
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")
                 return
@@ -157,7 +162,7 @@ final class SignedContainerTests {
 
         mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
 
-        mockContainerWrapper.saveHandler = { _ in true }
+        mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
 
         let container = SignedContainer(
             containerFile: originalURL,
@@ -217,7 +222,7 @@ final class SignedContainerTests {
             return uniqueFileURL
         }
 
-        mockContainerWrapper.saveHandler = { _ in true }
+        mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
 
         let container = SignedContainer(
             containerFile: originalURL,
@@ -245,10 +250,8 @@ final class SignedContainerTests {
         mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
 
         mockFileManager.moveItemHandler = { _, _ in
-            throw NSError(domain: "TestDomain", code: 1, userInfo: nil)
+            throw NSError(domain: "TestDomain - unable to rename container", code: 1, userInfo: nil)
         }
-
-        mockContainerWrapper.saveHandler = { _ in false }
 
         let container = SignedContainer(
             containerFile: originalURL,
@@ -273,10 +276,13 @@ final class SignedContainerTests {
         let newFileName = "renamed.asice"
         let directoryURL = originalURL.deletingLastPathComponent()
         let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+        let errorDomain = "TestDomain - unable to save container"
 
         mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
 
-        mockContainerWrapper.saveHandler = { _ in false }
+        mockFileManager.moveItemHandler = { _, _ in
+            throw NSError(domain: errorDomain, code: 1, userInfo: nil)
+        }
 
         let container = SignedContainer(
             containerFile: originalURL,
@@ -288,19 +294,10 @@ final class SignedContainerTests {
 
         do {
             _ = try await container.renameContainer(to: newFileName)
-            Issue.record("Expected to throw DigiDocError.containerSavingFailed")
+            Issue.record("Expected to throw Error")
             return
-        } catch let error as DigiDocError {
-            switch error {
-            case .containerSavingFailed:
-                #expect(true)
-            default:
-                Issue.record("Expected containerSavingFailed error")
-                return
-            }
         } catch {
-            Issue.record("Unexpected error type")
-            return
+            #expect((error as NSError).domain == errorDomain)
         }
     }
 
@@ -310,7 +307,7 @@ final class SignedContainerTests {
             [MockDataFileWrapper.mockDataFileWrapper()]
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
             return URL(fileURLWithPath: "/tmp/mockFile.txt")
         }
 
@@ -390,7 +387,7 @@ final class SignedContainerTests {
             mockContainerDataFilesDirURL
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
             testContainer
         }
 
@@ -491,7 +488,7 @@ final class SignedContainerTests {
             mockContainerDataFilesDirURL
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
             throw URLError(.fileDoesNotExist)
         }
 

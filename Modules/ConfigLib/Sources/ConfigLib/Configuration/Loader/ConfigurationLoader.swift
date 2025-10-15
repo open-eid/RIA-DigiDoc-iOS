@@ -367,6 +367,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     private func removeContinuation(_ token: UUID) {
-        continuations[token] = nil
+        continuations.removeValue(forKey: token)
     }
 }

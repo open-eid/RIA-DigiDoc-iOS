@@ -6,14 +6,13 @@
 - (instancetype)initWithConf:(int)logLevel
                      logFile:(NSString *)logFile
                     TSLCache:(NSString *)TSLCache
-                     SIVAURL:(NSString *)SIVAURL
-                      TSLURL:(NSString *)TSLURL
-                    TSLCERTS:(NSArray<NSString *> *)TSLCERTS
-                   LDAPCERTS:(NSArray<NSString *> *)LDAPCERTS
-                      TSAURL:(NSString *)TSAURL
+                     SIVAURL:(NSURL *)SIVAURL
+                      TSLURL:(NSURL *)TSLURL
+                    TSLCERTS:(NSArray<NSData *> *)TSLCERTS
+                   LDAPCERTS:(NSArray<NSData *> *)LDAPCERTS
+                      TSAURL:(NSURL *)TSAURL
                  OCSPISSUERS:(NSDictionary *)OCSPISSUERS
-                  CERTBUNDLE:(NSArray<NSString *> *)CERTBUNDLE
-                     TSACERT:(NSString *)TSACERT {
+                  CERTBUNDLE:(NSArray<NSData *> *)CERTBUNDLE {
     self = [super init];
     if (self) {
         _logLevel = logLevel;

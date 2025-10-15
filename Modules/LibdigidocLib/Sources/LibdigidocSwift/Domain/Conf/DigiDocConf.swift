@@ -46,8 +46,12 @@ public struct DigiDocConf: DigiDocConfProtocol {
                 logger.error("Unable to get configuration updates stream")
                 return
             }
-            for try await config in configStream {
-                try await sharedInitializer.overrideConfiguration(newConfig: config)
+            do {
+                for try await config in configStream {
+                    try await sharedInitializer.overrideConfiguration(newConfig: config)
+                }
+            } catch {
+                logger.error("Unable to override configuration updates: \(error)")
             }
         }
     }
@@ -172,54 +176,52 @@ public actor DigiDocInitializer {
         return Directories.getTslCacheDirectory(fileManager: fileManager)?.path ?? ""
     }
 
-    private func overrideTSLUrl(conf: ConfigurationProvider) -> String {
+    private func overrideTSLUrl(conf: ConfigurationProvider) -> URL {
         return conf.tslUrl
     }
 
-    private func overrideTSLCerts(conf: ConfigurationProvider) -> [String] {
+    private func overrideTSLCerts(conf: ConfigurationProvider) -> [Data] {
         return conf.tslCerts
     }
 
-    private func overrideTSAUrl(conf: ConfigurationProvider) -> String {
+    private func overrideTSAUrl(conf: ConfigurationProvider) -> URL {
         return conf.tsaUrl
     }
 
-    private func overrideSiVaUrl(conf: ConfigurationProvider) -> String {
+    private func overrideSiVaUrl(conf: ConfigurationProvider) -> URL {
         return conf.sivaUrl
     }
 
     private func overrideOCSPIssuers(conf: ConfigurationProvider) -> [String: String] {
-        return conf.ocspUrls
+        return conf.ocspIssuers
     }
 
-    private func overrideCertBundle(conf: ConfigurationProvider) -> [String] {
+    private func overrideCertBundle(conf: ConfigurationProvider) -> [Data] {
         return conf.certBundle
+    }
+
+    private func overrideLDAPCerts(conf: ConfigurationProvider) -> [Data] {
+        return conf.ldapCerts
     }
 
     private func initDigiDoc(
         conf digiDocConf: DigiDocConfig,
         digidocConfWrapper: DigiDocConfWrapper = DigiDocConfWrapper()
     ) async throws {
-        let lock = NSLock()
-        let isInitialized: Bool = try await withCheckedThrowingContinuation { continuation in
-            digidocConfWrapper.initWithConf(digiDocConf) { success, error in
-                lock.lock()
-                defer { lock.unlock() }
-                if let error = error as NSError? {
-                    let errorDetail = ErrorDetail(nsError: error)
-                    continuation.resume(
-                        throwing: DigiDocError.initializationFailed(errorDetail)
-                    )
-                } else {
-                    continuation.resume(returning: success)
-                }
-            }
-        }
+        do {
+            let isInitialized = try await digidocConfWrapper.initWithConf(digiDocConf)
 
-        guard isInitialized, DigiDocConfWrapper.sharedInstance() != nil else {
-            throw DigiDocError.initializationFailed(
-                ErrorDetail(message: "Unable to initialize Libdigidocpp with configuration")
-            )
+            guard isInitialized, DigiDocConfWrapper.sharedInstance() != nil else {
+                throw DigiDocError.initializationFailed(
+                    ErrorDetail(message: "Unable to initialize Libdigidocpp with configuration")
+                )
+            }
+        } catch {
+            if let nsError = error as NSError? {
+                throw DigiDocError.initializationFailed(ErrorDetail(nsError: nsError))
+            } else {
+                throw error
+            }
         }
     }
 }

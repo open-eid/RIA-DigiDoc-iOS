@@ -20,19 +20,16 @@ struct DiagnosticsView: View {
     @StateObject private var viewModel: DiagnosticsViewModel
 
     init(
-        viewModel: DiagnosticsViewModel = Container.shared.diagnosticsViewModel(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil(),
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.diagnosticsViewModel())
         self.fileUtil = fileUtil
     }
 
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Main diagnostics title"),
-            onLeftClick: {
-                dismiss()
-            },
+            onLeftClick: { dismiss() },
             content: {
                 ScrollView {
                     VStack(
@@ -74,6 +71,19 @@ struct DiagnosticsView: View {
                             isFileSaved: $isFileSaved
                         )
                     )
+                    .onAppear {
+                        Task {
+                            await viewModel
+                                .getConfigurationData(
+                                    configuration: viewModel.configuration
+                                )
+                        }
+                    }
+                    .onDisappear {
+                        Task {
+                            await viewModel.removeObservers()
+                        }
+                    }
                 }
             }
         )

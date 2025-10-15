@@ -19,6 +19,8 @@ struct ContentView: View {
     @State private var navigateToInfo = false
     @State private var navigateToDiagnostics = false
 
+    @State private var sharedFilesLoadingTask: Task<Void, Never>?
+
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
             onInfoClick: {
@@ -33,10 +35,8 @@ struct ContentView: View {
         )
     }
 
-    init(
-        viewModel: ContentViewModel = Container.shared.contentViewModel()
-    ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.contentViewModel())
     }
 
     var body: some View {
@@ -73,19 +73,28 @@ struct ContentView: View {
                 }
                 .onAppear {
                     if scenePhase == .active {
-                        let sharedFiles = viewModel.getSharedFiles()
-                        if !sharedFiles.isEmpty {
-                            openedUrls = sharedFiles
+                        sharedFilesLoadingTask = Task {
+                            let sharedFiles = viewModel.getSharedFiles()
+                            if !sharedFiles.isEmpty {
+                                openedUrls = sharedFiles
+                            }
                         }
                     }
                 }
                 .onChange(of: scenePhase) { newPhase in
                     if newPhase == .active {
-                        let sharedFiles = viewModel.getSharedFiles()
-                        if !sharedFiles.isEmpty {
-                            openedUrls = sharedFiles
+                        sharedFilesLoadingTask?.cancel()
+
+                        sharedFilesLoadingTask = Task {
+                            let sharedFiles = viewModel.getSharedFiles()
+                            if !sharedFiles.isEmpty {
+                                openedUrls = sharedFiles
+                            }
                         }
                     }
+                }
+                .onDisappear {
+                    sharedFilesLoadingTask?.cancel()
                 }
             }
         )

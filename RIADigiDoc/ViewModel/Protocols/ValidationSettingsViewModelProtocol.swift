@@ -18,4 +18,6 @@ public protocol ValidationSettingsViewModelProtocol: Sendable {
 
     // MARK: - SiVa Cert Import
     func importSiVaCert(from url: URL) async
+
+    func removeObservers() async
 }

@@ -15,13 +15,14 @@ import UtilsLibMocks
 final class DiagnosticsViewModelTests {
     private let viewModel: DiagnosticsViewModel!
 
-    private let mockContainerWrapper: ContainerWrapperProtocolMock!
-    private let mockFileManager: FileManagerProtocolMock!
-    private let mockConfigurationLoader: ConfigurationLoaderProtocolMock!
-    private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock!
-    private let mockTSLUtil: TSLUtilProtocolMock!
+    private let mockContainerWrapper: ContainerWrapperProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockConfigurationLoader: ConfigurationLoaderProtocolMock
+    private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock
+    private let mockTSLUtil: TSLUtilProtocolMock
+    private let mockDataStore: DataStoreProtocolMock
 
-    let mockConfigProvider: ConfigurationProvider!
+    let mockConfigProvider: ConfigurationProvider?
 
     init() async throws {
         mockContainerWrapper = ContainerWrapperProtocolMock()
@@ -29,8 +30,9 @@ final class DiagnosticsViewModelTests {
         mockConfigurationLoader = ConfigurationLoaderProtocolMock()
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
         mockTSLUtil = TSLUtilProtocolMock()
+        mockDataStore = DataStoreProtocolMock()
 
-        mockConfigProvider = TestConfigurationProvider.mockConfigurationProvider()
+        mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
 
         mockConfigurationRepository.observeConfigurationUpdatesHandler = { [mockConfigProvider] in
             guard let mockConfig = mockConfigProvider else {
@@ -76,6 +78,7 @@ final class DiagnosticsViewModelTests {
             configurationLoader: mockConfigurationLoader,
             configurationRepository: mockConfigurationRepository,
             tslUtil: mockTSLUtil,
+            dataStore: mockDataStore
         )
     }
 
@@ -88,26 +91,34 @@ final class DiagnosticsViewModelTests {
         }
     }
 
-    // MARK: - Fetch Content Tests
+    // MARK: - Get Configuration Data Tests
 
     @Test
-    func fetchContent_success() async throws {
+    func getConfigurationData_success() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp/test-schema-dir")
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         setupLocalizedHandler(for: mockLanguageSettings)
 
-        try await viewModel.observeConfigurationUpdates()
+        await viewModel.observeConfigurationUpdates()
 
         mockFileManager.contentsOfDirectoryAtHandler = { url, _, _ in
             let xmlFile = url.appendingPathComponent("test1.xml")
             let txtFile = url.appendingPathComponent("test1.txt")
             return [xmlFile, txtFile]
         }
+
         mockTSLUtil.readSequenceNumberHandler = { _ in
             return 45
         }
 
-        viewModel.fetchContent(languageSettings: mockLanguageSettings, tslSchemaDirectory: testDirectory)
+        mockDataStore.getRelyingPartyUUIDHandler = {
+            return Constants.Configuration.RelyingPartyUUID
+        }
+
+        await viewModel.getConfigurationData(
+            configuration: mockConfigProvider,
+            tslSchemaDirectory: testDirectory
+        )
 
         await checkVersionSection()
         await checkOsSection()
@@ -120,7 +131,7 @@ final class DiagnosticsViewModelTests {
     private func setupLocalizedHandler(for mockLanguageSettings: LanguageSettingsProtocolMock) {
         mockLanguageSettings.localizedHandler = { key, _ in
             switch key {
-            case "Main diagnostics operating system ios": return "iOS: "
+            case "Main diagnostics operating system ios": return "iOS:"
             case "Main diagnostics configuration last check date": return "LAST CHECK"
             case "Main diagnostics configuration update date": return "UPDATE DATE"
             default: return key
@@ -137,7 +148,7 @@ final class DiagnosticsViewModelTests {
 
     private func checkOsSection() async {
         for try await osSectionContent in viewModel.$osSectionContent.values {
-            #expect(!osSectionContent.isEmpty)
+            #expect(!osSectionContent.content.isEmpty)
             break
         }
     }
@@ -155,7 +166,7 @@ final class DiagnosticsViewModelTests {
                 "MID_SK_URL: https://midskrest.someUrl.abc",
                 "SIDV2_PROXY_URL: https://sidv2.someUrl.abc",
                 "SIDV2_SK_URL: https://sidv2skrest.someUrl.abc",
-                "RPUUID: -"
+                "RPUUID: 00000000-0000-0000-0000-000000000000"
             ])
             break
         }
@@ -179,24 +190,27 @@ final class DiagnosticsViewModelTests {
         }
     }
 
-    private func checkCentralConfigurationSection(dateIsNil: Bool = false) async {
-        let date = dateIsNil ? "-" : "02.09.2025 15:22:28"
+    private func checkCentralConfigurationSection(hasDate: Bool = true) async {
+        let date = !hasDate ? "-" : "02.09.2025 15:22:28"
 
         for try await centralConfigurationSectionContent in viewModel.$centralConfigurationSectionContent.values {
-            #expect(centralConfigurationSectionContent == [
+            let configurationSectionContent = centralConfigurationSectionContent.map { "\($0.key): \($0.content)" }
+            let expected = [
                 "DATE: 1970-01-01",
                 "SERIAL: 1",
                 "URL: https://someUrl.abc",
                 "VERSION: 1",
-                "UPDATE DATE: \(date)",
-                "LAST CHECK: \(date)"
-            ])
+                "Main diagnostics configuration update date: \(date)",
+                "Main diagnostics configuration last check date: \(date)"
+            ]
+
+            #expect(expected == configurationSectionContent)
             break
         }
     }
 
     @Test
-    func fetchContent_doesNotThrowWhenCouldNotListTslDirectory() async throws {
+    func getConfigurationData_doesNotThrowWhenCouldNotListTslDirectory() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp/test-schema-dir")
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         setupLocalizedHandler(for: mockLanguageSettings)
@@ -205,8 +219,11 @@ final class DiagnosticsViewModelTests {
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
 
-        #expect(throws: Never.self) {
-            self.viewModel.fetchContent(languageSettings: mockLanguageSettings, tslSchemaDirectory: testDirectory)
+        await #expect(throws: Never.self) {
+            await self.viewModel.getConfigurationData(
+                configuration: mockConfigProvider,
+                tslSchemaDirectory: testDirectory
+            )
         }
 
         for try await tslSectionContent in viewModel.$tslSectionContent.values {
@@ -216,7 +233,7 @@ final class DiagnosticsViewModelTests {
     }
 
     @Test
-    func fetchContent_doesNotThrowWhenTslFilesReadSequenceNumberFails() async throws {
+    func getConfigurationData_doesNotThrowWhenTslFilesReadSequenceNumberFails() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp/test-schema-dir")
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         setupLocalizedHandler(for: mockLanguageSettings)
@@ -231,8 +248,11 @@ final class DiagnosticsViewModelTests {
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
 
-        #expect(throws: Never.self) {
-            self.viewModel.fetchContent(languageSettings: mockLanguageSettings, tslSchemaDirectory: testDirectory)
+        await #expect(throws: Never.self) {
+            await self.viewModel.getConfigurationData(
+                configuration: mockConfigProvider,
+                tslSchemaDirectory: testDirectory
+            )
         }
 
         for try await tslSectionContent in viewModel.$tslSectionContent.values {
@@ -241,27 +261,41 @@ final class DiagnosticsViewModelTests {
         }
     }
 
-    @Test func fetchContent_doesNotThrowWhenUpdateDateIsNil() async throws {
+    @Test
+    func getConfigurationData_doesNotThrowWhenUpdateDateIsNil() async throws {
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         setupLocalizedHandler(for: mockLanguageSettings)
 
-        try await viewModel.observeConfigurationUpdates()
+        await viewModel.observeConfigurationUpdates()
 
         viewModel.configuration?.configurationUpdateDate = nil
         viewModel.configuration?.configurationLastUpdateCheckDate = nil
 
-        #expect(throws: Never.self) {
-            self.viewModel.fetchContent(languageSettings: mockLanguageSettings)
+        await #expect(throws: Never.self) {
+            await self.viewModel.getConfigurationData(configuration: mockConfigProvider)
         }
 
-        await checkCentralConfigurationSection(dateIsNil: true)
+        await checkCentralConfigurationSection(hasDate: true)
+    }
+
+    @Test
+    func getRpUuid_success() async {
+        let rpUuid = Constants.Configuration.RelyingPartyUUID
+        mockDataStore.getRelyingPartyUUIDHandler = {
+            return rpUuid
+        }
+
+        let uuid = await viewModel.getRpUuid()
+
+        #expect(rpUuid == uuid)
     }
 
     // MARK: - Create Log File Tests
 
-    @Test func createLogFile_success() async throws {
+    @Test
+    func createLogFile_success() async throws {
         let mockLanguageSettings = LanguageSettingsProtocolMock()
-        viewModel.fetchContent(languageSettings: mockLanguageSettings)
+        await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
         let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
         try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
@@ -275,18 +309,19 @@ final class DiagnosticsViewModelTests {
         }
 
         if let logFileUrl = await viewModel.createLogFile(
-                languageSettings: mockLanguageSettings,
-                directory: tempDirectoryURL
-            ) {
+            languageSettings: mockLanguageSettings,
+            directory: tempDirectoryURL
+        ) {
             #expect(!logFileUrl.path.isEmpty)
         }
     }
 
-    @Test func createLogFile_returnsNilWhenDirectoryDoesNotExist() async throws {
+    @Test
+    func createLogFile_returnsNilWhenDirectoryDoesNotExist() async throws {
         mockFileManager.fileExistsHandler = { _ in false }
 
         let mockLanguageSettings = LanguageSettingsProtocolMock()
-        viewModel.fetchContent(languageSettings: mockLanguageSettings)
+        await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
         let logFileUrl = await self.viewModel.createLogFile(
             languageSettings: mockLanguageSettings,
@@ -296,12 +331,14 @@ final class DiagnosticsViewModelTests {
 
     // MARK: - Remove Log Files Directory Tests
 
-    @Test func removeLogFilesDirectory_success() async throws {
+    @Test
+    func removeLogFilesDirectory_success() async throws {
         viewModel.removeLogFilesDirectory()
         #expect(mockFileManager.removeItemCallCount == 1)
     }
 
-    @Test func removeLogFilesDirectory_doesNotThrowWhenFails() async throws {
+    @Test
+    func removeLogFilesDirectory_doesNotThrowWhenFails() async throws {
         mockFileManager.removeItemHandler = { _ in
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
@@ -312,12 +349,14 @@ final class DiagnosticsViewModelTests {
 
     // MARK: - Update Configuration Tests
 
-    @Test func updateConfiguration_success() async throws {
+    @Test
+    func updateConfiguration_success() async throws {
         await viewModel.updateConfiguration()
         #expect(mockConfigurationLoader.loadCentralConfigurationCallCount == 1)
     }
 
-    @Test func updateConfiguration_doesNotThrowOnFailure() async throws {
+    @Test
+    func updateConfiguration_doesNotThrowOnFailure() async throws {
         mockConfigurationLoader.loadCentralConfigurationHandler = { _ in
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
@@ -329,12 +368,14 @@ final class DiagnosticsViewModelTests {
     }
 
     // MARK: - Observe Configuration Updates Tests
-    @Test func observeConfigurationUpdates_doesNotThrowWhenStreamIsNil() async throws {
+    @Test
+    func observeConfigurationUpdates_doesNotThrowWhenStreamIsNil() async throws {
         mockConfigurationRepository.observeConfigurationUpdatesHandler = {
             return nil
         }
+
         await #expect(throws: Never.self) {
-            try await self.viewModel.observeConfigurationUpdates()
+            await self.viewModel.observeConfigurationUpdates()
         }
     }
 }

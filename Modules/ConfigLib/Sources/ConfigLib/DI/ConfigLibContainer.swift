@@ -87,9 +87,7 @@ extension Container {
 
     public var bundle: Factory<BundleProtocol?> {
         self {
-            // Use Bundle.main in tests as Bundle.module might not be available
-            let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-            return isRunningTests ? Bundle.main : Bundle.module
+            Bundle.module
         }
     }
 }

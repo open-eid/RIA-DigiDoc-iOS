@@ -128,21 +128,19 @@ public actor SignedContainer: SignedContainerProtocol {
 
         containerFile = uniqueFileURL
 
-        let isSaved = try await container.save(file: uniqueFileURL)
-        guard isSaved else {
-            throw DigiDocError
-                .containerSavingFailed(
-                    ErrorDetail(
-                        message: "Cannot finish renaming container. Unable to save the container"
-                    )
-                )
-        }
-
         return uniqueFileURL
     }
 
     public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
-        return try await container.saveDataFile(dataFile: dataFile, to: directory)
+        guard let containerFileURL = containerFile else {
+            throw DigiDocError.containerRenamingFailed(
+                ErrorDetail(
+                    message: "Unable to save container. No container file found.",
+                    userInfo: ["fileName": containerFile?.lastPathComponent ?? "N/A"]
+                )
+            )
+        }
+        return try await container.saveDataFile(containerFile: containerFileURL, dataFile: dataFile, to: directory)
     }
 
     public func getNestedTimestampedContainer() async throws -> SignedContainerProtocol? {
@@ -246,31 +244,13 @@ extension SignedContainer {
         containerFile: URL,
         dataFiles: [URL]
     ) async throws -> SignedContainerProtocol {
-        let container = try await ContainerWrapper(
+        let containerWrapper = ContainerWrapper(
             fileManager: Container.shared.fileManager()
-        ).create(file: containerFile)
+        )
 
-        try await container.addDataFiles(dataFiles: dataFiles.compactMap { $0 })
+        try await containerWrapper.create(file: containerFile, dataFiles: dataFiles.compactMap { $0.path })
 
-        let isSaved = try await container.save(file: containerFile)
-        guard isSaved else {
-            throw DigiDocError
-            .containerSavingFailed(
-                ErrorDetail(
-                    message: "Cannot finish creating container. Unable to save the container"
-                )
-            )
-        }
-
-        let createdContainer = await container.getContainer()
-        guard let createdContainer else {
-            throw DigiDocError
-            .containerOpeningFailed(
-                ErrorDetail(
-                    message: "Cannot open container after creation. Unable to get container"
-                )
-            )
-        }
+        let createdContainer = try await containerWrapper.open(containerFile: containerFile, isSivaConfirmed: true)
 
         return SignedContainer(
             containerFile: containerFile,

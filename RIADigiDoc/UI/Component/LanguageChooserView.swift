@@ -6,10 +6,8 @@ struct LanguageChooserView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @StateObject private var viewModel: LanguageChooserViewModel
 
-    init(
-        viewModel: LanguageChooserViewModel = Container.shared.languageChooserViewModel()
-    ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.languageChooserViewModel())
     }
 
     private let supportedLanguages: [SupportedLanguage] = [

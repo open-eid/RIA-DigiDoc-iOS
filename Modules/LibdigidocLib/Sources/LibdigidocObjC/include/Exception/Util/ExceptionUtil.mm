@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "ExceptionUtil.h"
 #import "../DigiDocException.h"
-#import "../DigiDocExceptionWrapper.h"
 #import <digidocpp/Exception.h>
 #include <vector>
 

@@ -3,18 +3,17 @@
 @interface DigiDocConfig : NSObject
 
 
-@property (assign, nonatomic) int logLevel;
-@property (strong, nonatomic) NSString *logFile;
+@property (nonatomic, assign) int logLevel;
+@property (nonatomic, strong) NSString *logFile;
 
-@property (strong, nonatomic) NSString *TSLCACHE;
-@property (nonatomic, strong) NSString *SIVAURL;
-@property (nonatomic, strong) NSString *TSLURL;
-@property (nonatomic, strong) NSArray<NSString*> *TSLCERTS;
-@property (nonatomic, strong) NSArray<NSString*> *LDAPCERTS;
-@property (nonatomic, strong) NSString *TSAURL;
+@property (nonatomic, strong) NSString *TSLCACHE;
+@property (nonatomic, strong) NSURL *SIVAURL;
+@property (nonatomic, strong) NSURL *TSLURL;
+@property (nonatomic, strong) NSArray<NSData *> *TSLCERTS;
+@property (nonatomic, strong) NSArray<NSData *> *LDAPCERTS;
+@property (nonatomic, strong) NSURL *TSAURL;
 @property (nonatomic, strong) NSDictionary *OCSPISSUERS;
-
-@property (nonatomic, strong) NSArray<NSString*> *CERTBUNDLE;
+@property (nonatomic, strong) NSArray<NSData *> *CERTBUNDLE;
 
 - (instancetype)initWithConf:(int)logLevel
                      logFile:(NSString *)logFile
@@ -25,7 +24,6 @@
                    LDAPCERTS:(NSArray<NSString*> *)LDAPCERTS
                       TSAURL:(NSString *)TSAURL
                  OCSPISSUERS:(NSDictionary *)OCSPISSUERS
-                  CERTBUNDLE:(NSArray<NSString*> *)CERTBUNDLE
-                     TSACERT:(NSString *)TSACERT;
+                  CERTBUNDLE:(NSArray<NSString*> *)CERTBUNDLE;
 
 @end

@@ -25,6 +25,8 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
 
+    private var configurationObservationTask: Task<Void, Never>?
+
     // MARK: - Init
 
     init(
@@ -38,18 +40,22 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         self.fileManager = fileManager
         self.advancedSettingsRepository = advancedSettingsRepository
 
+        configurationObservationTask = Task {
+            await observeConfigurationUpdates()
+        }
+
         Task {
             await initializeSettings()
         }
     }
 
+    public func removeObservers() async {
+        configurationObservationTask?.cancel()
+    }
+
     // MARK: - Init helpers
 
     private func initializeSettings() async {
-        Task {
-            try await observeConfigurationUpdates()
-        }
-
         await ensureConfigurationLoaded()
         await loadSettings()
         await loadTSACert()
@@ -69,7 +75,7 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         self.tsaUrl = await dataStore.getTSAUrl()
 
         if self.tsaUrl.isEmpty {
-            self.tsaUrl = configuration?.tsaUrl ?? ""
+            self.tsaUrl = configuration?.tsaUrl.absoluteString ?? ""
         }
 
         self.selectedOption = await dataStore.getTSAUrlOption()
@@ -89,7 +95,7 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         tsaUrl = tsaUrl.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if selectedOption == .defaultSetting || tsaUrl.isEmpty {
-            tsaUrl = configuration?.tsaUrl ?? ""
+            tsaUrl = configuration?.tsaUrl.absoluteString ?? ""
         }
 
         await dataStore.setTSAUrl(tsaUrl: tsaUrl)
@@ -128,14 +134,24 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
 
     // MARK: - Observer
 
-    private func observeConfigurationUpdates() async throws {
-        guard let configStream = await configurationRepository.observeConfigurationUpdates()
-        else {
+    private func observeConfigurationUpdates() async {
+        guard !Task.isCancelled else {
+            return
+        }
+
+        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
             TimeStampSettingsViewModel.logger.error("Unable to get configuration updates stream")
             return
         }
-        for try await config in configStream {
-            configuration = config
+
+        do {
+            for try await config in configStream {
+                await MainActor.run {
+                    configuration = config
+                }
+            }
+        } catch {
+            TimeStampSettingsViewModel.logger.error("Unable to get configuration from stream")
         }
     }
 }

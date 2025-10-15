@@ -11,10 +11,8 @@ struct RecentDocumentsView: View {
 
     @StateObject private var viewModel: RecentDocumentsViewModel
 
-    init(
-        viewModel: RecentDocumentsViewModel = Container.shared.recentDocumentsViewModel()
-    ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.recentDocumentsViewModel())
     }
 
     var body: some View {

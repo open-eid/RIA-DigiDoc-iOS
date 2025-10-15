@@ -29,14 +29,11 @@ struct ContainerWrapperTests {
     init() async throws {
         mockSignature = MockSignatureWrapper.mockSignatureWrapper()
 
-        let mockContainerURL = URL(fileURLWithPath: "/tmp/path")
-
         mockFileManager = FileManagerProtocolMock()
 
-        containerWrapper = try await ContainerWrapper(fileManager: mockFileManager)
-            .create(file: mockContainerURL)
+        containerWrapper = ContainerWrapper(fileManager: mockFileManager)
 
-        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
+        configurationProvider = try TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
             try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
@@ -68,7 +65,18 @@ struct ContainerWrapperTests {
 
     @Test
     func getDataFiles_success() async throws {
-        try await containerWrapper.addDataFiles(dataFiles: dataFileURLs)
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
 
         let dataFiles = await containerWrapper.getDataFiles()
 
@@ -77,13 +85,26 @@ struct ContainerWrapperTests {
 
     @Test
     func getDataFiles_returnEmptyResultWithoutContainerInitialization() async throws {
-        let signatures = await ContainerWrapper(fileManager: mockFileManager).getDataFiles()
+        let dataFiles = await ContainerWrapper(fileManager: mockFileManager).getDataFiles()
 
-        #expect(signatures.isEmpty)
+        #expect(dataFiles.isEmpty)
     }
 
     @Test
     func getMimetype_success() async throws {
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
         let mimetype = await containerWrapper.getMimetype()
 
         #expect(CommonsLib.Constants.MimeType.Asice == mimetype)
@@ -98,24 +119,48 @@ struct ContainerWrapperTests {
 
     @Test
     func addDataFiles_success() async throws {
-        try await containerWrapper.addDataFiles(dataFiles: dataFileURLs)
+        let testFile = TestFileUtil.createSampleFile()
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: [testFile], isSivaConfirmed: true)
 
-        let isSaved = try await containerWrapper.save(file: dataFileURLs.first ?? URL(fileURLWithPath: ""))
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        #expect(isSaved)
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: testFile)
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
+        try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)
 
         let dataFiles = await containerWrapper.getDataFiles()
 
-        #expect(dataFiles.count == 2)
+        #expect(dataFiles.count == 3)
     }
 
     @Test
     func addDataFiles_throwErrorWithDuplicateFiles() async throws {
-        let tempFileURL = TestFileUtil.createSampleFile()
-        let expectedErrorMessage = "Document with same file name '\(tempFileURL.lastPathComponent)' already exists."
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
+        let fileName = dataFileURLs.first?.lastPathComponent ?? ""
+        let expectedErrorMessage = "Document with same file name '\(fileName)' already exists."
 
         do {
-            try await containerWrapper.addDataFiles(dataFiles: [tempFileURL, tempFileURL])
+            try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)
         } catch let error as DigiDocError {
             switch error {
             case .addingFilesToContainerFailed(let errorDetail):
@@ -126,15 +171,12 @@ struct ContainerWrapperTests {
             }
         }
 
-        let isSaved = try await containerWrapper.save(file: tempFileURL)
-
-        #expect(isSaved)
-
         let dataFiles = await containerWrapper.getDataFiles()
 
-        #expect(dataFiles.count == 1)
+        #expect(dataFiles.count == 2)
     }
 
+    @Test
     func open_success() async throws {
         let signedContainer = try await SignedContainer.openOrCreate(
             dataFiles: [dataFileURLs.first ?? URL(fileURLWithPath: "")], isSivaConfirmed: true
@@ -167,8 +209,28 @@ struct ContainerWrapperTests {
 
     @Test
     func addDataFiles_throwAddingFilesToContainerFailedError() async throws {
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
+        let notAFileUrl = URL(string: "notAFileUrl")
+
+        guard let mockNotAFileUrl = notAFileUrl else {
+            Issue.record("Unable to create URL")
+            return
+        }
+
         do {
-            try await containerWrapper.addDataFiles(dataFiles: [URL(string: "notAFileUrl")])
+            try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: [mockNotAFileUrl])
             Issue.record("Expected 'addingFilesToContainerFailed' error")
         } catch let error {
             switch error as? DigiDocError {
@@ -182,8 +244,18 @@ struct ContainerWrapperTests {
 
     @Test
     func saveDataFile_success() async throws {
-        try await containerWrapper.addDataFiles(dataFiles: dataFileURLs)
-        _ = try await containerWrapper.save(file: dataFileURLs.first ?? URL(fileURLWithPath: ""))
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        let containerWrapper = ContainerWrapper(
+            containerURL: containerFile,
+            fileManager: mockFileManager
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
 
         let containerDataFiles = await containerWrapper.getDataFiles()
 
@@ -192,14 +264,22 @@ struct ContainerWrapperTests {
             return
         }
 
-        let savedFileURL = try await containerWrapper.saveDataFile(dataFile: dataFile)
+        let savedFileURL = try await containerWrapper.saveDataFile(containerFile: containerFile, dataFile: dataFile)
 
         #expect(savedFileURL.isValidURL())
         #expect(savedFileURL.lastPathComponent == dataFile.fileName)
     }
 
     @Test
-    func saveDataFile_throwErrorWhenInvalidDataFile() async {
+    func saveDataFile_throwErrorWhenInvalidDataFile() async throws {
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
         let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "",
             fileName: "datafile-\(UUID().uuidString)",
@@ -207,12 +287,11 @@ struct ContainerWrapperTests {
             mediaType: CommonsLib.Constants.Extension.Default)
 
         do {
-            try await containerWrapper.addDataFiles(dataFiles: dataFileURLs)
-            _ = try await containerWrapper.saveDataFile(dataFile: dataFile)
+            _ = try await containerWrapper.saveDataFile(containerFile: containerFile, dataFile: dataFile)
             Issue.record("Expected an error")
             return
         } catch let error as DigiDocError {
-            #expect(error.localizedDescription.contains("Unable to save datafile"))
+            #expect(error.localizedDescription.contains("unable to save data file"))
         } catch {
             Issue.record("Unexpected error: \(error)")
             return

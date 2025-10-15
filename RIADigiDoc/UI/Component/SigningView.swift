@@ -87,6 +87,8 @@ struct SigningView: View {
         viewModel.isNestedContainer()
     }
 
+    @State private var containerLoadingTask: Task<Void, Never>?
+
     init(
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
@@ -273,11 +275,14 @@ struct SigningView: View {
                         }
                     }
                     .onAppear {
-                        Task {
+                        containerLoadingTask = Task {
                             await viewModel.loadContainerData(
                                 signedContainer: viewModel.signedContainer
                             )
                         }
+                    }
+                    .onDisappear {
+                        containerLoadingTask?.cancel()
                     }
                 }
             )

@@ -5,7 +5,43 @@ public struct TestConfigurationProviderUtil {
 
     public init() {}
 
-    public static func getConfigurationProvider() -> ConfigurationProvider {
+    public static func getConfigurationProvider() throws -> ConfigurationProvider {
+        guard let sivaUrl = URL(string: "https://siva.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let tslUrl = URL(string: "https://tsl.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let tsaUrl = URL(string: "https://tsa.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let ldapPersonUrl = URL(string: "https://ldapPerson.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let ldapCorpUrl = URL(string: "https://ldapCorp.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let midRestUrl = URL(string: "https://midRest.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let midSkRestUrl = URL(string: "https://midSkRest.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let sidV2RestUrl = URL(string: "https://sidv2Rest.example.abc") else {
+            throw URLError(.badURL)
+        }
+
+        guard let sidV2SkRestUrl = URL(string: "https://sidv2SkRest.example.abc") else {
+            throw URLError(.badURL)
+        }
+
         return ConfigurationProvider(
             metaInf: ConfigurationProvider.MetaInf.init(
                 url: "https://metaInfUrl.example.abc",
@@ -13,17 +49,17 @@ public struct TestConfigurationProviderUtil {
                 serial: 100,
                 version: 123
             ),
-            sivaUrl: "https://siva.example.abc",
-            tslUrl: "https://tsl.example.abc",
+            sivaUrl: sivaUrl,
+            tslUrl: tslUrl,
             tslCerts: [],
-            tsaUrl: "https://tsa.example.abc",
-            ocspUrls: [:],
-            ldapPersonUrl: "https://ldapPerson.example.abc",
-            ldapCorpUrl: "https://ldapCorp.example.abc",
-            midRestUrl: "https://midRest.example.abc",
-            midSkRestUrl: "https://midSkRest.example.abc",
-            sidV2RestUrl: "https://sidv2Rest.example.abc",
-            sidV2SkRestUrl: "https://sidv2SkRest.example.abc",
+            tsaUrl: tsaUrl,
+            ocspIssuers: [:],
+            ldapPersonUrl: ldapPersonUrl,
+            ldapCorpUrl: ldapCorpUrl,
+            midRestUrl: midRestUrl,
+            midSkRestUrl: midSkRestUrl,
+            sidV2RestUrl: sidV2RestUrl,
+            sidV2SkRestUrl: sidV2SkRestUrl,
             certBundle: [],
             ldapCerts: [],
             configurationLastUpdateCheckDate: Date(),
