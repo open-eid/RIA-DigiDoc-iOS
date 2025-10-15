@@ -1,5 +1,5 @@
 //
-//  Logging.swift
+//  shim.c
 //  IdCardLib
 //
 /*
@@ -20,11 +20,3 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-import Foundation
-
-func print(_ items: Any..., separator: String = " ", terminator: String = "\n") {
-#if DEBUG
-    Swift.print(items, separator: separator, terminator: terminator)
-#endif
-}

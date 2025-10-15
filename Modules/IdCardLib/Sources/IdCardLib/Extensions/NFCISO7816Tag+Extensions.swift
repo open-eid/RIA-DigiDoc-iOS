@@ -23,6 +23,7 @@
 
 import CoreNFC
 import CryptoTokenKit
+import OSLog
 
 extension NFCISO7816Tag {
     nonisolated(nonsending)
@@ -95,7 +96,8 @@ extension NFCISO7816Tag {
                 throw IdCardInternalError.invalidResponse(message: "response conversion failed")
             }
         } catch let error as IdCardInternalError {
-            print("sendPaceCommand \(error.localizedDescription)")
+            let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "NFCISO7816Tag")
+            logger.error("sendPaceCommand \(error.localizedDescription)")
             switch error {
             case .sendCommandFailed(message: let message):
                 throw IdCardInternalError.invalidResponse(message: message)

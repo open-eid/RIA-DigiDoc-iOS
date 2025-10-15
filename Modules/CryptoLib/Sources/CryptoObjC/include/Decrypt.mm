@@ -14,7 +14,7 @@
          completion:(void (^)(NSDictionary<NSString*,NSData*> *, NSError *))completion {
 
         NSError *error = nil;
-        NSData *certData = [smartToken getCertificateSync:&error];
+        NSData *certData = [smartToken getCertificate:&error];
         auto cert = [certData toVector];
         if(cert.empty()) {
             return completion(nil, error);

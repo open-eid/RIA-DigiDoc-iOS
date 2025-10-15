@@ -54,6 +54,8 @@ public enum IdCardInternalError: Error {
          couldNotVerifyChipsMAC,
          cancelledByUser,
          sessionInvalidated,
+         readerProcessFailed,
+         failedToRemovePadding,
          notSupportedAlgorithm
 
     public func getIdCardError() -> IdCardError {
@@ -79,6 +81,8 @@ public enum IdCardInternalError: Error {
                 .couldNotVerifyChipsMAC,
                 .cancelledByUser,
                 .sessionInvalidated,
+                .readerProcessFailed,
+                .failedToRemovePadding,
                 .notSupportedAlgorithm:
             return .sessionError
         case .canAuthenticationFailed:

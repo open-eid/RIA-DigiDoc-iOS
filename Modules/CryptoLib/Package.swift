@@ -20,6 +20,7 @@ let package = Package(
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
+        .package(path: "../IdCardLib"),
         .package(path: "../UtilsLib")
     ],
     targets: [
@@ -68,6 +69,7 @@ let package = Package(
                 "LDAP",
                 "ASN1Decoder",
                 "CommonsLib",
+                "IdCardLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
             path: "Sources/CryptoObjCWrapper",
