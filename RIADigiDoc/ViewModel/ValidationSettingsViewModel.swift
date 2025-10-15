@@ -6,9 +6,7 @@ import UniformTypeIdentifiers
 import UtilsLib
 
 @MainActor
-class ValidationSettingsViewModel:
-    ValidationSettingsViewModelProtocol,
-    ObservableObject {
+class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, ObservableObject {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ValidationSettingsViewModel")
 
@@ -25,6 +23,8 @@ class ValidationSettingsViewModel:
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
 
+    private var configurationObservationTask: Task<Void, Never>?
+
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
         dataStore: DataStoreProtocol,
@@ -36,18 +36,22 @@ class ValidationSettingsViewModel:
         self.fileManager = fileManager
         self.advancedSettingsRepository = advancedSettingsRepository
 
+        configurationObservationTask = Task {
+            await observeConfigurationUpdates()
+        }
+
         Task {
             await initializeSettings()
         }
     }
 
+    public func removeObservers() async {
+        configurationObservationTask?.cancel()
+    }
+
     // MARK: - Init helpers
 
     private func initializeSettings() async {
-        Task {
-            try await observeConfigurationUpdates()
-        }
-
         await ensureConfigurationLoaded()
         await loadSettings()
         await loadSiVaCert()
@@ -67,7 +71,7 @@ class ValidationSettingsViewModel:
         self.validationServiceURL = await dataStore.getValidationServiceURL()
 
         if self.validationServiceURL.isEmpty {
-            self.validationServiceURL = configuration?.sivaUrl ?? ""
+            self.validationServiceURL = configuration?.sivaUrl.absoluteString ?? ""
         }
 
         self.selectedOption = await dataStore.getValidationServiceOption()
@@ -87,7 +91,7 @@ class ValidationSettingsViewModel:
         validationServiceURL = validationServiceURL.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if selectedOption == .defaultSetting || validationServiceURL.isEmpty {
-            validationServiceURL = configuration?.sivaUrl ?? ""
+            validationServiceURL = configuration?.sivaUrl.absoluteString ?? ""
         }
 
         await dataStore.setValidationServiceURL(validationServiceURL: validationServiceURL)
@@ -127,14 +131,24 @@ class ValidationSettingsViewModel:
 
     // MARK: - Observer
 
-    private func observeConfigurationUpdates() async throws {
-        guard let configStream = await configurationRepository.observeConfigurationUpdates()
-        else {
+    private func observeConfigurationUpdates() async {
+        guard !Task.isCancelled else {
+            return
+        }
+
+        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
             ValidationSettingsViewModel.logger.error("Unable to get configuration updates stream")
             return
         }
-        for try await config in configStream {
-            configuration = config
+
+        do {
+            for try await config in configStream {
+                await MainActor.run {
+                    configuration = config
+                }
+            }
+        } catch {
+            ValidationSettingsViewModel.logger.error("Unable to get configuration from stream")
         }
     }
 }

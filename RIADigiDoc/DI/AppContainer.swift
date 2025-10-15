@@ -129,7 +129,8 @@ extension Container {
                 fileManager: self.fileManager(),
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),
-                tslUtil: self.tslUtil()
+                tslUtil: self.tslUtil(),
+                dataStore: self.dataStore()
             )
         }
     }

@@ -60,6 +60,7 @@ struct TimeStampSettingsView: View {
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
+                await viewModel.removeObservers()
             }
         }
         .fileImporter(

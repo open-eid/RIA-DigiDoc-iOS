@@ -5,20 +5,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DigiDocContainerWrapper : NSObject
 
-- (instancetype)init;
++ (void)create:(NSString *)containerPath withDataFilePaths:(NSArray<NSString *> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion;
 
-- (void)create:(NSString *)url completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
-- (void)open:(NSString *)url validateOnline:(BOOL)validateOnline completion:(void (^)(DigiDocContainer * container, NSError * _Nullable error))completion;
++ (nullable DigiDocContainer *)open:(NSString *)containerPath validateOnline:(BOOL)validateOnline error:(NSError **)error;
 
-- (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
-- (DigiDocContainer *)getContainer;
-- (NSArray<DigiDocDataFile *> *)getDataFiles;
-- (NSString*)getVersion;
-- (NSArray<DigiDocSignature *> *)getSignatures;
++ (void)addDataFilesToContainerWithPath:(NSString *)containerPath withDataFilePaths:(NSArray<NSString*> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion;
 
-- (void)addDataFile:(NSString *)url mimetype:(NSString *)mimetype completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
-- (void)save:(NSString *)url completion:(void (^)(NSError * _Nullable error))completion;
-- (void)saveDataFile:(NSString *)fileId fileLocation:(NSURL *)fileLocation completion:(void (^)(BOOL success, NSError * _Nullable error))completion;
++ (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion;
+
++ (NSString *)libdigidocppVersion;
++ (NSString *)mediaType;
 
 @end
 

@@ -13,12 +13,12 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     // MARK: - section content
     @Published var versionSectionContent: String = ""
-    @Published var osSectionContent: String = ""
+    @Published var osSectionContent: (key: String, content: String) = (key: "", content: "")
     @Published var libdigidocVersion: String = ""
     @Published var urlSectionContent: [String] = [""]
     @Published var cdoc2SectionContent: [String] = [""]
     @Published var tslSectionContent: [String] = [""]
-    @Published var centralConfigurationSectionContent: [String] = [""]
+    @Published var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
 
     // MARK: - dependencies
     private let containerWrapper: ContainerWrapperProtocol
@@ -26,81 +26,98 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let tslUtil: TSLUtilProtocol
+    private let dataStore: DataStoreProtocol
+
+    private var configurationObservationTask: Task<Void, Never>?
 
     init(
         containerWrapper: ContainerWrapperProtocol,
         fileManager: FileManagerProtocol,
         configurationLoader: ConfigurationLoaderProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
-        tslUtil: TSLUtilProtocol
+        tslUtil: TSLUtilProtocol,
+        dataStore: DataStoreProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
         self.tslUtil = tslUtil
+        self.dataStore = dataStore
+
+        configurationObservationTask = Task {
+            await observeConfigurationUpdates()
+        }
 
         Task {
-            await fetchAsyncContent()
-            try await observeConfigurationUpdates()
+            await loadLibdigidocVersion()
+
+            for await config in $configuration.values {
+                if let config = config {
+                    await getConfigurationData(configuration: config)
+                }
+            }
         }
+    }
+
+    public func removeObservers() async {
+        configurationObservationTask?.cancel()
     }
 
     // MARK: - Fetching content
 
-    func fetchContent(
-            languageSettings: LanguageSettingsProtocol,
-            tslSchemaDirectory: URL? = nil
-        ) {
-        fetchVersionContent()
-        fetchOsSectionContent(languageSettings: languageSettings)
-        fetchUrlSectionContent()
-        fetchCdoc2SectionContent()
-        fetchTslSectionContent(schemaDirectory: tslSchemaDirectory)
-        fetchCentralConfigurationContent(languageSettings: languageSettings)
+    func getConfigurationData(
+        configuration: ConfigurationProvider?,
+        tslSchemaDirectory: URL? = nil,
+    ) async {
+        getVersionContent()
+        loadOsSectionContent()
+        await loadUrlSectionContent(configuration: configuration)
+        loadCdoc2SectionContent(configuration: configuration)
+        loadTslSectionContent(schemaDirectory: tslSchemaDirectory)
+        loadCentralConfigurationContent(configuration: configuration)
     }
 
-    func fetchAsyncContent() async {
-        await fetchLibdigidocVersion()
+    func getRpUuid() async -> String {
+        await dataStore.getRelyingPartyUUID()
     }
 
-    private func fetchVersionContent() {
-        self.versionSectionContent = BundleUtil.getAppVersion()
+    private func getVersionContent() {
+        self.versionSectionContent =
+        BundleUtil.getBundleShortVersionString() + "." + BundleUtil.getBundleVersion()
     }
 
-    private func fetchOsSectionContent(languageSettings: LanguageSettingsProtocol) {
-        self.osSectionContent = languageSettings.localized(
-            "Main diagnostics operating system ios", [SystemUtil.getOSVersion()]
-        )
+    private func loadOsSectionContent() {
+        self.osSectionContent = (key: "Main diagnostics operating system ios", content: SystemUtil.getOSVersion())
     }
 
-    private func fetchLibdigidocVersion() async {
+    private func loadLibdigidocVersion() async {
         let libdigidocVersion = await containerWrapper.getVersion()
 
         self.libdigidocVersion = "libdigidocpp \(libdigidocVersion)"
     }
 
-    private func fetchUrlSectionContent() {
+    private func loadUrlSectionContent(configuration: ConfigurationProvider?) async {
         guard let config = configuration else { return }
 
-        let lines: [(label: String, value: String)] = [
+        let lines: [(label: String, value: String)] = await [
             ("CONFIG_URL", config.metaInf.url),
-            ("TSL_URL", config.tslUrl),
-            ("SIVA_URL", config.sivaUrl),
-            ("TSA_URL", config.tsaUrl),
-            ("LDAP_PERSON_URL", config.ldapPersonUrl),
-            ("LDAP_CORP_URL", config.ldapCorpUrl),
-            ("MID_PROXY_URL", config.midRestUrl),
-            ("MID_SK_URL", config.midSkRestUrl),
-            ("SIDV2_PROXY_URL", config.sidV2RestUrl),
-            ("SIDV2_SK_URL", config.sidV2SkRestUrl),
-            ("RPUUID", "-")  // TODO: implement RPUUID
+            ("TSL_URL", config.tslUrl.absoluteString),
+            ("SIVA_URL", config.sivaUrl.absoluteString),
+            ("TSA_URL", config.tsaUrl.absoluteString),
+            ("LDAP_PERSON_URL", config.ldapPersonUrl.absoluteString),
+            ("LDAP_CORP_URL", config.ldapCorpUrl.absoluteString),
+            ("MID_PROXY_URL", config.midRestUrl.absoluteString),
+            ("MID_SK_URL", config.midSkRestUrl.absoluteString),
+            ("SIDV2_PROXY_URL", config.sidV2RestUrl.absoluteString),
+            ("SIDV2_SK_URL", config.sidV2SkRestUrl.absoluteString),
+            ("RPUUID", getRpUuid())
         ]
 
         self.urlSectionContent = lines.map { "\($0.label): \($0.value)" }
     }
 
-    private func fetchCdoc2SectionContent() {
+    private func loadCdoc2SectionContent(configuration: ConfigurationProvider?) {
         guard let config = configuration else { return }
 
         let lines: [(label: String, value: String)] = [
@@ -112,7 +129,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         self.cdoc2SectionContent = lines.map { "\($0.label): \($0.value)" }
     }
 
-    private func fetchTslSectionContent(schemaDirectory: URL? = nil) {
+    private func loadTslSectionContent(schemaDirectory: URL? = nil) {
         let directory = schemaDirectory ?? Directories.getLibraryDirectory(fileManager: fileManager)
         guard let schemaDirectory = directory else {
             DiagnosticsViewModel.logger.error("Unable to get the schema directory")
@@ -149,13 +166,11 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         }
     }
 
-    private func fetchCentralConfigurationContent(languageSettings: LanguageSettingsProtocol) {
+    private func loadCentralConfigurationContent(configuration: ConfigurationProvider?) {
         guard let config = configuration else { return }
 
-        let updateDateLabel = languageSettings.localized(
-            "Main diagnostics configuration update date")
-        let lastCheckLabel = languageSettings.localized(
-            "Main diagnostics configuration last check date")
+        let updateDateLabel = "Main diagnostics configuration update date"
+        let lastCheckLabel = "Main diagnostics configuration last check date"
 
         let updateDate = formattedDateTimeString(config.configurationUpdateDate)
         let lastUpdateCheckDate = formattedDateTimeString(config.configurationLastUpdateCheckDate)
@@ -169,7 +184,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
             (lastCheckLabel, lastUpdateCheckDate)
         ]
 
-        centralConfigurationSectionContent = lines.map { "\($0.label): \($0.value)" }
+        centralConfigurationSectionContent = lines.map { (key: $0.label, content: $0.value) }
     }
 
     private func formattedDateTimeString(_ date: Date?) -> String {
@@ -206,11 +221,10 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     func removeLogFilesDirectory() {
         do {
-            let directory =
-                try Directories.getCacheDirectory(
-                    subfolder: CommonsLib.Constants.Folder.Logs,
-                    fileManager: fileManager
-                )
+            let directory = try Directories.getCacheDirectory(
+                subfolder: CommonsLib.Constants.Folder.Logs,
+                fileManager: fileManager
+            )
             try fileManager.removeItem(at: directory)
             DiagnosticsViewModel.logger.debug("Saved Files directory removed")
         } catch {
@@ -227,7 +241,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics operating system title"))
-        lines.append(self.osSectionContent)
+        lines.append("\(languageSettings.localized(osSectionContent.key)) \(osSectionContent.content)")
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics libraries title"))
@@ -247,7 +261,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics central configuration title"))
-        lines.append(contentsOf: self.centralConfigurationSectionContent)
+        lines.append(contentsOf: self.centralConfigurationSectionContent.map {
+            "\(languageSettings.localized($0.key)): \($0.content)"
+        })
 
         return lines.joined(separator: "\n")
     }
@@ -269,14 +285,24 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     // MARK: - Observer
 
-    public func observeConfigurationUpdates() async throws {
-        guard let configStream = await configurationRepository.observeConfigurationUpdates()
-        else {
+    public func observeConfigurationUpdates() async {
+        guard !Task.isCancelled else {
+            return
+        }
+
+        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
             DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
             return
         }
-        for try await config in configStream {
-            configuration = config
+
+        do {
+            for try await config in configStream {
+                await MainActor.run {
+                    configuration = config
+                }
+            }
+        } catch {
+            DiagnosticsViewModel.logger.error("Unable to get configuration from stream")
         }
     }
 }

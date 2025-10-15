@@ -21,8 +21,8 @@ struct ConfigurationRepositoryTests {
     }
 
     @Test
-    func getConfiguration_success() async {
-        let expectedConfiguration = TestConfigurationProvider.mockConfigurationProvider()
+    func getConfiguration_success() async throws {
+        let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
 
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
 
@@ -34,8 +34,9 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func getConfigurationUpdates_success() async throws {
+        let mockConfigurationProvider = try TestConfigurationProvider.mockConfigurationProvider()
         let stream = AsyncThrowingStream<ConfigurationProvider?, Error> { continuation in
-            continuation.yield(TestConfigurationProvider.mockConfigurationProvider())
+            continuation.yield(mockConfigurationProvider)
             continuation.finish()
         }
 
@@ -60,7 +61,7 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func getCentralConfiguration_success() async throws {
-        let expectedConfiguration = TestConfigurationProvider.mockConfigurationProvider()
+        let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
 
         mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
@@ -75,7 +76,7 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func getCentralConfiguration_returnConfigurationThatUsesDefaultConfiguration() async throws {
-        let expectedConfiguration = TestConfigurationProvider.mockConfigurationProvider()
+        let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
 
         mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
@@ -92,10 +93,10 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func getCentralConfigurationUpdates_success() async throws {
+        let mockConfigurationProvider = try TestConfigurationProvider.mockConfigurationProvider()
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
         let stream = AsyncThrowingStream<ConfigurationProvider?, Error> { continuation in
-            continuation
-                .yield(TestConfigurationProvider.mockConfigurationProvider())
+            continuation.yield(mockConfigurationProvider)
             continuation.finish()
         }
 
@@ -124,8 +125,9 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func getCentralConfigurationUpdates_returnConfigurationThatUsesDefaultConfiguration() async throws {
+        let mockConfigurationProvider = try TestConfigurationProvider.mockConfigurationProvider()
         let stream = AsyncThrowingStream<ConfigurationProvider?, Error> { continuation in
-            continuation.yield(TestConfigurationProvider.mockConfigurationProvider())
+            continuation.yield(mockConfigurationProvider)
             continuation.finish()
         }
 
@@ -155,8 +157,9 @@ struct ConfigurationRepositoryTests {
 
     @Test
     func observeConfigurationUpdates_handleErrorWhenStreamReturnsError() async throws {
+        let mockConfigurationProvider = try TestConfigurationProvider.mockConfigurationProvider()
         let stream = AsyncThrowingStream<ConfigurationProvider?, Error> { continuation in
-            continuation.yield(TestConfigurationProvider.mockConfigurationProvider())
+            continuation.yield(mockConfigurationProvider)
             continuation.finish(throwing: NSError(domain: "TestError", code: 1))
         }
 

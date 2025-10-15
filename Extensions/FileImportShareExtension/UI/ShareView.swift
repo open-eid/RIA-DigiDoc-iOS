@@ -2,19 +2,18 @@ import SwiftUI
 import FactoryKit
 
 struct ShareView: View {
-    @ObservedObject var viewModel: ShareViewModel
+    @StateObject private var viewModel: ShareViewModel
     var statusChanged: (() -> Void)?
     var completeRequest: (() -> Void)?
 
     var languageSettings: LanguageSettings
 
     init(
-        viewModel: ShareViewModel = Container.shared.shareViewModel(),
         statusChanged: (() -> Void)? = nil,
         completeRequest: (() -> Void)? = nil,
         languageSettings: LanguageSettings = LanguageSettings(dataStore: DataStore())
     ) {
-        _viewModel = ObservedObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.shareViewModel())
         self.statusChanged = statusChanged
         self.completeRequest = completeRequest
         self.languageSettings = languageSettings

@@ -1554,13 +1554,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iOS %@"
+            "value" : "iOS:"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iOS %@"
+            "value" : "iOS:"
           }
         }
       }
@@ -3038,13 +3038,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "File is now cached for you. Go to RIA DigiDoc application to finish import"
+            "value" : "Files are now cached for you. Go to RIA DigiDoc application to finish import"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fail on ajutisse kausta salvestatud. Impordi lõpetamiseks mine RIA DigiDoc rakendusse."
+            "value" : "Failid on ajutisse kausta salvestatud. Impordi lõpetamiseks mine RIA DigiDoc rakendusse."
           }
         }
       }

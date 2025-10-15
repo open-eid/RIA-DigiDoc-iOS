@@ -1,8 +1,11 @@
 import Foundation
+import OSLog
 
 @testable import ConfigLib
 
 public class TestConfigurationProvider {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TestConfigurationProvider")
+
     public static func mockConfigurationProvider(
         metaInfUrl: String = "https://someUrl.abc",
         metaInfDate: String = "1970-01-01",
@@ -12,7 +15,7 @@ public class TestConfigurationProvider {
         tslUrl: String = "https://tsl.someUrl.abc",
         tslCerts: [String] = ["cert1", "cert2"],
         tsaUrl: String = "https://tsa.someUrl.abc",
-        ocspUrls: [String: String] = ["url1": "issuer1"],
+        ocspIssuers: [String: String] = ["url1": "issuer1"],
         ldapPersonUrl: String = "https://ldap-person.someUrl.abc",
         ldapCorpUrl: String = "https://ldap-corp.someUrl.abc",
         midRestUrl: String = "https://midrest.someUrl.abc",
@@ -34,7 +37,7 @@ public class TestConfigurationProvider {
         cdoc2Conf: [String: [String: String]] = [
             "00000000-0000-0000-0000-000000000000": ["name": "test"]
         ]
-    ) -> ConfigurationProvider {
+    ) throws -> ConfigurationProvider {
         let metaInf = ConfigurationProvider.MetaInf(
             url: metaInfUrl,
             date: metaInfDate,
@@ -42,21 +45,72 @@ public class TestConfigurationProvider {
             version: metaInfVersion
         )
 
+        guard let sivaURL = URL(string: sivaUrl) else {
+            TestConfigurationProvider.logger.error("'\(sivaUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let tslURL = URL(string: tslUrl) else {
+            TestConfigurationProvider.logger.error("'\(tslUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        let tslCertsData: [Data] = tslCerts.compactMap { $0.data(using: .utf8) }
+
+        guard let tsaURL = URL(string: tsaUrl) else {
+            TestConfigurationProvider.logger.error("'\(tsaUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let ldapPersonURL = URL(string: ldapPersonUrl) else {
+            TestConfigurationProvider.logger.error("'\(ldapPersonUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let ldapCorpURL = URL(string: ldapCorpUrl) else {
+            TestConfigurationProvider.logger.error("'\(ldapCorpUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let midRestURL = URL(string: midRestUrl) else {
+            TestConfigurationProvider.logger.error("'\(midRestUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let midSkRestURL = URL(string: midSkRestUrl) else {
+            TestConfigurationProvider.logger.error("'\(midSkRestUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let sidV2RestURL = URL(string: sidV2RestUrl) else {
+            TestConfigurationProvider.logger.error("'\(sidV2RestUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        guard let sidV2SkRestURL = URL(string: sidV2SkRestUrl) else {
+            TestConfigurationProvider.logger.error("'\(sidV2SkRestUrl)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+
+        let certBundleData: [Data] = certBundle.compactMap { $0.data(using: .utf8) }
+
+        let ldapCertsData: [Data] = ldapCerts.compactMap { $0.data(using: .utf8) }
+
         return ConfigurationProvider(
             metaInf: metaInf,
-            sivaUrl: sivaUrl,
-            tslUrl: tslUrl,
-            tslCerts: tslCerts,
-            tsaUrl: tsaUrl,
-            ocspUrls: ocspUrls,
-            ldapPersonUrl: ldapPersonUrl,
-            ldapCorpUrl: ldapCorpUrl,
-            midRestUrl: midRestUrl,
-            midSkRestUrl: midSkRestUrl,
-            sidV2RestUrl: sidV2RestUrl,
-            sidV2SkRestUrl: sidV2SkRestUrl,
-            certBundle: certBundle,
-            ldapCerts: ldapCerts,
+            sivaUrl: sivaURL,
+            tslUrl: tslURL,
+            tslCerts: tslCertsData,
+            tsaUrl: tsaURL,
+            ocspIssuers: ocspIssuers,
+            ldapPersonUrl: ldapPersonURL,
+            ldapCorpUrl: ldapCorpURL,
+            midRestUrl: midRestURL,
+            midSkRestUrl: midSkRestURL,
+            sidV2RestUrl: sidV2RestURL,
+            sidV2SkRestUrl: sidV2SkRestURL,
+            certBundle: certBundleData,
+            ldapCerts: ldapCertsData,
             configurationLastUpdateCheckDate: configurationLastUpdateCheckDate,
             configurationUpdateDate: configurationUpdateDate,
             cdoc2DefaultKeyserver: cdoc2DefaultKeyserver,

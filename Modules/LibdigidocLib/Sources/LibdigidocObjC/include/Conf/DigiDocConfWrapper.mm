@@ -5,48 +5,41 @@
 #import "digidocpp/Exception.h"
 #import "DigiDocConfWrapper.h"
 #import "../Model/DigiDocConfig.h"
-#import "Exception/DigiDocExceptionWrapper.h"
 #import "Exception/Util/ExceptionUtil.h"
 
-class DigiDocConfCurrent: public digidoc::ConfCurrent {
-
+struct DigiDocConfCurrent final : public digidoc::ConfCurrent {
 private:
     DigiDocConfig *currentConf;
-    inline static std::string _sivaUrl;
-    inline static NSData* _sivaCert = nil;
-    inline static std::string _tsUrl;
-    inline static NSData* _tsCert = nil;
+    inline static NSURL *_sivaUrl;
+    inline static NSData *_sivaCert = nil;
+    inline static NSURL *_tsUrl;
+    inline static NSData *_tsCert = nil;
 
 public:
     DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
-    ~DigiDocConfCurrent() override = default;
 
-    int logLevel() const final {
-        return currentConf.logLevel;
-    }
-    
-    std::string logFile() const override {
-        return currentConf.logFile.UTF8String;
-    }
-
-    std::string TSLCache() const override {
-        NSString *tslCachePath = currentConf.TSLCACHE;
+    std::string TSLCache() const final {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSString *tslCachePath = [paths objectAtIndex:0];
         return tslCachePath.UTF8String;
     }
 
-    std::string TSLUrl() const override {
-        return currentConf.TSLURL.UTF8String;
+    std::string TSLUrl() const final {
+        NSURL *tslUrl = currentConf.TSLURL;
+        if (tslUrl && tslUrl.absoluteString.length > 0) {
+            return [tslUrl.path UTF8String];
+        }
+        return digidoc::ConfCurrent::TSLUrl();
     }
 
     std::vector<digidoc::X509Cert> TSCerts() const override {
-        NSMutableArray<NSString *> *certBundle = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
-        
+        NSMutableArray<NSData *> *certBundle = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
+
         if (_tsCert != nil && [_tsCert length] > 0) {
-            NSString *tsCert = [_tsCert base64EncodedStringWithOptions:0];
-            [certBundle addObject:tsCert];
+            [certBundle addObject:_tsCert];
         }
         
-        return stringsToX509Certs(certBundle);
+        return toX509Certs(certBundle);
     }
     
     void addTSCert(NSData * cert) {
@@ -54,116 +47,134 @@ public:
     }
     
     std::string TSUrl() const override {
-        if (!_tsUrl.empty()) {
-            return _tsUrl;
+        if (_tsUrl && _tsUrl.absoluteString.length > 0) {
+            std::string tsUrl = std::string([[_tsUrl absoluteString] UTF8String]);
+            return tsUrl;
+        }
+
+        NSURL *tsaUrl = currentConf.TSAURL;
+        
+        if (tsaUrl && tsaUrl.absoluteString.length > 0) {
+            return [tsaUrl.path UTF8String];
         }
         
-        if (currentConf && currentConf.TSAURL) {
-            return std::string([currentConf.TSAURL UTF8String]);
-        }
-        
-        return "";
+        return digidoc::ConfCurrent::TSUrl();
     }
     
-    void setTSUrl(std::string &tsaUrl) {
+    void setTSUrl(NSURL *tsaUrl) {
         _tsUrl = tsaUrl;
     }
     
-    void setSiVaUrl(std::string &sivaUrl) {
+    void setSiVaUrl(NSURL *sivaUrl) {
         _sivaUrl = sivaUrl;
     }
 
-    std::string ocsp(const std::string &issuer) const override {
-        NSString *ocspIssuer = [NSString stringWithCString:issuer.c_str() encoding:[NSString defaultCStringEncoding]];
-
+    std::string ocsp(const std::string &issuer) const final {
+        NSString *ocspIssuer = [NSString stringWithUTF8String:issuer.c_str()];
         NSString *ocspUrl = currentConf.OCSPISSUERS[ocspIssuer];
-        if (ocspUrl) {
-            return std::string([ocspUrl UTF8String]);
+        if (ocspUrl != nil && ocspUrl.length > 0) {
+            return ocspUrl.UTF8String;
         }
         return digidoc::ConfCurrent::ocsp(issuer);
     }
 
     std::string verifyServiceUri() const override {
-        if (!_sivaUrl.empty()) {
-            return _sivaUrl;
+        if (_sivaUrl && _sivaUrl.absoluteString.length > 0) {
+            std::string sivaUrl = std::string([[_sivaUrl absoluteString] UTF8String]);
+            return sivaUrl;
         }
-        
-        return currentConf.SIVAURL.UTF8String;
+
+        NSURL *sivaUrl = currentConf.SIVAURL;
+        if (sivaUrl && sivaUrl.absoluteString.length > 0) {
+            return [sivaUrl.path UTF8String];
+        }
+
+        return digidoc::ConfCurrent::verifyServiceUri();
     }
 
     virtual std::vector<digidoc::X509Cert> verifyServiceCerts() const override {
-        NSMutableArray<NSString*> *certs = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSString *sivaFileName = [defaults stringForKey:@"kSivaFileCertName"];
-        
+        NSMutableArray<NSData*> *certs = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
+
         if (_sivaCert != nil && [_sivaCert length] > 0) {
-            NSString *sivaCert = [_sivaCert base64EncodedStringWithOptions:0];
-            [certs addObject:sivaCert];
+            [certs addObject:_sivaCert];
         }
         
-        return stringsToX509Certs(certs);
+        return toX509Certs(certs);
+    }
+
+    int logLevel() const final {
+        return (int) currentConf.logLevel;
+    }
+
+    std::string logFile() const final {
+        return logFileLocation(currentConf.logFile);
     }
     
     void addSiVaCert(NSData * cert) {
         _sivaCert = cert;
     }
 
-    static Conf* instance() {
-        return digidoc::Conf::instance();
+    std::string logFileLocation(NSString *logsFolderPath) const {
+        return [logsFolderPath stringByAppendingPathComponent:@"libdigidocpp.log"].UTF8String;
     }
 
-    std::vector<digidoc::X509Cert> stringsToX509Certs(NSArray<NSString*> *certBundle) const {
+    std::vector<digidoc::X509Cert> toX509Certs(NSArray<NSData*> *certBundle, NSURL *cert = nil) const {
         std::vector<digidoc::X509Cert> x509Certs;
-
-        for (NSString *certString in certBundle) {
-            NSData *data = [[NSData alloc] initWithBase64EncodedString:certString options:NSDataBase64DecodingIgnoreUnknownCharacters];
-
-            if (data == nil || data.length == 0) {
-                continue;
-            }
-
+        auto add = [&x509Certs](NSData *data) {
             try {
-                const unsigned char *bytes = reinterpret_cast<const unsigned char*>(data.bytes);
-                x509Certs.emplace_back(bytes, data.length);
-            } catch (...) {
-                continue;
+                bool isPEM = std::string_view(reinterpret_cast<const char*>(data.bytes), data.length)
+                    .starts_with("-----BEGIN CERTIFICATE-----");
+                auto bytes = reinterpret_cast<const unsigned char*>(data.bytes);
+                x509Certs.emplace_back(bytes, data.length, isPEM ? digidoc::X509Cert::Pem : digidoc::X509Cert::Der);
+            } catch (const digidoc::Exception &e) {
+                printLog(@"Unable to generate a X509 certificate object. Code: %u, message: %s", e.code(), e.msg().c_str());
             }
+        };
+        for (NSData *data in certBundle) {
+            add(data);
         }
-
+        if (cert) {
+            add([NSData dataWithContentsOfURL:cert]);
+        }
         return x509Certs;
+    }
+
+    static digidoc::Conf* instance() {
+        return digidoc::Conf::instance();
     }
 };
 
 class DigiDocConfWrapperImpl {
 public:
-    DigiDocConfWrapperImpl() {}
-
-    static void initConf(DigiDocConfig *conf) {
+    static void initConf(DigiDocConfig *conf, void (^completion)(NSError * _Nullable error)) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            NSError *error = nil;
             try {
                 DigiDocConfCurrent *currentConf = new DigiDocConfCurrent(conf);
                 digidoc::Conf::init(currentConf);
                 digidoc::initialize("RIA DigiDoc 3.0", "RIA DigiDoc");
-            } catch(const digidoc::Exception &e) {
+            } catch (const digidoc::Exception &e) {
                 std::vector<digidoc::Exception> causes = e.causes();
-                @throw [[DigiDocExceptionWrapper alloc] init:
-                            [[DigiDocException alloc] init:[NSString stringWithUTF8String:e.msg().c_str()] code:static_cast<NSInteger>(e.code()) causes:[ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]]
-                ];
+                NSDictionary *userInfo = @{
+                    NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
+                    @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
+                };
+
+                error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
+            }
+
+            if (completion) {
+                completion(error);
             }
         });
     }
 
-    static DigiDocConfWrapperImpl* instance() {
-        static DigiDocConfWrapperImpl instance;
-        return &instance;
-    }
-
-    void updateConfiguration(DigiDocConfig *newConfig) {
-        DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(newConfig);
+    void updateConfiguration(DigiDocConfig *conf) {
+        DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(conf);
         digidoc::Conf::init(newCurrentConf);
     }
     
-    static void setSiVaUrl(std::string &sivaUrl) {
+    static void setSiVaUrl(NSURL *sivaUrl) {
         digidoc::Conf *conf = DigiDocConfCurrent::instance();
         if (!conf) return;
         DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
@@ -181,7 +192,7 @@ public:
         }
     }
     
-    static void setTSUrl(std::string &tsaUrl) {
+    static void setTSUrl(NSURL *tsaUrl) {
         digidoc::Conf *conf = DigiDocConfCurrent::instance();
         if (!conf) return;
         DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
@@ -212,20 +223,30 @@ public:
     return self;
 }
 
-- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL, NSError * _Nullable))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *digidocException = nil;
-        if (self) {
-            @try {
-                DigiDocConfWrapperImpl::initConf(conf);
-            } @catch (DigiDocExceptionWrapper *exceptionWrapper) {
-                digidocException = [NSError errorWithDomain:@"LibdigidocLib" code:exceptionWrapper.code userInfo:@{@"message":exceptionWrapper.message, @"causes": exceptionWrapper.causes }];
-            }
+        NSError *error = nil;
+        try {
+            DigiDocConfWrapperImpl::initConf(conf, ^(NSError *error) {
+                if (error) {
+                    error = [NSError errorWithDomain:@"LibdigidocLib"
+                                                code:1
+                                            userInfo:@{@"message": @"Unable to init configuration: %@"}];
+                }
+            });
+        } catch (const digidoc::Exception &e) {
+            std::vector<digidoc::Exception> causes = e.causes();
+            NSDictionary *userInfo = @{
+                NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
+                @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
+            };
+
+            error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) {
-                completion(digidocException == nil, digidocException);
+                completion(error == nil, error);
             }
         });
     });
@@ -235,37 +256,29 @@ public:
     _impl->updateConfiguration(conf);
 }
 
-- (void)setSiVaUrl:(NSString *)url {
-    if (!url) return;
-    std::string sivaUrl = std::string([url UTF8String]);
+- (void)setSiVaUrl:(NSURL *)sivaUrl {
     _impl->setSiVaUrl(sivaUrl);
 }
 
-- (void)addSiVaCert:(NSData *)cert {
-    if (!cert) return;
-    _impl->addSiVaCert(cert);
+- (void)addSiVaCert:(NSData *)sivaCert {
+    if (!sivaCert) return;
+    _impl->addSiVaCert(sivaCert);
 }
 
-- (void)setTSUrl:(NSString *)url {
-    if (!url) return;
-    std::string tsUrl = std::string([url UTF8String]);
+- (void)setTSUrl:(NSURL *)tsUrl {
     _impl->setTSUrl(tsUrl);
 }
 
-- (void)addTSCert:(NSData *)cert {
-    if (!cert) return;
-    _impl->addTSCert(cert);
+- (void)addTSCert:(NSData *)tsCert {
+    if (!tsCert) return;
+    _impl->addTSCert(tsCert);
 }
 
-+ (nullable DigiDocConfWrapper *)sharedInstance {
++ (nullable instancetype)sharedInstance {
     static DigiDocConfWrapper *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        digidoc::Conf* instanceImpl = DigiDocConfCurrent::instance();
-        if (instanceImpl) {
-            sharedInstance = [[DigiDocConfWrapper alloc] init];
-            sharedInstance->_impl = DigiDocConfWrapperImpl::instance();
-        }
+        sharedInstance = [[DigiDocConfWrapper alloc] init];
     });
     return sharedInstance;
 }

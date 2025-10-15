@@ -18,9 +18,9 @@ final class DigiDocConfTests {
     init() async throws {
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
         mockConfigurationLoader = ConfigurationLoaderProtocolMock()
-        configurationProvider = TestConfigurationProviderUtil.getConfigurationProvider()
+        configurationProvider = try TestConfigurationProviderUtil.getConfigurationProvider()
 
-        try DigiDocConf.observeConfigurationUpdates(configurationRepository: mockConfigurationRepository)
+        try await DigiDocConf.observeConfigurationUpdates(configurationRepository: mockConfigurationRepository)
 
         try await mockConfigurationLoader.initConfiguration(cacheDir: URL(fileURLWithPath: "/mock/path"))
     }

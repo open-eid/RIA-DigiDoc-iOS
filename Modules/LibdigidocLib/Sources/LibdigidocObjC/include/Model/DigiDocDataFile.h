@@ -2,10 +2,10 @@
 
 @interface DigiDocDataFile : NSObject
 
-@property (strong, nonatomic) NSString *fileId;
-@property (strong, nonatomic) NSString *fileName;
-@property (assign, nonatomic) long fileSize;
-@property (strong, nonatomic) NSString *mediaType;
+@property (nonatomic, strong) NSString *fileId;
+@property (nonatomic, strong) NSString *fileName;
+@property (nonatomic, assign) long fileSize;
+@property (nonatomic, strong) NSString *mediaType;
 
 @end
 

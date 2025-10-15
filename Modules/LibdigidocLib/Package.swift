@@ -29,7 +29,7 @@ let package = Package(
             path: "Sources/LibdigidocObjC",
             publicHeadersPath: "include",
             cxxSettings: [
-                .unsafeFlags(["-std=c++17"])
+                .unsafeFlags(["-std=gnu17", "-std=gnu++20"])
             ],
             swiftSettings: [.interoperabilityMode(.Cxx)]
         ),

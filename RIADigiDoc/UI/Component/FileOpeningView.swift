@@ -22,6 +22,8 @@ struct FileOpeningView: View {
         languageSettings.localized("Siva message url")
     }
 
+    @State private var fileHandlingTask: Task<Void, Never>?
+
     init(
         isFileOpeningLoading: Binding<Bool>,
         isNavigatingToNextView: Binding<Bool>
@@ -36,7 +38,10 @@ struct FileOpeningView: View {
             VStack {
                 LoadingView()
                     .onAppear {
-                        Task { await startFileHandling() }
+                        fileHandlingTask = Task { await startFileHandling() }
+                    }
+                    .onDisappear {
+                        fileHandlingTask?.cancel()
                     }
                     .alert(sivaMessage, isPresented: $showSivaMessage) {
                         Button(languageSettings.localized("OK")) {
@@ -65,6 +70,8 @@ struct FileOpeningView: View {
 
     @MainActor
     private func startFileHandling() async {
+        guard !Task.isCancelled else { return }
+
         await viewModel.handleFiles()
 
         if await viewModel.isSivaConfirmationNeeded() {

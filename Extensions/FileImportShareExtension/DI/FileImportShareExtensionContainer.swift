@@ -10,5 +10,6 @@ extension Container {
                 resourceChecker: self.urlResourceChecker()
             )
         }
+        .shared
     }
 }

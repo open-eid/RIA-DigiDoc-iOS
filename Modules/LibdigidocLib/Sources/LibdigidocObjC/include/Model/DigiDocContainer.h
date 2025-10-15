@@ -4,8 +4,16 @@
 
 @interface DigiDocContainer : NSObject
 
-@property (strong, nonatomic) NSArray<DigiDocDataFile *> *dataFiles;
-@property (strong, nonatomic) NSArray<DigiDocSignature *> *signatures;
-@property (strong, nonatomic) NSString *mediatype;
+@property (nonatomic, strong) NSString *fileName;
+@property (nonatomic, strong) NSString *filePath;
+@property (nonatomic, strong) NSArray<DigiDocDataFile *> *dataFiles;
+@property (nonatomic, strong) NSArray<DigiDocSignature *> *signatures;
+@property (nonatomic, strong) NSString *mediatype;
+
+- (instancetype)initWithFileName:(NSString *)fileName
+                        filePath:(NSString *)filePath
+                       dataFiles:(NSArray<DigiDocDataFile *> *)dataFiles
+                      signatures:(NSArray<DigiDocSignature *> *)signatures
+                       mediatype:(NSString *)mediatype;
 
 @end

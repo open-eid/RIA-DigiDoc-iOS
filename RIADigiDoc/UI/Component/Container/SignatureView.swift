@@ -24,6 +24,8 @@ struct SignatureView: View {
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false
     @State private var showBottomSheetFromTap = false
+
+    @State private var isVoiceOverObserverAdded = false
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
 
     private var bottomSheetActions: [BottomSheetButton] {
@@ -131,20 +133,24 @@ struct SignatureView: View {
             }
         }
         .onAppear {
-            NotificationCenter.default.addObserver(
-                forName: UIAccessibility.voiceOverStatusDidChangeNotification,
-                object: nil,
-                queue: .main
-            ) { _ in
-                Task { @MainActor in
-                    isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+            if !isVoiceOverObserverAdded {
+                NotificationCenter.default.addObserver(
+                    forName: UIAccessibility.voiceOverStatusDidChangeNotification,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    Task { @MainActor in
+                        isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
+                    }
                 }
+                isVoiceOverObserverAdded = true
             }
         }
         .onDisappear {
             NotificationCenter.default.removeObserver(self,
                 name: UIAccessibility.voiceOverStatusDidChangeNotification,
                 object: nil)
+            isVoiceOverObserverAdded = false
         }
         .background(
             NavigationLink(

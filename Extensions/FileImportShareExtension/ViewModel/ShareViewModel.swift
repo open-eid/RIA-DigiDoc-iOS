@@ -30,7 +30,9 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
     func importFiles(_ items: [ImportedFileItem]) async -> Bool {
         ShareViewModel.logger.debug("Importing files...")
         guard !items.isEmpty else {
-            status = .failed
+            await MainActor.run { [weak self] in
+                self?.status = .failed
+            }
             return false
         }
         do {
@@ -46,12 +48,16 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
                 ShareViewModel.logger.error("Could not import files")
             }
 
-            status = isImported ? .imported : .failed
+            await MainActor.run { [weak self] in
+                self?.status = isImported ? .imported : .failed
+            }
 
             return isImported
         } catch {
             ShareViewModel.logger.error("Unable to import files: \(error.localizedDescription)")
-            status = .failed
+            await MainActor.run { [weak self] in
+                self?.status = .failed
+            }
         }
 
         return false

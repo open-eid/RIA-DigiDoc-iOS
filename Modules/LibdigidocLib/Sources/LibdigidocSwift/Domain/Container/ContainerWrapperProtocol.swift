@@ -6,16 +6,15 @@ public protocol ContainerWrapperProtocol: Sendable {
     func getSignatures() async -> [SignatureWrapper]
     func getDataFiles() async -> [DataFileWrapper]
     func getMimetype() async -> String
-    func create(file: URL) async throws -> ContainerWrapper
+    func create(file: URL, dataFiles: [String]) async throws
     func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
-    func addDataFiles(dataFiles: [URL?]) async throws
-    func save(file: URL) async throws -> Bool
+    func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> Bool
     func getContainer() async -> ContainerWrapper?
-    func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
+    func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
 }
 
 extension ContainerWrapperProtocol {
-    func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
-        try await saveDataFile(dataFile: dataFile, to: nil)
+    func saveDataFile(containerFile: URL, dataFile: DataFileWrapper) async throws -> URL {
+        try await saveDataFile(containerFile: containerFile, dataFile: dataFile, to: nil)
     }
 }

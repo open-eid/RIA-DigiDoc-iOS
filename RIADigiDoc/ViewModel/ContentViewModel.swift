@@ -20,8 +20,7 @@ class ContentViewModel: ContentViewModelProtocol, ObservableObject {
         self.fileManager = fileManager
     }
 
-    func getSharedFiles(
-    ) -> [URL] {
+    func getSharedFiles() -> [URL] {
         do {
             ContentViewModel.logger.debug("Checking for shared files...")
             let sharedFolderURL = try Directories.getSharedFolder(fileManager: fileManager).validURL(

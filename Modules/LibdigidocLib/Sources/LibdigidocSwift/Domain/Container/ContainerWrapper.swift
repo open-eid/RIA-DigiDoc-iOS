@@ -33,7 +33,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     @MainActor
     public func getVersion() async -> String {
-        return digiDocContainerWrapper.getVersion()
+        return DigiDocContainerWrapper.libdigidocppVersion()
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
@@ -49,7 +49,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     @MainActor
-    public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
+    public func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
             subfolder: CommonsLib.Constants.Folder.SavedFiles,
             fileManager: fileManager
@@ -62,195 +62,103 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
         let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(sanitizedFilename)
 
-        let lock = NSLock()
-        return try await withCheckedThrowingContinuation { continuation in
-            ContainerWrapper.logger.debug(
-                "Saving datafile '\(sanitizedFilename)' to temporary location \(tempSavedFileLocation)"
+        do {
+            try await DigiDocContainerWrapper.container(
+                containerFile.path,
+                saveDataFile: dataFile.fileId,
+                to: tempSavedFileLocation.path
             )
-
-            digiDocContainerWrapper.saveDataFile(
-                dataFile.fileId,
-                fileLocation: tempSavedFileLocation
-            ) { isSaved, error in
-                lock.lock()
-                defer { lock.unlock() }
-                if error != nil {
-                    if let error = error as NSError? {
-                        continuation.resume(
-                            throwing: DigiDocError.containerDataFileSavingFailed(
-                                ErrorDetail(
-                                    nsError: error,
-                                    extraInfo: ["fileName": tempSavedFileLocation.lastPathComponent]
-                                )
-                            )
-                        )
-                    }
-                    return
-                }
-
-                if isSaved {
-                    ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
-                    continuation.resume(returning: tempSavedFileLocation)
-                } else {
-                    ContainerWrapper.logger.error(
-                        "Failed to save file. \(error?.localizedDescription ?? "No error to display")"
-                    )
-                    continuation.resume(throwing: DigiDocError.containerDataFileSavingFailed(
-                        ErrorDetail(
-                            message: "Unable to save datafile",
-                            code: 0,
-                            userInfo: ["fileName": tempSavedFileLocation.lastPathComponent])
-                    ))
-                }
-            }
+            ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
+            return tempSavedFileLocation
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot save data file", code: 2)
+            throw DigiDocError.containerDataFileSavingFailed(
+                ErrorDetail(nsError: nsError, extraInfo: ["fileName": tempSavedFileLocation.lastPathComponent])
+            )
         }
     }
 
     @MainActor
-    public func create(file: URL) async throws -> ContainerWrapper {
-        let lock = NSLock()
-        return try await withCheckedThrowingContinuation { continuation in
-            ContainerWrapper.logger.debug("Creating container")
-            digiDocContainerWrapper.create(file.path) { container, error in
-                lock.lock()
-                defer { lock.unlock() }
-                if let error = error as NSError? {
-                    continuation.resume(
-                        throwing: DigiDocError.containerCreationFailed(
-                            ErrorDetail(
-                                nsError: error,
-                                extraInfo: ["fileName": file.lastPathComponent]
-                            )
-                        )
-                    )
-                } else {
-                    let datafiles = ContainerWrapper.getDataFiles(from: container)
-                    let signatures = ContainerWrapper.getSignatures(from: container)
-                    let mediatype = container.mediatype
-
-                    Task {
-                        let updatedContainer = await self.updateContainer(
-                            datafiles: datafiles,
-                            signatures: signatures,
-                            mediaType: mediatype
-                        )
-
-                        continuation.resume(returning: updatedContainer)
-                    }
-                }
-            }
+    public func create(file: URL, dataFiles: [String]) async throws {
+        do {
+            return try await DigiDocContainerWrapper.create(file.path, withDataFilePaths: dataFiles)
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot create container", code: 1)
+            throw DigiDocError.containerCreationFailed(
+                ErrorDetail(nsError: nsError, extraInfo: ["fileName": file.lastPathComponent])
+            )
         }
     }
 
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
-        let lock = NSLock()
-        return try await withCheckedThrowingContinuation { continuation in
-            ContainerWrapper.logger.debug("Opening container file '\(containerFile.lastPathComponent)'")
-            digiDocContainerWrapper.open(containerFile.path, validateOnline: isSivaConfirmed) { container, error in
-                lock.lock()
-                defer { lock.unlock() }
-                if let error = error as NSError? {
-                    continuation.resume(
-                        throwing: DigiDocError.containerOpeningFailed(
-                            ErrorDetail(
-                                nsError: error,
-                                extraInfo: ["fileName": containerFile.lastPathComponent])
-                        )
-                    )
-                } else {
-                    let datafiles = ContainerWrapper.getDataFiles(from: container)
-                    let signatures = ContainerWrapper.getSignatures(from: container)
-                    let mediatype = container.mediatype
+        ContainerWrapper.logger.debug("Opening container file '\(containerFile.lastPathComponent)'")
 
-                    Task {
-                        let updatedContainer = await self.updateContainer(
-                            datafiles: datafiles,
-                            signatures: signatures,
-                            mediaType: mediatype
-                        )
+        do {
+            let container = try DigiDocContainerWrapper.open(
+                containerFile.path,
+                validateOnline: isSivaConfirmed
+            )
 
-                        continuation.resume(returning: updatedContainer)
-                    }
-                }
-            }
-        }
-    }
+            await setContainerURL(URL(fileURLWithPath: container.filePath))
 
-    @MainActor
-    public func addDataFiles(dataFiles: [URL?]) async throws {
-        for (index, dataFileUrl) in dataFiles.enumerated() {
-            guard let dataFile = dataFileUrl else { continue }
-            ContainerWrapper.logger.info(
-                "Adding datafile '\(dataFile.lastPathComponent)'. \(index + 1) / \(dataFiles.count)")
-            try await addDataFile(dataFile: dataFile)
+            let datafiles = ContainerWrapper.getDataFiles(from: container)
+            let signatures = ContainerWrapper.getSignatures(from: container)
+            let mediatype = container.mediatype
+
+            return await self.updateContainer(
+                datafiles: datafiles,
+                signatures: signatures,
+                mediaType: mediatype
+            )
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    nsError: nsError,
+                    extraInfo: ["fileName": containerFile.lastPathComponent])
+            )
         }
     }
 
     @discardableResult
     @MainActor
-    private func addDataFile(dataFile: URL) async throws -> Bool {
-        let lock = NSLock()
-        let mimetype = await dataFile.mimeType()
-        return try await withCheckedThrowingContinuation { continuation in
-            digiDocContainerWrapper.addDataFile(
-                dataFile.path,
-                mimetype: mimetype) { success, error in
-                lock.lock()
-                defer { lock.unlock() }
-                if let error = error as NSError? {
-                    continuation.resume(
-                        throwing: DigiDocError.addingFilesToContainerFailed(
-                            ErrorDetail(
-                                nsError: error,
-                                extraInfo: ["fileName": dataFile.lastPathComponent])
-                        )
-                    )
-                } else {
-                    continuation.resume(returning: success)
-                }
-            }
-        }
-    }
+    public func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> Bool {
+        let dataFilesPaths = dataFiles.compactMap { $0.path }
+        do {
+            try await DigiDocContainerWrapper.addDataFilesToContainer(
+                withPath: containerFile.path,
+                withDataFilePaths: dataFilesPaths
+            )
 
-    @MainActor
-    public func save(file: URL) async throws -> Bool {
-        let lock = NSLock()
-        return try await withCheckedThrowingContinuation { continuation in
-            digiDocContainerWrapper.save(file.path) { error in
-                lock.lock()
-                defer { lock.unlock() }
-                ContainerWrapper.logger.debug("Saving container '\(file.lastPathComponent)' after creation")
-                if let error = error as NSError? {
-                    continuation.resume(
-                        throwing: DigiDocError.containerSavingFailed(
-                            ErrorDetail(
-                                nsError: error,
-                                extraInfo: ["fileName": file.lastPathComponent])
-                        )
-                    )
-                } else {
-                    continuation.resume(returning: true)
-                }
-            }
+            return true
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot add data files", code: 4)
+            throw DigiDocError.addingFilesToContainerFailed(
+                ErrorDetail(
+                    nsError: nsError
+                )
+            )
         }
     }
 
     @MainActor
     public func getContainer() async -> ContainerWrapper? {
-        let digiDocContainer = digiDocContainerWrapper.getContainer() as DigiDocContainer?
+        do {
+            let digiDocContainer = try await open(containerFile: containerURL, isSivaConfirmed: true)
 
-        guard let container = digiDocContainer else { return nil }
+            let datafiles = await digiDocContainer.dataFiles
+            let signatures = await digiDocContainer.signatures
+            let mediatype = await digiDocContainer.mediatype
 
-        let datafiles = ContainerWrapper.getDataFiles(from: container)
-        let signatures = ContainerWrapper.getSignatures(from: container)
-        let mediatype = container.mediatype
-
-        return await updateContainer(
-            datafiles: datafiles,
-            signatures: signatures,
-            mediaType: mediatype
-        )
+            return await updateContainer(
+                datafiles: datafiles,
+                signatures: signatures,
+                mediaType: mediatype
+            )
+        } catch {
+            return nil
+        }
     }
 
     private static func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
@@ -295,7 +203,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         return dataFiles.compactMap { item in
             guard let dataFile = item as? DigiDocDataFile else {
                 ContainerWrapper.logger.error("Unexpected type: \(type(of: item))")
-                return nil
+                return DataFileWrapper(fileId: "", fileName: "", fileSize: 0, mediaType: "")
             }
 
             return DataFileWrapper(

@@ -8,10 +8,7 @@ class ShareViewController: UIViewController, Sendable {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ShareViewController")
 
-    let viewModel = ShareViewModel(
-        fileManager: Container.shared.fileManager(),
-        resourceChecker: Container.shared.urlResourceChecker()
-    )
+    let viewModel = Container.shared.shareViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +16,6 @@ class ShareViewController: UIViewController, Sendable {
         viewModel.status = .processing
 
         let shareView = ShareView(
-            viewModel: viewModel,
             statusChanged: {
                 Task { [weak self] in
                     guard let self else { return }

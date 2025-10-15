@@ -31,11 +31,10 @@ struct HomeView: View {
     }
 
     init(
-        viewModel: HomeViewModel = Container.shared.homeViewModel(),
         fileOpeningViewModel: FileOpeningViewModel = Container.shared.fileOpeningViewModel(),
         externalFiles: Binding<[URL]>
     ) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: Container.shared.homeViewModel())
         self.fileOpeningViewModel = fileOpeningViewModel
         self._externalFiles = externalFiles
     }

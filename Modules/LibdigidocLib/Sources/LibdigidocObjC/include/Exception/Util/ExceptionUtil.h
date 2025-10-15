@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 #import "../DigiDocException.h"
-#import "../DigiDocExceptionWrapper.h"
 
 @class ExternalClass;
 

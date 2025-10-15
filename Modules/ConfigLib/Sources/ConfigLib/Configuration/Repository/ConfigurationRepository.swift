@@ -46,22 +46,6 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
     }
 
     public func observeConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>? {
-
-        let loaderStream = await configurationLoader.getConfigurationUpdates(replayLatest: true)
-
-        return AsyncThrowingStream { continuation in
-            Task {
-                do {
-                    for try await config in loaderStream {
-                        if let config = config {
-                            continuation.yield(config)
-                        }
-                    }
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
-                }
-            }
-        }
+        return await configurationLoader.getConfigurationUpdates(replayLatest: true)
     }
 }
