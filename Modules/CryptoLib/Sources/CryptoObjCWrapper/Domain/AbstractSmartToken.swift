@@ -21,11 +21,10 @@
  */
 
 import Foundation
-import CryptoObjC
 
-@objc public protocol AbstractSmartToken: AbstractSmartTokenObjC {
+@objc public protocol AbstractSmartToken {
     func getCertificate() async throws -> Data
-    func decrypt(_ data: Data) throws -> Data
-    func derive(_ data: Data) throws -> Data
-    func authenticate(_ data: Data) throws -> Data
+    func decrypt(_ data: Data) async throws -> Data
+    func derive(_ data: Data) async throws -> Data
+    func authenticate(_ data: Data) async throws -> Data
 }

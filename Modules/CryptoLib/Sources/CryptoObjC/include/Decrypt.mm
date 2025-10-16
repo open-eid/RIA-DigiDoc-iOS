@@ -6,11 +6,11 @@
 #include <cdoc/Lock.h>
 #include <cdoc/Recipient.h>
 
-#import "AbstractSmartTokenObjC.h"
+#import "AbstractSmartToken.h"
 
 @implementation Decrypt
 
-+ (void)decryptFile:(NSString *)fullPath withToken:(id<AbstractSmartTokenObjC>)smartToken
++ (void)decryptFile:(NSString *)fullPath withToken:(AbstractSmartToken *)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> *, NSError *))completion {
 
         NSError *error = nil;

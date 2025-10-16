@@ -1,14 +1,14 @@
 #import "SmartCardTokenWrapper.h"
 #import "Extensions.h"
-#import "AbstractSmartTokenObjC.h"
+#import "AbstractSmartToken.h"
 
 struct SmartCardTokenWrapper::Private {
-    id<AbstractSmartTokenObjC> smartTokenClass;
+    AbstractSmartToken* smartTokenClass;
     NSError *error;
 };
 
 
-SmartCardTokenWrapper::SmartCardTokenWrapper(id<AbstractSmartTokenObjC> smartToken)
+SmartCardTokenWrapper::SmartCardTokenWrapper(AbstractSmartToken* smartToken)
     : token(std::make_unique<Private>())
 {
     *token = {smartToken, nullptr};
