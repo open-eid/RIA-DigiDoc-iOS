@@ -28,17 +28,20 @@ struct OutlinedRadioButtonCard<Content: View>: View {
     let title: String
     let isSelected: Bool
     let onSelect: () -> Void
+    let contentSpacing: CGFloat
     @ViewBuilder var content: () -> Content
 
     init(
         title: String,
         isSelected: Bool,
         onSelect: @escaping () -> Void,
+        contentSpacing: CGFloat = Dimensions.Padding.LPadding,
         @ViewBuilder content: @escaping () -> Content = { EmptyView() }
     ) {
         self.title = title
         self.isSelected = isSelected
         self.onSelect = onSelect
+        self.contentSpacing = contentSpacing
         self.content = content
     }
 
@@ -53,7 +56,7 @@ struct OutlinedRadioButtonCard<Content: View>: View {
     var body: some View {
         Button(action: onSelect) {
             VStack(
-                spacing: Dimensions.Padding.LPadding,
+                spacing: contentSpacing,
                 content: {
                     HStack {
                         Text(title)

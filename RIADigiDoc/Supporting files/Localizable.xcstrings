@@ -217,6 +217,24 @@
         }
       }
     },
+    "Choose button" : {
+      "comment" : "Choose button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose "
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali"
+          }
+        }
+      }
+    },
     "Choose file" : {
       "comment" : "Button to choose a file to sign or validate",
       "extractionState" : "manual",
@@ -2231,6 +2249,132 @@
         }
       }
     },
+    "Main settings crypto certificate title" : {
+      "comment" : "Main settings crypto certificate title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key transfer server SSL certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Võtmeedastusserveri SSL sertifikaat"
+          }
+        }
+      }
+    },
+    "Main settings crypto choose server option" : {
+      "comment" : "Main settings crypto choose server option",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose server"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali Server"
+          }
+        }
+      }
+    },
+    "Main settings crypto fetch url" : {
+      "comment" : "Main settings crypto fetch url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetch URL"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetch URL"
+          }
+        }
+      }
+    },
+    "Main settings crypto post url" : {
+      "comment" : "Main settings crypto post url",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post URL"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post URL"
+          }
+        }
+      }
+    },
+    "Main settings crypto server" : {
+      "comment" : "Main settings crypto server",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        }
+      }
+    },
+    "Main settings crypto server option manual" : {
+      "comment" : "Main settings crypto server option manual",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use a manually specified key transfer server for encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta krüpteerimiseks käsitsi määratud võtmeedastusserverit"
+          }
+        }
+      }
+    },
+    "Main settings crypto server option ria" : {
+      "comment" : "Main settings crypto server option ria",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA"
+          }
+        }
+      }
+    },
     "Main settings crypto services title" : {
       "comment" : "Main settings crypto services title",
       "extractionState" : "manual",
@@ -2245,6 +2389,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteerimisseaded"
+          }
+        }
+      }
+    },
+    "Main settings crypto use cdoc1" : {
+      "comment" : "Main settings crypto use cdoc1",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use CDOC1 file format for encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta krüpteerimiseks CDOC1 failiformaati"
+          }
+        }
+      }
+    },
+    "Main settings crypto use cdoc2" : {
+      "comment" : "Main settings crypto use cdoc2",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use CDOC2 file format for encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta krüpteerimiseks CDOC2 failiformaati"
+          }
+        }
+      }
+    },
+    "Main settings crypto use key transfer" : {
+      "comment" : "Main settings crypto use key transfer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use a key transfer server for encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta krüpteerimiseks võtmeedastusserverit"
+          }
+        }
+      }
+    },
+    "Main settings crypto uuid" : {
+      "comment" : "Main settings crypto uuid",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UUID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UUID"
           }
         }
       }

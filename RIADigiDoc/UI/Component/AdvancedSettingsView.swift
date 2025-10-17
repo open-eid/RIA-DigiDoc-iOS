@@ -32,6 +32,7 @@ struct AdvancedSettingsView: View {
     @State private var checkedAskRoleAndAddress: Bool = false
 
     @State private var navigateToValidationSettings = false
+    @State private var navigateToCryptoSettings = false
 
     var body: some View {
         TopBarContainer(
@@ -82,8 +83,14 @@ struct AdvancedSettingsView: View {
                             ) { }
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings crypto services title"),
-                                onClick: {}
+                                onClick: {
+                                    navigateToCryptoSettings = true
+                                }
                             )
+                            NavigationLink(
+                                destination: EncryptionSettingsView(),
+                                isActive: $navigateToCryptoSettings
+                            ) { }
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings proxy title"),
                                 onClick: {}

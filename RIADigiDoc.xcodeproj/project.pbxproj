@@ -127,6 +127,9 @@
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/DependencyLicense.swift,
+				Domain/Model/EncryptionCdocOption.swift,
+				Domain/Model/EncryptionServerOption.swift,
+				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/Notification/ContainerNotificationType.swift,
 				Domain/Model/ServicesSettingsOption.swift,
@@ -195,6 +198,7 @@
 		DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Model/EncryptionCdocOption.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
@@ -235,6 +239,7 @@
 		DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Domain/Model/EncryptionCdocOption.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
