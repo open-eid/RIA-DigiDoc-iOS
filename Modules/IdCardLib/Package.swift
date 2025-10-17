@@ -19,13 +19,24 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "iR301",
+            dependencies: ["iR301Binary"],
+            path: "Sources/bR301",
+            publicHeadersPath: "include"
+        ),
+        .binaryTarget(
+            name: "iR301Binary",
+            path: "Sources/bR301/bR301.xcframework"
+        ),
+        .target(
             name: "IdCardLib",
             dependencies: [
                 .product(name: "SwiftASN1", package: "swift-asn1"),
                 .product(name: "X509", package: "swift-certificates"),
                 "BigInt",
                 "Digest",
-                "SwiftECC"
+                "SwiftECC",
+                "iR301"
             ],
             path: "Sources/IdCardLib",
             swiftSettings: [
@@ -33,6 +44,11 @@ let package = Package(
                 .enableUpcomingFeature("SendableByDefault"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("InferIsolatedConformances")
+            ],
+            linkerSettings: [
+                .linkedFramework("CoreBluetooth", .when(platforms: [.iOS])),
+                .linkedFramework("ExternalAccessory", .when(platforms: [.iOS])),
+                .unsafeFlags(["-ObjC"], .when(platforms: [.iOS]))
             ]
         )
     ]

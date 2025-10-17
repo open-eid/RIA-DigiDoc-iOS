@@ -3,14 +3,14 @@
 #import <cdoc/CryptoBackend.h>
 #import <Foundation/Foundation.h>
 #include <memory>
-#import "AbstractSmartTokenObjC.h"
+#import "AbstractSmartToken.h"
 
 @protocol AbstractSmartToken;
 
 class SmartCardTokenWrapper: public libcdoc::CryptoBackend
 {
 public:
-    SmartCardTokenWrapper(id<AbstractSmartTokenObjC> smartToken);
+    SmartCardTokenWrapper(AbstractSmartToken * smartToken);
     ~SmartCardTokenWrapper() noexcept;
 
     libcdoc::result_t deriveECDH1(std::vector<uint8_t> &dst, const std::vector<uint8_t> &public_key, unsigned int idx) final;

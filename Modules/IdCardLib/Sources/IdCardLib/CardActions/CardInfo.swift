@@ -52,7 +52,7 @@ public struct CardInfo: Sendable {
     }
 }
 
-public enum CardField: Int {
+public enum CardField: Int, Sendable {
     case surname = 1,
          firstName,
          sex,

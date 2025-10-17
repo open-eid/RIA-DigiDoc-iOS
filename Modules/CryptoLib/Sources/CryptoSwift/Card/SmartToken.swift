@@ -1,24 +1,30 @@
 import Foundation
+import IdCardLib
+import CryptoObjCWrapper
 
-public class SmartToken: NSObject, AbstractSmartToken {
-    // TODO: Replace with real smartcard token implementation
+@MainActor
+public class SmartToken: AbstractSmartToken {
+    let pin1: String
+    let card: CardCommands
+
+    public init(card: CardCommands, pin1: String) {
+        self.card = card
+        self.pin1 = pin1
+    }
+
     public func getCertificate() async throws -> Data {
-        return Data()
+        return try await self.card.readAuthenticationCertificate()
     }
 
-    public func decrypt(_: Data) throws -> Data {
-        return Data()
+    public func decrypt(_ data: Data) async throws -> Data {
+        return try await self.card.decryptData(data, withPin1: self.pin1)
     }
 
-    public func derive(_: Data) throws -> Data {
-        return Data()
+    public func derive(_ data: Data) async throws -> Data {
+        return try await self.card.decryptData(data, withPin1: self.pin1)
     }
 
-    public func authenticate(_: Data) throws -> Data {
-        return Data()
-    }
-
-    public func getCertificateSync() throws -> Data {
-        return Data()
+    public func authenticate(_ data: Data) async throws -> Data {
+        return try await self.card.authenticate(for: data, withPin1: self.pin1)
     }
 }

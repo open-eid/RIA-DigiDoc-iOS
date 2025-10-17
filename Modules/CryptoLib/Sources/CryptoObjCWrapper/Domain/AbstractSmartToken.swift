@@ -1,9 +1,8 @@
 //
-//  Logging.swift
-//  IdCardLib
-//
+//  AbstractSmartToken.swift
+//  CryptoLib
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2024 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,8 +22,9 @@
 
 import Foundation
 
-func print(_ items: Any..., separator: String = " ", terminator: String = "\n") {
-#if DEBUG
-    Swift.print(items, separator: separator, terminator: terminator)
-#endif
+@objc public protocol AbstractSmartToken {
+    func getCertificate() async throws -> Data
+    func decrypt(_ data: Data) async throws -> Data
+    func derive(_ data: Data) async throws -> Data
+    func authenticate(_ data: Data) async throws -> Data
 }

@@ -2,29 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string>RIA DigiDoc</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>sileo</string>
-		<string>zbra</string>
-	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -233,6 +210,30 @@
 				<string>public.item</string>
 			</array>
 		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sileo</string>
+		<string>zbra</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Roboto_Condensed-Bold.ttf</string>
+		<string>Roboto_Condensed-Light.ttf</string>
+		<string>Roboto_Condensed-Medium.ttf</string>
+		<string>Roboto_Condensed-Regular.ttf</string>
+		<string>Roboto_Condensed-SemiBold.ttf</string>
+		<string>Roboto-Bold.ttf</string>
+		<string>Roboto-Light.ttf</string>
+		<string>Roboto-Medium.ttf</string>
+		<string>Roboto-Regular.ttf</string>
+		<string>Roboto-SemiBold.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>external-accessory</string>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
@@ -595,21 +596,6 @@
 			</dict>
 		</dict>
 	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Roboto_Condensed-Bold.ttf</string>
-		<string>Roboto_Condensed-Light.ttf</string>
-		<string>Roboto_Condensed-Medium.ttf</string>
-		<string>Roboto_Condensed-Regular.ttf</string>
-		<string>Roboto_Condensed-SemiBold.ttf</string>
-		<string>Roboto-Bold.ttf</string>
-		<string>Roboto-Light.ttf</string>
-		<string>Roboto-Medium.ttf</string>
-		<string>Roboto-Regular.ttf</string>
-		<string>Roboto-SemiBold.ttf</string>
-	</array>
-	<key>NFCReaderUsageDescription</key>
-	<string>This app uses NFC to scan ID-cards</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
