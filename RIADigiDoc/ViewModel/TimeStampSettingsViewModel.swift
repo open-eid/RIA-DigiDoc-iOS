@@ -58,7 +58,7 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
 
     // MARK: - Init helpers
 
-    private func initializeSettings() async {
+    public func initializeSettings() async {
         await ensureConfigurationLoaded()
         await loadSettings()
         await loadTSACert()
@@ -137,7 +137,7 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
 
     // MARK: - Observer
 
-    private func observeConfigurationUpdates() async {
+    public func observeConfigurationUpdates() async {
         guard !Task.isCancelled else {
             return
         }

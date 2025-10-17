@@ -9,6 +9,9 @@ public protocol TimeStampSettingsViewModelProtocol: Sendable {
     var isImportingTSACert: Bool { get }
     var isLoading: Bool { get }
 
+    // MARK: - Init helpers
+    func initializeSettings() async
+
     // MARK: Saving
     func saveSettings() async
 
@@ -19,5 +22,7 @@ public protocol TimeStampSettingsViewModelProtocol: Sendable {
     // MARK: - TSA Cert Import
     func importTSACert(from url: URL) async
 
+    // MARK: - Observer
+    func observeConfigurationUpdates() async throws
     func removeObservers() async
 }

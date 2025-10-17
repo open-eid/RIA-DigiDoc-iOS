@@ -24,7 +24,7 @@ class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol
 
     // MARK: - Loading
 
-    private func loadSettings() async {
+    public func loadSettings() async {
         self.relyingPartyUUID = await dataStore.getRelyingPartyUUID()
         self.selectedOption = await dataStore.getRelyingPartyOption()
     }

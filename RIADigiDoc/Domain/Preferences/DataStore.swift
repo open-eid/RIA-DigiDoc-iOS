@@ -97,8 +97,8 @@ public actor DataStore: DataStoreProtocol {
     private enum DefaultValues {
         static let language = "en"
         static let validationServiceURL = ""
-        static let relyingPartyUUID = CommonsLib.Constants.Configuration.RelyingPartyUUID
         static let tsaUrl = ""
+        static let relyingPartyUUID = CommonsLib.Constants.Configuration.RelyingPartyUUID
     }
 
     private enum Keys {
