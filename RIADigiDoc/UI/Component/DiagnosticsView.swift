@@ -71,8 +71,10 @@ struct DiagnosticsView: View {
                                 }
                             )
 
-                            OneTimeLogGenerationToggleSection(
-                                enableOneTimeLogGeneration: $enableOneTimeLogGeneration)
+                            ToggleSection(
+                                isOn: $enableOneTimeLogGeneration,
+                                label: languageSettings.localized("Main diagnostics logging switch")
+                            )
 
                             DiagnosticsSections()
                                 .environmentObject(viewModel)

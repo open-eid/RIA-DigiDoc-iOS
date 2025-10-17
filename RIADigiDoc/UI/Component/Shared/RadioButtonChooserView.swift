@@ -29,6 +29,26 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
     let titleKey: (T) -> String
     let onSelect: (T) -> Void
     let accessibilityLabel: (T, Bool) -> String
+    let trailingSpacer: Bool
+    let backgroundColor: Color?
+
+    init(
+        options: [T],
+        isSelected: @escaping (T) -> Bool,
+        titleKey: @escaping (T) -> String,
+        onSelect: @escaping (T) -> Void,
+        accessibilityLabel: @escaping (T, Bool) -> String,
+        trailingSpacer: Bool = true,
+        backgroundColor: Color? = nil
+    ) {
+        self.options = options
+        self.isSelected = isSelected
+        self.titleKey = titleKey
+        self.onSelect = onSelect
+        self.accessibilityLabel = accessibilityLabel
+        self.trailingSpacer = trailingSpacer
+        self.backgroundColor = backgroundColor
+    }
 
     var body: some View {
         VStack(
@@ -43,9 +63,11 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
                     )
                     Divider()
                 }
-                Spacer()
+                if trailingSpacer {
+                    Spacer()
+                }
             }
         )
-        .background(theme.surface)
+        .background(backgroundColor ?? theme.surface)
     }
 }

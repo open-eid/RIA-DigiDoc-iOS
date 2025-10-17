@@ -20,34 +20,47 @@
 import SwiftUI
 import FactoryKit
 
-struct OneTimeLogGenerationToggleSection: View {
+struct ToggleSection: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @Binding var enableOneTimeLogGeneration: Bool
+    @Binding var isOn: Bool
+    let label: String
+    let verticalPadding: CGFloat
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    init(
+        isOn: Binding<Bool>,
+        label: String,
+        verticalPadding: CGFloat = Dimensions.Padding.SPadding
+    ) {
+        self._isOn = isOn
+        self.label = label
+        self.verticalPadding = verticalPadding
+    }
 
     var body: some View {
         HStack {
-            Text(languageSettings.localized("Main diagnostics logging switch"))
+            Text(label)
                 .foregroundStyle(theme.onSurface)
                 .font(typography.bodyLarge)
             Spacer()
             Toggle(
-                isOn: $enableOneTimeLogGeneration,
+                isOn: $isOn,
                 label: {}
             )
-            .toggleStyle(SwitchToggleStyle(tint: theme.outline))
+            .toggleStyle(SwitchToggleStyle(tint: theme.primary))
             .labelsHidden()
         }
-        .padding(.vertical, Dimensions.Padding.SPadding)
+        .padding(.vertical, verticalPadding)
     }
 }
 
 // MARK: - Preview
 #Preview {
-    OneTimeLogGenerationToggleSection(enableOneTimeLogGeneration: .constant(false))
+    ToggleSection(
+        isOn: .constant(false),
+        label: "section label"
+    )
         .environmentObject(Container.shared.languageSettings())
         .environmentObject(Container.shared.themeSettings())
 }

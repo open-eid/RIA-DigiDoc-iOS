@@ -25,65 +25,168 @@ struct FloatingLabelTextField: View {
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
 
+    // MARK: - Parameters
     let title: String
+    let placeholder: String = ""
     @Binding var text: String
     var isSecure: Bool = false
-    var placeholder: String = ""
+    var isDropdown: Bool = false
+    var isDisabled: Bool = false
+    var onDropdownTap: (() -> Void)?
 
+    // MARK: - State
     @State private var isPasswordVisible: Bool = false
     @State private var isFocused: Bool = false
     @FocusState private var fieldIsFocused: Bool
+
+    // MARK: - Computed properties
 
     private var shouldFloatLabel: Bool {
         !text.isEmpty || isFocused
     }
 
+    private var isInteractionEnabled: Bool {
+        !isDisabled && !isDropdown
+    }
+
+    private var textColor: Color {
+        if isDisabled {
+            return theme.onSurface.opacity(Dimensions.Shadow.SOpacity)
+        }
+        return theme.onSurfaceVariant
+    }
+
+    private var borderColor: Color {
+        if isDisabled {
+            return theme.onSurface.opacity(Dimensions.Shadow.SOpacity)
+        } else if isFocused && isInteractionEnabled {
+            return theme.primary
+        }
+        return theme.outline
+    }
+
+    private var borderWidth: CGFloat {
+        if isFocused && isInteractionEnabled {
+            return Dimensions.Height.SBorder
+        } else {
+            return Dimensions.Height.XSBorder
+        }
+    }
+
+    // MARK: - Body
+
     var body: some View {
         ZStack {
-            mainTextField
+            if isDropdown {
+                dropdownButton
+            } else {
+                mainInputContainer
+            }
             floatingLabel
         }
     }
 
+    // MARK: - Dropdown button
+
     @ViewBuilder
-    private var mainTextField: some View {
-        HStack(spacing: Dimensions.Padding.XSPadding) {
-            Group {
-                if isSecure && !isPasswordVisible {
-                    SecureField(placeholder, text: $text)
-                        .multilineTextAlignment(.leading)
-                } else {
-                    TextField(placeholder, text: $text)
-                        .multilineTextAlignment(.leading)
+    private var dropdownButton: some View {
+        Button(
+            action: {
+                if !isDisabled {
+                    onDropdownTap?()
                 }
+            },
+            label: {
+                HStack(spacing: Dimensions.Padding.XSPadding) {
+                    Text(text)
+                        .font(typography.bodyLarge)
+                        .foregroundStyle(textColor)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(height: Dimensions.Icon.IconSizeXXS)
+
+                    Spacer()
+
+                    dropdownArrowIcon
+                }
+                .padding(.horizontal, Dimensions.Padding.SPadding)
+                .padding(.vertical, Dimensions.Padding.MSPadding)
+                .background(borderBackground)
+                .contentShape(Rectangle())
             }
-            .font(typography.bodyLarge)
-            .foregroundStyle(theme.onSurface)
-            .focused($fieldIsFocused)
-            .onChange(of: fieldIsFocused) { newValue in
+        )
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .accessibilityLabel(text)
+    }
+
+    // MARK: - Input
+
+    @ViewBuilder
+    private var mainInputContainer: some View {
+        HStack(spacing: Dimensions.Padding.XSPadding) {
+            inputField
+            Spacer()
+            trailingIcon
+        }
+        .padding(.horizontal, Dimensions.Padding.SPadding)
+        .padding(.vertical, Dimensions.Padding.MSPadding)
+        .background(borderBackground)
+        .contentShape(Rectangle())
+    }
+
+    @ViewBuilder
+    private var borderBackground: some View {
+        RoundedRectangle(cornerRadius: Dimensions.Corner.XXSCornerRadius)
+            .stroke(borderColor, lineWidth: borderWidth)
+    }
+
+    @ViewBuilder
+    private var inputField: some View {
+        Group {
+            if isSecure && !isPasswordVisible {
+                SecureField(placeholder, text: $text)
+                    .multilineTextAlignment(.leading)
+                    .disabled(isDisabled)
+            } else {
+                TextField(placeholder, text: $text)
+                    .multilineTextAlignment(.leading)
+                    .disabled(isDisabled)
+            }
+        }
+        .font(typography.bodyLarge)
+        .foregroundStyle(textColor)
+        .focused($fieldIsFocused)
+        .onChange(of: fieldIsFocused) { newValue in
+            if isInteractionEnabled {
                 withAnimation(.easeInOut(duration: Dimensions.Duration.focusAnimation)) {
                     isFocused = newValue
                 }
             }
-            .frame(height: Dimensions.Icon.IconSizeXXS)
-
-            Spacer()
-
-            if isSecure {
-                toggleVisibilityIconButton
-            } else if !text.isEmpty {
-                clearIconButton
-            }
         }
-        .padding(.horizontal, Dimensions.Padding.SPadding)
-        .padding(.vertical, Dimensions.Padding.MSPadding)
-        .background(
-            RoundedRectangle(cornerRadius: Dimensions.Corner.XXSCornerRadius)
-                .stroke(
-                    isFocused ? theme.primary : theme.outline,
-                    lineWidth: isFocused ? Dimensions.Height.SBorder : Dimensions.Height.XSBorder
-                )
-        )
+        .frame(height: Dimensions.Icon.IconSizeXXS)
+    }
+
+    // MARK: - Icons
+
+    @ViewBuilder
+    private var trailingIcon: some View {
+        if isSecure && !isDisabled {
+            toggleVisibilityIconButton
+        } else if !text.isEmpty && !isDisabled {
+            clearIconButton
+        }
+    }
+
+    @ViewBuilder
+    private var dropdownArrowIcon: some View {
+        Image("ic_m3_arrow_right_48pt_wght400")
+            .resizable()
+            .scaledToFit()
+            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+            .foregroundStyle(textColor)
+            .rotationEffect(.degrees(90))
+            .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -100,6 +203,7 @@ struct FloatingLabelTextField: View {
             }
         )
         .buttonStyle(.plain)
+        .disabled(isDisabled)
     }
 
     @ViewBuilder
@@ -120,7 +224,10 @@ struct FloatingLabelTextField: View {
             }
         )
         .buttonStyle(.plain)
+        .disabled(isDisabled)
     }
+
+    // MARK: - Floating label
 
     @ViewBuilder
     private var floatingLabel: some View {
@@ -128,9 +235,9 @@ struct FloatingLabelTextField: View {
             Text(title)
                 .font(shouldFloatLabel ? typography.bodySmall : typography.bodyLarge)
                 .foregroundStyle(
-                    shouldFloatLabel
-                    ? (isFocused ? theme.primary : theme.onSurfaceVariant)
-                    : theme.onSurfaceVariant
+                    isFocused
+                    ? theme.primary
+                    : (isDisabled ? theme.onSurface.opacity(Dimensions.Shadow.SOpacity) : theme.onSurfaceVariant)
                 )
                 .background(
                     Rectangle()
@@ -151,31 +258,39 @@ struct FloatingLabelTextField: View {
             Spacer()
         }
         .padding(.leading, Dimensions.Padding.SPadding)
+        .allowsHitTesting(false)
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-    FloatingLabelTextField(
-        title: "field label",
-        text: .constant("text inside field")
-    )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    VStack(spacing: 20) {
+        FloatingLabelTextField(
+            title: "field label",
+            text: .constant("text inside field")
+        )
 
-    FloatingLabelTextField(
-        title: "field label",
-        text: .constant("")
-    )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+        FloatingLabelTextField(
+            title: "dropdown field",
+            text: .constant("Selected value"),
+            isDropdown: true,
+            onDropdownTap: { print("Dropdown tapped") }
+        )
 
-    FloatingLabelTextField(
-        title: "field label",
-        text: .constant(""),
-        isSecure: true
-    )
+        FloatingLabelTextField(
+            title: "disabled field",
+            text: .constant("disabled text"),
+            isDisabled: true
+        )
+
+        FloatingLabelTextField(
+            title: "secure field",
+            text: .constant("password"),
+            isSecure: true
+        )
+    }
+    .padding()
     .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())
 }
