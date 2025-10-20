@@ -62,4 +62,3 @@ public final class SecureData {
     /// If you need a temporary `Data` view (try to avoid).
     func asData() -> Data { storage }
 }
- 

@@ -92,7 +92,7 @@ extension CardCommandsInternal {
             }
         }
     }
-    
+
     private func pinTemplate(_ pin: SecureData?, fillChar: UInt8 = 0xFF) -> Data {
         guard let pin = pin else { return Data() }
 
@@ -101,9 +101,9 @@ extension CardCommandsInternal {
 
         pin.withUnsafeBytes { raw in
             // Copy up to 12 bytes from the secure buffer
-            let n = min(raw.count, 12)
+            let nVal = min(raw.count, 12)
             let src = raw.bindMemory(to: UInt8.self)
-            out.append(contentsOf: src.prefix(n))
+            out.append(contentsOf: src.prefix(nVal))
         }
 
         // Pad with fillChar if needed
@@ -113,7 +113,7 @@ extension CardCommandsInternal {
 
         return out
     }
-    
+
     func changeCode(_ pinRef: UInt8, to code: SecureData, verifyCode: SecureData) async throws {
         try await errorForPinActionResponse {
             _ = try await reader.sendAPDU(ins: 0x24, p2Byte: pinRef, data: pinTemplate(verifyCode) + pinTemplate(code))
