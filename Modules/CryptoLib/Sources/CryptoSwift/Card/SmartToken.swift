@@ -4,10 +4,10 @@ import CryptoObjCWrapper
 
 @MainActor
 public class SmartToken: AbstractSmartToken {
-    let pin1: String
+    let pin1: SecureData
     let card: CardCommands
 
-    public init(card: CardCommands, pin1: String) {
+    public init(card: CardCommands, pin1: SecureData) {
         self.card = card
         self.pin1 = pin1
     }

@@ -77,7 +77,7 @@ public protocol CardCommands: Sendable {
      *   - verifyCode: The current PIN or PUK code for verification.
      * - Throws: An error if the operation fails.
      */
-    func changeCode(_ type: CodeType, to code: String, verifyCode: String) async throws
+    func changeCode(_ type: CodeType, to code: SecureData, verifyCode: SecureData) async throws
 
     /**
      * Verifies a PIN or PUK code.
@@ -87,7 +87,7 @@ public protocol CardCommands: Sendable {
      *   - code: The PIN/PUK code to verify.
      * - Throws: An error if the verification fails.
      */
-    func verifyCode(_ type: CodeType, code: String) async throws
+    func verifyCode(_ type: CodeType, code: SecureData) async throws
 
     /**
      * Unblocks a PIN using the PUK code.
@@ -98,7 +98,7 @@ public protocol CardCommands: Sendable {
      *   - newCode: The new PIN code.
      * - Throws: An error if the operation fails.
      */
-    func unblockCode(_ type: CodeType, puk: String, newCode: String) async throws
+    func unblockCode(_ type: CodeType, puk: SecureData, newCode: SecureData) async throws
 
     /**
      * Authenticates using a cryptographic challenge.
@@ -109,7 +109,7 @@ public protocol CardCommands: Sendable {
      * - Throws: An error if the operation fails.
      * - Returns: The authentication response as `Data`.
      */
-    func authenticate(for hash: Data, withPin1 pin1: String) async throws -> Data
+    func authenticate(for hash: Data, withPin1 pin1: SecureData) async throws -> Data
 
     /**
      * Calculates a digital signature for the given hash.
@@ -120,7 +120,7 @@ public protocol CardCommands: Sendable {
      * - Throws: An error if the operation fails.
      * - Returns: The signature as `Data`.
      */
-    func calculateSignature(for hash: Data, withPin2 pin2: String) async throws -> Data
+    func calculateSignature(for hash: Data, withPin2 pin2: SecureData) async throws -> Data
 
     /**
      * Decrypts data using PIN 1.
@@ -131,5 +131,5 @@ public protocol CardCommands: Sendable {
      * - Throws: An error if the operation fails.
      * - Returns: The decrypted data.
      */
-    func decryptData(_ hash: Data, withPin1 pin1: String) async throws -> Data
+    func decryptData(_ hash: Data, withPin1 pin1: SecureData) async throws -> Data
 }

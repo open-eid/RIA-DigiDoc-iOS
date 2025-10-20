@@ -92,25 +92,35 @@ extension CardCommandsInternal {
             }
         }
     }
+    
+    private func pinTemplate(_ pin: SecureData?, fillChar: UInt8 = 0xFF) -> Data {
+        guard let pin = pin else { return Data() }
 
-    private func pinTemplate(_ pin: String?) -> Data {
-        guard let pin else { return .init() }
-        guard var data = pin.data(using: .utf8) else { return Data() }
-        if data.count < 12 {
-            data.append(Data(repeating: fillChar, count: 12 - data.count))
-            return data
-        } else {
-            return data
+        var out = Data()
+        out.reserveCapacity(12)
+
+        pin.withUnsafeBytes { raw in
+            // Copy up to 12 bytes from the secure buffer
+            let n = min(raw.count, 12)
+            let src = raw.bindMemory(to: UInt8.self)
+            out.append(contentsOf: src.prefix(n))
         }
-    }
 
-    func changeCode(_ pinRef: UInt8, to code: String, verifyCode: String) async throws {
+        // Pad with fillChar if needed
+        if out.count < 12 {
+            out.append(Data(repeating: fillChar, count: 12 - out.count))
+        }
+
+        return out
+    }
+    
+    func changeCode(_ pinRef: UInt8, to code: SecureData, verifyCode: SecureData) async throws {
         try await errorForPinActionResponse {
             _ = try await reader.sendAPDU(ins: 0x24, p2Byte: pinRef, data: pinTemplate(verifyCode) + pinTemplate(code))
         }
     }
 
-    func unblockCode(_ pinRef: UInt8, puk: String?, newCode: String) async throws {
+    func unblockCode(_ pinRef: UInt8, puk: SecureData?, newCode: SecureData) async throws {
         try await errorForPinActionResponse {
             _ = try await reader
                 .sendAPDU(
@@ -122,7 +132,7 @@ extension CardCommandsInternal {
         }
     }
 
-    func verifyCode(_ pinRef: UInt8, code: String) async throws {
+    func verifyCode(_ pinRef: UInt8, code: SecureData) async throws {
         try await errorForPinActionResponse {
             _ = try await reader.sendAPDU(ins: 0x20, p2Byte: pinRef, data: pinTemplate(code))
         }
