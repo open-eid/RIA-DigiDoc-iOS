@@ -115,16 +115,16 @@ class Idemia: CardCommandsInternal {
         return 0
     }
 
-    func changeCode(_ type: CodeType, to code: String, verifyCode: String) async throws {
+    func changeCode(_ type: CodeType, to code: SecureData, verifyCode: SecureData) async throws {
         _ = try await select(file: type.aid)
         try await changeCode(type.pinRef, to: code, verifyCode: verifyCode)
     }
 
-    func verifyCode(_ type: CodeType, code: String) async throws {
+    func verifyCode(_ type: CodeType, code: SecureData) async throws {
         try await verifyCode(type.pinRef, code: code)
     }
 
-    func unblockCode(_ type: CodeType, puk: String, newCode: String) async throws {
+    func unblockCode(_ type: CodeType, puk: SecureData, newCode: SecureData) async throws {
         guard type != .puk else {
             throw IdCardInternalError.notSupportedCodeType
         }
@@ -137,7 +137,7 @@ class Idemia: CardCommandsInternal {
 
     // MARK: - Authentication & Signing
 
-    func authenticate(for hash: Data, withPin1 pin1: String) async throws -> Data {
+    func authenticate(for hash: Data, withPin1 pin1: SecureData) async throws -> Data {
         _ = try await select(file: kAIDOberthur)
         try await verifyCode(.pin1, code: pin1)
         try await setSecEnv(mode: 0xA4, algo: [0xFF, 0x20, 0x08, 0x00], keyRef: AUTHKEY)
@@ -146,7 +146,7 @@ class Idemia: CardCommandsInternal {
         return try await reader.sendAPDU(ins: 0x88, data: paddedHash, leByte: 0x00)
     }
 
-    func calculateSignature(for hash: Data, withPin2 pin2: String) async throws -> Data {
+    func calculateSignature(for hash: Data, withPin2 pin2: SecureData) async throws -> Data {
         _ = try await select(file: kAIDQSCD)
         try await verifyCode(.pin2, code: pin2)
         try await setSecEnv(mode: 0xB6, algo: [0xFF, 0x15, 0x08, 0x00], keyRef: SIGNKEY)
@@ -155,7 +155,7 @@ class Idemia: CardCommandsInternal {
         return try await reader.sendAPDU(ins: 0x2A, p1Byte: 0x9E, p2Byte: 0x9A, data: paddedHash, leByte: 0x00)
     }
 
-    func decryptData(_ hash: Data, withPin1 pin1: String) async throws -> Data {
+    func decryptData(_ hash: Data, withPin1 pin1: SecureData) async throws -> Data {
         _ = try await select(file: kAIDOberthur)
         try await verifyCode(.pin1, code: pin1)
         try await setSecEnv(mode: 0xB8, algo: [0xFF, 0x30, 0x04, 0x00], keyRef: AUTHKEY)
