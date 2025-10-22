@@ -21,6 +21,8 @@ import SwiftUI
 import FactoryKit
 
 struct ShareButtonBottomBar: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+
     @AppTheme private var theme
     @AppTypography private var typography
 

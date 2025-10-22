@@ -46,7 +46,7 @@ public:
     std::string TSLUrl() const final {
         NSURL *tslUrl = currentConf.TSLURL;
         if (tslUrl && tslUrl.absoluteString.length > 0) {
-            return [tslUrl.path UTF8String];
+            return [tslUrl.absoluteString UTF8String];
         }
         return digidoc::ConfCurrent::TSLUrl();
     }
@@ -74,7 +74,7 @@ public:
         NSURL *tsaUrl = currentConf.TSAURL;
         
         if (tsaUrl && tsaUrl.absoluteString.length > 0) {
-            return [tsaUrl.path UTF8String];
+            return [tsaUrl.absoluteString UTF8String];
         }
         
         return digidoc::ConfCurrent::TSUrl();
@@ -105,7 +105,7 @@ public:
 
         NSURL *sivaUrl = currentConf.SIVAURL;
         if (sivaUrl && sivaUrl.absoluteString.length > 0) {
-            return [sivaUrl.path UTF8String];
+            return [sivaUrl.absoluteString UTF8String];
         }
 
         return digidoc::ConfCurrent::verifyServiceUri();

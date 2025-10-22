@@ -287,6 +287,24 @@
         }
       }
     },
+    "Close container" : {
+      "comment" : "Accessibility variant for Close",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sulge ümbrik"
+          }
+        }
+      }
+    },
     "Container files" : {
       "comment" : "Signing view container files title",
       "localizations" : {
@@ -336,6 +354,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku nimi"
+          }
+        }
+      }
+    },
+    "Container notification" : {
+      "comment" : "Used in Container notifications view accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container notification"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku teavitus"
           }
         }
       }
@@ -538,6 +574,24 @@
         }
       }
     },
+    "Encrypt container" : {
+      "comment" : "Accessibility variant of Encrypt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encrypt container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeri dokument"
+          }
+        }
+      }
+    },
     "Failed to open container" : {
       "comment" : "Error message when unable to create a new container",
       "extractionState" : "manual",
@@ -624,6 +678,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili %@ salvestamine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "File" : {
+      "comment" : "Used in data file view for accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail"
           }
         }
       }
@@ -2051,24 +2123,6 @@
         }
       }
     },
-    "Main home signature title" : {
-      "comment" : "Main home signature title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Signature"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allkiri"
-          }
-        }
-      }
-    },
     "Main home version" : {
       "comment" : "Main home version",
       "extractionState" : "manual",
@@ -2750,22 +2804,6 @@
         }
       }
     },
-    "Notifications" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notifications"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teated"
-          }
-        }
-      }
-    },
     "OCSP Certificate" : {
       "comment" : "Signature detail",
       "extractionState" : "manual",
@@ -3177,6 +3215,24 @@
         }
       }
     },
+    "Selected" : {
+      "comment" : "Selected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valitud"
+          }
+        }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "en" : {
@@ -3207,6 +3263,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jaga"
+          }
+        }
+      }
+    },
+    "Share container" : {
+      "comment" : "Accessibility variant of sharing container button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jaga ümbrikut"
           }
         }
       }
@@ -3315,6 +3389,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjasta"
+          }
+        }
+      }
+    },
+    "Sign container" : {
+      "comment" : "Accessibility variant of Sign",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjasta dokument"
+          }
+        }
+      }
+    },
+    "Signature" : {
+      "comment" : "Home title, signer details title, accessibility signature prefix",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri"
           }
         }
       }
@@ -3678,24 +3788,6 @@
         }
       }
     },
-    "Signers details title" : {
-      "comment" : "Signature detail title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Signature"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allkiri"
-          }
-        }
-      }
-    },
     "Signers role and address title" : {
       "comment" : "Signature detail role and address title",
       "extractionState" : "manual",
@@ -3858,6 +3950,24 @@
         }
       }
     },
+    "Timestamp" : {
+      "comment" : "Used in signature view for accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timestamp"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempel"
+          }
+        }
+      }
+    },
     "TS Certificate" : {
       "comment" : "Signature detail",
       "extractionState" : "manual",
@@ -3932,6 +4042,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Unselected" : {
+      "comment" : "Unselected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unselected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valimata"
           }
         }
       }
@@ -4033,5 +4161,5 @@
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

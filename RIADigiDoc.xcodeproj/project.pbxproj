@@ -277,6 +277,9 @@
 				DF4E6A752D10FD4B00F6111A /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtension" target */,
 				DFA3EE502D149A4E001D951B /* Exceptions for "RIADigiDoc" folder in "FileImportShareExtensionTests" target */,
 			);
+			explicitFolders = (
+				UI/Component/Shared/Extension,
+			);
 			path = RIADigiDoc;
 			sourceTree = "<group>";
 		};

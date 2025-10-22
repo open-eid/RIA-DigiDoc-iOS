@@ -31,11 +31,11 @@ struct StyledNameText: View {
         let finalName = allCaps ? name.uppercased() : name
         let nameParts = finalName.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
 
-        HStack(spacing: 0) {
+        Group {
             if nameParts.count == 2 {
-                Text(nameParts[0])
-                    .fontWeight(.bold)
-                Text(verbatim: ", \(nameParts[1])")
+                (Text(nameParts[0]).fontWeight(.bold) +
+                 Text(verbatim: ", ").fontWeight(.regular) +
+                 Text(nameParts[1]).fontWeight(.regular))
             } else {
                 Text(finalName)
                     .fontWeight(.bold)
@@ -43,5 +43,7 @@ struct StyledNameText: View {
         }
         .foregroundStyle(theme.onSurface)
         .font(typography.bodyLarge)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

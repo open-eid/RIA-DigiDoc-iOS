@@ -31,6 +31,7 @@ struct ToastOverlay: View {
             if toast.isVisible, let message = toast.message {
                 Text(message)
                     .lineLimit(2)
+                    .minimumScaleFactor(0.5)
                     .padding(.horizontal, Dimensions.Padding.SPadding)
                     .padding(.vertical, Dimensions.Padding.MSPadding)
                     .background(theme.onBackground.opacity(0.9))

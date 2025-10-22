@@ -21,6 +21,7 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct DataFilesView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
@@ -28,6 +29,9 @@ struct DataFilesView: View {
     @State private var showBottomSheetFromButton = false
     @State private var showBottomSheetFromTap = false
 
+    @AccessibilityFocusState private var focusedField: AccessibilityField?
+
+    let fileIndex: Int
     let onOpenFileButtonClick: (DataFileWrapper) -> Void
     let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
 
@@ -57,11 +61,21 @@ struct DataFilesView: View {
                     .font(typography.titleMedium)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(4)
+                    .truncationMode(.middle)
                     .multilineTextAlignment(TextAlignment.leading)
+                    .accessibilityLabel(
+                        Text(
+                            verbatim: "\(languageSettings.localized("File")) " +
+                            "\(fileIndex), \(dataFile.fileName.lowercased())"
+                        )
+                    )
 
                 Spacer()
 
-                Button(action: {
+                Button(action: accessibleAction(
+                    voiceOverEnabled: voiceOverEnabled,
+                    focusedField: $focusedField
+                ) {
                     showBottomSheetFromButton = true
                 }, label: {
                     Image("ic_m3_more_vert_48pt_wght400")
@@ -69,15 +83,25 @@ struct DataFilesView: View {
                         .scaledToFit()
                         .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                         .foregroundStyle(theme.onBackground)
-                        .accessibilityLabel("More options")
+                        .accessibilityLabel(
+                            Text(
+                                verbatim: "\(languageSettings.localized("File")) " +
+                                "\(fileIndex), \(languageSettings.localized("More options"))"
+                            )
+                        )
                 })
                 .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                .accessibilityFocusRestore(
+                    focusedField: $focusedField,
+                    field: .dataFile(.openDataFileOptionsButton),
+                    when: showBottomSheetFromButton
+                )
             }
             .padding(Dimensions.Padding.MSPadding)
         }
         .listRowInsets(EdgeInsets())
         .onTapGesture {
-            showBottomSheetFromTap = true
+            onOpenFileButtonClick(dataFile)
         }
         .accessibilityAddTraits([.isButton])
         .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)

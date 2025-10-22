@@ -21,6 +21,7 @@ import FactoryKit
 import SwiftUI
 
 struct ContainerNameView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
@@ -30,6 +31,8 @@ struct ContainerNameView: View {
     @State private var tempContainerURL: URL?
     @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
+
+    @AccessibilityFocusState private var focusedField: AccessibilityField?
 
     let icon: String
     let containerNameTitle: String
@@ -80,22 +83,35 @@ struct ContainerNameView: View {
                                 .foregroundStyle(theme.onSurface)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .lineLimit(2)
+                                .truncationMode(.middle)
                                 .multilineTextAlignment(TextAlignment.leading)
                         }
                     }
+                    .accessibilityElement(children: .combine)
 
                     Spacer()
 
-                    Button(action: {
+                    Button(action: accessibleAction(
+                        voiceOverEnabled: voiceOverEnabled,
+                        focusedField: $focusedField
+                    ) {
                         showBottomSheetFromButton = true
                     }, label: {
                         Image("ic_m3_more_vert_48pt_wght400")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .frame(
+                                width: Dimensions.Icon.IconSizeXXS,
+                                height: Dimensions.Icon.IconSizeXXS
+                            )
                             .foregroundStyle(theme.onBackground)
-                            .accessibilityLabel(languageSettings.localized("More options"))
                     })
+                    .accessibilityFocusRestore(
+                        focusedField: $focusedField,
+                        field: .container(.openContainerOptionsButton),
+                        when: showBottomSheetFromButton
+                    )
+                    .accessibilityLabel(languageSettings.localized("More options"))
                     .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
                 }
 
@@ -130,10 +146,6 @@ struct ContainerNameView: View {
             .background(theme.surfaceContainerHighest)
             .cornerRadius(Dimensions.Corner.MSCornerRadius)
             .padding(.top, Dimensions.Padding.MSPadding)
-            .onTapGesture {
-                showBottomSheetFromTap = true
-            }
-            .accessibilityAddTraits([.isButton])
             .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
         }
     }
@@ -150,8 +162,8 @@ struct ContainerNameView: View {
         showRightActionButton: true,
         leftActionButtonName: "Sign",
         rightActionButtonName: "Encrypt",
-        leftActionButtonAccessibilityLabel: "Sign",
-        rightActionButtonAccessibilityLabel: "Encrypt",
+        leftActionButtonAccessibilityLabel: "Sign container",
+        rightActionButtonAccessibilityLabel: "Encrypt container",
         onLeftActionButtonClick: {},
         onRightActionButtonClick: {},
         onSaveContainerButtonClick: {},

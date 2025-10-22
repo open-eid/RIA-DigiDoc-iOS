@@ -37,30 +37,61 @@ struct SignaturesListView: View {
     let signatureUtil: SignatureUtilProtocol
 
     var body: some View {
-        List {
-            ForEach(timestamps) { timestamp in
-                SignatureView(
-                    containerMimetype: containerMimetype,
-                    dataFilesCount: dataFilesCount,
-                    signature: timestamp,
-                    isTimestamp: true,
-                    nameUtil: nameUtil,
-                    signatureUtil: signatureUtil,
-                    showRemoveSignatureButton: showRemoveSignatureButton
-                )
+        LazyVStack {
+            if #available(iOS 26.0, *) {
+                ForEach(timestamps.enumerated(), id: \.offset) { index, timestamp in
+                    SignatureView(
+                        signatureIndex: index + 1,
+                        containerMimetype: containerMimetype,
+                        dataFilesCount: dataFilesCount,
+                        signature: timestamp,
+                        isTimestamp: true,
+                        nameUtil: nameUtil,
+                        signatureUtil: signatureUtil,
+                        showRemoveSignatureButton: showRemoveSignatureButton
+                    )
+                }
+            } else {
+                ForEach(Array(timestamps.enumerated()), id: \.offset) { index, timestamp in
+                    SignatureView(
+                        signatureIndex: index + 1,
+                        containerMimetype: containerMimetype,
+                        dataFilesCount: dataFilesCount,
+                        signature: timestamp,
+                        isTimestamp: true,
+                        nameUtil: nameUtil,
+                        signatureUtil: signatureUtil,
+                        showRemoveSignatureButton: showRemoveSignatureButton
+                    )
+                }
             }
-            ForEach(signatures) { signature in
-                SignatureView(
-                    containerMimetype: containerMimetype,
-                    dataFilesCount: dataFilesCount,
-                    signature: signature,
-                    nameUtil: nameUtil,
-                    signatureUtil: signatureUtil,
-                    showRemoveSignatureButton: showRemoveSignatureButton
-                )
+            if #available(iOS 26.0, *) {
+                ForEach(signatures.enumerated(), id: \.offset) { index, signature in
+                    SignatureView(
+                        signatureIndex: index + 1,
+                        containerMimetype: containerMimetype,
+                        dataFilesCount: dataFilesCount,
+                        signature: signature,
+                        nameUtil: nameUtil,
+                        signatureUtil: signatureUtil,
+                        showRemoveSignatureButton: showRemoveSignatureButton
+                    )
+                }
+            } else {
+                ForEach(Array(signatures.enumerated()), id: \.offset) { index, signature in
+                    SignatureView(
+                        signatureIndex: index + 1,
+                        containerMimetype: containerMimetype,
+                        dataFilesCount: dataFilesCount,
+                        signature: signature,
+                        nameUtil: nameUtil,
+                        signatureUtil: signatureUtil,
+                        showRemoveSignatureButton: showRemoveSignatureButton
+                    )
+                }
+
             }
         }
-        .listStyle(.plain)
     }
 }
 

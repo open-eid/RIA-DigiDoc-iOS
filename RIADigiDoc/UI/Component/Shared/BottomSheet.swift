@@ -57,11 +57,18 @@ struct BottomSheet: View {
                                     .scaledToFit()
                                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                     .foregroundStyle(theme.onSurface)
-                                    .accessibilityLabel(item.accessibilityLabel)
+                                    .accessibilityHidden(true)
 
                                 Text(languageSettings.localized(item.title))
                                     .foregroundStyle(theme.onSurface)
                                     .font(typography.bodyLarge)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.leading)
+                                    .accessibilityLabel(
+                                        languageSettings.localized(item.accessibilityLabel).lowercased()
+                                    )
+                                    .accessibilityAddTraits([.isButton])
 
                                 Spacer()
 
@@ -71,9 +78,7 @@ struct BottomSheet: View {
                                         .scaledToFit()
                                         .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                         .foregroundStyle(theme.onSurface)
-                                        .accessibilityLabel(
-                                            languageSettings.localized(item.accessibilityLabel).lowercased()
-                                        )
+                                        .accessibilityHidden(true)
                             }
                         }
                         .foregroundStyle(theme.onSurface)

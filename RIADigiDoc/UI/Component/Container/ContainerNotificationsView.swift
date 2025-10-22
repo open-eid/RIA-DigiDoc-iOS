@@ -51,9 +51,16 @@ struct ContainerNotificationsView: View {
                                     .padding(Dimensions.Padding.XSPadding)
                                     .accessibilityHidden(true)
 
-                                Text(verbatim: message(for: notifications[index]))
+                                let notificationMessage = message(for: notifications[index])
+                                Text(verbatim: notificationMessage)
                                     .font(typography.bodyMedium)
                                     .foregroundStyle(theme.onSurfaceVariant)
+                                    .accessibilityLabel(
+                                        Text(
+                                            verbatim: "\(languageSettings.localized("Container notification")) " +
+                                            "\(index + 1). \(notificationMessage)"
+                                        )
+                                    )
                             }
                             .padding(.horizontal, Dimensions.Padding.XXSPadding)
 

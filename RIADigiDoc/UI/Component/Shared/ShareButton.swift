@@ -67,6 +67,7 @@ struct ShareButton: View {
                     y: Dimensions.Shadow.yOffset
                 )
         )
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityIdentifier("signedContainerShareButton")
     }

@@ -21,6 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct TabView<Content: View>: View {
+    @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -38,9 +39,20 @@ struct TabView<Content: View>: View {
                         }
                     }, label: {
                         VStack {
-                            Text(titles[index])
+                            let title = titles[index]
+                            let isSelected = selectedTab == index
+                            let selectedText = isSelected ?
+                            languageSettings.localized("Selected") :
+                            languageSettings.localized("Unselected")
+
+                            Text(title)
                                 .font(typography.labelLarge)
-                                .foregroundStyle(selectedTab == index ? theme.primary : theme.onSurface)
+                                .foregroundStyle(isSelected ? theme.primary : theme.onSurface)
+                                .accessibilityLabel(Text(verbatim:
+                                    "\(title), " +
+                                    "\(languageSettings.localized("Tab")) \(index + 1) / \(titles.count), " +
+                                    "\(selectedText)"
+                                ))
                             Rectangle()
                                 .fill(selectedTab == index ? theme.primary : theme.outlineVariant)
                                 .frame(height: Dimensions.Height.SBorder)
@@ -60,5 +72,6 @@ struct TabView<Content: View>: View {
     TabView(selectedTab: .constant(0), titles: ["Tab 1", "Tab 2"]) {
         EmptyView()
     }
+    .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())
 }

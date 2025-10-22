@@ -77,7 +77,7 @@ struct HomeView: View {
                 .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
 
                 SigningImportButton(
-                    title: languageSettings.localized("Main home signature title"),
+                    title: languageSettings.localized("Signature"),
                     description: languageSettings.localized("Main home signature description"),
                     assetImageName: "ic_m3_stylus_note_48pt_wght400",
                     isFileOpeningLoading: $isFileOpeningLoading,

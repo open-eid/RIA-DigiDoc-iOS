@@ -173,6 +173,7 @@ struct CertificateDetailView: View {
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                         .padding(.top, Dimensions.Padding.XSPadding)
                         .accessibilityHeading(.h1)
+                        .accessibilityAddTraits([.isHeader])
 
                     if !subjectCountryName.isEmpty {
                         SignerDetailView(
@@ -243,6 +244,7 @@ struct CertificateDetailView: View {
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                         .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
+                        .accessibilityAddTraits([.isHeader])
 
                     if !issuerCountryName.isEmpty {
                         SignerDetailView(
@@ -331,6 +333,7 @@ struct CertificateDetailView: View {
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                         .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
+                        .accessibilityAddTraits([.isHeader])
 
                     if !publicKeyAlgorithm.isEmpty {
                         SignerDetailView(
@@ -374,6 +377,7 @@ struct CertificateDetailView: View {
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                         .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h2)
+                        .accessibilityAddTraits([.isHeader])
 
                     if !extensions.isEmpty {
                         ForEach(extensions, id: \.id) { extensionItem in
@@ -400,6 +404,7 @@ struct CertificateDetailView: View {
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                         .padding(.top, Dimensions.Padding.MPadding)
                         .accessibilityHeading(.h1)
+                        .accessibilityAddTraits([.isHeader])
 
                     if !sha256Fingerprint.isEmpty {
                         SignerDetailView(
