@@ -88,8 +88,10 @@ struct ContainerWrapperTests {
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        let containerWrapper = ContainerWrapper(
+        let containerWrapper = await ContainerWrapper(
             containerURL: containerFile,
+            dataFiles: sampleContainer.getDataFiles(),
+            signatures: sampleContainer.getSignatures(),
             fileManager: mockFileManager
         )
 
@@ -115,8 +117,9 @@ struct ContainerWrapperTests {
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        let containerWrapper = ContainerWrapper(
+        let containerWrapper = await ContainerWrapper(
             containerURL: containerFile,
+            mediatype: sampleContainer.getContainerMimetype(),
             fileManager: mockFileManager
         )
 
@@ -143,8 +146,9 @@ struct ContainerWrapperTests {
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        let containerWrapper = ContainerWrapper(
+        let containerWrapper = await ContainerWrapper(
             containerURL: containerFile,
+            dataFiles: sampleContainer.getDataFiles(),
             fileManager: mockFileManager
         )
 
@@ -166,8 +170,9 @@ struct ContainerWrapperTests {
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        let containerWrapper = ContainerWrapper(
+        let containerWrapper = await ContainerWrapper(
             containerURL: containerFile,
+            dataFiles: sampleContainer.getDataFiles(),
             fileManager: mockFileManager
         )
 
@@ -201,12 +206,12 @@ struct ContainerWrapperTests {
             dataFiles: [dataFileURLs.first ?? URL(fileURLWithPath: "")], isSivaConfirmed: true
         )
 
-        _ = try await containerWrapper.open(containerFile: signedContainer.getRawContainerFile() ??
+        let container = try await containerWrapper.open(containerFile: signedContainer.getRawContainerFile() ??
                   URL(fileURLWithPath: ""), isSivaConfirmed: true)
 
-        let existingContainer = await containerWrapper.getContainer()
+        let dataFiles = await container.getDataFiles()
 
-        #expect(existingContainer != nil)
+        #expect(dataFiles.count == 1)
     }
 
     @Test
@@ -267,8 +272,9 @@ struct ContainerWrapperTests {
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
-        let containerWrapper = ContainerWrapper(
+        let containerWrapper = await ContainerWrapper(
             containerURL: containerFile,
+            dataFiles: sampleContainer.getDataFiles(),
             fileManager: mockFileManager
         )
 

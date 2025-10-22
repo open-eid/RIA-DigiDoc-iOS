@@ -22,6 +22,7 @@ import LibdigidocLibSwift
 import FactoryKit
 
 struct DataFilesListView: View {
+    @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -32,15 +33,29 @@ struct DataFilesListView: View {
     let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
 
     var body: some View {
-        List(dataFiles, id: \.self) { dataFile in
-            DataFilesView(
-                onOpenFileButtonClick: onOpenFileButtonClick,
-                onSaveDataFileButtonClick: onSaveDataFileButtonClick,
-                dataFile: dataFile,
-                showRemoveFileButton: showRemoveFileButton
-            )
+        LazyVStack {
+            if #available(iOS 26.0, *) {
+                ForEach(dataFiles.enumerated(), id: \.offset) { index, dataFile in
+                    DataFilesView(
+                        fileIndex: index + 1,
+                        onOpenFileButtonClick: onOpenFileButtonClick,
+                        onSaveDataFileButtonClick: onSaveDataFileButtonClick,
+                        dataFile: dataFile,
+                        showRemoveFileButton: showRemoveFileButton
+                    )
+                }
+            } else {
+                ForEach(Array(dataFiles.enumerated()), id: \.offset) { index, dataFile in
+                    DataFilesView(
+                        fileIndex: index + 1,
+                        onOpenFileButtonClick: onOpenFileButtonClick,
+                        onSaveDataFileButtonClick: onSaveDataFileButtonClick,
+                        dataFile: dataFile,
+                        showRemoveFileButton: showRemoveFileButton
+                    )
+                }
+            }
         }
-        .listStyle(.plain)
     }
 }
 

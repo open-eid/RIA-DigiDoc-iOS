@@ -31,45 +31,42 @@ private struct FontConfig {
     let size: CGFloat
     let weight: Font.Weight
     let isCondensed: Bool
+    let textStyle: Font.TextStyle
 }
 
 struct FontTypography {
     private static let fontConfigs: [AppTextStyle: FontConfig] = [
-        .displayLarge: FontConfig(size: 57, weight: .regular, isCondensed: true),
-        .displayMedium: FontConfig(size: 45, weight: .regular, isCondensed: true),
-        .displaySmall: FontConfig(size: 36, weight: .regular, isCondensed: true),
+        .displayLarge: FontConfig(size: 57, weight: .regular, isCondensed: true, textStyle: .largeTitle),
+        .displayMedium: FontConfig(size: 45, weight: .regular, isCondensed: true, textStyle: .largeTitle),
+        .displaySmall: FontConfig(size: 36, weight: .regular, isCondensed: true, textStyle: .largeTitle),
 
-        .headlineLarge: FontConfig(size: 32, weight: .regular, isCondensed: false),
-        .headlineMedium: FontConfig(size: 28, weight: .regular, isCondensed: false),
-        .headlineSmall: FontConfig(size: 24, weight: .regular, isCondensed: false),
+        .headlineLarge: FontConfig(size: 32, weight: .regular, isCondensed: false, textStyle: .title),
+        .headlineMedium: FontConfig(size: 28, weight: .regular, isCondensed: false, textStyle: .title2),
+        .headlineSmall: FontConfig(size: 24, weight: .regular, isCondensed: false, textStyle: .title3),
 
-        .titleLarge: FontConfig(size: 22, weight: .regular, isCondensed: false),
-        .titleMedium: FontConfig(size: 16, weight: .medium, isCondensed: false),
-        .titleSmall: FontConfig(size: 14, weight: .medium, isCondensed: false),
+        .titleLarge: FontConfig(size: 22, weight: .regular, isCondensed: false, textStyle: .title3),
+        .titleMedium: FontConfig(size: 16, weight: .medium, isCondensed: false, textStyle: .headline),
+        .titleSmall: FontConfig(size: 14, weight: .medium, isCondensed: false, textStyle: .subheadline),
 
-        .bodyLarge: FontConfig(size: 16, weight: .regular, isCondensed: false),
-        .bodyMedium: FontConfig(size: 14, weight: .regular, isCondensed: false),
-        .bodySmall: FontConfig(size: 12, weight: .regular, isCondensed: false),
+        .bodyLarge: FontConfig(size: 16, weight: .regular, isCondensed: false, textStyle: .body),
+        .bodyMedium: FontConfig(size: 14, weight: .regular, isCondensed: false, textStyle: .body),
+        .bodySmall: FontConfig(size: 12, weight: .regular, isCondensed: false, textStyle: .callout),
 
-        .labelLarge: FontConfig(size: 14, weight: .medium, isCondensed: false),
-        .labelMedium: FontConfig(size: 12, weight: .medium, isCondensed: false),
-        .labelSmall: FontConfig(size: 11, weight: .medium, isCondensed: false)
+        .labelLarge: FontConfig(size: 14, weight: .medium, isCondensed: false, textStyle: .subheadline),
+        .labelMedium: FontConfig(size: 12, weight: .medium, isCondensed: false, textStyle: .footnote),
+        .labelSmall: FontConfig(size: 11, weight: .medium, isCondensed: false, textStyle: .caption)
     ]
 
     static func font(for style: AppTextStyle) -> Font {
         let config = fontConfig(for: style)
         let fontName = fontName(forCondensed: config.isCondensed, weight: config.weight)
 
-        guard let uiFont = UIFont(name: fontName, size: config.size) else {
-            return Font.system(size: config.size, weight: config.weight)
-        }
-
-        let scaledFont = UIFontMetrics.default.scaledFont(for: uiFont)
-        return Font(scaledFont)
+        // Use relativeTo parameter for Dynamic Type support
+        return .custom(fontName, size: config.size, relativeTo: config.textStyle)
     }
 
     private static func fontConfig(for style: AppTextStyle) -> FontConfig {
-        return fontConfigs[style] ?? FontConfig(size: 14, weight: .regular, isCondensed: false)
+        return fontConfigs[style] ?? FontConfig(size: 14, weight: .regular, isCondensed: false, textStyle: .body)
     }
 
     private static func fontName(forCondensed: Bool, weight: Font.Weight) -> String {

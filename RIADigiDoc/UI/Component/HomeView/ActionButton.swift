@@ -47,7 +47,7 @@ struct ActionButton: View {
                 y: Dimensions.Shadow.yOffset
             )
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }
 

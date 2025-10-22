@@ -41,6 +41,6 @@ struct SaveButton: View {
             .cornerRadius(Dimensions.Corner.MSCornerRadius)
         }
         .padding(.horizontal, Dimensions.Padding.MSPadding)
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }

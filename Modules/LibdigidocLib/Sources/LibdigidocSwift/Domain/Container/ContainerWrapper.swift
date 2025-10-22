@@ -46,7 +46,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         self.containerURL = containerURL
         self.dataFiles = dataFiles
         self.signatures = signatures
-        self.mediatype = mediatype ?? CommonsLib.Constants.MimeType.Default
+        self.mediatype = mediatype ?? CommonsLib.Constants.MimeType.Container
         self.fileManager = fileManager
     }
 
@@ -56,15 +56,15 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
-        return await getContainer()?.signatures ?? []
+        return self.signatures
     }
 
     public func getDataFiles() async -> [DataFileWrapper] {
-        return await getContainer()?.dataFiles ?? []
+        return self.dataFiles
     }
 
     public func getMimetype() async -> String {
-        return await getContainer()?.mediatype ?? CommonsLib.Constants.MimeType.Container
+        return self.mediatype
     }
 
     @MainActor
@@ -150,6 +150,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                 withDataFilePaths: dataFilesPaths
             )
 
+            _ = try await open(containerFile: containerFile, isSivaConfirmed: true)
+
             return true
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot add data files", code: 4)
@@ -158,25 +160,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                     nsError: nsError
                 )
             )
-        }
-    }
-
-    @MainActor
-    public func getContainer() async -> ContainerWrapper? {
-        do {
-            let digiDocContainer = try await open(containerFile: containerURL, isSivaConfirmed: true)
-
-            let datafiles = await digiDocContainer.dataFiles
-            let signatures = await digiDocContainer.signatures
-            let mediatype = await digiDocContainer.mediatype
-
-            return await updateContainer(
-                datafiles: datafiles,
-                signatures: signatures,
-                mediaType: mediatype
-            )
-        } catch {
-            return nil
         }
     }
 

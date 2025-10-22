@@ -89,6 +89,7 @@ struct RIADigiDocApp: App {
                 LaunchScreenView()
                     .onAppear { onLaunchScreenViewAppear() }
                     .environmentObject(themeSettings)
+                    .preferredColorScheme(.light)
             }
         }
     }

@@ -67,6 +67,7 @@ struct SignerDetailView: View {
                 }
                 .contentShape(Rectangle())
                 .padding(.vertical, Dimensions.Padding.XSPadding)
+                .accessibilityElement(children: .combine)
 
                 Divider()
             }

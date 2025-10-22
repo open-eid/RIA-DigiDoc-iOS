@@ -250,12 +250,8 @@
 			<string>digidoc_icon</string>
 			<key>UTTypeIcons</key>
 			<dict>
-				<key>UTTypeIconBackgroundName</key>
-				<string></string>
 				<key>UTTypeIconBadgeName</key>
 				<string>digidoc_icon</string>
-				<key>UTTypeIconText</key>
-				<string></string>
 			</dict>
 			<key>UTTypeIdentifier</key>
 			<string>ee.ria.digidoc-asice</string>

@@ -24,9 +24,14 @@ import CommonsLib
 import UtilsLib
 
 struct SignatureView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
+
+    @AccessibilityFocusState private var focusedField: AccessibilityField?
+
+    let signatureIndex: Int
 
     let containerMimetype: String
     let dataFilesCount: Int
@@ -57,6 +62,7 @@ struct SignatureView: View {
     }
 
     init(
+        signatureIndex: Int,
         containerMimetype: String,
         dataFilesCount: Int,
         signature: SignatureWrapper,
@@ -68,6 +74,7 @@ struct SignatureView: View {
         showRole: Bool = true,
         showRemoveSignatureButton: Bool = true
     ) {
+        self.signatureIndex = signatureIndex
         self.containerMimetype = containerMimetype
         self.dataFilesCount = dataFilesCount
         self.signature = signature
@@ -97,9 +104,18 @@ struct SignatureView: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
-                    StyledNameText(name: nameUtil.formatName(signature.signedBy), allCaps: isTimestamp)
+                    let signedBy = nameUtil.formatName(signature.signedBy)
+                    StyledNameText(name: signedBy, allCaps: isTimestamp)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
+                        .accessibilityLabel(
+                            signatureIndex != 0 ?
+                            Text(
+                                verbatim: "\(languageSettings.localized(isTimestamp ? "Timestamp" : "Signature")) " +
+                                "\(signatureIndex), \(signedBy.lowercased())"
+                            ) :
+                                Text(verbatim: signedBy.lowercased())
+                        )
 
                     if showSignedDate {
                         Text(verbatim: languageSettings.localized("Signed at", [signedDate.date, signedDate.time]))
@@ -115,8 +131,7 @@ struct SignatureView: View {
                         ),
                         status: signature.status
                     )
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.leading)
+                    .multilineTextAlignment(.center)
 
                     if showRole && !signature.roles.isEmpty {
                         Text(verbatim: signature.roles.joined(separator: " / "))
@@ -126,51 +141,41 @@ struct SignatureView: View {
                             .truncationMode(.tail)
                     }
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
 
                 if showMoreOptionsButton {
-                    Button(action: {
-                        showBottomSheetFromButton = true
-                    }, label: {
+                    Button(action: accessibleAction(
+                        voiceOverEnabled: voiceOverEnabled,
+                        focusedField: $focusedField,
+                        action: {
+                            showBottomSheetFromButton = true
+                        }
+                    ), label: {
                         Image("ic_m3_more_vert_48pt_wght400")
                             .resizable()
                             .scaledToFit()
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onBackground)
-                            .accessibilityLabel(languageSettings.localized("More options"))
+                            .accessibilityLabel(
+                                Text(verbatim:
+                                        "\(languageSettings.localized(isTimestamp ? "Timestamp" : "Signature")) " +
+                                     "\(signatureIndex), \(languageSettings.localized("More options"))"
+                                    )
+                            )
                     })
                     .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                    .accessibilityFocusRestore(
+                        focusedField: $focusedField,
+                        field: .signature(.openSignatureOptionsButton),
+                        when: showBottomSheetFromButton
+                    )
                 }
             }
             .padding(Dimensions.Padding.MSPadding)
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            if !isVoiceOverRunning {
-                showBottomSheetFromTap = true
-            }
-        }
-        .onAppear {
-            if !isVoiceOverObserverAdded {
-                NotificationCenter.default.addObserver(
-                    forName: UIAccessibility.voiceOverStatusDidChangeNotification,
-                    object: nil,
-                    queue: .main
-                ) { _ in
-                    Task { @MainActor in
-                        isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-                    }
-                }
-                isVoiceOverObserverAdded = true
-            }
-        }
-        .onDisappear {
-            NotificationCenter.default.removeObserver(self,
-                name: UIAccessibility.voiceOverStatusDidChangeNotification,
-                object: nil)
-            isVoiceOverObserverAdded = false
-        }
         .background(
             NavigationLink(
                 destination: SignatureDetailView(
@@ -186,13 +191,13 @@ struct SignatureView: View {
             .hidden()
         )
         .listRowInsets(EdgeInsets())
-        .accessibilityAddTraits([.isButton])
         .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
     }
 }
 
 #Preview {
     SignatureView(
+        signatureIndex: 1,
         containerMimetype: Constants.MimeType.Asice,
         dataFilesCount: 1,
         signature: SignatureWrapper(

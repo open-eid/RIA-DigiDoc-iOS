@@ -51,6 +51,7 @@ struct UnsignedBottomBarView: View {
                     Text(languageSettings.localized(leftButtonLabel))
                         .foregroundStyle(theme.primary)
                         .font(typography.titleMedium)
+                        .accessibilityLabel(leftButtonAccessibilityLabel)
                 })
                 .foregroundStyle(theme.surfaceContainer)
             })
@@ -71,6 +72,7 @@ struct UnsignedBottomBarView: View {
                     Text(languageSettings.localized(rightButtonLabel))
                         .foregroundStyle(theme.primary)
                         .font(typography.titleMedium)
+                        .accessibilityLabel(rightButtonAccessibilityLabel)
                 }
                 .padding(.horizontal, Dimensions.Padding.MPadding)
                 .padding(.vertical, Dimensions.Padding.XSPadding)
@@ -94,8 +96,8 @@ struct UnsignedBottomBarView: View {
         leftButtonAction: {},
 
         rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
-        rightButtonLabel: "Sign",
-        rightButtonAccessibilityLabel: "Sign",
+        rightButtonLabel: "Sign container",
+        rightButtonAccessibilityLabel: "Sign container",
         rightButtonAction: {}
     )
     .environmentObject(Container.shared.languageSettings())

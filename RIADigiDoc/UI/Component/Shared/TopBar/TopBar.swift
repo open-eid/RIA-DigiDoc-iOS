@@ -35,7 +35,7 @@ struct TopBarContainer<Content: View>: View {
     var onRightSecondaryClick: () -> Void = {}
 
     var extraButtonIcon: String = "ic_m3_notifications_48pt_wght400"
-    var extraButtonIconAccessibility: String = "Notifications"
+    var extraButtonIconAccessibility: String = "Container notifications"
     var showExtraButton: Bool = false
     var extraBadgeCount: Int = 0
     var onExtraButtonClick: () -> Void = {}
@@ -82,9 +82,13 @@ struct TopBarContainer<Content: View>: View {
 
             content()
 
-            NavigationLink(destination: LanguageChooserView(), isActive: $navigateToLanguageChooser) { EmptyView() }
-            NavigationLink(destination: ThemeChooserView(), isActive: $navigateToThemeChooser) { EmptyView() }
-            NavigationLink(destination: AdvancedSettingsView(), isActive: $navigateToAdvancedSettings) { EmptyView() }
+            NavigationLink(destination: LanguageChooserView(), isActive: $navigateToLanguageChooser) {}
+                .accessibilityHidden(!showSettingsSheet)
+            NavigationLink(destination: ThemeChooserView(), isActive: $navigateToThemeChooser) {}
+                .accessibilityHidden(!showSettingsSheet)
+            NavigationLink(destination: AdvancedSettingsView(), isActive: $navigateToAdvancedSettings) {}
+                .accessibilityHidden(!showSettingsSheet)
+
         }
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())
         .navigationBarHidden(true)
@@ -173,10 +177,14 @@ struct TopBar: View {
                                     .foregroundStyle(theme.onBackground)
                                 if extraBadgeCount > 0 {
                                     Text(verbatim: "\(extraBadgeCount)")
-                                        .frame(width: Dimensions.Icon.IconSizeMicro,
-                                               height: Dimensions.Icon.IconSizeMicro)
+                                        .frame(
+                                            width: Dimensions.Icon.IconSizeMicro,
+                                            height: Dimensions.Icon.IconSizeMicro
+                                        )
+                                        .font(typography.bodySmall)
                                         .foregroundStyle(theme.onBackground)
                                         .padding(Dimensions.Padding.XXSPadding)
+                                        .minimumScaleFactor(0.5)
                                         .background(Circle().fill(theme.onError))
                                         .offset(x: Dimensions.Padding.XSPadding, y: -Dimensions.Padding.XSPadding)
                                 }

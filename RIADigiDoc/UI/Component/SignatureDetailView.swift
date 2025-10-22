@@ -43,7 +43,7 @@ struct SignatureDetailView: View {
     private let nameUtil: NameUtilProtocol
 
     var signersDetailsTitle: String {
-        return languageSettings.localized("Signers details title")
+        return languageSettings.localized("Signature")
     }
 
     var signersRoleAndAddressTitle: String {
@@ -142,6 +142,7 @@ struct SignatureDetailView: View {
             content: {
                 ScrollView {
                     SignatureView(
+                        signatureIndex: 0,
                         containerMimetype: containerMimetype,
                         dataFilesCount: dataFilesCount,
                         signature: signature,
@@ -199,7 +200,7 @@ struct SignatureDetailView: View {
                                                 )
                                             )
                                         }
-                                        .buttonStyle(PlainButtonStyle())
+                                        .buttonStyle(.plain)
 
                                         Button {
                                             if let url = URL(string: signature.signatureMethod) {
@@ -215,6 +216,8 @@ struct SignatureDetailView: View {
                                             )
                                         }
                                         .buttonStyle(.plain)
+                                        .accessibilityRemoveTraits([.isButton])
+                                        .accessibilityAddTraits([.isLink])
 
                                         SignerDetailView(
                                             signatureDataItem: SignatureDataItem(
@@ -278,7 +281,7 @@ struct SignatureDetailView: View {
                                                 )
                                             )
                                         }
-                                        .buttonStyle(PlainButtonStyle())
+                                        .buttonStyle(.plain)
 
                                         SignerDetailView(
                                             signatureDataItem: SignatureDataItem(
@@ -300,7 +303,7 @@ struct SignatureDetailView: View {
                                                 )
                                             )
                                         }
-                                        .buttonStyle(PlainButtonStyle())
+                                        .buttonStyle(.plain)
 
                                         SignerDetailView(
                                             signatureDataItem: SignatureDataItem(

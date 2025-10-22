@@ -78,6 +78,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
 
             files = validFiles
         } catch {
+            FileOpeningViewModel.logger.error("Unable to handle files. \(error)")
             handleError(error)
         }
     }
@@ -95,7 +96,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
 
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
-            handleError()
+            FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+            handleError(error)
         }
     }
 
@@ -119,7 +121,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
                 FileOpeningViewModel.logger.debug("Asics signed container set successfully")
                 handleLoadingSuccess(isSivaConfirmed: false)
             } catch {
-                handleError()
+                FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+                handleError(error)
             }
         }
     }
