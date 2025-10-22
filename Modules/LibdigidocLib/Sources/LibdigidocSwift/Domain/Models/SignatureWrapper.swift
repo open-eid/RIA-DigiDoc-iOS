@@ -29,6 +29,7 @@ public enum SignatureStatus: String, Sendable {
 
 public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var id: UUID = UUID()
+    public var pos: Int
     public var signingCert: Data
     public var timestampCert: Data
     public var ocspCert: Data
@@ -51,7 +52,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var status: SignatureStatus
     public var diagnosticsInfo: String
 
-    public init(signingCert: Data,
+    public init(pos: Int,
+                signingCert: Data,
                 timestampCert: Data,
                 ocspCert: Data,
                 signatureId: String,
@@ -70,6 +72,7 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 format: String,
                 messageImprint: Data,
                 diagnosticsInfo: String) {
+        self.pos = pos
         self.signingCert = signingCert
         self.timestampCert = timestampCert
         self.ocspCert = ocspCert

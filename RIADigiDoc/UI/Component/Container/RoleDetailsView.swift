@@ -91,6 +91,7 @@ struct RoleDetailsView: View {
 #Preview {
     RoleDetailsView(
         signature: SignatureWrapper(
+            pos: 0,
             signingCert: Data(),
             timestampCert: Data(),
             ocspCert: Data(),

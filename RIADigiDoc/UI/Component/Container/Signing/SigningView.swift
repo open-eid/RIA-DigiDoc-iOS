@@ -43,7 +43,8 @@ struct SigningView: View {
 
     @State private var tempContainerURL: URL?
     @State private var isFileSaved: Bool = false
-    @State private var showRenameDialog = false
+    @State private var showRenameModal = false
+    @State private var showRemoveSignatureModal = false
     @State private var newContainerName = Constants.Container.DefaultName
 
     @State private var showingShareSheet = false
@@ -195,16 +196,16 @@ struct SigningView: View {
                                         )
 
                                         if fileUtil.fileExists(fileLocation: tempContainerURL) {
-                                            viewModel.isShowingFileSaver = true
+                                            viewModel.isShowingContainerFileSaver = true
                                         }
                                     },
                                     onRenameContainerButtonClick: {
-                                        showRenameDialog = true
+                                        showRenameModal = true
                                     }
                                 )
                                 .background(
                                     FileSaverHandler(
-                                        isPresented: $viewModel.isShowingFileSaver,
+                                        isPresented: $viewModel.isShowingContainerFileSaver,
                                         fileURL: tempContainerURL,
                                         languageSettings: languageSettings,
                                         onComplete: {
@@ -244,6 +245,7 @@ struct SigningView: View {
                                                 containerMimetype: $viewModel.containerMimetype,
                                                 dataFilesCount: viewModel.dataFiles.count,
                                                 showRemoveSignatureButton: viewModel.isSignatureRemoveButtonShown(),
+                                                showRemoveSignatureModal: $showRemoveSignatureModal,
                                                 nameUtil: nameUtil,
                                                 signatureUtil: signatureUtil
                                             )
@@ -328,51 +330,6 @@ struct SigningView: View {
                 }
             )
 
-            if showRenameDialog {
-                // Make the background darker to focus on the dialog
-                Color.black
-                    .opacity(Dimensions.Shadow.LOpacity)
-                    .ignoresSafeArea()
-
-                Dialog(
-                    icon: "ic_m3_edit_48pt_wght400",
-                    title: languageSettings.localized("Change container name"),
-                    placeholder: viewModel.containerName,
-                    text: Binding<String>(
-                        get: {
-                            URL(fileURLWithPath: viewModel.containerName).deletingPathExtension().lastPathComponent
-                        },
-                        set: { newValue in
-                            let existingExtension = URL(fileURLWithPath: viewModel.containerName).pathExtension
-
-                            let newValueURL = URL(fileURLWithPath: newValue)
-
-                            let containerExtension =
-                            existingExtension.isEmpty ? Constants.Extension.Default : existingExtension
-
-                            newContainerName = newValueURL
-                                .appendingPathExtension(containerExtension)
-                                .lastPathComponent
-                        }),
-                    onConfirm: {
-                        showRenameDialog = false
-                        Task {
-                            let uniqueContainerName = await viewModel.renameContainer(to: newContainerName)
-                            defer { newContainerName = "" }
-
-                            if uniqueContainerName != nil {
-                                viewModel.containerName =
-                                uniqueContainerName?.lastPathComponent ?? viewModel.containerName
-                            }
-                        }
-                    },
-                    onCancel: {
-                        showRenameDialog = false
-                        newContainerName = ""
-                    }
-                )
-            }
-
             NavigationLink(
                 destination: ContainerNotificationsView(
                     notifications: viewModel.containerNotifications
@@ -380,8 +337,37 @@ struct SigningView: View {
                 isActive: $isNavigatingToContainerNotificationsView
             ) {}
                 .accessibilityHidden(!isNavigatingToContainerNotificationsView)
+
+            if showRenameModal {
+                RenameModalView(
+                    signingViewModel: viewModel,
+                    showRenameModal: $showRenameModal,
+                    newContainerName: $newContainerName
+                )
+            }
+
+            if showRemoveSignatureModal {
+                RemoveSignatureModalView(
+                    title: languageSettings.localized("Remove signature"),
+                    message: languageSettings.localized("Remove signature from container")
+                ) {
+                    Task {
+                        guard let signature = selectedSignature else {
+                            Toast.show(languageSettings.localized("Failed to remove signature from container"))
+                            return
+                        }
+
+                        await viewModel.removeSignature(signature: signature)
+                        selectedSignature = nil
+                        showRemoveSignatureModal = false
+                    }
+                } onCancel: {
+                    showRemoveSignatureModal = false
+                }
+            }
         }
-        .animation(.easeInOut, value: showRenameDialog)
+        .animation(.easeInOut, value: showRenameModal)
+        .animation(.easeInOut, value: showRemoveSignatureModal)
         .onReceive(viewModel.$errorMessage) { error in
             guard let error else { return }
             let (key, args) = error

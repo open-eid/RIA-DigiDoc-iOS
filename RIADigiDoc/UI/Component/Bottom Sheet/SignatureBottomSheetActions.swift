@@ -21,6 +21,7 @@ struct SignatureBottomSheetActions {
     static func actions(
         showRemoveSignatureButton: Bool,
         onDetailsButtonClick: @escaping () -> Void,
+        onRemoveSignatureButtonClick: @escaping () -> Void,
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -34,9 +35,7 @@ struct SignatureBottomSheetActions {
                 icon: "ic_m3_encrypted_48pt_wght400",
                 title: "Remove signature",
                 accessibilityLabel: "Remove signature",
-                onClick: {
-                    // TODO: Implement remove signature action
-                }
+                onClick: onRemoveSignatureButtonClick
             )
         ]
     }

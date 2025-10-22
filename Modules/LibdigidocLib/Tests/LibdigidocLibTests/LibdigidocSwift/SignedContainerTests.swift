@@ -547,4 +547,48 @@ final class SignedContainerTests {
 
         #expect(!isEmptyFileInContainer)
     }
+
+    @Test
+    func removeSignature_success() async throws {
+        let mockNewContainerWrapper = ContainerWrapperProtocolMock()
+
+        mockContainerWrapper.removeSignatureHandler = { _, _ in
+            return mockNewContainerWrapper
+        }
+
+        mockNewContainerWrapper.getSignaturesHandler = {[
+            MockSignatureWrapper.mockSignatureWrapper()
+        ]}
+
+        let container = try await signedContainer
+            .removeSignature(index: 0, containerFile: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+
+        let signatures = await container.getSignatures()
+
+        #expect(signatures.count == 1)
+    }
+
+    @Test
+    func removeSignature_throwErrorWhenSignatureDoesNotExist() async throws {
+        mockContainerWrapper.removeSignatureHandler = { _, _ in
+            throw DigiDocError.signatureRemovingFailed(
+                ErrorDetail(message: "Error", userInfo: [:])
+            )
+        }
+
+        do {
+            try await signedContainer
+                .removeSignature(index: 0, containerFile: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+            Issue.record("Expected 'signatureRemovingFailed' error")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .signatureRemovingFailed(_):
+                #expect(true)
+            default:
+                Issue.record("Unexpected error: \(error.localizedDescription)")
+                return
+            }
+        }
+    }
 }

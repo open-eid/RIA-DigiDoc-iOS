@@ -25,9 +25,9 @@ import UtilsLib
 
 struct SignatureView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
@@ -44,11 +44,11 @@ struct SignatureView: View {
     let showMoreOptionsButton: Bool
     let showRole: Bool
     var showRemoveSignatureButton: Bool
+    @Binding var showRemoveSignatureModal: Bool
+    var onSelect: (() -> Void)? = nil
 
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false
-    @State private var showBottomSheetFromTap = false
-
     @State private var isVoiceOverObserverAdded = false
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
 
@@ -57,6 +57,10 @@ struct SignatureView: View {
             showRemoveSignatureButton: showRemoveSignatureButton,
             onDetailsButtonClick: {
                 showDetail = true
+            },
+            onRemoveSignatureButtonClick: {
+                onSelect?()
+                showRemoveSignatureModal = true
             }
         )
     }
@@ -72,7 +76,9 @@ struct SignatureView: View {
         showSignedDate: Bool = true,
         showMoreOptionsButton: Bool = true,
         showRole: Bool = true,
-        showRemoveSignatureButton: Bool = true
+        showRemoveSignatureButton: Bool = true,
+        showRemoveSignatureModal: Binding<Bool>,
+        onSelect: (() -> Void)? = nil
     ) {
         self.signatureIndex = signatureIndex
         self.containerMimetype = containerMimetype
@@ -85,6 +91,8 @@ struct SignatureView: View {
         self.showMoreOptionsButton = showMoreOptionsButton
         self.showRole = showRole
         self.showRemoveSignatureButton = showRemoveSignatureButton
+        self._showRemoveSignatureModal = showRemoveSignatureModal
+        self.onSelect = onSelect
     }
 
     var body: some View {
@@ -185,13 +193,10 @@ struct SignatureView: View {
                     dataFilesCount: dataFilesCount
                 ),
                 isActive: $showDetail
-            ) {
-                EmptyView()
-            }
-            .hidden()
+            ) { EmptyView() }
+                .hidden()
         )
         .listRowInsets(EdgeInsets())
-        .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
     }
 }
 
@@ -201,6 +206,7 @@ struct SignatureView: View {
         containerMimetype: Constants.MimeType.Asice,
         dataFilesCount: 1,
         signature: SignatureWrapper(
+            pos: 0,
             signingCert: Data(),
             timestampCert: Data(),
             ocspCert: Data(),
@@ -221,7 +227,8 @@ struct SignatureView: View {
             diagnosticsInfo: ""
         ),
         nameUtil: Container.shared.nameUtil(),
-        signatureUtil: Container.shared.signatureUtil()
+        signatureUtil: Container.shared.signatureUtil(),
+        showRemoveSignatureModal: .constant(false)
     )
     .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())

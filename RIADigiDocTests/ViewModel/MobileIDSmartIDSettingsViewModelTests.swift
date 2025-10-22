@@ -31,7 +31,7 @@ final class MobileIDSmartIDSettingsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
 
         mockDataStore.getRelyingPartyUUIDHandler = {
-            return "12300000-0000-0000-0000-000000000000"
+            return Constants.Configuration.RelyingPartyUUID
         }
         mockDataStore.getRelyingPartyOptionHandler = {
             return .defaultSetting

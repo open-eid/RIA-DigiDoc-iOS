@@ -100,13 +100,12 @@ public:
 
 + (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos mediaType:(const std::string&)mediaType dataFileCount:(NSInteger)dataFileCount {
 
-
-
     DigiDocSignature *digiDocSignature = [DigiDocSignature new];
     digiDocSignature.signingCert = [DigiDocContainerWrapper getNSDataFromVector:signature->signingCertificate()];
     digiDocSignature.timestampCert = [DigiDocContainerWrapper getNSDataFromVector:signature->TimeStampCertificate()];
     digiDocSignature.ocspCert = [DigiDocContainerWrapper getNSDataFromVector:signature->OCSPCertificate()];
 
+    digiDocSignature.pos = pos;
     digiDocSignature.signatureId = [NSString stringWithUTF8String:signature->id().c_str()];
     digiDocSignature.claimedSigningTime = [NSString stringWithUTF8String:signature->claimedSigningTime().c_str()];
     digiDocSignature.signatureMethod = [NSString stringWithUTF8String:signature->signatureMethod().c_str()];
@@ -264,22 +263,29 @@ public:
             if (completion) {
                 NSDictionary *userInfo = @{
                     NSLocalizedDescriptionKey: @"Libdigidocpp - unable to save data file"
-            };
+                };
 
-            NSError *error = [NSError errorWithDomain:@"LibdigidocLib" code:1 userInfo:userInfo];
-            completion(error);
-            return;
+                NSError *error = [NSError errorWithDomain:@"LibdigidocLib" code:1 userInfo:userInfo];
+                completion(error);
+                return;
+            }
+        } else {
+            if (completion) {
+                completion(nil);
+            }
         }
-    } else {
-        if (completion) {
-            completion(nil);
+    } completion:^(NSError * _Nullable openError) {
+        if (openError && completion) {
+            completion(openError);
         }
-    }
-} completion:^(NSError * _Nullable openError) {
-    if (openError && completion) {
-        completion(openError);
-    }
-}];
+    }];
+}
+
++ (void)removeSignature:(int)index fromContainerWithPath:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion {
+    [self open:containerPath validateOnline:TRUE command:^(digidoc::Container &container) {
+        container.removeSignature(index);
+        container.save(containerPath.UTF8String);
+    } completion:completion];
 }
 
 

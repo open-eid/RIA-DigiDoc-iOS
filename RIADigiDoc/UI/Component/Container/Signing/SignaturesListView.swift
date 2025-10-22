@@ -32,6 +32,7 @@ struct SignaturesListView: View {
     @Binding var containerMimetype: String
     var dataFilesCount: Int
     var showRemoveSignatureButton: Bool
+    @Binding var showRemoveSignatureModal: Bool
 
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
@@ -48,7 +49,11 @@ struct SignaturesListView: View {
                         isTimestamp: true,
                         nameUtil: nameUtil,
                         signatureUtil: signatureUtil,
-                        showRemoveSignatureButton: showRemoveSignatureButton
+                        showRemoveSignatureButton: showRemoveSignatureButton,
+                        showRemoveSignatureModal: $showRemoveSignatureModal,
+                        onSelect: {
+                            selectedSignature = timestamp
+                        }
                     )
                 }
             } else {
@@ -61,7 +66,11 @@ struct SignaturesListView: View {
                         isTimestamp: true,
                         nameUtil: nameUtil,
                         signatureUtil: signatureUtil,
-                        showRemoveSignatureButton: showRemoveSignatureButton
+                        showRemoveSignatureButton: showRemoveSignatureButton,
+                        showRemoveSignatureModal: $showRemoveSignatureModal,
+                        onSelect: {
+                            selectedSignature = timestamp
+                        }
                     )
                 }
             }
@@ -74,7 +83,11 @@ struct SignaturesListView: View {
                         signature: signature,
                         nameUtil: nameUtil,
                         signatureUtil: signatureUtil,
-                        showRemoveSignatureButton: showRemoveSignatureButton
+                        showRemoveSignatureButton: showRemoveSignatureButton,
+                        showRemoveSignatureModal: $showRemoveSignatureModal,
+                        onSelect: {
+                            selectedSignature = signature
+                        }
                     )
                 }
             } else {
@@ -86,7 +99,11 @@ struct SignaturesListView: View {
                         signature: signature,
                         nameUtil: nameUtil,
                         signatureUtil: signatureUtil,
-                        showRemoveSignatureButton: showRemoveSignatureButton
+                        showRemoveSignatureButton: showRemoveSignatureButton,
+                        showRemoveSignatureModal: $showRemoveSignatureModal,
+                        onSelect: {
+                            selectedSignature = signature
+                        }
                     )
                 }
 
@@ -97,6 +114,7 @@ struct SignaturesListView: View {
 
 #Preview {
     let signature = SignatureWrapper(
+        pos: 0,
         signingCert: Data(),
         timestampCert: Data(),
         ocspCert: Data(),
@@ -124,6 +142,7 @@ struct SignaturesListView: View {
         containerMimetype: .constant("application/vnd.etsi.asic-e+zip"),
         dataFilesCount: 1,
         showRemoveSignatureButton: true,
+        showRemoveSignatureModal: .constant(false),
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )
