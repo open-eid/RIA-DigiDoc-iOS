@@ -29,6 +29,7 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 
 @interface DigiDocSignature : NSObject
 
+@property (nonatomic, assign) int pos;
 @property (nonatomic, strong) NSData *signingCert;
 @property (nonatomic, strong) NSData *timestampCert;
 @property (nonatomic, strong) NSData *ocspCert;

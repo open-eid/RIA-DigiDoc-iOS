@@ -956,4 +956,44 @@ struct SigningViewModelTests {
                 ]
         )
     }
+
+    @Test
+    func removeSignature_success() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.removeSignatureHandler = { _, _ in mockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func removeSignature_throwErrorWhenContainerDataNotLoaded() async {
+        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove signature from container", []))
+    }
+
+    @Test
+    func removeSignature_throwErrorWhenSignatureDoesNotExist() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+
+        mockSignedContainer.removeSignatureHandler = { _, _ in
+            throw DigiDocError.signatureRemovingFailed(
+                ErrorDetail(message: "Error", userInfo: [:])
+            )
+        }
+
+        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove signature from container", []))
+    }
 }

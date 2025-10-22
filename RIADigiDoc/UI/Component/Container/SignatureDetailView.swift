@@ -149,7 +149,8 @@ struct SignatureDetailView: View {
                         isTimestamp: isTimestamp,
                         showSignedDate: false,
                         showMoreOptionsButton: false,
-                        showRole: false
+                        showRole: false,
+                        showRemoveSignatureModal: .constant(false)
                     )
 
                     if !warningText.isEmpty {
@@ -338,6 +339,7 @@ struct SignatureDetailView: View {
 #Preview {
     SignatureDetailView(
         signature: SignatureWrapper(
+            pos: 0,
             signingCert: Data(),
             timestampCert: Data(),
             ocspCert: Data(),

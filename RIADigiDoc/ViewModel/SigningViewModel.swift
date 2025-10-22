@@ -36,6 +36,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var containerURL: URL?
     @Published var previewFile: URL?
     @Published var selectedDataFile: URL?
+    @Published var isShowingContainerFileSaver = false
     @Published var isShowingFileSaver = false
     @Published var showSignatureRemoveButton = false
     @Published var isTimestampedContainer = false
@@ -331,6 +332,23 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         }
 
         return await sivaRepository.isTimestampedContainer(signedContainer: container)
+    }
+
+    func removeSignature(signature: SignatureWrapper) async {
+        guard let container = signedContainer, let containerFile = containerURL else {
+            SigningViewModel.logger.error("Unable to remove signature from container. SignedContainer or containerURL is nil")
+            errorMessage = ("Failed to remove signature from container", [])
+            return
+        }
+
+        do {
+            let container = try await container.removeSignature(index: signature.pos, containerFile: containerFile)
+            await loadContainerData(signedContainer: container)
+        } catch {
+            SigningViewModel.logger.error("Unable to remove signature from container. \(error)")
+            errorMessage = ("Failed to remove signature from container", [])
+            return
+        }
     }
 
     private func openNestedContainer(fileURL: URL, isSivaConfirmed: Bool) async throws {

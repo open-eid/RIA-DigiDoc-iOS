@@ -646,6 +646,24 @@
         }
       }
     },
+    "Failed to remove signature from container" : {
+      "comment" : "Shows when unable to remove signature from container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove signature from container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja eemaldamine ümbrikust ebaõnnestus"
+          }
+        }
+      }
+    },
     "Failed to rename file" : {
       "comment" : "Error when renaming a container",
       "extractionState" : "manual",
@@ -3123,6 +3141,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eemalda allkiri"
+          }
+        }
+      }
+    },
+    "Remove signature from container" : {
+      "comment" : "Remove signature message in modal",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove signature from container?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soovid eemaldada allkirja?"
           }
         }
       }

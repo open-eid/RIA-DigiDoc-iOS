@@ -22,6 +22,7 @@ import LibdigidocLibSwift
 
 public struct MockSignatureWrapper {
     public static func mockSignatureWrapper(
+        pos: Int = 0,
         signingCert: Data = Data(),
         timestampCert: Data = Data(),
         ocspCert: Data = Data(),
@@ -43,6 +44,7 @@ public struct MockSignatureWrapper {
         diagnosticsInfo: String = ""
     ) -> SignatureWrapper {
         SignatureWrapper(
+            pos: pos,
             signingCert: signingCert,
             timestampCert: timestampCert,
             ocspCert: ocspCert,

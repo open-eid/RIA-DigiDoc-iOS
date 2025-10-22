@@ -33,9 +33,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     private let fileManager: FileManagerProtocol
 
-    @MainActor
-    private let digiDocContainerWrapper: DigiDocContainerWrapper = DigiDocContainerWrapper()
-
     public init(
         containerURL: URL = URL(fileURLWithPath: ""),
         dataFiles: [DataFileWrapper] = [],
@@ -163,6 +160,25 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         }
     }
 
+    @discardableResult
+    public func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
+        do {
+            try await DigiDocContainerWrapper.removeSignature(
+                Int32(index),
+                fromContainerWithPath: containerFile.path
+            )
+
+            return try await open(containerFile: containerFile, isSivaConfirmed: true)
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot remove signature", code: 5)
+            throw DigiDocError.signatureRemovingFailed(
+                ErrorDetail(
+                    nsError: nsError
+                )
+            )
+        }
+    }
+
     private static func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
         switch status {
         case .Valid:
@@ -220,6 +236,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     private static func getSignatures(from container: DigiDocContainer) -> [SignatureWrapper] {
         return container.signatures.compactMap { signature in
             SignatureWrapper(
+                pos: Int(signature.pos),
                 signingCert: signature.signingCert,
                 timestampCert: signature.timestampCert,
                 ocspCert: signature.ocspCert,

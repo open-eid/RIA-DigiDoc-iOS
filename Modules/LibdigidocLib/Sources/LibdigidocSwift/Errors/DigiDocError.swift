@@ -28,6 +28,7 @@ public enum DigiDocError: Error {
     case containerSavingFailed(ErrorDetail)
     case containerRenamingFailed(ErrorDetail)
     case containerDataFileSavingFailed(ErrorDetail)
+    case signatureRemovingFailed(ErrorDetail)
 
     public var errorDetail: ErrorDetail {
         switch self {
@@ -37,7 +38,8 @@ public enum DigiDocError: Error {
                 .addingFilesToContainerFailed(let errorDetail),
                 .containerSavingFailed(let errorDetail),
                 .containerRenamingFailed(let errorDetail),
-                .containerDataFileSavingFailed(let errorDetail):
+                .containerDataFileSavingFailed(let errorDetail),
+                .signatureRemovingFailed(let errorDetail):
             return errorDetail
 
         case .alreadyInitialized:

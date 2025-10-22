@@ -433,6 +433,7 @@ struct CertificateDetailView: View {
 #Preview {
     SignatureDetailView(
         signature: SignatureWrapper(
+            pos: 0,
             signingCert: Data(),
             timestampCert: Data(),
             ocspCert: Data(),
