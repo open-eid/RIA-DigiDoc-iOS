@@ -24,11 +24,11 @@ import Darwin // for memset_s
 public final class SecureData {
     private var storage: Data
 
-    init(_ bytes: [UInt8]) {
+    public init(_ bytes: [UInt8]) {
         self.storage = Data(bytes)
     }
 
-    init(_ data: Data) {
+    public init(_ data: Data) {
         self.storage = data
     }
 
@@ -44,10 +44,10 @@ public final class SecureData {
         try storage.withUnsafeMutableBytes(body)
     }
 
-    var count: Int { storage.count }
+    public var count: Int { storage.count }
 
     /// Explicitly wipe now (also runs on deinit).
-    func secureZero() {
+    public func secureZero() {
         guard storage.count > 0 else { return }
         storage.withUnsafeMutableBytes { buf in
             _ = memset_s(buf.baseAddress, buf.count, 0, buf.count)
