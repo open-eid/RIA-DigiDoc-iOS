@@ -68,10 +68,10 @@ public class OperationAuthenticateWithWebEID: NSObject {
 
     private func updateAlertMessage(step: Int) {
         let stepMessages = [
-            "Please place your ID card against the smart device.",
-            "Hold your ID card against your smart device until the data is read.",
-            "Reading data, please wait.",
-            "Authentication in progress, please wait."
+            "Please place your ID card against the smart device",
+            "Hold your ID card against your smart device until the data is read",
+            "Reading data please wait",
+            "Authentication in progress please wait"
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]

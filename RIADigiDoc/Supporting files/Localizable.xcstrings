@@ -40,7 +40,7 @@
         }
       }
     },
-    "Authentication in progress, please wait." : {
+    "Authentication in progress please wait" : {
       "comment" : "OperationAuthenticateWithWebEID alert message 4",
       "extractionState" : "manual",
       "localizations" : {
@@ -751,7 +751,7 @@
         }
       }
     },
-    "Hold your ID card against your smart device until the data is read." : {
+    "Hold your ID card against your smart device until the data is read" : {
       "comment" : "NFC session alert",
       "extractionState" : "manual",
       "localizations" : {
@@ -2927,7 +2927,7 @@
         }
       }
     },
-    "Please place your ID card against the smart device." : {
+    "Please place your ID card against the smart device" : {
       "comment" : "NFC message",
       "extractionState" : "manual",
       "localizations" : {
@@ -2999,7 +2999,7 @@
         }
       }
     },
-    "Reading data, please wait." : {
+    "Reading data please wait" : {
       "comment" : "NFC alert message, step 3",
       "extractionState" : "manual",
       "localizations" : {
@@ -3732,7 +3732,7 @@
         }
       }
     },
-    "Signing in progress, please wait." : {
+    "Signing in progress please wait" : {
       "comment" : "NFC alert message step 4",
       "extractionState" : "manual",
       "localizations" : {

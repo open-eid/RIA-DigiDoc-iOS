@@ -38,7 +38,7 @@ public class OperationUnblockPin: NSObject {
     private var codeType: CodeType?
     private var puk: SecureData?
     private var newPin: SecureData?
-    private let nfcMessage: String = "Please place your ID card against the smart device."
+    private let nfcMessage: String = "Please place your ID card against the smart device"
     private let connection = NFCConnection()
     private var continuation: CheckedContinuation<Void, Error>?
 
@@ -77,7 +77,7 @@ extension OperationUnblockPin: @MainActor NFCTagReaderSessionDelegate {
                 return
             }
             do {
-                session.alertMessage = "Hold your ID card against your smart device until the data is read."
+                session.alertMessage = "Hold your ID card against your smart device until the data is read"
                 let tag = try await self.connection.setup(session, tags: tags)
                 let cardCommands = try await self.connection.getCardCommands(session, tag: tag, CAN: self.CAN)
                 do {

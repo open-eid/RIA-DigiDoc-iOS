@@ -47,7 +47,7 @@ public class OperationReadCertificate: NSObject {
     private var session: NFCTagReaderSession?
     private var CAN: String = ""
     private var certUsage: CertificateUsage!
-    private let nfcMessage: String = "Please place your ID card against the smart device."
+    private let nfcMessage: String = "Please place your ID card against the smart device"
     private let connection = NFCConnection()
     private var continuation: CheckedContinuation<SecCertificate, Error>?
 
@@ -83,7 +83,7 @@ extension OperationReadCertificate: NFCTagReaderSessionDelegate {
                 return
             }
             do {
-                session.alertMessage = "Hold your ID card against your smart device until the data is read."
+                session.alertMessage = "Hold your ID card against your smart device until the data is read"
                 let tag = try await connection.setup(session, tags: tags)
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: CAN)
                 do {

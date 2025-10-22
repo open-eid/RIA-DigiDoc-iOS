@@ -31,7 +31,7 @@ public class OperationSignHash: NSObject {
     private var CAN: String = ""
     private var PIN: SecureData = SecureData([0x00])
     private var hashToSign: Data?
-    private let nfcMessage: String = "Please place your ID card against the smart device."
+    private let nfcMessage: String = "Please place your ID card against the smart device"
     private var continuation: CheckedContinuation<Data, Error>?
     private var connection = NFCConnection()
 
@@ -56,10 +56,10 @@ public class OperationSignHash: NSObject {
 
     private func updateAlertMessage(step: Int) {
         let stepMessages = [
-            "Please place your ID card against the smart device.",
-            "Hold your ID card against your smart device until the data is read.",
-            "Reading data, please wait.",
-            "Signing in progress, please wait."
+            "Please place your ID card against the smart device",
+            "Hold your ID card against your smart device until the data is read",
+            "Reading data please wait",
+            "Signing in progress please wait"
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
