@@ -40,6 +40,24 @@
         }
       }
     },
+    "Authentication in progress, please wait." : {
+      "comment" : "OperationAuthenticateWithWebEID alert message 4",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication in progress, please wait."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentimine käib, palun oodake."
+          }
+        }
+      }
+    },
     "Back" : {
       "localizations" : {
         "en" : {
@@ -105,6 +123,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaadi detailid"
+          }
+        }
+      }
+    },
+    "Certificate has expired" : {
+      "comment" : "OperationAuthenticateWithWebEID Certificate validity check",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate has expired"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaat on aegunud"
+          }
+        }
+      }
+    },
+    "Certificate not yet valid" : {
+      "comment" : "OperationAuthenticateWithWebEID Certificate validity check",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate not yet valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaat pole veel kehtiv"
           }
         }
       }
@@ -376,6 +430,24 @@
         }
       }
     },
+    "Data read" : {
+      "comment" : "NFC session finish alert message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data read"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andmed loetud"
+          }
+        }
+      }
+    },
     "DigiDoc" : {
       "comment" : "DigiDoc title on homesview",
       "extractionState" : "manual",
@@ -498,6 +570,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili %@ avamine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Failed to read data" : {
+      "comment" : "Error upon NFC connection",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to read data"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andmete lugemine ebaõnnestus"
           }
         }
       }
@@ -657,6 +747,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Peida parooli"
+          }
+        }
+      }
+    },
+    "Hold your ID card against your smart device until the data is read." : {
+      "comment" : "NFC session alert",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold your ID card against your smart device until the data is read."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoidke ID-kaarti vastu nutiseadet kuni andmeid loetakse."
           }
         }
       }
@@ -2783,6 +2891,60 @@
         }
       }
     },
+    "PIN change failed" : {
+      "comment" : "OperationUnblockPin error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN change failed"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PINi vahetamine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "PIN changed" : {
+      "comment" : "OperationUnblockPin success",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN changed"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN vahetatud"
+          }
+        }
+      }
+    },
+    "Please place your ID card against the smart device." : {
+      "comment" : "NFC message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please place your ID card against the smart device."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palun asetage oma ID-kaart vastu nutiseadet."
+          }
+        }
+      }
+    },
     "Radiobutton selected" : {
       "comment" : "Radiobutton selected",
       "extractionState" : "manual",
@@ -2833,6 +2995,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loe täpsemalt siit"
+          }
+        }
+      }
+    },
+    "Reading data, please wait." : {
+      "comment" : "NFC alert message, step 3",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading data, please wait."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andmete lugemine käib, palun oodake."
           }
         }
       }
@@ -3548,6 +3728,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjastamine"
+          }
+        }
+      }
+    },
+    "Signing in progress, please wait." : {
+      "comment" : "NFC alert message step 4",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing in progress, please wait."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signeerimine käib, palun oodake."
           }
         }
       }
