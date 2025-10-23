@@ -80,12 +80,14 @@ public struct Constants {
         public static let Logs = "logfiles"
         public static let SivaCert = "sivacert"
         public static let TSACert = "tsacert"
+        public static let EncryptionKeyTransferCert = "keytransfercert"
     }
 
     public struct FileBaseName {
-            public static let SiVaCert = "siva_cert"
-            public static let TSACert = "tsa_cert"
-        }
+        public static let SiVaCert = "siva_cert"
+        public static let TSACert = "tsa_cert"
+        public static let EncryptionKeyTransferCert = "key_transfer_cert"
+    }
 
     public struct Configuration {
         public static let CachedConfigJson = "active-config.json"

@@ -44,4 +44,14 @@ public protocol DataStoreProtocol: Sendable {
     func setRelyingPartyUUID(relyingPartyUUID: String) async
     func getRelyingPartyOption() async -> ServicesSettingsOption
     func setRelyingPartyOption(_ option: ServicesSettingsOption) async
+
+    // MARK: - Encryption Service Settings Methods
+    func getEncryptionCdocOption() async -> EncryptionCdocOption
+    func setEncryptionCdocOption(_ option: EncryptionCdocOption) async
+    func getEncryptionUseKeyTransfer() async -> Bool
+    func setEncryptionUseKeyTransfer(_ value: Bool) async
+    func getEncryptionServerId() async -> EncryptionServerOptionId
+    func setEncryptionServerId(_ option: EncryptionServerOptionId) async
+    func getEncryptionServerInfo() async -> EncryptionServerInfo
+    func setEncryptionServerInfo(_ info: EncryptionServerInfo) async
 }

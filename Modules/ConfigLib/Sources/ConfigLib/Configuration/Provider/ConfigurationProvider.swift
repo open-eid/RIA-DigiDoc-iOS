@@ -44,6 +44,25 @@ public struct ConfigurationProvider: Codable, Sendable {
         }
     }
 
+    public struct CDOC2Conf: Codable, Sendable {
+        public let name: String
+        public let postURL: URL
+        public let fetchURL: URL
+
+        // swiftlint:disable:next nesting
+        private enum CodingKeys: String, CodingKey {
+            case name = "NAME"
+            case postURL = "POST"
+            case fetchURL = "FETCH"
+        }
+
+        public init(name: String, postURL: URL, fetchURL: URL) {
+            self.name = name
+            self.postURL = postURL
+            self.fetchURL = fetchURL
+        }
+    }
+
     public let metaInf: MetaInf
     public let sivaUrl: URL
     public let tslUrl: URL
@@ -62,7 +81,7 @@ public struct ConfigurationProvider: Codable, Sendable {
     public var configurationUpdateDate: Date?
     public let cdoc2DefaultKeyserver: String
     public let cdoc2UseKeyserver: Bool
-    public let cdoc2Conf: [String: [String: String]]
+    public let cdoc2Conf: [String: CDOC2Conf]
 
     private enum CodingKeys: String, CodingKey {
         case metaInf = "META-INF"
@@ -133,7 +152,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         ldapCerts = try container.decode([Data].self, forKey: .ldapCerts)
         cdoc2DefaultKeyserver = try container.decode(String.self, forKey: .cdoc2DefaultKeyserver)
         cdoc2UseKeyserver = try container.decode(Bool.self, forKey: .cdoc2UseKeyserver)
-        cdoc2Conf = try container.decode([String: [String: String]].self, forKey: .cdoc2Conf)
+        cdoc2Conf = try container.decode([String: CDOC2Conf].self, forKey: .cdoc2Conf)
 
         let lastUpdateCheckString = try container.decodeIfPresent(
             String.self,
@@ -164,7 +183,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         configurationUpdateDate: Date?,
         cdoc2DefaultKeyserver: String,
         cdoc2UseKeyserver: Bool,
-        cdoc2Conf: [String: [String: String]],
+        cdoc2Conf: [String: CDOC2Conf],
     ) {
         self.metaInf = metaInf
         self.sivaUrl = sivaUrl
