@@ -26,19 +26,25 @@ struct EncryptionSettingsView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.dismiss) private var dismiss
 
-    // TODO: Most of these will move into the viewModel
-    @State private var useKeyServer = false
+    // MARK: - UI State
     @State private var showDialog = false
-    @State private var selectedServerId: EncryptionServerOptionId = .defaultSetting
-    @State private var encryptionCdocOption: EncryptionCdocOption = .cdoc1
     @State private var dialogSelectedServerId: EncryptionServerOptionId = .defaultSetting
+
+    // MARK: - Navigation
+    @State private var navigateToCertificateView = false
 
     private let serverOptions: [EncryptionServerOption] = [
         EncryptionServerOption(id: .defaultSetting, titleKey: "Main settings crypto server option ria"),
         EncryptionServerOption(id: .manualSetting, titleKey: "Main settings crypto server option manual")
     ]
     private var selectedServerOption: EncryptionServerOption? {
-        serverOptions.first { $0.id == selectedServerId }
+        serverOptions.first { $0.id == viewModel.serverId }
+    }
+
+    @StateObject private var viewModel: EncryptionSettingsViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.encryptionSettingsViewModel())
     }
 
     var body: some View {
@@ -51,17 +57,17 @@ struct EncryptionSettingsView: View {
                     ScrollView {
                         OutlinedRadioButtonCard(
                             title: languageSettings.localized("Main settings crypto use cdoc1"),
-                            isSelected: encryptionCdocOption == .cdoc1,
+                            isSelected: viewModel.encryptionCdocOption == .cdoc1,
                             onSelect: {
-                                encryptionCdocOption = .cdoc1
+                                viewModel.encryptionCdocOption = .cdoc1
                             }
                         )
 
                         OutlinedRadioButtonCard(
                             title: languageSettings.localized("Main settings crypto use cdoc2"),
-                            isSelected: encryptionCdocOption == .cdoc2,
+                            isSelected: viewModel.encryptionCdocOption == .cdoc2,
                             onSelect: {
-                                encryptionCdocOption = .cdoc2
+                                viewModel.encryptionCdocOption = .cdoc2
                             },
                             contentSpacing: Dimensions.Padding.MPadding,
                             content: {
@@ -80,48 +86,88 @@ struct EncryptionSettingsView: View {
                 chooseServerDialog
             }
         }
+        .onDisappear {
+            Task {
+                await viewModel.saveSettings()
+                await viewModel.removeObservers()
+            }
+        }
+        .fileImporter(
+            isPresented: $viewModel.isImportingCert,
+            allowedContentTypes: [.x509Certificate],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                Task {
+                    await viewModel.importCert(from: url)
+                }
+                viewModel.isImportingCert = false
+            case .failure:
+                viewModel.isImportingCert = false
+            }
+        }
+
+        // MARK: - Navigation links
+        if let certData = viewModel.certData {
+            NavigationLink(
+                destination: CertificateDetailView(
+                    certificate: certData
+                ),
+                isActive: $navigateToCertificateView,
+            ) { }
+        }
     }
 
     @ViewBuilder
     private var manualCardContent: some View {
         ToggleSection(
-            isOn: $useKeyServer,
+            isOn: $viewModel.useKeyTransfer,
             label: languageSettings.localized("Main settings crypto use key transfer"),
             verticalPadding: Dimensions.Padding.XSPadding
         )
-        if useKeyServer {
+        if viewModel.useKeyTransfer {
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto server"),
                 text: .constant(languageSettings.localized(selectedServerOption?.titleKey ?? "")),
                 isDropdown: true,
-                isDisabled: !useKeyServer,
+                isDisabled: !viewModel.useKeyTransfer,
                 onDropdownTap: {
+                    dialogSelectedServerId = viewModel.serverId
                     showDialog = true
                 }
             )
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto uuid"),
-                text: .constant("abc"),
-                isDisabled: !useKeyServer || selectedServerId == .defaultSetting
+                text: $viewModel.serverInfo.uuid,
+                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
             )
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto fetch url"),
-                text: .constant("abc"),
-                isDisabled: !useKeyServer || selectedServerId == .defaultSetting
+                text: $viewModel.serverInfo.fetchURL,
+                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
             )
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto post url"),
-                text: .constant("abc"),
-                isDisabled: !useKeyServer || selectedServerId == .defaultSetting
+                text: $viewModel.serverInfo.postURL,
+                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
             )
-            if selectedServerId == .manualSetting {
+            if viewModel.serverId == .manualSetting {
                 AdvancedSettingsCertificateSection(
                     certificateInfoHeader: languageSettings.localized("Main settings crypto certificate title"),
-                    showCertificateInfo: false,
-                    certificateIssuedTo: "certificateIssuedTo",
-                    certificateValidTo: "certificateValidTo",
-                    onShowCertificatePressed: {},
-                    onAddCertificatePressed: {})
+                    showCertificateInfo: viewModel.certData != nil,
+                    certificateIssuedTo: viewModel.getCertIssuer(),
+                    certificateValidTo: viewModel.getCertNotValidAfter(
+                        expiredLabel: languageSettings.localized("Main settings cert expired")
+                    ),
+                    onShowCertificatePressed: {
+                        navigateToCertificateView = true
+                    },
+                    onAddCertificatePressed: {
+                        viewModel.isImportingCert = true
+                    }
+                )
             }
         }
     }
@@ -178,7 +224,7 @@ struct EncryptionSettingsView: View {
 
                 Button(
                     action: {
-                        dialogSelectedServerId = selectedServerId
+                        dialogSelectedServerId = viewModel.serverId
                         showDialog = false
                     },
                     label: {
@@ -192,7 +238,7 @@ struct EncryptionSettingsView: View {
 
                 Button(
                     action: {
-                        selectedServerId = dialogSelectedServerId
+                        viewModel.serverId = dialogSelectedServerId
                         showDialog = false
                     },
                     label: {

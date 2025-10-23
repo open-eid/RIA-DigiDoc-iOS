@@ -19,6 +19,7 @@
 
 import Foundation
 import OSLog
+import CommonsTestShared
 
 @testable import ConfigLib
 
@@ -53,9 +54,10 @@ public class TestConfigurationProvider {
         ),
         cdoc2DefaultKeyserver: String = "https://cdoc2DefaultKeyserver.someUrl.abc",
         cdoc2UseKeyserver: Bool = false,
-        cdoc2Conf: [String: [String: String]] = [
-            "00000000-0000-0000-0000-000000000000": ["name": "test"]
-        ]
+        cdoc2ConfUUID: String = "00000000-0000-0000-0000-000000000000",
+        cdoc2ConfName: String = "RIA",
+        cdoc2ConfPostUrl: String = "https://cdoc2.example.ee:8443",
+        cdoc2ConfFetchUrl: String = "https://cdoc2.example.ee:8444"
     ) throws -> ConfigurationProvider {
         let metaInf = ConfigurationProvider.MetaInf(
             url: metaInfUrl,
@@ -64,56 +66,26 @@ public class TestConfigurationProvider {
             version: metaInfVersion
         )
 
-        guard let sivaURL = URL(string: sivaUrl) else {
-            TestConfigurationProvider.logger.error("'\(sivaUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let tslURL = URL(string: tslUrl) else {
-            TestConfigurationProvider.logger.error("'\(tslUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
+        let sivaURL = try TestFileUtil.getURL(string: sivaUrl)
+        let tslURL = try TestFileUtil.getURL(string: tslUrl)
+        let tsaURL = try TestFileUtil.getURL(string: tsaUrl)
+        let ldapPersonURL = try TestFileUtil.getURL(string: ldapPersonUrl)
+        let ldapCorpURL = try TestFileUtil.getURL(string: ldapCorpUrl)
+        let midRestURL = try TestFileUtil.getURL(string: midRestUrl)
+        let midSkRestURL = try TestFileUtil.getURL(string: midSkRestUrl)
+        let sidV2RestURL = try TestFileUtil.getURL(string: sidV2RestUrl)
+        let sidV2SkRestURL = try TestFileUtil.getURL(string: sidV2SkRestUrl)
 
         let tslCertsData: [Data] = tslCerts.compactMap { $0.data(using: .utf8) }
-
-        guard let tsaURL = URL(string: tsaUrl) else {
-            TestConfigurationProvider.logger.error("'\(tsaUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let ldapPersonURL = URL(string: ldapPersonUrl) else {
-            TestConfigurationProvider.logger.error("'\(ldapPersonUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let ldapCorpURL = URL(string: ldapCorpUrl) else {
-            TestConfigurationProvider.logger.error("'\(ldapCorpUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let midRestURL = URL(string: midRestUrl) else {
-            TestConfigurationProvider.logger.error("'\(midRestUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let midSkRestURL = URL(string: midSkRestUrl) else {
-            TestConfigurationProvider.logger.error("'\(midSkRestUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let sidV2RestURL = URL(string: sidV2RestUrl) else {
-            TestConfigurationProvider.logger.error("'\(sidV2RestUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
-        guard let sidV2SkRestURL = URL(string: sidV2SkRestUrl) else {
-            TestConfigurationProvider.logger.error("'\(sidV2SkRestUrl)' is not a valid URL")
-            throw URLError(.badURL)
-        }
-
         let certBundleData: [Data] = certBundle.compactMap { $0.data(using: .utf8) }
-
         let ldapCertsData: [Data] = ldapCerts.compactMap { $0.data(using: .utf8) }
+
+        let cdoc2Conf = try setupCDOC2Conf(
+            cdoc2ConfUUID: cdoc2ConfUUID,
+            cdoc2ConfName: cdoc2ConfName,
+            cdoc2ConfPostUrl: cdoc2ConfPostUrl,
+            cdoc2ConfFetchUrl: cdoc2ConfFetchUrl
+        )
 
         return ConfigurationProvider(
             metaInf: metaInf,
@@ -136,5 +108,23 @@ public class TestConfigurationProvider {
             cdoc2UseKeyserver: cdoc2UseKeyserver,
             cdoc2Conf: cdoc2Conf
         )
+    }
+
+    private static func setupCDOC2Conf(
+        cdoc2ConfUUID: String,
+        cdoc2ConfName: String,
+        cdoc2ConfPostUrl: String,
+        cdoc2ConfFetchUrl: String
+    ) throws -> [String: ConfigurationProvider.CDOC2Conf] {
+        let cdoc2ConfPostURL = try TestFileUtil.getURL(string: cdoc2ConfPostUrl)
+        let cdoc2ConfFetchURL = try TestFileUtil.getURL(string: cdoc2ConfFetchUrl)
+
+        return [
+            cdoc2ConfUUID: ConfigurationProvider.CDOC2Conf(
+                name: cdoc2ConfName,
+                postURL: cdoc2ConfPostURL,
+                fetchURL: cdoc2ConfFetchURL
+            )
+        ]
     }
 }

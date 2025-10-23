@@ -199,6 +199,18 @@ extension Container {
     }
 
     @MainActor
+    var encryptionSettingsViewModel: Factory<EncryptionSettingsViewModel> {
+        self { @MainActor in
+            EncryptionSettingsViewModel(
+                configurationRepository: self.configurationRepository(),
+                dataStore: self.dataStore(),
+                advancedSettingsRepository: self.advancedSettingsRepository(),
+                certificateUtil: self.certificateUtil()
+            )
+        }
+    }
+
+    @MainActor
     var timeStampSettingsViewModel: Factory<TimeStampSettingsViewModel> {
         self { @MainActor in
             TimeStampSettingsViewModel(

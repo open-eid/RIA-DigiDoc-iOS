@@ -128,6 +128,7 @@
 				Domain/Model/CertificateExtensionData.swift,
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/EncryptionCdocOption.swift,
+				Domain/Model/EncryptionServerInfo.swift,
 				Domain/Model/EncryptionServerOption.swift,
 				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/FileItem.swift,
@@ -167,6 +168,7 @@
 				ViewModel/ContentViewModel.swift,
 				ViewModel/DataFilesViewModel.swift,
 				ViewModel/DiagnosticsViewModel.swift,
+				ViewModel/EncryptionSettingsViewModel.swift,
 				ViewModel/FileOpeningViewModel.swift,
 				ViewModel/HomeViewModel.swift,
 				ViewModel/LanguageChooserViewModel.swift,
@@ -174,6 +176,7 @@
 				ViewModel/Protocols/CertificateDetailViewModelProtocol.swift,
 				ViewModel/Protocols/ContentViewModelProtocol.swift,
 				ViewModel/Protocols/DiagnosticsViewModelProtocol.swift,
+				ViewModel/Protocols/EncryptionSettingsViewModelProtocol.swift,
 				ViewModel/Protocols/FileOpeningViewModelProtocol.swift,
 				ViewModel/Protocols/HomeViewModelProtocol.swift,
 				ViewModel/Protocols/LanguageChooserViewModelProtocol.swift,
@@ -199,6 +202,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Domain/Model/EncryptionCdocOption.swift,
+				Domain/Model/EncryptionServerInfo.swift,
+				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
@@ -240,6 +245,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Domain/Model/EncryptionCdocOption.swift,
+				Domain/Model/EncryptionServerInfo.swift,
+				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,

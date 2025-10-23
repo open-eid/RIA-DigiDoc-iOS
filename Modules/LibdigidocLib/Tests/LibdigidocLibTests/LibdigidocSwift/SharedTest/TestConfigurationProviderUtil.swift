@@ -19,47 +19,24 @@
 
 import ConfigLib
 import Foundation
+import CommonsTestShared
 
 public struct TestConfigurationProviderUtil {
 
     public init() {}
 
     public static func getConfigurationProvider() throws -> ConfigurationProvider {
-        guard let sivaUrl = URL(string: "https://siva.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let tslUrl = URL(string: "https://tsl.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let tsaUrl = URL(string: "https://tsa.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let ldapPersonUrl = URL(string: "https://ldapPerson.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let ldapCorpUrl = URL(string: "https://ldapCorp.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let midRestUrl = URL(string: "https://midRest.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let midSkRestUrl = URL(string: "https://midSkRest.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let sidV2RestUrl = URL(string: "https://sidv2Rest.example.abc") else {
-            throw URLError(.badURL)
-        }
-
-        guard let sidV2SkRestUrl = URL(string: "https://sidv2SkRest.example.abc") else {
-            throw URLError(.badURL)
-        }
+        let sivaUrl = try TestFileUtil.getURL(string: "https://siva.example.abc")
+        let tslUrl = try TestFileUtil.getURL(string: "https://tsl.example.abc")
+        let tsaUrl = try TestFileUtil.getURL(string: "https://tsa.example.abc")
+        let ldapPersonUrl = try TestFileUtil.getURL(string: "https://ldapPerson.example.abc")
+        let ldapCorpUrl = try TestFileUtil.getURL(string: "https://ldapCorp.example.abc")
+        let midRestUrl = try TestFileUtil.getURL(string: "https://midRest.example.abc")
+        let midSkRestUrl = try TestFileUtil.getURL(string: "https://midSkRest.example.abc")
+        let sidV2RestUrl = try TestFileUtil.getURL(string: "https://sidv2Rest.example.abc")
+        let sidV2SkRestUrl = try TestFileUtil.getURL(string: "https://sidv2SkRest.example.abc")
+        let cdoc2ConfRiaPostUrl = try TestFileUtil.getURL(string: "https://cdoc2.example.ee:8443")
+        let cdoc2ConfRiaFetchUrl = try TestFileUtil.getURL(string: "https://cdoc2.example.ee:8444")
 
         return ConfigurationProvider(
             metaInf: ConfigurationProvider.MetaInf.init(
@@ -85,7 +62,13 @@ public struct TestConfigurationProviderUtil {
             configurationUpdateDate: Date(),
             cdoc2DefaultKeyserver: "https://cdoc2DefaultKeyserver.example.abc",
             cdoc2UseKeyserver: false,
-            cdoc2Conf: [:],
+            cdoc2Conf: [
+                "00000000-0000-0000-0000-000000000000": ConfigurationProvider.CDOC2Conf.init(
+                    name: "RIA",
+                    postURL: cdoc2ConfRiaPostUrl,
+                    fetchURL: cdoc2ConfRiaFetchUrl
+                )
+            ],
         )
     }
 }

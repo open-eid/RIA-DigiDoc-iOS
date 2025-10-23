@@ -33,6 +33,14 @@ public struct TestFileUtil {
 
     public init() {}
 
+    public static func getURL(string: String) throws -> URL {
+        guard let url = URL(string: string) else {
+            TestFileUtil.logger.error("'\(string)' is not a valid URL")
+            throw URLError(.badURL)
+        }
+        return url
+    }
+
     public static func getTemporaryDirectory(
         subfolder: String,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
