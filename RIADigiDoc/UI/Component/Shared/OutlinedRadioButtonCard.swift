@@ -83,6 +83,7 @@ struct OutlinedRadioButtonCard<Content: View>: View {
                 RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
                     .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
             )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .cornerRadius(Dimensions.Corner.XSCornerRadius)
