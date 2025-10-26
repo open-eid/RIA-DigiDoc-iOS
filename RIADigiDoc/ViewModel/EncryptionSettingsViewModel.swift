@@ -32,11 +32,7 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Observab
     @Published var encryptionCdocOption: EncryptionCdocOption = .cdoc1
     @Published var useKeyTransfer: Bool = false
     @Published var serverId: EncryptionServerOptionId = .defaultSetting
-    @Published var serverInfo: EncryptionServerInfo = EncryptionServerInfo(
-        uuid: "",
-        fetchURL: "",
-        postURL: ""
-    )
+    @Published var serverInfo: EncryptionServerInfo = EncryptionServerInfo()
     @Published var isImportingCert: Bool = false
     @Published var isLoading: Bool = true
 

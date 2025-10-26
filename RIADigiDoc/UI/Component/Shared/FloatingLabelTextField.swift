@@ -27,12 +27,39 @@ struct FloatingLabelTextField: View {
 
     // MARK: - Parameters
     let title: String
-    let placeholder: String = ""
+    let placeholder: String
     @Binding var text: String
-    var isSecure: Bool = false
-    var isDropdown: Bool = false
-    var isDisabled: Bool = false
-    var onDropdownTap: (() -> Void)?
+    let isSecure: Bool
+    let isDropdown: Bool
+    let isDisabled: Bool
+    let onDropdownTap: (() -> Void)?
+    let isInvalid: Bool
+    let invalidText: String
+    let keyboardType: UIKeyboardType
+
+    init(
+        title: String,
+        placeholder: String = "",
+        text: Binding<String>,
+        isSecure: Bool = false,
+        isDropdown: Bool = false,
+        isDisabled: Bool = false,
+        onDropdownTap: (() -> Void)? = {},
+        isInvalid: Bool = false,
+        invalidText: String = "",
+        keyboardType: UIKeyboardType = .default
+    ) {
+        self.title = title
+        self.placeholder = placeholder
+        self._text = text
+        self.isSecure = isSecure
+        self.isDropdown = isDropdown
+        self.isDisabled = isDisabled
+        self.onDropdownTap = onDropdownTap
+        self.isInvalid = isInvalid
+        self.invalidText = invalidText
+        self.keyboardType = keyboardType
+    }
 
     // MARK: - State
     @State private var isPasswordVisible: Bool = false
@@ -76,11 +103,25 @@ struct FloatingLabelTextField: View {
     // MARK: - Body
 
     var body: some View {
+        VStack(
+            alignment: .leading
+        ) {
+            mainContainer
+            if isInvalid {
+                Text(invalidText)
+                    .font(typography.bodyLarge)
+                    .foregroundStyle(theme.error)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainContainer: some View {
         ZStack {
             if isDropdown {
                 dropdownButton
             } else {
-                mainInputContainer
+                inputContainer
             }
             floatingLabel
         }
@@ -123,7 +164,7 @@ struct FloatingLabelTextField: View {
     // MARK: - Input
 
     @ViewBuilder
-    private var mainInputContainer: some View {
+    private var inputContainer: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             inputField
             Spacer()
@@ -148,10 +189,12 @@ struct FloatingLabelTextField: View {
                 SecureField(placeholder, text: $text)
                     .multilineTextAlignment(.leading)
                     .disabled(isDisabled)
+                    .keyboardType(keyboardType)
             } else {
                 TextField(placeholder, text: $text)
                     .multilineTextAlignment(.leading)
                     .disabled(isDisabled)
+                    .keyboardType(keyboardType)
             }
         }
         .font(typography.bodyLarge)
@@ -288,6 +331,13 @@ struct FloatingLabelTextField: View {
             title: "secure field",
             text: .constant("password"),
             isSecure: true
+        )
+
+        FloatingLabelTextField(
+            title: "invalid field",
+            text: .constant("invalid input"),
+            isInvalid: true,
+            invalidText: "input is invalid"
         )
     }
     .padding()

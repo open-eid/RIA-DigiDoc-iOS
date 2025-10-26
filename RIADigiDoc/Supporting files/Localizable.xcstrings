@@ -2609,6 +2609,132 @@
         }
       }
     },
+    "Main settings proxy check connection" : {
+      "comment" : "Main settings proxy check connection",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check connection"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrolli internetiühendust"
+          }
+        }
+      }
+    },
+    "Main settings proxy host" : {
+      "comment" : "Main settings proxy host",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host"
+          }
+        }
+      }
+    },
+    "Main settings proxy manual" : {
+      "comment" : "Main settings proxy manual",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual proxy configuration"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta käsitsi määratud proksiseadeid"
+          }
+        }
+      }
+    },
+    "Main settings proxy no proxy" : {
+      "comment" : "Main settings proxy no proxy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No proxy"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei kasuta proksit"
+          }
+        }
+      }
+    },
+    "Main settings proxy password" : {
+      "comment" : "Main settings proxy password",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parool"
+          }
+        }
+      }
+    },
+    "Main settings proxy port" : {
+      "comment" : "Main settings proxy port",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Port"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Port"
+          }
+        }
+      }
+    },
+    "Main settings proxy port error" : {
+      "comment" : "Main settings proxy port error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min 1, max 65535"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min 1, max 65535"
+          }
+        }
+      }
+    },
     "Main settings proxy title" : {
       "comment" : "Main settings proxy title",
       "extractionState" : "manual",
@@ -2623,6 +2749,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proksi"
+          }
+        }
+      }
+    },
+    "Main settings proxy use system" : {
+      "comment" : "Main settings proxy use system",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use system proxy settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta süsteemseid proksiseadeid"
+          }
+        }
+      }
+    },
+    "Main settings proxy username" : {
+      "comment" : "Main settings proxy username",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Username"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasutajanimi"
           }
         }
       }
