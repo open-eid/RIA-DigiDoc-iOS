@@ -34,17 +34,24 @@ struct DataFilesView: View {
     let fileIndex: Int
     let onOpenFileButtonClick: (DataFileWrapper) -> Void
     let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
+    let onRemoveFileButtonClick: (DataFileWrapper) -> Void
+
+    let dataFile: DataFileWrapper
+    let showRemoveFileButton: Bool
+    @Binding var showRemoveDataFileModal: Bool
+    var onSelect: (() -> Void)?
 
     private var bottomSheetActions: [BottomSheetButton] {
         DataFileBottomSheetActions.actions(
             showRemoveFileButton: showRemoveFileButton,
             onOpenFileButtonClick: { onOpenFileButtonClick(dataFile) },
-            onSaveFileButtonClick: { onSaveDataFileButtonClick(dataFile) }
+            onSaveFileButtonClick: { onSaveDataFileButtonClick(dataFile) },
+            onRemoveFileButtonClick: {
+                onSelect?()
+                showRemoveDataFileModal = true
+            }
         )
     }
-
-    let dataFile: DataFileWrapper
-    let showRemoveFileButton: Bool
 
     var body: some View {
         VStack {

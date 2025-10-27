@@ -21,7 +21,8 @@ struct DataFileBottomSheetActions {
     static func actions(
         showRemoveFileButton: Bool,
         onOpenFileButtonClick: @escaping () -> Void,
-        onSaveFileButtonClick: @escaping () -> Void
+        onSaveFileButtonClick: @escaping () -> Void,
+        onRemoveFileButtonClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
 
         return [
@@ -42,9 +43,7 @@ struct DataFileBottomSheetActions {
                 icon: "ic_m3_encrypted_48pt_wght400",
                 title: "Remove file",
                 accessibilityLabel: "Remove file",
-                onClick: {
-                    // TODO: Implement remove‑file action
-                }
+                onClick: onRemoveFileButtonClick
             )
         ]
     }

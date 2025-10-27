@@ -27,10 +27,13 @@ struct DataFilesListView: View {
     @AppTypography private var typography
 
     let dataFiles: [DataFileWrapper]
+    @Binding var selectedDataFile: DataFileWrapper?
     let showRemoveFileButton: Bool
+    @Binding var showRemoveDataFileModal: Bool
 
     let onOpenFileButtonClick: (DataFileWrapper) -> Void
     let onSaveDataFileButtonClick: (DataFileWrapper) -> Void
+    let onRemoveFileButtonClick: (DataFileWrapper) -> Void
 
     var body: some View {
         LazyVStack {
@@ -40,8 +43,13 @@ struct DataFilesListView: View {
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,
                         onSaveDataFileButtonClick: onSaveDataFileButtonClick,
+                        onRemoveFileButtonClick: onRemoveFileButtonClick,
                         dataFile: dataFile,
-                        showRemoveFileButton: showRemoveFileButton
+                        showRemoveFileButton: showRemoveFileButton,
+                        showRemoveDataFileModal: $showRemoveDataFileModal,
+                        onSelect: {
+                            selectedDataFile = dataFile
+                        }
                     )
                 }
             } else {
@@ -50,8 +58,13 @@ struct DataFilesListView: View {
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,
                         onSaveDataFileButtonClick: onSaveDataFileButtonClick,
+                        onRemoveFileButtonClick: onRemoveFileButtonClick,
                         dataFile: dataFile,
-                        showRemoveFileButton: showRemoveFileButton
+                        showRemoveFileButton: showRemoveFileButton,
+                        showRemoveDataFileModal: $showRemoveDataFileModal,
+                        onSelect: {
+                            selectedDataFile = dataFile
+                        }
                     )
                 }
             }
@@ -60,26 +73,32 @@ struct DataFilesListView: View {
 }
 
 #Preview {
+    let dataFiles = [
+        DataFileWrapper(
+            id: UUID(),
+            fileId: "1",
+            fileName: "DataFile1.txt",
+            fileSize: 123,
+            mediaType: "text/plain"
+        ),
+        DataFileWrapper(
+            id: UUID(),
+            fileId: "2",
+            fileName: "DataFile2.txt",
+            fileSize: 456,
+            mediaType: "text/plain"
+        )
+    ]
+
     DataFilesListView(
-        dataFiles: [
-            DataFileWrapper(
-                id: UUID(),
-                fileId: "1",
-                fileName: "DataFile1.txt",
-                fileSize: 123,
-                mediaType: "text/plain"
-            ),
-            DataFileWrapper(
-                id: UUID(),
-                fileId: "2",
-                fileName: "DataFile2.txt",
-                fileSize: 456,
-                mediaType: "text/plain"
-            )
-        ],
+        dataFiles: dataFiles,
+        selectedDataFile: .constant(dataFiles.first),
         showRemoveFileButton: true,
+        showRemoveDataFileModal: .constant(false),
         onOpenFileButtonClick: { _ in },
-        onSaveDataFileButtonClick: { _ in }
+        onSaveDataFileButtonClick: { _ in },
+        onRemoveFileButtonClick: { _ in }
     )
+    .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())
 }

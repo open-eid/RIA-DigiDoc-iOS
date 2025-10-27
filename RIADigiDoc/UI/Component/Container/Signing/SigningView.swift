@@ -45,6 +45,7 @@ struct SigningView: View {
     @State private var isFileSaved: Bool = false
     @State private var showRenameModal = false
     @State private var showRemoveSignatureModal = false
+    @State private var showRemoveDataFileModal = false
     @State private var newContainerName = Constants.Container.DefaultName
 
     @State private var showingShareSheet = false
@@ -233,7 +234,7 @@ struct SigningView: View {
                                                 selectedDataFile: $selectedDataFile,
                                                 showSivaMessage: $showSivaMessage,
                                                 isFileSaved: $isFileSaved,
-                                                languageSettings: languageSettings
+                                                showRemoveDataFileModal: $showRemoveDataFileModal
                                             )
                                         } else {
                                             SignaturesListView(
@@ -267,7 +268,7 @@ struct SigningView: View {
                                             selectedDataFile: $selectedDataFile,
                                             showSivaMessage: $showSivaMessage,
                                             isFileSaved: $isFileSaved,
-                                            languageSettings: languageSettings
+                                            showRemoveDataFileModal: $showRemoveDataFileModal
                                         )
                                         .background(
                                             FileSaverHandler(
@@ -347,23 +348,34 @@ struct SigningView: View {
             }
 
             if showRemoveSignatureModal {
-                RemoveSignatureModalView(
+                ConfirmModalView(
                     title: languageSettings.localized("Remove signature"),
-                    message: languageSettings.localized("Remove signature from container")
-                ) {
-                    Task {
-                        guard let signature = selectedSignature else {
-                            Toast.show(languageSettings.localized("Failed to remove signature from container"))
-                            return
+                    message: languageSettings.localized("Remove signature from container"),
+                    onConfirm: {
+                        Task {
+                            await handleRemoveSignature()
                         }
-
-                        await viewModel.removeSignature(signature: signature)
-                        selectedSignature = nil
+                    }, onCancel: {
                         showRemoveSignatureModal = false
                     }
-                } onCancel: {
-                    showRemoveSignatureModal = false
-                }
+                )
+            }
+
+            if showRemoveDataFileModal {
+                ConfirmModalView(
+                    title: languageSettings.localized("Remove datafile"),
+                    message: languageSettings.localized(
+                        viewModel.dataFiles.count == 1 ?
+                        "Remove last datafile from container message" :
+                            "Remove datafile from container message"
+                    ),
+                    onConfirm: {
+                        Task {
+                            await handleRemoveDataFile()
+                        }
+                    },
+                    onCancel: { showRemoveDataFileModal = false }
+                )
             }
         }
         .animation(.easeInOut, value: showRenameModal)
@@ -394,6 +406,35 @@ struct SigningView: View {
         await MainActor.run {
             isSignButtonShown = shouldShowSignButton
             isEncryptButtonShown = shouldShowEncryptButton
+        }
+    }
+
+    private func handleRemoveSignature() async {
+        guard let signature = selectedSignature else {
+            Toast.show(languageSettings.localized("Failed to remove signature from container"))
+            return
+        }
+
+        await viewModel.removeSignature(signature)
+        selectedSignature = nil
+        showRemoveSignatureModal = false
+
+    }
+
+    private func handleRemoveDataFile() async {
+        guard let dataFile = selectedDataFile else {
+            Toast.show(languageSettings.localized("Failed to remove datafile from container", [""]))
+            return
+        }
+
+        await viewModel.removeDataFile(dataFile)
+        selectedDataFile = nil
+        showRemoveDataFileModal = false
+
+        if viewModel.dataFiles.count == 1, viewModel.isLastDataFileRemoved {
+            if await viewModel.handleBackButton() {
+                dismiss()
+            }
         }
     }
 }

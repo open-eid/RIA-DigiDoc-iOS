@@ -182,7 +182,7 @@ struct TopBar: View {
                                             height: Dimensions.Icon.IconSizeMicro
                                         )
                                         .font(typography.bodySmall)
-                                        .foregroundStyle(theme.onBackground)
+                                        .foregroundStyle(Color.white)
                                         .padding(Dimensions.Padding.XXSPadding)
                                         .minimumScaleFactor(0.5)
                                         .background(Circle().fill(theme.onError))

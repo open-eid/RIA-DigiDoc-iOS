@@ -32,7 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion;
 
-+ (void)removeSignature:(int)index fromContainerWithPath:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion;
++ (void)removeSignature:(NSUInteger)index fromContainerWithPath:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion;
+
++ (void)removeDataFileFromContainerWithPath:(NSString *)containerPath atIndex:(NSUInteger)dataFileIndex completion:(void (^)(NSError * _Nullable error))completion;
 
 + (NSString *)libdigidocppVersion;
 + (NSString *)mediaType;
