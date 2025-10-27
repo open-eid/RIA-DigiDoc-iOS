@@ -583,7 +583,51 @@ final class SignedContainerTests {
             return
         } catch let error as DigiDocError {
             switch error {
-            case .signatureRemovingFailed(_):
+            case .signatureRemovingFailed:
+                #expect(true)
+            default:
+                Issue.record("Unexpected error: \(error.localizedDescription)")
+                return
+            }
+        }
+    }
+
+    @Test
+    func removeDataFile_success() async throws {
+        let mockNewContainerWrapper = ContainerWrapperProtocolMock()
+
+        mockContainerWrapper.removeDataFileHandler = { _, _ in
+            return mockNewContainerWrapper
+        }
+
+        mockNewContainerWrapper.getDataFilesHandler = {[
+            MockDataFileWrapper.mockDataFileWrapper()
+        ]}
+
+        let container = try await signedContainer
+            .removeDataFile(index: 0, containerFile: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+
+        let dataFiles = await container.getDataFiles()
+
+        #expect(dataFiles.count == 1)
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenSignatureDoesNotExist() async throws {
+        mockContainerWrapper.removeDataFileHandler = { _, _ in
+            throw DigiDocError.dataFileRemovingFailed(
+                ErrorDetail(message: "Error", userInfo: [:])
+            )
+        }
+
+        do {
+            try await signedContainer
+                .removeDataFile(index: 0, containerFile: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+            Issue.record("Expected 'dataFileRemovingFailed' error")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .dataFileRemovingFailed:
                 #expect(true)
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")

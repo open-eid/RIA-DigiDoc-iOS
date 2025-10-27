@@ -965,14 +965,14 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+        await viewModel.removeSignature(MockSignatureWrapper.mockSignatureWrapper())
 
         #expect(viewModel.errorMessage == nil)
     }
 
     @Test
     func removeSignature_throwErrorWhenContainerDataNotLoaded() async {
-        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+        await viewModel.removeSignature(MockSignatureWrapper.mockSignatureWrapper())
 
         let errorMessage = viewModel.errorMessage ?? ("", [])
 
@@ -990,10 +990,122 @@ struct SigningViewModelTests {
             )
         }
 
-        await viewModel.removeSignature(signature: MockSignatureWrapper.mockSignatureWrapper())
+        await viewModel.removeSignature(MockSignatureWrapper.mockSignatureWrapper())
 
         let errorMessage = viewModel.errorMessage ?? ("", [])
 
         #expect(errorMessage == ("Failed to remove signature from container", []))
+    }
+
+    @Test
+    func removeSignature_throwErrorWhenUnableToRemoveSignature() async {
+        let mockSignature = MockSignatureWrapper.mockSignatureWrapper(pos: 0)
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getSignaturesHandler = { [mockSignature] }
+
+        mockSignedContainer.removeSignatureHandler = { _, _ in
+            throw DigiDocError.signatureRemovingFailed(
+                ErrorDetail(message: "Error", userInfo: [:])
+            )
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeSignature(mockSignature)
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove signature from container", []))
+    }
+
+    @Test
+    func removeDataFile_success() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getDataFilesHandler = {
+            [mockDataFile, MockDataFileWrapper.mockDataFileWrapper(fileId: "S2")]
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeDataFile(mockDataFile)
+
+        #expect(viewModel.errorMessage == nil)
+        #expect(mockFileManager.removeItemCallCount == 0)
+    }
+
+    @Test
+    func removeDataFile_successWithLastDataFile() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper()
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getDataFilesHandler = { [mockDataFile] }
+        mockSignedContainer.removeDataFileHandler = { _, _ in mockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeDataFile(mockDataFile)
+
+        #expect(viewModel.errorMessage == nil)
+        #expect(mockFileManager.removeItemCallCount == 1)
+        #expect(viewModel.isLastDataFileRemoved)
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenContainerDataNotLoaded() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper()
+        await viewModel.removeDataFile(mockDataFile)
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(mockFileManager.removeItemCallCount == 0)
+        #expect(!viewModel.isLastDataFileRemoved)
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenDataFileDoesNotExist() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getDataFilesHandler = { [MockDataFileWrapper.mockDataFileWrapper(fileId: "S2")] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeDataFile(mockDataFile)
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(mockFileManager.removeItemCallCount == 0)
+        #expect(!viewModel.isLastDataFileRemoved)
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenUnableToRemoveDataFile() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getDataFilesHandler = {
+            [mockDataFile, MockDataFileWrapper.mockDataFileWrapper(fileId: "S2")]
+        }
+
+        mockSignedContainer.removeDataFileHandler = { _, _ in
+            throw DigiDocError.dataFileRemovingFailed(
+                ErrorDetail(message: "Error", userInfo: [:])
+            )
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeDataFile(mockDataFile)
+
+        let errorMessage = viewModel.errorMessage ?? ("", [])
+
+        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(mockFileManager.removeItemCallCount == 0)
+        #expect(!viewModel.isLastDataFileRemoved)
     }
 }

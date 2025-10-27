@@ -45,7 +45,7 @@ struct SignatureView: View {
     let showRole: Bool
     var showRemoveSignatureButton: Bool
     @Binding var showRemoveSignatureModal: Bool
-    var onSelect: (() -> Void)? = nil
+    var onSelect: (() -> Void)?
 
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false

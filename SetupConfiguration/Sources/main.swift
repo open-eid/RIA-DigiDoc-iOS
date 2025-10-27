@@ -1,3 +1,5 @@
+#!/usr/bin/swift sh
+
 /*
  * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
@@ -16,8 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-#!/usr/bin/swift sh
 
 import Foundation
 

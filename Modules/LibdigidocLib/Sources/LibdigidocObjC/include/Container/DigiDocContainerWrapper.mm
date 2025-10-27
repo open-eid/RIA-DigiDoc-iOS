@@ -281,9 +281,16 @@ public:
     }];
 }
 
-+ (void)removeSignature:(int)index fromContainerWithPath:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion {
++ (void)removeSignature:(NSUInteger)index fromContainerWithPath:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion {
     [self open:containerPath validateOnline:TRUE command:^(digidoc::Container &container) {
-        container.removeSignature(index);
+        container.removeSignature((int)index);
+        container.save(containerPath.UTF8String);
+    } completion:completion];
+}
+
++ (void)removeDataFileFromContainerWithPath:(NSString *)containerPath atIndex:(NSUInteger)dataFileIndex completion:(void (^)(NSError * _Nullable error))completion {
+    [self open:containerPath validateOnline:TRUE command:^(digidoc::Container &container) {
+        container.removeDataFile((int)dataFileIndex);
         container.save(containerPath.UTF8String);
     } completion:completion];
 }

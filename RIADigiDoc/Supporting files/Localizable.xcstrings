@@ -664,8 +664,26 @@
         }
       }
     },
+    "Failed to remove file from container" : {
+      "comment" : "Shows when unable to remove file from unsigned container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove file %@ from container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili %@ eemaldamine ümbrikust ebaõnnestus"
+          }
+        }
+      }
+    },
     "Failed to remove signature from container" : {
-      "comment" : "Shows when unable to remove signature from container",
+      "comment" : "Shows when unable to remove signature from signed container",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3325,6 +3343,42 @@
         }
       }
     },
+    "Remove datafile" : {
+      "comment" : "Title in modal when removing data file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemalda fail"
+          }
+        }
+      }
+    },
+    "Remove datafile from container message" : {
+      "comment" : "Message in modal when removing data file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove file from container?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soovid eemaldada faili ümbrikust?"
+          }
+        }
+      }
+    },
     "Remove file" : {
       "comment" : "Bottom sheet action",
       "extractionState" : "manual",
@@ -3339,6 +3393,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eemalda fail"
+          }
+        }
+      }
+    },
+    "Remove last datafile from container message" : {
+      "comment" : "Shown when removing last container file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are about to remove the last file in the container, it is removed along with the container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oled kustutamas viimast faili ümbrikus, koos sellega eemaldatakse ka ümbrik."
           }
         }
       }

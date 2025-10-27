@@ -164,7 +164,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     public func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
         do {
             try await DigiDocContainerWrapper.removeSignature(
-                Int32(index),
+                UInt(index),
                 fromContainerWithPath: containerFile.path
             )
 
@@ -172,6 +172,25 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot remove signature", code: 5)
             throw DigiDocError.signatureRemovingFailed(
+                ErrorDetail(
+                    nsError: nsError
+                )
+            )
+        }
+    }
+
+    @discardableResult
+    public func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
+        do {
+            try await DigiDocContainerWrapper.removeDataFileFromContainer(
+                withPath: containerFile.path,
+                at: UInt(index)
+            )
+
+            return try await open(containerFile: containerFile, isSivaConfirmed: true)
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot remove datafile", code: 6)
+            throw DigiDocError.dataFileRemovingFailed(
                 ErrorDetail(
                     nsError: nsError
                 )

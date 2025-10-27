@@ -22,6 +22,7 @@ import LibdigidocLibSwift
 
 struct DataFilesSection: View {
     @Environment(\.openURL) private var openURL
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @ObservedObject var viewModel: SigningViewModel
     let isContainerSigned: Bool
@@ -29,7 +30,7 @@ struct DataFilesSection: View {
     @Binding var selectedDataFile: DataFileWrapper?
     @Binding var showSivaMessage: Bool
     @Binding var isFileSaved: Bool
-    let languageSettings: LanguageSettings
+    @Binding var showRemoveDataFileModal: Bool
 
     private var sivaMessage: String {
         languageSettings.localized("Siva message")
@@ -42,9 +43,14 @@ struct DataFilesSection: View {
     var body: some View {
         DataFilesListView(
             dataFiles: viewModel.dataFiles,
+            selectedDataFile: $selectedDataFile,
             showRemoveFileButton: !isContainerSigned && !isNestedContainer,
+            showRemoveDataFileModal: $showRemoveDataFileModal,
             onOpenFileButtonClick: openFile,
-            onSaveDataFileButtonClick: saveFile
+            onSaveDataFileButtonClick: saveFile,
+            onRemoveFileButtonClick: { _ in
+                showRemoveDataFileModal = true
+            }
         )
         .alert(sivaMessage, isPresented: $showSivaMessage, actions: alertActions)
         .background(fileSaverBackground)

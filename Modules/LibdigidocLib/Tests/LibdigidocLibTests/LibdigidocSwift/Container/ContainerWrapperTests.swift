@@ -350,7 +350,11 @@ struct ContainerWrapperTests {
             try? FileManager.default.removeItem(at: tempDirectory)
         }
 
-        let updatedContainerWrapper = try await containerWrapper.removeSignature(index: 0, containerFile: localExampleContainer)
+        let updatedContainerWrapper = try await containerWrapper.removeSignature(
+            index: 0,
+            containerFile: localExampleContainer
+        )
+
         let signatures = await updatedContainerWrapper.getSignatures()
 
         #expect(signatures.count == 1)
@@ -372,6 +376,66 @@ struct ContainerWrapperTests {
             return
         } catch let error as DigiDocError {
             #expect(error.localizedDescription.contains("Incorrect signature id"))
+        } catch {
+            Issue.record("Unexpected error: \(error)")
+            return
+        }
+    }
+
+    @Test
+    func removeDataFile_success() async throws {
+        let containerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
+
+        guard let exampleContainer = containerFile else {
+            Issue.record("Unable to get resource file")
+            return
+        }
+
+        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+            subfolder: "ContainerWrapperTests"
+        )
+
+        let localExampleContainer = tempDirectory.appendingPathComponent(
+            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        )
+
+        try FileManager.default.copyItem(
+            at: exampleContainer,
+            to: localExampleContainer
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: localExampleContainer)
+            try? FileManager.default.removeItem(at: tempDirectory)
+        }
+
+        let updatedContainerWrapper = try await containerWrapper.removeDataFile(
+            index: 0,
+            containerFile: localExampleContainer
+        )
+
+        let dataFiles = await updatedContainerWrapper.getDataFiles()
+
+        #expect(dataFiles.count == 1)
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenDataFileDoesNotExist() async throws {
+        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+
+        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
+
+        defer {
+            try? FileManager.default.removeItem(at: containerFile)
+        }
+
+        do {
+            try await containerWrapper.removeDataFile(index: 99, containerFile: containerFile)
+            Issue.record("Expected an error")
+            return
+
+        } catch let error as DigiDocError {
+            #expect(error.localizedDescription.contains("Incorrect document id"))
         } catch {
             Issue.record("Unexpected error: \(error)")
             return

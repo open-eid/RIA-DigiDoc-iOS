@@ -49,7 +49,7 @@ enum AppColors {
         let onSecondaryContainer = Color(hex: 0xFF3D4960)
         let onTertiary = Color.white
         let onTertiaryContainer = Color(hex: 0xFFF3C7FF)
-        let onError = Color.white
+        let onError = Color(hex: 0xFF690005)
         let onErrorContainer = Color(hex: 0xFF410002)
 
         let background = Color.white

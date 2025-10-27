@@ -42,6 +42,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     @Published var isTimestampedContainer = false
     @Published var isCadesContainer = false
     @Published var isXadesContainer = false
+    @Published var isLastDataFileRemoved = false
     @Published private(set) var containerNotifications: [ContainerNotificationType] = []
     @Published private(set) var errorMessage: (String, [String])?
 
@@ -334,9 +335,11 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         return await sivaRepository.isTimestampedContainer(signedContainer: container)
     }
 
-    func removeSignature(signature: SignatureWrapper) async {
+    func removeSignature(_ signature: SignatureWrapper) async {
         guard let container = signedContainer, let containerFile = containerURL else {
-            SigningViewModel.logger.error("Unable to remove signature from container. SignedContainer or containerURL is nil")
+            SigningViewModel.logger.error(
+                "Unable to remove signature from container. SignedContainer or containerURL is nil"
+            )
             errorMessage = ("Failed to remove signature from container", [])
             return
         }
@@ -347,6 +350,40 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         } catch {
             SigningViewModel.logger.error("Unable to remove signature from container. \(error)")
             errorMessage = ("Failed to remove signature from container", [])
+            return
+        }
+    }
+
+    func removeDataFile(_ dataFile: DataFileWrapper) async {
+        guard let container = signedContainer, let containerFile = containerURL else {
+            SigningViewModel.logger.error(
+                "Unable to remove file from container. SignedContainer or containerURL is nil"
+            )
+            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
+            return
+        }
+
+        guard let index = dataFiles.firstIndex(where: { $0.fileId == dataFile.fileId }) else {
+            SigningViewModel.logger.error(
+                "Unable to remove file from container. File not found in container"
+            )
+            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
+            return
+        }
+
+        do {
+            if dataFiles.count == 1 {
+                try fileManager.removeItem(at: containerFile)
+                isLastDataFileRemoved = true
+                return
+            }
+
+            let container = try await container.removeDataFile(index: index, containerFile: containerFile)
+            await loadContainerData(signedContainer: container)
+            return
+        } catch {
+            SigningViewModel.logger.error("Unable to remove file from container. \(error)")
+            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
             return
         }
     }

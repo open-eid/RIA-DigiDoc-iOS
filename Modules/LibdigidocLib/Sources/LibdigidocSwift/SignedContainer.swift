@@ -225,6 +225,20 @@ public actor SignedContainer: SignedContainerProtocol {
             containerUtil: containerUtil
         )
     }
+
+    @discardableResult
+    public func removeDataFile(index: Int, containerFile: URL) async throws -> SignedContainerProtocol {
+        let containerWrapper = try await container.removeDataFile(index: index, containerFile: containerFile)
+
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: true,
+            container: containerWrapper,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
+    }
 }
 
 extension SignedContainer {

@@ -39,6 +39,7 @@ public protocol SignedContainerProtocol: Sendable, AnyObject {
     func isCades() async -> Bool
     func isXades() async -> Bool
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> SignedContainerProtocol
+    @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> SignedContainerProtocol
 }
 
 extension SignedContainerProtocol {

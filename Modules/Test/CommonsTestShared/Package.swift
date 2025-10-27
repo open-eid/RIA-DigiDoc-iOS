@@ -29,7 +29,8 @@ let package = Package(
                 "CommonsLib"
             ],
             resources: [
-                .process("Resources/example.asice")
+                .process("Resources/example.asice"),
+                .process("Resources/example_no_signatures.asice")
             ],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency"),

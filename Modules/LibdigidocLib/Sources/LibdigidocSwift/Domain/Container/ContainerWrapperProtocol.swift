@@ -30,6 +30,7 @@ public protocol ContainerWrapperProtocol: Sendable {
     @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> Bool
     func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
+    @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
 }
 
 extension ContainerWrapperProtocol {
