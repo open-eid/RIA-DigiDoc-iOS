@@ -182,53 +182,35 @@ extension URL {
     }
 
     public func validURL(
-        fileUtil: FileUtilProtocol = fileUtil(),
-        fileManager: FileManagerProtocol = fileManager()
-    ) throws -> URL {
+        fileUtil: FileUtilProtocol = fileUtil()
+    ) async throws -> URL {
         _ = self.startAccessingSecurityScopedResource()
 
         defer {
             self.stopAccessingSecurityScopedResource()
         }
-        let validFileInApp = try fileUtil.getValidFileInApp(currentURL: self)
+        let validFileInApp = await fileUtil.getValidPath(url: self)
 
         if let validFileURL = validFileInApp {
             return validFileURL
         }
 
         // Check if file is opened externally (outside of application)
-        let appGroupURL = try Directories.getSharedFolder(fileManager: fileManager)
-        let resolvedAppGroupURL = appGroupURL.deletingLastPathComponent().resolvingSymlinksInPath()
-
-        let normalizedURL = FilePath(stringLiteral: self.resolvingSymlinksInPath().path).lexicallyNormalized()
-
-        let resolvedAppGroupFilePath = FilePath(
-            stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path
+        let fileFromAppGroup = fileUtil.getFileUrlFromAppGroup(
+            self,
+            appGroupIdentifier: Constants.Identifier.Group
         )
 
-        let isFromAppGroup = normalizedURL.starts(with: resolvedAppGroupFilePath)
-
-        if isFromAppGroup {
-            return self
+        if let fileUrl = fileFromAppGroup {
+            return fileUrl
         }
 
         // Check if file is opened from iCloud
         if fileUtil.isFileFromiCloud(fileURL: self) {
             if !fileUtil.isFileDownloadedFromiCloud(fileURL: self) {
+                let downloadedFileUrl = await fileUtil.downloadFileFromiCloud(fileURL: self)
 
-                var fileLocationURL: URL?
-
-                fileUtil.downloadFileFromiCloud(fileURL: self) { downloadedFileUrl in
-                    if let fileUrl = downloadedFileUrl {
-                        DispatchQueue.main.async {
-                            fileLocationURL = fileUrl
-                        }
-                    } else {
-                        return
-                    }
-                }
-
-                guard let fileLocation = fileLocationURL else {
+                guard let fileLocation = downloadedFileUrl else {
                     throw URLError(.badURL)
                 }
 

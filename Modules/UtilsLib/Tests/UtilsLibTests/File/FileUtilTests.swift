@@ -38,20 +38,37 @@ struct FileUtilTests {
         self.fileUtil = FileUtil(fileManager: mockFileManager)
     }
 
-    @Test(.container)
+    @Test
     func getMimeTypeFromZipFile_returnCorrectMimeType() async throws {
         let asiceMimetype = CommonsLib.Constants.MimeType.Asice
         let zipFileURL = try TestContainerUtil.createMockContainer(
             with: ["mimetype": asiceMimetype],
             containerExtension: "zip")
 
+        mockFileManager.createDirectoryHandler = { url, _, _ in
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        }
+
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.temporaryDirectory = sharedContainerURL
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+
         defer {
             try? FileManager.default.removeItem(at: zipFileURL)
+            try? FileManager.default.removeItem(
+                at: mockFileManager.temporaryDirectory.appendingPathComponent("com.apple.dt.xctest.tool")
+            )
         }
 
         let fileNameToFind = "mimetype"
 
-        let fileUtil = FileUtil(fileManager: Container.shared.fileManager())
         let fileFromZip = try #require(await fileUtil.getFileFromZipFile(
             from: zipFileURL,
             fileNameToFind: fileNameToFind
@@ -82,80 +99,172 @@ struct FileUtilTests {
     }
 
     @Test
-    func getValidFileInApp_returnFileURLWhenFileExistsInAppDirectory() async throws {
-        let fileURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
+    func getValidPath_successWithAppContainerPath() async throws {
+        let appContainerFileURL = URL(fileURLWithPath: "/var/mobile/Containers/Data/Application/mockFile.txt")
 
-        guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
-        ) else {
-            Issue.record("Expected valid shared container URL")
-            return
-        }
+        let result = await fileUtil.getValidPath(url: appContainerFileURL)
 
-        mockFileManager.urlsHandler = { _, _ in [fileURL] }
-        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
-        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [fileURL] }
-
-        let result = try fileUtil.getValidFileInApp(currentURL: fileURL)
-
-        #expect(fileURL.resolvingSymlinksInPath() == result)
+        #expect(result == appContainerFileURL)
     }
 
     @Test
-    func getValidFileInApp_returnNilWhenFileNotInDirectories() async throws {
+    func getValidPath_successWithMailUrl() async throws {
+        let mailFileURL = URL(fileURLWithPath: "/var/mobile/Library/Mail")
+
+        let result = await fileUtil.getValidPath(url: mailFileURL)
+
+        #expect(result == mailFileURL)
+    }
+
+    @Test
+    func getValidPath_returnNilWhenFileNotInDirectories() async throws {
         let nonExistentFileURL = URL(fileURLWithPath: "someFolder")
 
-        let result = try fileUtil.getValidFileInApp(currentURL: nonExistentFileURL)
+        let result = await fileUtil.getValidPath(url: nonExistentFileURL)
 
         #expect(result == nil)
     }
 
     @Test
-    func getValidFileInApp_ContinueSearchAndReturnSameDirectoryURLWhenDirectoryAccessFails() async throws {
-        let testDirectory = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
-        let fileURL = testDirectory.appendingPathComponent("testFile.txt")
-        let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistent-\(UUID().uuidString)")
+    func getFileUrlFromAppGroup_returnNilWhenFileNotInAppGroup() async throws {
+        let groupIdentifier = Constants.Identifier.Group
+        let nonExistentFileURL = URL(fileURLWithPath: "/mock/nonExistent/path/file.txt")
 
-        mockFileManager.urlsHandler = { _, _ in [testDirectory] }
-        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [fileURL] }
-
-        let result = try fileUtil.getValidFileInApp(currentURL: nonExistentDirectory)
-
-        #expect(nonExistentDirectory.resolvingSymlinksInPath() == result)
-    }
-
-    @Test
-    func isFileFromAppGroup_returnTrueWhenFileInsideAppGroup() async throws {
-
-        mockFileManager.containerURLHandler = { _ in
-            FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
-            )
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: groupIdentifier
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
         }
 
-        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
 
-        let appGroupFolder = try Directories.getSharedFolder(fileManager: mockFileManager)
-        let fileInAppGroup = appGroupFolder.appendingPathComponent("file.txt")
+        let result = fileUtil.getFileUrlFromAppGroup(nonExistentFileURL, appGroupIdentifier: groupIdentifier)
 
-        let result = try fileUtil.isFileFromAppGroup(url: fileInAppGroup, appGroupURL: appGroupFolder)
-
-        #expect(result)
+        #expect(result == nil)
     }
 
     @Test
-    func isFileFromAppGroup_returnFalseWhenFileOutsideAppGroup() async throws {
-        let mockFileUrl = URL(fileURLWithPath: "/data/example/Documents/file.txt")
-        let mockAppGroupUrl = URL(fileURLWithPath: "/data/example/Library/GroupContainers/group.com.example")
+    func isFileInsideMailFolder_successWithFileInsideMailSubfolder() async throws {
+        let url = URL(fileURLWithPath: "/var/mobile/Library/Mail/Inbox/message.eml")
+        let isFileInsideMailFolder = fileUtil.isFileInsideMailFolder(url)
+        #expect(isFileInsideMailFolder)
+    }
 
-        mockFileManager.containerURLHandler = { _ in mockFileUrl }
-        mockFileManager.fileExistsHandler = { _ in true }
+    @Test
+    func isFileInsideMailFolder_successWithTrailingSlash() async throws {
+        let url = URL(fileURLWithPath: "/var/mobile/Library/Mail/")
+        let isFileInsideMailFolder = fileUtil.isFileInsideMailFolder(url)
+        #expect(isFileInsideMailFolder)
+    }
 
-        let result = try fileUtil.isFileFromAppGroup(
-            url: mockFileUrl, appGroupURL: mockAppGroupUrl
-        )
+    @Test
+    func isFileInsideMailFolder_returnFalseWhenFileOutsideMailFolder() async throws {
+        let url = URL(fileURLWithPath: "/var/mobile/Library/OtherApp/file.txt")
+        let isFileInsideMailFolder = fileUtil.isFileInsideMailFolder(url)
+        #expect(!isFileInsideMailFolder)
+    }
 
-        #expect(!result)
+    @Test
+    func getAllFileURLs_success() async throws {
+        let folderURL = URL(fileURLWithPath: "/mock/folder")
+        let expectedFiles = [
+            URL(fileURLWithPath: "/mock/folder/file1.txt"),
+            URL(fileURLWithPath: "/mock/folder/file2.txt")
+        ]
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in expectedFiles }
+
+        let result = fileUtil.getAllFileURLs(from: folderURL)
+
+        #expect(result == expectedFiles)
+    }
+
+    @Test
+    func getAllFileURLs_successWhenFolderIsEmpty() async throws {
+        let folderURL = URL(fileURLWithPath: "/mock/empty")
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [] }
+
+        let result = fileUtil.getAllFileURLs(from: folderURL)
+
+        #expect(result.isEmpty)
+    }
+
+    @Test
+    func getAllFileURLs_returnEmptyArrayWhenUnableToGetContentsOfFolderDirectory() async throws {
+        let folderURL = URL(fileURLWithPath: "/mock/error")
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        let result = fileUtil.getAllFileURLs(from: folderURL)
+
+        #expect(result.isEmpty)
+    }
+
+    @Test
+    func removeSharedFiles_success() async throws {
+        let sharedFolderURL = URL(fileURLWithPath: "/mock/shared")
+        let files = [
+            sharedFolderURL.appendingPathComponent("file1.txt"),
+            sharedFolderURL.appendingPathComponent("file2.txt")
+        ]
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in files }
+        mockFileManager.fileExistsAtPathHandler = { path, isDirectoryPtr in
+            if path == sharedFolderURL.path {
+                isDirectoryPtr?.pointee = ObjCBool(true)
+                return true
+            }
+            return false
+        }
+
+        try fileUtil.removeSharedFiles(url: sharedFolderURL)
+
+        #expect(mockFileManager.removeItemArgValues == files)
+    }
+
+    @Test
+    func removeSharedFiles_throwErrorWhenUnableToRemoveItem() async throws {
+        let sharedFolderURL = URL(fileURLWithPath: "/mock/shared")
+        let files = [
+            sharedFolderURL.appendingPathComponent("file1.txt"),
+            sharedFolderURL.appendingPathComponent("file2.txt")
+        ]
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in files }
+        mockFileManager.fileExistsAtPathHandler = { path, isDirectoryPtr in
+            if path == sharedFolderURL.path {
+                isDirectoryPtr?.pointee = ObjCBool(true)
+                return true
+            }
+            return false
+        }
+
+        mockFileManager.removeItemHandler = { _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        do {
+            try fileUtil.removeSharedFiles(url: sharedFolderURL)
+            Issue.record("Expected to throw an error")
+            return
+        } catch {
+            #expect(true)
+        }
+    }
+
+    @Test
+    func removeSharedFiles_doesntRemoveAnythingWhenNoFilesInDirectory() async throws {
+        let sharedFolderURL = URL(fileURLWithPath: "/mock/shared")
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [] }
+
+        try fileUtil.removeSharedFiles(url: sharedFolderURL)
+
+        #expect(mockFileManager.removeItemCallCount == 0)
     }
 
     @Test

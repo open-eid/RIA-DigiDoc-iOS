@@ -43,9 +43,9 @@ public struct FileUtil: FileUtilProtocol {
         let archive = try Archive(url: zipFileURL, accessMode: .read)
 
         if let entry = archive.first(where: { $0.path.contains(fileNameToFind) }) {
-            let extractedFile = try Directories
+            let extractedFile = try await Directories
                 .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
-                .validURL(fileUtil: self, fileManager: fileManager)
+                .validURL(fileUtil: self)
                 .appendingPathComponent(entry.path)
 
             if fileManager.fileExists(atPath: extractedFile.path) {
@@ -66,72 +66,88 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     // Check file path so its valid and is not modified by someone else
-    public func getValidFileInApp(currentURL: URL) throws -> URL? {
-        let directories: [FileManager.SearchPathDirectory] = [
-            .applicationDirectory,
-            .documentDirectory,
-            .downloadsDirectory,
-            .userDirectory,
-            .libraryDirectory,
-            .allLibrariesDirectory
+    public func getValidPath(url: URL) async -> URL? {
+        FileUtil.logger.debug("Getting valid path for file: \(url)")
+
+        let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
+        let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
+
+        let containerBasePaths = [
+            URL(fileURLWithPath: "/private/var/mobile/Containers/Data/Application/"),
+            URL(fileURLWithPath: "/var/mobile/Containers/Data/Application/")
         ]
 
-        for directory in directories {
-            guard let directoryURL = fileManager.urls(for: directory, in: .userDomainMask).first else {
-                continue
+        for containerBasePath in containerBasePaths {
+            let appContainerPath = FilePath(containerBasePath
+                .resolvingSymlinksInPath()
+                .standardizedFileURL.path)
+                .lexicallyNormalized()
+
+            if filePath.starts(with: appContainerPath) {
+                FileUtil.logger.debug("Resolved valid file path: \(resolvedURL)")
+                return resolvedURL
             }
+        }
 
-            var subdirectoryURLs = [URL]()
+        // Check if file is opened externally (outside of application)
+        let fileFromAppGroup = getFileUrlFromAppGroup(resolvedURL, appGroupIdentifier: Constants.Identifier.Group)
+        if let fileUrl = fileFromAppGroup {
+            FileUtil.logger.debug("File is from app group: \(fileUrl)")
+            return fileUrl
+        }
 
-            do {
-                subdirectoryURLs = try fileManager.contentsOfDirectory(
-                    at: directoryURL,
-                    includingPropertiesForKeys: nil,
-                    options: .skipsHiddenFiles
-                )
-            } catch {
-                continue
-            }
+        if isFileInsideMailFolder(resolvedURL) {
+            FileUtil.logger.debug("File is from Mail app")
+            return resolvedURL
+        } else {
+            FileUtil.logger.debug("Checking if file is from iCloud")
+            // Check if file is opened from iCloud
+            if isFileFromiCloud(fileURL: resolvedURL) {
+                if !isFileDownloadedFromiCloud(fileURL: resolvedURL) {
+                    FileUtil.logger.debug(
+                        "File '\(resolvedURL.lastPathComponent)' from iCloud is not downloaded. Downloading..."
+                    )
 
-            let resolvedCurrentUrl = currentURL.resolvingSymlinksInPath()
-
-            for subdirectoryURL in subdirectoryURLs {
-                let resolvedSubdirectoryURL = subdirectoryURL.resolvingSymlinksInPath()
-                let resolvedSubdirectoryPath = resolvedSubdirectoryURL.path
-
-                if FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
-                    with: FilePath(stringLiteral: resolvedSubdirectoryPath)
-                ) ||
-                    FilePath(stringLiteral: resolvedCurrentUrl.path).lexicallyNormalized().starts(
-                        with: FilePath(
-                            stringLiteral: fileManager.temporaryDirectory.resolvingSymlinksInPath().path
-                        )
-                    ) {
-                    return resolvedCurrentUrl
+                    let downloadedFileUrl = await downloadFileFromiCloud(fileURL: resolvedURL)
+                    if let fileUrl = downloadedFileUrl {
+                        FileUtil.logger.debug("File '\(resolvedURL.lastPathComponent)' downloaded from iCloud")
+                        return fileUrl
+                    } else {
+                        FileUtil.logger.debug("Unable to download file '\(resolvedURL.lastPathComponent)' from iCloud")
+                        return nil
+                    }
+                } else {
+                    FileUtil.logger.debug("File '\(resolvedURL.lastPathComponent)' from iCloud is already downloaded")
+                    return url
                 }
             }
         }
+
+        FileUtil.logger.debug("File is NOT from iCloud")
         return nil
     }
 
-    // Check if file is opened externally (outside of application)
-    public func isFileFromAppGroup(url: URL, appGroupURL: URL? = nil) throws -> Bool {
-        let appGroupUrl = try appGroupURL ?? Directories.getSharedFolder(fileManager: fileManager)
-        let resolvedAppGroupURL = appGroupUrl.deletingLastPathComponent().resolvingSymlinksInPath()
+    public func getFileUrlFromAppGroup(_ url: URL, appGroupIdentifier: String) -> URL? {
+        let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
+        let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
 
-        let normalizedURL = FilePath(stringLiteral: url.resolvingSymlinksInPath().path).lexicallyNormalized()
-
-        let resolvedAppGroupFilePath = FilePath(
-            stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path
-        )
-
-        let isFromAppGroup = normalizedURL.starts(with: resolvedAppGroupFilePath)
-
-        if isFromAppGroup {
-            return true
+        guard let appGroupURL = fileManager.containerURL(
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
+        ) else {
+            return nil
         }
 
-        return false
+        let resolvedAppGroupURL = appGroupURL.resolvingSymlinksInPath()
+        let normalizedURL = URL(fileURLWithPath: String(decoding: filePath))
+        let resolvedAppGroupFilePath = FilePath(stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path)
+
+        let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath)
+        if isFromAppGroup {
+            FileUtil.logger.debug("File is from app group: \(normalizedURL)")
+            return normalizedURL
+        }
+
+        return nil
     }
 
     public func isFileFromiCloud(fileURL: URL) -> Bool {
@@ -154,42 +170,69 @@ public struct FileUtil: FileUtilProtocol {
         do {
             let values = try fileURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
 
-            if let downloadingStatus = values.ubiquitousItemDownloadingStatus,
-               downloadingStatus == .current {
+            if let downloadingStatus = values.ubiquitousItemDownloadingStatus, downloadingStatus == .current {
+                FileUtil.logger.debug("File downloaded from iCloud")
                 return true
             }
         } catch {
-            let errorMessage = String(format: "Unable to check iCloud file '%@' download status: %@",
-                                      fileURL.lastPathComponent,
-                                      error.localizedDescription)
+            let errorMessage = String(
+                format: "Unable to check iCloud file '%@' download status: %@",
+                fileURL.lastPathComponent,
+                error.localizedDescription
+            )
             FileUtil.logger.error("\(errorMessage)")
         }
 
         return false
     }
 
-    public func downloadFileFromiCloud(
-        fileURL: URL,
-        completion: @escaping @Sendable (URL?) -> Void
-    ) {
+    public func downloadFileFromiCloud(fileURL: URL) async -> URL? {
         do {
             try fileManager.startDownloadingUbiquitousItem(at: fileURL)
             FileUtil.logger.debug("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
 
-            Task { @Sendable in
-                while !isFileDownloadedFromiCloud(fileURL: fileURL) {
-                    try await Task.sleep(nanoseconds: 500_000_000)
-                }
-                FileUtil.logger.debug("iCloud file '\(fileURL.lastPathComponent)' downloaded")
-                completion(fileURL)
+            while !isFileDownloadedFromiCloud(fileURL: fileURL) {
+                try await Task.sleep(nanoseconds: 500_000_000)
             }
+
+            FileUtil.logger.debug("iCloud file '\(fileURL.lastPathComponent)' downloaded")
+            return fileURL
         } catch {
-            FileUtil.logger
-                .error(
-                    "Unable to start iCloud file '\(fileURL.lastPathComponent)' download: \(error.localizedDescription)"
-                )
-            completion(nil)
+            FileUtil.logger.error(
+                "Unable to start iCloud file '\(fileURL.lastPathComponent)' download: \(error.localizedDescription)"
+            )
+            return nil
         }
+    }
+
+    public func isFileInsideMailFolder(_ url: URL) -> Bool {
+        let mailFolderPath = FilePath(stringLiteral: "/var/mobile/Library/Mail").lexicallyNormalized()
+        let filePath = FilePath(stringLiteral: url.path).lexicallyNormalized()
+
+        if filePath == mailFolderPath {
+            FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+            return true
+        }
+
+        if filePath.starts(with: mailFolderPath) {
+            let mailPathString = mailFolderPath.string
+            let filePathString = filePath.string
+
+            if filePathString.count == mailPathString.count {
+                FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+                return true
+            }
+
+            let index = filePathString.index(filePathString.startIndex, offsetBy: mailPathString.count)
+            if filePathString[index] == "/" {
+                FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+                return true
+            }
+        }
+
+        FileUtil.logger.debug("File '\(url.lastPathComponent)' is NOT from Mail app")
+
+        return false
     }
 
     public func getAllFileURLs(from folderURL: URL) -> [URL] {

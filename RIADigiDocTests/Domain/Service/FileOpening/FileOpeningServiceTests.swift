@@ -95,7 +95,7 @@ struct FileOpeningServiceTests {
 
         let result: Result<[URL], Error> = .success(urls)
 
-        mockFileUtil.getValidFileInAppHandler = { _ in tempURL }
+        mockFileUtil.getValidPathHandler = { _ in tempURL }
 
         mockFileManager.urlsHandler = { _, _ in [tempURL] }
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL2] }
@@ -115,7 +115,7 @@ struct FileOpeningServiceTests {
 
         let result: Result<[URL], Error> = .success(urls)
 
-        mockFileUtil.getValidFileInAppHandler = { _ in tempURL }
+        mockFileUtil.getValidPathHandler = { _ in tempURL }
 
         mockFileManager.urlsHandler = { _, _ in [tempURL] }
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [tempFileURL, tempFileURL] }

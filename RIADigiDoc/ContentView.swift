@@ -93,7 +93,7 @@ struct ContentView: View {
                 .onAppear {
                     if scenePhase == .active {
                         sharedFilesLoadingTask = Task {
-                            let sharedFiles = viewModel.getSharedFiles()
+                            let sharedFiles = await viewModel.getSharedFiles()
                             if !sharedFiles.isEmpty {
                                 openedUrls = sharedFiles
                             }
@@ -105,7 +105,7 @@ struct ContentView: View {
                         sharedFilesLoadingTask?.cancel()
 
                         sharedFilesLoadingTask = Task {
-                            let sharedFiles = viewModel.getSharedFiles()
+                            let sharedFiles = await viewModel.getSharedFiles()
                             if !sharedFiles.isEmpty {
                                 openedUrls = sharedFiles
                             }
