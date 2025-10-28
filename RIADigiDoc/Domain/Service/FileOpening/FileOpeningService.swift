@@ -53,12 +53,13 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             var validFiles: [URL] = []
 
             for url in urls {
-                let validUrl = try url.validURL(fileUtil: fileUtil, fileManager: fileManager)
-                let validFileUrl = try fileUtil.getValidFileInApp(currentURL: validUrl)
-                let requiresScopedAccess = try validFileUrl == nil && !fileUtil.isFileFromAppGroup(
-                    url: validUrl,
-                    appGroupURL: nil
+                let validUrl = try await url.validURL(fileUtil: fileUtil)
+                let validFileUrl = fileUtil.getFileUrlFromAppGroup(
+                    validUrl,
+                    appGroupIdentifier: Constants.Identifier.Group
                 )
+
+                let requiresScopedAccess = validFileUrl == nil
 
                 if requiresScopedAccess {
                     guard validUrl.startAccessingSecurityScopedResource() else {

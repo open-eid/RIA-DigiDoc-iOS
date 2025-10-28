@@ -24,5 +24,5 @@ import UtilsLib
 /// @mockable
 @MainActor
 public protocol ContentViewModelProtocol: Sendable {
-    func getSharedFiles() -> [URL]
+    func getSharedFiles() async -> [URL]
 }

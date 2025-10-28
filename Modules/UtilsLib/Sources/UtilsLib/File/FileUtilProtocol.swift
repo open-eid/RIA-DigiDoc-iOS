@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import System
 import FactoryKit
 import CommonsLib
 
@@ -30,18 +31,17 @@ public protocol FileUtilProtocol: Sendable {
 
     func fileExists(fileLocation: URL?) -> Bool
 
-    func getValidFileInApp(currentURL: URL) throws -> URL?
+    func getValidPath(url: URL) async -> URL?
 
-    func isFileFromAppGroup(url: URL, appGroupURL: URL?) throws -> Bool
+    func getFileUrlFromAppGroup(_ url: URL, appGroupIdentifier: String) -> URL?
 
     func isFileFromiCloud(fileURL: URL) -> Bool
 
     func isFileDownloadedFromiCloud(fileURL: URL) -> Bool
 
-    func downloadFileFromiCloud(
-        fileURL: URL,
-        completion: @escaping @Sendable (URL?) -> Void
-    )
+    func downloadFileFromiCloud(fileURL: URL) async -> URL?
+
+    func isFileInsideMailFolder(_ url: URL) -> Bool
 
     func getAllFileURLs(from folderURL: URL) -> [URL]
 

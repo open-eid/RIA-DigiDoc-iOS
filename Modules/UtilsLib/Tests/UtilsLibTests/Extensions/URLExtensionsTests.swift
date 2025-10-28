@@ -49,7 +49,7 @@ struct URLExtensionsTests {
 
         let mockFile = URL(fileURLWithPath: "/mock/path/text.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { _ in
+        mockFileUtil.getValidPathHandler = { _ in
             return mockFile
         }
 
@@ -193,77 +193,56 @@ struct URLExtensionsTests {
     }
 
     @Test
-    func validURL_returnValidURL() throws {
+    func validURL_returnValidURL() async throws {
         let nonExistentFileLocation = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { _ in
+        mockFileUtil.getValidPathHandler = { _ in
             return nonExistentFileLocation
         }
 
-        let result = try nonExistentFileLocation.validURL(fileUtil: mockFileUtil)
+        let result = try await nonExistentFileLocation.validURL(fileUtil: mockFileUtil)
 
         #expect(nonExistentFileLocation == result)
     }
 
     @Test
-    func validURL_returnSameURLWhenFileFromAppGroup() throws {
-        mockFileUtil.getValidFileInAppHandler = { _ in
+    func validURL_returnValidAppGroupURL() async throws {
+        let mockFile = URL(fileURLWithPath: "/path/to/valid/file.txt")
+
+        mockFileUtil.getValidPathHandler = { _ in
             return nil
         }
 
-        guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
-        ) else {
-            Issue.record("Expected valid shared container URL")
-            return
-        }
+        mockFileUtil.getFileUrlFromAppGroupHandler = { _, _ in mockFile }
 
-        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        let result = try await mockFile.validURL(fileUtil: mockFileUtil)
 
-        do {
-            let fileURL = try Directories.getSharedFolder(
-                fileManager: mockFileManager
-            ).appendingPathComponent("testfolder").appendingPathComponent(
-                "testFile.txt"
-            )
-
-            let testURL = URL(fileURLWithPath: fileURL.path)
-
-            let result = try testURL.validURL(
-                fileUtil: mockFileUtil,
-                fileManager: mockFileManager
-            )
-
-            #expect(testURL == result)
-        } catch {
-            Issue.record("Could not get shared folder")
-            return
-        }
+        #expect(mockFile == result)
     }
 
     @Test
-    func validURL_returnURLWhenFileFromiCloudDownloaded() throws {
-        mockFileUtil.getValidFileInAppHandler = { _ in nil }
+    func validURL_returnURLWhenFileFromiCloudDownloaded() async throws {
+        mockFileUtil.getValidPathHandler = { _ in nil }
         mockFileUtil.isFileFromiCloudHandler = { _ in true }
         mockFileUtil.isFileDownloadedFromiCloudHandler = { _ in true }
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        let result = try testURL.validURL(fileUtil: mockFileUtil)
+        let result = try await testURL.validURL(fileUtil: mockFileUtil)
 
         #expect(testURL == result)
     }
 
     @Test
-    func validURL_throwErrorWhenInvalidURL() throws {
+    func validURL_throwErrorWhenInvalidURL() async throws {
 
         let testURL = URL(fileURLWithPath: "/path/to/valid/file.txt")
 
-        mockFileUtil.getValidFileInAppHandler = { _ in nil }
+        mockFileUtil.getValidPathHandler = { _ in nil }
         mockFileUtil.isFileFromiCloudHandler = { _ in false }
 
         do {
-            _ = try testURL.validURL(fileUtil: mockFileUtil)
+            _ = try await testURL.validURL(fileUtil: mockFileUtil)
             Issue.record("Expected .badURL error")
             return
         } catch let error as URLError {
