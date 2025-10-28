@@ -166,4 +166,81 @@ final class DataStoreTests {
         await dataStore.setRelyingPartyOption(.manualSetting)
         #expect(await dataStore.getRelyingPartyOption() == .manualSetting)
     }
+
+    // MARK: - Encryption Service Settings Methods
+
+    @Test
+    func getEncryptionCdocOption_success() async throws {
+        let retrievedOption = await dataStore.getEncryptionCdocOption()
+        let allowedOptions: [EncryptionCdocOption] = [
+            .cdoc1,
+            .cdoc2
+        ]
+        #expect(allowedOptions.contains(retrievedOption))
+    }
+
+    @Test
+    func setEncryptionCdocOption_success() async throws {
+        await dataStore.setEncryptionCdocOption(.cdoc1)
+        #expect(await dataStore.getEncryptionCdocOption() == .cdoc1)
+        await dataStore.setEncryptionCdocOption(.cdoc2)
+        #expect(await dataStore.getEncryptionCdocOption() == .cdoc2)
+    }
+
+    @Test
+    func getEncryptionUseKeyTransfer_success() async throws {
+        let retrieved = await dataStore.getEncryptionUseKeyTransfer()
+        #expect(retrieved == false)
+    }
+
+    @Test
+    func setEncryptionUseKeyTransfer_success() async throws {
+        await dataStore.setEncryptionUseKeyTransfer(true)
+        #expect(await dataStore.getEncryptionUseKeyTransfer() == true)
+        await dataStore.setEncryptionUseKeyTransfer(false)
+        #expect(await dataStore.getEncryptionUseKeyTransfer() == false)
+    }
+
+    @Test
+    func getEncryptionServerId_success() async throws {
+        let retrievedOption = await dataStore.getEncryptionServerId()
+        let allowedOptions: [EncryptionServerOptionId] = [
+            .defaultSetting,
+            .manualSetting
+        ]
+        #expect(allowedOptions.contains(retrievedOption))
+    }
+
+    @Test
+    func setEncryptionServerId_success() async throws {
+        await dataStore.setEncryptionServerId(.defaultSetting)
+        #expect(await dataStore.getEncryptionServerId() == .defaultSetting)
+        await dataStore.setEncryptionServerId(.manualSetting)
+        #expect(await dataStore.getEncryptionServerId() == .manualSetting)
+    }
+
+    @Test
+    func getEncryptionServerInfo_success() async throws {
+        let retrievedInfo = await dataStore.getEncryptionServerInfo()
+
+        #expect(retrievedInfo.uuid == "")
+        #expect(retrievedInfo.fetchURL == "")
+        #expect(retrievedInfo.postURL == "")
+
+    }
+
+    @Test
+    func setEncryptionServerInfo_success() async throws {
+        let testInfo = EncryptionServerInfo(
+            uuid: "testUUID",
+            fetchURL: "testFetchURL",
+            postURL: "testPostURL"
+        )
+
+        await dataStore.setEncryptionServerInfo(testInfo)
+        let retrievedInfo = await dataStore.getEncryptionServerInfo()
+        #expect(testInfo.uuid == retrievedInfo.uuid)
+        #expect(testInfo.fetchURL == retrievedInfo.fetchURL)
+        #expect(testInfo.postURL == retrievedInfo.postURL)
+    }
 }
