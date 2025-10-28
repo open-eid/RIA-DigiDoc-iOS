@@ -32,7 +32,7 @@ final class ValidationSettingsViewModelTests {
     private let mockDataStore: DataStoreProtocolMock!
     private let mockFileManager: FileManagerProtocolMock!
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
-    private let mockCertificateUtil: CertificateUtilProtocolMock
+    private let mockCertificateUtil: CertificateUtilProtocolMock!
 
     let mockConfigProvider: ConfigurationProvider!
 
@@ -67,6 +67,7 @@ final class ValidationSettingsViewModelTests {
     }
 
     // MARK: - init tests
+
     @Test
     func init_successWithEmptyUrl() async throws {
         mockDataStore.getValidationServiceURLHandler = {
@@ -169,7 +170,7 @@ final class ValidationSettingsViewModelTests {
         #expect(label == "")
     }
 
-    // MARK: - importTSACert test
+    // MARK: - Import Cert tests
 
     @Test
     func importSiVaCert_success() async throws {
@@ -189,6 +190,5 @@ final class ValidationSettingsViewModelTests {
         await viewModel.importSiVaCert(from: certURL)
 
         #expect(mockAdvancedSettingsRepository.importCertificateCallCount == 1)
-
     }
 }

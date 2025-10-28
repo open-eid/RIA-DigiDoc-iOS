@@ -132,13 +132,13 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Observab
 
         let centralConfServerInfo = getCentralCDOC2Conf()
         if serverId == .defaultSetting {
-            await dataStore.setEncryptionServerInfo(centralConfServerInfo)
+            serverInfo = centralConfServerInfo
         } else {
             serverInfo.uuid = serverInfo.uuid.trimmingCharacters(in: .whitespacesAndNewlines)
             serverInfo.fetchURL = serverInfo.fetchURL.trimmingCharacters(in: .whitespacesAndNewlines)
             serverInfo.postURL = serverInfo.postURL.trimmingCharacters(in: .whitespacesAndNewlines)
-            await dataStore.setEncryptionServerInfo(serverInfo)
         }
+        await dataStore.setEncryptionServerInfo(serverInfo)
     }
 
     // MARK: - Cert Info Getters
