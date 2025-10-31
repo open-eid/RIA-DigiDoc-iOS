@@ -1,0 +1,73 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import SwiftUI
+import FactoryKit
+
+struct ControlCodeView: View {
+    @EnvironmentObject private var languageSettings: LanguageSettings
+
+    @AppTheme private var theme
+    @AppTypography private var typography
+
+    @State var icon: String
+
+    @State var controlCode: String = "1234"
+
+    let onSuccess: () -> Void
+
+    var body: some View {
+        VStack(alignment: .center) {
+            Image(icon)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(theme.onBackground)
+                .frame(width: Dimensions.Icon.IconSizeXXL, height: Dimensions.Icon.IconSizeXXL)
+                .padding(.vertical, Dimensions.Padding.LPadding)
+                .padding(.top, Dimensions.Padding.SPadding)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .center, spacing: Dimensions.Padding.SPadding) {
+                Text(verbatim: languageSettings.localized("Control code"))
+                    .font(typography.bodyLarge)
+                    .foregroundStyle(theme.onSurface)
+
+                Text(verbatim: controlCode)
+                    .font(typography.displayMedium)
+                    .foregroundStyle(theme.onSurface)
+                    .scaleEffect(x: Dimensions.Scaling.WideScaling, y: Dimensions.Scaling.DefaultScaling)
+            }
+        }
+        .onAppear {
+            // TODO: Remove. Simulate signing for 3 seconds and return to signing view
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                onSuccess()
+            }
+        }
+    }
+}
+
+#Preview {
+    ControlCodeView(
+        icon: "mobile_id_logo",
+        onSuccess: {}
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
+}

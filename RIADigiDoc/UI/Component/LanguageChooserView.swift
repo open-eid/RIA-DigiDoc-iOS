@@ -59,6 +59,8 @@ struct LanguageChooserView: View {
                         return "\(title) \(selected)"
                     }
                 )
+                .padding(.horizontal, Dimensions.Padding.SPadding)
+                .padding(.vertical, Dimensions.Padding.XSPadding)
             }
         )
     }

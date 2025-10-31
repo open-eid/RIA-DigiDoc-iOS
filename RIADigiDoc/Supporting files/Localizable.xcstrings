@@ -217,6 +217,24 @@
         }
       }
     },
+    "Choose a signing method" : {
+      "comment" : "Title for signing method choosing view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a signing method"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali allkirjastamise meetod"
+          }
+        }
+      }
+    },
     "Choose button" : {
       "comment" : "Choose button",
       "extractionState" : "manual",
@@ -448,6 +466,24 @@
         }
       }
     },
+    "Control code" : {
+      "comment" : "Control code text in Mobile-ID and Smart-ID views",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control code: "
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontrollkood: "
+          }
+        }
+      }
+    },
     "Could not load selected files" : {
       "comment" : "No files or when loading files is unsuccessful",
       "extractionState" : "manual",
@@ -462,6 +498,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failide laadimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Country code and phone number" : {
+      "comment" : "Used in Mobile-ID view textfield",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Country code and phone number"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riigikood ja telefoninumber"
           }
         }
       }
@@ -891,6 +945,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hoidke ID-kaarti vastu nutiseadet kuni andmeid loetakse."
+          }
+        }
+      }
+    },
+    "ID-card via NFC" : {
+      "comment" : "ID-card via NFC signing method",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card via NFC"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart NFC abil"
+          }
+        }
+      }
+    },
+    "ID-card via USB" : {
+      "comment" : "ID-card via USB signing method",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card via USB"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart kaardilugeja abil"
           }
         }
       }
@@ -3183,6 +3273,24 @@
         }
       }
     },
+    "Mobile-ID" : {
+      "comment" : "Mobile-ID signing method",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mobile-ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mobile-ID"
+          }
+        }
+      }
+    },
     "More options" : {
       "comment" : "More options button name",
       "localizations" : {
@@ -3343,6 +3451,24 @@
         }
       }
     },
+    "Personal code" : {
+      "comment" : "Used in Mobile-ID and Smart-ID textfield views",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isikukood"
+          }
+        }
+      }
+    },
     "PIN change failed" : {
       "comment" : "OperationUnblockPin error",
       "extractionState" : "manual",
@@ -3483,6 +3609,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hiljutised dokumendid"
+          }
+        }
+      }
+    },
+    "Remember me" : {
+      "comment" : "Used in signing views to remember values",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember me"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pea mind meeles"
+          }
+        }
+      }
+    },
+    "Remember me message" : {
+      "comment" : "Message shown under Remember me switch",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected method and data fields will be filled in for the next usage"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Järgmisel kasutamisel on valitud meetod ja andmeväljad täidetud"
           }
         }
       }
@@ -3679,6 +3841,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvesta fail"
+          }
+        }
+      }
+    },
+    "Save selection" : {
+      "comment" : "Button in Signing method selection view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save selection"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta valik"
           }
         }
       }
@@ -3911,6 +4091,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkiri"
+          }
+        }
+      }
+    },
+    "Signature added" : {
+      "comment" : "Shown as Toast when signing succeeds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature added"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkiri lisatud"
           }
         }
       }
@@ -4328,6 +4526,24 @@
         }
       }
     },
+    "Signing method" : {
+      "comment" : "Title for signing method in container signing view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing method"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamise meetod"
+          }
+        }
+      }
+    },
     "Siva message" : {
       "comment" : "SiVa message on file opening",
       "extractionState" : "manual",
@@ -4360,6 +4576,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "https://www.id.ee/artikkel/riigi-infosusteemi-ameti-id-tarkvara-andmekaitsetingimused/"
+          }
+        }
+      }
+    },
+    "Smart-ID" : {
+      "comment" : "Smart-ID signing method",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID"
           }
         }
       }

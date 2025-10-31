@@ -30,7 +30,6 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
     let onSelect: (T) -> Void
     let accessibilityLabel: (T, Bool) -> String
     let trailingSpacer: Bool
-    let backgroundColor: Color?
 
     init(
         options: [T],
@@ -39,7 +38,6 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
         onSelect: @escaping (T) -> Void,
         accessibilityLabel: @escaping (T, Bool) -> String,
         trailingSpacer: Bool = true,
-        backgroundColor: Color? = nil
     ) {
         self.options = options
         self.isSelected = isSelected
@@ -47,7 +45,6 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
         self.onSelect = onSelect
         self.accessibilityLabel = accessibilityLabel
         self.trailingSpacer = trailingSpacer
-        self.backgroundColor = backgroundColor
     }
 
     var body: some View {
@@ -68,6 +65,5 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
                 }
             }
         )
-        .background(backgroundColor ?? theme.surface)
     }
 }

@@ -40,7 +40,7 @@ struct ToggleSection: View {
 
     var body: some View {
         HStack {
-            Text(label)
+            Text(verbatim: label)
                 .foregroundStyle(theme.onSurface)
                 .font(typography.bodyLarge)
             Spacer()

@@ -20,14 +20,21 @@
 import SwiftUI
 import FactoryKit
 
-struct TabView<Content: View>: View {
+struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue == Int {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @Binding var selectedTab: Int
+    @Binding var selectedTab: Tab
     let titles: [String]
     @ViewBuilder let content: () -> Content
+
+    private var selectedIndex: Binding<Int> {
+        Binding(
+            get: { selectedTab.rawValue },
+            set: { selectedTab = Tab(rawValue: $0) ?? selectedTab }
+        )
+    }
 
     var body: some View {
         VStack {
@@ -35,12 +42,12 @@ struct TabView<Content: View>: View {
                 ForEach(titles.indices, id: \.self) { index in
                     Button(action: {
                         withAnimation {
-                            selectedTab = index
+                            selectedIndex.wrappedValue = index
                         }
                     }, label: {
                         VStack {
                             let title = titles[index]
-                            let isSelected = selectedTab == index
+                            let isSelected = selectedIndex.wrappedValue == index
                             let selectedText = isSelected ?
                             languageSettings.localized("Selected") :
                             languageSettings.localized("Unselected")
@@ -54,7 +61,7 @@ struct TabView<Content: View>: View {
                                     "\(selectedText)"
                                 ))
                             Rectangle()
-                                .fill(selectedTab == index ? theme.primary : theme.outlineVariant)
+                                .fill(selectedIndex.wrappedValue == index ? theme.primary : theme.outlineVariant)
                                 .frame(height: Dimensions.Height.SBorder)
                         }
                         .frame(maxWidth: .infinity)
@@ -69,7 +76,13 @@ struct TabView<Content: View>: View {
 }
 
 #Preview {
-    TabView(selectedTab: .constant(0), titles: ["Tab 1", "Tab 2"]) {
+    TabView(
+        selectedTab: .constant(SigningViewTab.files),
+        titles: [
+            "Files",
+            "Signatures"
+        ]
+    ) {
         EmptyView()
     }
     .environmentObject(Container.shared.languageSettings())

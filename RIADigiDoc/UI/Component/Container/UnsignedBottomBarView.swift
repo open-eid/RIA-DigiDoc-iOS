@@ -58,9 +58,7 @@ struct UnsignedBottomBarView: View {
 
             Spacer()
 
-            Button(action: {
-                // TODO: Add sign action
-            }, label: {
+            Button(action: rightButtonAction, label: {
                 HStack(spacing: Dimensions.Padding.XSPadding) {
                     Image(rightButtonIconName)
                         .resizable()

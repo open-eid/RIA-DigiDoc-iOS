@@ -122,4 +122,8 @@ public struct Constants {
 
         public static let RelyingPartyUUID = "00000000-0000-0000-0000-000000000000"
     }
+
+    public struct MobileId {
+        public static let DefaultCountryCode = "372"
+    }
 }
