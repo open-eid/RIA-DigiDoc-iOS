@@ -202,8 +202,7 @@ struct EncryptionSettingsView: View {
                         : languageSettings.localized("Radiobutton unselected")
                         return "\(title) \(selected)"
                     },
-                    trailingSpacer: false,
-                    backgroundColor: theme.surfaceContainerHighest
+                    trailingSpacer: false
                 )
 
                 dialogButtonRow

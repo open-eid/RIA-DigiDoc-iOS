@@ -27,7 +27,7 @@ struct FloatingLabelTextField: View {
 
     // MARK: - Parameters
     let title: String
-    let placeholder: String
+    var placeholder: String = ""
     @Binding var text: String
     let isSecure: Bool
     let isDropdown: Bool
@@ -35,7 +35,9 @@ struct FloatingLabelTextField: View {
     let onDropdownTap: (() -> Void)?
     let isInvalid: Bool
     let invalidText: String
+    let submitLabel: SubmitLabel
     let keyboardType: UIKeyboardType
+    let showDashButton: Bool
 
     init(
         title: String,
@@ -47,7 +49,9 @@ struct FloatingLabelTextField: View {
         onDropdownTap: (() -> Void)? = {},
         isInvalid: Bool = false,
         invalidText: String = "",
-        keyboardType: UIKeyboardType = .default
+        submitLabel: SubmitLabel = .done,
+        keyboardType: UIKeyboardType = .default,
+        showDashButton: Bool = false
     ) {
         self.title = title
         self.placeholder = placeholder
@@ -58,7 +62,9 @@ struct FloatingLabelTextField: View {
         self.onDropdownTap = onDropdownTap
         self.isInvalid = isInvalid
         self.invalidText = invalidText
+        self.submitLabel = submitLabel
         self.keyboardType = keyboardType
+        self.showDashButton = showDashButton
     }
 
     // MARK: - State
@@ -139,7 +145,7 @@ struct FloatingLabelTextField: View {
             },
             label: {
                 HStack(spacing: Dimensions.Padding.XSPadding) {
-                    Text(text)
+                    Text(verbatim: text)
                         .font(typography.bodyLarge)
                         .foregroundStyle(textColor)
                         .multilineTextAlignment(.leading)
@@ -190,11 +196,57 @@ struct FloatingLabelTextField: View {
                     .multilineTextAlignment(.leading)
                     .disabled(isDisabled)
                     .keyboardType(keyboardType)
+                    .submitLabel(submitLabel)
+                    .onSubmit {
+                        isFocused = false
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .keyboard) {
+                            if fieldIsFocused {
+                                HStack {
+                                    if showDashButton {
+                                        Button(
+                                            action: { text.append("-") },
+                                            label: { Text(verbatim: "-") }
+                                        )
+                                    }
+
+                                    Button(
+                                        action: { fieldIsFocused = false },
+                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                    )
+                                }
+                            }
+                        }
+                    }
             } else {
                 TextField(placeholder, text: $text)
                     .multilineTextAlignment(.leading)
                     .disabled(isDisabled)
                     .keyboardType(keyboardType)
+                    .submitLabel(submitLabel)
+                    .onSubmit {
+                        fieldIsFocused = false
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .keyboard) {
+                            if fieldIsFocused {
+                                HStack {
+                                    if showDashButton {
+                                        Button(
+                                            action: { text.append("-") },
+                                            label: { Text(verbatim: "-") }
+                                        )
+                                    }
+
+                                    Button(
+                                        action: { fieldIsFocused = false },
+                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                    )
+                                }
+                            }
+                        }
+                    }
             }
         }
         .font(typography.bodyLarge)

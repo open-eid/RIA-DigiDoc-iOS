@@ -27,7 +27,7 @@ struct SigningServicesSettingsView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedTab: Int = 0
+    @State private var selectedTab: SigningServicesSettingsViewTab = .timestampServices
 
     @State private var showSettingsBottomSheetFromButton = false
 
@@ -48,7 +48,7 @@ struct SigningServicesSettingsView: View {
                             languageSettings.localized("Main settings mobile id and smart id title")
                         ],
                         content: {
-                            if selectedTab == 0 {
+                            if selectedTab == .timestampServices {
                                 TimeStampSettingsView()
                                     .padding(.horizontal, Dimensions.Padding.SPadding)
                             } else {

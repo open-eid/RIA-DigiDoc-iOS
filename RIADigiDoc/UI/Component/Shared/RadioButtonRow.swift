@@ -32,8 +32,8 @@ struct RadioButtonRow<T: Equatable>: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack {
-                Text(title)
+            HStack(spacing: Dimensions.Padding.SPadding) {
+                Text(verbatim: title)
                     .font(typography.bodyLarge)
                     .foregroundStyle(theme.onSurface)
                     .multilineTextAlignment(.leading)
@@ -44,7 +44,6 @@ struct RadioButtonRow<T: Equatable>: View {
                     accessibilityLabel: accessibilityLabel
                 )
             }
-            .padding(.horizontal, Dimensions.Padding.SPadding)
             .padding(.vertical, Dimensions.Padding.SPadding)
             .contentShape(Rectangle())
         }

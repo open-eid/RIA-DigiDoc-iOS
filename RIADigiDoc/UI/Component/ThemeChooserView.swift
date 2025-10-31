@@ -46,7 +46,7 @@ struct ThemeChooserView: View {
                     },
                     titleKey: { themeOption in themeOption.titleKey },
                     onSelect: { themeOption in
-                        Task {await themeSettings.setSelectedTheme(themeOption.themeKey)}
+                        Task { await themeSettings.setSelectedTheme(themeOption.themeKey) }
                     },
                     accessibilityLabel: { themeOption, isSelected in
                         let title = languageSettings.localized(themeOption.titleKey)
@@ -56,6 +56,8 @@ struct ThemeChooserView: View {
                         return "\(title) \(selected)"
                     }
                 )
+                .padding(.horizontal, Dimensions.Padding.SPadding)
+                .padding(.vertical, Dimensions.Padding.XSPadding)
             }
         )
     }

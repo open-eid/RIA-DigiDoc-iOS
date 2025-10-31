@@ -30,7 +30,7 @@ struct SignatureDetailView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.openURL) var openURL
 
-    @State private var selectedTab = 0
+    @State private var selectedTab: SignatureDetailViewTab = .roleAndAddress
 
     @StateObject private var viewModel: SignatureDetailViewModel
     private var certificateDetailViewModel: CertificateDetailViewModel
@@ -178,7 +178,7 @@ struct SignatureDetailView: View {
                             titles: [signersRoleAndAddressTitle, signersDetailsTitle],
                             content: {
                                 VStack(alignment: .leading) {
-                                    if selectedTab == 0 {
+                                    if selectedTab == .roleAndAddress {
                                         RoleDetailsView(signature: signature)
                                     } else {
                                         SignerDetailView(

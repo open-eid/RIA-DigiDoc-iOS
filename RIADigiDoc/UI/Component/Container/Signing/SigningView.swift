@@ -35,7 +35,7 @@ struct SigningView: View {
     private let fileUtil: FileUtilProtocol
 
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedTab = 0
+    @State private var selectedTab: SigningViewTab = .files
 
     @State private var selectedSignature: SignatureWrapper?
 
@@ -56,6 +56,7 @@ struct SigningView: View {
     @State private var showSivaMessage = false
 
     @State private var isNavigatingToContainerNotificationsView = false
+    @State private var isNavigatingToContainerSigningView = false
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
@@ -186,7 +187,7 @@ struct SigningView: View {
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                     rightActionButtonAccessibilityLabel: encryptAccessibilityLabel.lowercased(),
                                     onLeftActionButtonClick: {
-                                        // TODO: Implement signing functionality
+                                        isNavigatingToContainerSigningView = true
                                     },
                                     onRightActionButtonClick: {
                                         // TODO: Implement encrypt functionality
@@ -226,7 +227,7 @@ struct SigningView: View {
                                         containerFilesTitle,
                                         containerSignaturesTitle
                                     ]) {
-                                        if selectedTab == 0 {
+                                        if selectedTab == .files {
                                             DataFilesSection(
                                                 viewModel: viewModel,
                                                 isContainerSigned: isContainerSigned,
@@ -311,7 +312,7 @@ struct SigningView: View {
                                 rightButtonLabel: signLabel,
                                 rightButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                 rightButtonAction: {
-                                    // TODO: Implement signing functionality
+                                    isNavigatingToContainerSigningView = true
                                 }
                             )
                         }
@@ -338,6 +339,17 @@ struct SigningView: View {
                 isActive: $isNavigatingToContainerNotificationsView
             ) {}
                 .accessibilityHidden(!isNavigatingToContainerNotificationsView)
+
+            NavigationLink(
+                destination:
+                    SigningRootView(
+                        onSuccess: {
+                            Toast.show(languageSettings.localized("Signature added"))
+                            selectedTab = .signatures
+                        }),
+                isActive: $isNavigatingToContainerSigningView
+            ) {}
+                .accessibilityHidden(!isNavigatingToContainerSigningView)
 
             if showRenameModal {
                 RenameModalView(
