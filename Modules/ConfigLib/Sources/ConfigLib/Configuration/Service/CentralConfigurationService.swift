@@ -37,9 +37,12 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         self.session = session
     }
 
-    public func fetchConfiguration() async throws -> String {
+    public func fetchConfiguration(
+        proxyInfo: ProxyInfo,
+    ) async throws -> String {
         let session = self.session ?? constructHttpClient(
-            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout
+            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
+            proxyInfo: proxyInfo
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.json"
@@ -51,9 +54,12 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         return response
     }
 
-    public func fetchPublicKey() async throws -> String {
+    public func fetchPublicKey(
+        proxyInfo: ProxyInfo
+    ) async throws -> String {
         let session = self.session ?? constructHttpClient(
-            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout
+            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
+            proxyInfo: proxyInfo
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.pub"
@@ -65,9 +71,12 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         return response
     }
 
-    public func fetchSignature() async throws -> String {
+    public func fetchSignature(
+        proxyInfo: ProxyInfo
+    ) async throws -> String {
         let session = self.session ?? constructHttpClient(
-            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout
+            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
+            proxyInfo: proxyInfo
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.rsa"
@@ -85,7 +94,8 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
 
     private func constructHttpClient(
         defaultTimeout: TimeInterval,
-        customConfiguration: URLSessionConfiguration? = nil
+        proxyInfo: ProxyInfo,
+        customConfiguration: URLSessionConfiguration? = nil,
     ) -> Session {
         let interceptor = constructAlamofireRequestInterceptor()
 
@@ -96,7 +106,11 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
             return config
         }()
 
-        return Session(configuration: configuration, interceptor: interceptor)
+        return Session.withProxy(
+            proxyInfo: proxyInfo,
+            configuration: configuration,
+            interceptor: interceptor
+        )
     }
 
     private func constructAlamofireRequestInterceptor() -> RequestInterceptor {

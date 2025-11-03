@@ -33,6 +33,10 @@ private:
     inline static NSData *_sivaCert = nil;
     inline static NSURL *_tsUrl;
     inline static NSData *_tsCert = nil;
+    inline static NSString * _Nullable _proxyHost = nil;
+    inline static NSString * _Nullable _proxyPort = nil;
+    inline static NSString * _Nullable _proxyUser = nil;
+    inline static NSString * _Nullable _proxyPass = nil;
 
 public:
     DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
@@ -95,6 +99,54 @@ public:
             return ocspUrl.UTF8String;
         }
         return digidoc::ConfCurrent::ocsp(issuer);
+    }
+    
+    std::string proxyHost() const final {
+        if (_proxyHost && _proxyHost.length > 0) {
+            std::string proxyHost = std::string([_proxyHost UTF8String]);
+            return proxyHost;
+        }
+        return {};
+    }
+    
+    void setProxyHost(NSString *proxyHost) {
+        _proxyHost = proxyHost;
+    }
+    
+    std::string proxyPort() const final {
+        if (_proxyPort && _proxyPort.length > 0) {
+            std::string proxyPort = std::string([_proxyPort UTF8String]);
+            return proxyPort;
+        }
+        return {};
+    }
+    
+    void setProxyPort(NSString *proxyPort) {
+        _proxyPort = proxyPort;
+    }
+    
+    std::string proxyUser() const final {
+        if (_proxyUser && _proxyUser.length > 0) {
+            std::string proxyUser = std::string([_proxyUser UTF8String]);
+            return proxyUser;
+        }
+        return {};
+    }
+    
+    void setProxyUser(NSString *proxyUser) {
+        _proxyUser = proxyUser;
+    }
+    
+    std::string proxyPass() const final {
+        if (_proxyPass && _proxyPass.length > 0) {
+            std::string proxyPass = std::string([_proxyPass UTF8String]);
+            return proxyPass;
+        }
+        return {};
+    }
+    
+    void setProxyPass(NSString *proxyPass) {
+        _proxyPass = proxyPass;
     }
 
     std::string verifyServiceUri() const override {
@@ -228,6 +280,42 @@ public:
             currentConf->addTSCert(cert);
         }
     }
+    
+    static void setProxyHost(NSString *proxyHost) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setProxyHost(proxyHost);
+        }
+    }
+    
+    static void setProxyPort(NSString *proxyPort) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setProxyPort(proxyPort);
+        }
+    }
+    
+    static void setProxyUser(NSString *proxyUser) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setProxyUser(proxyUser);
+        }
+    }
+    
+    static void setProxyPass(NSString *proxyPass) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            currentConf->setProxyPass(proxyPass);
+        }
+    }
 };
 
 @implementation DigiDocConfWrapper {
@@ -291,6 +379,26 @@ public:
 - (void)addTSCert:(NSData *)tsCert {
     if (!tsCert) return;
     _impl->addTSCert(tsCert);
+}
+
+- (void)setProxyHost:(NSString *)proxyHost {
+    if (!proxyHost) return;
+    _impl->setProxyHost(proxyHost);
+}
+
+- (void)setProxyPort:(NSString *)proxyPort {
+    if (!proxyPort) return;
+    _impl->setProxyPort(proxyPort);
+}
+
+- (void)setProxyUser:(NSString *)proxyUser {
+    if (!proxyUser) return;
+    _impl->setProxyUser(proxyUser);
+}
+
+- (void)setProxyPass:(NSString *)proxyPass {
+    if (!proxyPass) return;
+    _impl->setProxyPass(proxyPass);
 }
 
 + (nullable instancetype)sharedInstance {

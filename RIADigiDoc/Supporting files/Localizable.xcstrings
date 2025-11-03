@@ -2933,6 +2933,42 @@
         }
       }
     },
+    "Main settings proxy check connection success" : {
+      "comment" : "Main settings proxy check connection success",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internet connection available!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internetiühendus on olemas!"
+          }
+        }
+      }
+    },
+    "Main settings proxy check connection unsuccessful" : {
+      "comment" : "Main settings proxy check connection unsuccessful",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No internet connection!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internetiühendus puudub!"
+          }
+        }
+      }
+    },
     "Main settings proxy host" : {
       "comment" : "Main settings proxy host",
       "extractionState" : "manual",

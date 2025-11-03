@@ -39,10 +39,11 @@ class ConfigurationViewModel {
         self.fileManager = fileManager
     }
 
-    func fetchConfiguration(lastUpdate: TimeInterval) async {
+    func fetchConfiguration(lastUpdate: TimeInterval, proxyInfo: ProxyInfo) async {
         do {
             guard let updates = try await repository.getCentralConfigurationUpdates(
-                cacheDir: Directories.getConfigDirectory(fileManager: fileManager)
+                cacheDir: Directories.getConfigDirectory(fileManager: fileManager),
+                proxyInfo: proxyInfo
             ) else {
                 ConfigurationViewModel.logger.error("No configuration updates available.")
                 return

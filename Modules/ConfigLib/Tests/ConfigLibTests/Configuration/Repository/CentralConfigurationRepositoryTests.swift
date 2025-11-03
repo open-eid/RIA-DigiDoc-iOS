@@ -17,9 +17,10 @@
  *
  */
 
+import CommonsLib
+import ConfigLibMocks
 import Foundation
 import Testing
-import ConfigLibMocks
 
 @testable import ConfigLib
 
@@ -36,9 +37,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchConfiguration_success() async throws {
         let expectedConfiguration = "MockConfiguration"
 
-        mockConfigurationService.fetchConfigurationHandler = { expectedConfiguration }
+        mockConfigurationService.fetchConfigurationHandler = { _ in expectedConfiguration }
 
-        let result = try await repository.fetchConfiguration()
+        let result = try await repository.fetchConfiguration(proxyInfo: ProxyInfo())
 
         #expect(expectedConfiguration == result)
         #expect(mockConfigurationService.fetchConfigurationCallCount == 1)
@@ -48,9 +49,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchPublicKey_success() async throws {
         let expectedPublicKey = "MockPublicKey"
 
-        mockConfigurationService.fetchPublicKeyHandler = { expectedPublicKey }
+        mockConfigurationService.fetchPublicKeyHandler = { _ in expectedPublicKey }
 
-        let result = try await repository.fetchPublicKey()
+        let result = try await repository.fetchPublicKey(proxyInfo: ProxyInfo())
 
         #expect(expectedPublicKey == result)
         #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
@@ -60,9 +61,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchSignature_success() async throws {
         let expectedSignature = "MockSignature"
 
-        mockConfigurationService.fetchSignatureHandler = { expectedSignature }
+        mockConfigurationService.fetchSignatureHandler = { _ in expectedSignature }
 
-        let result = try await repository.fetchSignature()
+        let result = try await repository.fetchSignature(proxyInfo: ProxyInfo())
 
         #expect(expectedSignature == result)
         #expect(mockConfigurationService.fetchSignatureCallCount == 1)
@@ -72,9 +73,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchConfiguration_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 1, userInfo: nil)
 
-        mockConfigurationService.fetchConfigurationHandler = { throw expectedError }
+        mockConfigurationService.fetchConfigurationHandler = { _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchConfiguration() }
+        await #expect(throws: (any Error).self) { try await repository.fetchConfiguration(proxyInfo: ProxyInfo()) }
         #expect(mockConfigurationService.fetchConfigurationCallCount == 1)
     }
 
@@ -82,9 +83,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchPublicKey_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 2, userInfo: nil)
 
-        mockConfigurationService.fetchPublicKeyHandler = { throw expectedError }
+        mockConfigurationService.fetchPublicKeyHandler = { _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchPublicKey() }
+        await #expect(throws: (any Error).self) { try await repository.fetchPublicKey(proxyInfo: ProxyInfo()) }
         #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
     }
 
@@ -92,9 +93,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchSignature_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 3, userInfo: nil)
 
-        mockConfigurationService.fetchSignatureHandler = { throw expectedError }
+        mockConfigurationService.fetchSignatureHandler = { _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchSignature() }
+        await #expect(throws: (any Error).self) { try await repository.fetchSignature(proxyInfo: ProxyInfo()) }
         #expect(mockConfigurationService.fetchSignatureCallCount == 1)
     }
 }

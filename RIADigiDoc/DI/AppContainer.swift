@@ -33,7 +33,9 @@ extension Container {
                 fileManager: self.fileManager(),
                 tslUtil: self.tslUtil(),
                 dataStore: self.dataStore(),
-                advancedSettingsRepository: self.advancedSettingsRepository()
+                advancedSettingsRepository: self.advancedSettingsRepository(),
+                keychainStore: self.keychainStore(),
+                proxyUtil: self.proxyUtil()
             )
         }
         .shared
@@ -107,6 +109,13 @@ extension Container {
         self { @MainActor in CertificateUtil() }
     }
 
+    public var proxyUtil: Factory<ProxyUtilProtocol> {
+        self { @MainActor in ProxyUtil(
+            dataStore: self.dataStore(),
+            keychainStore: self.keychainStore()
+        ) }
+    }
+
     @MainActor
     var languageSettings: Factory<LanguageSettings> {
         self { @MainActor in LanguageSettings(dataStore: self.dataStore()) }.singleton
@@ -120,6 +129,11 @@ extension Container {
     @MainActor
     var dataStore: Factory<DataStore> {
         self { @MainActor in DataStore() }.singleton
+    }
+
+    @MainActor
+    var keychainStore: Factory<KeychainStore> {
+        self { @MainActor in KeychainStore() }.singleton
     }
 
     @MainActor
@@ -153,7 +167,8 @@ extension Container {
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),
                 tslUtil: self.tslUtil(),
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                proxyUtil: self.proxyUtil()
             )
         }
     }
@@ -206,6 +221,15 @@ extension Container {
                 dataStore: self.dataStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
                 certificateUtil: self.certificateUtil()
+            )
+        }
+    }
+
+    @MainActor
+    var proxySettingsViewModel: Factory<ProxySettingsViewModel> {
+        self { @MainActor in
+            ProxySettingsViewModel(
+                proxyUtil: self.proxyUtil()
             )
         }
     }

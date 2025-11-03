@@ -38,30 +38,24 @@ public struct DigiDocConf: DigiDocConfProtocol {
         sivaUrl: String? = nil,
         sivaCert: Data? = nil,
         tsaUrl: String? = nil,
-        tsCert: Data? = nil
+        tsCert: Data? = nil,
+        proxyInfo: ProxyInfo? = nil
     ) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
 
-        if let sivaUrl = sivaUrl, !sivaUrl.isEmpty {
-            await setSiVaUrl(sivaUrl)
-        }
-
-        if let sivaCert = sivaCert, !sivaCert.isEmpty {
-            await addSiVaCert(sivaCert)
-        }
-
-        if let tsaUrl = tsaUrl, !tsaUrl.isEmpty {
-            await setTSUrl(tsaUrl)
-        }
-
-        if let tsCert = tsCert, !tsCert.isEmpty {
-            await addTSCert(tsCert)
-        }
+        await apply(sivaUrl, DigiDocConf.setSiVaUrl)
+        await apply(sivaCert, DigiDocConf.addSiVaCert)
+        await apply(tsaUrl, DigiDocConf.setTSUrl)
+        await apply(tsCert, DigiDocConf.addTSCert)
+        await apply(proxyInfo, DigiDocConf.setProxyInfo)
     }
 
-    public static func observeConfigurationUpdates(configurationRepository: ConfigurationRepositoryProtocol) throws {
+    public static func observeConfigurationUpdates(
+        configurationRepository: ConfigurationRepositoryProtocol,
+    ) throws {
         Task {
-            guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
+            guard let configStream = await configurationRepository.observeConfigurationUpdates(
+            ) else {
                 logger.error("Unable to get configuration updates stream")
                 return
             }
@@ -75,21 +69,41 @@ public struct DigiDocConf: DigiDocConfProtocol {
         }
     }
 
+    public static func setProxyInfo(_ proxyInfo: ProxyInfo) async {
+        DigiDocConfWrapper.sharedInstance()?.setProxyHost(proxyInfo.host)
+        let portString = String(proxyInfo.port)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPort(portString)
+        DigiDocConfWrapper.sharedInstance()?.setProxyUser(proxyInfo.username)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPass(proxyInfo.password)
+    }
+
     public static func setSiVaUrl(_ url: String) async {
         if url.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(url)
     }
 
     public static func addSiVaCert(_ cert: Data) async {
+        if cert.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
     }
 
     public static func setTSUrl(_ url: String) async {
+        if url.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.setTSUrl(url)
     }
 
     public static func addTSCert(_ cert: Data) async {
+        if cert.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.addTSCert(cert)
+    }
+
+    private static func apply<T>(_ value: T?, _ action: @escaping (T) async -> Void) async {
+        if let value {
+            if let string = value as? String, string.isEmpty { return }
+            if let data = value as? Data, data.isEmpty { return }
+            if let proxyInfo = value as? ProxyInfo, proxyInfo.host.isEmpty { return }
+            await action(value)
+        }
     }
 }
 

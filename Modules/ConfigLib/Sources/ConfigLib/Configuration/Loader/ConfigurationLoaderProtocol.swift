@@ -22,7 +22,7 @@ import CommonsLib
 
 /// @mockable
 public protocol ConfigurationLoaderProtocol: Sendable {
-    func initConfiguration(cacheDir: URL) async throws
+    func initConfiguration(cacheDir: URL, proxyInfo: ProxyInfo) async throws
 
     func loadConfigurationProperty() async throws -> ConfigurationProperty
 
@@ -30,7 +30,7 @@ public protocol ConfigurationLoaderProtocol: Sendable {
 
     func loadDefaultConfiguration(cacheDir: URL?) async throws
 
-    func loadCentralConfiguration(cacheDir: URL?) async throws
+    func loadCentralConfiguration(cacheDir: URL?, proxyInfo: ProxyInfo) async throws
 
     func shouldCheckForUpdates() async throws -> Bool
 

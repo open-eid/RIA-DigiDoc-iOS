@@ -17,11 +17,12 @@
  *
  */
 
+import CommonsLib
+import CommonsLibMocks
+import ConfigLibMocks
 import Foundation
 import Testing
 import UtilsLib
-import ConfigLibMocks
-import CommonsLibMocks
 
 @testable import ConfigLib
 
@@ -83,13 +84,13 @@ struct ConfigurationRepositoryTests {
         let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
 
-        let configuration = try await repository.getCentralConfiguration(cacheDir: mockCacheDir)
+        let configuration = try await repository.getCentralConfiguration(cacheDir: mockCacheDir, proxyInfo: ProxyInfo())
 
         #expect(expectedConfiguration.tslUrl == configuration?.tslUrl)
-        #expect(mockConfigurationLoader.loadCentralConfigurationArgValues.first == mockCacheDir)
+        #expect(mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir == mockCacheDir)
         #expect(mockConfigurationLoader.getConfigurationCallCount == 1)
     }
 
@@ -97,13 +98,13 @@ struct ConfigurationRepositoryTests {
     func getCentralConfiguration_returnConfigurationThatUsesDefaultConfiguration() async throws {
         let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
 
-        let configuration = try await repository.getCentralConfiguration(cacheDir: nil)
+        let configuration = try await repository.getCentralConfiguration(cacheDir: nil, proxyInfo: ProxyInfo())
 
-        let isCorrectDirectory = try mockConfigurationLoader.loadCentralConfigurationArgValues.first == Directories
-            .getConfigDirectory(fileManager: mockFileManager)
+        let isCorrectDirectory = try mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir ==
+        Directories.getConfigDirectory(fileManager: mockFileManager)
 
         #expect(expectedConfiguration.tslUrl == configuration?.tslUrl)
         #expect(isCorrectDirectory)
@@ -119,10 +120,13 @@ struct ConfigurationRepositoryTests {
             continuation.finish()
         }
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
         mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
-        let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: mockCacheDir)
+        let resultStream = try await repository.getCentralConfigurationUpdates(
+            cacheDir: mockCacheDir,
+            proxyInfo: ProxyInfo()
+        )
 
         #expect(resultStream != nil)
 
@@ -137,7 +141,7 @@ struct ConfigurationRepositoryTests {
         }
         #expect(1 == receivedConfigurations.count)
         #expect(
-            mockConfigurationLoader.loadCentralConfigurationArgValues.first == mockCacheDir
+            mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir == mockCacheDir
         )
         #expect(mockConfigurationLoader.getConfigurationUpdatesCallCount == 1)
     }
@@ -150,10 +154,10 @@ struct ConfigurationRepositoryTests {
             continuation.finish()
         }
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
         mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
-        let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: nil)
+        let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: nil, proxyInfo: ProxyInfo())
 
         #expect(resultStream != nil)
 
@@ -168,8 +172,8 @@ struct ConfigurationRepositoryTests {
         }
         #expect(1 == receivedConfigurations.count)
 
-        let isCorrectDirectory = try mockConfigurationLoader.loadCentralConfigurationArgValues.first == Directories
-            .getConfigDirectory(fileManager: mockFileManager)
+        let isCorrectDirectory = try mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir ==
+        Directories.getConfigDirectory(fileManager: mockFileManager)
         #expect(isCorrectDirectory)
         #expect(mockConfigurationLoader.getConfigurationUpdatesCallCount == 1)
     }

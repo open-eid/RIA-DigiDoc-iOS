@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CommonsLib
 
 public struct CentralConfigurationRepository: CentralConfigurationRepositoryProtocol {
 
@@ -27,15 +28,21 @@ public struct CentralConfigurationRepository: CentralConfigurationRepositoryProt
         self.centralConfigurationService = centralConfigurationService
     }
 
-    public func fetchConfiguration() async throws -> String {
-        return try await centralConfigurationService.fetchConfiguration()
+    public func fetchConfiguration(proxyInfo: ProxyInfo) async throws -> String {
+        return try await centralConfigurationService.fetchConfiguration(
+            proxyInfo: proxyInfo
+        )
     }
 
-    public func fetchPublicKey() async throws -> String {
-        return try await centralConfigurationService.fetchPublicKey()
+    public func fetchPublicKey(proxyInfo: ProxyInfo) async throws -> String {
+        return try await centralConfigurationService.fetchPublicKey(
+            proxyInfo: proxyInfo
+        )
     }
 
-    public func fetchSignature() async throws -> String {
-        return try await centralConfigurationService.fetchSignature()
+    public func fetchSignature(proxyInfo: ProxyInfo) async throws -> String {
+        return try await centralConfigurationService.fetchSignature(
+            proxyInfo: proxyInfo
+        )
     }
 }

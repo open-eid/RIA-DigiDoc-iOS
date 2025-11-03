@@ -33,6 +33,8 @@ actor LibrarySetup {
     private let tslUtil: TSLUtilProtocol
     private let dataStore: DataStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+    private let keychainStore: KeychainStoreProtocol
+    private let proxyUtil: ProxyUtilProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
@@ -40,7 +42,9 @@ actor LibrarySetup {
         fileManager: FileManagerProtocol,
         tslUtil: TSLUtilProtocol,
         dataStore: DataStoreProtocol,
-        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
+        advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
+        keychainStore: KeychainStoreProtocol,
+        proxyUtil: ProxyUtilProtocol
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
@@ -48,11 +52,17 @@ actor LibrarySetup {
         self.tslUtil = tslUtil
         self.dataStore = dataStore
         self.advancedSettingsRepository = advancedSettingsRepository
+        self.keychainStore = keychainStore
+        self.proxyUtil = proxyUtil
     }
 
     func setupLibraries() async {
         do {
-            try DigiDocConf.observeConfigurationUpdates(configurationRepository: configurationRepository)
+            let proxyInfo = await proxyUtil.getProxyInfo()
+
+            try DigiDocConf.observeConfigurationUpdates(
+                configurationRepository: configurationRepository
+            )
             if let schemaDirectory = Directories.getLibraryDirectory(fileManager: fileManager) {
                 try tslUtil.setupTSLFiles(tsls: [], destinationDir: schemaDirectory)
             } else {
@@ -63,13 +73,17 @@ actor LibrarySetup {
             ).appendingPathComponent(
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
-            try await configurationLoader.initConfiguration(cacheDir: configDirectory)
+            try await configurationLoader.initConfiguration(
+                cacheDir: configDirectory,
+                proxyInfo: proxyInfo
+            )
             LibrarySetup.logger.debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
                 sivaUrl: getSiVaUrl(),
                 sivaCert: getSiVaCert(),
                 tsaUrl: getTSUrl(),
-                tsCert: getTSCert()
+                tsCert: getTSCert(),
+                proxyInfo: proxyInfo
             )
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
         } catch let error {

@@ -159,7 +159,38 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(info.postURL, forKey: Keys.encryptionServerInfoPostURL)
     }
 
+    // MARK: - Proxy Service Settings Methods
+
+    public func getProxyInfo() async -> ProxyInfo {
+        let rawOption = userDefaults().integer(forKey: Keys.proxyOption)
+        let option = ProxySettingsOption(rawValue: rawOption) ?? DefaultValues.proxyOption
+
+        let host = userDefaults().string(forKey: Keys.proxyInfoHost) ??
+        DefaultValues.proxyInfoHost
+
+        var port = userDefaults().integer(forKey: Keys.proxyInfoPort)
+        if port == 0 { port = DefaultValues.proxyInfoPort }
+
+        let username = userDefaults().string(forKey: Keys.proxyInfoUsername) ??
+        DefaultValues.proxyInfoUsername
+
+        return ProxyInfo(
+            option: option,
+            host: host,
+            port: port,
+            username: username
+        )
+    }
+
+    public func setProxyInfo(_ info: ProxyInfo) async {
+        userDefaults().set(info.option.rawValue, forKey: Keys.proxyOption)
+        userDefaults().set(info.host, forKey: Keys.proxyInfoHost)
+        userDefaults().set(info.port, forKey: Keys.proxyInfoPort)
+        userDefaults().set(info.username, forKey: Keys.proxyInfoUsername)
+    }
+
     // MARK: - Signing Selection Methods
+
     public func getSelectedSigningMethod() async -> SigningMethod {
         if let rawValue = userDefaults().string(forKey: "selectedSigningMethod") {
             return SigningMethod(rawValue: rawValue) ??
@@ -173,6 +204,7 @@ public actor DataStore: DataStoreProtocol {
     }
 
     // MARK: - Mobile-ID Methods
+
     public func getMobileIdInputData() async -> MobileIdInputData {
         let phoneNumber = userDefaults().string(forKey: Keys.mobileIdPhoneNumber) ?? DefaultValues.mobileIdPhoneNumber
         let personalCode = userDefaults().string(
@@ -200,6 +232,10 @@ public actor DataStore: DataStoreProtocol {
         static let encryptionServerInfoUUID = ""
         static let encryptionServerInfoFetchURL = ""
         static let encryptionServerInfoPostURL = ""
+        static let proxyOption: ProxySettingsOption = .disabled
+        static let proxyInfoHost = ""
+        static let proxyInfoPort = 80
+        static let proxyInfoUsername = ""
         static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
         static let mobileIdPersonalCode = ""
         static let selectedSigningMethod: SigningMethod = .idCardViaNFC
@@ -220,6 +256,10 @@ public actor DataStore: DataStoreProtocol {
         static let encryptionServerInfoUUID = "encryptionServerInfoUUID"
         static let encryptionServerInfoFetchURL = "encryptionServerInfoFetchURL"
         static let encryptionServerInfoPostURL = "encryptionServerInfoPostURL"
+        static let proxyOption = "proxyOption"
+        static let proxyInfoHost = "proxyInfoHost"
+        static let proxyInfoPort = "proxyInfoPort"
+        static let proxyInfoUsername = "proxyInfoUsername"
         static let selectedSigningMethod = "selectedSigningMethod"
         static let mobileIdPhoneNumber = "mobileIdPhoneNumber"
         static let mobileIdPersonalCode = "mobileIdPersonalCode"

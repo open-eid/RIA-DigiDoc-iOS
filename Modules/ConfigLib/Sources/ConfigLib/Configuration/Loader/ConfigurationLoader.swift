@@ -62,7 +62,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         self.bundle = bundle ?? Bundle.module
     }
 
-    public func initConfiguration(cacheDir: URL) async throws {
+    public func initConfiguration(cacheDir: URL, proxyInfo: ProxyInfo) async throws {
         ConfigurationLoader.logger.debug("Initializing configuration")
 
         if !fileManager.fileExists(atPath: cacheDir.path) {
@@ -76,7 +76,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         if try await shouldCheckForUpdates() {
             ConfigurationLoader.logger.debug("Checking for configuration updates...")
-            try await loadCentralConfiguration(cacheDir: cacheDir)
+            try await loadCentralConfiguration(cacheDir: cacheDir, proxyInfo: proxyInfo)
         }
 
         ConfigurationLoader.logger.debug("Finished initializing configuration")
@@ -261,7 +261,10 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         updateConfiguration(configurationProvider)
     }
 
-    public func loadCentralConfiguration(cacheDir: URL?) async throws {
+    public func loadCentralConfiguration(
+        cacheDir: URL?,
+        proxyInfo: ProxyInfo
+    ) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         let cachedSignature = try await configurationCache.getCachedFile(
@@ -276,10 +279,9 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         var centralSignature = ""
 
         do {
-            centralSignature = try await centralConfigurationRepository.fetchSignature()
-                .trimmingCharacters(
-                    in: .whitespaces
-                )
+            centralSignature = try await centralConfigurationRepository.fetchSignature(
+                proxyInfo: proxyInfo
+            ).trimmingCharacters(in: .whitespaces)
         } catch {
             ConfigurationLoader.logger.error(
                 "Unable to get remote configuration signature \(error)"
@@ -290,8 +292,12 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
             ConfigurationLoader.logger.debug("Found new configuration")
 
-            let centralConfig = try await centralConfigurationRepository.fetchConfiguration()
-            let centralPublicKey = try await centralConfigurationRepository.fetchPublicKey()
+            let centralConfig = try await centralConfigurationRepository.fetchConfiguration(
+                proxyInfo: proxyInfo
+            )
+            let centralPublicKey = try await centralConfigurationRepository.fetchPublicKey(
+                proxyInfo: proxyInfo
+            )
 
             let centralConfigurationProvider = try JSONDecoder().decode(
                 ConfigurationProvider.self, from: Data(centralConfig.utf8)

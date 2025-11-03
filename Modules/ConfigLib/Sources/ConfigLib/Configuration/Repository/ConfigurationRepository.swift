@@ -45,26 +45,31 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
         return await configurationLoader.getConfigurationUpdates(replayLatest: true)
     }
 
-    public func getCentralConfiguration(cacheDir: URL?) async throws -> ConfigurationProvider? {
+    public func getCentralConfiguration(
+        cacheDir: URL?,
+        proxyInfo: ProxyInfo
+    ) async throws -> ConfigurationProvider? {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir)
+        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir, proxyInfo: proxyInfo)
         return await getConfiguration()
     }
 
     public func getCentralConfigurationUpdates(
-        cacheDir: URL?
+        cacheDir: URL?,
+        proxyInfo: ProxyInfo
     ) async throws -> AsyncThrowingStream<
         ConfigurationProvider?,
         Error
     >? {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir)
+        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir, proxyInfo: proxyInfo)
         return await getConfigurationUpdates()
     }
 
-    public func observeConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>? {
+    public func observeConfigurationUpdates(
+    ) async -> AsyncThrowingStream<ConfigurationProvider?, Error>? {
         return await configurationLoader.getConfigurationUpdates(replayLatest: true)
     }
 }

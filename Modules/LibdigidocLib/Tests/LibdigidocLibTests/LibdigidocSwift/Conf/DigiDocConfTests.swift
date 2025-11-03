@@ -41,7 +41,10 @@ final class DigiDocConfTests {
 
         try DigiDocConf.observeConfigurationUpdates(configurationRepository: mockConfigurationRepository)
 
-        try await mockConfigurationLoader.initConfiguration(cacheDir: URL(fileURLWithPath: "/mock/path"))
+        try await mockConfigurationLoader.initConfiguration(
+            cacheDir: URL(fileURLWithPath: "/mock/path"),
+            proxyInfo: ProxyInfo()
+        )
     }
 
     @Test

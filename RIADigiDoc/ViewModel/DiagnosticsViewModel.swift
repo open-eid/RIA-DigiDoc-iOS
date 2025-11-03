@@ -46,6 +46,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let tslUtil: TSLUtilProtocol
     private let dataStore: DataStoreProtocol
+    private let proxyUtil: ProxyUtilProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -55,7 +56,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         configurationLoader: ConfigurationLoaderProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
         tslUtil: TSLUtilProtocol,
-        dataStore: DataStoreProtocol
+        dataStore: DataStoreProtocol,
+        proxyUtil: ProxyUtilProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
@@ -63,6 +65,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         self.configurationRepository = configurationRepository
         self.tslUtil = tslUtil
         self.dataStore = dataStore
+        self.proxyUtil = proxyUtil
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -296,7 +299,11 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
             ).appendingPathComponent(
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
-            try await configurationLoader.loadCentralConfiguration(cacheDir: configDirectory)
+            let proxyInfo = await proxyUtil.getProxyInfo()
+            try await configurationLoader.loadCentralConfiguration(
+                cacheDir: configDirectory,
+                proxyInfo: proxyInfo
+            )
         } catch {
             DiagnosticsViewModel.logger.error("Unable to update configuration")
         }
@@ -309,7 +316,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
             return
         }
 
-        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
+        guard let configStream = await configurationRepository.observeConfigurationUpdates(
+        ) else {
             DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
             return
         }

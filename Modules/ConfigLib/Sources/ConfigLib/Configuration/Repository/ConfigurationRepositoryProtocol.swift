@@ -17,20 +17,23 @@
  *
  */
 
+import CommonsLib
 import Foundation
 
 /// @mockable
 public protocol ConfigurationRepositoryProtocol: Sendable {
     func getConfiguration() async -> ConfigurationProvider?
 
-    func getCentralConfiguration(cacheDir: URL?) async throws -> ConfigurationProvider?
+    func getCentralConfiguration(cacheDir: URL?, proxyInfo: ProxyInfo) async throws -> ConfigurationProvider?
 
-    func observeConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>?
+    func observeConfigurationUpdates(
+    ) async -> AsyncThrowingStream<ConfigurationProvider?, Error>?
 
     func getConfigurationUpdates() async -> AsyncThrowingStream<ConfigurationProvider?, Error>?
 
     func getCentralConfigurationUpdates(
-        cacheDir: URL?
+        cacheDir: URL?,
+        proxyInfo: ProxyInfo
     ) async throws -> AsyncThrowingStream<
         ConfigurationProvider?,
         Error
