@@ -142,9 +142,10 @@ struct CDOC_EXPORT NetworkBackend {
      * @param rcpt_key recipient's public key
      * @param key_material encrypted KEK or ECDH public Key used to derive shared secret
 	 * @param type algorithm type, currently either "rsa" or "ecc_secp384r1"
+     * @param expiry_ts the requested capsule expiry timestamp, 0 - use server default
 	 * @return error code or OK
 	 */
-    virtual result_t sendKey (CapsuleInfo& dst, const std::string& url, const std::vector<uint8_t>& rcpt_key, const std::vector<uint8_t> &key_material, const std::string& type);
+    virtual result_t sendKey (CapsuleInfo& dst, const std::string& url, const std::vector<uint8_t>& rcpt_key, const std::vector<uint8_t> &key_material, const std::string& type, uint64_t expiry_ts);
     /**
      * @brief send key share to server
      *

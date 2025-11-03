@@ -34,7 +34,7 @@ public struct ContainerUtil: ContainerUtilProtocol {
         self.fileManager = fileManager
     }
 
-    public func getSignatureContainerFile(
+    public func getContainerFile(
         for fileURL: URL,
         in directory: URL
     ) -> URL {

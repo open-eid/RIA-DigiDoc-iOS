@@ -17,19 +17,21 @@
  *
  */
 
+
 #if __cplusplus
+
+//@import CryptoObjCWrapper;
 
 #import <cdoc/CryptoBackend.h>
 #import <Foundation/Foundation.h>
 #include <memory>
-#import "AbstractSmartToken.h"
 
 @protocol AbstractSmartToken;
 
 class SmartCardTokenWrapper: public libcdoc::CryptoBackend
 {
 public:
-    SmartCardTokenWrapper(AbstractSmartToken * smartToken);
+    SmartCardTokenWrapper(id<AbstractSmartToken> smartToken);
     ~SmartCardTokenWrapper() noexcept;
 
     libcdoc::result_t deriveECDH1(std::vector<uint8_t> &dst, const std::vector<uint8_t> &public_key, unsigned int idx) final;

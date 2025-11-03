@@ -33,21 +33,43 @@ let package = Package(
             path: "./Sources/CryptoObjC/Libs/LDAP.xcframework"
         ),
         .target(
+            name: "CryptoObjCWrapper",
+            dependencies: [
+                "LDAP",
+                "ASN1Decoder",
+                "CommonsLib",
+                "IdCardLib",
+                .product(name: "FactoryKit", package: "Factory")
+            ],
+            path: "Sources/CryptoObjCWrapper",
+            cSettings: [
+                .unsafeFlags(["-fmodules"])
+            ],
+            cxxSettings: [
+                .unsafeFlags(["-std=c++20", "-fcxx-modules"])
+            ]
+        ),
+        .target(
             name: "CryptoObjC",
             dependencies: [
                 "cdoc",
                 "CryptoObjCWrapper"
+
             ],
             path: "Sources/CryptoObjC",
             publicHeadersPath: "include",
+            cSettings: [
+                .unsafeFlags(["-fmodules"])
+            ],
             cxxSettings: [
-                .unsafeFlags(["-std=c++20"])
+                .unsafeFlags(["-std=c++20", "-fcxx-modules"])
             ]
         ),
         .target(
             name: "CryptoSwift",
             dependencies: [
                 "CryptoObjC",
+                "CryptoObjCWrapper",
                 "CommonsLib",
                 "ConfigLib",
                 "UtilsLib",
@@ -62,17 +84,6 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("InferIsolatedConformances")
             ]
-        ),
-        .target(
-            name: "CryptoObjCWrapper",
-            dependencies: [
-                "LDAP",
-                "ASN1Decoder",
-                "CommonsLib",
-                "IdCardLib",
-                .product(name: "FactoryKit", package: "Factory")
-            ],
-            path: "Sources/CryptoObjCWrapper",
         )
     ]
 )

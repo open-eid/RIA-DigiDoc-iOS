@@ -22,6 +22,7 @@ import Foundation
 public struct Constants {
     public struct Container {
         public static let SignedContainerFolder = "SignedContainers"
+        public static let CryptoContainerFolder = "CryptoContainers"
         public static let DefaultName = "newFile"
         public static let ContainerExtensions = [
             Extension.Asice,
@@ -32,6 +33,11 @@ public struct Constants {
             Extension.Edoc,
             Extension.Asics,
             Extension.Scs
+        ]
+
+        public static let CryptoContainerExtensions = [
+            Extension.Cdoc,
+            Extension.Cdoc2
         ]
     }
 
@@ -60,10 +66,15 @@ public struct Constants {
         public static let Adoc = "adoc"
         public static let Bdoc = "bdoc"
         public static let Edoc = "edoc"
+
+        public static let Cdoc = "cdoc"
+        public static let Cdoc2 = "cdoc2"
+
         public static let Scs = "scs"
         public static let Default = Asice
 
         public static let AsicsContainers = [Asics, Scs]
+        public static let CryptoContainers = [Cdoc, Cdoc2]
 
         public static let UnsignableContainerExtensions = [Adoc, Ddoc] + AsicsContainers
     }

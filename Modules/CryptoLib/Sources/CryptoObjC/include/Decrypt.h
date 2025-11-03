@@ -17,18 +17,19 @@
  *
  */
 
+//@import CryptoObjCWrapper;
 #import <Foundation/Foundation.h>
-#import "AbstractSmartToken.h"
 
+@protocol AbstractSmartToken;
 @class CdocInfo;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Decrypt : NSObject
-
-+ (void)decryptFile:(NSString *)fullPath withToken:(AbstractSmartToken *)smartToken
++ (nullable id)cdocInfo:(NSString *)fullPath error:(NSError **)error;
++ (void)decryptFile:(NSString *)fullPath withToken:(id)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> * _Nullable, NSError * _Nullable))completion;
-
++ (NSDictionary<NSString*,NSData*> * _Nullable)decryptFile:(NSString *)fullPath withPassword:(NSString*)password error:(NSError**)error;
 @end
 
 NS_ASSUME_NONNULL_END

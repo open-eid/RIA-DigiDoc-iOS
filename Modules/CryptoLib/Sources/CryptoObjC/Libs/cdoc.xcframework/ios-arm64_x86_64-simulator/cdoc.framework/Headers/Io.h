@@ -26,7 +26,7 @@
 
 namespace libcdoc {
 
-class DataSource;
+struct DataSource;
 
 /**
  * @brief The DataConsumer class

@@ -17,15 +17,30 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for CryptoLib.
-FOUNDATION_EXPORT double CryptoLibVersionNumber;
+public struct CryptoErrorDetail: Sendable {
+    public let message: String
+    public let code: Int
+    public let userInfo: [String: String]
 
-//! Project version string for CryptoLib.
-FOUNDATION_EXPORT const unsigned char CryptoLibVersionString[];
+    public init(message: String = "", code: Int = 0, userInfo: [String: String] = [:]) {
+        self.message = message
+        self.code = code
+        self.userInfo = userInfo
+    }
 
-// In this header, you should import all the public headers of your framework using statements like #import <CryptoLib/PublicHeader.h>
+    public var description: String {
+        return """
+            Error: \(self.message)
+            Code: \(self.code)
+            Info: \(self.userInfo)
+        """
+    }
 
-#import <CryptoLib/Encrypt.h>
-#import <CryptoLib/Decrypt.h>
+    private static func convertUserInfoToStringDictionary(_ userInfo: [String: Any]) -> [String: String] {
+        userInfo.mapValues { value in
+            String(describing: value)
+        }
+    }
+}

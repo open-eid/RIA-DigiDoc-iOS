@@ -1,0 +1,385 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import Foundation
+import OSLog
+import FactoryKit
+import CryptoObjC
+import CryptoObjCWrapper
+import IdCardLib
+import CommonsLib
+import UtilsLib
+
+public actor CryptoContainer: CryptoContainerProtocol {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.CryptoLib", category: "CryptoContainer")
+
+    private static let cryptoContainerLogTag: String = "CryptoContainer"
+
+    private var containerFile: URL?
+    private let fileManager: FileManagerProtocol
+    private let containerUtil: ContainerUtilProtocol
+    private var dataFiles: [URL?]?
+    private var recipients: [Addressee?]?
+    private let isDecrypted: Bool
+    private let isEncrypted: Bool
+
+    public init(
+        containerFile: URL? = nil,
+        fileManager: FileManagerProtocol,
+        containerUtil: ContainerUtilProtocol,
+        dataFiles: [URL?]? = [],
+        recipients: [Addressee?]? = [],
+        isDecrypted: Bool = false,
+        isEncrypted: Bool = false,
+    ) {
+        self.containerFile = containerFile
+        self.fileManager = fileManager
+        self.containerUtil = containerUtil
+        self.dataFiles = dataFiles
+        self.recipients = recipients
+        self.isDecrypted = isDecrypted
+        self.isEncrypted = isEncrypted
+    }
+
+    public func getContainerName() async -> String {
+        return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
+    }
+
+    public func getContainerMimetype() async -> String {
+        return CommonsLib.Constants.MimeType.Container
+    }
+
+    public func getRawContainerFile() async -> URL? {
+        return containerFile
+    }
+
+    public func addDataFiles(_ filesToAdd: [URL]) async {
+        dataFiles?.append(contentsOf: filesToAdd)
+    }
+
+    public func addRecipients(_ recipientsToAdd: [Addressee]) async {
+        recipients?.append(contentsOf: recipientsToAdd)
+    }
+
+    public func getDataFiles() async -> [URL] {
+        guard let dataFiles else {
+            return []
+        }
+        return dataFiles.compactMap { $0 }
+    }
+
+    public func getRecipients() async -> [Addressee] {
+        guard let recipients else {
+            return []
+        }
+        return recipients.compactMap { $0 }
+    }
+
+    public func removeRecipient(_ recipient: Addressee) async throws {
+        let localRecipients = await getRecipients()
+        guard !localRecipients.isEmpty else { return }
+
+        for (index, rec) in localRecipients.enumerated()
+            where recipient.identifier == rec.identifier {
+                recipients?.remove(at: index)
+                break
+        }
+    }
+
+    public func removeDataFile(_ dataFile: URL) async throws {
+        let localDataFiles = await getDataFiles()
+        guard !localDataFiles.isEmpty else { return }
+
+        for (index, file) in localDataFiles.enumerated()
+        where dataFile.lastPathComponent == file.lastPathComponent {
+                dataFiles?.remove(at: index)
+                break
+        }
+    }
+
+    @discardableResult
+    public func renameContainer(to newName: String) async throws -> URL {
+
+        let fileName = newName.isEmpty ? CommonsLib.Constants.Container.DefaultName : newName
+
+        let sanitizedFileName = fileName.sanitized()
+        let normalizedPath = URL(fileURLWithPath: sanitizedFileName).standardizedPathURL
+
+        guard let currentURL = containerFile else {
+            throw CryptoError.containerRenamingFailed(
+                CryptoErrorDetail(
+                    message: "Unable to rename container. Current URL is nil",
+                    userInfo: ["fileName": containerFile?.lastPathComponent ?? ""]
+                )
+            )
+        }
+
+        let newFileName = normalizedPath.lastPathComponent
+        guard !newFileName.isEmpty else {
+            throw CryptoError.containerRenamingFailed(
+                CryptoErrorDetail(
+                    message: "Unable to rename container. New filename is empty",
+                    userInfo: ["fileName": currentURL.lastPathComponent]
+                )
+            )
+        }
+
+        let destinationURL = currentURL
+            .deletingLastPathComponent()
+            .appendingPathComponent(newFileName)
+
+        let uniqueFileURL = containerUtil.getContainerFile(
+            for: destinationURL,
+            in: destinationURL.deletingLastPathComponent()
+        )
+
+        try fileManager.moveItem(at: currentURL, to: uniqueFileURL)
+
+        containerFile = uniqueFileURL
+
+        return uniqueFileURL
+    }
+
+    private func save(_ source: URL, as destination: URL) throws {
+        try fileManager.copyItem(at: source, to: destination)
+    }
+
+    public func saveDataFile(dataFile: URL, to directory: URL?) async throws -> URL {
+        let sanitizedName = dataFile.lastPathComponent.sanitized()
+        let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
+            subfolder: CommonsLib.Constants.Folder.SavedFiles,
+            fileManager: fileManager
+        )
+        let file = savedFilesDirectory.appendingPathComponent(sanitizedName)
+        let dataFiles = await getDataFiles()
+
+        for containerDataFile in dataFiles
+        where dataFile.lastPathComponent == containerDataFile.lastPathComponent {
+                if !fileManager.fileExists(atPath: file.path) {
+                    try save(containerDataFile, as: file)
+                }
+                return file
+        }
+        throw CryptoError.containerDataFileSavingFailed(
+            CryptoErrorDetail(
+                message: "Could not find file in container",
+                userInfo: ["fileName": dataFile.lastPathComponent]
+            )
+        )
+    }
+}
+
+extension CryptoContainer {
+
+    @MainActor
+    public static func openOrCreate(
+        dataFiles: [URL],
+        containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
+    ) async throws -> CryptoContainerProtocol {
+        logger.debug("Opening or creating crypto container. Found \(dataFiles.count) datafile(s)")
+        guard let firstFile = dataFiles.first else {
+            logger.error("Unable to create or open crypto container. First datafile is nil")
+            throw CryptoError.containerCreationFailed(
+                CryptoErrorDetail(
+                    message: "Cannot create or open crypto container. Datafiles are empty"
+                )
+            )
+        }
+
+        let isFirstDataFileContainer = await firstFile.isCryptoContainer()
+        var containerFile: URL? = firstFile
+
+        if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
+            firstFile.pathExtension != CommonsLib.Constants.Extension.Default {
+            let uniqueContainerFile = firstFile
+                .deletingPathExtension()
+                .appendingPathExtension(CommonsLib.Constants.Extension.Default)
+            containerFile = containerUtil.getContainerFile(
+                for: uniqueContainerFile,
+                in: uniqueContainerFile.deletingLastPathComponent()
+            )
+        }
+
+        guard let containerFile else {
+            let error = isFirstDataFileContainer
+                ? CryptoError.containerOpeningFailed(
+                    CryptoErrorDetail(
+                        message: "Cannot open crypto container. Container file is nil"))
+                : CryptoError.containerCreationFailed(
+                    CryptoErrorDetail(
+                        message: "Cannot create crypto container. Container file is nil"
+                    )
+                )
+            throw error
+        }
+
+        if dataFiles.count == 1 && isFirstDataFileContainer {
+            CryptoContainer.logger.debug("Opening existing crypto container")
+            return try await open(containerFile: containerFile)
+        } else {
+            CryptoContainer.logger.debug("Creating a new crypto container")
+            return try await create(
+                containerFile: containerFile,
+                dataFiles: dataFiles,
+                recipients: [],
+                isDecrypted: false,
+                isEncrypted: false
+            )
+        }
+    }
+
+    @MainActor
+    public static func decrypt(
+        containerFile: URL,
+        recipients: [Addressee],
+        cardCommands: CardCommands,
+        pin: SecureData,
+        fileManager: FileManagerProtocol = Container.shared.fileManager()
+    ) async throws -> CryptoContainerProtocol {
+        let decryptedData =
+        try await Decrypt.decryptFile(
+            containerFile.absoluteString,
+            withToken: SmartToken(card: cardCommands, pin1: pin)
+        )
+        var cryptoDataFiles: [CryptoDataFile] = []
+        var urlDataFiles: [URL] = []
+        cryptoDataFiles.removeAll()
+        for dataFile in decryptedData {
+
+            let destinationPath = try Directories
+                .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
+            let fileUrl = destinationPath.appendingPathComponent(dataFile.key)
+
+            cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.path))
+            urlDataFiles.append(fileUrl)
+            let isCreated =
+            fileManager.createFile(
+                atPath: destinationPath.path, contents: dataFile.value, attributes: nil
+            )
+
+            if !isCreated {
+                CryptoContainer.logger.error("Unable to create file at path: \(destinationPath.path)")
+            }
+        }
+
+        return try await create(
+            containerFile: containerFile,
+            dataFiles: urlDataFiles,
+            recipients: recipients,
+            isDecrypted: true,
+            isEncrypted: false
+        )
+    }
+
+    @MainActor
+    public static func encrypt(
+        containerFile: URL,
+        dataFiles: [URL],
+        recipients: [Addressee]
+    ) async throws -> CryptoContainerProtocol {
+        if dataFiles.isEmpty {
+            throw CryptoError.containerCreationFailed(
+                CryptoErrorDetail(
+                    message: "Cannot create an empty crypto container"
+                )
+            )
+        }
+
+        if recipients.isEmpty {
+            throw CryptoError.containerCreationFailed(
+                CryptoErrorDetail(
+                    message: "Cannot create crypto container without recipients"
+                )
+            )
+        }
+        var cryptoDataFiles: [CryptoDataFile] = []
+
+        for dataFile in dataFiles {
+            cryptoDataFiles.append(
+                CryptoDataFile(
+                    filename: dataFile.lastPathComponent,
+                    filePath: dataFile.absoluteString
+                )
+            )
+        }
+
+        try await Encrypt.encryptFile(
+            containerFile.absoluteString,
+            withDataFiles: cryptoDataFiles,
+            withAddressees: recipients
+        )
+
+        return try await open(containerFile: containerFile)
+    }
+
+    private static func open(containerFile: URL) async throws -> CryptoContainerProtocol {
+        guard let cdocInfo = try Decrypt.cdocInfo(containerFile.path) as? CdocInfo else {
+            throw CryptoError.containerOpeningFailed(
+                CryptoErrorDetail(
+                    message: "Cannot open container with invalid CDOC info"
+                )
+            )
+        }
+
+        let cryptoDataFiles = cdocInfo.dataFiles
+        let recipients = cdocInfo.addressees
+
+        var dataFiles: [URL] = []
+
+        for dataFile in cryptoDataFiles {
+            guard let filePath = dataFile.filePath else {
+                throw CryptoError.containerOpeningFailed(
+                    CryptoErrorDetail(
+                        message: "Cannot open container with datafile path nil"
+                    )
+                )
+            }
+            let fileUrl = URL(fileURLWithPath: filePath).appendingPathComponent(dataFile.filename)
+
+            dataFiles.append(fileUrl)
+        }
+
+        return try await create(
+            containerFile: containerFile,
+            dataFiles: dataFiles,
+            recipients: recipients,
+            isDecrypted: false,
+            isEncrypted: true
+        )
+    }
+
+    private static func create(
+        containerFile: URL,
+        dataFiles: [URL],
+        recipients: [Addressee],
+        isDecrypted: Bool,
+        isEncrypted: Bool
+    ) async throws -> CryptoContainerProtocol {
+
+        return CryptoContainer(
+            containerFile: containerFile,
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil(),
+            dataFiles: dataFiles,
+            recipients: recipients,
+            isDecrypted: isDecrypted,
+            isEncrypted: isEncrypted,
+        )
+    }
+}

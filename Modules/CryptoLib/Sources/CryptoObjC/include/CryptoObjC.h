@@ -19,10 +19,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Addressee : NSObject
+//! Project version number for CryptoObjC.
+FOUNDATION_EXPORT double CryptoObjCVersionNumber;
 
-@property (nonatomic, strong, readonly) NSData * _Nullable data;
+//! Project version string for CryptoObjC.
+FOUNDATION_EXPORT const unsigned char CryptoObjCVersionString[];
 
-- (instancetype _Nonnull )initWithCert:(NSData * _Nonnull)cert;
+// In this header, you should import all the public headers of your framework using statements like #import <CryptoObjC/PublicHeader.h>
 
-@end
+#import "Encrypt.h"
+#import "Decrypt.h"
+

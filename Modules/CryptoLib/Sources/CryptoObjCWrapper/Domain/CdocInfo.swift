@@ -20,14 +20,19 @@
 import Foundation
 import OSLog
 
-@objc public class CdocInfo: NSObject {
+public class CdocInfo: NSObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CdocInfo")
+    public let format: String
+    public let addressees: [Addressee]
+    public let dataFiles: [CryptoDataFile]
 
-    @objc public let format: String
-    @objc public let addressees: [Addressee]
-    @objc public let dataFiles: [CryptoDataFile]
+    @objc public init(addressees: [Addressee]) {
+        format = String()
+        self.addressees = addressees
+        self.dataFiles = []
+    }
 
-    public init(cdoc1Path path: String) throws {
+    @objc public init(cdoc1Path path: String) throws {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else {
             CdocInfo.logger.error("Error: Unable to read file at \(path)")
             throw NSError(domain: XMLParser.errorDomain, code: XMLParser.ErrorCode.internalError.rawValue, userInfo: [
@@ -70,10 +75,8 @@ class CdocParserDelegate: NSObject, XMLParserDelegate {
         switch elementName {
         case "ds:X509Certificate":
             data = String()
-        case "denc:EncryptionProperty"
-            where (attributeDict["Name"] == "orig_file"
-                   || attributeDict["Name"] == "DocumentFormat"
-            ):
+        case "denc:EncryptionProperty" where attributeDict["Name"] == "orig_file"
+            || attributeDict["Name"] == "DocumentFormat":
             attr = attributeDict["Name"] ?? ""
             data = String()
         default: break

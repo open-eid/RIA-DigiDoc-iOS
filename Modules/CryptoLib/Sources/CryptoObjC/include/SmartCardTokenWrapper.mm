@@ -17,17 +17,16 @@
  *
  */
 
+@import CryptoObjCWrapper;
 #import "SmartCardTokenWrapper.h"
 #import "Extensions.h"
-#import "AbstractSmartToken.h"
 
 struct SmartCardTokenWrapper::Private {
-    AbstractSmartToken* smartTokenClass;
+    id<AbstractSmartToken> smartTokenClass;
     NSError *error;
 };
 
-
-SmartCardTokenWrapper::SmartCardTokenWrapper(AbstractSmartToken* smartToken)
+SmartCardTokenWrapper::SmartCardTokenWrapper(id<AbstractSmartToken> smartToken)
     : token(std::make_unique<Private>())
 {
     *token = {smartToken, nullptr};
@@ -42,24 +41,114 @@ NSError* SmartCardTokenWrapper::lastError() const
 
 libcdoc::result_t SmartCardTokenWrapper::deriveECDH1(std::vector<uint8_t>& dst, const std::vector<uint8_t> &public_key, unsigned int idx)
 {
-    NSError *error = nil;
-    dst = [[token->smartTokenClass derive:[NSData dataFromVectorNoCopy:public_key] error:&error] toVector];
-    token->error = error;
+    __block NSData  *resultData = nil;
+    __block NSError *blockError = nil;
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    NSData *pub = [NSData dataFromVectorNoCopy:public_key];
+
+    auto invoke = ^{
+        [token->smartTokenClass derive:pub
+                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
+            resultData = data;
+            blockError = error;
+            dispatch_semaphore_signal(sema);
+        }];
+    };
+
+    if ([NSThread isMainThread]) {
+        /// Avoid deadlock: perform async then wait.
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
+    } else {
+        /// Already off main thread; call directly.
+        invoke();
+    }
+
+    /// Wait for completion (consider a timeout if appropriate)
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    if (resultData) {
+        dst = [resultData toVector];
+    } else {
+        dst.clear();
+    }
+
+    token->error = blockError;
     return dst.empty() ? libcdoc::CRYPTO_ERROR : libcdoc::OK;
 }
 
 libcdoc::result_t SmartCardTokenWrapper::decryptRSA(std::vector<uint8_t>& dst, const std::vector<uint8_t>& data, bool oaep, unsigned int idx)
 {
-    NSError *error = nil;
-    dst = [[token->smartTokenClass decrypt:[NSData dataFromVectorNoCopy:data] error:&error] toVector];
-    token->error = error;
+    __block NSData  *resultData = nil;
+    __block NSError *blockError = nil;
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    NSData *pub = [NSData dataFromVectorNoCopy:data];
+
+    auto invoke = ^{
+        [token->smartTokenClass decrypt:pub
+                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
+            resultData = data;
+            blockError = error;
+            dispatch_semaphore_signal(sema);
+        }];
+    };
+
+    if ([NSThread isMainThread]) {
+        /// Avoid deadlock: perform async then wait.
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
+    } else {
+        /// Already off main thread; call directly.
+        invoke();
+    }
+
+    /// Wait for completion (consider a timeout if appropriate)
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    if (resultData) {
+        dst = [resultData toVector];
+    } else {
+        dst.clear();
+    }
+
+    token->error = blockError;
     return dst.empty() ? libcdoc::CRYPTO_ERROR : libcdoc::OK;
 }
 
 libcdoc::result_t SmartCardTokenWrapper::sign(std::vector<uint8_t> &dst, HashAlgorithm algorithm, const std::vector<uint8_t> &digest, unsigned int idx)
 {
-    NSError *error = nil;
-    dst = [[token->smartTokenClass authenticate:[NSData dataFromVectorNoCopy:digest] error:&error] toVector];
-    token->error = error;
+    __block NSData  *resultData = nil;
+    __block NSError *blockError = nil;
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    NSData *pub = [NSData dataFromVectorNoCopy:digest];
+
+    auto invoke = ^{
+        [token->smartTokenClass authenticate:pub
+                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
+            resultData = data;
+            blockError = error;
+            dispatch_semaphore_signal(sema);
+        }];
+    };
+
+    if ([NSThread isMainThread]) {
+        /// Avoid deadlock: perform async then wait.
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
+    } else {
+        /// Already off main thread; call directly.
+        invoke();
+    }
+
+    /// Wait for completion (consider a timeout if appropriate)
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    if (resultData) {
+        dst = [resultData toVector];
+    } else {
+        dst.clear();
+    }
+
+    token->error = blockError;
     return dst.empty() ? libcdoc::CRYPTO_ERROR : libcdoc::OK;
 }

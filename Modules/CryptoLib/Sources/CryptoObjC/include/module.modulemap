@@ -1,4 +1,5 @@
 module CryptoObjC {
-    private header "AbstractSmartTokenObjC.h"
+    private header "Encrypt.h"
+    private header "Decrypt.h"
     export *
 }

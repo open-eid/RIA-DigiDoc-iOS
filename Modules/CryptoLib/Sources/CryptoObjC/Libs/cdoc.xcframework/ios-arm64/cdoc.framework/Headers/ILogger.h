@@ -23,13 +23,8 @@
 
 #include <string>
 
-#ifdef __cpp_lib_format
 #include <format>
 namespace fmt = std;
-#else
-#define FMT_HEADER_ONLY
-#include "fmt/format.h"
-#endif
 
 #define FORMAT fmt::format
 
@@ -133,6 +128,8 @@ public:
      * @return Global logger's instance.
      */
     static ILogger* getLogger();
+
+    static void setLogger(ILogger *logger);
 
 protected:
     /**
