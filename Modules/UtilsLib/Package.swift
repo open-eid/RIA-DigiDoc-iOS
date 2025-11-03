@@ -16,6 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 19)),
         .package(path: "../CommonsLib"),
         .package(path: "../ConfigLib"),
@@ -27,6 +28,7 @@ let package = Package(
         .target(
             name: "UtilsLib",
             dependencies: [
+                "Alamofire",
                 "ZIPFoundation",
                 "CommonsLib",
                 .product(name: "FactoryKit", package: "Factory")

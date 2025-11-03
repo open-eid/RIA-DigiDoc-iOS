@@ -17,31 +17,12 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "../Model/DigiDocConfig.h"
+import CommonsLib
 
-#if DEBUG
-#define printLog(...) NSLog(__VA_ARGS__)
-#else
-#define printLog(...)
-#endif
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface DigiDocConfWrapper : NSObject
-
-- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL, NSError * _Nullable))completion;
-- (void)updateConfiguration:(DigiDocConfig *)conf;
-- (void)setSiVaUrl:(NSString *)url;
-- (void)addSiVaCert:(NSData *)cert;
-- (void)setTSUrl:(NSString *)url;
-- (void)addTSCert:(NSData *)cert;
-- (void)setProxyHost:(NSString *)proxyHost;
-- (void)setProxyPort:(NSString *)proxyPort;
-- (void)setProxyUser:(NSString *)proxyUser;
-- (void)setProxyPass:(NSString *)proxyPass;
-+ (nullable instancetype)sharedInstance;
-
-@end
-
-NS_ASSUME_NONNULL_END
+/// @mockable
+public protocol ProxyUtilProtocol: Sendable {
+    func isPortValid(_ port: Int) -> Bool
+    func getProxyInfo() async -> ProxyInfo
+    func saveSetting(proxyInfo: ProxyInfo) async
+    func getSystemProxyInfo() -> ProxyInfo
+}

@@ -40,6 +40,7 @@ final class DiagnosticsViewModelTests {
     private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock
     private let mockTSLUtil: TSLUtilProtocolMock
     private let mockDataStore: DataStoreProtocolMock
+    private let mockProxyUtil: ProxyUtilProtocolMock
 
     let mockConfigProvider: ConfigurationProvider?
 
@@ -50,6 +51,7 @@ final class DiagnosticsViewModelTests {
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
         mockTSLUtil = TSLUtilProtocolMock()
         mockDataStore = DataStoreProtocolMock()
+        mockProxyUtil = ProxyUtilProtocolMock()
 
         mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
         TestConfigurationSetup.configureMocks(
@@ -57,13 +59,16 @@ final class DiagnosticsViewModelTests {
             configProvider: mockConfigProvider
         )
 
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
         viewModel = DiagnosticsViewModel(
             containerWrapper: mockContainerWrapper,
             fileManager: mockFileManager,
             configurationLoader: mockConfigurationLoader,
             configurationRepository: mockConfigurationRepository,
             tslUtil: mockTSLUtil,
-            dataStore: mockDataStore
+            dataStore: mockDataStore,
+            proxyUtil: mockProxyUtil
         )
     }
 
@@ -342,7 +347,7 @@ final class DiagnosticsViewModelTests {
 
     @Test
     func updateConfiguration_doesNotThrowOnFailure() async throws {
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _ in
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
         await #expect(throws: Never.self) {

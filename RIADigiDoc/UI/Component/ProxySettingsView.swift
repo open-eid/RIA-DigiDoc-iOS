@@ -26,19 +26,10 @@ struct ProxySettingsView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.dismiss) private var dismiss
 
-    @State private var proxyOption: ProxySettingsOption = .disabled
+    @StateObject private var viewModel: ProxySettingsViewModel
 
-    // TODO: This will move into viewmodel
-    @State private var port: String = "70000"
-
-    private var isPortValid: Bool {
-        if port.isEmpty { return true }
-        if let portInt = Int(port) {
-            if 0 < portInt && portInt < 65536 {
-                return true
-            }
-        }
-        return false
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.proxySettingsViewModel())
     }
 
     var body: some View {
@@ -50,25 +41,25 @@ struct ProxySettingsView: View {
                 ScrollView {
                     OutlinedRadioButtonCard(
                         title: languageSettings.localized("Main settings proxy no proxy"),
-                        isSelected: proxyOption == .disabled,
+                        isSelected: viewModel.proxyInfo.option == .disabled,
                         onSelect: {
-                            proxyOption = .disabled
+                            viewModel.proxyInfo.option = .disabled
                         }
                     )
 
                     OutlinedRadioButtonCard(
                         title: languageSettings.localized("Main settings proxy use system"),
-                        isSelected: proxyOption == .system,
+                        isSelected: viewModel.proxyInfo.option == .system,
                         onSelect: {
-                            proxyOption = .system
+                            viewModel.proxyInfo.option = .system
                         }
                     )
 
                     OutlinedRadioButtonCard(
                         title: languageSettings.localized("Main settings proxy manual"),
-                        isSelected: proxyOption == .manual,
+                        isSelected: viewModel.proxyInfo.option == .manual,
                         onSelect: {
-                            proxyOption = .manual
+                            viewModel.proxyInfo.option = .manual
                         },
                         contentSpacing: Dimensions.Padding.MPadding,
                         content: {
@@ -77,7 +68,15 @@ struct ProxySettingsView: View {
                     )
 
                     Button(
-                        action: {},
+                        action: {
+                            Task {
+                                let isConnected = await viewModel.checkInternetAccess()
+                                let message = isConnected
+                                ? languageSettings.localized("Main settings proxy check connection success")
+                                : languageSettings.localized("Main settings proxy check connection unsuccessful")
+                                Toast.show(message)
+                            }
+                        },
                         label: {
                             Text(languageSettings.localized("Main settings proxy check connection"))
                                 .font(typography.labelLarge)
@@ -93,28 +92,39 @@ struct ProxySettingsView: View {
             }
         )
         .background(theme.surface)
+        .onDisappear {
+            Task {
+                await viewModel.saveSettings()
+            }
+        }
+        .onChange(of: viewModel.portText) { _ in
+            if viewModel.isPortTextValid {
+                guard let port = Int(viewModel.portText) else { return }
+                viewModel.proxyInfo.port = port
+            }
+        }
     }
 
     @ViewBuilder
     private var manualCardContent: some View {
         FloatingLabelTextField(
             title: languageSettings.localized("Main settings proxy host"),
-            text: .constant(""),
+            text: $viewModel.proxyInfo.host,
         )
         FloatingLabelTextField(
             title: languageSettings.localized("Main settings proxy port"),
-            text: $port,
-            isInvalid: !isPortValid,
+            text: $viewModel.portText,
+            isInvalid: !viewModel.isPortTextValid,
             invalidText: languageSettings.localized("Main settings proxy port error"),
             keyboardType: .numberPad
         )
         FloatingLabelTextField(
             title: languageSettings.localized("Main settings proxy username"),
-            text: .constant(""),
+            text: $viewModel.proxyInfo.username,
         )
         FloatingLabelTextField(
             title: languageSettings.localized("Main settings proxy password"),
-            text: .constant(""),
+            text: $viewModel.proxyInfo.password,
             isSecure: true
         )
     }

@@ -75,9 +75,9 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationLastCheckDateHandler = { _ in }
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
-        mockCentralConfigurationRepository.fetchConfigurationHandler = { configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { "some key" }
-        mockCentralConfigurationRepository.fetchSignatureHandler = { "some signature" }
+        mockCentralConfigurationRepository.fetchConfigurationHandler = { _ in configurationResponse }
+        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _ in "some key" }
+        mockCentralConfigurationRepository.fetchSignatureHandler = { _ in "some signature" }
 
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
         mockFileManager.urlsHandler = { directory, domain in
@@ -122,7 +122,7 @@ struct ConfigurationLoaderTests {
             return nil
         }
 
-        try await configurationLoader.initConfiguration(cacheDir: mockCacheDir)
+        try await configurationLoader.initConfiguration(cacheDir: mockCacheDir, proxyInfo: ProxyInfo())
 
         defer {
             try? FileManager.default.removeItem(at: cacheDir)
@@ -149,9 +149,9 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationLastCheckDateHandler = { _ in }
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
-        mockCentralConfigurationRepository.fetchConfigurationHandler = { configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { "some key" }
-        mockCentralConfigurationRepository.fetchSignatureHandler = { "some signature" }
+        mockCentralConfigurationRepository.fetchConfigurationHandler = { _ in configurationResponse }
+        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _ in "some key" }
+        mockCentralConfigurationRepository.fetchSignatureHandler = { _ in "some signature" }
 
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
@@ -345,13 +345,13 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationLastCheckDateHandler = { _ in }
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
-        mockCentralConfigurationRepository.fetchConfigurationHandler = { configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { "some key" }
-        mockCentralConfigurationRepository.fetchSignatureHandler = { "some signature" }
+        mockCentralConfigurationRepository.fetchConfigurationHandler = { _ in configurationResponse }
+        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _ in "some key" }
+        mockCentralConfigurationRepository.fetchSignatureHandler = { _ in "some signature" }
 
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
 
-        try await configurationLoader.initConfiguration(cacheDir: mockCacheDir)
+        try await configurationLoader.initConfiguration(cacheDir: mockCacheDir, proxyInfo: ProxyInfo())
 
         mockFileManager.urlsHandler = { directory, domain in
             guard directory == .cachesDirectory, domain == .userDomainMask else {
@@ -634,13 +634,13 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationLastCheckDateHandler = { _ in }
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
-        mockCentralConfigurationRepository.fetchConfigurationHandler = { configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { "publicKey" }
-        mockCentralConfigurationRepository.fetchSignatureHandler = { "validSignature" }
+        mockCentralConfigurationRepository.fetchConfigurationHandler = { _ in configurationResponse }
+        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _ in "publicKey" }
+        mockCentralConfigurationRepository.fetchSignatureHandler = { _ in "validSignature" }
 
         mockConfigurationCache.getCachedFileHandler = { _, _ in signatureFile }
 
-        try await configurationLoader.loadCentralConfiguration(cacheDir: nil)
+        try await configurationLoader.loadCentralConfiguration(cacheDir: nil, proxyInfo: ProxyInfo())
 
         await #expect(configurationLoader.getConfiguration() != nil)
         #expect(
@@ -697,12 +697,12 @@ struct ConfigurationLoaderTests {
 
         mockConfigurationCache.getCachedFileHandler = { _, _ in signatureFile }
 
-        mockCentralConfigurationRepository.fetchConfigurationHandler = { configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { "some key" }
-        mockCentralConfigurationRepository.fetchSignatureHandler = { "some signature" }
+        mockCentralConfigurationRepository.fetchConfigurationHandler = { _ in configurationResponse }
+        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _ in "some key" }
+        mockCentralConfigurationRepository.fetchSignatureHandler = { _ in "some signature" }
 
         await #expect(throws: ConfigurationLoaderError.configurationVerificationFailed) {
-            try await configurationLoader.loadCentralConfiguration(cacheDir: nil)
+            try await configurationLoader.loadCentralConfiguration(cacheDir: nil, proxyInfo: ProxyInfo())
         }
     }
 

@@ -29,6 +29,7 @@ final class ToastController: ObservableObject {
     private var dismissTask: Task<Void, Never>?
 
     func show(message: String, duration: TimeInterval) {
+        guard !isVisible else { return }
         self.message = message
 
         withAnimation(.interpolatingSpring(stiffness: 300, damping: 25)) {

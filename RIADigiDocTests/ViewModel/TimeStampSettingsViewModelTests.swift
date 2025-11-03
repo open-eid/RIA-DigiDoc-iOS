@@ -33,7 +33,7 @@ final class TimeStampSettingsViewModelTests {
     private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock!
     private let mockFileManager: FileManagerProtocolMock!
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
-    private let mockCertificateUtil: CertificateUtilProtocolMock
+    private let mockCertificateUtil: CertificateUtilProtocolMock!
 
     let mockConfigProvider: ConfigurationProvider!
 

@@ -71,7 +71,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let result = try await service.fetchConfiguration()
+        let result = try await service.fetchConfiguration(proxyInfo: ProxyInfo())
         #expect(result == "{\"configKey\": \"configValue\"}")
     }
 
@@ -106,7 +106,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Alamofire.AFError.self) {
-            try await errorService.fetchConfiguration()
+            try await errorService.fetchConfiguration(proxyInfo: ProxyInfo())
         }
     }
 
@@ -141,7 +141,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let fetchedPublicKey = try await service.fetchPublicKey()
+        let fetchedPublicKey = try await service.fetchPublicKey(proxyInfo: ProxyInfo())
         #expect(fetchedPublicKey == String(data: mockData, encoding: .utf8))
     }
 
@@ -176,7 +176,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Alamofire.AFError.self) {
-            try await errorService.fetchPublicKey()
+            try await errorService.fetchPublicKey(proxyInfo: ProxyInfo())
         }
     }
 
@@ -211,7 +211,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let fetchedSignature = try await service.fetchSignature()
+        let fetchedSignature = try await service.fetchSignature(proxyInfo: ProxyInfo())
         #expect(fetchedSignature == String(data: mockData, encoding: .utf8))
     }
 
@@ -246,7 +246,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Alamofire.AFError.self) {
-            try await errorService.fetchSignature()
+            try await errorService.fetchSignature(proxyInfo: ProxyInfo())
         }
     }
 }

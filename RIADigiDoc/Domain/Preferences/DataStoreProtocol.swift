@@ -17,6 +17,8 @@
  *
  */
 
+import CommonsLib
+
 /// @mockable
 public protocol DataStoreProtocol: Sendable {
     // MARK: - Language Methods
@@ -54,6 +56,10 @@ public protocol DataStoreProtocol: Sendable {
     func setEncryptionServerId(_ option: EncryptionServerOptionId) async
     func getEncryptionServerInfo() async -> EncryptionServerInfo
     func setEncryptionServerInfo(_ info: EncryptionServerInfo) async
+
+    // MARK: - Proxy Service Settings Methods
+    func getProxyInfo() async -> ProxyInfo
+    func setProxyInfo(_ info: ProxyInfo) async
 
     // MARK: - Signing Selection Methods
     func getSelectedSigningMethod() async -> SigningMethod
