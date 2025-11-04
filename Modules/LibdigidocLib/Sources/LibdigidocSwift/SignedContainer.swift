@@ -156,7 +156,7 @@ public actor SignedContainer: SignedContainerProtocol {
             .deletingLastPathComponent()
             .appendingPathComponent(newFileName)
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: destinationURL,
             in: destinationURL.deletingLastPathComponent()
         )
@@ -170,7 +170,7 @@ public actor SignedContainer: SignedContainerProtocol {
 
     public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
         guard let containerFileURL = containerFile else {
-            throw DigiDocError.containerRenamingFailed(
+            throw DigiDocError.containerDataFileSavingFailed(
                 ErrorDetail(
                     message: "Unable to save container. No container file found.",
                     userInfo: ["fileName": containerFile?.lastPathComponent ?? "N/A"]
@@ -269,7 +269,7 @@ extension SignedContainer {
             let uniqueContainerFile = firstFile
                 .deletingPathExtension()
                 .appendingPathExtension(CommonsLib.Constants.Extension.Default)
-            containerFile = containerUtil.getSignatureContainerFile(
+            containerFile = containerUtil.getContainerFile(
                 for: uniqueContainerFile,
                 in: uniqueContainerFile.deletingLastPathComponent()
             )

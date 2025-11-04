@@ -43,7 +43,7 @@ struct ContainerUtilTests {
         let uniqueFileName = "file-\(UUID().uuidString).txt"
         let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
             in: tempDirectory
         )
@@ -67,7 +67,7 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
             in: tempDirectory
         )
@@ -92,7 +92,7 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
             in: tempDirectory
         )
@@ -114,7 +114,7 @@ struct ContainerUtilTests {
             existingPaths.contains(path)
         }
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
             in: tempDirectory
         )
@@ -138,7 +138,7 @@ struct ContainerUtilTests {
             return existingPaths.contains(path)
         }
 
-        let uniqueFileURL = containerUtil.getSignatureContainerFile(
+        let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
             in: tempDirectory
         )

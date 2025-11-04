@@ -20,19 +20,49 @@
 import ASN1Decoder
 import Foundation
 
-@objc public class Addressee: NSObject {
-    @objc public var data: Data
+public final class Addressee: NSObject, Sendable {
+    @objc public let data: Data
     public let identifier: String
     public let givenName: String?
     public let surname: String?
     public let serialNumber: String?
     public let certType: CertType
-    public var validTo: Date?
+    public let validTo: Date?
+
+    @objc public init(
+        data: Data,
+        cnVal: String,
+        givenName: String?,
+        surname: String?,
+        serialNumber: String?,
+        certType: CertType,
+        validTo: Date?
+    ) {
+        self.identifier = cnVal
+        self.data = data
+        self.givenName = givenName
+        self.surname = surname
+        self.serialNumber = serialNumber
+        self.certType = certType
+        self.validTo = validTo
+    }
+
+    @objc public convenience init(data: Data, cnVal: String) {
+        self.init(
+            data: data,
+            cnVal: cnVal,
+            givenName: nil,
+            surname: nil,
+            serialNumber: nil,
+            certType: .unknownType,
+            validTo: nil
+        )
+    }
 
     init(cert: Data, x509: X509Certificate?) {
         data = cert
-        let commonName = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
-        let split = commonName.split(separator: ",").map { String($0) }
+        let cnVal = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
+        let split = cnVal.split(separator: ",").map { String($0) }
         if split.count > 1 {
             surname = split[0]
             givenName = split[1]
@@ -40,7 +70,7 @@ import Foundation
         } else {
             surname = nil
             givenName = nil
-            identifier = commonName
+            identifier = cnVal
         }
         serialNumber = x509?.subject(oid: .serialNumber)?.joined(separator: ",")
         certType = x509?.certType() ?? .unknownType
@@ -51,15 +81,30 @@ import Foundation
         self.init(cert: cert, x509: try? X509Certificate(der: cert))
     }
 
+    // MARK: - Equatable
+    public static func == (lhs: Addressee, rhs: Addressee) -> Bool {
+        return
+            lhs.data == rhs.data &&
+            lhs.identifier == rhs.identifier &&
+            lhs.givenName == rhs.givenName &&
+            lhs.surname == rhs.surname &&
+            lhs.certType == rhs.certType &&
+            lhs.validTo == rhs.validTo
+    }
+
     public override func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? Addressee else { return false }
-        return (
-            data == other.data &&
-            identifier == other.identifier &&
-            givenName == other.givenName &&
-            surname == other.surname &&
-            certType == other.certType &&
-            validTo == other.validTo
-        )
+        return self == other
+    }
+
+    static public func == (lhs: Addressee, rhs: Data) -> Bool {
+        if lhs.data == rhs {
+            return true
+        }
+        if let key = try? X509Certificate(der: rhs).publicKey?.derEncodedKey,
+           lhs.data == key {
+            return true
+        }
+        return false
     }
 }

@@ -19,11 +19,11 @@
 
 import Foundation
 
-@objc public class CryptoDataFile: NSObject {
+public final class CryptoDataFile: NSObject, Sendable {
     @objc public let filename: String
     @objc public let filePath: String?
 
-    @objc public init(filename: String, filePath: String? = nil) {
+    public init(filename: String, filePath: String? = nil) {
         self.filename = filename
         self.filePath = filePath
     }

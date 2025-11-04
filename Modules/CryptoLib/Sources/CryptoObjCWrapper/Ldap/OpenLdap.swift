@@ -25,7 +25,7 @@ import Foundation
 public class OpenLdap {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "CertificateDetailViewModel"
+        category: "OpenLdap"
     )
 
     private let ldapConfiguration: LdapConfiguration

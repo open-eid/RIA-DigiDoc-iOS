@@ -17,14 +17,24 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+import Foundation
+import CryptoObjC
+import CryptoObjCWrapper
 
-@interface CryptoDataFile : NSObject
+public protocol CryptoContainerProtocol: Sendable, AnyObject {
+    func getContainerName() async -> String
+    func getContainerMimetype() async -> String
+    func getRawContainerFile() async -> URL?
+    func addDataFiles(_ filesToAdd: [URL]) async
+    func addRecipients(_ recipientsToAdd: [Addressee]) async
 
-@property (nonatomic, strong, readonly) NSString * _Nonnull filename;
-@property (nonatomic, strong, readonly, nullable) NSString *filePath;
+    func getDataFiles() async -> [URL]
+    func getRecipients() async -> [Addressee]
 
-- (instancetype _Nonnull )initWithFilename:(NSString * _Nonnull)filename
-                        filePath:(NSString * _Nullable)filePath;
+    func removeRecipient(_ recipient: Addressee) async throws
+    func removeDataFile(_ dataFile: URL) async throws
 
-@end
+    @discardableResult func renameContainer(to newName: String) async throws -> URL
+    func saveDataFile(dataFile: URL, to directory: URL?) async throws -> URL
+
+}

@@ -88,6 +88,10 @@ extension URL {
         return await isDdoc(mimeTypeDecoder: mimeTypeDecoder)
     }
 
+    public func isCryptoContainer() async -> Bool {
+        return Constants.Extension.CryptoContainers.contains(self.pathExtension)
+    }
+
     public func isDdoc(
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
     ) async -> Bool {
