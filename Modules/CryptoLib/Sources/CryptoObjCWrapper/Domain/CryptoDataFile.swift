@@ -19,7 +19,7 @@
 
 import Foundation
 
-public class CryptoDataFile: NSObject {
+public final class CryptoDataFile: NSObject, Sendable {
     @objc public let filename: String
     @objc public let filePath: String?
 

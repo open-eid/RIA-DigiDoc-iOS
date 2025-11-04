@@ -20,14 +20,14 @@
 import ASN1Decoder
 import Foundation
 
-public class Addressee: NSObject, @unchecked Sendable {
-    @objc public var data: Data
+public final class Addressee: NSObject, Sendable {
+    @objc public let data: Data
     public let identifier: String
     public let givenName: String?
     public let surname: String?
     public let serialNumber: String?
     public let certType: CertType
-    public var validTo: Date?
+    public let validTo: Date?
 
     @objc public init(
         data: Data,
@@ -81,15 +81,20 @@ public class Addressee: NSObject, @unchecked Sendable {
         self.init(cert: cert, x509: try? X509Certificate(der: cert))
     }
 
+    // MARK: - Equatable
+    public static func == (lhs: Addressee, rhs: Addressee) -> Bool {
+        return
+            lhs.data == rhs.data &&
+            lhs.identifier == rhs.identifier &&
+            lhs.givenName == rhs.givenName &&
+            lhs.surname == rhs.surname &&
+            lhs.certType == rhs.certType &&
+            lhs.validTo == rhs.validTo
+    }
+
     public override func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? Addressee else { return false }
-        return
-            data == other.data &&
-            identifier == other.identifier &&
-            givenName == other.givenName &&
-            surname == other.surname &&
-            certType == other.certType &&
-            validTo == other.validTo
+        return self == other
     }
 
     static public func == (lhs: Addressee, rhs: Data) -> Bool {

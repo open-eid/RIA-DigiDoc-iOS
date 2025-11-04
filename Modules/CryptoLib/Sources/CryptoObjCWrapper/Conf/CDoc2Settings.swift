@@ -21,8 +21,15 @@
  */
 
 import Foundation
+import OSLog
 
-public class CDoc2Settings: NSObject {
+public final class CDoc2Settings: NSObject, Sendable {
+
+    private static let logger = Logger(
+        subsystem: "ee.ria.digidoc.RIADigiDoc",
+        category: "CDoc2Settings"
+    )
+
     public static let kUseCDoc2Encryption = "kUseCDoc2Encryption"
     public static let kUseCDoc2OnlineEncryption = "kUseCDoc2OnlineEncryption"
     public static let kCDoc2SelectedService = "kCDoc2SelectedService"
@@ -43,68 +50,68 @@ public class CDoc2Settings: NSObject {
         return UserDefaults.standard.object(forKey: key) as? T
     }
 
-    public class var useEncryption: Bool {
+    public static var useEncryption: Bool {
         get { get(kUseCDoc2Encryption) ?? false }
         set { set(kUseCDoc2Encryption, value: newValue) }
     }
 
-    public class var useOnlineEncryption: Bool {
+    public static var useOnlineEncryption: Bool {
         get { get(kUseCDoc2OnlineEncryption) ?? true }
         set { set(kUseCDoc2OnlineEncryption, value: newValue) }
     }
 
-    public class var cdoc2SelectedService: String? {
+    public static var cdoc2SelectedService: String? {
         get { get(kCDoc2SelectedService) }
         set { set(kCDoc2SelectedService, value: newValue) }
     }
 
-    public class var cdoc2UUID: String? {
+    public static var cdoc2UUID: String? {
         get { get(kCDoc2UUID) }
         set { set(kCDoc2UUID, value: newValue) }
     }
 
-    public class var cdoc2PostURL: String? {
+    public static var cdoc2PostURL: String? {
         get { get(kCDoc2PostURL) }
         set { set(kCDoc2PostURL, value: newValue) }
     }
 
-    public class var cdoc2FetchURL: String? {
+    public static var cdoc2FetchURL: String? {
         get { get(kCDoc2FetchURL) }
         set { set(kCDoc2FetchURL, value: newValue) }
     }
 
-    public class var cdoc2Cert: Data? {
+    public static var cdoc2Cert: Data? {
         get { get(kCDoc2Cert) }
         set { set(kCDoc2Cert, value: newValue) }
     }
 
     @MainActor @objc public static var cdoc2Certs = [Data]()
 
-    @objc public class func isEncryptionEnabled() -> Bool {
+    @objc public static func isEncryptionEnabled() -> Bool {
         return useEncryption
     }
 
-    @objc public class func isOnlineEncryptionEnabled() -> Bool {
+    @objc public static func isOnlineEncryptionEnabled() -> Bool {
         return useOnlineEncryption
     }
 
-    @objc public class func getSelectedService() -> String? {
+    @objc public static func getSelectedService() -> String? {
         return cdoc2SelectedService
     }
 
-    @objc public class func getUUID() -> String? {
+    @objc public static func getUUID() -> String? {
         return cdoc2UUID
     }
 
-    @objc public class func getPostURL() -> String? {
+    @objc public static func getPostURL() -> String? {
         return cdoc2PostURL
     }
 
-    @objc public class func getFetchURL() -> String? {
+    @objc public static func getFetchURL() -> String? {
         return cdoc2FetchURL
     }
 
-    @objc public class func getCert() -> Data? {
+    @objc public static func getCert() -> Data? {
         return cdoc2Cert
     }
 
@@ -129,12 +136,12 @@ public class CDoc2Settings: NSObject {
             return nil
         default:
             let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-            print("Keychain lookup failed (\(status)): \(message)")
+            logger.error("Keychain lookup failed (\(status)): \(message)")
             return nil
         }
     }
 
-    @objc public class func proxyCredentials() -> [String: Any]? {
+    @objc public static func proxyCredentials() -> [String: Any]? {
         guard let result = findProxy(withData: true),
               let host = result[kSecAttrServer as String] as? String,
               let port = result[kSecAttrPort as String] as? Int,
@@ -151,9 +158,9 @@ public class CDoc2Settings: NSObject {
         ]
     }
 
-    public class func setProxyCredentials(host: String, port: Int, username: String, password: String) {
+    public static func setProxyCredentials(host: String, port: Int, username: String, password: String) {
         guard let passwordData = password.data(using: .utf8) else {
-            print("Failed to convert password to UTF-8 data")
+            logger.error("Failed to convert password to UTF-8 data")
             return
         }
 
@@ -186,7 +193,7 @@ public class CDoc2Settings: NSObject {
             let status = SecItemUpdate(updateQuery as CFDictionary, updateAttrs as CFDictionary)
             if status != errSecSuccess {
                 let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-                print("Keychain update failed (\(status)): \(message)")
+                logger.error("Keychain update failed (\(status)): \(message)")
             }
 
         } else {
@@ -202,12 +209,12 @@ public class CDoc2Settings: NSObject {
             let status = SecItemAdd(attributes as CFDictionary, nil)
             if status != errSecSuccess {
                 let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-                print("Keychain add failed (\(status)): \(message)")
+                logger.error("Keychain add failed (\(status)): \(message)")
             }
         }
     }
 
-    public class func clearProxyCredentials() {
+    public static func clearProxyCredentials() {
         guard
             let item = findProxy(),
             let server = item[kSecAttrServer as String] as? String,
@@ -232,7 +239,7 @@ public class CDoc2Settings: NSObject {
         let status = SecItemDelete(deleteQuery as CFDictionary)
         if status != errSecSuccess {
             let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-            print("Keychain delete failed (\(status)): \(message)")
+            logger.error("Keychain delete failed (\(status)): \(message)")
         }
     }
 }

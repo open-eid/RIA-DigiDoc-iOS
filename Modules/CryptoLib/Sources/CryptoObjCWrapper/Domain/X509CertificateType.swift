@@ -19,7 +19,7 @@
 
 import ASN1Decoder
 
-@objc public enum CertType: UInt {
+@objc public enum CertType: UInt, Sendable {
     case unknownType
     case iDCardType
     case digiIDType

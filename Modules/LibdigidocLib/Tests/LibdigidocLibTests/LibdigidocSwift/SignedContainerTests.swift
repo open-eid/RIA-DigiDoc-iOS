@@ -179,7 +179,7 @@ final class SignedContainerTests {
         let directoryURL = originalURL.deletingLastPathComponent()
         let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
 
-        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+        mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
         mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
 
@@ -236,7 +236,7 @@ final class SignedContainerTests {
         let defaultFileName = CommonsLib.Constants.Container.DefaultName
         let uniqueFileURL = directoryURL.appendingPathComponent("\(defaultFileName)_unique.asice")
 
-        mockContainerUtil.getSignatureContainerFileHandler = { url, _ in
+        mockContainerUtil.getContainerFileHandler = { url, _ in
             #expect(url.lastPathComponent.starts(with: defaultFileName))
             return uniqueFileURL
         }
@@ -266,7 +266,7 @@ final class SignedContainerTests {
         let directoryURL = originalURL.deletingLastPathComponent()
         let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
 
-        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+        mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
         mockFileManager.moveItemHandler = { _, _ in
             throw NSError(domain: "TestDomain - unable to rename container", code: 1, userInfo: nil)
@@ -297,7 +297,7 @@ final class SignedContainerTests {
         let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
         let errorDomain = "TestDomain - unable to save container"
 
-        mockContainerUtil.getSignatureContainerFileHandler = { _, _ in uniqueFileURL }
+        mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
         mockFileManager.moveItemHandler = { _, _ in
             throw NSError(domain: errorDomain, code: 1, userInfo: nil)
