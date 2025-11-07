@@ -239,6 +239,46 @@ public actor SignedContainer: SignedContainerProtocol {
             containerUtil: containerUtil
         )
     }
+
+    // swiftlint:disable:next function_parameter_count
+    public func prepareSignature(
+        cert: Data,
+        containerPath: URL,
+        roles: [String],
+        roleCity: String,
+        roleState: String,
+        roleCountry: String,
+        roleZip: String,
+        userAgent: String
+    ) async throws -> Data {
+        return try await container
+            .prepareSignature(
+                cert: cert,
+                containerPath: containerPath,
+                roles: roles,
+                roleCity: roleCity,
+                roleState: roleState,
+                roleCountry: roleCountry,
+                roleZip: roleZip,
+                userAgent: userAgent
+            )
+    }
+
+    public func addSignature(signature: Data, containerFile: URL) async throws -> SignedContainerProtocol {
+        let containerWrapper = try await container.addSignature(
+            signature: signature,
+            containerFile: containerFile
+        )
+
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: true,
+            container: containerWrapper,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
+    }
 }
 
 extension SignedContainer {

@@ -340,16 +340,22 @@ struct SigningView: View {
             ) {}
                 .accessibilityHidden(!isNavigatingToContainerNotificationsView)
 
-            NavigationLink(
-                destination:
-                    SigningRootView(
-                        onSuccess: {
-                            Toast.show(languageSettings.localized("Signature added"))
-                            selectedTab = .signatures
-                        }),
-                isActive: $isNavigatingToContainerSigningView
-            ) {}
-                .accessibilityHidden(!isNavigatingToContainerSigningView)
+            if let container = viewModel.signedContainer {
+                NavigationLink(
+                    destination:
+                        SigningRootView(
+                            signedContainer: container,
+                            onSuccess: { updatedContainer in
+                                Task {
+                                    Toast.show(languageSettings.localized("Signature added"))
+                                    await viewModel.loadContainerData(signedContainer: updatedContainer)
+                                    selectedTab = .signatures
+                                }
+                            }),
+                    isActive: $isNavigatingToContainerSigningView
+                ) {}
+                    .accessibilityHidden(!isNavigatingToContainerSigningView)
+            }
 
             if showRenameModal {
                 RenameModalView(

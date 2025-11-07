@@ -31,7 +31,7 @@ final class MobileIDSmartIDSettingsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
 
         mockDataStore.getRelyingPartyUUIDHandler = {
-            return Constants.Configuration.RelyingPartyUUID
+            return Constants.Signing.RelyingPartyUUID
         }
         mockDataStore.getRelyingPartyOptionHandler = {
             return .defaultSetting
@@ -69,7 +69,7 @@ final class MobileIDSmartIDSettingsViewModelTests {
         #expect(mockDataStore.setRelyingPartyUUIDCallCount == 1)
         #expect(mockDataStore.setRelyingPartyOptionCallCount == 1)
 
-        #expect(viewModel.relyingPartyUUID == Constants.Configuration.RelyingPartyUUID)
+        #expect(viewModel.relyingPartyUUID == Constants.Signing.RelyingPartyUUID)
     }
 
     @Test

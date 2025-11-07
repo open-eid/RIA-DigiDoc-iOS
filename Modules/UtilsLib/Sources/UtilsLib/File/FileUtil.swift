@@ -72,9 +72,19 @@ public struct FileUtil: FileUtilProtocol {
         let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
         let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
 
+        let documentsDirectory: URL = Directories.getDocumentsDirectory(fileManager: fileManager) ?? URL(
+            fileURLWithPath: "/var/mobile/Containers/Data/Application/"
+        )
+
+        let applicationDirectory: URL = Directories.getApplicationDirectory(fileManager: fileManager) ?? URL(
+            fileURLWithPath: "/var/mobile/Containers/Data/Application/"
+        )
+
         let containerBasePaths = [
             URL(fileURLWithPath: "/private/var/mobile/Containers/Data/Application/"),
-            URL(fileURLWithPath: "/var/mobile/Containers/Data/Application/")
+            URL(fileURLWithPath: "/var/mobile/Containers/Data/Application/"),
+            documentsDirectory,
+            applicationDirectory
         ]
 
         for containerBasePath in containerBasePaths {
@@ -141,7 +151,10 @@ public struct FileUtil: FileUtilProtocol {
         let normalizedURL = URL(fileURLWithPath: String(decoding: filePath))
         let resolvedAppGroupFilePath = FilePath(stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path)
 
-        let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath)
+        let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath) || filePath.starts(with: FilePath("/private").appending(
+                resolvedAppGroupFilePath.components
+            )
+        )
         if isFromAppGroup {
             FileUtil.logger.debug("File is from app group: \(normalizedURL)")
             return normalizedURL

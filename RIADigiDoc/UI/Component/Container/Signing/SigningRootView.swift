@@ -1,25 +1,86 @@
 import SwiftUI
+import FactoryKit
+import LibdigidocLibSwift
 
 struct SigningRootView: View {
+    @Environment(\.dismiss) private var dismiss
 
-    private let chosenMethod: SigningMethod = .mobileId
+    @State private var chosenMethod: SigningMethod = .idCardViaNFC
 
-    let onSuccess: () -> Void
+    @StateObject private var viewModel: SigningRootViewModel
+
+    let signedContainer: SignedContainerProtocol
+    let onSuccess: (SignedContainerProtocol) -> Void
+
+    init(
+        signedContainer: SignedContainerProtocol,
+        onSuccess: @escaping (SignedContainerProtocol) -> Void
+    ) {
+        _viewModel = StateObject(wrappedValue: Container.shared.signingRootViewModel())
+        self.signedContainer = signedContainer
+        self.onSuccess = onSuccess
+    }
 
     var body: some View {
-        switch chosenMethod {
-        case .idCardViaNFC:
-            EmptyView()
-        case .idCardViaUSB:
-            EmptyView()
-        case .mobileId:
-            MobileIdView(onSuccess: onSuccess)
-        case .smartId:
-            EmptyView()
+        ZStack {
+            switch chosenMethod {
+            case .idCardViaNFC:
+                // TODO: Replace with ID-card NFC view
+                SignatureInputScreen(
+                    selectedSigningMethod: "ID-card via NFC",
+                    isSigningEnabled: .constant(false),
+                    isSigning: .constant(false),
+                    onBackClick: { dismiss() },
+                    onSign: {},
+                    content: {
+                        EmptyView()
+                    }
+                )
+            case .idCardViaUSB:
+                // TODO: Replace with ID-card USB view
+                SignatureInputScreen(
+                    selectedSigningMethod: "ID-card via USB",
+                    isSigningEnabled: .constant(false),
+                    isSigning: .constant(false),
+                    onBackClick: { dismiss() },
+                    onSign: {},
+                    content: {
+                        EmptyView()
+                    }
+                )
+            case .mobileId:
+                MobileIdView(
+                    signedContainer: signedContainer,
+                    onSuccess: onSuccess
+                )
+            case .smartId:
+                // TODO: Replace with Smart-ID view
+                SignatureInputScreen(
+                    selectedSigningMethod: "Smart-ID",
+                    isSigningEnabled: .constant(false),
+                    isSigning: .constant(false),
+                    onBackClick: { dismiss() },
+                    onSign: {},
+                    content: {
+                        EmptyView()
+                    }
+                )
+            }
+        }
+        .onAppear {
+            Task {
+                chosenMethod = await viewModel.getSelectedSigningMethod()
+            }
         }
     }
 }
 
 #Preview {
-    SigningRootView(onSuccess: {})
+    SigningRootView(
+        signedContainer: SignedContainer(
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        ),
+        onSuccess: {_ in }
+    )
 }

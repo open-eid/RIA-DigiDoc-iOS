@@ -119,11 +119,25 @@ public struct Constants {
         public static let TslFilesFolder = "tslFiles"
 
         public static let DefaultTimeout = 5.0
-
-        public static let RelyingPartyUUID = "00000000-0000-0000-0000-000000000000"
     }
 
     public struct MobileId {
         public static let DefaultCountryCode = "372"
+        public static let DisplayTextFormat = "GSM-7"
+    }
+
+    public struct Validation {
+        public static let MaximumPersonalCodeLength = 11
+        public static let MaximumLatvianPersonalCodeLength = 12
+        public static let MinimumPhoneNumberLength = 10
+        public static let AllowedPhoneNumberCountryCodes = ["370", "372"]
+    }
+
+    public struct Signing {
+        public static let RelyingPartyName = "RIA DigiDoc"
+        public static let RelyingPartyUUID = "00000000-0000-0000-0000-000000000000"
+        public static let HashType = "SHA256"
+        public static let Timeout = 120 // Seconds
+        public static let DefaultTimeout = 5 // Seconds
     }
 }

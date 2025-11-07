@@ -198,6 +198,46 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         }
     }
 
+    // swiftlint:disable:next function_parameter_count
+    public func prepareSignature(
+        cert: Data,
+        containerPath: URL,
+        roles: [String],
+        roleCity: String,
+        roleState: String,
+        roleCountry: String,
+        roleZip: String,
+        userAgent: String
+    ) async throws -> Data {
+        return try await DigiDocSigningWrapper
+            .prepareSignature(
+                cert,
+                containerPath: containerPath.path,
+                roles: roles,
+                roleCity: roleCity,
+                roleState: roleState,
+                roleCountry: roleCountry,
+                roleZip: roleZip,
+                userAgent: userAgent
+            )
+    }
+
+    public func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol {
+
+        do {
+            try await DigiDocSigningWrapper.addSignature(signature)
+
+            return try await open(containerFile: containerFile, isSivaConfirmed: true)
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot add signature", code: 7)
+            throw DigiDocError.signatureAddingFailed(
+                ErrorDetail(
+                    nsError: nsError
+                )
+            )
+        }
+    }
+
     private static func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
         switch status {
         case .Valid:

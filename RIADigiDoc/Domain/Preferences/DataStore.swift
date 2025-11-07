@@ -159,18 +159,50 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(info.postURL, forKey: Keys.encryptionServerInfoPostURL)
     }
 
+    // MARK: - Signing Selection Methods
+    public func getSelectedSigningMethod() async -> SigningMethod {
+        if let rawValue = userDefaults().string(forKey: "selectedSigningMethod") {
+            return SigningMethod(rawValue: rawValue) ??
+            DefaultValues.selectedSigningMethod
+        }
+        return DefaultValues.selectedSigningMethod
+    }
+
+    public func setSelectedSigningMethod(_ method: SigningMethod) async {
+        userDefaults().set(method.rawValue, forKey: Keys.selectedSigningMethod)
+    }
+
+    // MARK: - Mobile-ID Methods
+    public func getMobileIdInputData() async -> MobileIdInputData {
+        let phoneNumber = userDefaults().string(forKey: Keys.mobileIdPhoneNumber) ?? DefaultValues.mobileIdPhoneNumber
+        let personalCode = userDefaults().string(
+            forKey: Keys.mobileIdPersonalCode
+        ) ?? DefaultValues.mobileIdPersonalCode
+        let rememberMe = userDefaults().object(forKey: Keys.mobileIdRememberMe) as? Bool ?? true
+        return MobileIdInputData(phoneNumber: phoneNumber, personalCode: personalCode, rememberMe: rememberMe)
+    }
+
+    public func setMobileIdInputData(_ inputData: MobileIdInputData) async {
+        userDefaults().set(inputData.phoneNumber, forKey: Keys.mobileIdPhoneNumber)
+        userDefaults().set(inputData.personalCode, forKey: Keys.mobileIdPersonalCode)
+        userDefaults().set(inputData.rememberMe, forKey: Keys.mobileIdRememberMe)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
         static let language = "en"
         static let validationServiceURL = ""
         static let tsaURL = ""
-        static let relyingPartyUUID = CommonsLib.Constants.Configuration.RelyingPartyUUID
+        static let relyingPartyUUID = CommonsLib.Constants.Signing.RelyingPartyUUID
         static let encryptionCdocOption: EncryptionCdocOption = .cdoc1
         static let encryptionServerId: EncryptionServerOptionId = .defaultSetting
         static let encryptionServerInfoUUID = ""
         static let encryptionServerInfoFetchURL = ""
         static let encryptionServerInfoPostURL = ""
+        static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
+        static let mobileIdPersonalCode = ""
+        static let selectedSigningMethod: SigningMethod = .idCardViaNFC
     }
 
     private enum Keys {
@@ -188,5 +220,9 @@ public actor DataStore: DataStoreProtocol {
         static let encryptionServerInfoUUID = "encryptionServerInfoUUID"
         static let encryptionServerInfoFetchURL = "encryptionServerInfoFetchURL"
         static let encryptionServerInfoPostURL = "encryptionServerInfoPostURL"
+        static let selectedSigningMethod = "selectedSigningMethod"
+        static let mobileIdPhoneNumber = "mobileIdPhoneNumber"
+        static let mobileIdPersonalCode = "mobileIdPersonalCode"
+        static let mobileIdRememberMe = "mobileIdRememberMe"
     }
 }

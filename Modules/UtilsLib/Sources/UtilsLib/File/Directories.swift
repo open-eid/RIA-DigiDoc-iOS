@@ -126,6 +126,24 @@ public struct Directories {
         return nil
     }
 
+    public static func getDocumentsDirectory(
+        fileManager: FileManagerProtocol
+    ) -> URL? {
+        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            return documentsDirectory
+        }
+        return nil
+    }
+
+    public static func getApplicationDirectory(
+        fileManager: FileManagerProtocol
+    ) -> URL? {
+        if let applicationDirectory = fileManager.urls(for: .applicationDirectory, in: .userDomainMask).first {
+            return applicationDirectory
+        }
+        return nil
+    }
+
     public static func getConfigDirectory(from directory: URL? = nil, fileManager: FileManagerProtocol) throws -> URL {
         let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
         return baseDirectory.appendingPathComponent(

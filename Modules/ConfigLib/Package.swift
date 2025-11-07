@@ -47,7 +47,10 @@ let package = Package(
         ),
         .target(
             name: "ConfigLibMocks",
-            dependencies: ["ConfigLib"],
+            dependencies: [
+                "ConfigLib",
+                "CommonsTestShared"
+            ],
             path: "Tests/Mocks"
         ),
         .testTarget(

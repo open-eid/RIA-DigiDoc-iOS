@@ -97,7 +97,7 @@ final class DiagnosticsViewModelTests {
         }
 
         mockDataStore.getRelyingPartyUUIDHandler = {
-            return Constants.Configuration.RelyingPartyUUID
+            return Constants.Signing.RelyingPartyUUID
         }
 
         await viewModel.getConfigurationData(
@@ -265,7 +265,7 @@ final class DiagnosticsViewModelTests {
 
     @Test
     func getRpUuid_success() async {
-        let rpUuid = Constants.Configuration.RelyingPartyUUID
+        let rpUuid = Constants.Signing.RelyingPartyUUID
         mockDataStore.getRelyingPartyUUIDHandler = {
             return rpUuid
         }

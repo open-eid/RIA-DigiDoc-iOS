@@ -31,6 +31,18 @@ public protocol ContainerWrapperProtocol: Sendable {
     func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
     @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
+    // swiftlint:disable:next function_parameter_count
+    func prepareSignature(
+        cert: Data,
+        containerPath: URL,
+        roles: [String],
+        roleCity: String,
+        roleState: String,
+        roleCountry: String,
+        roleZip: String,
+        userAgent: String
+    ) async throws -> Data
+    func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol
 }
 
 extension ContainerWrapperProtocol {
