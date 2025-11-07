@@ -28,6 +28,8 @@
 		DF9AFE992E0358C20062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE982E0358C20062C64D /* FactoryKit */; };
 		DF9AFE9B2E0358C70062C64D /* FactoryTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE9A2E0358C70062C64D /* FactoryTesting */; };
 		DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF9B53972CF7B01B00971F2A /* UtilsLib */; };
+		DFA23CBD2EB6DC64000403E4 /* MobileIdLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA23CBC2EB6DC64000403E4 /* MobileIdLib */; };
+		DFA23CBF2EB6DC73000403E4 /* MobileIdLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA23CBE2EB6DC73000403E4 /* MobileIdLib */; };
 		DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE3E2D1495EC001D951B /* CommonsLib */; };
 		DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE402D1495EE001D951B /* UtilsLib */; };
 		DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5A2D14C4C2001D951B /* Alamofire */; };
@@ -111,6 +113,7 @@
 		DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FileImportShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF67D4F92D28531600F09EB9 /* ConfigLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ConfigLib; sourceTree = "<group>"; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
+		DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MobileIdLib; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
 		DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileImportShareExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFCF22F82E83512D0015AE6B /* CommonsTestShared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsTestShared; sourceTree = "<group>"; };
@@ -136,6 +139,8 @@
 				Domain/Model/ProxySettingsOption.swift,
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Model/SettingsMenuBottomSheetPages.swift,
+				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
+				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
@@ -193,6 +198,12 @@
 				ViewModel/Shared/SharedContainerViewModel.swift,
 				ViewModel/Shared/SharedNFCViewModel.swift,
 				ViewModel/SignatureDetailViewModel.swift,
+				ViewModel/Signing/MobileId/MobileIdViewModel.swift,
+				ViewModel/Signing/MobileId/MobileIdViewModelProtocol.swift,
+				ViewModel/Signing/RootView/SigningRootViewModel.swift,
+				ViewModel/Signing/RootView/SigningRootViewModelProtocol.swift,
+				ViewModel/Signing/SigningMethod/SigningMethodSelectionViewModel.swift,
+				ViewModel/Signing/SigningMethod/SigningMethodSelectionViewModelProtocol.swift,
 				ViewModel/SigningViewModel.swift,
 				ViewModel/TimeStampSettingsViewModel.swift,
 				ViewModel/ValidationSettingsViewModel.swift,
@@ -206,6 +217,8 @@
 				Domain/Model/EncryptionServerInfo.swift,
 				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/ServicesSettingsOption.swift,
+				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
+				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				"Supporting files/Localizable.xcstrings",
@@ -249,6 +262,8 @@
 				Domain/Model/EncryptionServerInfo.swift,
 				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/ServicesSettingsOption.swift,
+				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
+				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Util/Language/LanguageSettings.swift,
@@ -344,6 +359,7 @@
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
 				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
 				1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */,
+				DFA23CBD2EB6DC64000403E4 /* MobileIdLib in Frameworks */,
 				DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */,
 				DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */,
 			);
@@ -362,6 +378,7 @@
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
 				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
 				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
+				DFA23CBF2EB6DC73000403E4 /* MobileIdLib in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DFAABCFE2E82AF0900906874 /* CommonsLibMocks in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
@@ -395,6 +412,7 @@
 			isa = PBXGroup;
 			children = (
 				DFCF22F92E83512D0015AE6B /* Test */,
+				DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */,
 				1A1548DE2E85801500DC2339 /* IdCardLib */,
 				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
 				DF67D4F92D28531600F09EB9 /* ConfigLib */,
@@ -543,6 +561,7 @@
 				DF9AFE912E00D30A0062C64D /* FactoryKit */,
 				1A438FD82E72CF1900546B86 /* CryptoLib */,
 				1A5026EC2E8BFCF400C184D7 /* IdCardLib */,
+				DFA23CBC2EB6DC64000403E4 /* MobileIdLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -578,6 +597,7 @@
 				DFAABCFF2E82AF0900906874 /* ConfigLibMocks */,
 				DFAABD042E82B1AB00906874 /* Alamofire */,
 				DFAABD0A2E82B45700906874 /* CommonsTestShared */,
+				DFA23CBE2EB6DC73000403E4 /* MobileIdLib */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -1079,6 +1099,7 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1135,6 +1156,7 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1465,6 +1487,14 @@
 		DF9B53972CF7B01B00971F2A /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
+		};
+		DFA23CBC2EB6DC64000403E4 /* MobileIdLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MobileIdLib;
+		};
+		DFA23CBE2EB6DC73000403E4 /* MobileIdLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MobileIdLib;
 		};
 		DFA3EE3E2D1495EC001D951B /* CommonsLib */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -34,6 +34,7 @@ struct FloatingLabelTextField: View {
     let isDisabled: Bool
     let onDropdownTap: (() -> Void)?
     let isInvalid: Bool
+    let isError: Bool
     let invalidText: String
     let submitLabel: SubmitLabel
     let keyboardType: UIKeyboardType
@@ -48,6 +49,7 @@ struct FloatingLabelTextField: View {
         isDisabled: Bool = false,
         onDropdownTap: (() -> Void)? = {},
         isInvalid: Bool = false,
+        isError: Bool = false,
         invalidText: String = "",
         submitLabel: SubmitLabel = .done,
         keyboardType: UIKeyboardType = .default,
@@ -61,6 +63,7 @@ struct FloatingLabelTextField: View {
         self.isDisabled = isDisabled
         self.onDropdownTap = onDropdownTap
         self.isInvalid = isInvalid
+        self.isError = isError
         self.invalidText = invalidText
         self.submitLabel = submitLabel
         self.keyboardType = keyboardType
@@ -82,6 +85,19 @@ struct FloatingLabelTextField: View {
         !isDisabled && !isDropdown
     }
 
+    private var titleColor: Color {
+        if isError {
+            return theme.error
+        }
+        if isFocused {
+            return theme.primary
+        }
+        if isDisabled {
+            return theme.onSurface.opacity(Dimensions.Shadow.SOpacity)
+        }
+        return theme.onSurfaceVariant
+    }
+
     private var textColor: Color {
         if isDisabled {
             return theme.onSurface.opacity(Dimensions.Shadow.SOpacity)
@@ -90,9 +106,13 @@ struct FloatingLabelTextField: View {
     }
 
     private var borderColor: Color {
+        if isError {
+            return theme.error
+        }
         if isDisabled {
             return theme.onSurface.opacity(Dimensions.Shadow.SOpacity)
-        } else if isFocused && isInteractionEnabled {
+        }
+        if isFocused && isInteractionEnabled {
             return theme.primary
         }
         return theme.outline
@@ -293,7 +313,7 @@ struct FloatingLabelTextField: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)
-                    .foregroundStyle(theme.onSurfaceVariant)
+                    .foregroundStyle(isError ? theme.error : theme.onSurfaceVariant)
                     .accessibilityLabel(languageSettings.localized("Clear text"))
             }
         )
@@ -310,7 +330,7 @@ struct FloatingLabelTextField: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)
-                    .foregroundStyle(theme.onSurfaceVariant)
+                    .foregroundStyle(isError ? theme.error : theme.onSurfaceVariant)
                     .accessibilityLabel(
                         isPasswordVisible
                         ? languageSettings.localized("Hide password")
@@ -327,13 +347,9 @@ struct FloatingLabelTextField: View {
     @ViewBuilder
     private var floatingLabel: some View {
         HStack {
-            Text(title)
+            Text(verbatim: title)
                 .font(shouldFloatLabel ? typography.bodySmall : typography.bodyLarge)
-                .foregroundStyle(
-                    isFocused
-                    ? theme.primary
-                    : (isDisabled ? theme.onSurface.opacity(Dimensions.Shadow.SOpacity) : theme.onSurfaceVariant)
-                )
+                .foregroundStyle(titleColor)
                 .background(
                     Rectangle()
                         .fill(theme.surface)

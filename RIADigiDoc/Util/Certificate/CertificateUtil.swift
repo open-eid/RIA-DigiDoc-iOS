@@ -37,6 +37,10 @@ public struct CertificateUtil: CertificateUtilProtocol {
         return Data(base64Encoded: base64String)
     }
 
+    public func certificate(from data: Data) -> SecCertificate? {
+        return SecCertificateCreateWithData(nil, data as CFData)
+    }
+
     public func getSubjectAttribute(cert: Data, attribute: ASN1ObjectIdentifier) -> String {
         do {
             let certificate = try Certificate(derEncoded: cert.map { $0 })

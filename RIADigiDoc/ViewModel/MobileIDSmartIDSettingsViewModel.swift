@@ -55,7 +55,7 @@ class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol
         relyingPartyUUID = relyingPartyUUID.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if selectedOption == .defaultSetting || relyingPartyUUID.isEmpty {
-            relyingPartyUUID = Constants.Configuration.RelyingPartyUUID
+            relyingPartyUUID = Constants.Signing.RelyingPartyUUID
         }
 
         await dataStore.setRelyingPartyUUID(relyingPartyUUID: relyingPartyUUID)

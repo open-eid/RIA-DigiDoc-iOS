@@ -42,19 +42,19 @@ public struct DigiDocConf: DigiDocConfProtocol {
     ) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
 
-        if let sivaUrl = sivaUrl {
+        if let sivaUrl = sivaUrl, !sivaUrl.isEmpty {
             await setSiVaUrl(sivaUrl)
         }
 
-        if let sivaCert = sivaCert {
+        if let sivaCert = sivaCert, !sivaCert.isEmpty {
             await addSiVaCert(sivaCert)
         }
 
-        if let tsaUrl = tsaUrl {
+        if let tsaUrl = tsaUrl, !tsaUrl.isEmpty {
             await setTSUrl(tsaUrl)
         }
 
-        if let tsCert = tsCert {
+        if let tsCert = tsCert, !tsCert.isEmpty {
             await addTSCert(tsCert)
         }
     }

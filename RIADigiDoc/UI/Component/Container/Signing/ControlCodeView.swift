@@ -26,11 +26,9 @@ struct ControlCodeView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @State var icon: String
+    var icon: String
 
-    @State var controlCode: String = "1234"
-
-    let onSuccess: () -> Void
+    @Binding var controlCode: String
 
     var body: some View {
         VStack(alignment: .center) {
@@ -54,11 +52,8 @@ struct ControlCodeView: View {
                     .scaleEffect(x: Dimensions.Scaling.WideScaling, y: Dimensions.Scaling.DefaultScaling)
             }
         }
-        .onAppear {
-            // TODO: Remove. Simulate signing for 3 seconds and return to signing view
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                onSuccess()
-            }
+        .onDisappear {
+            controlCode = "- - - -"
         }
     }
 }
@@ -66,7 +61,7 @@ struct ControlCodeView: View {
 #Preview {
     ControlCodeView(
         icon: "mobile_id_logo",
-        onSuccess: {}
+        controlCode: .constant("1234")
     )
     .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())

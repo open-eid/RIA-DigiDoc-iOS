@@ -17,11 +17,13 @@
  *
  */
 
-enum SigningMethod: String, CaseIterable, Identifiable {
+import Foundation
+
+public enum SigningMethod: String, Sendable, CaseIterable, Identifiable {
     case idCardViaNFC = "ID-card via NFC"
     case idCardViaUSB = "ID-card via USB"
     case mobileId = "Mobile-ID"
     case smartId = "Smart-ID"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 }

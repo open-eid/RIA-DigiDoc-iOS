@@ -54,4 +54,12 @@ public protocol DataStoreProtocol: Sendable {
     func setEncryptionServerId(_ option: EncryptionServerOptionId) async
     func getEncryptionServerInfo() async -> EncryptionServerInfo
     func setEncryptionServerInfo(_ info: EncryptionServerInfo) async
+
+    // MARK: - Signing Selection Methods
+    func getSelectedSigningMethod() async -> SigningMethod
+    func setSelectedSigningMethod(_ method: SigningMethod) async
+
+    // MARK: - Mobile-ID Input Methods
+    func getMobileIdInputData() async -> MobileIdInputData
+    func setMobileIdInputData(_ inputData: MobileIdInputData) async
 }

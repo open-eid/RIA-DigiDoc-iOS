@@ -28,7 +28,13 @@ struct SigningMethodSelectionView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @State var selectedSigningMethod: SigningMethod = .idCardViaNFC
+    @StateObject private var viewModel: SigningMethodSelectionViewModel
+
+    @State private var selectedSigningMethod: SigningMethod = .idCardViaNFC
+
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.signingMethodSelectionViewModel())
+    }
 
     var body: some View {
         TopBarContainer(
@@ -50,9 +56,15 @@ struct SigningMethodSelectionView: View {
                                 .mobileId,
                                 .smartId
                             ],
-                            isSelected: { signingMethod in signingMethod == selectedSigningMethod },
-                            titleKey: { signingMethod in languageSettings.localized(signingMethod.rawValue) },
-                            onSelect: { signingMethod in selectedSigningMethod = signingMethod },
+                            isSelected: { signingMethod in
+                                signingMethod == selectedSigningMethod
+                            },
+                            titleKey: { signingMethod in
+                                languageSettings.localized(signingMethod.rawValue)
+                            },
+                            onSelect: { signingMethod in
+                                selectedSigningMethod = signingMethod
+                            },
                             accessibilityLabel: { _, _ in "" }
                         )
 
@@ -60,7 +72,15 @@ struct SigningMethodSelectionView: View {
                             text: languageSettings.localized("Save selection"),
                             isButtonEnabled: true,
                             action: {
-                                // TODO: Save method choice
+                                Task {
+                                    await viewModel.setSelectedSigningMethod(
+                                        selectedSigningMethod
+                                    )
+
+                                    await MainActor.run {
+                                        dismiss()
+                                    }
+                                }
                             }
                         )
                         .padding(.vertical, Dimensions.Padding.MPadding)
@@ -69,6 +89,11 @@ struct SigningMethodSelectionView: View {
                 .padding(.horizontal, Dimensions.Padding.SPadding)
             }
         )
+        .onAppear {
+            Task {
+                selectedSigningMethod = await viewModel.getSelectedSigningMethod()
+            }
+        }
     }
 }
 

@@ -26,6 +26,8 @@ struct SignatureInputScreen<Content: View>: View {
 
     @EnvironmentObject private var languageSettings: LanguageSettings
 
+    private let selectedSigningMethod: String
+
     @Binding var isSigningEnabled: Bool
     @Binding var isSigning: Bool
     let onBackClick: () -> Void
@@ -33,12 +35,14 @@ struct SignatureInputScreen<Content: View>: View {
     let content: Content
 
     init(
+        selectedSigningMethod: String,
         isSigningEnabled: Binding<Bool>,
         isSigning: Binding<Bool>,
         onBackClick: @escaping () -> Void,
         onSign: @escaping () -> Void,
         @ViewBuilder content: () -> Content
     ) {
+        self.selectedSigningMethod = selectedSigningMethod
         self._isSigningEnabled = isSigningEnabled
         self._isSigning = isSigning
         self.onBackClick = onBackClick
@@ -68,8 +72,7 @@ struct SignatureInputScreen<Content: View>: View {
 
                                 NavigationLink(destination: SigningMethodSelectionView()) {
                                     HStack {
-                                        // TODO: Replace with actual chosen signing method
-                                        Text(verbatim: languageSettings.localized("Mobile-ID"))
+                                        Text(verbatim: languageSettings.localized(selectedSigningMethod))
                                             .font(typography.bodyLarge)
                                             .foregroundStyle(theme.onSurface)
                                         Spacer()
@@ -81,6 +84,7 @@ struct SignatureInputScreen<Content: View>: View {
                                                 height: Dimensions.Icon.IconSizeXXS
                                             )
                                             .foregroundStyle(theme.onBackground)
+                                            .accessibilityHidden(true)
                                     }
                                 }
                             }
@@ -109,6 +113,7 @@ struct SignatureInputScreen<Content: View>: View {
 
 #Preview {
     SignatureInputScreen(
+        selectedSigningMethod: "ID-card via NFC",
         isSigningEnabled: .constant(true),
         isSigning: .constant(false),
         onBackClick: {},

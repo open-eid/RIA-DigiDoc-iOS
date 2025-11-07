@@ -40,6 +40,24 @@
         }
       }
     },
+    "Additional information" : {
+      "comment" : "Additional information button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Additional information"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loe täpsemalt siit"
+          }
+        }
+      }
+    },
     "Authentication in progress please wait" : {
       "comment" : "OperationAuthenticateWithWebEID alert message 4",
       "extractionState" : "manual",
@@ -159,6 +177,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaat pole veel kehtiv"
+          }
+        }
+      }
+    },
+    "Certificate status revoked" : {
+      "comment" : "Signing error when certificate status is revoked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate status revoked"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaat on kehtetu"
           }
         }
       }
@@ -520,6 +556,24 @@
         }
       }
     },
+    "Country code not included" : {
+      "comment" : "Shown in signing view when country code is not included",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please include correct country code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefoninumber peab sisaldama riigikoodi"
+          }
+        }
+      }
+    },
     "Country title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -660,6 +714,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Exceeded unsuccessful requests" : {
+      "comment" : "Signing error for exceededUnsuccessfulRequests",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to send request. The number of unsuccessful request from this IP address has been exceeded. Please try again later"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päringu saatmine ebaõnnestus. Sellelt IP-aadressilt on ebaõnnestunud päringute arv ületatud. Palun proovige mõne aja pärast uuesti"
+          }
+        }
+      }
+    },
+    "Expired mobile-ID transaction" : {
+      "comment" : "Mobile-ID error for timeout",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your mobile-ID transaction has expired. Please try again"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu mobiil-ID toiming aegus. Palun proovi uuesti"
+          }
+        }
+      }
+    },
+    "Failed mobile-ID transaction" : {
+      "comment" : "Mobile-ID error for signatureHashMismatch",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your mobile-ID transaction has failed. Please contact your mobile network operator"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu mobiil-ID toiming ebaõnnestus. Palun võta ühendust enda mobiilioperaatoriga"
           }
         }
       }
@@ -1021,6 +1129,24 @@
         }
       }
     },
+    "Invalid country code" : {
+      "comment" : "Shown in signing view when country code is not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid country code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vigane riigikood"
+          }
+        }
+      }
+    },
     "Invalid file size" : {
       "comment" : "When trying adding 0 byte file to container",
       "extractionState" : "manual",
@@ -1035,6 +1161,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tühja faili ei saa lisada ümbrikusse"
+          }
+        }
+      }
+    },
+    "Invalid Mobile-ID access rights" : {
+      "comment" : "Mobile-ID error for invalidAccessRights",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to sign container. Check your mobile-ID service access settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku allkirjastamine ebaõnnestus. Kontrolli mobiil-ID teenuse ligipääsu seadeid"
+          }
+        }
+      }
+    },
+    "Invalid Mobile-ID access rights url" : {
+      "comment" : "URL that user can open in browser to read more about signing large quantities of documents",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/for-organisations-that-sign-large-quantities-of-documents-using-digidoc4-client/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/asutustele-kus-allkirjastatakse-digidoc4-kliendi-kaudu-suuremates-kogustes-dokumente/"
+          }
+        }
+      }
+    },
+    "Invalid personal code" : {
+      "comment" : "Shown in signing view when personal code is not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal code is not valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isikukood pole korrektne"
+          }
+        }
+      }
+    },
+    "Invalid phone number" : {
+      "comment" : "Shown in signing view when phone number is not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone number is not valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefoninumber pole korrektne"
+          }
+        }
+      }
+    },
+    "Invalid proxy settings" : {
+      "comment" : "Signing error when unable to connect with proxy server",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to connect with service server. Please check your network settings or try again later"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teenuse serveriga ühendus ebaõnnestus. Palun kontrolli võrgu sätteid või proovi hiljem uuesti"
           }
         }
       }
@@ -3286,7 +3502,43 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "mobile-ID"
+            "value" : "mobiil-ID"
+          }
+        }
+      }
+    },
+    "Mobile-ID incorrect parameters" : {
+      "comment" : "Mobile-ID error when input parameters are not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
+          }
+        }
+      }
+    },
+    "Mobile-ID technical error" : {
+      "comment" : "Mobile-ID error for technical error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to send request. Mobile-ID service has encountered technical errors. Please try again later"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päringu saatmine ebaõnnestus. Mobiil-ID teenuses esinevad tehnilised tõrked. Palun proovige mõne aja pärast uuesti"
           }
         }
       }
@@ -3308,6 +3560,24 @@
         }
       }
     },
+    "No Internet connection" : {
+      "comment" : "Error shown whne app is unable to conenct to the Internet to do requests",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please check your internet connection"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palun kontrolli internetiühendust"
+          }
+        }
+      }
+    },
     "No recent documents" : {
       "comment" : "Text for when no recent documents are found",
       "extractionState" : "manual",
@@ -3322,6 +3592,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dokumendid puuduvad"
+          }
+        }
+      }
+    },
+    "Not a mobile-id client" : {
+      "comment" : "Mobile-ID error when user is not found or not active",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User is not a mobile-ID client"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasutaja ei ole mobiil-ID klient"
           }
         }
       }
@@ -3358,6 +3646,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kehtivuskinnituse sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "OCSP response not in valid time slot" : {
+      "comment" : "Signing error when clock is wrong",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please check your smart device time"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palun kontrolli oma nutiseadme kellaaega"
+          }
+        }
+      }
+    },
+    "OCSP response not in valid time slot url" : {
+      "comment" : "URL that user can open in browser to read more about checking device time",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/ria-digidoc-error-please-check-your-smart-device-time/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/ria-digidoc-viga-palun-kontrollige-oma-nutiseadme-kellaaega/"
           }
         }
       }
@@ -3465,6 +3789,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Isikukood"
+          }
+        }
+      }
+    },
+    "Phone is not in coverage area" : {
+      "comment" : "Mobile-ID error for phoneAbsent",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone is not in coverage area"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefon ei ole levis"
           }
         }
       }
@@ -3775,6 +4117,24 @@
         }
       }
     },
+    "Request sending error" : {
+      "comment" : "Mobile-ID error for deliveryError",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request sending error"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päringu saatmise viga"
+          }
+        }
+      }
+    },
     "Role title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -4067,6 +4427,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjasta dokument"
+          }
+        }
+      }
+    },
+    "Sign document" : {
+      "comment" : "Shown on user mobile screen when signing and entering PIN code",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign document"
           }
         },
         "et" : {
@@ -4544,6 +4922,24 @@
         }
       }
     },
+    "SIM error" : {
+      "comment" : "Mobile-ID error for simError",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM error"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SIM-kaardi viga"
+          }
+        }
+      }
+    },
     "Siva message" : {
       "comment" : "SiVa message on file opening",
       "extractionState" : "manual",
@@ -4594,6 +4990,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Smart-ID"
+          }
+        }
+      }
+    },
+    "SSL handshake failed" : {
+      "comment" : "Error when cannot create SSL connection with host",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SSL handshake failed. Check your application settings or software upgrades"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SSL ühenduskanali loomine ebaõnnestus. Kontrolli rakenduse seadeid või tarkvara uuendusi"
           }
         }
       }
@@ -4684,6 +5098,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajatempel"
+          }
+        }
+      }
+    },
+    "Too many requests" : {
+      "comment" : "Signing error when request responds with too many requests error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The limit for %@ digital signatures per month has been reached"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu %@ tasuta allkirjade kuulimiit on ületatud"
+          }
+        }
+      }
+    },
+    "Too many requests url" : {
+      "comment" : "URL that user can open in browser to read more about too many requests error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/for-organisations-that-sign-large-quantities-of-documents-using-digidoc4-client/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/asutustele-kus-allkirjastatakse-digidoc4-kliendi-kaudu-suuremates-kogustes-dokumente/"
           }
         }
       }
@@ -4798,6 +5248,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tegemist on vanas formaadis DigiDoc ümbrikuga. Sellele ümbrikule ei saa allkirja lisada ega eemaldada."
+          }
+        }
+      }
+    },
+    "User denied or cancelled" : {
+      "comment" : "Signing error when user has denied or cancelled signing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User denied or cancelled"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasutaja keeldus või katkestas"
           }
         }
       }

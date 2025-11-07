@@ -19,10 +19,13 @@
 
 import SwiftUI
 import FactoryKit
+import LibdigidocLibSwift
 import CommonsLib
 
 struct MobileIdView: View {
+    @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var languageSettings: LanguageSettings
 
     @State private var phoneNumber = Constants.MobileId.DefaultCountryCode
     @State private var personalCode = ""
@@ -30,13 +33,29 @@ struct MobileIdView: View {
     @State private var isSigningEnabled = false
     @State private var isSigning: Bool = false
 
-    let onSuccess: () -> Void
+    @StateObject private var viewModel: MobileIdViewModel
+
+    @State private var task: Task<Void, Never>?
+
+    let signedContainer: SignedContainerProtocol
+    let onSuccess: (SignedContainerProtocol) -> Void
+
+    init(
+        signedContainer: SignedContainerProtocol,
+        onSuccess: @escaping (SignedContainerProtocol) -> Void
+    ) {
+        _viewModel = StateObject(wrappedValue: Container.shared.mobileIdViewModel())
+        self.signedContainer = signedContainer
+        self.onSuccess = onSuccess
+    }
 
     var body: some View {
         SignatureInputScreen(
+            selectedSigningMethod: "Mobile-ID",
             isSigningEnabled: $isSigningEnabled,
             isSigning: $isSigning,
             onBackClick: {
+                cancelSigning()
                 guard isSigning else {
                     dismiss()
                     return
@@ -44,39 +63,117 @@ struct MobileIdView: View {
                 isSigning = false
             },
             onSign: {
-                print("Sign via Mobile-ID")
-                isSigning = true
-            }
-        ) {
-            if isSigning {
-                ControlCodeView(
-                    icon: "mobile_id_logo",
-                    onSuccess: {
+                cancelSigning()
+
+                task = Task {
+                    let (inputPhoneNumber, inputPersonalCode) = rememberMe
+                        ? (phoneNumber, personalCode)
+                        : (Constants.MobileId.DefaultCountryCode, "")
+
+                    await viewModel.saveInputData(
+                        phoneNumber: inputPhoneNumber,
+                        personalCode: inputPersonalCode,
+                        rememberMe: rememberMe
+                    )
+
+                    isSigning = true
+                    let updatedContainer = await viewModel.sign(
+                        phoneNumber: phoneNumber,
+                        personalCode: personalCode,
+                        signedContainer: signedContainer
+                    )
+                    guard let container = updatedContainer else {
+                        cancelSigning()
                         isSigning = false
-                        dismiss()
-                        self.onSuccess()
+                        if let messageKey = viewModel.mobileIdMessageKey,
+                           !messageKey.isEmpty {
+                            Toast.show(
+                                languageSettings.localized(messageKey)
+                            )
+                        }
+
+                        return
                     }
-                )
-            } else {
-                MobileIdInputView(
-                    phoneNumber: $phoneNumber,
-                    personalCode: $personalCode,
-                    rememberMe: $rememberMe,
-                    onFieldChange: {
-                        validateFields()
-                    }
-                )
+
+                    cancelSigning()
+
+                    onSuccess(container)
+                    dismiss()
+                }
+            },
+            content: {
+                if isSigning {
+                    ControlCodeView(
+                        icon: "mobile_id_logo",
+                        controlCode: $viewModel.controlCode
+                    )
+                } else {
+                    MobileIdInputView(
+                        phoneNumber: $phoneNumber,
+                        personalCode: $personalCode,
+                        rememberMe: $rememberMe,
+                        isSigningEnabled: $isSigningEnabled,
+                        countryCodeAndPhoneError: $viewModel.countryCodeAndPhoneErrorKey,
+                        personalCodeError: $viewModel.personalCodeErrorKey,
+                        onInputChange: {
+                            isSigningEnabled = viewModel.isSigningEnabled(
+                                phoneNumber: phoneNumber,
+                                personalCode: personalCode
+                            )
+                        }
+                    )
+                }
             }
+        )
+        .alert(
+            languageSettings.localized(
+                viewModel.mobileIdAlertMessageKey ?? "",
+                viewModel.mobileIdAlertMessageExtraArguments
+            ),
+            isPresented: $viewModel.showMobileIdAlertMessage
+        ) {
+            Button(languageSettings.localized("OK")) {
+                viewModel.resetErrors()
+            }
+
+            if let messageUrl = viewModel.mobileIdAlertMessageUrl, !messageUrl.isEmpty {
+                Button(languageSettings.localized("Additional information")) {
+                    if let url = URL(string: languageSettings.localized(messageUrl)),
+                       UIApplication.shared.canOpenURL(url) {
+                        openURL(url)
+                    }
+                    viewModel.resetErrors()
+                    isSigning = false
+                }
+            }
+        }
+        .onAppear {
+            Task {
+                let inputData = await viewModel.getInputData()
+                phoneNumber = inputData.phoneNumber
+                personalCode = inputData.personalCode
+                rememberMe = inputData.rememberMe
+            }
+        }
+        .onDisappear {
+            cancelSigning()
         }
     }
 
-    private func validateFields() {
-        isSigningEnabled = !phoneNumber.isEmpty && !personalCode.isEmpty
+    func cancelSigning() {
+        task?.cancel()
+        task = nil
     }
 }
 
 #Preview {
-    MobileIdView(onSuccess: {})
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+    MobileIdView(
+        signedContainer: SignedContainer(
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        ),
+        onSuccess: { _ in }
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

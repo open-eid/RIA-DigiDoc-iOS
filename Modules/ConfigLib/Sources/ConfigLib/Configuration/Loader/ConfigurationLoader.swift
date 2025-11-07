@@ -273,12 +273,21 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         _ = try await loadConfigurationProperty()
 
-        let centralSignature = try await centralConfigurationRepository.fetchSignature()
-            .trimmingCharacters(
-                in: .whitespaces
-            )
+        var centralSignature = ""
 
-        if currentSignature != centralSignature.data(using: .utf8) {
+        do {
+            centralSignature = try await centralConfigurationRepository.fetchSignature()
+                .trimmingCharacters(
+                    in: .whitespaces
+                )
+        } catch {
+            ConfigurationLoader.logger.error(
+                "Unable to get remote configuration signature \(error)"
+            )
+            return
+        }
+
+        if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
             ConfigurationLoader.logger.debug("Found new configuration")
 
             let centralConfig = try await centralConfigurationRepository.fetchConfiguration()

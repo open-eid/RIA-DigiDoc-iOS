@@ -31,31 +31,78 @@ struct MobileIdInputView: View {
     @Binding var phoneNumber: String
     @Binding var personalCode: String
     @Binding var rememberMe: Bool
+    @Binding var isSigningEnabled: Bool
+    @Binding var countryCodeAndPhoneError: String?
+    @Binding var personalCodeError: String?
 
-    var onFieldChange: () -> Void
+    let onInputChange: () -> Void
+
+    private var countryCodeAndPhoneErrorText: String {
+        return languageSettings.localized(countryCodeAndPhoneError ?? "")
+    }
+
+    private var personalCodeErrorText: String {
+        return languageSettings.localized(personalCodeError ?? "")
+    }
+
+    init(
+        phoneNumber: Binding<String>,
+        personalCode: Binding<String>,
+        rememberMe: Binding<Bool>,
+        isSigningEnabled: Binding<Bool>,
+        countryCodeAndPhoneError: Binding<String?>,
+        personalCodeError: Binding<String?>,
+        onInputChange: @escaping () -> Void
+    ) {
+        self._phoneNumber = phoneNumber
+        self._personalCode = personalCode
+        self._rememberMe = rememberMe
+        self._isSigningEnabled = isSigningEnabled
+        self._countryCodeAndPhoneError = countryCodeAndPhoneError
+        self._personalCodeError = personalCodeError
+        self.onInputChange = onInputChange
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
-                FloatingLabelTextField(
-                    title: languageSettings.localized("Country code and phone number"),
-                    placeholder: phoneNumberPlaceholder,
-                    text: $phoneNumber,
-                    keyboardType: .phonePad,
-                    showDashButton: true
-                )
-                .onChange(of: phoneNumber) { _ in
-                    onFieldChange()
+                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                    FloatingLabelTextField(
+                        title: languageSettings.localized("Country code and phone number"),
+                        placeholder: phoneNumberPlaceholder,
+                        text: $phoneNumber,
+                        isError: !countryCodeAndPhoneErrorText.isEmpty,
+                        keyboardType: .phonePad,
+                        showDashButton: true
+                    )
+                    .onChange(of: phoneNumber) { _ in
+                        onInputChange()
+                    }
+
+                    if !countryCodeAndPhoneErrorText.isEmpty {
+                        Text(verbatim: countryCodeAndPhoneErrorText)
+                            .font(typography.bodySmall)
+                            .foregroundStyle(theme.error)
+                    }
                 }
 
-                FloatingLabelTextField(
-                    title: languageSettings.localized("Personal code"),
-                    text: $personalCode,
-                    keyboardType: .phonePad,
-                    showDashButton: true
-                )
-                .onChange(of: personalCode) { _ in
-                    onFieldChange()
+                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                    FloatingLabelTextField(
+                        title: languageSettings.localized("Personal code"),
+                        text: $personalCode,
+                        isError: !personalCodeErrorText.isEmpty,
+                        keyboardType: .phonePad,
+                        showDashButton: true
+                    )
+                    .onChange(of: personalCode) { _ in
+                        onInputChange()
+                    }
+
+                    if !personalCodeErrorText.isEmpty {
+                        Text(verbatim: personalCodeErrorText)
+                            .font(typography.bodySmall)
+                            .foregroundStyle(theme.error)
+                    }
                 }
             }
             .padding(.vertical, Dimensions.Padding.ZeroPadding)
@@ -81,7 +128,11 @@ struct MobileIdInputView: View {
         phoneNumber: .constant("123"),
         personalCode: .constant("456"),
         rememberMe: .constant(true),
-        onFieldChange: {}
+        isSigningEnabled: .constant(true),
+        countryCodeAndPhoneError: .constant(""),
+        personalCodeError: .constant(""),
+        onInputChange: {}
+
     )
     .environmentObject(Container.shared.languageSettings())
     .environmentObject(Container.shared.themeSettings())

@@ -254,4 +254,34 @@ extension Container {
             SivaRepository(sivaService: self.sivaService())
         }
     }
+
+    @MainActor
+    var mobileIdViewModel: Factory<MobileIdViewModel> {
+        self { @MainActor in
+            MobileIdViewModel(
+                configurationRepository: self.configurationRepository(),
+                mobileIdSignService: self.mobileIdSignService(),
+                certificateUtil: self.certificateUtil(),
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
+    var signingMethodSelectionViewModel: Factory<SigningMethodSelectionViewModel> {
+        self { @MainActor in
+            SigningMethodSelectionViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
+    var signingRootViewModel: Factory<SigningRootViewModel> {
+        self { @MainActor in
+            SigningRootViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
 }

@@ -40,6 +40,18 @@ public protocol SignedContainerProtocol: Sendable, AnyObject {
     func isXades() async -> Bool
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> SignedContainerProtocol
     @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> SignedContainerProtocol
+    // swiftlint:disable:next function_parameter_count
+    func prepareSignature(
+        cert: Data,
+        containerPath: URL,
+        roles: [String],
+        roleCity: String,
+        roleState: String,
+        roleCountry: String,
+        roleZip: String,
+        userAgent: String
+    ) async throws -> Data
+    func addSignature(signature: Data, containerFile: URL) async throws -> SignedContainerProtocol
 }
 
 extension SignedContainerProtocol {
