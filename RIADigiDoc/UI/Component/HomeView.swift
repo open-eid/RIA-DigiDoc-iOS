@@ -118,7 +118,7 @@ struct HomeView: View {
                 destination: EncryptView(),
                 isActive: $isNavigatingToEncryptView
             ) {}
-            
+
             NavigationLink(
                 destination: RecentDocumentsView(),
                 isActive: $isNavigatingToRecentDocumentsView

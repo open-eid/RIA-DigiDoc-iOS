@@ -62,7 +62,7 @@ extension Container {
         }
             .shared
     }
-    
+
     @MainActor
     var sharedContainerViewModel: Factory<SharedContainerViewModelProtocol> {
         self { @MainActor in SharedContainerViewModel() }
@@ -105,7 +105,7 @@ extension Container {
             )
         }
     }
-    
+
     @MainActor
     var encryptViewModel: Factory<EncryptViewModel> {
         self {
@@ -351,4 +351,3 @@ extension Container {
         }
     }
 }
-

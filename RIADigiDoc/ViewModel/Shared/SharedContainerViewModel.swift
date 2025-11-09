@@ -38,7 +38,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
         self.cryptoContainer = cryptoContainer
         addNestedContainer(cryptoContainer)
     }
-    
+
     func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?) {
         self.fileOpeningResult = fileOpeningResult
     }

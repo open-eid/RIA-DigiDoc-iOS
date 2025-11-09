@@ -20,7 +20,7 @@
 import Foundation
 import OSLog
 
-public class CdocInfo: NSObject {
+@objc public class CdocInfo: NSObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CdocInfo")
     public let format: String
     public let addressees: [Addressee]

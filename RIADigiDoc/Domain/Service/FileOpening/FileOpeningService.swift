@@ -83,7 +83,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
     func openOrCreateCryptoContainer(dataFiles: [URL]) async throws -> CryptoContainerProtocol {
         return try await CryptoContainer.openOrCreate(dataFiles: dataFiles)
     }
-    
+
     private func cacheFile(
         from sourceURL: URL,
     ) throws -> URL {

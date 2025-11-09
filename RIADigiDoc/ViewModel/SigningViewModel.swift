@@ -76,7 +76,8 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger.debug("Loading container data")
-        let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer()) as? any SignedContainerProtocol
+        let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
+            as? any SignedContainerProtocol
         guard let openedContainer else {
             SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")
             return

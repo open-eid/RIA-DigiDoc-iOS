@@ -70,7 +70,8 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
 
     func loadContainerData(cryptoContainer: CryptoContainerProtocol?) async {
         EncryptViewModel.logger.debug("Loading container data")
-        let openedContainer = (cryptoContainer ?? sharedContainerViewModel.currentContainer()) as? any CryptoContainerProtocol
+        let openedContainer = (cryptoContainer ?? sharedContainerViewModel.currentContainer())
+            as? any CryptoContainerProtocol
         guard let openedContainer else {
             EncryptViewModel.logger.error("Cannot load container data. Crypto container is nil.")
             return
@@ -191,7 +192,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             if mimeType == Constants.MimeType.Ddoc && !isSivaConfirmed {
                 return
             }
-            
+
             if Constants.Extension.CryptoContainers.contains(fileURL.pathExtension) {
                 do {
                     try await openNestedContainer(fileURL: fileURL)
@@ -233,12 +234,12 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             return false
         }
     }
-    
+
     func isEncryptedContainer(cryptoContainer: CryptoContainerProtocol?) async -> Bool {
         guard let container = cryptoContainer else {
             return false
         }
-        
+
         return await container.isEncrypted()
     }
 
@@ -246,18 +247,18 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         guard let container = cryptoContainer else {
             return false
         }
-        
+
         return await container.isDecrypted()
     }
-    
+
     func isContainerWithoutRecipients(cryptoContainer: CryptoContainerProtocol?) async -> Bool {
         guard let container = cryptoContainer else {
             return false
         }
-        
+
         return await container.getRecipients().isEmpty
     }
-    
+
     func isNestedContainer() -> Bool {
         return sharedContainerViewModel.isNestedContainer(
             sharedContainerViewModel.currentContainer()
@@ -276,17 +277,17 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             return true
         }
     }
-    
+
     func isDataFilesInContainer(
         cryptoContainer: CryptoContainerProtocol?,
     ) async -> Bool {
         guard let container = cryptoContainer else {
             return false
         }
-        
+
         return await container.getDataFiles().isEmpty
     }
-    
+
     func isCDOC1Container(
         cryptoContainer: CryptoContainerProtocol?,
     ) async -> Bool {
@@ -312,7 +313,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         return isContainerWithoutRecipients && !isEncryptedContainer && !isDecryptedContainer &&
             !isNestedContainer
     }
-    
+
     func isContainerUnlocked(
         cryptoContainer: CryptoContainerProtocol?,
     ) async -> Bool {
@@ -320,7 +321,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         let isContainerWithoutRecipients = await isContainerWithoutRecipients(cryptoContainer: cryptoContainer)
         return !isEncryptedContainer && !isContainerWithoutRecipients
     }
-    
+
     func isEditButtonShown(
         cryptoContainer: CryptoContainerProtocol?,
         isNestedContainer: Bool
@@ -329,7 +330,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         let isDecryptedContainer = await isDecryptedContainer(cryptoContainer: cryptoContainer)
         return !isEncryptedContainer && !isDecryptedContainer && !isNestedContainer
     }
-    
+
     func isSignButtonShown(
         cryptoContainer: CryptoContainerProtocol?,
         isNestedContainer: Bool
@@ -337,7 +338,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         let isEncryptedContainer = await isEncryptedContainer(cryptoContainer: cryptoContainer)
         return isEncryptedContainer && !isNestedContainer
     }
-    
+
     func isShareButtonShown(
         cryptoContainer: CryptoContainerProtocol?
     ) async -> Bool {
@@ -357,15 +358,15 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         cryptoContainer: CryptoContainerProtocol?,
         isNestedContainer: Bool
     ) async -> Bool {
-        if (await isDecryptedContainer(cryptoContainer: cryptoContainer) || isNestedContainer) {
+        if await isDecryptedContainer(cryptoContainer: cryptoContainer) || isNestedContainer {
             return false
         }
 
         let isContainerWithoutRecipients = await !isContainerWithoutRecipients(cryptoContainer: cryptoContainer)
-        
+
         return await (!isEncryptedContainer(cryptoContainer: cryptoContainer) && isContainerWithoutRecipients)
     }
-    
+
     func removeDataFile(_ dataFile: URL) async {
         guard let container = cryptoContainer, let containerFile = containerURL else {
             EncryptViewModel.logger.error(
@@ -391,9 +392,9 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             return
         }
     }
-    
+
     private func openNestedContainer(fileURL: URL) async throws {
-        if (Constants.Extension.CryptoContainers.contains(fileURL.pathExtension)) {
+        if Constants.Extension.CryptoContainers.contains(fileURL.pathExtension) {
             let container = try await fileOpeningService
                 .openOrCreateCryptoContainer(dataFiles: [fileURL])
             await loadContainerData(cryptoContainer: container)

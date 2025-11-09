@@ -42,7 +42,7 @@ struct EncryptView: View {
     @State private var containerTitle: String = ""
     @State private var encryptDecryptLabel: String = ""
     @State private var encryptDecryptAccessibilityLabel: String = ""
-    
+
     @State private var tempContainerURL: URL?
     @State private var isFileSaved: Bool = false
     @State private var showRenameModal = false
@@ -50,7 +50,7 @@ struct EncryptView: View {
     @State private var newContainerName = Constants.Container.DefaultName
 
     @State private var showingShareSheet = false
-    
+
     @State private var isContainerWithoutRecipients = false
     @State private var isContainerEncrypted = false
     @State private var isContainerDecrypted = false
@@ -61,7 +61,7 @@ struct EncryptView: View {
     @State private var isShareButtonShown = false
     @State private var isEditButtonShown = false
     @State private var shouldShowDatafiles = false
-    
+
     @State private var selectedDataFile: URL?
 
     @State private var showSivaMessage = false
@@ -118,7 +118,7 @@ struct EncryptView: View {
     private var encryptLabel: String {
         languageSettings.localized("Encrypt")
     }
-    
+
     private func encryptDecryptLabel() async -> String {
         if await isDecryptButtonShown() {
             return languageSettings.localized("Decrypt")
@@ -138,7 +138,7 @@ struct EncryptView: View {
            return ""
         }
     }
-    
+
     private var addMoreFilesLabel: String {
         languageSettings.localized("Add more files")
     }
@@ -146,63 +146,63 @@ struct EncryptView: View {
     private var isNestedContainer: Bool {
         viewModel.isNestedContainer()
     }
-    
+
     private func isContainerWithoutRecipients() async -> Bool {
         return await viewModel.isContainerWithoutRecipients(cryptoContainer: viewModel.cryptoContainer)
     }
-    
+
     private func isContainerEncrypted() async -> Bool {
         return await viewModel.isEncryptedContainer(cryptoContainer: viewModel.cryptoContainer)
     }
-    
+
     private func isContainerDecrypted() async -> Bool {
         return await viewModel.isDecryptedContainer(cryptoContainer: viewModel.cryptoContainer)
     }
-    
+
     private func isContainerUnlocked() async -> Bool {
         return await viewModel.isContainerUnlocked(cryptoContainer: viewModel.cryptoContainer)
     }
-    
+
     private func isEncryptButtonShown() async -> Bool {
         return await viewModel.isEncryptButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         )
     }
-    
+
     private func isDecryptButtonShown() async -> Bool {
         return await viewModel.isEncryptButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         )
     }
-    
+
     private func isSignButtonShown() async -> Bool {
         return await viewModel.isSignButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         )
     }
-    
+
     private func isShareButtonShown() async -> Bool {
         return await viewModel.isShareButtonShown(
             cryptoContainer: viewModel.cryptoContainer
         )
     }
-    
+
     private func isEditButtonShown() async -> Bool {
         return await viewModel.isEditButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         )
     }
-    
+
     private func shouldShowDatafiles() async -> Bool {
         return await viewModel.shouldShowDataFiles(
             cryptoContainer: viewModel.cryptoContainer,
         )
     }
-    
+
     @State private var containerLoadingTask: Task<Void, Never>?
 
     init(
@@ -231,7 +231,7 @@ struct EncryptView: View {
                     }
                 },
                 onExtraButtonClick: {
-                    
+
                 },
                 content: {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
@@ -322,7 +322,7 @@ struct EncryptView: View {
                                         containerRecipientsTitle
                                     ]) {
                                         if selectedTab == 0 {
-                                            if (shouldShowDatafiles) {
+                                            if shouldShowDatafiles {
                                                 CryptoDataFilesSection(
                                                     viewModel: viewModel,
                                                     isContainerUnlocked: isContainerUnlocked,
@@ -337,7 +337,7 @@ struct EncryptView: View {
                                             }
                                         } else {
                                             // TODO: RecipientListView
-                                            //.environmentObject(languageSettings)
+                                            // .environmentObject(languageSettings)
                                         }
                                     }
                                 }
@@ -346,7 +346,7 @@ struct EncryptView: View {
                         .padding(Dimensions.Padding.SPadding)
                         if isContainerWithoutRecipients && !isNestedContainer {
                         } else {
-                            
+
                         }
                         if isShareButtonShown {
                             if let containerFile = viewModel.containerURL {
@@ -427,7 +427,7 @@ struct EncryptView: View {
     }
 
     private func updateAsyncProperties() async {
-        
+
         let containerTitle = await containerTitle()
         let encryptDecryptLabel = await self.encryptDecryptLabel()
         let encryptDecryptAccessibilityLabel = await self.encryptDecryptAccessibilityLabel()

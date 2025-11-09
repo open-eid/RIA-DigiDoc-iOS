@@ -129,7 +129,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
 
     func showFileAddedMessage() async -> Bool {
         let container = sharedContainerViewModel.currentContainer() as? any SignedContainerProtocol
-        
+
         return await container?.getSignatures().isEmpty ?? false
     }
 
