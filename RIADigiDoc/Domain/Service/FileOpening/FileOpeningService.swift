@@ -22,6 +22,7 @@ import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
+import CryptoSwift
 
 actor FileOpeningService: FileOpeningServiceProtocol {
 
@@ -79,6 +80,10 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         return try await SignedContainer.openOrCreate(dataFiles: dataFiles, isSivaConfirmed: isSivaConfirmed)
     }
 
+    func openOrCreateCryptoContainer(dataFiles: [URL]) async throws -> CryptoContainerProtocol {
+        return try await CryptoContainer.openOrCreate(dataFiles: dataFiles)
+    }
+    
     private func cacheFile(
         from sourceURL: URL,
     ) throws -> URL {

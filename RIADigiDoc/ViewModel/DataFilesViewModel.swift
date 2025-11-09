@@ -40,8 +40,8 @@ class DataFilesViewModel: ObservableObject {
 
     func saveDataFile(dataFile: DataFileWrapper) async -> URL? {
         do {
-            return try await sharedContainerViewModel
-                .currentContainer()?
+            return try await (sharedContainerViewModel
+                .currentContainer() as? any SignedContainerProtocol)?
                 .saveDataFile(dataFile: dataFile, to: nil)
         } catch {
             DataFilesViewModel.logger.error(

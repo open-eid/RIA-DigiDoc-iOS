@@ -76,7 +76,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger.debug("Loading container data")
-        let openedContainer = signedContainer ?? sharedContainerViewModel.currentContainer()
+        let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer()) as? any SignedContainerProtocol
         guard let openedContainer else {
             SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")
             return
@@ -290,7 +290,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     func handleBackButton() async -> Bool {
         if sharedContainerViewModel.containers().count > 1 {
             sharedContainerViewModel.removeLastContainer()
-            let currentContainer = sharedContainerViewModel.currentContainer()
+            let currentContainer = sharedContainerViewModel.currentContainer() as? any SignedContainerProtocol
             sharedContainerViewModel.setSignedContainer(currentContainer)
             await loadContainerData(signedContainer: currentContainer)
             return false

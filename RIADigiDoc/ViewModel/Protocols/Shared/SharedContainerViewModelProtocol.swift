@@ -18,20 +18,22 @@
  */
 
 import Foundation
+import CryptoSwift
 import LibdigidocLibSwift
 
 /// @mockable
 @MainActor
 public protocol SharedContainerViewModelProtocol: Sendable {
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?)
+    func setCryptoContainer(_ cryptoContainer: CryptoContainerProtocol?)
     func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?)
     func getFileOpeningResult() -> Result<[URL], Error>?
     func setAddedFilesCount(addedFiles: Int)
     func getAddedFilesCount() -> Int
 
-    func currentContainer() -> SignedContainerProtocol?
-    func isNestedContainer(_ container: SignedContainerProtocol?) -> Bool
-    func containers() -> [SignedContainerProtocol]
-    @discardableResult func removeLastContainer() -> SignedContainerProtocol?
+    func currentContainer() -> AnyObject?
+    func isNestedContainer(_ container: AnyObject?) -> Bool
+    func containers() -> [AnyObject]
+    @discardableResult func removeLastContainer() -> AnyObject?
     func clearContainers()
 }

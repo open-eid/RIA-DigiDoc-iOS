@@ -32,6 +32,7 @@ struct HomeView: View {
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
     @State private var isNavigatingToRecentDocumentsView = false
+    @State private var isNavigatingToEncryptView = false
 
     @State private var showFilesBottomSheet: Bool = false
     @State private var showSignatureBottomSheet: Bool = false
@@ -88,11 +89,17 @@ struct HomeView: View {
                 )
                 .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 
-                ActionButton(
+                SigningImportButton(
                     title: languageSettings.localized("Main home crypto title"),
                     description: languageSettings.localized("Main home crypto description"),
                     assetImageName: "ic_m3_encrypted_48pt_wght400",
-                ) {}
+                    isFileOpeningLoading: $isFileOpeningLoading,
+                    isNavigatingToNextView: $isNavigatingToEncryptView,
+                    showBottomSheet: $showSignatureBottomSheet,
+                    isImporting: $isImporting,
+                    viewModel: viewModel
+                )
+                .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 
                 ActionButton(
                     title: languageSettings.localized("Main home my eid title"),
@@ -107,6 +114,11 @@ struct HomeView: View {
                 isActive: $isNavigatingToSigningView
             ) {}
 
+            NavigationLink(
+                destination: EncryptView(),
+                isActive: $isNavigatingToEncryptView
+            ) {}
+            
             NavigationLink(
                 destination: RecentDocumentsView(),
                 isActive: $isNavigatingToRecentDocumentsView

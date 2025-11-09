@@ -57,6 +57,14 @@ public actor CryptoContainer: CryptoContainerProtocol {
         self.isEncrypted = isEncrypted
     }
 
+    public func isDecrypted() async -> Bool {
+        return isDecrypted
+    }
+    
+    public func isEncrypted() async -> Bool {
+        return isEncrypted
+    }
+    
     public func getContainerName() async -> String {
         return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }

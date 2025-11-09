@@ -22,6 +22,8 @@ import CryptoObjC
 import CryptoObjCWrapper
 
 public protocol CryptoContainerProtocol: Sendable, AnyObject {
+    func isDecrypted() async -> Bool
+    func isEncrypted() async -> Bool
     func getContainerName() async -> String
     func getContainerMimetype() async -> String
     func getRawContainerFile() async -> URL?

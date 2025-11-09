@@ -62,9 +62,10 @@ extension Container {
         }
             .shared
     }
-
+    
+    @MainActor
     var sharedContainerViewModel: Factory<SharedContainerViewModelProtocol> {
-        self { SharedContainerViewModel() }
+        self { @MainActor in SharedContainerViewModel() }
             .shared
     }
 
@@ -94,6 +95,22 @@ extension Container {
         self {
             @MainActor in
             SigningViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileOpeningService: self.fileOpeningService(),
+                mimeTypeCache: self.mimeTypeCache(),
+                mimeTypeDecoder: self.mimeTypeDecoder(),
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager(),
+                sivaRepository: self.sivaRepository()
+            )
+        }
+    }
+    
+    @MainActor
+    var encryptViewModel: Factory<EncryptViewModel> {
+        self {
+            @MainActor in
+            EncryptViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileOpeningService: self.fileOpeningService(),
                 mimeTypeCache: self.mimeTypeCache(),
@@ -334,3 +351,4 @@ extension Container {
         }
     }
 }
+
