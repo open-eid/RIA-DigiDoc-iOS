@@ -292,6 +292,13 @@ extension Container {
     }
 
     @MainActor
+    var smartIdViewModel: Factory<SmartIdViewModel> {
+        self { @MainActor in
+            SmartIdViewModel()
+        }
+    }
+
+    @MainActor
     var signingMethodSelectionViewModel: Factory<SigningMethodSelectionViewModel> {
         self { @MainActor in
             SigningMethodSelectionViewModel(

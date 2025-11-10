@@ -151,10 +151,11 @@ public struct FileUtil: FileUtilProtocol {
         let normalizedURL = URL(fileURLWithPath: String(decoding: filePath))
         let resolvedAppGroupFilePath = FilePath(stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path)
 
-        let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath) || filePath.starts(with: FilePath("/private").appending(
-                resolvedAppGroupFilePath.components
-            )
+        let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath) ||
+        filePath.starts(with: FilePath("/private")
+            .appending(resolvedAppGroupFilePath.components)
         )
+
         if isFromAppGroup {
             FileUtil.logger.debug("File is from app group: \(normalizedURL)")
             return normalizedURL

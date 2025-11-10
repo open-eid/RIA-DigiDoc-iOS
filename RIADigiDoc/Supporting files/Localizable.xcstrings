@@ -289,6 +289,24 @@
         }
       }
     },
+    "Choose country" : {
+      "comment" : "Smart-ID country chooser modal title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose country"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali riik"
+          }
+        }
+      }
+    },
     "Choose file" : {
       "comment" : "Button to choose a file to sign or validate",
       "extractionState" : "manual",
@@ -575,7 +593,7 @@
       }
     },
     "Country title" : {
-      "comment" : "Role details",
+      "comment" : "Role details, Smart-ID country textfield title",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
