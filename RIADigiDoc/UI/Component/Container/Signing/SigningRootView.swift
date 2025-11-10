@@ -54,16 +54,9 @@ struct SigningRootView: View {
                     onSuccess: onSuccess
                 )
             case .smartId:
-                // TODO: Replace with Smart-ID view
-                SignatureInputScreen(
-                    selectedSigningMethod: "Smart-ID",
-                    isSigningEnabled: .constant(false),
-                    isSigning: .constant(false),
-                    onBackClick: { dismiss() },
-                    onSign: {},
-                    content: {
-                        EmptyView()
-                    }
+                SmartIdView(
+                    signedContainer: signedContainer,
+                    onSuccess: onSuccess
                 )
             }
         }
