@@ -69,14 +69,14 @@ class ProxySettingsViewModel: ProxySettingsViewModelProtocol, ObservableObject {
 
     // MARK: - Check connection
 
-    public func checkInternetAccess() async -> Bool {
+    public func checkInternetAccess(session: Session? = nil) async -> Bool {
         var requestProxyInfo = proxyInfo
         if requestProxyInfo.option == .system {
             requestProxyInfo = proxyUtil.getSystemProxyInfo()
         }
 
         let url = "https://id.eesti.ee/config.json"
-        let session = Session.withProxy(proxyInfo: requestProxyInfo)
+        let session = session ?? Session.withProxy(proxyInfo: requestProxyInfo)
 
         let response = await session.request(url)
             .validate()
