@@ -17,6 +17,7 @@
  *
  */
 
+import CommonsLib
 import Foundation
 import Testing
 
@@ -242,5 +243,35 @@ final class DataStoreTests {
         #expect(testInfo.uuid == retrievedInfo.uuid)
         #expect(testInfo.fetchURL == retrievedInfo.fetchURL)
         #expect(testInfo.postURL == retrievedInfo.postURL)
+    }
+
+    @Test
+    func getProxyInfo_success() async throws {
+        let retrievedInfo = await dataStore.getProxyInfo()
+
+        #expect(retrievedInfo.option == .disabled)
+        #expect(retrievedInfo.host == "")
+        #expect(retrievedInfo.port == 80)
+        #expect(retrievedInfo.username == "")
+        #expect(retrievedInfo.password == "")
+    }
+
+    @Test
+    func setProxyInfo_success() async throws {
+        let testInfo = ProxyInfo(
+            option: .manual,
+            host: "testHost",
+            port: 1234,
+            username: "testUser",
+            password: "testPassword"
+        )
+
+        await dataStore.setProxyInfo(testInfo)
+        let retrievedInfo = await dataStore.getProxyInfo()
+        #expect(retrievedInfo.option == testInfo.option)
+        #expect(retrievedInfo.host == testInfo.host)
+        #expect(retrievedInfo.port == testInfo.port)
+        #expect(retrievedInfo.username == testInfo.username)
+        #expect(retrievedInfo.password == "")
     }
 }

@@ -17,6 +17,7 @@
  *
  */
 
+import Alamofire
 import Foundation
 import CommonsLib
 
@@ -28,5 +29,5 @@ public protocol ProxySettingsViewModelProtocol: Sendable {
     var isPortTextValid: Bool { get }
 
     func saveSettings() async
-    func checkInternetAccess() async -> Bool
+    func checkInternetAccess(session: Session?) async -> Bool
 }
