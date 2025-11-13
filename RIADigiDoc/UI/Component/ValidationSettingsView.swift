@@ -65,7 +65,7 @@ struct ValidationSettingsView: View {
                                 if !viewModel.isLoading {
                                     AdvancedSettingsManualCardContent(
                                         textFieldTitle: languageSettings.localized("Main settings siva service url"),
-                                        textFieldText: $viewModel.validationServiceURL,
+                                        textFieldText: $viewModel.validationServiceUrl,
                                         certificateInfoHeader:
                                             languageSettings.localized("Main settings siva certificate title"),
                                         showCertificateInfo: viewModel.sivaCertData != nil,

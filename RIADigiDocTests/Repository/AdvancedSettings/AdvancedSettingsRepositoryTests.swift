@@ -193,4 +193,34 @@ struct AdvancedSettingsRepositoryTests {
             #expect(certificateData == nil)
         }
     }
+
+    // MARK: - removeAllCertFiles tests
+
+    @Test
+    func removeAllCertFiles_success() async throws {
+        let sampleFileURL = URL(fileURLWithPath: "/test/path/folder/file.cer")
+        let sampleFileFolder = URL(fileURLWithPath: "/test/path/folder")
+
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
+            [sampleFileURL]
+        }
+
+        mockFileManager.urlHandler = { _, _, _, _ in
+            return sampleFileFolder
+        }
+
+        try await repository.removeAllCertFiles(certificateFolders: [
+            sampleFileFolder.lastPathComponent,
+            sampleFileFolder.lastPathComponent
+        ])
+        #expect(mockFileManager.removeItemCallCount == 2)
+    }
+
+    @Test
+    func removeAllCertFiles_doesNotThrowWithNoFolders() async throws {
+        await #expect(throws: Never.self) {
+            try await repository.removeAllCertFiles(certificateFolders: [])
+            #expect(mockFileManager.removeItemCallCount == 0)
+        }
+    }
 }

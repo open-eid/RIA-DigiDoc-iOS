@@ -115,13 +115,16 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
     public func saveSettings() async {
         await dataStore.setTSAUrlOption(selectedOption)
         tsaUrl = tsaUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        var tsaURL: URL? = URL(string: tsaUrl)
 
         if selectedOption == .defaultSetting || tsaUrl.isEmpty {
             tsaUrl = configuration?.tsaUrl.absoluteString ?? ""
+            tsaURL = configuration?.tsaUrl
         }
 
         await dataStore.setTSAUrl(tsaUrl: tsaUrl)
-        await DigiDocConf.setTSUrl(tsaUrl)
+        guard let tsaURL else { return }
+        await DigiDocConf.setTSUrl(tsaURL)
     }
 
     // MARK: - TSA Cert Info Getters

@@ -35,9 +35,9 @@ public struct DigiDocConf: DigiDocConfProtocol {
 
     public static func initDigiDoc(
         configuration: ConfigurationProvider? = nil,
-        sivaUrl: String? = nil,
+        sivaUrl: URL? = nil,
         sivaCert: Data? = nil,
-        tsaUrl: String? = nil,
+        tsaUrl: URL? = nil,
         tsCert: Data? = nil,
         proxyInfo: ProxyInfo? = nil
     ) async throws {
@@ -77,8 +77,8 @@ public struct DigiDocConf: DigiDocConfProtocol {
         DigiDocConfWrapper.sharedInstance()?.setProxyPass(proxyInfo.password)
     }
 
-    public static func setSiVaUrl(_ url: String) async {
-        if url.isEmpty { return }
+    public static func setSiVaUrl(_ url: URL) async {
+        if url.absoluteString.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(url)
     }
 
@@ -87,8 +87,8 @@ public struct DigiDocConf: DigiDocConfProtocol {
         DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
     }
 
-    public static func setTSUrl(_ url: String) async {
-        if url.isEmpty { return }
+    public static func setTSUrl(_ url: URL) async {
+        if url.absoluteString.isEmpty { return }
         DigiDocConfWrapper.sharedInstance()?.setTSUrl(url)
     }
 
@@ -97,9 +97,25 @@ public struct DigiDocConf: DigiDocConfProtocol {
         DigiDocConfWrapper.sharedInstance()?.addTSCert(cert)
     }
 
+    public static func restoreDefaultSettings(
+        defaultSiVaUrl: URL,
+        defaultTSUrl: URL
+    ) async {
+        DigiDocConfWrapper.sharedInstance()?.setProxyHost("")
+        DigiDocConfWrapper.sharedInstance()?.setProxyPort("")
+        DigiDocConfWrapper.sharedInstance()?.setProxyUser("")
+        DigiDocConfWrapper.sharedInstance()?.setProxyPass("")
+        DigiDocConfWrapper.sharedInstance()?.addSiVaCert(nil)
+        DigiDocConfWrapper.sharedInstance()?.addTSCert(nil)
+
+        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(defaultSiVaUrl)
+        DigiDocConfWrapper.sharedInstance()?.setTSUrl(defaultTSUrl)
+    }
+
     private static func apply<T>(_ value: T?, _ action: @escaping (T) async -> Void) async {
         if let value {
             if let string = value as? String, string.isEmpty { return }
+            if let url = value as? URL, url.absoluteString.isEmpty { return }
             if let data = value as? Data, data.isEmpty { return }
             if let proxyInfo = value as? ProxyInfo, proxyInfo.host.isEmpty { return }
             await action(value)

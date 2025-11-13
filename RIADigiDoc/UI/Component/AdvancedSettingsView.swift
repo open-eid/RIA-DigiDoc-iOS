@@ -29,11 +29,15 @@ struct AdvancedSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var navigateToSigningServicesSettings: Bool = false
-    @State private var checkedAskRoleAndAddress: Bool = false
-
     @State private var navigateToValidationSettings = false
     @State private var navigateToCryptoSettings = false
     @State private var navigateToProxySettings = false
+
+    @StateObject private var viewModel: AdvancedSettingsViewModel
+
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.advancedSettingsViewModel())
+    }
 
     var body: some View {
         TopBarContainer(
@@ -52,7 +56,7 @@ struct AdvancedSettingsView: View {
                         ) {
                             AdvancedSettingsCheckboxRow(
                                 label: languageSettings.localized("Main settings ask role and address title"),
-                                isChecked: $checkedAskRoleAndAddress
+                                isChecked: $viewModel.checkedAskRoleAndAddress
                             )
                         }
 
@@ -105,7 +109,14 @@ struct AdvancedSettingsView: View {
                         }
 
                         Button(
-                            action: {},
+                            action: {
+                                Task {
+                                    await viewModel.restoreDefaultSettings()
+                                    Toast.show(
+                                        languageSettings.localized("Main settings use default settings message")
+                                    )
+                                }
+                            },
                             label: {
                                 Text(languageSettings.localized("Main settings use default settings button title"))
                                     .font(typography.labelLarge)
@@ -121,6 +132,11 @@ struct AdvancedSettingsView: View {
             }
         )
         .background(theme.surface)
+        .onDisappear {
+            Task {
+                await viewModel.removeObservers()
+            }
+        }
     }
 }
 

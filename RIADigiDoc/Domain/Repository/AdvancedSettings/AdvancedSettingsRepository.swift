@@ -129,4 +129,14 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
             try fileManager.removeItem(at: certURL)
         }
     }
+
+    public func removeAllCertFiles(certificateFolders: [String]) async throws {
+        for certificateFolder in certificateFolders {
+            let certCacheDirectory = try Directories.getCacheDirectory(
+                subfolder: certificateFolder,
+                fileManager: fileManager
+            )
+            try removeAllCertFiles(certCacheDirectory: certCacheDirectory)
+        }
+    }
 }

@@ -235,6 +235,18 @@ extension Container {
     }
 
     @MainActor
+    var advancedSettingsViewModel: Factory<AdvancedSettingsViewModel> {
+        self { @MainActor in
+            AdvancedSettingsViewModel(
+                dataStore: self.dataStore(),
+                keychainStore: self.keychainStore(),
+                advancedSettingsRepository: self.advancedSettingsRepository(),
+                configurationRepository: self.configurationRepository()
+            )
+        }
+    }
+
+    @MainActor
     var timeStampSettingsViewModel: Factory<TimeStampSettingsViewModel> {
         self { @MainActor in
             TimeStampSettingsViewModel(

@@ -66,6 +66,32 @@ final class DataStoreTests {
         #expect(await dataStore.getSelectedTheme() == testThemeRawValue)
     }
 
+    // MARK: - Restore Default Services Settings Tests
+    @Test
+    func restoreDefaultServicesSettings_success() async throws {
+        await dataStore.restoreDefaultServicesSettings()
+
+        #expect(await dataStore.getValidationServiceURL() == "")
+        #expect(await dataStore.getValidationServiceOption() == .defaultSetting)
+        #expect(await dataStore.getTSAUrl() == "")
+        #expect(await dataStore.getTSAUrlOption() == .defaultSetting)
+        #expect(await dataStore.getRelyingPartyUUID() == CommonsLib.Constants.Signing.RelyingPartyUUID)
+        #expect(await dataStore.getRelyingPartyOption() == .defaultSetting)
+        #expect(await dataStore.getEncryptionCdocOption() == .cdoc1)
+        #expect(await dataStore.getEncryptionUseKeyTransfer() == false)
+        #expect(await dataStore.getEncryptionServerId() == .defaultSetting)
+        let encryptionServerInfo: EncryptionServerInfo = await dataStore.getEncryptionServerInfo()
+        #expect(encryptionServerInfo.uuid == "")
+        #expect(encryptionServerInfo.fetchURL == "")
+        #expect(encryptionServerInfo.postURL == "")
+        let proxyInfo = await dataStore.getProxyInfo()
+        #expect(proxyInfo.option == .disabled)
+        #expect(proxyInfo.host == "")
+        #expect(proxyInfo.port == 80)
+        #expect(proxyInfo.username == "")
+        #expect(proxyInfo.password == "")
+    }
+
     // MARK: - Validation Service Settings Tests
 
     @Test

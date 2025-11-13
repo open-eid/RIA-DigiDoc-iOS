@@ -30,9 +30,9 @@ struct DigiDocConfCurrent final : public digidoc::ConfCurrent {
 private:
     DigiDocConfig *currentConf;
     inline static NSURL *_sivaUrl;
-    inline static NSData *_sivaCert = nil;
+    inline static NSData * _Nullable _sivaCert = nil;
     inline static NSURL *_tsUrl;
-    inline static NSData *_tsCert = nil;
+    inline static NSData * _Nullable _tsCert = nil;
     inline static NSString * _Nullable _proxyHost = nil;
     inline static NSString * _Nullable _proxyPort = nil;
     inline static NSString * _Nullable _proxyUser = nil;

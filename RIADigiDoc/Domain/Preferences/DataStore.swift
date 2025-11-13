@@ -54,6 +54,31 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(rawValue, forKey: Keys.selectedTheme)
     }
 
+    // MARK: - Restore Default Services Settings
+
+    public func restoreDefaultServicesSettings() async {
+        await setValidationServiceURL(validationServiceURL: DefaultValues.validationServiceURL)
+        await setValidationServiceOption(.defaultSetting)
+        await setTSAUrl(tsaUrl: DefaultValues.tsaURL)
+        await setTSAUrlOption(.defaultSetting)
+        await setRelyingPartyUUID(relyingPartyUUID: DefaultValues.relyingPartyUUID)
+        await setRelyingPartyOption(.defaultSetting)
+        await setEncryptionCdocOption(.cdoc1)
+        await setEncryptionUseKeyTransfer(DefaultValues.encryptionUseKeyTransfer)
+        await setEncryptionServerId(DefaultValues.encryptionServerId)
+        await setEncryptionServerInfo(EncryptionServerInfo(
+            uuid: DefaultValues.encryptionServerInfoUUID,
+            fetchURL: DefaultValues.encryptionServerInfoFetchURL,
+            postURL: DefaultValues.encryptionServerInfoPostURL
+        ))
+        await setProxyInfo(ProxyInfo(
+            option: DefaultValues.proxyOption,
+            host: DefaultValues.proxyInfoHost,
+            port: DefaultValues.proxyInfoPort,
+            username: DefaultValues.proxyInfoUsername,
+        ))
+    }
+
     // MARK: - Validation Service Settings Methods
 
     public func getValidationServiceURL() async -> String {
@@ -250,6 +275,7 @@ public actor DataStore: DataStoreProtocol {
         static let tsaURL = ""
         static let relyingPartyUUID = CommonsLib.Constants.Signing.RelyingPartyUUID
         static let encryptionCdocOption: EncryptionCdocOption = .cdoc1
+        static let encryptionUseKeyTransfer: Bool = false
         static let encryptionServerId: EncryptionServerOptionId = .defaultSetting
         static let encryptionServerInfoUUID = ""
         static let encryptionServerInfoFetchURL = ""
