@@ -84,7 +84,7 @@ final class ValidationSettingsViewModelTests {
 
         await testViewModel.initializeSettings()
 
-        #expect(!testViewModel.validationServiceURL.isEmpty)
+        #expect(!testViewModel.validationServiceUrl.isEmpty)
     }
 
     // MARK: - saveSettings tests
@@ -93,21 +93,21 @@ final class ValidationSettingsViewModelTests {
     func saveSettings_successWithDefaultSetting() async throws {
         viewModel.selectedOption = .defaultSetting
         let testURL = "some.url"
-        viewModel.validationServiceURL = testURL
+        viewModel.validationServiceUrl = testURL
 
         await viewModel.saveSettings()
 
         #expect(mockDataStore.setValidationServiceOptionCallCount == 1)
         #expect(mockDataStore.setValidationServiceURLCallCount == 1)
 
-        #expect(viewModel.validationServiceURL != testURL)
+        #expect(viewModel.validationServiceUrl != testURL)
     }
 
     @Test
     func saveSettings_successWithManualSettingWithEmptyString() async throws {
         viewModel.selectedOption = .manualSetting
         let testURL = ""
-        viewModel.validationServiceURL = testURL
+        viewModel.validationServiceUrl = testURL
         await viewModel.observeConfigurationUpdates()
 
         await viewModel.saveSettings()
@@ -115,21 +115,21 @@ final class ValidationSettingsViewModelTests {
         #expect(mockDataStore.setValidationServiceOptionCallCount == 1)
         #expect(mockDataStore.setValidationServiceURLCallCount == 1)
 
-        #expect(viewModel.validationServiceURL != testURL)
+        #expect(viewModel.validationServiceUrl != testURL)
     }
 
     @Test
     func saveSettings_successWithManualSettingWithValidURL() async throws {
         viewModel.selectedOption = .manualSetting
         let testURL = "http://valid.url.ee"
-        viewModel.validationServiceURL = testURL
+        viewModel.validationServiceUrl = testURL
 
         await viewModel.saveSettings()
 
         #expect(mockDataStore.setValidationServiceOptionCallCount == 1)
         #expect(mockDataStore.setValidationServiceURLCallCount == 1)
 
-        #expect(viewModel.validationServiceURL == testURL)
+        #expect(viewModel.validationServiceUrl == testURL)
     }
 
     // MARK: - Cert info getter tests

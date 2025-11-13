@@ -29,6 +29,9 @@ public protocol DataStoreProtocol: Sendable {
     func getSelectedTheme() async -> Int
     func setSelectedTheme(_ rawValue: Int) async
 
+    // MARK: - Restore Default Services Settings
+    func restoreDefaultServicesSettings() async
+
     // MARK: - Validation Service Settings Methods
     func getValidationServiceURL() async -> String
     func setValidationServiceURL(validationServiceURL: String) async

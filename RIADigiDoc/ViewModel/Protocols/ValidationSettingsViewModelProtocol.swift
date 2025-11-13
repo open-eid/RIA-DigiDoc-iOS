@@ -22,7 +22,7 @@ import Foundation
 /// @mockable
 @MainActor
 public protocol ValidationSettingsViewModelProtocol: Sendable {
-    var validationServiceURL: String { get }
+    var validationServiceUrl: String { get }
     var selectedOption: ServicesSettingsOption { get }
     var sivaCertData: Data? { get }
     var isImportingCert: Bool { get }

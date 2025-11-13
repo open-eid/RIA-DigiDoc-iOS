@@ -98,8 +98,9 @@ actor LibrarySetup {
         }
     }
 
-    func getSiVaUrl() async -> String? {
-        return await dataStore.getValidationServiceURL()
+    func getSiVaUrl() async -> URL? {
+        let urlString = await dataStore.getValidationServiceURL()
+        return URL(string: urlString)
     }
 
     func getSiVaCert() async -> Data? {
@@ -109,8 +110,9 @@ actor LibrarySetup {
         )
     }
 
-    func getTSUrl() async -> String? {
-        return await dataStore.getTSAUrl()
+    func getTSUrl() async -> URL? {
+        let urlString = await dataStore.getTSAUrl()
+        return URL(string: urlString)
     }
 
     func getTSCert() async -> Data? {

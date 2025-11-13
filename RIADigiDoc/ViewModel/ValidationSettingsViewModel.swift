@@ -30,7 +30,7 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ValidationSettingsViewModel")
 
     @Published var configuration: ConfigurationProvider?
-    @Published var validationServiceURL: String = ""
+    @Published var validationServiceUrl: String = ""
     @Published var selectedOption: ServicesSettingsOption = .defaultSetting
     @Published var sivaCertData: Data?
     @Published var isImportingCert: Bool = false
@@ -90,10 +90,10 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
     }
 
     private func loadSettings() async {
-        self.validationServiceURL = await dataStore.getValidationServiceURL()
+        self.validationServiceUrl = await dataStore.getValidationServiceURL()
 
-        if self.validationServiceURL.isEmpty {
-            self.validationServiceURL = configuration?.sivaUrl.absoluteString ?? ""
+        if self.validationServiceUrl.isEmpty {
+            self.validationServiceUrl = configuration?.sivaUrl.absoluteString ?? ""
         }
 
         self.selectedOption = await dataStore.getValidationServiceOption()
@@ -110,13 +110,16 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
 
     public func saveSettings() async {
         await dataStore.setValidationServiceOption(selectedOption)
-        validationServiceURL = validationServiceURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        validationServiceUrl = validationServiceUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        var validationServiceURL: URL? = URL(string: validationServiceUrl)
 
-        if selectedOption == .defaultSetting || validationServiceURL.isEmpty {
-            validationServiceURL = configuration?.sivaUrl.absoluteString ?? ""
+        if selectedOption == .defaultSetting || validationServiceUrl.isEmpty {
+            validationServiceUrl = configuration?.sivaUrl.absoluteString ?? ""
+            validationServiceURL = configuration?.sivaUrl
         }
 
-        await dataStore.setValidationServiceURL(validationServiceURL: validationServiceURL)
+        await dataStore.setValidationServiceURL(validationServiceURL: validationServiceUrl)
+        guard let validationServiceURL else { return }
         await DigiDocConf.setSiVaUrl(validationServiceURL)
     }
 

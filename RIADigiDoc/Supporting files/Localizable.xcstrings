@@ -3527,6 +3527,24 @@
         }
       }
     },
+    "Main settings use default settings message" : {
+      "comment" : "Main settings use default settings message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default settings restored"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algseaded taastatud"
+          }
+        }
+      }
+    },
     "Main settings validation services title" : {
       "comment" : "Main settings validation services title",
       "extractionState" : "manual",

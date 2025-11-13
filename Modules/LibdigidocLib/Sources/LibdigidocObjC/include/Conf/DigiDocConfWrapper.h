@@ -32,10 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL, NSError * _Nullable))completion;
 - (void)updateConfiguration:(DigiDocConfig *)conf;
-- (void)setSiVaUrl:(NSString *)url;
-- (void)addSiVaCert:(NSData *)cert;
-- (void)setTSUrl:(NSString *)url;
-- (void)addTSCert:(NSData *)cert;
+- (void)setSiVaUrl:(NSURL *)url;
+- (void)addSiVaCert:(NSData * _Nullable)cert;
+- (void)setTSUrl:(NSURL *)url;
+- (void)addTSCert:(NSData * _Nullable)cert;
 - (void)setProxyHost:(NSString *)proxyHost;
 - (void)setProxyPort:(NSString *)proxyPort;
 - (void)setProxyUser:(NSString *)proxyUser;

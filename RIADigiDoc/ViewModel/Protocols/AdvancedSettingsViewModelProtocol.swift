@@ -17,20 +17,11 @@
  *
  */
 
-import Foundation
-
 /// @mockable
-public protocol AdvancedSettingsRepositoryProtocol: Sendable {
-    func getCertificate(
-        certificateFolder: String,
-        certificateBaseName: String,
-    ) async -> Data?
+@MainActor
+public protocol AdvancedSettingsViewModelProtocol: Sendable {
+    func restoreDefaultSettings() async
 
-    func importCertificate(
-        from url: URL,
-        certificateFolder: String,
-        certificateBaseName: String
-    ) async -> Data?
-
-    func removeAllCertFiles(certificateFolders: [String]) async throws
+    func removeObservers() async
+    func observeConfigurationUpdates() async
 }
