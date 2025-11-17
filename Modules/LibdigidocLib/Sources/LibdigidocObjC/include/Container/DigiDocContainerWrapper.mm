@@ -100,10 +100,27 @@ public:
 
 + (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos mediaType:(const std::string&)mediaType dataFileCount:(NSInteger)dataFileCount {
 
+    digidoc::X509Cert signingCert = signature->signingCertificate();
+    digidoc::X509Cert ocspCert = signature->OCSPCertificate();
+    digidoc::X509Cert timestampCert = signature->TimeStampCertificate();
+
     DigiDocSignature *digiDocSignature = [DigiDocSignature new];
-    digiDocSignature.signingCert = [DigiDocContainerWrapper getNSDataFromVector:signature->signingCertificate()];
-    digiDocSignature.timestampCert = [DigiDocContainerWrapper getNSDataFromVector:signature->TimeStampCertificate()];
-    digiDocSignature.ocspCert = [DigiDocContainerWrapper getNSDataFromVector:signature->OCSPCertificate()];
+    digiDocSignature.signingCert = [DigiDocContainerWrapper getNSDataFromVector:signingCert];
+    digiDocSignature.timestampCert = [DigiDocContainerWrapper getNSDataFromVector:ocspCert];
+    digiDocSignature.ocspCert = [DigiDocContainerWrapper getNSDataFromVector:ocspCert];
+
+    std::string givename = signingCert.subjectName("GN");
+    std::string surname = signingCert.subjectName("SN");
+    std::string serialNr = signingCert.subjectName("serialNumber");
+
+    NSString *serialNR = [DigiDocContainerWrapper getSerialNumber:[NSString stringWithUTF8String:serialNr.c_str()]];
+
+    std::string name = givename.empty() || surname.empty() ? signingCert.subjectName("CN") :
+        surname + ", " + givename + ", " + [serialNR UTF8String];
+
+    if (name.empty()) {
+        name = signature->signedBy();
+    }
 
     digiDocSignature.pos = pos;
     digiDocSignature.signatureId = [NSString stringWithUTF8String:signature->id().c_str()];
@@ -111,7 +128,7 @@ public:
     digiDocSignature.signatureMethod = [NSString stringWithUTF8String:signature->signatureMethod().c_str()];
     digiDocSignature.ocspProducedAt = [NSString stringWithUTF8String:signature->OCSPProducedAt().c_str()];
     digiDocSignature.timeStampTime = [NSString stringWithUTF8String:signature->TimeStampTime().c_str()];
-    digiDocSignature.signedBy = [NSString stringWithUTF8String:signature->signedBy().c_str()];
+    digiDocSignature.signedBy = [NSString stringWithUTF8String:name.c_str()];
     digiDocSignature.format = [NSString stringWithUTF8String:signature->profile().c_str()];
     digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
     digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];

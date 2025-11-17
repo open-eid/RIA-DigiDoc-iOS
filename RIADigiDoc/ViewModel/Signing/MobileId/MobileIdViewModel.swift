@@ -93,10 +93,6 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
         return await dataStore.getMobileIdInputData()
     }
 
-    func getUUID() async -> String {
-        return await dataStore.getRelyingPartyUUID()
-    }
-
     func resetErrors() {
         mobileIdMessageKey = nil
         mobileIdAlertMessageKey = nil
@@ -122,7 +118,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
         }
 
         let savedUuid = await getUUID()
-        let uuid = !savedUuid.isEmpty ? Constants.Signing.RelyingPartyUUID : savedUuid
+        let uuid = savedUuid.isEmpty ? Constants.Signing.RelyingPartyUUID : savedUuid
         let midUrl = (
             uuid.isEmpty || uuid == Constants.Signing.RelyingPartyUUID
         ) ? configuration.midRestUrl : configuration.midSkRestUrl
@@ -357,6 +353,10 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
         return containerFile
     }
 
+    private func getUUID() async -> String {
+        return await dataStore.getRelyingPartyUUID()
+    }
+
     private func getTrustedCertificates(certificates: [Data]) -> [SecCertificate] {
         MobileIdViewModel.logger.debug("Mobile-ID: Getting trusted certificates list")
         return certificates.compactMap { certificateUtil.certificate(from: $0) }
@@ -400,7 +400,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
             mobileIdMessageKey = "Expired mobile-ID transaction"
 
         case .incorrectParameters:
-            mobileIdMessageKey = "Mobile-ID incorrect parameters"
+            mobileIdMessageKey = "Signing incorrect parameters"
 
         case .userCancelled:
             mobileIdMessageKey = "User denied or cancelled"
@@ -430,11 +430,14 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
             mobileIdMessageKey = "Exceeded unsuccessful requests"
 
         case .invalidAccessRights:
-            mobileIdAlertMessageKey = "Invalid Mobile-ID access rights"
-            mobileIdAlertMessageUrl = "Invalid Mobile-ID access rights url"
+            showMobileIdAlertMessage = true
+            mobileIdAlertMessageKey = "Invalid signing access rights"
+            mobileIdAlertMessageUrl = "Invalid signing access rights url"
+            mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
 
         case .technicalError:
-            mobileIdMessageKey = "Mobile-ID technical error"
+            mobileIdMessageKey = "Signing technical error"
+            mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
         }
     }
 
@@ -489,7 +492,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
                 mobileIdMessageKey = "Invalid proxy settings"
 
             default:
-                mobileIdMessageKey = "Mobile-ID technical error"
+                mobileIdMessageKey = "Signing technical error"
+                mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
             }
 
         default:

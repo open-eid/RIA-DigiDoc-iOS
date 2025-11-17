@@ -18,25 +18,12 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
+import FactoryKit
 
-/// @mockable
-@MainActor
-public protocol MobileIdViewModelProtocol: Sendable {
-    func isSigningEnabled(
-        phoneNumber: String,
-        personalCode: String,
-    ) -> Bool
-    func saveInputData(
-        phoneNumber: String,
-        personalCode: String,
-        rememberMe: Bool
-    ) async
-    func getInputData() async -> MobileIdInputData
-    func resetErrors()
-    func sign(
-        phoneNumber: String,
-        personalCode: String,
-        signedContainer: SignedContainerProtocol
-    ) async -> SignedContainerProtocol?
+extension Container {
+    public var smartIdSignService: Factory<SmartIdSignServiceProtocol> {
+        self {
+            SmartIdSignService()
+        }
+    }
 }

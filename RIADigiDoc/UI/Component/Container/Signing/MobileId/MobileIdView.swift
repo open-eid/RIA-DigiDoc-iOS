@@ -87,8 +87,9 @@ struct MobileIdView: View {
                         isSigning = false
                         if let messageKey = viewModel.mobileIdMessageKey,
                            !messageKey.isEmpty {
+                            let extraArguments = viewModel.mobileIdAlertMessageExtraArguments
                             Toast.show(
-                                languageSettings.localized(messageKey)
+                                languageSettings.localized(messageKey, extraArguments)
                             )
                         }
 

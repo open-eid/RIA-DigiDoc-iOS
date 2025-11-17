@@ -736,6 +736,24 @@
         }
       }
     },
+    "Estonia" : {
+      "comment" : "Country choice in Smart-ID view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estonia"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesti"
+          }
+        }
+      }
+    },
     "Exceeded unsuccessful requests" : {
       "comment" : "Signing error for exceededUnsuccessfulRequests",
       "extractionState" : "manual",
@@ -772,6 +790,24 @@
         }
       }
     },
+    "Expired Smart-ID transaction" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Smart-ID transaction has expired or user account not found"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu Smart-ID toiming aegus või kontot ei leitud"
+          }
+        }
+      }
+    },
     "Failed mobile-ID transaction" : {
       "comment" : "Mobile-ID error for signatureHashMismatch",
       "extractionState" : "manual",
@@ -786,6 +822,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sinu mobiil-ID toiming ebaõnnestus. Palun võta ühendust enda mobiilioperaatoriga"
+          }
+        }
+      }
+    },
+    "Failed Smart-ID transaction" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Smart-ID transaction has failed. Please check your Smart-ID application or contact Smart-ID customer support"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu Smart-ID toiming ebaõnnestus. Palun kontrolli Smart-ID rakendust või võta ühendust Smart-ID klienditoega"
           }
         }
       }
@@ -1183,24 +1237,6 @@
         }
       }
     },
-    "Invalid Mobile-ID access rights" : {
-      "comment" : "Mobile-ID error for invalidAccessRights",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to sign container. Check your mobile-ID service access settings"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ümbriku allkirjastamine ebaõnnestus. Kontrolli mobiil-ID teenuse ligipääsu seadeid"
-          }
-        }
-      }
-    },
     "Invalid Mobile-ID access rights url" : {
       "comment" : "URL that user can open in browser to read more about signing large quantities of documents",
       "extractionState" : "manual",
@@ -1315,6 +1351,42 @@
         }
       }
     },
+    "Invalid signing access rights" : {
+      "comment" : "Signing error for invalidAccessRights",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to sign container. Check your %@ service access settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku allkirjastamine ebaõnnestus. Kontrolli %@ teenuse ligipääsu seadeid"
+          }
+        }
+      }
+    },
+    "Latvia" : {
+      "comment" : "Country choice in Smart-ID view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latvia"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läti"
+          }
+        }
+      }
+    },
     "Libdigidocpp is already initialized" : {
       "comment" : "Meant to be shown in logging only",
       "localizations" : {
@@ -1332,6 +1404,24 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "Lithuania" : {
+      "comment" : "Country choice in Smart-ID view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lithuania"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leedu"
+          }
+        }
+      }
     },
     "Loading" : {
       "comment" : "Loading label",
@@ -3561,42 +3651,6 @@
         }
       }
     },
-    "Mobile-ID incorrect parameters" : {
-      "comment" : "Mobile-ID error when input parameters are not correct",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
-          }
-        }
-      }
-    },
-    "Mobile-ID technical error" : {
-      "comment" : "Mobile-ID error for technical error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to send request. Mobile-ID service has encountered technical errors. Please try again later"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Päringu saatmine ebaõnnestus. Mobiil-ID teenuses esinevad tehnilised tõrked. Palun proovige mõne aja pärast uuesti"
-          }
-        }
-      }
-    },
     "More options" : {
       "comment" : "More options button name",
       "localizations" : {
@@ -4958,6 +5012,24 @@
         }
       }
     },
+    "Signing incorrect parameters" : {
+      "comment" : "Signing error when input parameters are not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code for Mobile-ID or incorrect country and / or personal code for Smart-ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
+          }
+        }
+      }
+    },
     "Signing method" : {
       "comment" : "Title for signing method in container signing view",
       "extractionState" : "manual",
@@ -4972,6 +5044,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjastamise meetod"
+          }
+        }
+      }
+    },
+    "Signing technical error" : {
+      "comment" : "Signing error for technical error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to send request. %@ service has encountered technical errors. Please try again later"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päringu saatmine ebaõnnestus. %@ teenuses esinevad tehnilised tõrked. Palun proovige mõne aja pärast uuesti"
           }
         }
       }
@@ -5044,6 +5134,114 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Smart-ID"
+          }
+        }
+      }
+    },
+    "Smart-ID certificate level not qualified" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Smart-ID certificate level must be qualified to sign documents in RIA DigiDoc mobile application"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc mobiilirakenduses allkirjastamiseks peab sinu Smart-ID vastama tasemele kõrge"
+          }
+        }
+      }
+    },
+    "Smart-ID notification title" : {
+      "comment" : "Smart-ID signing notification title in Notification Center",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID signing control code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID allkirjastamise kontrollkood"
+          }
+        }
+      }
+    },
+    "Smart-ID old api" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc mobile application needs an upgrade. Please install new version from the mobile app store. Additional info is available ID-helpline (+372) 666 8888"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc mobiilirakendus vajab uuendamist. Paigalda uus versioon mobiilirakenduse poest. Lisainfo ID-abiliini telefonil (+372) 666 8888"
+          }
+        }
+      }
+    },
+    "Smart-ID session not found" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session not found"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessiooni ei leitud"
+          }
+        }
+      }
+    },
+    "Smart-ID under maintenance" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID service has encountered technical errors. Please try again later"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart-ID teenuses esinevad tehnilised tõrked. Palun proovi mõne aja pärast uuesti"
+          }
+        }
+      }
+    },
+    "Smart-ID wrong vc" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: an incorrect control code was chosen"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viga: valiti vale kontrollkood"
           }
         }
       }

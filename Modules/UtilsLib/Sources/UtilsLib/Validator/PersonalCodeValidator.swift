@@ -40,7 +40,7 @@ public struct PersonalCodeValidator {
 
         guard !personalCode.isEmpty,
               personalCode.count == Constants.Validation.MaximumLatvianPersonalCodeLength else {
-            PersonalCodeValidator.logger.error("Personal code is NOT Latvian")
+            PersonalCodeValidator.logger.debug("Personal code is NOT Latvian")
             return false
         }
 

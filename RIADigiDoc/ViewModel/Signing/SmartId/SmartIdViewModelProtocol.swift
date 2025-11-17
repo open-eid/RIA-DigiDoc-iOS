@@ -18,11 +18,30 @@
  */
 
 import Foundation
+import LibdigidocLibSwift
 
 /// @mockable
 @MainActor
 public protocol SmartIdViewModelProtocol: Sendable {
+    func appDidEnterBackground()
+    func appDidBecomeActive()
     func isSigningEnabled(
         personalCode: String,
     ) -> Bool
+
+    func saveInputData(
+        country: SmartIdCountry,
+        personalCode: String,
+        rememberMe: Bool
+    ) async
+
+    func getInputData() async -> SmartIdInputData
+
+    func resetErrors()
+
+    func sign(
+        country: SmartIdCountry,
+        personalCode: String,
+        signedContainer: SignedContainerProtocol
+    ) async -> SignedContainerProtocol?
 }

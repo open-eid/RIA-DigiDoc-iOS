@@ -68,4 +68,8 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - Mobile-ID Input Methods
     func getMobileIdInputData() async -> MobileIdInputData
     func setMobileIdInputData(_ inputData: MobileIdInputData) async
+
+    // MARK: - Smart-ID Input Methods
+    func getSmartIdInputData() async -> SmartIdInputData
+    func setSmartIdInputData(_ inputData: SmartIdInputData) async
 }

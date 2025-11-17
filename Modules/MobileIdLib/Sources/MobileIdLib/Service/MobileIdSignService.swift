@@ -103,8 +103,6 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
                 trustedCertificates: trustedCertificates
             )
 
-            MobileIdSignService.logger.debug("Response: \(sessionResponse?.description ?? "N/A")")
-
             if let response = sessionResponse,
                response.state == .complete {
                 return response
