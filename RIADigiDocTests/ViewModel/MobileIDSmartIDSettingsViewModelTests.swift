@@ -23,8 +23,6 @@ import Testing
 
 @MainActor
 final class MobileIDSmartIDSettingsViewModelTests {
-    private let viewModel: MobileIDSmartIDSettingsViewModel!
-
     private let mockDataStore: DataStoreProtocolMock!
 
     init() {
@@ -36,14 +34,13 @@ final class MobileIDSmartIDSettingsViewModelTests {
         mockDataStore.getRelyingPartyOptionHandler = {
             return .defaultSetting
         }
-
-        viewModel = MobileIDSmartIDSettingsViewModel(dataStore: mockDataStore)
     }
 
     // MARK: - Tests
 
     @Test
     func saveSettings_successDefaultSetting() async throws {
+        let viewModel = MobileIDSmartIDSettingsViewModel(dataStore: mockDataStore)
         viewModel.selectedOption = .defaultSetting
         let testUUID = "00000000-0000-0000-0000-000000000001"
         viewModel.relyingPartyUUID = testUUID
@@ -58,6 +55,8 @@ final class MobileIDSmartIDSettingsViewModelTests {
 
     @Test
     func saveSettings_successWithManualSettingWithEmptyString() async throws {
+        let viewModel = MobileIDSmartIDSettingsViewModel(dataStore: mockDataStore)
+
         await viewModel.loadSettings()
 
         viewModel.selectedOption = .manualSetting
@@ -74,6 +73,8 @@ final class MobileIDSmartIDSettingsViewModelTests {
 
     @Test
     func saveSettings_successWithManualSettingWithValidUUID() async throws {
+        let viewModel = MobileIDSmartIDSettingsViewModel(dataStore: mockDataStore)
+
         mockDataStore.getRelyingPartyOptionHandler = {
             return .manualSetting
         }

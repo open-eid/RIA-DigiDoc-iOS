@@ -49,4 +49,9 @@ extension Container {
     public var containerUtil: Factory<ContainerUtilProtocol> {
         self { ContainerUtil() }
     }
+
+    @MainActor
+    public var notificationUtil: Factory<NotificationUtilProtocol> {
+        self { @MainActor in NotificationUtil() }
+    }
 }

@@ -23,6 +23,7 @@ import LibdigidocLibSwift
 import CommonsLib
 
 struct SmartIdView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var languageSettings: LanguageSettings
@@ -55,19 +56,76 @@ struct SmartIdView: View {
             isSigningEnabled: $isSigningEnabled,
             isSigning: $isSigning,
             onBackClick: {
+                cancelSigning()
                 guard isSigning else {
                     dismiss()
                     return
                 }
                 isSigning = false
             },
-            onSign: {},
+            onSign: {
+                cancelSigning()
+
+                task = Task {
+                    let (inputCountry, inputPersonalCode) = rememberMe
+                        ? (country, personalCode)
+                        : (SmartIdCountry.estonia, "")
+
+                    await viewModel.saveInputData(
+                        country: inputCountry,
+                        personalCode: inputPersonalCode,
+                        rememberMe: rememberMe
+                    )
+
+                    isSigning = true
+                    let updatedContainer = await viewModel.sign(
+                        country: country,
+                        personalCode: personalCode,
+                        signedContainer: signedContainer
+                    )
+                    guard let container = updatedContainer else {
+                        cancelSigning()
+                        isSigning = false
+                        if let messageKey = viewModel.smartIdMessageKey,
+                           !messageKey.isEmpty {
+                            let extraArguments = viewModel.smartIdAlertMessageExtraArguments
+                            Toast.show(
+                                languageSettings.localized(messageKey, extraArguments)
+                            )
+                        }
+
+                        return
+                    }
+
+                    cancelSigning()
+
+                    onSuccess(container)
+                    dismiss()
+                }
+            },
             content: {
                 if isSigning {
-                    ControlCodeView(
-                        icon: "smart_id_logo",
-                        controlCode: $viewModel.controlCode
-                    )
+                    if #available(iOS 17.0, *) {
+                        ControlCodeView(
+                            icon: "smart_id_logo",
+                            controlCode: $viewModel.controlCode
+                        )
+                        .onChange(of: scenePhase) { _, newPhase in
+                            switch newPhase {
+                            case .background:
+                                viewModel.appDidEnterBackground()
+                            case .active:
+                                viewModel.appDidBecomeActive()
+                            default:
+                                break
+                            }
+                        }
+                    } else {
+                        ControlCodeView(
+                            icon: "smart_id_logo",
+                            controlCode: $viewModel.controlCode
+                        )
+                    }
                 } else {
                     SmartIdInputView(
                         country: $country,
@@ -84,6 +142,44 @@ struct SmartIdView: View {
                 }
             }
         )
+        .alert(
+            languageSettings.localized(
+                viewModel.smartIdAlertMessageKey ?? "",
+                viewModel.smartIdAlertMessageExtraArguments
+            ),
+            isPresented: $viewModel.showSmartIdAlertMessage
+        ) {
+            Button(languageSettings.localized("OK")) {
+                viewModel.resetErrors()
+            }
+
+            if let messageUrl = viewModel.smartIdAlertMessageUrl, !messageUrl.isEmpty {
+                Button(languageSettings.localized("Additional information")) {
+                    if let url = URL(string: languageSettings.localized(messageUrl)),
+                       UIApplication.shared.canOpenURL(url) {
+                        openURL(url)
+                    }
+                    viewModel.resetErrors()
+                    isSigning = false
+                }
+            }
+        }
+        .onAppear {
+            Task {
+                let inputData = await viewModel.getInputData()
+                country = inputData.country
+                personalCode = inputData.personalCode
+                rememberMe = inputData.rememberMe
+            }
+        }
+        .onDisappear {
+            cancelSigning()
+        }
+    }
+
+    func cancelSigning() {
+        task?.cancel()
+        task = nil
     }
 }
 

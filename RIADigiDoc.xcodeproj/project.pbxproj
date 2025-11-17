@@ -23,6 +23,7 @@
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
 		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 		DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
+		DF64D0EE2EC36F7700FF73C6 /* SmartIdLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */; };
 		DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE912E00D30A0062C64D /* FactoryKit */; };
 		DF9AFE942E00D7A00062C64D /* FactoryTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE932E00D7A00062C64D /* FactoryTesting */; };
 		DF9AFE992E0358C20062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE982E0358C20062C64D /* FactoryKit */; };
@@ -111,6 +112,7 @@
 		DF3E4A862CE2C54600137235 /* CommonsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsLib; sourceTree = "<group>"; };
 		DF3E4A872CE2C5B500137235 /* LibdigidocLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LibdigidocLib; sourceTree = "<group>"; };
 		DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FileImportShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF64D0E12EC363C200FF73C6 /* SmartIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SmartIdLib; sourceTree = "<group>"; };
 		DF67D4F92D28531600F09EB9 /* ConfigLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ConfigLib; sourceTree = "<group>"; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MobileIdLib; sourceTree = "<group>"; };
@@ -141,6 +143,8 @@
 				Domain/Model/SettingsMenuBottomSheetPages.swift,
 				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
 				Domain/Model/Signing/SigningMethod.swift,
+				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
+				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
@@ -210,6 +214,8 @@
 				ViewModel/Signing/RootView/SigningRootViewModelProtocol.swift,
 				ViewModel/Signing/SigningMethod/SigningMethodSelectionViewModel.swift,
 				ViewModel/Signing/SigningMethod/SigningMethodSelectionViewModelProtocol.swift,
+				ViewModel/Signing/SmartId/SmartIdViewModel.swift,
+				ViewModel/Signing/SmartId/SmartIdViewModelProtocol.swift,
 				ViewModel/SigningViewModel.swift,
 				ViewModel/TimeStampSettingsViewModel.swift,
 				ViewModel/ValidationSettingsViewModel.swift,
@@ -226,6 +232,8 @@
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
 				Domain/Model/Signing/SigningMethod.swift,
+				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
+				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
@@ -275,6 +283,8 @@
 				Domain/Model/ServicesSettingsOption.swift,
 				Domain/Model/Signing/MobileId/MobileIdInputData.swift,
 				Domain/Model/Signing/SigningMethod.swift,
+				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
+				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
@@ -367,6 +377,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
+				DF64D0EE2EC36F7700FF73C6 /* SmartIdLib in Frameworks */,
 				1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
@@ -426,6 +437,7 @@
 			isa = PBXGroup;
 			children = (
 				DFCF22F92E83512D0015AE6B /* Test */,
+				DF64D0E12EC363C200FF73C6 /* SmartIdLib */,
 				DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */,
 				1A1548DE2E85801500DC2339 /* IdCardLib */,
 				1AA9FF6C2E71A14200FFDC35 /* CryptoLib */,
@@ -576,6 +588,7 @@
 				1A438FD82E72CF1900546B86 /* CryptoLib */,
 				1A5026EC2E8BFCF400C184D7 /* IdCardLib */,
 				DFA23CBC2EB6DC64000403E4 /* MobileIdLib */,
+				DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -1477,6 +1490,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
 			productName = X509;
+		};
+		DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SmartIdLib;
 		};
 		DF9AFE912E00D30A0062C64D /* FactoryKit */ = {
 			isa = XCSwiftPackageProductDependency;

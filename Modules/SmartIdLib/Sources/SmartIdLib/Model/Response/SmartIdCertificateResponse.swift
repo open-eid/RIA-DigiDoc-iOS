@@ -18,25 +18,15 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
 
-/// @mockable
-@MainActor
-public protocol MobileIdViewModelProtocol: Sendable {
-    func isSigningEnabled(
-        phoneNumber: String,
-        personalCode: String,
-    ) -> Bool
-    func saveInputData(
-        phoneNumber: String,
-        personalCode: String,
-        rememberMe: Bool
-    ) async
-    func getInputData() async -> MobileIdInputData
-    func resetErrors()
-    func sign(
-        phoneNumber: String,
-        personalCode: String,
-        signedContainer: SignedContainerProtocol
-    ) async -> SignedContainerProtocol?
+public struct SmartIdSessionIdResponse: Sendable, Decodable, CustomStringConvertible {
+    public let sessionID: String?
+
+    public var description: String {
+        return """
+        SmartIdSignatureResponse(
+            sessionId: \(sessionID ?? "-")
+        )
+        """
+    }
 }

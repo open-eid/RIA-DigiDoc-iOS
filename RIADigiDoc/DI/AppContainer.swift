@@ -294,7 +294,13 @@ extension Container {
     @MainActor
     var smartIdViewModel: Factory<SmartIdViewModel> {
         self { @MainActor in
-            SmartIdViewModel()
+            SmartIdViewModel(
+                configurationRepository: self.configurationRepository(),
+                smartIdSignService: self.smartIdSignService(),
+                certificateUtil: self.certificateUtil(),
+                notificationUtil: self.notificationUtil(),
+                dataStore: self.dataStore()
+            )
         }
     }
 

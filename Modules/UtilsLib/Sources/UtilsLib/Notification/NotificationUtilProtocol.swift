@@ -18,25 +18,15 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
+import NotificationCenter
 
 /// @mockable
 @MainActor
-public protocol MobileIdViewModelProtocol: Sendable {
-    func isSigningEnabled(
-        phoneNumber: String,
-        personalCode: String,
-    ) -> Bool
-    func saveInputData(
-        phoneNumber: String,
-        personalCode: String,
-        rememberMe: Bool
-    ) async
-    func getInputData() async -> MobileIdInputData
-    func resetErrors()
-    func sign(
-        phoneNumber: String,
-        personalCode: String,
-        signedContainer: SignedContainerProtocol
-    ) async -> SignedContainerProtocol?
+public protocol NotificationUtilProtocol: Sendable {
+    func requestAuthorization() async -> Bool
+    func sendNotification(
+        title: String,
+        body: String
+    ) async throws -> String
+    func removeNotification(id: String)
 }

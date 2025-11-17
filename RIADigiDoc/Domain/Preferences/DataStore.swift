@@ -220,6 +220,28 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(inputData.rememberMe, forKey: Keys.mobileIdRememberMe)
     }
 
+    // MARK: - Smart-ID Methods
+    public func getSmartIdInputData() async -> SmartIdInputData {
+        let country = (userDefaults().object(
+            forKey: Keys.smartIdCountry
+        ) as? SmartIdCountry) ?? DefaultValues.smartIdCountry
+        let personalCode = userDefaults().string(
+            forKey: Keys.smartIdPersonalCode
+        ) ?? DefaultValues.smartIdPersonalCode
+        let rememberMe = userDefaults().object(forKey: Keys.smartIdRememberMe) as? Bool ?? true
+        return SmartIdInputData(
+            country: country,
+            personalCode: personalCode,
+            rememberMe: rememberMe
+        )
+    }
+
+    public func setSmartIdInputData(_ inputData: SmartIdInputData) async {
+        userDefaults().set(inputData.country.rawValue, forKey: Keys.smartIdCountry)
+        userDefaults().set(inputData.personalCode, forKey: Keys.smartIdPersonalCode)
+        userDefaults().set(inputData.rememberMe, forKey: Keys.smartIdRememberMe)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -236,9 +258,11 @@ public actor DataStore: DataStoreProtocol {
         static let proxyInfoHost = ""
         static let proxyInfoPort = 80
         static let proxyInfoUsername = ""
+        static let selectedSigningMethod: SigningMethod = .idCardViaNFC
         static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
         static let mobileIdPersonalCode = ""
-        static let selectedSigningMethod: SigningMethod = .idCardViaNFC
+        static let smartIdCountry = SmartIdCountry.estonia
+        static let smartIdPersonalCode = ""
     }
 
     private enum Keys {
@@ -264,5 +288,8 @@ public actor DataStore: DataStoreProtocol {
         static let mobileIdPhoneNumber = "mobileIdPhoneNumber"
         static let mobileIdPersonalCode = "mobileIdPersonalCode"
         static let mobileIdRememberMe = "mobileIdRememberMe"
+        static let smartIdCountry = "smartIdCountry"
+        static let smartIdPersonalCode = "smartIdPersonalCode"
+        static let smartIdRememberMe = "smartIdRememberMe"
     }
 }

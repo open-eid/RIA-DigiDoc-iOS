@@ -18,25 +18,29 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
 
-/// @mockable
-@MainActor
-public protocol MobileIdViewModelProtocol: Sendable {
-    func isSigningEnabled(
-        phoneNumber: String,
-        personalCode: String,
-    ) -> Bool
-    func saveInputData(
-        phoneNumber: String,
-        personalCode: String,
-        rememberMe: Bool
-    ) async
-    func getInputData() async -> MobileIdInputData
-    func resetErrors()
-    func sign(
-        phoneNumber: String,
-        personalCode: String,
-        signedContainer: SignedContainerProtocol
-    ) async -> SignedContainerProtocol?
+public enum SmartIdError: Error {
+    case generalError
+    case uninitializedSession
+    case explicitlyCancelled
+    case noInternetConnection
+    case incorrectParameters
+    case timeout
+    case documentUnusable
+    case wrongVC
+    case userRefused
+    case accountNotFound
+    case sessionNotFound
+    case missingSessionId
+    case tooManyRequests
+    case exceededUnsuccessfulRequests
+    case ocspInvalidTimeSlot
+    case certificateRevoked
+    case notQualified
+    case invalidAccessRights
+    case oldApi
+    case underMaintenance
+    case noResponse
+    case invalidSslHandshake
+    case technicalError
 }
