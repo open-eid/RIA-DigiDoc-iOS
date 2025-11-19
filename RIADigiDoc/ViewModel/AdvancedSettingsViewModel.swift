@@ -69,33 +69,19 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
         await dataStore.restoreDefaultServicesSettings()
         await keychainStore.removeAll()
         await removeCertificates()
-        await restoreLibDigidocDefaultValues()
+        await DigiDocConf.restoreDefaultSettings()
     }
 
     private func removeCertificates() async {
         do {
             try await advancedSettingsRepository.removeAllCertFiles(certificateFolders: [
-                CommonsLib.Constants.Folder.SivaCert,
+                CommonsLib.Constants.Folder.SiVaCert,
                 CommonsLib.Constants.Folder.TSACert,
                 CommonsLib.Constants.Folder.EncryptionKeyTransferCert
             ])
         } catch {
             AdvancedSettingsViewModel.logger.error("Unable to remove all certificates")
         }
-    }
-
-    private func restoreLibDigidocDefaultValues() async {
-        await ensureConfigurationLoaded()
-        let defaultSiVaUrl = configuration?.sivaUrl
-        let defaultTSUrl = configuration?.tsaUrl
-        guard let defaultSiVaUrl, let defaultTSUrl else {
-            AdvancedSettingsViewModel.logger.error("Unable get default urls from configuration")
-            return
-        }
-        await DigiDocConf.restoreDefaultSettings(
-            defaultSiVaUrl: defaultSiVaUrl,
-            defaultTSUrl: defaultTSUrl
-        )
     }
 
     // MARK: - Observer

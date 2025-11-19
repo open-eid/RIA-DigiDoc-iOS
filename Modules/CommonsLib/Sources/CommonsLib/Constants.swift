@@ -90,7 +90,7 @@ public struct Constants {
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
         public static let Logs = "logfiles"
-        public static let SivaCert = "sivacert"
+        public static let SiVaCert = "sivacert"
         public static let TSACert = "tsacert"
         public static let EncryptionKeyTransferCert = "keytransfercert"
     }

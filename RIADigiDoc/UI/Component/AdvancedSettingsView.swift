@@ -146,7 +146,6 @@ struct AdvancedSettingsView: View {
                 }
             }
         )
-        .background(theme.surface)
         .onDisappear {
             Task {
                 await viewModel.removeObservers()

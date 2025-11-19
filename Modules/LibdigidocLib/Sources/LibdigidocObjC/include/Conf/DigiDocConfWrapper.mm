@@ -29,9 +29,9 @@
 struct DigiDocConfCurrent final : public digidoc::ConfCurrent {
 private:
     DigiDocConfig *currentConf;
-    inline static NSURL *_sivaUrl;
+    inline static NSURL * _Nullable _sivaUrl = nil;
     inline static NSData * _Nullable _sivaCert = nil;
-    inline static NSURL *_tsUrl;
+    inline static NSURL * _Nullable _tsUrl = nil;
     inline static NSData * _Nullable _tsCert = nil;
     inline static NSString * _Nullable _proxyHost = nil;
     inline static NSString * _Nullable _proxyPort = nil;
@@ -40,6 +40,38 @@ private:
 
 public:
     DigiDocConfCurrent(DigiDocConfig *conf) : currentConf(conf) {}
+    
+    void setTSUrl(NSURL *tsaUrl) {
+        _tsUrl = tsaUrl;
+    }
+    
+    void addTSCert(NSData * cert) {
+        _tsCert = cert;
+    }
+    
+    void setSiVaUrl(NSURL *sivaUrl) {
+        _sivaUrl = sivaUrl;
+    }
+    
+    void addSiVaCert(NSData * cert) {
+        _sivaCert = cert;
+    }
+
+    void setProxyHost(NSString *proxyHost) {
+        _proxyHost = proxyHost;
+    }
+    
+    void setProxyPort(NSString *proxyPort) {
+        _proxyPort = proxyPort;
+    }
+    
+    void setProxyUser(NSString *proxyUser) {
+        _proxyUser = proxyUser;
+    }
+    
+    void setProxyPass(NSString *proxyPass) {
+        _proxyPass = proxyPass;
+    }
 
     std::string TSLCache() const final {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -65,10 +97,6 @@ public:
         return toX509Certs(certBundle);
     }
     
-    void addTSCert(NSData * cert) {
-        _tsCert = cert;
-    }
-    
     std::string TSUrl() const override {
         if (_tsUrl != nil && [_tsUrl isKindOfClass:[NSURL class]] && _tsUrl.absoluteString.length > 0) {
             std::string tsUrl = std::string([[_tsUrl absoluteString] UTF8String]);
@@ -82,14 +110,6 @@ public:
         }
         
         return digidoc::ConfCurrent::TSUrl();
-    }
-    
-    void setTSUrl(NSURL *tsaUrl) {
-        _tsUrl = tsaUrl;
-    }
-    
-    void setSiVaUrl(NSURL *sivaUrl) {
-        _sivaUrl = sivaUrl;
     }
 
     std::string ocsp(const std::string &issuer) const final {
@@ -109,20 +129,12 @@ public:
         return {};
     }
     
-    void setProxyHost(NSString *proxyHost) {
-        _proxyHost = proxyHost;
-    }
-    
     std::string proxyPort() const final {
         if (_proxyPort && _proxyPort.length > 0) {
             std::string proxyPort = std::string([_proxyPort UTF8String]);
             return proxyPort;
         }
         return {};
-    }
-    
-    void setProxyPort(NSString *proxyPort) {
-        _proxyPort = proxyPort;
     }
     
     std::string proxyUser() const final {
@@ -133,10 +145,6 @@ public:
         return {};
     }
     
-    void setProxyUser(NSString *proxyUser) {
-        _proxyUser = proxyUser;
-    }
-    
     std::string proxyPass() const final {
         if (_proxyPass && _proxyPass.length > 0) {
             std::string proxyPass = std::string([_proxyPass UTF8String]);
@@ -144,13 +152,9 @@ public:
         }
         return {};
     }
-    
-    void setProxyPass(NSString *proxyPass) {
-        _proxyPass = proxyPass;
-    }
 
     std::string verifyServiceUri() const override {
-        if (_sivaUrl && _sivaUrl.absoluteString.length > 0) {
+        if (_sivaUrl != nil && _sivaUrl.absoluteString.length > 0) {
             std::string sivaUrl = std::string([[_sivaUrl absoluteString] UTF8String]);
             return sivaUrl;
         }
@@ -179,10 +183,6 @@ public:
 
     std::string logFile() const final {
         return logFileLocation(currentConf.logFile);
-    }
-    
-    void addSiVaCert(NSData * cert) {
-        _sivaCert = cert;
     }
 
     std::string logFileLocation(NSString *logsFolderPath) const {
@@ -216,6 +216,17 @@ public:
 };
 
 class DigiDocConfWrapperImpl {
+private:
+    template<typename Func>
+    static void withCurrentConf(Func&& fn) {
+        digidoc::Conf *conf = DigiDocConfCurrent::instance();
+        if (!conf) return;
+        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+        if (currentConf) {
+            fn(currentConf);
+        }
+    }
+    
 public:
     static void initConf(DigiDocConfig *conf, void (^completion)(NSError * _Nullable error)) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -245,76 +256,52 @@ public:
         digidoc::Conf::init(newCurrentConf);
     }
     
-    static void setSiVaUrl(NSURL *sivaUrl) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
-            currentConf->setSiVaUrl(sivaUrl);
-        }
-    }
-    
-    static void addSiVaCert(NSData *cert) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
-            currentConf->addSiVaCert(cert);
-        }
-    }
-    
     static void setTSUrl(NSURL *tsaUrl) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([tsaUrl](DigiDocConfCurrent *currentConf) {
             currentConf->setTSUrl(tsaUrl);
-        }
+        });
     }
     
     static void addTSCert(NSData *cert) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([cert](DigiDocConfCurrent *currentConf) {
             currentConf->addTSCert(cert);
-        }
+        });
+    }
+    
+    static void setSiVaUrl(NSURL *sivaUrl) {
+        withCurrentConf([sivaUrl](DigiDocConfCurrent *currentConf) {
+            currentConf->setSiVaUrl(sivaUrl);
+        });
+    }
+    
+    static void addSiVaCert(NSData *cert) {
+        withCurrentConf([cert](DigiDocConfCurrent *currentConf) {
+            currentConf->addSiVaCert(cert);
+        });
     }
     
     static void setProxyHost(NSString *proxyHost) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([proxyHost](DigiDocConfCurrent *currentConf) {
             currentConf->setProxyHost(proxyHost);
-        }
+        });
     }
     
     static void setProxyPort(NSString *proxyPort) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([proxyPort](DigiDocConfCurrent *currentConf) {
             currentConf->setProxyPort(proxyPort);
-        }
+        });
     }
     
     static void setProxyUser(NSString *proxyUser) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([proxyUser](DigiDocConfCurrent *currentConf) {
             currentConf->setProxyUser(proxyUser);
-        }
+        });
     }
     
     static void setProxyPass(NSString *proxyPass) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
+        withCurrentConf([proxyPass](DigiDocConfCurrent *currentConf) {
             currentConf->setProxyPass(proxyPass);
-        }
+        });
     }
 };
 
@@ -363,41 +350,35 @@ public:
     _impl->updateConfiguration(conf);
 }
 
-- (void)setSiVaUrl:(NSURL *)sivaUrl {
-    _impl->setSiVaUrl(sivaUrl);
-}
-
-- (void)addSiVaCert:(NSData *)sivaCert {
-    if (!sivaCert) return;
-    _impl->addSiVaCert(sivaCert);
-}
-
 - (void)setTSUrl:(NSURL *)tsUrl {
     _impl->setTSUrl(tsUrl);
 }
 
 - (void)addTSCert:(NSData *)tsCert {
-    if (!tsCert) return;
     _impl->addTSCert(tsCert);
 }
 
+- (void)setSiVaUrl:(NSURL *)sivaUrl {
+    _impl->setSiVaUrl(sivaUrl);
+}
+
+- (void)addSiVaCert:(NSData *)sivaCert {
+    _impl->addSiVaCert(sivaCert);
+}
+
 - (void)setProxyHost:(NSString *)proxyHost {
-    if (!proxyHost) return;
     _impl->setProxyHost(proxyHost);
 }
 
 - (void)setProxyPort:(NSString *)proxyPort {
-    if (!proxyPort) return;
     _impl->setProxyPort(proxyPort);
 }
 
 - (void)setProxyUser:(NSString *)proxyUser {
-    if (!proxyUser) return;
     _impl->setProxyUser(proxyUser);
 }
 
 - (void)setProxyPass:(NSString *)proxyPass {
-    if (!proxyPass) return;
     _impl->setProxyPass(proxyPass);
 }
 

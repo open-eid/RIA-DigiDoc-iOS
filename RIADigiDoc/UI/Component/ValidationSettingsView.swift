@@ -91,7 +91,6 @@ struct ValidationSettingsView: View {
                 .padding(.horizontal, Dimensions.Padding.SPadding)
             }
         )
-        .background(theme.surface)
         .onDisappear {
             Task {
                 await viewModel.saveSettings()

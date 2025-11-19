@@ -37,7 +37,7 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
     func getConfigurationData(configuration: ConfigurationProvider?, tslSchemaDirectory: URL?) async
 
     // MARK: Actions
-    func updateConfiguration() async
+    func updateConfiguration() async -> Bool
     func createLogFile(languageSettings: LanguageSettingsProtocol, directory: URL?) async -> URL?
     func removeLogFilesDirectory()
 

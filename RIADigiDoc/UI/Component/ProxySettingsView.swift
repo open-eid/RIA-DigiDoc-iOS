@@ -91,7 +91,6 @@ struct ProxySettingsView: View {
                 .padding(.vertical, Dimensions.Padding.SPadding)
             }
         )
-        .background(theme.surface)
         .onDisappear {
             Task {
                 await viewModel.saveSettings()

@@ -292,7 +292,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
     // MARK: - Update configuration
 
-    func updateConfiguration() async {
+    func updateConfiguration() async -> Bool {
         do {
             let configDirectory = try Directories.getCacheDirectory(
                 fileManager: fileManager
@@ -304,8 +304,10 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
                 cacheDir: configDirectory,
                 proxyInfo: proxyInfo
             )
+            return true
         } catch {
-            DiagnosticsViewModel.logger.error("Unable to update configuration")
+            DiagnosticsViewModel.logger.error("Unable to update configuration: \(error)")
+            return false
         }
     }
 

@@ -62,7 +62,7 @@ final class AdvancedSettingsViewModelTests {
         #expect(mockKeychainStore.removeAllCallCount == 1)
         #expect(mockAdvancedSettingsRepository.removeAllCertFilesCallCount == 1)
         #expect(mockAdvancedSettingsRepository.removeAllCertFilesArgValues.first == [
-            CommonsLib.Constants.Folder.SivaCert,
+            CommonsLib.Constants.Folder.SiVaCert,
             CommonsLib.Constants.Folder.TSACert,
             CommonsLib.Constants.Folder.EncryptionKeyTransferCert
         ])
@@ -80,7 +80,7 @@ final class AdvancedSettingsViewModelTests {
             #expect(mockKeychainStore.removeAllCallCount == 1)
             #expect(mockAdvancedSettingsRepository.removeAllCertFilesCallCount == 1)
             #expect(mockAdvancedSettingsRepository.removeAllCertFilesArgValues.first == [
-                CommonsLib.Constants.Folder.SivaCert,
+                CommonsLib.Constants.Folder.SiVaCert,
                 CommonsLib.Constants.Folder.TSACert,
                 CommonsLib.Constants.Folder.EncryptionKeyTransferCert
             ])

@@ -79,10 +79,12 @@ actor LibrarySetup {
             )
             LibrarySetup.logger.debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
+                tsaOption: getTSAOption(),
+                tsaUrl: getTSAUrl(),
+                tsaCert: getTSACert(),
+                sivaOption: getSiVaOption(),
                 sivaUrl: getSiVaUrl(),
                 sivaCert: getSiVaCert(),
-                tsaUrl: getTSUrl(),
-                tsCert: getTSCert(),
                 proxyInfo: proxyInfo
             )
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
@@ -98,27 +100,35 @@ actor LibrarySetup {
         }
     }
 
-    func getSiVaUrl() async -> URL? {
-        let urlString = await dataStore.getValidationServiceURL()
-        return URL(string: urlString)
+    private func getTSAOption() async -> ServicesSettingsOption {
+        return await dataStore.getTSAUrlOption()
     }
 
-    func getSiVaCert() async -> Data? {
-        return await advancedSettingsRepository.getCertificate(
-            certificateFolder: CommonsLib.Constants.Folder.SivaCert,
-            certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert,
-        )
-    }
-
-    func getTSUrl() async -> URL? {
+    private func getTSAUrl() async -> URL? {
         let urlString = await dataStore.getTSAUrl()
         return URL(string: urlString)
     }
 
-    func getTSCert() async -> Data? {
+    private func getTSACert() async -> Data? {
         return await advancedSettingsRepository.getCertificate(
             certificateFolder: CommonsLib.Constants.Folder.TSACert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.TSACert,
+        )
+    }
+
+    private func getSiVaOption() async -> ServicesSettingsOption {
+        return await dataStore.getValidationServiceOption()
+    }
+
+    private func getSiVaUrl() async -> URL? {
+        let urlString = await dataStore.getValidationServiceURL()
+        return URL(string: urlString)
+    }
+
+    private func getSiVaCert() async -> Data? {
+        return await advancedSettingsRepository.getCertificate(
+            certificateFolder: CommonsLib.Constants.Folder.SiVaCert,
+            certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert,
         )
     }
 }

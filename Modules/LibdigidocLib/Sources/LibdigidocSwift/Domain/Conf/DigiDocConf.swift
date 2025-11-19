@@ -35,19 +35,23 @@ public struct DigiDocConf: DigiDocConfProtocol {
 
     public static func initDigiDoc(
         configuration: ConfigurationProvider? = nil,
+        tsaOption: ServicesSettingsOption? = nil,
+        tsaUrl: URL? = nil,
+        tsaCert: Data? = nil,
+        sivaOption: ServicesSettingsOption? = nil,
         sivaUrl: URL? = nil,
         sivaCert: Data? = nil,
-        tsaUrl: URL? = nil,
-        tsCert: Data? = nil,
         proxyInfo: ProxyInfo? = nil
     ) async throws {
         try await sharedInitializer.initializeDigiDoc(configuration: configuration)
 
-        await apply(sivaUrl, DigiDocConf.setSiVaUrl)
-        await apply(sivaCert, DigiDocConf.addSiVaCert)
-        await apply(tsaUrl, DigiDocConf.setTSUrl)
-        await apply(tsCert, DigiDocConf.addTSCert)
-        await apply(proxyInfo, DigiDocConf.setProxyInfo)
+        if let tsaOption {
+            setTSAInfo(url: tsaUrl, cert: tsaCert, option: tsaOption, isInit: true)
+        }
+        if let sivaOption {
+            setSiVaInfo(url: sivaUrl, cert: sivaCert, option: sivaOption, isInit: true)
+        }
+        setProxyInfo(proxyInfo: proxyInfo, isInit: true)
     }
 
     public static func observeConfigurationUpdates(
@@ -69,57 +73,95 @@ public struct DigiDocConf: DigiDocConfProtocol {
         }
     }
 
-    public static func setProxyInfo(_ proxyInfo: ProxyInfo) async {
-        DigiDocConfWrapper.sharedInstance()?.setProxyHost(proxyInfo.host)
-        let portString = String(proxyInfo.port)
-        DigiDocConfWrapper.sharedInstance()?.setProxyPort(portString)
-        DigiDocConfWrapper.sharedInstance()?.setProxyUser(proxyInfo.username)
-        DigiDocConfWrapper.sharedInstance()?.setProxyPass(proxyInfo.password)
-    }
-
-    public static func setSiVaUrl(_ url: URL) async {
-        if url.absoluteString.isEmpty { return }
-        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(url)
-    }
-
-    public static func addSiVaCert(_ cert: Data) async {
-        if cert.isEmpty { return }
-        DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
-    }
-
-    public static func setTSUrl(_ url: URL) async {
-        if url.absoluteString.isEmpty { return }
-        DigiDocConfWrapper.sharedInstance()?.setTSUrl(url)
-    }
-
-    public static func addTSCert(_ cert: Data) async {
-        if cert.isEmpty { return }
-        DigiDocConfWrapper.sharedInstance()?.addTSCert(cert)
-    }
-
-    public static func restoreDefaultSettings(
-        defaultSiVaUrl: URL,
-        defaultTSUrl: URL
-    ) async {
-        DigiDocConfWrapper.sharedInstance()?.setProxyHost("")
-        DigiDocConfWrapper.sharedInstance()?.setProxyPort("")
-        DigiDocConfWrapper.sharedInstance()?.setProxyUser("")
-        DigiDocConfWrapper.sharedInstance()?.setProxyPass("")
+    public static func restoreDefaultSettings() async {
+        DigiDocConfWrapper.sharedInstance()?.setProxyHost(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPort(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyUser(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPass(nil)
         DigiDocConfWrapper.sharedInstance()?.addSiVaCert(nil)
         DigiDocConfWrapper.sharedInstance()?.addTSCert(nil)
-
-        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(defaultSiVaUrl)
-        DigiDocConfWrapper.sharedInstance()?.setTSUrl(defaultTSUrl)
+        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(nil)
+        DigiDocConfWrapper.sharedInstance()?.setTSUrl(nil)
     }
 
-    private static func apply<T>(_ value: T?, _ action: @escaping (T) async -> Void) async {
-        if let value {
-            if let string = value as? String, string.isEmpty { return }
-            if let url = value as? URL, url.absoluteString.isEmpty { return }
-            if let data = value as? Data, data.isEmpty { return }
-            if let proxyInfo = value as? ProxyInfo, proxyInfo.host.isEmpty { return }
-            await action(value)
+    public static func setProxyInfo(proxyInfo: ProxyInfo?, isInit: Bool = false) {
+        if let proxyInfo, proxyInfo.option != .disabled {
+            DigiDocConfWrapper.sharedInstance()?.setProxyHost(proxyInfo.host)
+            let portString = String(proxyInfo.port)
+            DigiDocConfWrapper.sharedInstance()?.setProxyPort(portString)
+            DigiDocConfWrapper.sharedInstance()?.setProxyUser(proxyInfo.username)
+            DigiDocConfWrapper.sharedInstance()?.setProxyPass(proxyInfo.password)
+            return
         }
+        if isInit { return }
+        DigiDocConfWrapper.sharedInstance()?.setProxyHost(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPort(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyUser(nil)
+        DigiDocConfWrapper.sharedInstance()?.setProxyPass(nil)
+    }
+
+    public static func setSiVaInfo(
+        url: URL?,
+        cert: Data?,
+        option: ServicesSettingsOption,
+        isInit: Bool = false
+    ) {
+        setSiVaUrl(url: url, option: option, isInit: isInit)
+        addSiVaCert(cert: cert, option: option, isInit: isInit)
+    }
+
+    public static func setTSAInfo(
+        url: URL?,
+        cert: Data?,
+        option: ServicesSettingsOption,
+        isInit: Bool = false
+    ) {
+        setTSAUrl(url: url, option: option, isInit: isInit)
+        addTSACert(cert: cert, option: option, isInit: isInit)
+    }
+
+    private static func setTSAUrl(url: URL?, option: ServicesSettingsOption, isInit: Bool = false) {
+        if option == .manualSetting {
+            if let url, url.absoluteString.isEmpty == false {
+                DigiDocConfWrapper.sharedInstance()?.setTSUrl(url)
+                return
+            }
+        }
+        if isInit { return }
+        DigiDocConfWrapper.sharedInstance()?.setTSUrl(nil)
+    }
+
+    private static func addTSACert(cert: Data?, option: ServicesSettingsOption, isInit: Bool = false) {
+        if option == .manualSetting {
+            if let cert, cert.isEmpty == false {
+                DigiDocConfWrapper.sharedInstance()?.addTSCert(cert)
+                return
+            }
+        }
+        if isInit { return }
+        DigiDocConfWrapper.sharedInstance()?.addTSCert(nil)
+    }
+
+    private static func setSiVaUrl(url: URL?, option: ServicesSettingsOption, isInit: Bool = false) {
+        if option == .manualSetting {
+            if let url, url.absoluteString.isEmpty == false {
+                DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(url)
+                return
+            }
+        }
+        if isInit { return }
+        DigiDocConfWrapper.sharedInstance()?.setSiVaUrl(nil)
+    }
+
+    private static func addSiVaCert(cert: Data?, option: ServicesSettingsOption, isInit: Bool = false) {
+        if option == .manualSetting {
+            if let cert, cert.isEmpty == false {
+                DigiDocConfWrapper.sharedInstance()?.addSiVaCert(cert)
+                return
+            }
+        }
+        if isInit { return }
+        DigiDocConfWrapper.sharedInstance()?.addSiVaCert(nil)
     }
 }
 

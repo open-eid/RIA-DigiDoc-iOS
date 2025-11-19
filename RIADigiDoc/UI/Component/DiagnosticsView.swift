@@ -56,7 +56,14 @@ struct DiagnosticsView: View {
                         content: {
                             DiagnosticsHeaderButtons(
                                 onCheckUpdateClick: {
-                                    Task { await viewModel.updateConfiguration() }
+                                    Task {
+                                        let status = await viewModel.updateConfiguration()
+                                        if !status {
+                                            Toast.show(
+                                                languageSettings.localized("No Internet connection")
+                                            )
+                                        }
+                                    }
                                 },
                                 onSaveDiagnosticsClick: {
                                     Task {
@@ -108,7 +115,6 @@ struct DiagnosticsView: View {
                 }
             }
         )
-        .background(theme.surface)
     }
 }
 
