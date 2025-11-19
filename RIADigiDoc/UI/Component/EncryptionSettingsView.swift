@@ -80,7 +80,6 @@ struct EncryptionSettingsView: View {
                     .padding(.vertical, Dimensions.Padding.SPadding)
                 }
             )
-            .background(theme.surface)
 
             if showDialog {
                 chooseServerDialog

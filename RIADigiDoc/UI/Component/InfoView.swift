@@ -44,7 +44,7 @@ struct InfoView: View {
                     )
                 }
             }
-        ).background(theme.surface)
+        )
     }
 }
 

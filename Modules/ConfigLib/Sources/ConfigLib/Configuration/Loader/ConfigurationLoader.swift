@@ -278,16 +278,9 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         var centralSignature = ""
 
-        do {
-            centralSignature = try await centralConfigurationRepository.fetchSignature(
-                proxyInfo: proxyInfo
-            ).trimmingCharacters(in: .whitespaces)
-        } catch {
-            ConfigurationLoader.logger.error(
-                "Unable to get remote configuration signature \(error)"
-            )
-            return
-        }
+        centralSignature = try await centralConfigurationRepository.fetchSignature(
+            proxyInfo: proxyInfo
+        ).trimmingCharacters(in: .whitespaces)
 
         if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
             ConfigurationLoader.logger.debug("Found new configuration")

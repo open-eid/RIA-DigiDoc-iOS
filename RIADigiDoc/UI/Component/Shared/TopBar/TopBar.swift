@@ -20,6 +20,7 @@
 import SwiftUI
 
 struct TopBarContainer<Content: View>: View {
+    @AppTheme private var theme
     var title: String?
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
@@ -93,6 +94,7 @@ struct TopBarContainer<Content: View>: View {
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+        .background(theme.surface)
     }
 
     private func buildBottomSheetActions() -> [BottomSheetButton] {

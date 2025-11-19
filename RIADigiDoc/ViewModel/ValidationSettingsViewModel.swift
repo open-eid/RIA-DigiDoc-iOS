@@ -101,7 +101,7 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
 
     private func loadSiVaCert() async {
         sivaCertData = await advancedSettingsRepository.getCertificate(
-            certificateFolder: CommonsLib.Constants.Folder.SivaCert,
+            certificateFolder: CommonsLib.Constants.Folder.SiVaCert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert,
         )
     }
@@ -119,8 +119,11 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
         }
 
         await dataStore.setValidationServiceURL(validationServiceURL: validationServiceUrl)
-        guard let validationServiceURL else { return }
-        await DigiDocConf.setSiVaUrl(validationServiceURL)
+        DigiDocConf.setSiVaInfo(
+            url: validationServiceURL,
+            cert: sivaCertData,
+            option: selectedOption
+        )
     }
 
     // MARK: - SiVa Cert Info Getters
@@ -145,12 +148,9 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
     public func importSiVaCert(from url: URL) async {
         sivaCertData = await advancedSettingsRepository.importCertificate(
             from: url,
-            certificateFolder: CommonsLib.Constants.Folder.SivaCert,
+            certificateFolder: CommonsLib.Constants.Folder.SiVaCert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert
         )
-        if let sivaCertData = sivaCertData {
-            await DigiDocConf.addSiVaCert(sivaCertData)
-        }
     }
 
     // MARK: - Observer

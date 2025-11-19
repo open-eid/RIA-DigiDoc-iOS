@@ -123,8 +123,11 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         }
 
         await dataStore.setTSAUrl(tsaUrl: tsaUrl)
-        guard let tsaURL else { return }
-        await DigiDocConf.setTSUrl(tsaURL)
+        DigiDocConf.setTSAInfo(
+            url: tsaURL,
+            cert: tsaCertData,
+            option: selectedOption
+        )
     }
 
     // MARK: - TSA Cert Info Getters
@@ -152,9 +155,6 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
             certificateFolder: CommonsLib.Constants.Folder.TSACert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.TSACert
         )
-        if let tsaCertData = tsaCertData {
-            await DigiDocConf.addTSCert(tsaCertData)
-        }
     }
 
     // MARK: - Observer

@@ -17,6 +17,8 @@
  *
  */
 
+import CommonsLib
+
 /// @mockable
 @MainActor
 public protocol MobileIDSmartIDSettingsViewModelProtocol: Sendable {

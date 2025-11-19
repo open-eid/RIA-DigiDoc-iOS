@@ -341,20 +341,23 @@ final class DiagnosticsViewModelTests {
 
     @Test
     func updateConfiguration_success() async throws {
-        await viewModel.updateConfiguration()
+        let status = await viewModel.updateConfiguration()
         #expect(mockConfigurationLoader.loadCentralConfigurationCallCount == 1)
+        #expect(status)
     }
 
     @Test
-    func updateConfiguration_doesNotThrowOnFailure() async throws {
+    func updateConfiguration_returnsFalseOnFailure() async throws {
         mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in
             throw NSError(domain: "TestError", code: 1, userInfo: nil)
         }
         await #expect(throws: Never.self) {
-            await self.viewModel.updateConfiguration()
+            let status = await viewModel.updateConfiguration()
+            #expect(!status)
         }
 
         #expect(mockConfigurationLoader.loadCentralConfigurationCallCount == 1)
+
     }
 
     // MARK: - Observe Configuration Updates Tests

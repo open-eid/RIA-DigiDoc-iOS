@@ -46,7 +46,6 @@ struct AccessibilityView: View {
                 }
             }
         )
-        .background(theme.surface)
     }
 }
 

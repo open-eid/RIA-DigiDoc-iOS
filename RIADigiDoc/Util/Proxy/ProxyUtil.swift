@@ -69,7 +69,7 @@ public struct ProxyUtil: ProxyUtilProtocol {
             let passwordData = Data(proxyInfo.password.utf8)
             _ = await keychainStore.save(key: .proxyPassword, info: passwordData)
         }
-        await DigiDocConf.setProxyInfo(proxyInfo)
+        DigiDocConf.setProxyInfo(proxyInfo: proxyInfo)
     }
 
     public func getSystemProxyInfo() -> ProxyInfo {
