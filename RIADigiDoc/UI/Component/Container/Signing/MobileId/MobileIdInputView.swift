@@ -45,6 +45,10 @@ struct MobileIdInputView: View {
         return languageSettings.localized(personalCodeError ?? "")
     }
 
+    private var rememberMeLabel: String {
+        languageSettings.localized("Remember me")
+    }
+
     init(
         phoneNumber: Binding<String>,
         personalCode: Binding<String>,
@@ -72,17 +76,12 @@ struct MobileIdInputView: View {
                         placeholder: phoneNumberPlaceholder,
                         text: $phoneNumber,
                         isError: !countryCodeAndPhoneErrorText.isEmpty,
+                        errorText: countryCodeAndPhoneErrorText,
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
                     .onChange(of: phoneNumber) { _ in
                         onInputChange()
-                    }
-
-                    if !countryCodeAndPhoneErrorText.isEmpty {
-                        Text(verbatim: countryCodeAndPhoneErrorText)
-                            .font(typography.bodySmall)
-                            .foregroundStyle(theme.error)
                     }
                 }
 
@@ -91,17 +90,12 @@ struct MobileIdInputView: View {
                         title: languageSettings.localized("Personal code"),
                         text: $personalCode,
                         isError: !personalCodeErrorText.isEmpty,
+                        errorText: personalCodeErrorText,
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
                     .onChange(of: personalCode) { _ in
                         onInputChange()
-                    }
-
-                    if !personalCodeErrorText.isEmpty {
-                        Text(verbatim: personalCodeErrorText)
-                            .font(typography.bodySmall)
-                            .foregroundStyle(theme.error)
                     }
                 }
             }
@@ -111,12 +105,15 @@ struct MobileIdInputView: View {
                 ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
                     .padding(.trailing, Dimensions.Padding.XSPadding)
                     .padding(.vertical, Dimensions.Padding.ZeroPadding)
+                    .accessibilityLabel(Text(verbatim: "\(rememberMeLabel) \(rememberMe)"))
 
-                HStack {
-                    Text(verbatim: languageSettings.localized("Remember me message"))
-                        .font(typography.bodyMedium)
-                        .foregroundStyle(theme.onSurfaceVariant)
-                    Spacer()
+                if rememberMe {
+                    HStack {
+                        Text(verbatim: languageSettings.localized("Remember me message"))
+                            .font(typography.bodyMedium)
+                            .foregroundStyle(theme.onSurfaceVariant)
+                        Spacer()
+                    }
                 }
             }
         }

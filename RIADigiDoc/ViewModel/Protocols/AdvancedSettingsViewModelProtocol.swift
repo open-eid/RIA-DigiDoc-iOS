@@ -21,7 +21,8 @@
 @MainActor
 public protocol AdvancedSettingsViewModelProtocol: Sendable {
     func restoreDefaultSettings() async
-
     func removeObservers() async
     func observeConfigurationUpdates() async
+    func getIsRoleAndAddressEnabled() async -> Bool
+    func setIsRoleAndAddressEnabled(_ isEnabled: Bool) async
 }

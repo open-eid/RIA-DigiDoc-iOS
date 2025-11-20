@@ -267,6 +267,40 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(inputData.rememberMe, forKey: Keys.smartIdRememberMe)
     }
 
+    public func getIsRoleAndAddressEnabled() async -> Bool {
+        userDefaults().bool(forKey: Keys.roleAndAddressSetting)
+    }
+
+    public func setIsRoleAndAddressEnabled(_ isEnabled: Bool) async {
+        userDefaults().set(isEnabled, forKey: Keys.roleAndAddressSetting)
+    }
+
+    public func getRoleData() async -> RoleData {
+        let roles = userDefaults().string(forKey: Keys.roles) ?? DefaultValues.roles
+        let city = userDefaults().string(forKey: Keys.roleCity) ?? DefaultValues.roleCity
+        let state = userDefaults().string(forKey: Keys.roleState) ?? DefaultValues.roleState
+        let country = userDefaults().string(forKey: Keys.roleCountry) ?? DefaultValues.roleCountry
+        let zipCode = userDefaults().string(forKey: Keys.roleZipCode) ?? DefaultValues.roleZipCode
+
+        return RoleData(
+            roles: roles
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) },
+            city: city,
+            state: state,
+            country: country,
+            zipCode: zipCode
+        )
+    }
+
+    public func setRoleData(_ roleData: RoleData) async {
+        userDefaults().set(roleData.roles.joined(separator: ","), forKey: Keys.roles)
+        userDefaults().set(roleData.city, forKey: Keys.roleCity)
+        userDefaults().set(roleData.state, forKey: Keys.roleState)
+        userDefaults().set(roleData.country, forKey: Keys.roleCountry)
+        userDefaults().set(roleData.zipCode, forKey: Keys.roleZipCode)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -289,6 +323,11 @@ public actor DataStore: DataStoreProtocol {
         static let mobileIdPersonalCode = ""
         static let smartIdCountry = SmartIdCountry.estonia
         static let smartIdPersonalCode = ""
+        static let roles = ""
+        static let roleCity = ""
+        static let roleState = ""
+        static let roleCountry = ""
+        static let roleZipCode = ""
     }
 
     private enum Keys {
@@ -317,5 +356,11 @@ public actor DataStore: DataStoreProtocol {
         static let smartIdCountry = "smartIdCountry"
         static let smartIdPersonalCode = "smartIdPersonalCode"
         static let smartIdRememberMe = "smartIdRememberMe"
+        static let roleAndAddressSetting = "roleAndAddressSetting"
+        static let roles = "roles"
+        static let roleCity = "roleCity"
+        static let roleState = "roleState"
+        static let roleCountry = "roleCountry"
+        static let roleZipCode = "roleZipCode"
     }
 }

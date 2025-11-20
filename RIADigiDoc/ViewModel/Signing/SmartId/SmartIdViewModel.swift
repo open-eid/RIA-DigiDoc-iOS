@@ -116,6 +116,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
     func sign(
         country: SmartIdCountry,
         personalCode: String,
+        roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async -> SignedContainerProtocol? {
         SmartIdViewModel.logger.debug("Smart-ID: Signing with Smart-ID")
@@ -178,6 +179,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
             hash = try await prepareSignature(
                 cert: cert,
                 containerFile: containerFile,
+                roleData: roleData,
                 signedContainer: signedContainer
             )
         } catch {
@@ -255,6 +257,10 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
             notificationUtil.removeNotification(id: notificationIdentifier)
             return nil
         }
+    }
+
+    func isRoleDataEnabled() async -> Bool {
+        await dataStore.getIsRoleAndAddressEnabled()
     }
 
     private func checkPersonalCodeValidity(_ personalCode: String) {
@@ -406,6 +412,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
     private func prepareSignature(
         cert: Data,
         containerFile: URL,
+        roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async throws -> Data {
         SmartIdViewModel.logger.debug(
@@ -415,11 +422,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
         return try await signedContainer.prepareSignature(
             cert: cert,
             containerPath: containerFile,
-            roles: [],
-            roleCity: "",
-            roleState: "",
-            roleCountry: "",
-            roleZip: "",
+            roleData: roleData,
             userAgent: ""
         )
     }

@@ -22,6 +22,8 @@
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
 		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
+		DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */; };
+		DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903772ECCC42500D1A278 /* SmartIdLibMocks */; };
 		DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
 		DF64D0EE2EC36F7700FF73C6 /* SmartIdLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */; };
 		DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DF9AFE912E00D30A0062C64D /* FactoryKit */; };
@@ -212,6 +214,8 @@
 				ViewModel/SignatureDetailViewModel.swift,
 				ViewModel/Signing/MobileId/MobileIdViewModel.swift,
 				ViewModel/Signing/MobileId/MobileIdViewModelProtocol.swift,
+				ViewModel/Signing/RoleAndAddress/RoleViewModel.swift,
+				ViewModel/Signing/RoleAndAddress/RoleViewModelProtocol.swift,
 				ViewModel/Signing/RootView/SigningRootViewModel.swift,
 				ViewModel/Signing/RootView/SigningRootViewModelProtocol.swift,
 				ViewModel/Signing/SigningMethod/SigningMethodSelectionViewModel.swift,
@@ -403,8 +407,10 @@
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
+				DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */,
 				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
 				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
+				DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */,
 				DFA23CBF2EB6DC73000403E4 /* MobileIdLib in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DFAABCFE2E82AF0900906874 /* CommonsLibMocks in Frameworks */,
@@ -627,6 +633,8 @@
 				DFAABD042E82B1AB00906874 /* Alamofire */,
 				DFAABD0A2E82B45700906874 /* CommonsTestShared */,
 				DFA23CBE2EB6DC73000403E4 /* MobileIdLib */,
+				DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */,
+				DF5903772ECCC42500D1A278 /* SmartIdLibMocks */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -1492,6 +1500,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
 			productName = X509;
+		};
+		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MobileIdLibMocks;
+		};
+		DF5903772ECCC42500D1A278 /* SmartIdLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SmartIdLibMocks;
 		};
 		DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */ = {
 			isa = XCSwiftPackageProductDependency;

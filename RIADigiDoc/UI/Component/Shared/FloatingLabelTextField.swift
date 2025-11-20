@@ -21,9 +21,12 @@ import SwiftUI
 import FactoryKit
 
 struct FloatingLabelTextField: View {
+    @Environment(\.sizeCategory) private var sizeCategory
     @AppTheme private var theme
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
+
+    @State private var floatingLabelHeight: CGFloat = 0
 
     // MARK: - Parameters
     let title: String
@@ -33,9 +36,8 @@ struct FloatingLabelTextField: View {
     let isDropdown: Bool
     let isDisabled: Bool
     let onDropdownTap: (() -> Void)?
-    let isInvalid: Bool
     let isError: Bool
-    let invalidText: String
+    let errorText: String
     let submitLabel: SubmitLabel
     let keyboardType: UIKeyboardType
     let showDashButton: Bool
@@ -48,9 +50,8 @@ struct FloatingLabelTextField: View {
         isDropdown: Bool = false,
         isDisabled: Bool = false,
         onDropdownTap: (() -> Void)? = {},
-        isInvalid: Bool = false,
         isError: Bool = false,
-        invalidText: String = "",
+        errorText: String = "",
         submitLabel: SubmitLabel = .done,
         keyboardType: UIKeyboardType = .default,
         showDashButton: Bool = false
@@ -62,9 +63,8 @@ struct FloatingLabelTextField: View {
         self.isDropdown = isDropdown
         self.isDisabled = isDisabled
         self.onDropdownTap = onDropdownTap
-        self.isInvalid = isInvalid
         self.isError = isError
-        self.invalidText = invalidText
+        self.errorText = errorText
         self.submitLabel = submitLabel
         self.keyboardType = keyboardType
         self.showDashButton = showDashButton
@@ -76,6 +76,18 @@ struct FloatingLabelTextField: View {
     @FocusState private var fieldIsFocused: Bool
 
     // MARK: - Computed properties
+
+    private var labelHeight: CGFloat {
+        FontTypography.bodySmallSize * Dimensions.TextField.lineHeightMultiplier
+    }
+
+    private var textFieldTopPadding: CGFloat {
+        guard shouldFloatLabel else { return 0 }
+        let baseValue = floatingLabelHeight * Dimensions.TextField.paddingMultiplier
+        return sizeCategory.isAccessibilityCategory ?
+        floatingLabelHeight * Dimensions.TextField.accessibilityPaddingMultiplier :
+        baseValue
+    }
 
     private var shouldFloatLabel: Bool {
         !text.isEmpty || isFocused
@@ -133,10 +145,11 @@ struct FloatingLabelTextField: View {
             alignment: .leading
         ) {
             mainContainer
-            if isInvalid {
-                Text(invalidText)
+            if isError {
+                Text(errorText)
                     .font(typography.bodyLarge)
                     .foregroundStyle(theme.error)
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -150,6 +163,7 @@ struct FloatingLabelTextField: View {
                 inputContainer
             }
             floatingLabel
+                .accessibilityHidden(true)
         }
     }
 
@@ -176,6 +190,12 @@ struct FloatingLabelTextField: View {
 
                     dropdownArrowIcon
                 }
+                .padding(.top,
+                    shouldFloatLabel ? max(
+                        floatingLabelHeight / 2 - Dimensions.Padding.XXSPadding,
+                        Dimensions.Padding.XXSPadding
+                    ) : 0
+                )
                 .padding(.horizontal, Dimensions.Padding.SPadding)
                 .padding(.vertical, Dimensions.Padding.MSPadding)
                 .background(borderBackground)
@@ -184,7 +204,8 @@ struct FloatingLabelTextField: View {
         )
         .buttonStyle(.plain)
         .disabled(isDisabled)
-        .accessibilityLabel(text)
+        .accessibilityLabel(Text(verbatim: "\(title) \(text) \(errorText)"))
+        .accessibilityValue(Text(verbatim: ""))
     }
 
     // MARK: - Input
@@ -193,9 +214,18 @@ struct FloatingLabelTextField: View {
     private var inputContainer: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             inputField
+                .accessibilityLabel(Text(verbatim: "\(title) \(text) \(errorText)"))
+                .accessibilityValue(Text(verbatim: ""))
             Spacer()
             trailingIcon
         }
+        .accessibilityElement(children: .contain)
+        .padding(.top,
+            shouldFloatLabel ? max(
+                floatingLabelHeight / 2 - Dimensions.Padding.XXSPadding,
+                Dimensions.Padding.XXSPadding
+            ) : 0
+        )
         .padding(.horizontal, Dimensions.Padding.SPadding)
         .padding(.vertical, Dimensions.Padding.MSPadding)
         .background(borderBackground)
@@ -239,6 +269,7 @@ struct FloatingLabelTextField: View {
                             }
                         }
                     }
+                    .accessibilityValue(Text(verbatim: ""))
             } else {
                 TextField(placeholder, text: $text)
                     .multilineTextAlignment(.leading)
@@ -267,6 +298,7 @@ struct FloatingLabelTextField: View {
                             }
                         }
                     }
+                    .accessibilityValue(Text(verbatim: ""))
             }
         }
         .font(typography.bodyLarge)
@@ -280,6 +312,7 @@ struct FloatingLabelTextField: View {
             }
         }
         .frame(height: Dimensions.Icon.IconSizeXXS)
+        .accessibilityValue(Text(verbatim: ""))
     }
 
     // MARK: - Icons
@@ -314,11 +347,11 @@ struct FloatingLabelTextField: View {
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)
                     .foregroundStyle(isError ? theme.error : theme.onSurfaceVariant)
-                    .accessibilityLabel(languageSettings.localized("Clear text"))
             }
         )
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityLabel(languageSettings.localized("Clear text"))
     }
 
     @ViewBuilder
@@ -331,15 +364,16 @@ struct FloatingLabelTextField: View {
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)
                     .foregroundStyle(isError ? theme.error : theme.onSurfaceVariant)
-                    .accessibilityLabel(
-                        isPasswordVisible
-                        ? languageSettings.localized("Hide password")
-                        : languageSettings.localized("Show password")
-                    )
+
             }
         )
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityLabel(
+            isPasswordVisible
+            ? languageSettings.localized("Hide password")
+            : languageSettings.localized("Show password")
+        )
     }
 
     // MARK: - Floating label
@@ -347,7 +381,7 @@ struct FloatingLabelTextField: View {
     @ViewBuilder
     private var floatingLabel: some View {
         HStack {
-            Text(verbatim: title)
+            Text(verbatim: shouldFloatLabel ? title : "")
                 .font(shouldFloatLabel ? typography.bodySmall : typography.bodyLarge)
                 .foregroundStyle(titleColor)
                 .background(
@@ -356,8 +390,20 @@ struct FloatingLabelTextField: View {
                         .padding(.horizontal, -Dimensions.Padding.XXSPadding)
                         .opacity(shouldFloatLabel ? 1 : 0)
                 )
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear.onAppear {
+                            floatingLabelHeight = geometry.size.height
+                        }
+                        .onChange(of: geometry.size.height) { newHeight in
+                            floatingLabelHeight = newHeight
+                        }
+                    }
+                )
                 .offset(
-                    y: shouldFloatLabel ? -Dimensions.Padding.MPadding : Dimensions.Padding.ZeroPadding
+                    y: shouldFloatLabel ?
+                    -(Dimensions.Padding.MSPadding + textFieldTopPadding + labelHeight / 2) :
+                        Dimensions.Padding.MSPadding
                 )
                 .animation(
                     .easeInOut(
@@ -404,8 +450,8 @@ struct FloatingLabelTextField: View {
         FloatingLabelTextField(
             title: "invalid field",
             text: .constant("invalid input"),
-            isInvalid: true,
-            invalidText: "input is invalid"
+            isError: true,
+            errorText: "input is invalid"
         )
     }
     .padding()

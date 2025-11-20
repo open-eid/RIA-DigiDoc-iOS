@@ -333,4 +333,13 @@ extension Container {
             )
         }
     }
+
+    @MainActor
+    var roleViewModel: Factory<RoleViewModel> {
+        self { @MainActor in
+            RoleViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
 }

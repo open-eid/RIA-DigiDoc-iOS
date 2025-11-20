@@ -19,6 +19,7 @@
 
 import Foundation
 import LibdigidocLibSwift
+import CommonsLib
 
 /// @mockable
 @MainActor
@@ -37,6 +38,8 @@ public protocol MobileIdViewModelProtocol: Sendable {
     func sign(
         phoneNumber: String,
         personalCode: String,
+        roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async -> SignedContainerProtocol?
+    func isRoleDataEnabled() async -> Bool
 }

@@ -75,4 +75,10 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - Smart-ID Input Methods
     func getSmartIdInputData() async -> SmartIdInputData
     func setSmartIdInputData(_ inputData: SmartIdInputData) async
+
+    // MARK: - Role And Address Methods
+    func getIsRoleAndAddressEnabled() async -> Bool
+    func setIsRoleAndAddressEnabled(_ isEnabled: Bool) async
+    func getRoleData() async -> RoleData
+    func setRoleData(_ roleData: RoleData) async
 }

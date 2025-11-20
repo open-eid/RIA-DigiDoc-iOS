@@ -33,6 +33,7 @@ struct SmartIdView: View {
     @State private var rememberMe: Bool = true
     @State private var isSigningEnabled = false
     @State private var isSigning: Bool = false
+    @State private var showRoleView: Bool = false
 
     @StateObject private var viewModel: SmartIdViewModel
 
@@ -64,43 +65,13 @@ struct SmartIdView: View {
                 isSigning = false
             },
             onSign: {
-                cancelSigning()
-
-                task = Task {
-                    let (inputCountry, inputPersonalCode) = rememberMe
-                        ? (country, personalCode)
-                        : (SmartIdCountry.estonia, "")
-
-                    await viewModel.saveInputData(
-                        country: inputCountry,
-                        personalCode: inputPersonalCode,
-                        rememberMe: rememberMe
-                    )
-
-                    isSigning = true
-                    let updatedContainer = await viewModel.sign(
-                        country: country,
-                        personalCode: personalCode,
-                        signedContainer: signedContainer
-                    )
-                    guard let container = updatedContainer else {
-                        cancelSigning()
-                        isSigning = false
-                        if let messageKey = viewModel.smartIdMessageKey,
-                           !messageKey.isEmpty {
-                            let extraArguments = viewModel.smartIdAlertMessageExtraArguments
-                            Toast.show(
-                                languageSettings.localized(messageKey, extraArguments)
-                            )
-                        }
-
-                        return
+                Task {
+                    let isRoleDataEnabled = await viewModel.isRoleDataEnabled()
+                    if isRoleDataEnabled {
+                        showRoleView = true
+                    } else {
+                        sign()
                     }
-
-                    cancelSigning()
-
-                    onSuccess(container)
-                    dismiss()
                 }
             },
             content: {
@@ -164,6 +135,24 @@ struct SmartIdView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $showRoleView) {
+            RoleView(
+                onComplete: { roles, city, state, country, zipCode in
+                    showRoleView = false
+                    sign(
+                        roleData: RoleData(
+                            roles: roles
+                                .split(separator: ",")
+                                .map { $0.trimmingCharacters(in: .whitespaces) },
+                            city: city,
+                            state: state,
+                            country: country,
+                            zipCode: zipCode
+                        )
+                    )
+                }
+            )
+        }
         .onAppear {
             Task {
                 let inputData = await viewModel.getInputData()
@@ -177,7 +166,55 @@ struct SmartIdView: View {
         }
     }
 
-    func cancelSigning() {
+    private func sign(roleData: RoleData? = nil) {
+        cancelSigning()
+
+        task = Task {
+            let (inputCountry, inputPersonalCode) = rememberMe
+                ? (country, personalCode)
+                : (SmartIdCountry.estonia, "")
+
+            await viewModel.saveInputData(
+                country: inputCountry,
+                personalCode: inputPersonalCode,
+                rememberMe: rememberMe
+            )
+
+            isSigning = true
+            let updatedContainer = await viewModel.sign(
+                country: country,
+                personalCode: personalCode,
+                roleData: roleData ?? RoleData(
+                    roles: [],
+                    city: "",
+                    state: "",
+                    country: "",
+                    zipCode: ""
+                ),
+                signedContainer: signedContainer
+            )
+            guard let container = updatedContainer else {
+                cancelSigning()
+                isSigning = false
+                if let messageKey = viewModel.smartIdMessageKey,
+                   !messageKey.isEmpty {
+                    let extraArguments = viewModel.smartIdAlertMessageExtraArguments
+                    Toast.show(
+                        languageSettings.localized(messageKey, extraArguments)
+                    )
+                }
+
+                return
+            }
+
+            cancelSigning()
+
+            onSuccess(container)
+            dismiss()
+        }
+    }
+
+    private func cancelSigning() {
         task?.cancel()
         task = nil
     }

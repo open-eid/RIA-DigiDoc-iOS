@@ -34,6 +34,14 @@ struct SignatureInputScreen<Content: View>: View {
     let onSign: () -> Void
     let content: Content
 
+    private var selectedSigningMethodLabel: String {
+        languageSettings.localized("Signing method")
+    }
+
+    private var selectedSigningMethodText: String {
+        languageSettings.localized(selectedSigningMethod)
+    }
+
     init(
         selectedSigningMethod: String,
         isSigningEnabled: Binding<Bool>,
@@ -63,18 +71,24 @@ struct SignatureInputScreen<Content: View>: View {
                             .foregroundStyle(theme.onSurface)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, Dimensions.Padding.SPadding)
+                            .accessibilityHeading(.h1)
+                            .accessibilityAddTraits([.isHeader])
 
                         if !isSigning {
                             VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
-                                Text(verbatim: languageSettings.localized("Signing method"))
+                                Text(verbatim: selectedSigningMethodLabel)
                                     .font(typography.labelLarge)
                                     .foregroundStyle(theme.onSurfaceVariant)
+                                    .accessibilityHidden(true)
 
                                 NavigationLink(destination: SigningMethodSelectionView()) {
                                     HStack {
-                                        Text(verbatim: languageSettings.localized(selectedSigningMethod))
+                                        Text(verbatim: selectedSigningMethodText)
                                             .font(typography.bodyLarge)
                                             .foregroundStyle(theme.onSurface)
+                                            .accessibilityLabel(Text(verbatim:
+                                                "\(selectedSigningMethodLabel) \(selectedSigningMethodText)")
+                                            )
                                         Spacer()
                                         Image("ic_m3_arrow_right_48pt_wght400")
                                             .resizable()

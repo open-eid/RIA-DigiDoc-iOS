@@ -104,6 +104,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
     func sign(
         phoneNumber: String,
         personalCode: String,
+        roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async -> SignedContainerProtocol? {
         MobileIdViewModel.logger.debug("Mobile-ID: Signing with Mobile-ID")
@@ -154,6 +155,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
             hash = try await prepareSignature(
                 cert: cert,
                 containerFile: containerFile,
+                roleData: roleData,
                 signedContainer: signedContainer
             )
         } catch {
@@ -223,6 +225,10 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
             handleSignatureAddingError(error)
             return nil
         }
+    }
+
+    func isRoleDataEnabled() async -> Bool {
+        await dataStore.getIsRoleAndAddressEnabled()
     }
 
     private func requestCertificate(
@@ -310,6 +316,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
     private func prepareSignature(
         cert: Data,
         containerFile: URL,
+        roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async throws -> Data {
         MobileIdViewModel.logger.debug(
@@ -319,11 +326,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
         return try await signedContainer.prepareSignature(
             cert: cert,
             containerPath: containerFile,
-            roles: [],
-            roleCity: "",
-            roleState: "",
-            roleCountry: "",
-            roleZip: "",
+            roleData: roleData,
             userAgent: ""
         )
     }

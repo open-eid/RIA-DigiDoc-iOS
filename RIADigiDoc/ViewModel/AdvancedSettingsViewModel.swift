@@ -29,7 +29,6 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "AdvancedSettingsViewModel")
 
     @Published var configuration: ConfigurationProvider?
-    @Published var checkedAskRoleAndAddress: Bool = false
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -67,7 +66,6 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
     // MARK: - Restore Default Settings
 
     public func restoreDefaultSettings() async {
-        checkedAskRoleAndAddress = false
         await dataStore.restoreDefaultServicesSettings()
         await keychainStore.removeAll()
         await removeCertificates()
@@ -127,4 +125,11 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
         }
     }
 
+    func getIsRoleAndAddressEnabled() async -> Bool {
+        await dataStore.getIsRoleAndAddressEnabled()
+    }
+
+    func setIsRoleAndAddressEnabled(_ isEnabled: Bool) async {
+        await dataStore.setIsRoleAndAddressEnabled(isEnabled)
+    }
 }

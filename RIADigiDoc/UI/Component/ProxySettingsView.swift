@@ -114,8 +114,8 @@ struct ProxySettingsView: View {
         FloatingLabelTextField(
             title: languageSettings.localized("Main settings proxy port"),
             text: $viewModel.portText,
-            isInvalid: !viewModel.isPortTextValid,
-            invalidText: languageSettings.localized("Main settings proxy port error"),
+            isError: !viewModel.isPortTextValid,
+            errorText: languageSettings.localized("Main settings proxy port error"),
             keyboardType: .numberPad
         )
         FloatingLabelTextField(

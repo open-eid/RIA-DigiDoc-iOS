@@ -4261,6 +4261,24 @@
         }
       }
     },
+    "Role and address title" : {
+      "comment" : "Role and address view title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your role and address info"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisesta oma roll ja aadress"
+          }
+        }
+      }
+    },
     "Role title" : {
       "comment" : "Role details",
       "extractionState" : "manual",
@@ -5042,7 +5060,7 @@
         },
         "et" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
           }
         }
