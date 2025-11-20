@@ -31,8 +31,8 @@
 #import "../Model/DigiDocContainer.h"
 #import "../Model/DigiDocDataFile.h"
 #import "../Model/DigiDocSignature.h"
+#import "../Model/DigiDocRoleData.h"
 #import "Exception/Util/ExceptionUtil.h"
-
 
 @implementation DigiDocSigningWrapper {}
 
@@ -40,7 +40,7 @@ static std::unique_ptr<digidoc::Container> docContainer = nil;
 static digidoc::Signature *signature = nil;
 static std::unique_ptr<digidoc::Signer> signer{};
 
-+ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roles:(NSArray<NSString *> *)roles roleCity:(NSString *)roleCity roleState:(NSString *)roleState roleCountry:(NSString *)roleCountry roleZip:(NSString *)roleZip userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable dataToSign, NSError * _Nullable error))completion {
++ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSError *error = nil;
     try {
         signer = std::make_unique<WebSigner>(digidoc::X509Cert(reinterpret_cast<const unsigned char *>(cert.bytes), cert.length));
@@ -51,11 +51,16 @@ static std::unique_ptr<digidoc::Signer> signer{};
         docContainer = digidoc::Container::openPtr(containerPath.UTF8String, &cb);
 
         signer->setProfile("time-stamp");
-        signer->setSignatureProductionPlace(roleCity.UTF8String ?: "", roleState.UTF8String ?: "", roleZip.UTF8String ?: "", roleCountry.UTF8String ?: "");
+
+        signer->setSignatureProductionPlace(roleData.city.UTF8String ?: "",
+                                            roleData.state.UTF8String ?: "",
+                                            roleData.zipcode.UTF8String ?: "",
+                                            roleData.country.UTF8String ?: "");
+
         signer->setUserAgent(userAgent.UTF8String);
 
         std::vector<std::string> rolesList;
-        for (NSString *role in roles) {
+        for (NSString *role in roleData.roles) {
             if (role.length > 0) {
                 rolesList.push_back(role.UTF8String);
             }

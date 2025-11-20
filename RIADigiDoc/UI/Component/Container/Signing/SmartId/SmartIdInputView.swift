@@ -40,6 +40,10 @@ struct SmartIdInputView: View {
         return languageSettings.localized(personalCodeError ?? "")
     }
 
+    private var rememberMeLabel: String {
+        languageSettings.localized("Remember me")
+    }
+
     init(
         country: Binding<SmartIdCountry>,
         personalCode: Binding<String>,
@@ -76,32 +80,32 @@ struct SmartIdInputView: View {
                         title: languageSettings.localized("Personal code"),
                         text: $personalCode,
                         isError: !personalCodeErrorText.isEmpty,
+                        errorText: personalCodeErrorText,
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
                     .onChange(of: personalCode) { _ in
                         onInputChange()
                     }
-
-                    if !personalCodeErrorText.isEmpty {
-                        Text(verbatim: personalCodeErrorText)
-                            .font(typography.bodySmall)
-                            .foregroundStyle(theme.error)
-                    }
                 }
             }
             .padding(.vertical, Dimensions.Padding.ZeroPadding)
 
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
-                ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
-                    .padding(.trailing, Dimensions.Padding.XSPadding)
-                    .padding(.vertical, Dimensions.Padding.ZeroPadding)
+                ToggleSection(
+                    isOn: $rememberMe,
+                    label: rememberMeLabel
+                )
+                .padding(.trailing, Dimensions.Padding.XSPadding)
+                .padding(.vertical, Dimensions.Padding.ZeroPadding)
 
-                HStack {
-                    Text(verbatim: languageSettings.localized("Remember me message"))
-                        .font(typography.bodyMedium)
-                        .foregroundStyle(theme.onSurfaceVariant)
-                    Spacer()
+                if rememberMe {
+                    HStack {
+                        Text(verbatim: languageSettings.localized("Remember me message"))
+                            .font(typography.bodyMedium)
+                            .foregroundStyle(theme.onSurfaceVariant)
+                        Spacer()
+                    }
                 }
             }
         }

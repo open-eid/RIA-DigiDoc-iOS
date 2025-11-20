@@ -17,16 +17,25 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "../Model/DigiDocRoleData.h"
+import Foundation
+import OSLog
+import CommonsLib
 
-NS_ASSUME_NONNULL_BEGIN
+@MainActor
+class RoleViewModel: RoleViewModelProtocol, ObservableObject {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RoleViewModel")
 
-@interface DigiDocSigningWrapper : NSObject
+    private let dataStore: DataStoreProtocol
 
-+ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable dataToSign, NSError * _Nullable error))completion;
-+ (void)addSignature:(NSData *)data completion:(void (^)(BOOL valid, NSError * _Nullable error))completion;
+    init(dataStore: DataStoreProtocol) {
+        self.dataStore = dataStore
+    }
 
-@end
+    func saveInputData(_ roleData: RoleData) async {
+        await dataStore.setRoleData(roleData)
+    }
 
-NS_ASSUME_NONNULL_END
+    func getInputData() async -> RoleData {
+        await dataStore.getRoleData()
+    }
+}

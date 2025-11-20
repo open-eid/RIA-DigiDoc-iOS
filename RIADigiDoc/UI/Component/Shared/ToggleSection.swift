@@ -43,6 +43,7 @@ struct ToggleSection: View {
             Text(verbatim: label)
                 .foregroundStyle(theme.onSurface)
                 .font(typography.bodyLarge)
+                .accessibilityHidden(true)
             Spacer()
             Toggle(
                 isOn: $isOn,
@@ -50,6 +51,7 @@ struct ToggleSection: View {
             )
             .toggleStyle(SwitchToggleStyle(tint: theme.primary))
             .labelsHidden()
+            .accessibilityLabel(label)
         }
         .padding(.vertical, verticalPadding)
     }

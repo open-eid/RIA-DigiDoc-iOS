@@ -10,7 +10,8 @@ let package = Package(
         .library(
             name: "MobileIdLib",
             targets: ["MobileIdLib"]
-        )
+        ),
+        .library(name: "MobileIdLibMocks", targets: ["MobileIdLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
@@ -32,9 +33,19 @@ let package = Package(
                 .enableUpcomingFeature("InferIsolatedConformances")
             ]
         ),
+        .target(
+            name: "MobileIdLibMocks",
+            dependencies: ["MobileIdLib"],
+            path: "Tests/Mocks/Generated"
+        ),
         .testTarget(
             name: "MobileIdLibTests",
-            dependencies: ["MobileIdLib"]
+            dependencies: [
+                "MobileIdLib",
+                "CommonsLib",
+                .product(name: "CommonsLibMocks", package: "commonslib"),
+                .product(name: "FactoryTesting", package: "Factory")
+            ]
         )
     ]
 )

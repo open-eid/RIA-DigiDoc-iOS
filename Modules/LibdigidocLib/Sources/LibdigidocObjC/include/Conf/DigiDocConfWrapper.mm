@@ -70,7 +70,7 @@ public:
     }
     
     std::string TSUrl() const override {
-        if (_tsUrl && _tsUrl.absoluteString.length > 0) {
+        if (_tsUrl != nil && [_tsUrl isKindOfClass:[NSURL class]] && _tsUrl.absoluteString.length > 0) {
             std::string tsUrl = std::string([[_tsUrl absoluteString] UTF8String]);
             return tsUrl;
         }

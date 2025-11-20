@@ -68,4 +68,10 @@ enum Dimensions {
         static let DefaultScaling: CGFloat = 1.0
         static let WideScaling: CGFloat = 1.2
     }
+
+    enum TextField {
+        static let lineHeightMultiplier: CGFloat = 1.2
+        static let paddingMultiplier: CGFloat = 0.4
+        static let accessibilityPaddingMultiplier: CGFloat = 0.3
+    }
 }

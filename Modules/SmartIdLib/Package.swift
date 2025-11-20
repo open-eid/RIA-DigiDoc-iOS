@@ -10,7 +10,8 @@ let package = Package(
         .library(
             name: "SmartIdLib",
             targets: ["SmartIdLib"]
-        )
+        ),
+        .library(name: "SmartIdLibMocks", targets: ["SmartIdLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
@@ -34,9 +35,20 @@ let package = Package(
                 .enableUpcomingFeature("InferIsolatedConformances")
             ]
         ),
+        .target(
+            name: "SmartIdLibMocks",
+            dependencies: ["SmartIdLib"],
+            path: "Tests/Mocks/Generated"
+        ),
         .testTarget(
             name: "SmartIdLibTests",
-            dependencies: ["SmartIdLib"]
+            dependencies: [
+                "SmartIdLib",
+                "UtilsLib",
+                .product(name: "UtilsLibMocks", package: "utilslib"),
+                .product(name: "CommonsLibMocks", package: "commonslib"),
+                .product(name: "FactoryTesting", package: "Factory")
+            ]
         )
     ]
 )

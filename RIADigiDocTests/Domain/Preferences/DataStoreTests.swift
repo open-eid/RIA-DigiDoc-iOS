@@ -17,9 +17,9 @@
  *
  */
 
-import CommonsLib
 import Foundation
 import Testing
+import CommonsLib
 
 final class DataStoreTests {
     private let dataStore: DataStoreProtocol
@@ -299,5 +299,48 @@ final class DataStoreTests {
         #expect(retrievedInfo.port == testInfo.port)
         #expect(retrievedInfo.username == testInfo.username)
         #expect(retrievedInfo.password == "")
+    }
+
+    // MARK: - Role Data Tests
+
+    @Test
+    func getIsRoleAndAddressEnabled_success() async throws {
+        let isRoleDataEnabled = await dataStore.getIsRoleAndAddressEnabled()
+        #expect(!isRoleDataEnabled)
+    }
+
+    @Test
+    func setIsRoleAndAddressEnabled_success() async throws {
+        await dataStore.setIsRoleAndAddressEnabled(true)
+        #expect(await dataStore.getIsRoleAndAddressEnabled())
+    }
+
+    @Test
+    func getRoleData_success() async throws {
+        let roleData = await dataStore.getRoleData()
+        #expect(roleData.roles.isEmpty)
+        #expect(roleData.city.isEmpty)
+        #expect(roleData.state.isEmpty)
+        #expect(roleData.country.isEmpty)
+        #expect(roleData.zipCode.isEmpty)
+    }
+
+    @Test
+    func setRoleData_success() async throws {
+        await dataStore.setRoleData(
+            RoleData(
+                roles: ["Role 1", "Role 2"],
+                city: "Test city",
+                state: "Test state",
+                country: "Test country",
+                zipCode: "Test zip code"
+            )
+        )
+
+        let roleData = await dataStore.getRoleData()
+        #expect(roleData.roles == ["Role 1", "Role 2"])
+        #expect(roleData.city == "Test city")
+        #expect(roleData.state == "Test state")
+        #expect(roleData.country == "Test country")
     }
 }

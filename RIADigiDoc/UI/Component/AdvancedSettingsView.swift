@@ -33,6 +33,8 @@ struct AdvancedSettingsView: View {
     @State private var navigateToCryptoSettings = false
     @State private var navigateToProxySettings = false
 
+    @State private var checkedAskRoleAndAddress = false
+
     @StateObject private var viewModel: AdvancedSettingsViewModel
 
     init() {
@@ -49,15 +51,28 @@ struct AdvancedSettingsView: View {
             content: {
                 ScrollView {
                     VStack(spacing: Dimensions.Padding.ZeroPadding) {
-
                         AdvancedSettingsSectionColumn(
                             title: languageSettings.localized("Main settings general title"),
                             isScrollable: false
                         ) {
                             AdvancedSettingsCheckboxRow(
                                 label: languageSettings.localized("Main settings ask role and address title"),
-                                isChecked: $viewModel.checkedAskRoleAndAddress
+                                isChecked: $checkedAskRoleAndAddress
                             )
+                            .onAppear {
+                                Task {
+                                    let isRoleAndAddressEnabled = await viewModel.getIsRoleAndAddressEnabled()
+
+                                    await MainActor.run {
+                                        checkedAskRoleAndAddress = isRoleAndAddressEnabled
+                                    }
+                                }
+                            }
+                            .onChange(of: checkedAskRoleAndAddress) { newValue in
+                                Task {
+                                    await viewModel.setIsRoleAndAddressEnabled(newValue)
+                                }
+                            }
                         }
 
                         Divider().padding(.vertical, Dimensions.Padding.SPadding)

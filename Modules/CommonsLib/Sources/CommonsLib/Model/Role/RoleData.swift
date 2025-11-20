@@ -17,16 +17,26 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "../Model/DigiDocRoleData.h"
+import Foundation
 
-NS_ASSUME_NONNULL_BEGIN
+public struct RoleData: Sendable {
+    public var roles: [String]
+    public var city: String
+    public var state: String
+    public var country: String
+    public var zipCode: String
 
-@interface DigiDocSigningWrapper : NSObject
-
-+ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable dataToSign, NSError * _Nullable error))completion;
-+ (void)addSignature:(NSData *)data completion:(void (^)(BOOL valid, NSError * _Nullable error))completion;
-
-@end
-
-NS_ASSUME_NONNULL_END
+    public init(
+        roles: [String],
+        city: String,
+        state: String,
+        country: String,
+        zipCode: String
+    ) {
+        self.roles = roles
+        self.city = city
+        self.state = state
+        self.country = country
+        self.zipCode = zipCode
+    }
+}

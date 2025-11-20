@@ -86,4 +86,30 @@ final class AdvancedSettingsViewModelTests {
             ])
         }
     }
+
+    @Test
+    func getIsRoleAndAddressEnabled_successWithTrue() async {
+        mockDataStore.getIsRoleAndAddressEnabledHandler = { true }
+
+        let isRoleAndAddressEnabled = await viewModel.getIsRoleAndAddressEnabled()
+
+        #expect(isRoleAndAddressEnabled)
+    }
+
+    @Test
+    func getIsRoleAndAddressEnabled_successWithFalse() async {
+        mockDataStore.getIsRoleAndAddressEnabledHandler = { false }
+
+        let isRoleAndAddressEnabled = await viewModel.getIsRoleAndAddressEnabled()
+
+        #expect(!isRoleAndAddressEnabled)
+    }
+
+    @Test
+    func setIsRoleAndAddressEnabled_success() async {
+        await viewModel.setIsRoleAndAddressEnabled(true)
+
+        #expect(mockDataStore.setIsRoleAndAddressEnabledCallCount == 1)
+        #expect(mockDataStore.setIsRoleAndAddressEnabledArgValues.first == true)
+    }
 }

@@ -263,26 +263,17 @@ public actor SignedContainer: SignedContainerProtocol {
         )
     }
 
-    // swiftlint:disable:next function_parameter_count
     public func prepareSignature(
         cert: Data,
         containerPath: URL,
-        roles: [String],
-        roleCity: String,
-        roleState: String,
-        roleCountry: String,
-        roleZip: String,
+        roleData: RoleData,
         userAgent: String
     ) async throws -> Data {
         return try await container
             .prepareSignature(
                 cert: cert,
                 containerPath: containerPath,
-                roles: roles,
-                roleCity: roleCity,
-                roleState: roleState,
-                roleCountry: roleCountry,
-                roleZip: roleZip,
+                roleData: roleData,
                 userAgent: userAgent
             )
     }

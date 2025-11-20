@@ -18,15 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "../Model/DigiDocRoleData.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@interface DigiDocRoleData : NSObject
 
-@interface DigiDocSigningWrapper : NSObject
+@property (nonatomic, strong) NSArray<NSString *> *roles;
+@property (nonatomic, strong) NSString *city;
+@property (nonatomic, strong) NSString *state;
+@property (nonatomic, strong) NSString *country;
+@property (nonatomic, strong) NSString *zipcode;
 
-+ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable dataToSign, NSError * _Nullable error))completion;
-+ (void)addSignature:(NSData *)data completion:(void (^)(BOOL valid, NSError * _Nullable error))completion;
+- (instancetype)initWithRoles:(NSArray<NSString *> *)roles
+                         city:(NSString *)city
+                        state:(NSString *)state
+                      country:(NSString *)country
+                      zipcode:(NSString *)zipcode;
 
 @end
 
-NS_ASSUME_NONNULL_END
