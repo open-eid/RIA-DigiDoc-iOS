@@ -34,6 +34,16 @@ public actor DataStore: DataStoreProtocol {
         return .standard
     }
 
+    // MARK: - Is Initial Langauge Selected
+
+    public func getIsInitialLanguageSelected() async -> Bool {
+        userDefaults().bool(forKey: Keys.isInitialLanguageSelected)
+    }
+
+    public func setIsInitialLanguageSelected(_ value: Bool) async {
+        userDefaults().set(value, forKey: Keys.isInitialLanguageSelected)
+    }
+
     // MARK: - Language Methods
 
     public func getSelectedLanguage() async -> String {
@@ -331,6 +341,7 @@ public actor DataStore: DataStoreProtocol {
     }
 
     private enum Keys {
+        static let isInitialLanguageSelected = "isInitialLanguageSelected"
         static let selectedLanguage = "selectedLanguage"
         static let selectedTheme = "selectedTheme"
         static let validationServiceURL = "validationServiceURL"

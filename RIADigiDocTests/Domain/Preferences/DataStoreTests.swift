@@ -34,6 +34,22 @@ final class DataStoreTests {
         UserDefaults().removePersistentDomain(forName: testSuiteName)
     }
 
+    // MARK: - Is Initial Langauge Selected Tests
+    @Test
+    func getIsInitialLanguageSelected_success() async throws {
+        #expect(!(await dataStore.getIsInitialLanguageSelected()))
+    }
+
+    @Test
+    func setIsInitialLanguageSelected_success() async throws {
+        let expectedValue1: Bool = true
+        await dataStore.setIsInitialLanguageSelected(expectedValue1)
+        #expect(await dataStore.getIsInitialLanguageSelected() == expectedValue1)
+        let expectedValue2: Bool = false
+        await dataStore.setIsInitialLanguageSelected(expectedValue2)
+        #expect(await dataStore.getIsInitialLanguageSelected() == expectedValue2)
+    }
+
     // MARK: - Language Tests
 
     @Test

@@ -21,6 +21,10 @@ import CommonsLib
 
 /// @mockable
 public protocol DataStoreProtocol: Sendable {
+    // MARK: - Skip Language Selector
+    func getIsInitialLanguageSelected() async -> Bool
+    func setIsInitialLanguageSelected(_ value: Bool) async
+
     // MARK: - Language Methods
     func getSelectedLanguage() async -> String
     func setSelectedLanguage(newLanguageCode: String) async

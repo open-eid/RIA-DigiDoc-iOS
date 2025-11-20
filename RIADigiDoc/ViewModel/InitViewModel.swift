@@ -17,9 +17,26 @@
  *
  */
 
-struct SupportedLanguage: Identifiable, Equatable, Hashable {
-    let code: String
-    let titleKey: String
-    let accessibilityInputLabel: String
-    var id: String { code }
+import Foundation
+import OSLog
+
+@MainActor
+class InitViewModel: InitViewModelProtocol, ObservableObject {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "InitViewModel")
+
+    private let languageSettings: LanguageSettingsProtocol
+    private let dataStore: DataStoreProtocol
+
+    init(
+        languageSettings: LanguageSettingsProtocol,
+        dataStore: DataStoreProtocol
+    ) {
+        self.languageSettings = languageSettings
+        self.dataStore = dataStore
+    }
+
+    func selectLanguage(code: String) async {
+        await languageSettings.setSelectedLanguage(newLanguageCode: code)
+        await dataStore.setIsInitialLanguageSelected(true)
+    }
 }
