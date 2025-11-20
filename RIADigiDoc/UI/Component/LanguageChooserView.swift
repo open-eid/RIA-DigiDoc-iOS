@@ -30,8 +30,8 @@ struct LanguageChooserView: View {
     }
 
     private let supportedLanguages: [SupportedLanguage] = [
-        SupportedLanguage(code: "et", titleKey: "Init lang locale et"),
-        SupportedLanguage(code: "en", titleKey: "Init lang locale en")
+        SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
+        SupportedLanguage(code: "en", titleKey: "Init lang locale en", accessibilityInputLabel: "English")
     ]
 
     var body: some View {

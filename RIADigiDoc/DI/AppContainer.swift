@@ -182,6 +182,17 @@ extension Container {
     }
 
     @MainActor
+    var initViewModel: Factory<InitViewModel> {
+        self {
+            @MainActor in
+            InitViewModel(
+                languageSettings: self.languageSettings(),
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
     var contentViewModel: Factory<ContentViewModel> {
         self {
             @MainActor in

@@ -55,6 +55,24 @@
         }
       }
     },
+    "App name" : {
+      "comment" : "App name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc"
+          }
+        }
+      }
+    },
     "Authentication in progress please wait" : {
       "comment" : "OperationAuthenticateWithWebEID alert message 4",
       "extractionState" : "manual",
@@ -1237,6 +1255,7 @@
       }
     },
     "Help" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4473,6 +4492,27 @@
           }
         }
       }
+    },
+    "RIA small caps" : {
+      "comment" : "RIA small caps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rɪɪɢɪ Iɴꜰᴏꜱüꜱᴛᴇᴇᴍɪ Aᴍᴇᴛ"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rɪɪɢɪ Iɴꜰᴏꜱüꜱᴛᴇᴇᴍɪ Aᴍᴇᴛ"
+          }
+        }
+      }
+    },
+    "Riigi Infosüsteemide Amet" : {
+
     },
     "Role and address title" : {
       "comment" : "Role and address view title",
