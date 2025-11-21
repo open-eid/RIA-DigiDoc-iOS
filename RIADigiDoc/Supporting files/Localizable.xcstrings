@@ -538,6 +538,24 @@
         }
       }
     },
+    "Could not add files" : {
+      "comment" : "Show number of files that could not be added to container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not add %@ files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ faili lisamine ebaõnnestus"
+          }
+        }
+      }
+    },
     "Could not load selected files" : {
       "comment" : "No files or when loading files is unsuccessful",
       "extractionState" : "manual",
@@ -642,6 +660,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "RIA DigiDoc"
+          }
+        }
+      }
+    },
+    "Document already exists" : {
+      "comment" : "When trying to add a data file that already exists in the container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document with same file name %@ already exists"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail %@ on juba ümbrikus olemas"
           }
         }
       }
@@ -1309,8 +1345,8 @@
         }
       }
     },
-    "Invalid signature %d" : {
-      "comment" : "Invalid signature message in container notificatins",
+    "Invalid signature" : {
+      "comment" : "Invalid signature message in container notifications",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5540,7 +5576,7 @@
         }
       }
     },
-    "Valid signature %d" : {
+    "Valid signature" : {
       "comment" : "Used as an announcement with VoiceOver",
       "extractionState" : "manual",
       "localizations" : {

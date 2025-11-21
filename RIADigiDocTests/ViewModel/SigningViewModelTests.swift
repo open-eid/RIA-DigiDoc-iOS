@@ -35,30 +35,33 @@ struct SigningViewModelTests {
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
     private let viewModel: SigningViewModel
     private let mockFileManager: FileManagerProtocolMock
+    private let mockFileInspector: FileInspectorProtocolMock
     private let mockContainerUtil: ContainerUtilProtocolMock
     private let mockFileUtil: FileUtilProtocolMock
     private let mockFileOpeningService: FileOpeningServiceProtocolMock
     private let mockMimeTypeCache: MimeTypeCacheProtocolMock
-    private let mimeTypeDecoder: MimeTypeDecoderProtocolMock
+    private let mockMimeTypeDecoder: MimeTypeDecoderProtocolMock
     private let mockSivaRepository: SivaRepositoryProtocolMock
 
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
+        mockFileInspector = FileInspectorProtocolMock()
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
         mockMimeTypeCache = MimeTypeCacheProtocolMock()
-        mimeTypeDecoder = MimeTypeDecoderProtocolMock()
+        mockMimeTypeDecoder = MimeTypeDecoderProtocolMock()
         mockSivaRepository = SivaRepositoryProtocolMock()
 
         viewModel = SigningViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileOpeningService: mockFileOpeningService,
             mimeTypeCache: mockMimeTypeCache,
-            mimeTypeDecoder: mimeTypeDecoder,
+            mimeTypeDecoder: mockMimeTypeDecoder,
             fileUtil: mockFileUtil,
             fileManager: mockFileManager,
+            fileInspector: mockFileInspector,
             sivaRepository: mockSivaRepository
         )
     }
@@ -1107,5 +1110,255 @@ struct SigningViewModelTests {
         #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
         #expect(mockFileManager.removeItemCallCount == 0)
         #expect(!viewModel.isLastDataFileRemoved)
+    }
+
+    @Test
+    func addDataFiles_successWithSingleFile() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockAddedDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "S2",
+            fileName: "test.txt"
+        )
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        mockFileInspector.fileSizeHandler = { _ in 123 }
+
+        let updatedMockSignedContainer = SignedContainerProtocolMock()
+        updatedMockSignedContainer.getDataFilesHandler = { [mockDataFile, mockAddedDataFile] }
+        mockSignedContainer.addDataFilesHandler = { _, _ in updatedMockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles(
+            [URL(fileURLWithPath: "/mock/path/test.txt")],
+            to: containerFile
+        )
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("File successfully added", []))
+        await #expect(updatedMockSignedContainer.getDataFiles().count == 2)
+    }
+
+    @Test
+    func addDataFiles_successWithMultipleFiles() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockAddedDataFile = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "S2",
+            fileName: "test.txt"
+        )
+        let mockAddedDataFile2 = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "S3",
+            fileName: "text.txt"
+        )
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        mockFileInspector.fileSizeHandler = { _ in 123 }
+
+        let updatedMockSignedContainer = SignedContainerProtocolMock()
+        updatedMockSignedContainer.getDataFilesHandler = { [mockDataFile, mockAddedDataFile, mockAddedDataFile2] }
+        mockSignedContainer.addDataFilesHandler = { _, _ in updatedMockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles(
+            [URL(fileURLWithPath: "/mock/path/test.txt"),
+             URL(fileURLWithPath: "/mock/path/text.txt")],
+            to: containerFile
+        )
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Files successfully added", []))
+        await #expect(updatedMockSignedContainer.getDataFiles().count == 3)
+    }
+
+    @Test
+    func addDataFiles_handleErrorWhenFileEmpty() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        mockFileInspector.fileSizeHandler = { _ in 0 }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles(
+            [URL(fileURLWithPath: "/mock/path/test.txt")],
+            to: containerFile
+        )
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Invalid file size", []))
+        #expect(mockSignedContainer.addDataFilesCallCount == 0)
+    }
+
+    @Test
+    func addDataFiles_handleErrorWhenNoDataFiles() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles([], to: containerFile)
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Could not load selected files", []))
+        #expect(mockSignedContainer.addDataFilesCallCount == 0)
+    }
+
+    @Test
+    func addDataFiles_handleErrorWhenFileAlreadyExists() async {
+        let mockFileName = "test.txt"
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper(fileId: "S1")
+        let mockDataFile2 = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "S2",
+            fileName: mockFileName
+        )
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        mockSignedContainer.getDataFilesHandler = {
+            [mockDataFile, mockDataFile2]
+        }
+
+        mockFileInspector.fileSizeHandler = { _ in 123 }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles(
+            [URL(fileURLWithPath: "/mock/path/\(mockFileName)")],
+            to: containerFile
+        )
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Document already exists", [mockFileName]))
+        await #expect(mockSignedContainer.getDataFiles().count == 2)
+    }
+
+    @Test
+    func addDataFiles_handleErrorWhenPartialAddingSucceeds() async throws {
+        let testFile = TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
+        let testFile2 = TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
+        let testFile3 = TestFileUtil.createSampleFile(name: "test", withExtension: "txt")
+        let containerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
+
+        guard let exampleContainer = containerFile else {
+            Issue.record("Unable to get resource file")
+            return
+        }
+
+        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+            subfolder: "SigningViewModelTests-handleErrorWhenPartialAddingSucceeds"
+        )
+
+        let localExampleContainer = tempDirectory.appendingPathComponent(
+            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        )
+
+        try FileManager.default.copyItem(
+            at: exampleContainer,
+            to: localExampleContainer
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: localExampleContainer)
+            try? FileManager.default.removeItem(at: tempDirectory)
+        }
+
+        let signedContainer = try await SignedContainer.openOrCreate(
+            dataFiles: [localExampleContainer],
+            isSivaConfirmed: true
+        )
+
+        mockMimeTypeDecoder.parseHandler = { _ in
+            return ContainerType.none
+        }
+
+        await viewModel.loadContainerData(signedContainer: signedContainer)
+
+        await viewModel.addDataFiles([
+            testFile, testFile2, testFile3
+        ], to: localExampleContainer)
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Could not add files", ["2"]))
+        #expect(viewModel.dataFiles.count == 3)
+    }
+
+    @Test
+    func addDataFiles_handleErrorWhenNoFilesAreAdded() async throws {
+        let testFile = TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
+        let testFile2 = TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
+        let containerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
+
+        guard let exampleContainer = containerFile else {
+            Issue.record("Unable to get resource file")
+            return
+        }
+
+        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+            subfolder: "SigningViewModelTests-handleErrorWhenNoFilesAreAdded"
+        )
+
+        let localExampleContainer = tempDirectory.appendingPathComponent(
+            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        )
+
+        try FileManager.default.copyItem(
+            at: exampleContainer,
+            to: localExampleContainer
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: localExampleContainer)
+            try? FileManager.default.removeItem(at: tempDirectory)
+        }
+
+        let signedContainer = try await SignedContainer.openOrCreate(
+            dataFiles: [localExampleContainer],
+            isSivaConfirmed: true
+        )
+
+        mockMimeTypeDecoder.parseHandler = { _ in
+            return ContainerType.none
+        }
+
+        await viewModel.loadContainerData(signedContainer: signedContainer)
+
+        await viewModel.addDataFiles([
+            testFile, testFile2
+        ], to: localExampleContainer)
+
+        #expect(viewModel.errorMessage ?? ("", []) == ("Could not add files", ["2"]))
+        #expect(viewModel.dataFiles.count == 2)
     }
 }

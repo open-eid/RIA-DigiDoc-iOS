@@ -82,7 +82,7 @@ struct ContainerNotificationsView: View {
         case .unknownSignatures(let count):
             return languageSettings.localized("Unknown signature", [count])
         case .invalidSignatures(let count):
-            return languageSettings.localized("Invalid signature \(count)")
+            return languageSettings.localized("Invalid signature", [count])
         case .emptyFile:
             return languageSettings.localized("Empty file in container")
         case .unsupportedContainer:

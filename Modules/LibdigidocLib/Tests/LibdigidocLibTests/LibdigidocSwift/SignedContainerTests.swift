@@ -635,4 +635,71 @@ final class SignedContainerTests {
             }
         }
     }
+
+    @Test
+    func addDataFiles_success() async throws {
+        let mockUpdatedContainerWrapper = ContainerWrapperProtocolMock()
+
+        mockContainerWrapper.addDataFilesHandler = { _, _ in
+            return mockUpdatedContainerWrapper
+        }
+
+        mockUpdatedContainerWrapper.getDataFilesHandler = {[
+            MockDataFileWrapper.mockDataFileWrapper(),
+            MockDataFileWrapper.mockDataFileWrapper()
+        ]}
+
+        let container = try await signedContainer
+            .addDataFiles([
+                URL(fileURLWithPath: "/mock/path/file.txt")
+            ], to: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+
+        let dataFiles = await container.getDataFiles()
+
+        #expect(dataFiles.count == 2)
+    }
+
+    @Test
+    func addDataFiles_throwErrorWhenNoDataFiles() async throws {
+        do {
+            try await signedContainer.addDataFiles([], to: URL(fileURLWithPath: "/mock/path/mockContainer.asice"))
+            Issue.record("Expected 'dataFileRemovingFailed' error")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .addingFilesToContainerFailed:
+                #expect(true)
+            default:
+                Issue.record("Unexpected error: \(error.localizedDescription)")
+                return
+            }
+        }
+    }
+
+    @Test
+    func removeDataFile_throwErrorWhenAddingFilesDoesNotSucceed() async throws {
+        mockContainerWrapper.addDataFilesHandler = { _, _ in
+            throw DigiDocError.addingFilesToContainerFailed(
+                ErrorDetail(message: "TestError", userInfo: [:])
+            )
+        }
+
+        do {
+            try await signedContainer
+                .addDataFiles(
+                    [URL(fileURLWithPath: "/mock/path/file.txt")],
+                    to: URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+                )
+            Issue.record("Expected 'addingFilesToContainerFailed' error")
+            return
+        } catch let error as DigiDocError {
+            switch error {
+            case .addingFilesToContainerFailed:
+                #expect(true)
+            default:
+                Issue.record("Unexpected error: \(error.localizedDescription)")
+                return
+            }
+        }
+    }
 }

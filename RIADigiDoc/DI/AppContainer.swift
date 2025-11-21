@@ -100,6 +100,7 @@ extension Container {
                 mimeTypeDecoder: self.mimeTypeDecoder(),
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager(),
+                fileInspector: self.fileInspector(),
                 sivaRepository: self.sivaRepository()
             )
         }

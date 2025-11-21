@@ -27,7 +27,7 @@ public protocol ContainerWrapperProtocol: Sendable {
     func getMimetype() async -> String
     func create(file: URL, dataFiles: [String]) async throws
     func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
-    @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> Bool
+    @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol
     func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
     @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol

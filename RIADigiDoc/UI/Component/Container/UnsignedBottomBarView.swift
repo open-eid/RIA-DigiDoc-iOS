@@ -37,9 +37,7 @@ struct UnsignedBottomBarView: View {
 
     var body: some View {
         HStack {
-            Button(action: {
-                // TODO: Add file action
-            }, label: {
+            Button(action: leftButtonAction, label: {
                 HStack(spacing: Dimensions.Padding.XSPadding, content: {
                     Image(leftButtonIconName)
                         .resizable()

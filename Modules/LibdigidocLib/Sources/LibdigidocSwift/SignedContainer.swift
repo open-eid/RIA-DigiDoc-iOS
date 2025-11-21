@@ -126,6 +126,29 @@ public actor SignedContainer: SignedContainerProtocol {
     }
 
     @discardableResult
+    public func addDataFiles(_ dataFiles: [URL], to containerFile: URL) async throws -> SignedContainerProtocol {
+        if dataFiles.isEmpty {
+            throw DigiDocError.addingFilesToContainerFailed(
+                ErrorDetail(
+                    message: "SignedContainer - cannot add data files. No data files found",
+                    code: 5
+                )
+            )
+        }
+
+        let updatedContainer = try await container.addDataFiles(containerFile: containerFile, dataFiles: dataFiles)
+
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: true,
+            container: updatedContainer,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
+    }
+
+    @discardableResult
     public func renameContainer(to newName: String) async throws -> URL {
 
         let fileName = newName.isEmpty ? CommonsLib.Constants.Container.DefaultName : newName

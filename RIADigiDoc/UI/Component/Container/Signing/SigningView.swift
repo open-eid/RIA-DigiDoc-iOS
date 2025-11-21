@@ -47,6 +47,7 @@ struct SigningView: View {
     @State private var showRemoveSignatureModal = false
     @State private var showRemoveDataFileModal = false
     @State private var newContainerName = Constants.Container.DefaultName
+    @State private var isImportingAddedFiles: Bool = false
 
     @State private var showingShareSheet = false
     @State private var isSignButtonShown = false
@@ -305,7 +306,7 @@ struct SigningView: View {
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
                                 leftButtonAction: {
-                                    // TODO: Implement add more files functionality
+                                    isImportingAddedFiles = true
                                 },
 
                                 rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
@@ -315,6 +316,32 @@ struct SigningView: View {
                                     isNavigatingToContainerSigningView = true
                                 }
                             )
+                            .fileImporter(
+                                isPresented: $isImportingAddedFiles,
+                                allowedContentTypes: [.item],
+                                allowsMultipleSelection: true
+                            ) { result in
+                                switch result {
+                                case .success(let urls):
+                                    Task {
+                                        guard let containerFile = viewModel.containerURL else { return }
+
+                                        for url in urls {
+                                            guard url.startAccessingSecurityScopedResource() else { continue }
+                                        }
+
+                                        isImportingAddedFiles = false
+                                        await viewModel.addDataFiles(urls, to: containerFile)
+
+                                        for url in urls {
+                                            url.stopAccessingSecurityScopedResource()
+                                        }
+                                    }
+
+                                case .failure:
+                                    isImportingAddedFiles = false
+                                }
+                            }
                         }
                     }
                     .onAppear {
@@ -401,9 +428,8 @@ struct SigningView: View {
         .onReceive(viewModel.$errorMessage) { error in
             guard let error else { return }
             let (key, args) = error
-            Toast.show(String(
-                format: languageSettings.localized(key),
-                args.joined(separator: ", "))
+            Toast.show(
+                languageSettings.localized(key, [args.joined(separator: ", ")])
             )
         }
     }
