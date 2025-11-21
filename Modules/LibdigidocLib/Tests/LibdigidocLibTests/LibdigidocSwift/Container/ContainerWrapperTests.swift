@@ -180,8 +180,7 @@ struct ContainerWrapperTests {
             try? FileManager.default.removeItem(at: containerFile)
         }
 
-        let fileName = dataFileURLs.first?.lastPathComponent ?? ""
-        let expectedErrorMessage = "Document with same file name '\(fileName)' already exists."
+        let expectedErrorMessage = "Could not add files"
 
         do {
             try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)

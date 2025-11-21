@@ -254,13 +254,55 @@ public:
     return [NSString stringWithUTF8String:digidoc::version().c_str()];
 }
 
-+ (void)addDataFilesToContainerWithPath:(NSString *)containerPath withDataFilePaths:(NSArray<NSString*> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion {
-    [self open:containerPath validateOnline:TRUE command:^(digidoc::Container &container) {
++ (void)addDataFilesToContainerWithPath:(NSString *)containerPath
+                        withDataFilePaths:(NSArray<NSString *> *)dataFilePaths
+                              completion:(void (^)(NSError * _Nullable error))completion
+{
+    [self open:containerPath validateOnline:YES command:^(digidoc::Container &container) {
+        NSMutableArray<NSError *> *errors = [NSMutableArray array];
+
         for (NSString *dataFilePath in dataFilePaths) {
-            container.addDataFile(dataFilePath.UTF8String, "application/octet-stream");
+            try {
+                container.addDataFile(dataFilePath.UTF8String, "application/octet-stream");
+            }
+            catch (const digidoc::Exception &e) {
+                std::vector<digidoc::Exception> causes = e.causes();
+                NSDictionary *userInfo = @{
+                    NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
+                    @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
+                };
+
+                NSError *addFileError = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
+
+                [errors addObject:addFileError];
+            }
         }
+
         container.save(containerPath.UTF8String);
-    } completion:completion];
+
+        if (completion) {
+            if (errors.count > 0) {
+                NSInteger failedCount = errors.count;
+                NSInteger totalFileCount = dataFilePaths.count;
+                NSString *summary = [NSString stringWithFormat: @"Could not add files"];
+                NSDictionary *info = @{
+                    NSLocalizedDescriptionKey: summary,
+                    @"failedFileCount": @(failedCount),
+                    @"totalFileCount": @(totalFileCount),
+                    @"causes": errors
+                };
+                NSError *combined = [NSError errorWithDomain:@"LibdigidocLib" code:1 userInfo:info];
+                completion(combined);
+            } else {
+                completion(nil);
+            }
+        }
+
+    } completion:^(NSError * _Nullable error) {
+        if (error && completion) {
+            completion(error);
+        }
+    }];
 }
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion {

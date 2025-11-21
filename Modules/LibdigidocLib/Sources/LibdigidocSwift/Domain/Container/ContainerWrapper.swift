@@ -139,7 +139,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     @discardableResult
     @MainActor
-    public func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> Bool {
+    public func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol {
         let dataFilesPaths = dataFiles.compactMap { $0.path }
         do {
             try await DigiDocContainerWrapper.addDataFilesToContainer(
@@ -147,9 +147,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                 withDataFilePaths: dataFilesPaths
             )
 
-            _ = try await open(containerFile: containerFile, isSivaConfirmed: true)
-
-            return true
+            return try await open(containerFile: containerFile, isSivaConfirmed: true)
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot add data files", code: 4)
             throw DigiDocError.addingFilesToContainerFailed(

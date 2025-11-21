@@ -52,6 +52,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     private let mimeTypeDecoder: MimeTypeDecoderProtocol
     private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
+    private let fileInspector: FileInspectorProtocol
     private let sivaRepository: SivaRepositoryProtocol
 
     @Published private(set) var signedContainer: SignedContainerProtocol?
@@ -63,6 +64,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         mimeTypeDecoder: MimeTypeDecoderProtocol,
         fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol,
+        fileInspector: FileInspectorProtocol,
         sivaRepository: SivaRepositoryProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
@@ -71,6 +73,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         self.mimeTypeDecoder = mimeTypeDecoder
         self.fileUtil = fileUtil
         self.fileManager = fileManager
+        self.fileInspector = fileInspector
         self.sivaRepository = sivaRepository
     }
 
@@ -177,6 +180,111 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             SigningViewModel.logger.debug("Saved Files directory removed")
         } catch {
             SigningViewModel.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
+        }
+    }
+
+    public func addDataFiles(_ files: [URL], to container: URL) async {
+        do {
+            try validateFiles(files)
+        } catch {
+            handleFileValidationError(error)
+            return
+        }
+
+        do {
+            let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
+            SigningViewModel.logger.debug("Added data files to container")
+            errorMessage = (files.count == 1 ? "File successfully added" : "Files successfully added", [])
+            await loadContainerData(signedContainer: updatedContainer)
+        } catch {
+            await handleAddFilesError(error, container: container)
+        }
+    }
+
+    private func validateFiles(_ files: [URL]) throws {
+        guard let firstFile = files.first else {
+            throw FileOpeningError.noDataFiles
+        }
+
+        // Show specific error message when unable to validate a single file
+        if files.count == 1 {
+            if dataFiles.contains(where: { $0.fileName == firstFile.lastPathComponent }) {
+                throw DigiDocError.addingFilesToContainerFailed(
+                    ErrorDetail(
+                        message: "Document already exists",
+                        userInfo: ["fileName": firstFile.lastPathComponent]
+                    )
+                )
+            }
+
+            if try fileInspector.fileSize(for: firstFile) == 0 {
+                throw FileOpeningError.invalidFileSize
+            }
+        }
+    }
+
+    private func handleFileValidationError(_ error: Error) {
+        switch error {
+        case let digiDocError as DigiDocError:
+            switch digiDocError {
+            case .addingFilesToContainerFailed(let detail):
+                let fileName = detail.userInfo["fileName"] ?? ""
+                errorMessage = (detail.message, [fileName])
+            default:
+                errorMessage = ("General error", [])
+            }
+
+        case let fileError as FileOpeningError:
+            switch fileError {
+            case .invalidFileSize:
+                errorMessage = ("Invalid file size", [])
+            case .noDataFiles:
+                errorMessage = ("Could not load selected files", [])
+            default:
+                errorMessage = ("General error", [])
+            }
+
+        default:
+            errorMessage = ("General error", [])
+        }
+    }
+
+    private func handleAddFilesError(_ error: Error, container: URL) async {
+        SigningViewModel.logger.error("Unable to add data files to container: \(error.localizedDescription)")
+
+        var totalFilesCount = 0
+        var failedFileCount = 0
+
+        guard let digiDocError = error as? DigiDocError else {
+            errorMessage = ("General error", [])
+            return
+        }
+
+        switch digiDocError {
+        case .addingFilesToContainerFailed(let errorDetail):
+            totalFilesCount = Int(errorDetail.userInfo["totalFileCount"] ?? "0") ?? 0
+            failedFileCount = Int(errorDetail.userInfo["failedFileCount"] ?? "0") ?? 0
+
+            errorMessage = (errorDetail.message, [String(failedFileCount)])
+        default:
+            errorMessage = ("General error", [])
+        }
+
+        // Update container when at least one file has been added to container
+        if totalFilesCount > failedFileCount {
+            await refreshContainer(with: container)
+        }
+    }
+
+    private func refreshContainer(with container: URL) async {
+        do {
+            let updatedContainer = try await SignedContainer.openOrCreate(
+                dataFiles: [container],
+                isSivaConfirmed: true
+            )
+            await loadContainerData(signedContainer: updatedContainer)
+        } catch {
+            errorMessage = ("General error", [])
         }
     }
 

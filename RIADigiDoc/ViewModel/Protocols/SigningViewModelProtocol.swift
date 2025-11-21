@@ -26,6 +26,7 @@ public protocol SigningViewModelProtocol: Sendable {
     func loadContainerData(signedContainer: SignedContainerProtocol?) async
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL?
     func removeSavedFilesDirectory(savedFilesDirectory: URL?)
+    func addDataFiles(_ files: [URL], to container: URL) async
     @discardableResult func renameContainer(to newName: String) async -> URL?
     func getDataFileURL(_ dataFile: DataFileWrapper) async -> Result<URL, Error>
     func handleFileOpening(dataFile: DataFileWrapper, isSivaConfirmed: Bool) async
