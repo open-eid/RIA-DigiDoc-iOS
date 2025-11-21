@@ -72,6 +72,7 @@ public struct Constants {
 
         public static let Scs = "scs"
         public static let Default = Asice
+        public static let DefaultCrypto = Cdoc
 
         public static let AsicsContainers = [Asics, Scs]
         public static let CryptoContainers = [Cdoc, Cdoc2]

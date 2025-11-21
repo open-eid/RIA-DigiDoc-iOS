@@ -1,0 +1,146 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import Foundation
+import OSLog
+import FactoryKit
+import CryptoSwift
+import CommonsLib
+import UtilsLib
+
+@MainActor
+class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, ObservableObject {
+    @Published var isFileOpeningLoading: Bool = false
+    @Published var isNavigatingToNextView: Bool = false
+
+    @Published var cryptoContainer: CryptoContainerProtocol =  CryptoContainer(
+        fileManager: Container.shared.fileManager(),
+        containerUtil: Container.shared.containerUtil()
+    )
+    @Published var errorMessage: ToastMessage?
+
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
+
+    private let fileOpeningRepository: FileOpeningRepositoryProtocol
+    private let sivaRepository: SivaRepositoryProtocol
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    private let fileUtil: FileUtilProtocol
+    private let fileManager: FileManagerProtocol
+
+    init(
+        fileOpeningRepository: FileOpeningRepositoryProtocol,
+        sivaRepository: SivaRepositoryProtocol,
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileUtil: FileUtilProtocol,
+        fileManager: FileManagerProtocol
+    ) {
+        self.fileOpeningRepository = fileOpeningRepository
+        self.sivaRepository = sivaRepository
+        self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileUtil = fileUtil
+        self.fileManager = fileManager
+    }
+
+    private var files: [URL] = []
+
+    func handleFiles() async {
+        do {
+            CryptoFileOpeningViewModel.logger.debug("Handling chosen files from file system or from external sources")
+            let validFiles = try await fileOpeningRepository.getValidFiles(
+                sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
+            )
+
+            try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
+
+            CryptoFileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
+
+            if validFiles.isEmpty {
+                CryptoFileOpeningViewModel.logger.debug("No valid files found")
+                throw FileOpeningError.noDataFiles
+            }
+
+            files = validFiles
+        } catch {
+            CryptoFileOpeningViewModel.logger.error("Unable to handle files. \(error)")
+            handleError(error)
+        }
+    }
+
+    func handleConfirmation() async {
+        sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
+
+        do {
+            let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
+            sharedContainerViewModel.setCryptoContainer(container)
+
+            handleLoadingSuccess()
+        } catch {
+            CryptoFileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+            handleError(error)
+        }
+    }
+
+    func showFileAddedMessage() async -> Bool {
+        let container = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
+
+        return await container?.getRecipients().isEmpty ?? false
+    }
+
+    func addedFilesCount() -> Int {
+        return sharedContainerViewModel.getAddedFilesCount()
+    }
+
+    func handleError() {
+        errorMessage = nil
+        isFileOpeningLoading = false
+        isNavigatingToNextView = false
+    }
+
+    private func handleLoadingSuccess() {
+        isFileOpeningLoading = false
+        isNavigatingToNextView = true
+    }
+
+    private func handleError(_ error: Error) {
+        let ddeMessage = (error as? CryptoError)?.description ?? error.localizedDescription
+        CryptoFileOpeningViewModel.logger.error("\(ddeMessage)")
+
+        if let dde = error as? CryptoError {
+            CryptoFileOpeningViewModel.logger.error("\(dde)")
+            errorMessage = createToastMessage(for: dde)
+        } else {
+            errorMessage = ToastMessage(key: error.localizedDescription)
+        }
+    }
+
+    private func createToastMessage(for error: CryptoError) -> ToastMessage {
+        switch error {
+        case .containerCreationFailed(let errorDetail),
+                .containerOpeningFailed(let errorDetail),
+                .containerSavingFailed(let errorDetail):
+            return ToastMessage(key: "Failed to open container", args: [errorDetail.userInfo["fileName"] ?? ""])
+        case .addingFilesToContainerFailed(let errorDetail):
+            return ToastMessage(key: "Failed to open file", args: [errorDetail.userInfo["fileName"] ?? ""])
+        case .containerDataFileSavingFailed(let errorDetail):
+            return ToastMessage(key: "Failed to save file", args: [errorDetail.userInfo["fileName"] ?? ""])
+        default:
+            return ToastMessage(key: "General error")
+        }
+    }
+}

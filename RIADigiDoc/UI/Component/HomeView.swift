@@ -26,16 +26,21 @@ struct HomeView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
 
     @StateObject private var viewModel: HomeViewModel
+    @StateObject private var cryptoViewModel: CryptoHomeViewModel
     private var fileOpeningViewModel: FileOpeningViewModel
+    private var cryptoFileOpeningViewModel: CryptoFileOpeningViewModel
 
     @State private var isImporting = false
+    @State private var isCryptoImporting = false
     @State private var isFileOpeningLoading = false
+    @State private var isCryptoFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
     @State private var isNavigatingToRecentDocumentsView = false
     @State private var isNavigatingToEncryptView = false
 
     @State private var showFilesBottomSheet: Bool = false
     @State private var showSignatureBottomSheet: Bool = false
+    @State private var showCryptoBottomSheet: Bool = false
 
     @Binding private var externalFiles: [URL]
 
@@ -50,12 +55,26 @@ struct HomeView: View {
         )
     }
 
+    private var cryptoFilesBottomSheetActions: [BottomSheetButton] {
+        HomeViewBottomSheetActions.actions(
+            onOpenFilesClick: {
+                isCryptoImporting = true
+            },
+            onRecentDocumentsClick: {
+                isNavigatingToRecentDocumentsView = true
+            }
+        )
+    }
+
     init(
         fileOpeningViewModel: FileOpeningViewModel = Container.shared.fileOpeningViewModel(),
+        cryptoFileOpeningViewModel: CryptoFileOpeningViewModel = Container.shared.cryptoFileOpeningViewModel(),
         externalFiles: Binding<[URL]>
     ) {
         _viewModel = StateObject(wrappedValue: Container.shared.homeViewModel())
+        _cryptoViewModel = StateObject(wrappedValue: Container.shared.cryptoHomeViewModel())
         self.fileOpeningViewModel = fileOpeningViewModel
+        self.cryptoFileOpeningViewModel = cryptoFileOpeningViewModel
         self._externalFiles = externalFiles
     }
 
@@ -89,17 +108,17 @@ struct HomeView: View {
                 )
                 .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 
-                SigningImportButton(
+                CryptoImportButton(
                     title: languageSettings.localized("Main home crypto title"),
                     description: languageSettings.localized("Main home crypto description"),
                     assetImageName: "ic_m3_encrypted_48pt_wght400",
-                    isFileOpeningLoading: $isFileOpeningLoading,
+                    isFileOpeningLoading: $isCryptoFileOpeningLoading,
                     isNavigatingToNextView: $isNavigatingToEncryptView,
-                    showBottomSheet: $showSignatureBottomSheet,
-                    isImporting: $isImporting,
-                    viewModel: viewModel
+                    showBottomSheet: $showCryptoBottomSheet,
+                    isImporting: $isCryptoImporting,
+                    viewModel: cryptoViewModel
                 )
-                .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
+                .bottomSheet(isPresented: $showCryptoBottomSheet, actions: cryptoFilesBottomSheetActions)
 
                 ActionButton(
                     title: languageSettings.localized("Main home my eid title"),

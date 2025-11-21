@@ -77,10 +77,31 @@ extension Container {
     }
 
     @MainActor
+    var cryptoHomeViewModel: Factory<CryptoHomeViewModel> {
+        self { @MainActor in
+            CryptoHomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
+        }
+    }
+
+    @MainActor
     var fileOpeningViewModel: Factory<FileOpeningViewModel> {
         self {
             @MainActor in
             FileOpeningViewModel(
+                fileOpeningRepository: self.fileOpeningRepository(),
+                sivaRepository: self.sivaRepository(),
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var cryptoFileOpeningViewModel: Factory<CryptoFileOpeningViewModel> {
+        self {
+            @MainActor in
+            CryptoFileOpeningViewModel(
                 fileOpeningRepository: self.fileOpeningRepository(),
                 sivaRepository: self.sivaRepository(),
                 sharedContainerViewModel: self.sharedContainerViewModel(),
