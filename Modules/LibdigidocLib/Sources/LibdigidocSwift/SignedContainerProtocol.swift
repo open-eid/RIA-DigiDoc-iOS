@@ -21,7 +21,7 @@ import Foundation
 import CommonsLib
 
 /// @mockable
-public protocol SignedContainerProtocol: GeneralContainer, Sendable, AnyObject {
+public protocol SignedContainerProtocol: GeneralContainer, Sendable {
     func getDataFiles() async -> [DataFileWrapper]
     func getSignatures() async -> [SignatureWrapper]
     func getTimestamps() async -> [SignatureWrapper]

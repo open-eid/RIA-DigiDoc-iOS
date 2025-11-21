@@ -20,6 +20,6 @@
 import Foundation
 
 /// @mockable
-public protocol GeneralContainer: AnyObject {
+public protocol GeneralContainer: Sendable, AnyObject {
 
 }
