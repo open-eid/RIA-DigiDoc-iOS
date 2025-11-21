@@ -50,6 +50,17 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
 
     @Published private(set) var cryptoContainer: CryptoContainerProtocol?
 
+    @Published private(set) var isContainerWithoutRecipients = false
+    @Published private(set) var isContainerEncrypted = false
+    @Published private(set) var isContainerDecrypted = false
+    @Published private(set) var isContainerUnlocked = false
+    @Published private(set) var isEncryptButtonShown = false
+    @Published private(set) var isDecryptButtonShown = false
+    @Published private(set) var isSignButtonShown = false
+    @Published private(set) var isShareButtonShown = false
+    @Published private(set) var isEditButtonShown = false
+    @Published private(set) var shouldShowDatafiles = false
+
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
         fileOpeningService: FileOpeningServiceProtocol,
@@ -390,6 +401,44 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             EncryptViewModel.logger.error("Unable to remove file from container. \(error)")
             errorMessage = ("Failed to remove file from container", [dataFile.lastPathComponent])
             return
+        }
+    }
+
+    func updateAsyncProperties() async {
+        let isContainerWithoutRecipients = await isContainerWithoutRecipients(cryptoContainer: cryptoContainer)
+        let isContainerEncrypted = await isEncryptedContainer(cryptoContainer: cryptoContainer)
+        let isContainerDecrypted = await isDecryptedContainer(cryptoContainer: cryptoContainer)
+        let isContainerUnlocked = await isContainerUnlocked(cryptoContainer: cryptoContainer)
+        let isEncryptButtonShown = await isEncryptButtonShown(
+            cryptoContainer: cryptoContainer,
+            isNestedContainer: isNestedContainer()
+        )
+        let isDecryptButtonShown = await isDecryptButtonShown(
+            cryptoContainer: cryptoContainer,
+            isNestedContainer: isNestedContainer()
+        )
+        let isSignButtonShown = await isSignButtonShown(
+            cryptoContainer: cryptoContainer,
+            isNestedContainer: isNestedContainer()
+        )
+        let isShareButtonShown = await isShareButtonShown(cryptoContainer: cryptoContainer)
+        let isEditButtonShown = await isEditButtonShown(
+            cryptoContainer: cryptoContainer,
+            isNestedContainer: isNestedContainer()
+        )
+        let shouldShowDatafiles = await shouldShowDataFiles(cryptoContainer: cryptoContainer, )
+
+        await MainActor.run {
+            self.isContainerWithoutRecipients = isContainerWithoutRecipients
+            self.isContainerEncrypted = isContainerEncrypted
+            self.isContainerDecrypted = isContainerDecrypted
+            self.isContainerUnlocked = isContainerUnlocked
+            self.isEncryptButtonShown = isEncryptButtonShown
+            self.isDecryptButtonShown = isDecryptButtonShown
+            self.isSignButtonShown = isSignButtonShown
+            self.isShareButtonShown = isShareButtonShown
+            self.isEditButtonShown = isEditButtonShown
+            self.shouldShowDatafiles = shouldShowDatafiles
         }
     }
 

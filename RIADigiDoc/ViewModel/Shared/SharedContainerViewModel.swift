@@ -18,8 +18,9 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
+import CommonsLib
 import CryptoSwift
+import LibdigidocLibSwift
 
 @MainActor
 class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObject {
@@ -27,7 +28,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
     private var cryptoContainer: CryptoContainerProtocol?
     private var fileOpeningResult: Result<[URL], Error>?
     private var addedFilesCount: Int = 0
-    private var nestedContainers: [AnyObject] = []
+    private var nestedContainers: [GeneralContainer] = []
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
@@ -55,7 +56,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
         return addedFilesCount
     }
 
-    private func addNestedContainer(_ container: AnyObject?) {
+    private func addNestedContainer(_ container: GeneralContainer?) {
         guard let container else { return }
         if !nestedContainers.contains(where: { $0 === container }) {
             nestedContainers.append(container)
@@ -63,7 +64,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
     }
 
     @discardableResult
-    func removeLastContainer() -> AnyObject? {
+    func removeLastContainer() -> GeneralContainer? {
         nestedContainers.popLast()
     }
 
@@ -71,16 +72,16 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
         nestedContainers.removeAll()
     }
 
-    func currentContainer() -> AnyObject? {
+    func currentContainer() -> GeneralContainer? {
         nestedContainers.last
     }
 
-    func isNestedContainer(_ container: AnyObject?) -> Bool {
+    func isNestedContainer(_ container: GeneralContainer?) -> Bool {
         guard let container else { return false }
         return nestedContainers.count > 1 && currentContainer().map { $0 === container } == true
     }
 
-    func containers() -> [AnyObject] {
+    func containers() -> [GeneralContainer] {
         return nestedContainers
     }
 }

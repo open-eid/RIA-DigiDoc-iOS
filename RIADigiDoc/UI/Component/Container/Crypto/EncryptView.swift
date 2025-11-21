@@ -35,7 +35,7 @@ struct EncryptView: View {
     private let fileUtil: FileUtilProtocol
 
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedTab = 0
+    @State private var selectedTab: EncryptViewTab = .files
 
     @StateObject private var viewModel: EncryptViewModel
 
@@ -51,17 +51,6 @@ struct EncryptView: View {
 
     @State private var showingShareSheet = false
 
-    @State private var isContainerWithoutRecipients = false
-    @State private var isContainerEncrypted = false
-    @State private var isContainerDecrypted = false
-    @State private var isContainerUnlocked = false
-    @State private var isEncryptButtonShown = false
-    @State private var isDecryptButtonShown = false
-    @State private var isSignButtonShown = false
-    @State private var isShareButtonShown = false
-    @State private var isEditButtonShown = false
-    @State private var shouldShowDatafiles = false
-
     @State private var selectedDataFile: URL?
 
     @State private var showSivaMessage = false
@@ -75,6 +64,38 @@ struct EncryptView: View {
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         ) ? languageSettings.localized("Container encryption") : containerFilesTitle
+    }
+
+    private func encryptDecryptLabel() async -> String {
+        if await viewModel.isDecryptButtonShown(
+            cryptoContainer: viewModel.cryptoContainer,
+            isNestedContainer: isNestedContainer
+        ) {
+            return languageSettings.localized("Decrypt")
+        } else if await viewModel.isEncryptButtonShown(
+            cryptoContainer: viewModel.cryptoContainer,
+            isNestedContainer: isNestedContainer
+        ) {
+            return languageSettings.localized("Encrypt")
+        } else {
+           return ""
+        }
+    }
+
+    private func encryptDecryptAccessibilityLabel() async -> String {
+        if await viewModel.isDecryptButtonShown(
+            cryptoContainer: viewModel.cryptoContainer,
+            isNestedContainer: isNestedContainer
+        ) {
+            return languageSettings.localized("Decrypt container")
+        } else if await viewModel.isEncryptButtonShown(
+            cryptoContainer: viewModel.cryptoContainer,
+            isNestedContainer: isNestedContainer
+        ) {
+            return languageSettings.localized("Encrypt container")
+        } else {
+           return ""
+        }
     }
 
     private var containerNameTitle: String {
@@ -119,88 +140,12 @@ struct EncryptView: View {
         languageSettings.localized("Encrypt")
     }
 
-    private func encryptDecryptLabel() async -> String {
-        if await isDecryptButtonShown() {
-            return languageSettings.localized("Decrypt")
-        } else if await isEncryptButtonShown() {
-            return languageSettings.localized("Encrypt")
-        } else {
-           return ""
-        }
-    }
-
-    private func encryptDecryptAccessibilityLabel() async -> String {
-        if await isDecryptButtonShown() {
-            return languageSettings.localized("Decrypt container")
-        } else if await isEncryptButtonShown() {
-            return languageSettings.localized("Encrypt container")
-        } else {
-           return ""
-        }
-    }
-
     private var addMoreFilesLabel: String {
         languageSettings.localized("Add more files")
     }
 
     private var isNestedContainer: Bool {
         viewModel.isNestedContainer()
-    }
-
-    private func isContainerWithoutRecipients() async -> Bool {
-        return await viewModel.isContainerWithoutRecipients(cryptoContainer: viewModel.cryptoContainer)
-    }
-
-    private func isContainerEncrypted() async -> Bool {
-        return await viewModel.isEncryptedContainer(cryptoContainer: viewModel.cryptoContainer)
-    }
-
-    private func isContainerDecrypted() async -> Bool {
-        return await viewModel.isDecryptedContainer(cryptoContainer: viewModel.cryptoContainer)
-    }
-
-    private func isContainerUnlocked() async -> Bool {
-        return await viewModel.isContainerUnlocked(cryptoContainer: viewModel.cryptoContainer)
-    }
-
-    private func isEncryptButtonShown() async -> Bool {
-        return await viewModel.isEncryptButtonShown(
-            cryptoContainer: viewModel.cryptoContainer,
-            isNestedContainer: isNestedContainer
-        )
-    }
-
-    private func isDecryptButtonShown() async -> Bool {
-        return await viewModel.isEncryptButtonShown(
-            cryptoContainer: viewModel.cryptoContainer,
-            isNestedContainer: isNestedContainer
-        )
-    }
-
-    private func isSignButtonShown() async -> Bool {
-        return await viewModel.isSignButtonShown(
-            cryptoContainer: viewModel.cryptoContainer,
-            isNestedContainer: isNestedContainer
-        )
-    }
-
-    private func isShareButtonShown() async -> Bool {
-        return await viewModel.isShareButtonShown(
-            cryptoContainer: viewModel.cryptoContainer
-        )
-    }
-
-    private func isEditButtonShown() async -> Bool {
-        return await viewModel.isEditButtonShown(
-            cryptoContainer: viewModel.cryptoContainer,
-            isNestedContainer: isNestedContainer
-        )
-    }
-
-    private func shouldShowDatafiles() async -> Bool {
-        return await viewModel.shouldShowDataFiles(
-            cryptoContainer: viewModel.cryptoContainer,
-        )
     }
 
     @State private var containerLoadingTask: Task<Void, Never>?
@@ -241,10 +186,11 @@ struct EncryptView: View {
                                     icon: "ic_m3_stylus_note_48pt_wght400",
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
-                                    isEditContainerButtonShown: isEditButtonShown,
-                                    isEncryptButtonShown: isEncryptButtonShown,
-                                    showLeftActionButton: isSignButtonShown,
-                                    showRightActionButton: isEncryptButtonShown || isDecryptButtonShown,
+                                    isEditContainerButtonShown: viewModel.isEditButtonShown,
+                                    isEncryptButtonShown: viewModel.isEncryptButtonShown,
+                                    showLeftActionButton: viewModel.isSignButtonShown,
+                                    showRightActionButton: viewModel.isEncryptButtonShown ||
+                                        viewModel.isDecryptButtonShown,
                                     leftActionButtonName: signLabel,
                                     rightActionButtonName: encryptDecryptLabel,
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
@@ -281,11 +227,12 @@ struct EncryptView: View {
                                 )
                                 .onChange(of: viewModel.isNestedContainer()) { _ in
                                     Task {
-                                        await updateAsyncProperties()
+                                        await updateAsyncLabels()
+                                        await viewModel.updateAsyncProperties()
                                     }
                                 }
 
-                                if isContainerWithoutRecipients && !isNestedContainer {
+                                if viewModel.isContainerWithoutRecipients && !isNestedContainer {
                                     VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                                         Text(verbatim: languageSettings.localized("Container files"))
                                             .foregroundStyle(theme.onSurfaceVariant)
@@ -321,11 +268,11 @@ struct EncryptView: View {
                                         containerFilesTitle,
                                         containerRecipientsTitle
                                     ]) {
-                                        if selectedTab == 0 {
-                                            if shouldShowDatafiles {
+                                        if selectedTab == .files {
+                                            if viewModel.shouldShowDatafiles {
                                                 CryptoDataFilesSection(
                                                     viewModel: viewModel,
-                                                    isContainerUnlocked: isContainerUnlocked,
+                                                    isContainerUnlocked: viewModel.isContainerUnlocked,
                                                     isNestedContainer: isNestedContainer,
                                                     selectedDataFile: $selectedDataFile,
                                                     showSivaMessage: $showSivaMessage,
@@ -344,11 +291,7 @@ struct EncryptView: View {
                             }
                         }
                         .padding(Dimensions.Padding.SPadding)
-                        if isContainerWithoutRecipients && !isNestedContainer {
-                        } else {
-
-                        }
-                        if isShareButtonShown {
+                        if viewModel.isShareButtonShown {
                             if let containerFile = viewModel.containerURL {
                                 ShareButtonBottomBar(
                                     iconName: "ic_m3_ios_share_48pt_wght400",
@@ -368,7 +311,7 @@ struct EncryptView: View {
 
                                 rightButtonIconName: "ic_m3_encrypted_48pt_wght400",
                                 rightButtonLabel: encryptLabel,
-                                rightButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
+                                rightButtonAccessibilityLabel: encryptLabel.lowercased(),
                                 rightButtonAction: {
                                     // TODO: Implement encrypt functionality
                                 }
@@ -381,7 +324,8 @@ struct EncryptView: View {
                                 cryptoContainer: viewModel.cryptoContainer
                             )
 
-                            await updateAsyncProperties()
+                            await updateAsyncLabels()
+                            await viewModel.updateAsyncProperties()
                         }
                     }
                     .onDisappear {
@@ -426,36 +370,15 @@ struct EncryptView: View {
         }
     }
 
-    private func updateAsyncProperties() async {
-
+    func updateAsyncLabels() async {
         let containerTitle = await containerTitle()
         let encryptDecryptLabel = await self.encryptDecryptLabel()
         let encryptDecryptAccessibilityLabel = await self.encryptDecryptAccessibilityLabel()
-        let isContainerWithoutRecipients = await isContainerWithoutRecipients()
-        let isContainerEncrypted = await isContainerEncrypted()
-        let isContainerDecrypted = await isContainerDecrypted()
-        let isContainerUnlocked = await isContainerUnlocked()
-        let isEncryptButtonShown = await isEncryptButtonShown()
-        let isDecryptButtonShown = await isDecryptButtonShown()
-        let isSignButtonShown = await isSignButtonShown()
-        let isShareButtonShown = await isShareButtonShown()
-        let isEditButtonShown = await isEditButtonShown()
-        let shouldShowDatafiles = await self.shouldShowDatafiles()
 
         await MainActor.run {
             self.containerTitle = containerTitle
             self.encryptDecryptLabel = encryptDecryptLabel
             self.encryptDecryptAccessibilityLabel = encryptDecryptAccessibilityLabel
-            self.isContainerWithoutRecipients = isContainerWithoutRecipients
-            self.isContainerEncrypted = isContainerEncrypted
-            self.isContainerDecrypted = isContainerDecrypted
-            self.isContainerUnlocked = isContainerUnlocked
-            self.isEncryptButtonShown = isEncryptButtonShown
-            self.isDecryptButtonShown = isDecryptButtonShown
-            self.isSignButtonShown = isSignButtonShown
-            self.isShareButtonShown = isShareButtonShown
-            self.isEditButtonShown = isEditButtonShown
-            self.shouldShowDatafiles = shouldShowDatafiles
         }
     }
 
