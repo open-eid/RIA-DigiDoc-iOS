@@ -22,11 +22,16 @@ import FactoryKit
 import UtilsLib
 
 struct RecentDocumentsView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var languageSettings: LanguageSettings
+
+    @AppTheme private var theme
+    @AppTypography private var typography
 
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
-    @State private var isRefreshing = false
+    @State private var selectedFileIndex: Int = -1
+    @State private var showRemoveContainerModal = false
 
     @StateObject private var viewModel: RecentDocumentsViewModel
 
@@ -34,74 +39,161 @@ struct RecentDocumentsView: View {
         _viewModel = StateObject(wrappedValue: Container.shared.recentDocumentsViewModel())
     }
 
+    var noDocuments: Bool {
+        viewModel.filteredFiles.isEmpty
+    }
+
+    var noSearchResults: Bool {
+        !viewModel.searchText.isEmpty && noDocuments
+    }
+
     var body: some View {
-        VStack {
-            HStack {
-                TextField(languageSettings.localized("Search container file"), text: $viewModel.searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocorrectionDisabled(true)
-                    .padding(.leading, 8)
-                    .disabled(viewModel.files.count < 2)
-                    .opacity(viewModel.files.count < 2 ? 0 : 1.0)
-                    .onChange(of: viewModel.searchText) { _ in
-                        viewModel.loadFiles()
+        TopBarContainer(
+            title: nil,
+            onLeftClick: { dismiss() },
+            showRightIcons: true,
+            content: {
+                ZStack {
+                    if #available(iOS 17.0, *) {
+                        VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+                            Text(verbatim: languageSettings.localized("Recent documents"))
+                                .foregroundStyle(theme.onSurface)
+                                .font(typography.headlineSmall)
+                                .padding(.top, Dimensions.Padding.SPadding)
+                                .accessibilityHeading(.h1)
+                                .accessibilityAddTraits([.isHeader])
+
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundStyle(theme.onSurfaceVariant)
+                                    .accessibilityHidden(true)
+
+                                TextField(
+                                    languageSettings.localized("Search container file"),
+                                    text: $viewModel.searchText
+                                )
+                                .submitLabel(.done)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled(true)
+                                .onChange(of: viewModel.searchText) { _ in
+                                    viewModel.loadFiles()
+                                }
+
+                                if !viewModel.searchText.isEmpty {
+                                    Button(
+                                        action: {
+                                            viewModel.searchText = ""
+                                        },
+                                        label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: Dimensions.Icon.IconSizeXXXS,
+                                                       height: Dimensions.Icon.IconSizeXXXS)
+                                                .foregroundStyle(theme.onSurfaceVariant)
+                                        })
+                                    .accessibilityLabel(languageSettings.localized("Clear text"))
+                                }
+                            }
+                            .padding(.horizontal, Dimensions.Padding.SPadding)
+                            .padding(.vertical, Dimensions.Padding.MSPadding)
+                            .background(
+                                RoundedRectangle(cornerRadius: Dimensions.Padding.MPadding, style: .continuous)
+                                    .fill(Color(.systemGray6))
+                            )
+                            .padding(.top, Dimensions.Padding.LPadding)
+                            .padding(.bottom, Dimensions.Padding.SPadding)
+
+                            NavigationStack {
+                                if noSearchResults {
+                                    ContentUnavailableView {
+                                        Text(verbatim: languageSettings.localized("Document not found"))
+                                    }
+                                    .listRowSeparator(.hidden)
+                                } else if noDocuments {
+                                    ContentUnavailableView {
+                                        Text(verbatim: languageSettings.localized("No recent documents"))
+                                    }
+                                    .listRowSeparator(.hidden)
+                                } else {
+                                    List {
+                                        if #available(iOS 26.0, *) {
+                                            ForEach(viewModel.filteredFiles.enumerated(), id: \.offset
+                                            ) { index, item in
+                                                fileRow(index: index, item: item)
+                                            }
+                                        } else {
+                                            ForEach(Array(viewModel.filteredFiles.enumerated()), id: \.offset
+                                            ) { index, item in
+                                                fileRow(index: index, item: item)
+                                            }
+                                        }
+                                    }
+                                    .listStyle(.plain)
+                                    .scrollContentBackground(.hidden)
+                                    .listRowSpacing(0)
+                                    .listSectionSpacing(.compact)
+                                    .fullScreenCover(isPresented: $isFileOpeningLoading) {
+                                        FileOpeningView(
+                                            isFileOpeningLoading: $isFileOpeningLoading,
+                                            isNavigatingToNextView: $isNavigatingToSigningView
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal, Dimensions.Padding.SPadding)
+                    } else {
+                        EmptyView()
                     }
 
-                if !viewModel.searchText.isEmpty {
-                    Button(action: {
-                        viewModel.searchText = ""
-                    }, label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.gray)
-                            .accessibilityLabel(languageSettings.localized("Remove"))
-                    })
-                    .padding(.trailing, 8)
-                }
-            }
-            .padding()
+                    NavigationLink(
+                        destination: SigningView(),
+                        isActive: $isNavigatingToSigningView
+                    ) {}
+                        .accessibilityHidden(!isNavigatingToSigningView)
 
-            List {
-                if viewModel.filteredFiles.isEmpty {
-                    Text(
-                        viewModel.searchText.isEmpty ? languageSettings.localized("No recent documents") :
-                            languageSettings.localized("Document not found")
-                    )
-                    .font(.headline)
-                    .foregroundStyle(.gray)
-                    .padding()
-                    Spacer()
-                } else {
-                    ForEach(viewModel.filteredFiles) { file in
-                        Button(action: {
-                            self.viewModel.setChosenFiles(.success([file.url]))
-                            self.isFileOpeningLoading = true
-                        }, label: {
-                            RecentDocumentFileRow(file: file)
-                        })
-                        .buttonStyle(.plain)
+                    if showRemoveContainerModal {
+                        ConfirmModalView(
+                            title: "\(languageSettings.localized("Remove container"))?",
+                            message: languageSettings.localized("Remove container message"),
+                            onConfirm: {
+                                if selectedFileIndex != -1 {
+                                    viewModel.deleteFile(at: selectedFileIndex)
+                                    viewModel.loadFiles()
+                                    showRemoveContainerModal = false
+                                }
+                            }, onCancel: {
+                                showRemoveContainerModal = false
+                            }
+                        )
                     }
-                    .onDelete(perform: viewModel.deleteFile)
+                }
+                .onAppear {
+                    viewModel.loadFiles()
                 }
             }
-            .refreshable {
-                viewModel.loadFiles()
-            }
-            .fullScreenCover(isPresented: $isFileOpeningLoading) {
-                FileOpeningView(
-                    isFileOpeningLoading: $isFileOpeningLoading,
-                    isNavigatingToNextView: $isNavigatingToSigningView
-                )
-            }
+        )
+    }
 
-            NavigationLink(
-                destination: SigningView(),
-                isActive: $isNavigatingToSigningView
-            ) {}
-        }
-        .navigationTitle(languageSettings.localized("Recent documents"))
-        .onAppear {
-            viewModel.loadFiles()
-        }
+    @ViewBuilder
+    private func fileRow(index: Int, item: FileItem) -> some View {
+        RecentDocumentFileView(
+            file: item,
+            fileIndex: index,
+            onOpenContainer: {
+                viewModel.setChosenFiles(.success([item.url]))
+                isFileOpeningLoading = true
+            },
+            onRemoveContainer: {
+                selectedFileIndex = index
+                showRemoveContainerModal = true
+            }
+        )
+        .padding(.vertical, Dimensions.Padding.SPadding)
+        .listRowInsets(EdgeInsets())
+        .contentShape(Rectangle())
+        .buttonStyle(.plain)
     }
 }
 

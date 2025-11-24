@@ -89,15 +89,13 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
         }
     }
 
-    func deleteFile(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let file = filteredFiles[index]
-            do {
-                try fileManager.removeItem(at: file.url)
-                files.removeAll { $0.url == file.url }
-            } catch {
-                RecentDocumentsViewModel.logger.error("Unable to delete file: \(error.localizedDescription)")
-            }
+    func deleteFile(at index: Int) {
+        let file = filteredFiles[index]
+        do {
+            try fileManager.removeItem(at: file.url)
+            files.removeAll { $0.url == file.url }
+        } catch {
+            RecentDocumentsViewModel.logger.error("Unable to delete file: \(error.localizedDescription)")
         }
     }
 }

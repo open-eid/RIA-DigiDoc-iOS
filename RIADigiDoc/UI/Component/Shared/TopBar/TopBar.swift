@@ -155,7 +155,7 @@ struct TopBar: View {
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                     .foregroundStyle(theme.onBackground)
             }
-            .accessibilityLabel(leftIconAccessibility)
+            .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
 
             if let title = title {
                 Text(title)
@@ -192,7 +192,7 @@ struct TopBar: View {
                                 }
                             }
                         }
-                        .accessibilityLabel(extraButtonIconAccessibility)
+                        .accessibilityLabel(languageSettings.localized(extraButtonIconAccessibility))
                     }
 
                     if let onRightPrimaryClick = onRightPrimaryClick {
@@ -203,7 +203,7 @@ struct TopBar: View {
                                 .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                 .foregroundStyle(theme.onBackground)
                         }
-                        .accessibilityLabel(rightPrimaryIconAccessibility)
+                        .accessibilityLabel(languageSettings.localized(rightPrimaryIconAccessibility))
                     }
 
                     Button(action: onRightSecondaryClick) {
@@ -213,7 +213,7 @@ struct TopBar: View {
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onBackground)
                     }
-                    .accessibilityLabel(rightSecondaryIconAccessibility)
+                    .accessibilityLabel(languageSettings.localized(rightSecondaryIconAccessibility))
                 }
             }
         }

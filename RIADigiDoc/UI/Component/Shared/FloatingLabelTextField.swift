@@ -342,7 +342,7 @@ struct FloatingLabelTextField: View {
         Button(
             action: { text = "" },
             label: {
-                Image(systemName: "xmark.circle")
+                Image(systemName: "xmark.circle.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXXS, height: Dimensions.Icon.IconSizeXXXS)

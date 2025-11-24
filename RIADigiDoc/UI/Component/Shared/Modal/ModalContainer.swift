@@ -24,9 +24,13 @@ struct ModalContainer<Content: View>: View {
     @AppTypography private var typography
     @EnvironmentObject private var languageSettings: LanguageSettings
 
+    @AccessibilityFocusState private var isFocused: Bool
+
     var icon: String?
     var title: String
     var confirmButtonTitle: String = "OK"
+    var confirmButtonAccessibility: String?
+    var cancelButtonAccessibility: String?
     var onConfirm: () -> Void
     var onCancel: () -> Void
     @ViewBuilder var content: Content
@@ -50,18 +54,27 @@ struct ModalContainer<Content: View>: View {
                 .font(typography.headlineSmall)
                 .padding(.leading, Dimensions.Padding.MSPadding)
                 .padding(.trailing, Dimensions.Padding.LPadding)
+                .accessibilityFocused($isFocused)
 
             content
-                .padding(.horizontal, Dimensions.Padding.SPadding)
+                .padding(.horizontal, Dimensions.Padding.MSPadding)
 
             HStack(spacing: Dimensions.Padding.MPadding) {
                 Button(languageSettings.localized("Cancel")) { onCancel() }
                     .font(typography.labelLarge)
                     .foregroundStyle(theme.primary)
+                    .accessibilityLabel(
+                        cancelButtonAccessibility ??
+                        languageSettings.localized(languageSettings.localized("Cancel")).lowercased()
+                    )
 
                 Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
                     .font(typography.labelLarge)
                     .foregroundStyle(theme.primary)
+                    .accessibilityLabel(
+                        confirmButtonAccessibility ??
+                        languageSettings.localized(confirmButtonTitle).lowercased()
+                    )
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.vertical, Dimensions.Padding.MSPadding)
@@ -73,5 +86,12 @@ struct ModalContainer<Content: View>: View {
                 .fill(theme.surfaceContainerHighest)
         )
         .padding(.horizontal, Dimensions.Padding.XLPadding)
+        .onAppear {
+            Task {
+                await MainActor.run {
+                    isFocused = true
+                }
+            }
+        }
     }
 }
