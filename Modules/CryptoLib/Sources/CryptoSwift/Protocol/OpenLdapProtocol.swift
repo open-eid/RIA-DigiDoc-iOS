@@ -18,7 +18,7 @@
  */
 import CryptoObjCWrapper
 
-/// @mockable"
+/// @mockable
 public protocol OpenLdapProtocol: Sendable {
     @MainActor func search(identityCode: String) -> (
         addressees: [Addressee],

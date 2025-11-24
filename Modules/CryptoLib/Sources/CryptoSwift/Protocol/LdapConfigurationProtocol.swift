@@ -17,7 +17,7 @@
  *
  */
 
-/// @mockable"
+/// @mockable
 public protocol LdapConfigurationProtocol: Sendable {
     func ldapCertsPath() -> String?
 }
