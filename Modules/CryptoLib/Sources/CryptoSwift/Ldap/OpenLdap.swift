@@ -33,7 +33,7 @@ final public class OpenLdap: OpenLdapProtocol {
 
     private let ldapConfiguration: LdapConfigurationProtocol
     private let fileManager: FileManagerProtocol
-    
+
     public init(
         fileManager: FileManagerProtocol,
         moppLdapConfiguration: LdapConfigurationProtocol

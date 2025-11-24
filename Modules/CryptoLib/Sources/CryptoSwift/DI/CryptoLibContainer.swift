@@ -28,7 +28,7 @@ extension Container {
             )
         }
     }
-    
+
     public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
         self {
             LdapConfiguration(
@@ -36,7 +36,7 @@ extension Container {
             )
         }
     }
-    
+
     public var openLdap: Factory<OpenLdapProtocol> {
         self {
             OpenLdap(
