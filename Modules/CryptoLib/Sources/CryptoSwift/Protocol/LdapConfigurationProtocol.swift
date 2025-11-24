@@ -16,6 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
+/// @mockable"
 public protocol LdapConfigurationProtocol: Sendable {
     func ldapCertsPath() -> String?
 }
