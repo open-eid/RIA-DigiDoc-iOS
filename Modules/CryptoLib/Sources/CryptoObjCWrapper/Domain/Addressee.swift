@@ -59,7 +59,7 @@ import Foundation
         )
     }
 
-    init(cert: Data, x509: X509Certificate?) {
+    public init(cert: Data, x509: X509Certificate?) {
         data = cert
         let cnVal = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
         let split = cnVal.split(separator: ",").map { String($0) }
@@ -77,7 +77,7 @@ import Foundation
         validTo = x509?.notAfter
     }
 
-    convenience init(cert: Data) {
+    convenience public init(cert: Data) {
         self.init(cert: cert, x509: try? X509Certificate(der: cert))
     }
     // swiftlint:disable nsobject_prefer_isequal

@@ -62,27 +62,6 @@ struct CryptoFileOpeningView: View {
                     .onDisappear {
                         fileHandlingTask?.cancel()
                     }
-//                    .alert(sivaMessage, isPresented: $showSivaMessage) {
-//                        Button(languageSettings.localized("OK")) {
-//                            Task {
-//                                await viewModel.handleSivaConfirmation()
-//                                await handleFileOpening()
-//                            }
-//                        }
-//                        Button(languageSettings.localized("Cancel")) {
-//                            Task {
-//                                await viewModel.handleSivaCancellation()
-//                                await handleFileOpening()
-//                            }
-//                        }
-//                        Button(languageSettings.localized("Read more here")) {
-//                            if let url = URL(string: sivaMessageUrl),
-//                               UIApplication.shared.canOpenURL(url) {
-//                                openURL(url)
-//                            }
-//                            dismiss()
-//                        }
-//                    }
             }
         }
     }

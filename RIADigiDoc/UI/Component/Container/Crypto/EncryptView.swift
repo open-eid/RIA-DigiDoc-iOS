@@ -175,9 +175,6 @@ struct EncryptView: View {
                         }
                     }
                 },
-                onExtraButtonClick: {
-
-                },
                 content: {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
                         ScrollView {

@@ -16,28 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+import CryptoObjCWrapper
 
-import Foundation
-import CommonsLib
-
-public struct LdapConfiguration {
-    @MainActor static public var ldapPersonURLS = [URL(string: "ldaps://esteid.ldap.sk.ee")]
-    @MainActor static public var ldapCorpURL = URL(string: "ldaps://k3.ldap.sk.ee")
-
-    private let fileManager: FileManagerProtocol
-
-    public init(
-        fileManager: FileManagerProtocol
-    ) {
-        self.fileManager = fileManager
-    }
-
-    public var ldapCertsPath: String? {
-        self.fileManager.urls(
-            for: .libraryDirectory,
-            in: .userDomainMask
-        )
-        .first?
-        .appendingPathComponent("LDAPCerts/ldapCerts.pem").path
-    }
+public protocol OpenLdapProtocol: Sendable {
+    @MainActor func search(identityCode: String) -> (
+        addressees: [Addressee],
+        tooManyResults: Bool
+    )
 }

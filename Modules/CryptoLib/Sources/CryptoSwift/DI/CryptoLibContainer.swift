@@ -17,13 +17,32 @@
  *
  */
 
-import Foundation
+import FactoryKit
 
-/// @mockable
-@MainActor
-public protocol CryptoFileOpeningViewModelProtocol: Sendable {
-    func handleFiles() async
-    func showFileAddedMessage() async -> Bool
-    func addedFilesCount() -> Int
-    func handleError() async
+extension Container {
+    public var cryptoContainer: Factory<CryptoContainerProtocol> {
+        self {
+            CryptoContainer(
+                fileManager: self.fileManager(),
+                containerUtil: self.containerUtil()
+            )
+        }
+    }
+    
+    public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
+        self {
+            LdapConfiguration(
+                fileManager: self.fileManager()
+            )
+        }
+    }
+    
+    public var openLdap: Factory<OpenLdapProtocol> {
+        self {
+            OpenLdap(
+                fileManager: self.fileManager(),
+                moppLdapConfiguration: self.ldapConfiguration()
+            )
+        }
+    }
 }

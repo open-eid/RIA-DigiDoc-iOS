@@ -16,14 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-import Foundation
-
-/// @mockable
-@MainActor
-public protocol CryptoFileOpeningViewModelProtocol: Sendable {
-    func handleFiles() async
-    func showFileAddedMessage() async -> Bool
-    func addedFilesCount() -> Int
-    func handleError() async
+public protocol LdapConfigurationProtocol: Sendable {
+    func ldapCertsPath() -> String?
 }
