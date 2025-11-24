@@ -160,7 +160,7 @@ class RecentDocumentsViewModelTests {
 
         mockFileManager.removeItemHandler = { _ in }
 
-        viewModel.deleteFile(at: IndexSet(integer: 0))
+        viewModel.deleteFile(at: 0)
 
         #expect(mockFileManager.removeItemCallCount == 1)
         #expect(mockFileManager.removeItemArgValues.first == file)
@@ -176,7 +176,7 @@ class RecentDocumentsViewModelTests {
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError, userInfo: nil)
         }
 
-        viewModel.deleteFile(at: IndexSet(integer: 0))
+        viewModel.deleteFile(at: 0)
 
         #expect(mockFileManager.removeItemCallCount == 1)
         #expect(viewModel.files.count == 1)

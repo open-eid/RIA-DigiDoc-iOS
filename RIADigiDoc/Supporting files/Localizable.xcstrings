@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld" : {
-      "shouldTranslate" : false
-    },
     "Add more files" : {
       "comment" : "Add more files button in signature view and crypto view",
       "extractionState" : "manual",
@@ -124,6 +121,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tühista"
+          }
+        }
+      }
+    },
+    "Cancel container removal" : {
+      "comment" : "Recent documents remove container accessibility cancel button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel container removal"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katkesta ümbriku eemaldamine"
           }
         }
       }
@@ -391,6 +406,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sulge ümbrik"
+          }
+        }
+      }
+    },
+    "Confirm container removal" : {
+      "comment" : "Recent documents remove container accessibility confirm button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm container removal"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kinnita ümbriku eemaldamine"
           }
         }
       }
@@ -3777,6 +3810,24 @@
         }
       }
     },
+    "Mobile-ID incorrect parameters" : {
+      "comment" : "Signing error when input parameters are not correct for Mobile-ID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
+          }
+        }
+      }
+    },
     "More options" : {
       "comment" : "More options button name",
       "localizations" : {
@@ -4184,7 +4235,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hiljutised dokumendid"
+            "value" : "Hiljutised ümbrikud"
           }
         }
       }
@@ -4239,6 +4290,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eemalda"
+          }
+        }
+      }
+    },
+    "Remove container" : {
+      "comment" : "Recent documents delete button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemalda konteiner"
+          }
+        }
+      }
+    },
+    "Remove container message" : {
+      "comment" : "Recent documents delete container confirmation message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove container?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soovid eemaldada ümbriku?"
           }
         }
       }
@@ -4482,13 +4569,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search container file"
+            "value" : "Search container file..."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Otsi ümbrikku"
+            "value" : "Otsi ümbrikku..."
           }
         }
       }
@@ -5152,24 +5239,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Signeerimine käib, palun oodake."
-          }
-        }
-      }
-    },
-    "Signing incorrect parameters" : {
-      "comment" : "Signing error when input parameters are not correct",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code for Mobile-ID or incorrect country and / or personal code for Smart-ID"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
           }
         }
       }

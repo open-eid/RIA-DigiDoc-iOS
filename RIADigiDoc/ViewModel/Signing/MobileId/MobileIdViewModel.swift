@@ -403,7 +403,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
             mobileIdMessageKey = "Expired mobile-ID transaction"
 
         case .incorrectParameters:
-            mobileIdMessageKey = "Signing incorrect parameters"
+            mobileIdMessageKey = "Mobile-ID incorrect parameters"
 
         case .userCancelled:
             mobileIdMessageKey = "User denied or cancelled"

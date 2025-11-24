@@ -467,7 +467,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
             smartIdMessageKey = "No Internet connection"
 
         case .incorrectParameters:
-            smartIdMessageKey = "Signing incorrect parameters"
+            smartIdMessageKey = "Invalid personal code"
 
         case .timeout, .accountNotFound:
             smartIdMessageKey = "Expired Smart-ID transaction"

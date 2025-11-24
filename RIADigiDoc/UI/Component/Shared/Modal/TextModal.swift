@@ -27,6 +27,8 @@ struct TextModal: View {
     var title: String
     var message: String
     var confirmButtonTitle: String = "OK"
+    var confirmButtonAccessibility: String?
+    var cancelButtonAccessibility: String?
     var onConfirm: () -> Void
     var onCancel: () -> Void
 
@@ -35,6 +37,8 @@ struct TextModal: View {
             icon: icon,
             title: title,
             confirmButtonTitle: confirmButtonTitle,
+            confirmButtonAccessibility: confirmButtonAccessibility,
+            cancelButtonAccessibility: cancelButtonAccessibility,
             onConfirm: onConfirm,
             onCancel: onCancel
         ) {
@@ -42,8 +46,6 @@ struct TextModal: View {
                 .font(typography.bodyMedium)
                 .multilineTextAlignment(.leading)
                 .foregroundStyle(theme.onSurfaceVariant)
-                .padding(.leading, Dimensions.Padding.MSPadding)
-                .padding(.trailing, Dimensions.Padding.LPadding)
         }
     }
 }
