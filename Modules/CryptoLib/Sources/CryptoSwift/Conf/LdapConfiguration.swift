@@ -19,22 +19,25 @@
 
 import Foundation
 import CommonsLib
-import CryptoSwift
-import LibdigidocLibSwift
 
-/// @mockable
-@MainActor
-public protocol SharedContainerViewModelProtocol: Sendable {
-    func setSignedContainer(_ signedContainer: SignedContainerProtocol?)
-    func setCryptoContainer(_ cryptoContainer: CryptoContainerProtocol?)
-    func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?)
-    func getFileOpeningResult() -> Result<[URL], Error>?
-    func setAddedFilesCount(addedFiles: Int)
-    func getAddedFilesCount() -> Int
+public struct LdapConfiguration: LdapConfigurationProtocol {
+    @MainActor static public var ldapPersonURLS = [URL(string: "ldaps://esteid.ldap.sk.ee")]
+    @MainActor static public var ldapCorpURL = URL(string: "ldaps://k3.ldap.sk.ee")
 
-    func currentContainer() -> GeneralContainer?
-    func isNestedContainer(_ container: GeneralContainer?) -> Bool
-    func containers() -> [GeneralContainer]
-    @discardableResult func removeLastContainer() -> GeneralContainer?
-    func clearContainers()
+    private let fileManager: FileManagerProtocol
+
+    public init(
+        fileManager: FileManagerProtocol
+    ) {
+        self.fileManager = fileManager
+    }
+
+    public func ldapCertsPath() -> String? {
+        return self.fileManager.urls(
+            for: .libraryDirectory,
+            in: .userDomainMask
+        )
+        .first?
+        .appendingPathComponent("LDAPCerts/ldapCerts.pem").path
+    }
 }

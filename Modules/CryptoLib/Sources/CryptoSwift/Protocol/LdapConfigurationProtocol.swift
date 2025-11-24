@@ -17,24 +17,7 @@
  *
  */
 
-import Foundation
-import CommonsLib
-import CryptoSwift
-import LibdigidocLibSwift
-
 /// @mockable
-@MainActor
-public protocol SharedContainerViewModelProtocol: Sendable {
-    func setSignedContainer(_ signedContainer: SignedContainerProtocol?)
-    func setCryptoContainer(_ cryptoContainer: CryptoContainerProtocol?)
-    func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?)
-    func getFileOpeningResult() -> Result<[URL], Error>?
-    func setAddedFilesCount(addedFiles: Int)
-    func getAddedFilesCount() -> Int
-
-    func currentContainer() -> GeneralContainer?
-    func isNestedContainer(_ container: GeneralContainer?) -> Bool
-    func containers() -> [GeneralContainer]
-    @discardableResult func removeLastContainer() -> GeneralContainer?
-    func clearContainers()
+public protocol LdapConfigurationProtocol: Sendable {
+    func ldapCertsPath() -> String?
 }

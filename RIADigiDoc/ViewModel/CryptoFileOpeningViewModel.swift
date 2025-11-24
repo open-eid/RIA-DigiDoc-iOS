@@ -20,17 +20,16 @@
 import Foundation
 import OSLog
 import FactoryKit
-import LibdigidocLibSwift
+import CryptoSwift
 import CommonsLib
 import UtilsLib
 
 @MainActor
-class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
+class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, ObservableObject {
     @Published var isFileOpeningLoading: Bool = false
     @Published var isNavigatingToNextView: Bool = false
-    @Published var isSivaConfirmed = false
 
-    @Published var signedContainer: SignedContainerProtocol = SignedContainer(
+    @Published var cryptoContainer: CryptoContainerProtocol =  CryptoContainer(
         fileManager: Container.shared.fileManager(),
         containerUtil: Container.shared.containerUtil()
     )
@@ -62,75 +61,45 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
 
     func handleFiles() async {
         do {
-            FileOpeningViewModel.logger.debug("Handling chosen files from file system or from external sources")
+            CryptoFileOpeningViewModel.logger.debug("Handling chosen files from file system or from external sources")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            FileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
+            CryptoFileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
 
             if validFiles.isEmpty {
-                FileOpeningViewModel.logger.debug("No valid files found")
+                CryptoFileOpeningViewModel.logger.debug("No valid files found")
                 throw FileOpeningError.noDataFiles
             }
 
             files = validFiles
         } catch {
-            FileOpeningViewModel.logger.error("Unable to handle files. \(error)")
+            CryptoFileOpeningViewModel.logger.error("Unable to handle files. \(error)")
             handleError(error)
         }
     }
 
-    func handleSivaConfirmation() async {
+    func handleConfirmation() async {
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
-            let container = try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
-            if await container.getContainerMimetype() == Constants.MimeType.Asics {
-                try await handleAsicsSivaConfirmation(parentContainer: container)
-            } else {
-                sharedContainerViewModel.setSignedContainer(container)
-            }
+            let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
+            sharedContainerViewModel.setCryptoContainer(container)
 
-            handleLoadingSuccess(isSivaConfirmed: true)
+            handleLoadingSuccess()
         } catch {
-            FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+            CryptoFileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
             handleError(error)
-        }
-    }
-
-    func handleSivaCancellation() async {
-        sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
-
-        let fileMimetype = await files.first?.mimeType()
-
-        guard let mimetype = fileMimetype else {
-            handleError()
-            return
-        }
-
-        if mimetype == Constants.MimeType.Ddoc {
-            handleError()
-        } else if mimetype == Constants.MimeType.Asics {
-            do {
-                let container = try await fileOpeningRepository
-                    .openOrCreateContainer(urls: files, isSivaConfirmed: false)
-                sharedContainerViewModel.setSignedContainer(container)
-                FileOpeningViewModel.logger.debug("Asics signed container set successfully")
-                handleLoadingSuccess(isSivaConfirmed: false)
-            } catch {
-                FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
-                handleError(error)
-            }
         }
     }
 
     func showFileAddedMessage() async -> Bool {
-        let container = sharedContainerViewModel.currentContainer() as? any SignedContainerProtocol
+        let container = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
 
-        return await container?.getSignatures().isEmpty ?? false
+        return await container?.getRecipients().isEmpty ?? false
     }
 
     func addedFilesCount() -> Int {
@@ -143,42 +112,24 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
         isNavigatingToNextView = false
     }
 
-    func isSivaConfirmationNeeded() async -> Bool {
-        return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
-    }
-
-    private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
-        let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
-        let isCades = await parentContainer.isCades()
-        let isXades = await parentContainer.isXades()
-        if isTimestampedContainer && !isCades && !isXades {
-            let nestedTimestampedContainer = try await sivaRepository
-                .getTimestampedContainer(parentContainer: parentContainer)
-            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
-        } else {
-            sharedContainerViewModel.setSignedContainer(parentContainer)
-        }
-    }
-
-    private func handleLoadingSuccess(isSivaConfirmed: Bool) {
-        self.isSivaConfirmed = isSivaConfirmed
+    private func handleLoadingSuccess() {
         isFileOpeningLoading = false
         isNavigatingToNextView = true
     }
 
     private func handleError(_ error: Error) {
-        let ddeMessage = (error as? DigiDocError)?.description ?? error.localizedDescription
-        FileOpeningViewModel.logger.error("\(ddeMessage)")
+        let ddeMessage = (error as? CryptoError)?.description ?? error.localizedDescription
+        CryptoFileOpeningViewModel.logger.error("\(ddeMessage)")
 
-        if let dde = error as? DigiDocError {
-            FileOpeningViewModel.logger.error("\(dde)")
+        if let dde = error as? CryptoError {
+            CryptoFileOpeningViewModel.logger.error("\(dde)")
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)
         }
     }
 
-    private func createToastMessage(for error: DigiDocError) -> ToastMessage {
+    private func createToastMessage(for error: CryptoError) -> ToastMessage {
         switch error {
         case .containerCreationFailed(let errorDetail),
                 .containerOpeningFailed(let errorDetail),
@@ -188,8 +139,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
             return ToastMessage(key: "Failed to open file", args: [errorDetail.userInfo["fileName"] ?? ""])
         case .containerDataFileSavingFailed(let errorDetail):
             return ToastMessage(key: "Failed to save file", args: [errorDetail.userInfo["fileName"] ?? ""])
-        case .alreadyInitialized:
-            return ToastMessage(key: "Libdigidocpp is already initialized")
         default:
             return ToastMessage(key: "General error")
         }

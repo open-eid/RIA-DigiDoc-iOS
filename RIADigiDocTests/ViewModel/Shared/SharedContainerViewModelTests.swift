@@ -49,7 +49,7 @@ struct SharedContainerViewModelTests {
         let result = viewModel.currentContainer()
 
         let signedContainerName = await signedContainer.getContainerName()
-        let containerName = await result?.getContainerName()
+        let containerName = await (result as? SignedContainer)?.getContainerName()
 
         #expect(signedContainerName == containerName)
     }

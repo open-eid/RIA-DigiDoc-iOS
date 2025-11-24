@@ -57,6 +57,14 @@ public actor CryptoContainer: CryptoContainerProtocol {
         self.isEncrypted = isEncrypted
     }
 
+    public func isDecrypted() async -> Bool {
+        return isDecrypted
+    }
+
+    public func isEncrypted() async -> Bool {
+        return isEncrypted
+    }
+
     public func getContainerName() async -> String {
         return containerFile?.lastPathComponent ?? CommonsLib.Constants.Container.DefaultName
     }
@@ -115,7 +123,6 @@ public actor CryptoContainer: CryptoContainerProtocol {
 
     @discardableResult
     public func renameContainer(to newName: String) async throws -> URL {
-
         let fileName = newName.isEmpty ? CommonsLib.Constants.Container.DefaultName : newName
 
         let sanitizedFileName = fileName.sanitized()
@@ -206,10 +213,10 @@ extension CryptoContainer {
         var containerFile: URL? = firstFile
 
         if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
-            firstFile.pathExtension != CommonsLib.Constants.Extension.Default {
+            firstFile.pathExtension != CommonsLib.Constants.Extension.DefaultCrypto {
             let uniqueContainerFile = firstFile
                 .deletingPathExtension()
-                .appendingPathExtension(CommonsLib.Constants.Extension.Default)
+                .appendingPathExtension(CommonsLib.Constants.Extension.DefaultCrypto)
             containerFile = containerUtil.getContainerFile(
                 for: uniqueContainerFile,
                 in: uniqueContainerFile.deletingLastPathComponent()

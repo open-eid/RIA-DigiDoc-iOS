@@ -395,6 +395,24 @@
         }
       }
     },
+    "Container encryption" : {
+      "comment" : "EncryptView title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku krüpteerimine"
+          }
+        }
+      }
+    },
     "Container files" : {
       "comment" : "Signing view container files title",
       "localizations" : {
@@ -480,6 +498,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku teavitused"
+          }
+        }
+      }
+    },
+    "Container recipients" : {
+      "comment" : "Encrypt view container recipients title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container recipients"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku adressaadid"
           }
         }
       }
@@ -624,6 +660,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Andmed loetud"
+          }
+        }
+      }
+    },
+    "Decrypt" : {
+      "comment" : "Decrypt button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrypt"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteeri"
+          }
+        }
+      }
+    },
+    "Decrypt container" : {
+      "comment" : "Accessibility variant of Decrypt",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrypt container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteeri dokument"
           }
         }
       }

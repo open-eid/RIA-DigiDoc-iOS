@@ -78,7 +78,6 @@ let package = Package(
             ],
             path: "Sources/CryptoSwift",
             swiftSettings: [
-                .interoperabilityMode(.Cxx),
                 .enableExperimentalFeature("StrictConcurrency"),
                 .enableUpcomingFeature("SendableByDefault"),
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),

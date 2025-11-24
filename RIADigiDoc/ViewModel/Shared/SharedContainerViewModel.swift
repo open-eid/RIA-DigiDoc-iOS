@@ -18,18 +18,26 @@
  */
 
 import Foundation
+import CommonsLib
+import CryptoSwift
 import LibdigidocLibSwift
 
 @MainActor
 class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObject {
     private var signedContainer: SignedContainerProtocol?
+    private var cryptoContainer: CryptoContainerProtocol?
     private var fileOpeningResult: Result<[URL], Error>?
     private var addedFilesCount: Int = 0
-    private var nestedContainers: [SignedContainerProtocol] = []
+    private var nestedContainers: [GeneralContainer] = []
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
         addNestedContainer(signedContainer)
+    }
+
+    func setCryptoContainer(_ cryptoContainer: CryptoContainerProtocol?) {
+        self.cryptoContainer = cryptoContainer
+        addNestedContainer(cryptoContainer)
     }
 
     func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?) {
@@ -48,7 +56,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
         return addedFilesCount
     }
 
-    private func addNestedContainer(_ container: SignedContainerProtocol?) {
+    private func addNestedContainer(_ container: GeneralContainer?) {
         guard let container else { return }
         if !nestedContainers.contains(where: { $0 === container }) {
             nestedContainers.append(container)
@@ -56,7 +64,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
     }
 
     @discardableResult
-    func removeLastContainer() -> SignedContainerProtocol? {
+    func removeLastContainer() -> GeneralContainer? {
         nestedContainers.popLast()
     }
 
@@ -64,16 +72,16 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
         nestedContainers.removeAll()
     }
 
-    func currentContainer() -> SignedContainerProtocol? {
+    func currentContainer() -> GeneralContainer? {
         nestedContainers.last
     }
 
-    func isNestedContainer(_ container: SignedContainerProtocol?) -> Bool {
+    func isNestedContainer(_ container: GeneralContainer?) -> Bool {
         guard let container else { return false }
         return nestedContainers.count > 1 && currentContainer().map { $0 === container } == true
     }
 
-    func containers() -> [SignedContainerProtocol] {
+    func containers() -> [GeneralContainer] {
         return nestedContainers
     }
 }

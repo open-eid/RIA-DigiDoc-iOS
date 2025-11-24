@@ -1,0 +1,110 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import SwiftUI
+import FactoryKit
+import LibdigidocLibSwift
+
+struct CryptoFileOpeningView: View {
+    @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
+
+    @EnvironmentObject private var languageSettings: LanguageSettings
+    @StateObject private var viewModel: CryptoFileOpeningViewModel
+
+    @Binding var isFileOpeningLoading: Bool
+    @Binding var isNavigatingToNextView: Bool
+
+    @State private var showSivaMessage = false
+
+    private var sivaMessage: String {
+        languageSettings.localized("Siva message")
+    }
+
+    private var sivaMessageUrl: String {
+        languageSettings.localized("Siva message url")
+    }
+
+    @State private var fileHandlingTask: Task<Void, Never>?
+
+    init(
+        isFileOpeningLoading: Binding<Bool>,
+        isNavigatingToNextView: Binding<Bool>
+    ) {
+        _viewModel = StateObject(wrappedValue: Container.shared.cryptoFileOpeningViewModel())
+        _isFileOpeningLoading = isFileOpeningLoading
+        _isNavigatingToNextView = isNavigatingToNextView
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                LoadingView()
+                    .onAppear {
+                        fileHandlingTask = Task { await startFileHandling() }
+                    }
+                    .onDisappear {
+                        fileHandlingTask?.cancel()
+                    }
+            }
+        }
+    }
+
+    @MainActor
+    private func startFileHandling() async {
+        guard !Task.isCancelled else { return }
+
+        await viewModel.handleFiles()
+        await viewModel.handleConfirmation()
+        await handleFileOpening()
+    }
+
+    @MainActor
+    private func handleFileOpening() async {
+        let errorMessage = viewModel.errorMessage
+        if errorMessage == nil {
+            isFileOpeningLoading = viewModel.isFileOpeningLoading
+            isNavigatingToNextView = viewModel.isNavigatingToNextView
+
+            let showFileAddedMessage = await viewModel.showFileAddedMessage()
+
+            if showFileAddedMessage {
+                let message = viewModel.addedFilesCount() > 1
+                ? languageSettings.localized("Files successfully added")
+                : languageSettings.localized("File successfully added")
+
+                Toast.show(message)
+            }
+        } else {
+            Toast.show(languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? []))
+            viewModel.handleError()
+            isFileOpeningLoading = viewModel.isFileOpeningLoading
+            isNavigatingToNextView = viewModel.isNavigatingToNextView
+        }
+    }
+}
+
+#Preview {
+    FileOpeningView(
+        isFileOpeningLoading: .constant(true),
+        isNavigatingToNextView: .constant(false)
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
+}

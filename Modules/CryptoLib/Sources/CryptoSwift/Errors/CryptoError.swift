@@ -40,4 +40,19 @@ public enum CryptoError: Error {
             return errorDetail
         }
     }
+
+    public var description: String {
+        let detail = errorDetail
+        return """
+            Error: \(detail.message)
+            Code: \(detail.code)
+            Info: \(detail.userInfo)
+        """
+    }
+}
+
+extension CryptoError: LocalizedError {
+    public var errorDescription: String? {
+        return errorDetail.message
+    }
 }

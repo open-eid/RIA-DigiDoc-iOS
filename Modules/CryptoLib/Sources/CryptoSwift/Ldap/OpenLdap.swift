@@ -17,22 +17,28 @@
  *
  */
 
+import CryptoObjC
+import CryptoObjCWrapper
+import CommonsLib
 import LDAP
 import OSLog
 import ASN1Decoder
 import Foundation
 
-public class OpenLdap {
+final public class OpenLdap: OpenLdapProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc",
         category: "OpenLdap"
     )
 
-    private let ldapConfiguration: LdapConfiguration
+    private let ldapConfiguration: LdapConfigurationProtocol
+    private let fileManager: FileManagerProtocol
 
     public init(
-        moppLdapConfiguration: LdapConfiguration
+        fileManager: FileManagerProtocol,
+        moppLdapConfiguration: LdapConfigurationProtocol
     ) {
+        self.fileManager = fileManager
         self.ldapConfiguration = moppLdapConfiguration
     }
 
@@ -71,8 +77,8 @@ public class OpenLdap {
         tooManyResults: Bool
     ) {
         var filePath: String?
-        if let ldapCertFilePath = self.ldapConfiguration.ldapCertsPath {
-            if FileManager.default.fileExists(atPath: ldapCertFilePath) {
+        if let ldapCertFilePath = self.ldapConfiguration.ldapCertsPath() {
+            if fileManager.fileExists(atPath: ldapCertFilePath) {
                 filePath = ldapCertFilePath
             } else {
                 OpenLdap.logger.error("File ldapCerts.pem does not exist at directory path: \(ldapCertFilePath)")

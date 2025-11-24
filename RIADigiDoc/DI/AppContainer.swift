@@ -63,8 +63,9 @@ extension Container {
             .shared
     }
 
+    @MainActor
     var sharedContainerViewModel: Factory<SharedContainerViewModelProtocol> {
-        self { SharedContainerViewModel() }
+        self { @MainActor in SharedContainerViewModel() }
             .shared
     }
 
@@ -72,6 +73,13 @@ extension Container {
     var homeViewModel: Factory<HomeViewModel> {
         self { @MainActor in
             HomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
+        }
+    }
+
+    @MainActor
+    var cryptoHomeViewModel: Factory<CryptoHomeViewModel> {
+        self { @MainActor in
+            CryptoHomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
         }
     }
 
@@ -90,10 +98,40 @@ extension Container {
     }
 
     @MainActor
+    var cryptoFileOpeningViewModel: Factory<CryptoFileOpeningViewModel> {
+        self {
+            @MainActor in
+            CryptoFileOpeningViewModel(
+                fileOpeningRepository: self.fileOpeningRepository(),
+                sivaRepository: self.sivaRepository(),
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
     var signingViewModel: Factory<SigningViewModel> {
         self {
             @MainActor in
             SigningViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileOpeningService: self.fileOpeningService(),
+                mimeTypeCache: self.mimeTypeCache(),
+                mimeTypeDecoder: self.mimeTypeDecoder(),
+                fileUtil: self.fileUtil(),
+                fileManager: self.fileManager(),
+                sivaRepository: self.sivaRepository()
+            )
+        }
+    }
+
+    @MainActor
+    var encryptViewModel: Factory<EncryptViewModel> {
+        self {
+            @MainActor in
+            EncryptViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileOpeningService: self.fileOpeningService(),
                 mimeTypeCache: self.mimeTypeCache(),

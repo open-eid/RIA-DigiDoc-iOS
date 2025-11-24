@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CryptoSwift
 import LibdigidocLibSwift
 
 actor FileOpeningRepository: FileOpeningRepositoryProtocol {
@@ -39,6 +40,10 @@ actor FileOpeningRepository: FileOpeningRepositoryProtocol {
 
     func openOrCreateContainer(urls: [URL], isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
         return try await fileOpeningService.openOrCreateContainer(dataFiles: urls, isSivaConfirmed: isSivaConfirmed)
+    }
+
+    func openOrCreateCryptoContainer(urls: [URL]) async throws -> CryptoContainerProtocol {
+        return try await fileOpeningService.openOrCreateCryptoContainer(dataFiles: urls)
     }
 
     func isSivaConfirmationNeeded(files: [URL]) async -> Bool {

@@ -18,10 +18,13 @@
  */
 
 import Foundation
+import CommonsLib
 import CryptoObjC
 import CryptoObjCWrapper
 
-public protocol CryptoContainerProtocol: Sendable, AnyObject {
+public protocol CryptoContainerProtocol: GeneralContainer, Sendable {
+    func isDecrypted() async -> Bool
+    func isEncrypted() async -> Bool
     func getContainerName() async -> String
     func getContainerMimetype() async -> String
     func getRawContainerFile() async -> URL?

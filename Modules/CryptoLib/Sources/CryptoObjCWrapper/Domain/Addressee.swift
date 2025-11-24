@@ -20,7 +20,7 @@
 import ASN1Decoder
 import Foundation
 
-public final class Addressee: NSObject, Sendable {
+@objc public final class Addressee: NSObject, Sendable {
     @objc public let data: Data
     public let identifier: String
     public let givenName: String?
@@ -59,7 +59,7 @@ public final class Addressee: NSObject, Sendable {
         )
     }
 
-    init(cert: Data, x509: X509Certificate?) {
+    public init(cert: Data, x509: X509Certificate?) {
         data = cert
         let cnVal = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
         let split = cnVal.split(separator: ",").map { String($0) }
@@ -77,10 +77,10 @@ public final class Addressee: NSObject, Sendable {
         validTo = x509?.notAfter
     }
 
-    convenience init(cert: Data) {
+    convenience public init(cert: Data) {
         self.init(cert: cert, x509: try? X509Certificate(der: cert))
     }
-
+    // swiftlint:disable nsobject_prefer_isequal
     // MARK: - Equatable
     public static func == (lhs: Addressee, rhs: Addressee) -> Bool {
         return
@@ -90,11 +90,6 @@ public final class Addressee: NSObject, Sendable {
             lhs.surname == rhs.surname &&
             lhs.certType == rhs.certType &&
             lhs.validTo == rhs.validTo
-    }
-
-    public override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? Addressee else { return false }
-        return self == other
     }
 
     static public func == (lhs: Addressee, rhs: Data) -> Bool {
@@ -107,4 +102,5 @@ public final class Addressee: NSObject, Sendable {
         }
         return false
     }
+    // swiftlint:enable nsobject_prefer_isequal
 }

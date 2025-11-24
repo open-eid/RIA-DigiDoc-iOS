@@ -17,24 +17,32 @@
  *
  */
 
-import Foundation
-import CommonsLib
-import CryptoSwift
-import LibdigidocLibSwift
+import FactoryKit
 
-/// @mockable
-@MainActor
-public protocol SharedContainerViewModelProtocol: Sendable {
-    func setSignedContainer(_ signedContainer: SignedContainerProtocol?)
-    func setCryptoContainer(_ cryptoContainer: CryptoContainerProtocol?)
-    func setFileOpeningResult(fileOpeningResult: Result<[URL], Error>?)
-    func getFileOpeningResult() -> Result<[URL], Error>?
-    func setAddedFilesCount(addedFiles: Int)
-    func getAddedFilesCount() -> Int
+extension Container {
+    public var cryptoContainer: Factory<CryptoContainerProtocol> {
+        self {
+            CryptoContainer(
+                fileManager: self.fileManager(),
+                containerUtil: self.containerUtil()
+            )
+        }
+    }
 
-    func currentContainer() -> GeneralContainer?
-    func isNestedContainer(_ container: GeneralContainer?) -> Bool
-    func containers() -> [GeneralContainer]
-    @discardableResult func removeLastContainer() -> GeneralContainer?
-    func clearContainers()
+    public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
+        self {
+            LdapConfiguration(
+                fileManager: self.fileManager()
+            )
+        }
+    }
+
+    public var openLdap: Factory<OpenLdapProtocol> {
+        self {
+            OpenLdap(
+                fileManager: self.fileManager(),
+                moppLdapConfiguration: self.ldapConfiguration()
+            )
+        }
+    }
 }
