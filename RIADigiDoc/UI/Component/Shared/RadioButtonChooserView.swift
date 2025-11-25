@@ -29,6 +29,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
     let titleKey: (T) -> String
     let onSelect: (T) -> Void
     let accessibilityLabel: (T, Bool) -> String
+    let accessibilityInputLabel: (T) -> String?
     let trailingSpacer: Bool
 
     init(
@@ -37,6 +38,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
         titleKey: @escaping (T) -> String,
         onSelect: @escaping (T) -> Void,
         accessibilityLabel: @escaping (T, Bool) -> String,
+        accessibilityInputLabel: @escaping (T) -> String? = {_ in nil},
         trailingSpacer: Bool = true,
     ) {
         self.options = options
@@ -44,6 +46,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
         self.titleKey = titleKey
         self.onSelect = onSelect
         self.accessibilityLabel = accessibilityLabel
+        self.accessibilityInputLabel = accessibilityInputLabel
         self.trailingSpacer = trailingSpacer
     }
 
@@ -56,7 +59,8 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
                         title: languageSettings.localized(titleKey(option)),
                         isSelected: isSelected(option),
                         onTap: { onSelect(option) },
-                        accessibilityLabel: accessibilityLabel(option, isSelected(option))
+                        accessibilityLabel: accessibilityLabel(option, isSelected(option)),
+                        accessibilityInputLabel: accessibilityInputLabel(option)
                     )
                     Divider()
                 }

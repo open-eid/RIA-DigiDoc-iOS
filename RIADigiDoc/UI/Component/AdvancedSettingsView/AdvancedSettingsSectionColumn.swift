@@ -53,6 +53,8 @@ struct AdvancedSettingsSectionColumn<Content: View>: View {
                     .font(typography.titleLarge)
                     .foregroundStyle(theme.onSurfaceVariant)
                     .padding(.vertical, Dimensions.Padding.SPadding)
+                    .accessibilityHeading(.h1)
+                    .accessibilityAddTraits([.isHeader])
 
                 content()
             }

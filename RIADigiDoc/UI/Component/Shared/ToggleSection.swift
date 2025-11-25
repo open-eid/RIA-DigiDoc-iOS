@@ -52,6 +52,7 @@ struct ToggleSection: View {
             .toggleStyle(SwitchToggleStyle(tint: theme.primary))
             .labelsHidden()
             .accessibilityLabel(label)
+            .accessibilityInputLabels(["Toggle", label])
         }
         .padding(.vertical, verticalPadding)
     }

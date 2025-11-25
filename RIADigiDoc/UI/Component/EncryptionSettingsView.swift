@@ -26,6 +26,8 @@ struct EncryptionSettingsView: View {
     @EnvironmentObject private var languageSettings: LanguageSettings
     @Environment(\.dismiss) private var dismiss
 
+    @AccessibilityFocusState private var isDialogHeaderFocused: Bool
+
     // MARK: - UI State
     @State private var showDialog = false
     @State private var dialogSelectedServerId: EncryptionServerOptionId = .defaultSetting
@@ -34,8 +36,16 @@ struct EncryptionSettingsView: View {
     @State private var navigateToCertificateView = false
 
     private let serverOptions: [EncryptionServerOption] = [
-        EncryptionServerOption(id: .defaultSetting, titleKey: "Main settings crypto server option ria"),
-        EncryptionServerOption(id: .manualSetting, titleKey: "Main settings crypto server option manual")
+        EncryptionServerOption(
+            id: .defaultSetting,
+            titleKey: "Main settings crypto server option ria",
+            accessibilityInputLabel: "Ria"
+        ),
+        EncryptionServerOption(
+            id: .manualSetting,
+            titleKey: "Main settings crypto server option manual",
+            accessibilityInputLabel: "Manual"
+        )
     ]
     private var selectedServerOption: EncryptionServerOption? {
         serverOptions.first { $0.id == viewModel.serverId }
@@ -60,7 +70,8 @@ struct EncryptionSettingsView: View {
                             isSelected: viewModel.encryptionCdocOption == .cdoc1,
                             onSelect: {
                                 viewModel.encryptionCdocOption = .cdoc1
-                            }
+                            },
+                            accessibilityInputLabel: .defaultSetting
                         )
 
                         OutlinedRadioButtonCard(
@@ -70,6 +81,7 @@ struct EncryptionSettingsView: View {
                                 viewModel.encryptionCdocOption = .cdoc2
                             },
                             contentSpacing: Dimensions.Padding.MPadding,
+                            accessibilityInputLabel: .manualSetting,
                             content: {
                                 manualCardContent
                             }
@@ -80,6 +92,7 @@ struct EncryptionSettingsView: View {
                     .padding(.vertical, Dimensions.Padding.SPadding)
                 }
             )
+            .accessibilityHidden(showDialog)
 
             if showDialog {
                 chooseServerDialog
@@ -115,7 +128,8 @@ struct EncryptionSettingsView: View {
                     certificate: certData
                 ),
                 isActive: $navigateToCertificateView,
-            ) { }
+            ) { EmptyView() }
+                .hidden()
         }
     }
 
@@ -135,6 +149,7 @@ struct EncryptionSettingsView: View {
                 onDropdownTap: {
                     dialogSelectedServerId = viewModel.serverId
                     showDialog = true
+                    isDialogHeaderFocused = true
                 }
             )
             FloatingLabelTextField(
@@ -184,6 +199,9 @@ struct EncryptionSettingsView: View {
                 Text(languageSettings.localized("Main settings crypto choose server option"))
                     .foregroundStyle(theme.onSurface)
                     .font(typography.headlineSmall)
+                    .accessibilityHeading(.h1)
+                    .accessibilityAddTraits([.isHeader])
+                    .accessibilityFocused($isDialogHeaderFocused)
 
                 RadioButtonChooserView<EncryptionServerOption>(
                     options: serverOptions,
@@ -201,6 +219,7 @@ struct EncryptionSettingsView: View {
                         : languageSettings.localized("Radiobutton unselected")
                         return "\(title) \(selected)"
                     },
+                    accessibilityInputLabel: {serverOption in serverOption.accessibilityInputLabel},
                     trailingSpacer: false
                 )
 

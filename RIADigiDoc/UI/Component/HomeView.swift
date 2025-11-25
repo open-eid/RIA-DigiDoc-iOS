@@ -131,17 +131,20 @@ struct HomeView: View {
             NavigationLink(
                 destination: SigningView(),
                 isActive: $isNavigatingToSigningView
-            ) {}
+            ) { EmptyView() }
+                .hidden()
 
             NavigationLink(
                 destination: EncryptView(),
                 isActive: $isNavigatingToEncryptView
-            ) {}
+            ) { EmptyView() }
+                .hidden()
 
             NavigationLink(
                 destination: RecentDocumentsView(),
                 isActive: $isNavigatingToRecentDocumentsView
-            ) {}
+            ) { EmptyView() }
+                .hidden()
 
             Spacer()
         }

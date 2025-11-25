@@ -90,7 +90,8 @@ struct AdvancedSettingsView: View {
                             NavigationLink(
                                 destination: SigningServicesSettingsView(),
                                 isActive: $navigateToSigningServicesSettings
-                            ) { }
+                            ) { EmptyView() }
+                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings validation services title"),
                                 onClick: {
@@ -100,7 +101,8 @@ struct AdvancedSettingsView: View {
                             NavigationLink(
                                 destination: ValidationSettingsView(),
                                 isActive: $navigateToValidationSettings
-                            ) { }
+                            ) { EmptyView() }
+                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings crypto services title"),
                                 onClick: {
@@ -110,7 +112,8 @@ struct AdvancedSettingsView: View {
                             NavigationLink(
                                 destination: EncryptionSettingsView(),
                                 isActive: $navigateToCryptoSettings
-                            ) { }
+                            ) { EmptyView() }
+                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings proxy title"),
                                 onClick: {
@@ -120,7 +123,8 @@ struct AdvancedSettingsView: View {
                             NavigationLink(
                                 destination: ProxySettingsView(),
                                 isActive: $navigateToProxySettings
-                            ) { }
+                            ) { EmptyView() }
+                                .hidden()
                         }
 
                         Button(

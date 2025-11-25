@@ -52,7 +52,8 @@ struct ValidationSettingsView: View {
                             isSelected: viewModel.selectedOption == .defaultSetting,
                             onSelect: {
                                 viewModel.selectedOption = .defaultSetting
-                            }
+                            },
+                            accessibilityInputLabel: .defaultSetting
                         )
 
                         OutlinedRadioButtonCard(
@@ -61,6 +62,7 @@ struct ValidationSettingsView: View {
                             onSelect: {
                                 viewModel.selectedOption = .manualSetting
                             },
+                            accessibilityInputLabel: .manualSetting,
                             content: {
                                 if !viewModel.isLoading {
                                     AdvancedSettingsManualCardContent(
@@ -121,7 +123,8 @@ struct ValidationSettingsView: View {
                     certificate: sivaCertData
                 ),
                 isActive: $navigateToCertificateView,
-            ) { }
+            ) { EmptyView() }
+                .hidden()
         }
     }
 }

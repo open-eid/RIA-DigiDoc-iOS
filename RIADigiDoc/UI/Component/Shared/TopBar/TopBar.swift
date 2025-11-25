@@ -83,12 +83,12 @@ struct TopBarContainer<Content: View>: View {
 
             content()
 
-            NavigationLink(destination: LanguageChooserView(), isActive: $navigateToLanguageChooser) {}
-                .accessibilityHidden(!showSettingsSheet)
-            NavigationLink(destination: ThemeChooserView(), isActive: $navigateToThemeChooser) {}
-                .accessibilityHidden(!showSettingsSheet)
-            NavigationLink(destination: AdvancedSettingsView(), isActive: $navigateToAdvancedSettings) {}
-                .accessibilityHidden(!showSettingsSheet)
+            NavigationLink(destination: LanguageChooserView(), isActive: $navigateToLanguageChooser) { EmptyView() }
+                .hidden()
+            NavigationLink(destination: ThemeChooserView(), isActive: $navigateToThemeChooser) { EmptyView() }
+                .hidden()
+            NavigationLink(destination: AdvancedSettingsView(), isActive: $navigateToAdvancedSettings) { EmptyView() }
+                .hidden()
 
         }
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())

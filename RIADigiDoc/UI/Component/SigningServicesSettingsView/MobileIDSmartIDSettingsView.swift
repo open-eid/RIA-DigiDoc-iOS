@@ -34,14 +34,16 @@ struct MobileIDSmartIDSettingsView: View {
 
     var body: some View {
         AdvancedSettingsSectionColumn(
-            title: languageSettings.localized("Main settings relying party title")
+            title: languageSettings.localized("Main settings relying party title"),
+            isScrollable: false
         ) {
             OutlinedRadioButtonCard(
                 title: languageSettings.localized("Main settings default access title"),
                 isSelected: viewModel.selectedOption == .defaultSetting,
                 onSelect: {
                     viewModel.selectedOption = .defaultSetting
-                }
+                },
+                accessibilityInputLabel: .defaultSetting
             )
             OutlinedRadioButtonCard(
                 title: languageSettings.localized("Main settings default manual access title"),
@@ -49,6 +51,7 @@ struct MobileIDSmartIDSettingsView: View {
                 onSelect: {
                     viewModel.selectedOption = .manualSetting
                 },
+                accessibilityInputLabel: .manualSetting,
                 content: {
                     FloatingLabelTextField(
                         title: languageSettings.localized("Main settings relying party title"),

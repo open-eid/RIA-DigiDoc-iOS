@@ -36,14 +36,16 @@ struct TimeStampSettingsView: View {
 
     var body: some View {
         AdvancedSettingsSectionColumn(
-            title: languageSettings.localized("Main settings tsa url title")
+            title: languageSettings.localized("Main settings tsa url title"),
+            isScrollable: false
         ) {
             OutlinedRadioButtonCard(
                 title: languageSettings.localized("Main settings default access title"),
                 isSelected: viewModel.selectedOption == .defaultSetting,
                 onSelect: {
                     viewModel.selectedOption = .defaultSetting
-                }
+                },
+                accessibilityInputLabel: .defaultSetting
             )
             OutlinedRadioButtonCard(
                 title: languageSettings.localized("Main settings default manual access title"),
@@ -51,6 +53,7 @@ struct TimeStampSettingsView: View {
                 onSelect: {
                     viewModel.selectedOption = .manualSetting
                 },
+                accessibilityInputLabel: .manualSetting,
                 content: {
                     if !viewModel.isLoading {
                         AdvancedSettingsManualCardContent(
@@ -106,7 +109,8 @@ struct TimeStampSettingsView: View {
                     certificate: tsaCertData
                 ),
                 isActive: $navigateToCertificateView,
-            ) { }
+            ) { EmptyView() }
+                .hidden()
         }
     }
 }

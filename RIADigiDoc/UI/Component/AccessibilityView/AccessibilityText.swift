@@ -44,11 +44,21 @@ struct AccessibilityText: View {
                 .accessibilityLabel(Text(verbatim: "\(languageSettings.localized("Open Button")) \(text)"))
             }
         } else {
-            Text(text)
-                .font(isTitle ? typography.titleLarge : typography.bodyLarge)
-                .foregroundStyle(theme.onSurface)
-                .multilineTextAlignment(.leading)
-                .padding(.bottom, bottomPadding)
+            if isTitle {
+                Text(text)
+                    .font(typography.titleLarge)
+                    .foregroundStyle(theme.onSurface)
+                    .multilineTextAlignment(.leading)
+                    .padding(.bottom, bottomPadding)
+                    .accessibilityHeading(.h1)
+                    .accessibilityAddTraits([.isHeader])
+            } else {
+                Text(text)
+                    .font(typography.bodyLarge)
+                    .foregroundStyle(theme.onSurface)
+                    .multilineTextAlignment(.leading)
+                    .padding(.bottom, bottomPadding)
+            }
         }
     }
 }

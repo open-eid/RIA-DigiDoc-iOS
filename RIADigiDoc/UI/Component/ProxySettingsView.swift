@@ -44,7 +44,8 @@ struct ProxySettingsView: View {
                         isSelected: viewModel.proxyInfo.option == .disabled,
                         onSelect: {
                             viewModel.proxyInfo.option = .disabled
-                        }
+                        },
+                        accessibilityInputLabel: .disabledSetting
                     )
 
                     OutlinedRadioButtonCard(
@@ -52,7 +53,8 @@ struct ProxySettingsView: View {
                         isSelected: viewModel.proxyInfo.option == .system,
                         onSelect: {
                             viewModel.proxyInfo.option = .system
-                        }
+                        },
+                        accessibilityInputLabel: .systemSetting
                     )
 
                     OutlinedRadioButtonCard(
@@ -62,6 +64,7 @@ struct ProxySettingsView: View {
                             viewModel.proxyInfo.option = .manual
                         },
                         contentSpacing: Dimensions.Padding.MPadding,
+                        accessibilityInputLabel: .manualSetting,
                         content: {
                             manualCardContent
                         }
