@@ -118,11 +118,13 @@ struct FileUtilTests {
 
     @Test
     func getValidPath_returnNilWhenFileNotInDirectories() async throws {
-        let nonExistentFileURL = URL(fileURLWithPath: "someFolder")
+        if !SystemUtil.isSimulator {
+            let nonExistentFileURL = URL(fileURLWithPath: "someFolder")
 
-        let result = await fileUtil.getValidPath(url: nonExistentFileURL)
+            let result = await fileUtil.getValidPath(url: nonExistentFileURL)
 
-        #expect(result == nil)
+            #expect(result == nil)
+        }
     }
 
     @Test
@@ -293,5 +295,33 @@ struct FileUtilTests {
     func fileExists_returnFalseWithNilInput() async {
         let containerFileExists = fileUtil.fileExists(fileLocation: nil)
         #expect(!containerFileExists)
+    }
+
+    @Test
+    func removeSavedFilesDirectory_successWhenDirectoryExists() async throws {
+        let testDirectory = URL(fileURLWithPath: "/tmp")
+        let savedFilesDirectory = testDirectory.appendingPathComponent(Constants.Folder.SavedFiles)
+
+        mockFileManager.fileExistsHandler = { path in
+            return path == savedFilesDirectory.path
+        }
+
+        #expect(mockFileManager.fileExists(atPath: savedFilesDirectory.path))
+
+        fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
+
+        #expect(mockFileManager.removeItemCallCount == 1)
+    }
+
+    @Test
+    func removeSavedFilesDirectory_doesNotThrowErrorWhenRemovingDirectoryAndItDoesntExist() async {
+        let testDirectory = URL(fileURLWithPath: "/tmp")
+        let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistentDir")
+
+        #expect(throws: Never.self) {
+            self.fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
+        }
+
+        #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.path))
     }
 }

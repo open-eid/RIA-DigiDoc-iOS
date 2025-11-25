@@ -19,9 +19,9 @@
 
 import Foundation
 
-struct FileItem: Identifiable {
-    let id = UUID()
-    let name: String
-    let url: URL
-    let modifiedDate: Date
+public struct FileItem: Identifiable {
+    public let id = UUID()
+    public let name: String
+    public let url: URL
+    public let modifiedDate: Date
 }

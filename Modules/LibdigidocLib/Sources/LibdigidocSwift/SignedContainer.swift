@@ -368,6 +368,7 @@ extension SignedContainer {
         containerFile: URL,
         dataFiles: [URL]
     ) async throws -> SignedContainerProtocol {
+        let fileManager = Container.shared.fileManager()
         let containerWrapper = ContainerWrapper(
             fileManager: Container.shared.fileManager()
         )
@@ -375,6 +376,17 @@ extension SignedContainer {
         try await containerWrapper.create(file: containerFile, dataFiles: dataFiles.compactMap { $0.path })
 
         let createdContainer = try await containerWrapper.open(containerFile: containerFile, isSivaConfirmed: true)
+
+        SignedContainer.logger.debug("Container created. Removing \(dataFiles.count) saved data files")
+        for (index, dataFile) in dataFiles.enumerated() {
+            SignedContainer.logger.debug(
+                "Removing data file (\(index + 1) / \(dataFiles.count)): \(dataFile.lastPathComponent)"
+            )
+            if fileManager.fileExists(atPath: dataFile.path) && fileManager.isDeletableFile(atPath: dataFile.path) {
+                try fileManager.removeItem(at: dataFile)
+                SignedContainer.logger.debug("Data file: '\(dataFile.lastPathComponent)' removed")
+            }
+        }
 
         return SignedContainer(
             containerFile: containerFile,

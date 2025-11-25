@@ -19,6 +19,7 @@
 
 import Foundation
 import CommonsLib
+import UtilsLib
 
 public struct LdapConfiguration: LdapConfigurationProtocol {
     @MainActor static public var ldapPersonURLS = [URL(string: "ldaps://esteid.ldap.sk.ee")]
@@ -33,11 +34,8 @@ public struct LdapConfiguration: LdapConfigurationProtocol {
     }
 
     public func ldapCertsPath() -> String? {
-        return self.fileManager.urls(
-            for: .libraryDirectory,
-            in: .userDomainMask
-        )
-        .first?
-        .appendingPathComponent("LDAPCerts/ldapCerts.pem").path
+        return Directories
+            .getLibraryDirectory(fileManager: fileManager)?
+            .appendingPathComponent("LDAPCerts/ldapCerts.pem").path
     }
 }

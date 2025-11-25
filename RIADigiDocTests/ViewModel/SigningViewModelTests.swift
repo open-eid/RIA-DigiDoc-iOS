@@ -241,15 +241,9 @@ struct SigningViewModelTests {
         let testDirectory = URL(fileURLWithPath: "/tmp")
         let savedFilesDirectory = testDirectory.appendingPathComponent(Constants.Folder.SavedFiles)
 
-        mockFileManager.fileExistsHandler = { path in
-            return path == savedFilesDirectory.path
-        }
-
-        #expect(mockFileManager.fileExists(atPath: savedFilesDirectory.path))
-
         viewModel.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
 
-        #expect(mockFileManager.removeItemCallCount == 1)
+        #expect(mockFileUtil.removeSavedFilesDirectoryCallCount == 1)
     }
 
     @Test

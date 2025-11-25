@@ -35,6 +35,7 @@ struct RIADigiDocApp: App {
     private let configurationProperty: ConfigurationProperty
     private let configurationLoader: ConfigurationLoaderProtocol
     private let fileManager: FileManagerProtocol
+    private let fileUtil: FileUtilProtocol
     private let librarySetup: LibrarySetup
 
     init() {
@@ -44,6 +45,7 @@ struct RIADigiDocApp: App {
         self.configurationProperty = Container.shared.configurationProperty()
         self.configurationLoader = Container.shared.configurationLoader()
         self.fileManager = Container.shared.fileManager()
+        self.fileUtil = Container.shared.fileUtil()
         self.librarySetup = Container.shared.librarySetup()
     }
 
@@ -57,6 +59,7 @@ struct RIADigiDocApp: App {
             }
 
             await librarySetup.setupLibraries()
+            fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nil)
             await MainActor.run {
                 self.isSetupComplete = true
             }

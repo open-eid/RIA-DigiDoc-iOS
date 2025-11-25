@@ -20,6 +20,8 @@
 import SwiftUI
 import FactoryKit
 import LibdigidocLibSwift
+import CommonsLib
+import UtilsLib
 
 struct HomeView: View {
     @AppTheme private var theme
@@ -42,6 +44,9 @@ struct HomeView: View {
     @State private var showSignatureBottomSheet: Bool = false
     @State private var showCryptoBottomSheet: Bool = false
 
+    @State private var containerType: ContainerType = .asice
+    @State private var recentDocumentsExtensions: [String] = Constants.Container.ContainerExtensions
+
     @Binding private var externalFiles: [URL]
 
     private var filesBottomSheetActions: [BottomSheetButton] {
@@ -50,6 +55,8 @@ struct HomeView: View {
                 isImporting = true
             },
             onRecentDocumentsClick: {
+                containerType = .asice
+                recentDocumentsExtensions = Constants.Container.ContainerExtensions
                 isNavigatingToRecentDocumentsView = true
             }
         )
@@ -61,6 +68,8 @@ struct HomeView: View {
                 isCryptoImporting = true
             },
             onRecentDocumentsClick: {
+                containerType = .cdoc
+                recentDocumentsExtensions = Constants.Container.CryptoContainerExtensions
                 isNavigatingToRecentDocumentsView = true
             }
         )
@@ -139,7 +148,10 @@ struct HomeView: View {
             ) {}
 
             NavigationLink(
-                destination: RecentDocumentsView(),
+                destination: RecentDocumentsView(
+                    folderURL: getRecentDocumentsFolder(containerType: containerType),
+                    extensions: recentDocumentsExtensions
+                ),
                 isActive: $isNavigatingToRecentDocumentsView
             ) {}
 
@@ -152,6 +164,15 @@ struct HomeView: View {
                 self.viewModel.setChosenFiles(.success(extFiles))
                 externalFiles = []
             }
+        }
+    }
+
+    func getRecentDocumentsFolder(containerType: ContainerType) -> URL? {
+        switch containerType {
+        case .cdoc:
+            return cryptoViewModel.getRecentDocumentsFolder()
+        default:
+            return viewModel.getRecentDocumentsFolder()
         }
     }
 }

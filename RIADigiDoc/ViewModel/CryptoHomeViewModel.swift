@@ -21,9 +21,11 @@ import Foundation
 import FactoryKit
 import OSLog
 import CryptoSwift
+import CommonsLib
+import UtilsLib
 
 @MainActor
-class CryptoHomeViewModel: HomeViewModelProtocol, ObservableObject {
+class CryptoHomeViewModel: CryptoHomeViewModelProtocol, ObservableObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
 
     @Published var isImporting = false
@@ -33,11 +35,14 @@ class CryptoHomeViewModel: HomeViewModelProtocol, ObservableObject {
     )
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    private let fileManager: FileManagerProtocol
 
     init(
-        sharedContainerViewModel: SharedContainerViewModelProtocol
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileManager = fileManager
     }
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
@@ -51,5 +56,15 @@ class CryptoHomeViewModel: HomeViewModelProtocol, ObservableObject {
 
     func setChosenFiles(_ chosenFiles: Result<[URL], Error>) {
         sharedContainerViewModel.setFileOpeningResult(fileOpeningResult: chosenFiles)
+    }
+
+    func getRecentDocumentsFolder() -> URL? {
+        do {
+            return try Directories.getCacheDirectory(fileManager: fileManager)
+                .appendingPathComponent(Constants.Container.CryptoContainerFolder)
+        } catch {
+            CryptoHomeViewModel.logger.error("Unable to get crypto recent documents folder: \(error)")
+            return nil
+        }
     }
 }

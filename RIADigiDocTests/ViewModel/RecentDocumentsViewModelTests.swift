@@ -20,6 +20,7 @@
 import Foundation
 import Testing
 import CommonsTestShared
+import CommonsLib
 import CommonsLibMocks
 
 @MainActor
@@ -39,7 +40,6 @@ class RecentDocumentsViewModelTests {
 
         viewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: tempFolderURL,
             fileManager: mockFileManager
         )
     }
@@ -62,7 +62,9 @@ class RecentDocumentsViewModelTests {
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError, userInfo: nil)
         }
 
-        viewModel.loadFiles()
+        mockFileManager.fileExistsAtPathHandler = { _, _ in true }
+
+        viewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
 
         let files = viewModel.files
 
@@ -80,11 +82,10 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenNoFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: nil,
             fileManager: mockFileManager
         )
 
-        recentDocumentsViewModel.loadFiles()
+        recentDocumentsViewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
 
         let filesCount = recentDocumentsViewModel.files.count
 
@@ -95,11 +96,10 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenInvalidFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            folderURL: URL(fileURLWithPath: "/invalid/path"),
             fileManager: mockFileManager
         )
 
-        recentDocumentsViewModel.loadFiles()
+        recentDocumentsViewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
 
         let filesCount = recentDocumentsViewModel.files.count
 
@@ -124,7 +124,7 @@ class RecentDocumentsViewModelTests {
         ]
         viewModel.searchText = "file"
 
-        let filteredFiles = viewModel.filteredFiles
+        let filteredFiles = viewModel.filteredFiles(using: Constants.Container.ContainerExtensions)
 
         #expect(filteredFiles.count == 2)
         #expect(filteredFiles[0].name == "File1.asice")
@@ -160,7 +160,7 @@ class RecentDocumentsViewModelTests {
 
         mockFileManager.removeItemHandler = { _ in }
 
-        viewModel.deleteFile(at: 0)
+        viewModel.deleteFile(fileItem)
 
         #expect(mockFileManager.removeItemCallCount == 1)
         #expect(mockFileManager.removeItemArgValues.first == file)
@@ -170,13 +170,14 @@ class RecentDocumentsViewModelTests {
     @Test
     func deleteFile_filesNotChangedWhenUnableToDelete() async {
         let file = tempFolderURL.appendingPathComponent("test1.asice")
-        viewModel.files = [FileItem(name: "test1.asice", url: file, modifiedDate: Date())]
+        let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
+        viewModel.files = [fileItem]
 
         mockFileManager.removeItemHandler = { _ in
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileNoSuchFileError, userInfo: nil)
         }
 
-        viewModel.deleteFile(at: 0)
+        viewModel.deleteFile(fileItem)
 
         #expect(mockFileManager.removeItemCallCount == 1)
         #expect(viewModel.files.count == 1)

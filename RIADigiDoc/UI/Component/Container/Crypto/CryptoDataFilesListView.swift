@@ -74,23 +74,11 @@ struct CryptoDataFilesListView: View {
 
 #Preview {
     let dataFiles = [
-        DataFileWrapper(
-            id: UUID(),
-            fileId: "1",
-            fileName: "DataFile1.txt",
-            fileSize: 123,
-            mediaType: "text/plain"
-        ),
-        DataFileWrapper(
-            id: UUID(),
-            fileId: "2",
-            fileName: "DataFile2.txt",
-            fileSize: 456,
-            mediaType: "text/plain"
-        )
+        URL(fileURLWithPath: "/preview/path1"),
+        URL(fileURLWithPath: "/preview/path2")
     ]
 
-    DataFilesListView(
+    CryptoDataFilesListView(
         dataFiles: dataFiles,
         selectedDataFile: .constant(dataFiles.first),
         showRemoveFileButton: true,

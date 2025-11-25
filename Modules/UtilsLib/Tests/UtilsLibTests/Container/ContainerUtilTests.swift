@@ -149,7 +149,9 @@ struct ContainerUtilTests {
     @Test
     func getSignatureContainersDir_success() throws {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
-        let expectedDir = cachesDir.appendingPathComponent(Constants.Container.SignedContainerFolder)
+        let expectedDir = cachesDir
+            .appendingPathComponent(BundleUtil.getBundleIdentifier())
+            .appendingPathComponent(Constants.Container.SignedContainerFolder)
 
         mockFileManager.urlHandler = { directory, _, _, _ in
             #expect(directory == .cachesDirectory)
@@ -184,7 +186,9 @@ struct ContainerUtilTests {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
         let signatureDir = cachesDir.appendingPathComponent(Constants.Container.SignedContainerFolder)
         let containerFile = signatureDir.appendingPathComponent("file.asice")
-        let expectedDataDir = cachesDir.appendingPathComponent("file.asice-data-files")
+        let expectedDataDir = cachesDir
+            .appendingPathComponent(Constants.Container.SignedContainerFolder)
+            .appendingPathComponent("file.asice-data-files")
 
         mockFileManager.urlHandler = { _, _, _, _ in cachesDir }
         mockFileManager.urlsHandler = { _, _ in [cachesDir] }

@@ -21,5 +21,7 @@ import Foundation
 
 public enum ContainerType {
     case none
+    case asice
+    case cdoc
     case ddoc
 }

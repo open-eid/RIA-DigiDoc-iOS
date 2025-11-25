@@ -18,7 +18,9 @@
  */
 
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
+import CommonsLib
 
 struct DataFilesView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
@@ -113,4 +115,23 @@ struct DataFilesView: View {
         .accessibilityAddTraits([.isButton])
         .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
     }
+}
+
+#Preview {
+    DataFilesView(
+        fileIndex: 0,
+        onOpenFileButtonClick: { _ in },
+        onSaveDataFileButtonClick: { _ in },
+        onRemoveFileButtonClick: { _ in },
+        dataFile: DataFileWrapper(
+            fileId: "0",
+            fileName: Constants.Container.DefaultName,
+            fileSize: 123,
+            mediaType: Constants.MimeType.Default
+        ),
+        showRemoveFileButton: true,
+        showRemoveDataFileModal: .constant(false)
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

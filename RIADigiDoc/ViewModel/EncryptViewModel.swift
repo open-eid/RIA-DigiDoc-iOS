@@ -140,16 +140,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
     }
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
-        do {
-            let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles,
-                fileManager: fileManager
-            )
-            try fileManager.removeItem(at: directory)
-            EncryptViewModel.logger.debug("Saved Files directory removed")
-        } catch {
-            EncryptViewModel.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
-        }
+        fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
     }
 
     @discardableResult

@@ -20,15 +20,21 @@
 import Foundation
 import Testing
 import CommonsLib
+import CommonsLibMocks
 
 @MainActor
 struct HomeViewModelTests {
-    private var mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
-    private var viewModel: HomeViewModel!
+    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
+    private let viewModel: HomeViewModel
 
     init() async throws {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
-        viewModel = HomeViewModel(sharedContainerViewModel: mockSharedContainerViewModel)
+        mockFileManager = FileManagerProtocolMock()
+        viewModel = HomeViewModel(
+            sharedContainerViewModel: mockSharedContainerViewModel,
+            fileManager: mockFileManager
+        )
     }
 
     @Test

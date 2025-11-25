@@ -29,7 +29,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
     @Published var isImporting = false
     @Published var files: [FileItem] = []
     @Published var searchText: String = ""
-    @Published var folderURL: URL
+    @Published var errorMessage: String = ""
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
 
@@ -37,28 +37,16 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        folderURL: URL? = FileManager.default.urls(
-            for: .cachesDirectory,
-            in: .userDomainMask
-        ).first?.appendingPathComponent(
-            Constants.Container.SignedContainerFolder,
-            isDirectory: true
-        ),
         fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
-        if let folderURL = folderURL {
-            self.folderURL = folderURL
-        } else {
-            self.folderURL = URL(fileURLWithPath: "")
-        }
         self.fileManager = fileManager
     }
 
-    var filteredFiles: [FileItem] {
+    func filteredFiles(using extensions: [String]) -> [FileItem] {
         let sortedFiles = files.sorted { $0.modifiedDate > $1.modifiedDate }
         return sortedFiles.filter { file in
-            CommonsLib.Constants.Container.ContainerExtensions.contains(file.url.pathExtension.lowercased()) &&
+            extensions.contains(file.url.pathExtension.lowercased()) &&
                 (searchText.isEmpty || file.name.localizedCaseInsensitiveContains(searchText))
         }
     }
@@ -67,8 +55,11 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
         sharedContainerViewModel.setFileOpeningResult(fileOpeningResult: chosenFiles)
     }
 
-    func loadFiles() {
+    func loadFiles(from folderURL: URL, withExtensions extensions: [String]) {
         do {
+            var isDirectory = ObjCBool(true)
+            guard fileManager.fileExists(atPath: folderURL.path, isDirectory: &isDirectory) else { return }
+
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: folderURL,
                 includingPropertiesForKeys: [.contentModificationDateKey],
@@ -77,7 +68,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
             files = fileURLs.compactMap { url in
                 if let attributes = try? fileManager.attributesOfItem(atPath: url.path),
                    let modifiedDate = attributes[.modificationDate] as? Date {
-                    if CommonsLib.Constants.Container.ContainerExtensions.contains(url.pathExtension.lowercased()) {
+                    if extensions.contains(url.pathExtension.lowercased()) {
                         return FileItem(name: url.lastPathComponent, url: url, modifiedDate: modifiedDate)
                     }
                 }
@@ -85,17 +76,18 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
             }
         } catch {
             files = []
-            RecentDocumentsViewModel.logger.error("Unable to load files: \(error.localizedDescription)")
+            errorMessage = "Could not load selected files"
+            RecentDocumentsViewModel.logger.error("Unable to load files: \(error)")
         }
     }
 
-    func deleteFile(at index: Int) {
-        let file = filteredFiles[index]
+    func deleteFile(_ file: FileItem) {
         do {
             try fileManager.removeItem(at: file.url)
             files.removeAll { $0.url == file.url }
         } catch {
-            RecentDocumentsViewModel.logger.error("Unable to delete file: \(error.localizedDescription)")
+            errorMessage = "Failed to remove file"
+            RecentDocumentsViewModel.logger.error("Unable to delete file: \(error)")
         }
     }
 }
