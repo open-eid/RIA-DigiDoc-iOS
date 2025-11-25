@@ -27,6 +27,10 @@ struct InfoHeaderHelpButton: View {
     @Environment(\.openURL) var openURL
     @EnvironmentObject private var languageSettings: LanguageSettings
 
+    private var helpLabel: String {
+        languageSettings.localized("Main about help center")
+    }
+
     var body: some View {
         Button(
             action: {
@@ -42,7 +46,7 @@ struct InfoHeaderHelpButton: View {
                         .frame(width: Dimensions.Icon.IconSizeXXS)
                         .foregroundStyle(theme.onPrimary)
                         .accessibilityHidden(true)
-                    Text(languageSettings.localized("Main about help center"))
+                    Text(helpLabel)
                         .font(typography.labelMedium)
                         .foregroundStyle(theme.onPrimary)
 
@@ -54,6 +58,7 @@ struct InfoHeaderHelpButton: View {
             }
         )
         .buttonStyle(.plain)
+        .accessibilityInputLabels(["Helpdesk", helpLabel])
     }
 }
 

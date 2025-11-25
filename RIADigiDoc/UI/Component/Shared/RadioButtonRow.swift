@@ -29,6 +29,14 @@ struct RadioButtonRow<T: Equatable>: View {
     let isSelected: Bool
     let onTap: () -> Void
     let accessibilityLabel: String
+    let accessibilityInputLabel: String?
+
+    private var accessibilityInputLabels: [String] {
+        if let accessibilityInputLabel {
+            return [accessibilityInputLabel, accessibilityLabel]
+        }
+        return [accessibilityLabel]
+    }
 
     var body: some View {
         Button(action: onTap) {
@@ -41,11 +49,12 @@ struct RadioButtonRow<T: Equatable>: View {
                 Spacer()
                 RadioButton(
                     isChecked: isSelected,
-                    accessibilityLabel: accessibilityLabel
                 )
             }
             .padding(.vertical, Dimensions.Padding.SPadding)
             .contentShape(Rectangle())
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityInputLabels(accessibilityInputLabels)
         }
         .buttonStyle(.plain)
     }

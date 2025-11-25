@@ -73,15 +73,18 @@ struct ContentView: View {
                         NavigationLink(
                             destination: InfoView(),
                             isActive: $navigateToInfo
-                        ) { }
+                        ) { EmptyView() }
+                            .hidden()
                         NavigationLink(
                             destination: AccessibilityView(),
                             isActive: $navigateToAccessibility
-                        ) { }
+                        ) { EmptyView() }
+                            .hidden()
                         NavigationLink(
                             destination: DiagnosticsView(),
                             isActive: $navigateToDiagnostics
-                        ) { }
+                        ) { EmptyView() }
+                            .hidden()
 
                         Spacer()
                     }

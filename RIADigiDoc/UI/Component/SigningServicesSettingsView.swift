@@ -40,23 +40,25 @@ struct SigningServicesSettingsView: View {
             },
             excludeDestinations: [.advanced],
             content: {
-                VStack(spacing: Dimensions.Padding.ZeroPadding) {
-                    TabView(
-                        selectedTab: $selectedTab,
-                        titles: [
-                            languageSettings.localized("Main settings timestamp services title"),
-                            languageSettings.localized("Main settings mobile id and smart id title")
-                        ],
-                        content: {
-                            if selectedTab == .timestampServices {
-                                TimeStampSettingsView()
-                                    .padding(.horizontal, Dimensions.Padding.SPadding)
-                            } else {
-                                MobileIDSmartIDSettingsView()
-                                    .padding(.horizontal, Dimensions.Padding.SPadding)
+                ScrollView {
+                    VStack(spacing: Dimensions.Padding.ZeroPadding) {
+                        TabView(
+                            selectedTab: $selectedTab,
+                            titles: [
+                                languageSettings.localized("Main settings timestamp services title"),
+                                languageSettings.localized("Main settings mobile id and smart id title")
+                            ],
+                            content: {
+                                if selectedTab == .timestampServices {
+                                    TimeStampSettingsView()
+                                        .padding(.horizontal, Dimensions.Padding.SPadding)
+                                } else {
+                                    MobileIDSmartIDSettingsView()
+                                        .padding(.horizontal, Dimensions.Padding.SPadding)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         )

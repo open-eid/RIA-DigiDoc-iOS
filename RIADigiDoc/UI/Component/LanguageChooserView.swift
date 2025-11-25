@@ -57,6 +57,9 @@ struct LanguageChooserView: View {
                         ? languageSettings.localized("Menu language selected")
                         : languageSettings.localized("Menu language")
                         return "\(title) \(selected)"
+                    },
+                    accessibilityInputLabel: { languageOption in
+                        languageOption.accessibilityInputLabel
                     }
                 )
                 .padding(.horizontal, Dimensions.Padding.SPadding)

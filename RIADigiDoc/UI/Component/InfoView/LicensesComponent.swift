@@ -34,6 +34,8 @@ struct LicensesComponent: View {
                 .font(typography.titleLarge)
                 .padding(.bottom, Dimensions.Padding.XSPadding)
                 .foregroundStyle(theme.onSurface)
+                .accessibilityHeading(.h1)
+                .accessibilityAddTraits([.isHeader])
 
             ForEach(packages, id: \.id) { pkg in
                 SingleLicenseButton(package: pkg)

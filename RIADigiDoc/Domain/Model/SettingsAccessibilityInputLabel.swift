@@ -17,8 +17,9 @@
  *
  */
 
-struct EncryptionServerOption: Identifiable, Equatable, Hashable {
-    let id: EncryptionServerOptionId
-    let titleKey: String
-    let accessibilityInputLabel: String
+public enum SettingsAccessibilityInputLabel: String, Sendable {
+    case defaultSetting = "Default"
+    case manualSetting = "Manual"
+    case disabledSetting = "Disabled"
+    case systemSetting = "System"
 }

@@ -24,8 +24,18 @@ struct AdvancedSettingsCheckboxRow: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @EnvironmentObject private var languageSettings: LanguageSettings
+
     var label: String
     @Binding var isChecked: Bool
+
+    func getAccessibilityLabelWithState(_ baseAccessibilityLabel: String) -> String {
+        let checked = isChecked
+        ? languageSettings.localized("Checkbox checked")
+        : languageSettings.localized("Checkbox unchecked")
+
+        return "\(baseAccessibilityLabel) \(checked)"
+    }
 
     var body: some View {
         Button(
@@ -40,11 +50,12 @@ struct AdvancedSettingsCheckboxRow: View {
                     Spacer()
                     CheckBox(
                         isChecked: $isChecked,
-                        baseAccessibilityLabel: label.lowercased()
                     )
                 }
                 .contentShape(Rectangle())
                 .padding(.vertical, Dimensions.Padding.SPadding)
+                .accessibilityLabel(getAccessibilityLabelWithState(label.lowercased()))
+                .accessibilityInputLabels(["Toggle", label])
             }
         )
         .buttonStyle(.plain)

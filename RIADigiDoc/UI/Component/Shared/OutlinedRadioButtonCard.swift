@@ -29,19 +29,29 @@ struct OutlinedRadioButtonCard<Content: View>: View {
     let isSelected: Bool
     let onSelect: () -> Void
     let contentSpacing: CGFloat
+    let accessibilityInputLabel: SettingsAccessibilityInputLabel?
     @ViewBuilder var content: () -> Content
+
+    private var accessibilityInputLabels: [String] {
+        if let accessibilityInputLabel {
+            return [accessibilityInputLabel.rawValue, title]
+        }
+        return [title]
+    }
 
     init(
         title: String,
         isSelected: Bool,
         onSelect: @escaping () -> Void,
         contentSpacing: CGFloat = Dimensions.Padding.LPadding,
+        accessibilityInputLabel: SettingsAccessibilityInputLabel? = nil,
         @ViewBuilder content: @escaping () -> Content = { EmptyView() }
     ) {
         self.title = title
         self.isSelected = isSelected
         self.onSelect = onSelect
         self.contentSpacing = contentSpacing
+        self.accessibilityInputLabel = accessibilityInputLabel
         self.content = content
     }
 
@@ -54,10 +64,10 @@ struct OutlinedRadioButtonCard<Content: View>: View {
     }
 
     var body: some View {
-        Button(action: onSelect) {
-            VStack(
-                spacing: contentSpacing,
-                content: {
+        VStack(
+            spacing: contentSpacing,
+            content: {
+                Button(action: onSelect) {
                     HStack {
                         Text(title)
                             .font(typography.bodyLarge)
@@ -66,28 +76,29 @@ struct OutlinedRadioButtonCard<Content: View>: View {
                         Spacer()
                         RadioButton(
                             isChecked: isSelected,
-                            accessibilityLabel:
-                                getAccessibilityLabelWithState(title.lowercased())
                         )
                         .padding(.trailing, Dimensions.Padding.SPadding)
                     }
-
-                    if isSelected {
-                        content()
-                    }
+                    .contentShape(Rectangle())
                 }
-            )
-            .padding(.vertical, Dimensions.Padding.LPadding)
-            .padding(.horizontal, Dimensions.Padding.SPadding)
-            .background(
-                RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
-                    .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
-            )
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
+                .buttonStyle(.plain)
+                .accessibilityLabel(getAccessibilityLabelWithState(title.lowercased()))
+                .accessibilityInputLabels(self.accessibilityInputLabels)
+
+                if isSelected {
+                    content()
+                }
+            }
+        )
+        .padding(.vertical, Dimensions.Padding.LPadding)
+        .padding(.horizontal, Dimensions.Padding.SPadding)
+        .background(
+            RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
+                .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
+        )
         .cornerRadius(Dimensions.Corner.XSCornerRadius)
         .padding(.vertical, Dimensions.Padding.XSPadding)
+        .accessibilityElement(children: .contain)
     }
 }
 
