@@ -1039,6 +1039,24 @@
         }
       }
     },
+    "Failed to remove file" : {
+      "comment" : "Error shown in Recent Documents view when deleting fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili eemaldamine ebaõnnestus"
+          }
+        }
+      }
+    },
     "Failed to remove file from container" : {
       "comment" : "Shows when unable to remove file from unsigned container",
       "extractionState" : "manual",

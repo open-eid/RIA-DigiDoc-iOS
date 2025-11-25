@@ -171,16 +171,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     }
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
-        do {
-            let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles,
-                fileManager: fileManager
-            )
-            try fileManager.removeItem(at: directory)
-            SigningViewModel.logger.debug("Saved Files directory removed")
-        } catch {
-            SigningViewModel.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
-        }
+        fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
     }
 
     public func addDataFiles(_ files: [URL], to container: URL) async {

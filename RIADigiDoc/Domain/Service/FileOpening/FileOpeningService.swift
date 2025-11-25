@@ -87,14 +87,9 @@ actor FileOpeningService: FileOpeningServiceProtocol {
     private func cacheFile(
         from sourceURL: URL,
     ) throws -> URL {
-        let cachesDirectory = try fileManager.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: false)
-        let signedContainersDirectory = cachesDirectory.appendingPathComponent(
-            Constants.Container.SignedContainerFolder,
-            isDirectory: true
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolder: Constants.Container.SignedContainerFolder,
+            fileManager: fileManager
         )
 
         // Check if file is already in signed containers directory (like Recent documents)

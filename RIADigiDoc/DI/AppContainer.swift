@@ -72,14 +72,20 @@ extension Container {
     @MainActor
     var homeViewModel: Factory<HomeViewModel> {
         self { @MainActor in
-            HomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
+            HomeViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileManager: self.fileManager()
+            )
         }
     }
 
     @MainActor
     var cryptoHomeViewModel: Factory<CryptoHomeViewModel> {
         self { @MainActor in
-            CryptoHomeViewModel(sharedContainerViewModel: self.sharedContainerViewModel())
+            CryptoHomeViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                fileManager: self.fileManager()
+            )
         }
     }
 

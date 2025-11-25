@@ -72,6 +72,11 @@ public struct FileUtil: FileUtilProtocol {
         let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
         let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
 
+        // The simulator uses different directories than a real iOS device
+        if SystemUtil.isSimulator {
+            return resolvedURL
+        }
+
         let documentsDirectory: URL = Directories.getDocumentsDirectory(fileManager: fileManager) ?? URL(
             fileURLWithPath: "/var/mobile/Containers/Data/Application/"
         )
@@ -263,12 +268,30 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     public func removeSharedFiles(url: URL?) throws {
+        FileUtil.logger.debug("Removing shared files")
+
         let sharedFilesFolder = try url ?? Directories.getSharedFolder(fileManager: fileManager)
 
         let contents = try sharedFilesFolder.folderContents(fileManager: fileManager)
 
         for fileURL in contents {
             try fileManager.removeItem(at: fileURL)
+        }
+
+        FileUtil.logger.debug("Shared files removed")
+    }
+
+    public func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
+        FileUtil.logger.debug("Removing saved files directory")
+        do {
+            let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
+                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                fileManager: fileManager
+            )
+            try fileManager.removeItem(at: directory)
+            FileUtil.logger.debug("Saved Files directory removed")
+        } catch {
+            FileUtil.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
         }
     }
 }

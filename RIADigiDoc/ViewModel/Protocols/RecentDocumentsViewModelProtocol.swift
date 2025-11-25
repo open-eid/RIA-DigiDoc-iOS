@@ -25,6 +25,6 @@ import CommonsLib
 @MainActor
 public protocol RecentDocumentsViewModelProtocol: Sendable {
     func setChosenFiles(_ chosenFiles: Result<[URL], Error>)
-    func loadFiles()
-    func deleteFile(at index: Int)
+    func loadFiles(from folderURL: URL, withExtensions extensions: [String])
+    func deleteFile(_ file: FileItem)
 }

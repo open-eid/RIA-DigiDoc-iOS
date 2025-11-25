@@ -24,4 +24,5 @@ import Foundation
 public protocol CryptoHomeViewModelProtocol: Sendable {
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool
     func setChosenFiles(_ chosenFiles: Result<[URL], Error>)
+    func getRecentDocumentsFolder() -> URL?
 }

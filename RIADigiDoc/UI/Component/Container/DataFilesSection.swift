@@ -18,6 +18,7 @@
  */
 
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 
 struct DataFilesSection: View {
@@ -109,4 +110,18 @@ struct DataFilesSection: View {
             await viewModel.handleFileOpening(dataFile: dataFile, isSivaConfirmed: confirmed)
         }
     }
+}
+
+#Preview {
+    DataFilesSection(
+        viewModel: Container.shared.signingViewModel(),
+        isContainerSigned: false,
+        isNestedContainer: false,
+        selectedDataFile: .constant(nil),
+        showSivaMessage: .constant(false),
+        isFileSaved: .constant(false),
+        showRemoveDataFileModal: .constant(false)
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }

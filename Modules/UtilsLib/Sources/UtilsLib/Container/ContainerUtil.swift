@@ -57,14 +57,9 @@ public struct ContainerUtil: ContainerUtilProtocol {
     }
 
     public func getSignatureContainersDir() throws -> URL {
-        let cachesDirectory = try fileManager.url(
-            for: .cachesDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: false)
-        let signedContainersDirectory = cachesDirectory.appendingPathComponent(
-            Constants.Container.SignedContainerFolder,
-            isDirectory: true
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolder: Constants.Container.SignedContainerFolder,
+            fileManager: fileManager
         )
 
         do {
@@ -83,7 +78,7 @@ public struct ContainerUtil: ContainerUtilProtocol {
         containerFile: URL?
     ) throws -> URL {
         let signatureDir = try getSignatureContainersDir()
-        let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first
+        let cacheDir = try Directories.getCacheDirectory(fileManager: fileManager)
 
         if containerFile?.deletingLastPathComponent() == signatureDir {
             return createDataFileDirectory(

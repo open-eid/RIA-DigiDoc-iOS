@@ -21,6 +21,8 @@ import Foundation
 import FactoryKit
 import OSLog
 import LibdigidocLibSwift
+import CommonsLib
+import UtilsLib
 
 @MainActor
 class HomeViewModel: HomeViewModelProtocol, ObservableObject {
@@ -33,11 +35,14 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     )
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    private let fileManager: FileManagerProtocol
 
     init(
-        sharedContainerViewModel: SharedContainerViewModelProtocol
+        sharedContainerViewModel: SharedContainerViewModelProtocol,
+        fileManager: FileManagerProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
+        self.fileManager = fileManager
     }
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
@@ -51,5 +56,15 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
 
     func setChosenFiles(_ chosenFiles: Result<[URL], Error>) {
         sharedContainerViewModel.setFileOpeningResult(fileOpeningResult: chosenFiles)
+    }
+
+    func getRecentDocumentsFolder() -> URL? {
+        do {
+            return try Directories.getCacheDirectory(fileManager: fileManager)
+                .appendingPathComponent(Constants.Container.SignedContainerFolder)
+        } catch {
+            HomeViewModel.logger.error("Unable to get signed containers recent documents folder: \(error)")
+            return nil
+        }
     }
 }

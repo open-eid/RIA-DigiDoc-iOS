@@ -20,6 +20,7 @@
 import SwiftUI
 import FactoryKit
 import UtilsLib
+import CommonsLib
 
 struct RecentDocumentsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -30,17 +31,26 @@ struct RecentDocumentsView: View {
 
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
-    @State private var selectedFileIndex: Int = -1
+    @State private var selectedFile: FileItem?
     @State private var showRemoveContainerModal = false
 
     @StateObject private var viewModel: RecentDocumentsViewModel
 
-    init() {
+    let folderURL: URL?
+    let extensions: [String]
+
+    init(folderURL: URL?, extensions: [String]) {
         _viewModel = StateObject(wrappedValue: Container.shared.recentDocumentsViewModel())
+        self.folderURL = folderURL
+        self.extensions = extensions
+    }
+
+    var filteredFiles: [FileItem] {
+        viewModel.filteredFiles(using: extensions)
     }
 
     var noDocuments: Bool {
-        viewModel.filteredFiles.isEmpty
+        filteredFiles.isEmpty
     }
 
     var noSearchResults: Bool {
@@ -76,7 +86,11 @@ struct RecentDocumentsView: View {
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled(true)
                                 .onChange(of: viewModel.searchText) { _ in
-                                    viewModel.loadFiles()
+                                    guard let recentDocumentsFolder = folderURL else { return }
+                                    viewModel.loadFiles(
+                                        from: recentDocumentsFolder,
+                                        withExtensions: extensions
+                                    )
                                 }
 
                                 if !viewModel.searchText.isEmpty {
@@ -118,12 +132,12 @@ struct RecentDocumentsView: View {
                                 } else {
                                     List {
                                         if #available(iOS 26.0, *) {
-                                            ForEach(viewModel.filteredFiles.enumerated(), id: \.offset
+                                            ForEach(filteredFiles.enumerated(), id: \.offset
                                             ) { index, item in
                                                 fileRow(index: index, item: item)
                                             }
                                         } else {
-                                            ForEach(Array(viewModel.filteredFiles.enumerated()), id: \.offset
+                                            ForEach(Array(filteredFiles.enumerated()), id: \.offset
                                             ) { index, item in
                                                 fileRow(index: index, item: item)
                                             }
@@ -158,19 +172,37 @@ struct RecentDocumentsView: View {
                             title: "\(languageSettings.localized("Remove container"))?",
                             message: languageSettings.localized("Remove container message"),
                             onConfirm: {
-                                if selectedFileIndex != -1 {
-                                    viewModel.deleteFile(at: selectedFileIndex)
-                                    viewModel.loadFiles()
-                                    showRemoveContainerModal = false
+                                guard let file = selectedFile else {
+                                    Toast.show(languageSettings.localized("Failed to remove file"))
+                                    return
                                 }
-                            }, onCancel: {
+
+                                viewModel.deleteFile(file)
+                                selectedFile = nil
+                                showRemoveContainerModal = false
+                                guard let recentDocumentsFolder = folderURL else { return }
+                                viewModel.loadFiles(
+                                    from: recentDocumentsFolder,
+                                    withExtensions: extensions
+                                )
+                            },
+                            onCancel: {
+                                selectedFile = nil
                                 showRemoveContainerModal = false
                             }
                         )
                     }
                 }
                 .onAppear {
-                    viewModel.loadFiles()
+                    guard let recentDocumentsFolder = folderURL else { return }
+                    viewModel.loadFiles(
+                        from: recentDocumentsFolder,
+                        withExtensions: extensions
+                    )
+                }
+                .onReceive(viewModel.$errorMessage) { error in
+                    guard !error.isEmpty else { return }
+                    Toast.show(languageSettings.localized(error))
                 }
             }
         )
@@ -186,7 +218,7 @@ struct RecentDocumentsView: View {
                 isFileOpeningLoading = true
             },
             onRemoveContainer: {
-                selectedFileIndex = index
+                selectedFile = item
                 showRemoveContainerModal = true
             }
         )
@@ -198,7 +230,10 @@ struct RecentDocumentsView: View {
 }
 
 #Preview {
-    RecentDocumentsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+    RecentDocumentsView(
+        folderURL: URL(fileURLWithPath: "/recentDocumentsFolder/"),
+        extensions: Constants.Container.ContainerExtensions
+    )
+    .environmentObject(Container.shared.languageSettings())
+    .environmentObject(Container.shared.themeSettings())
 }
