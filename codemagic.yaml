@@ -28,7 +28,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: 26
+      xcode: latest
     inputs:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
@@ -55,10 +55,6 @@ workflows:
         description: TSL member lists
         type: string
         default: "EE;EE_T"
-      buildParameters_input:
-        description: Build parameters
-        type: string
-        default: "-DDEBUG"
       enableTests_input:
         description: Run tests?
         type: boolean
@@ -70,7 +66,6 @@ workflows:
           echo Default Central Configuration Update Interval: ${{ inputs.defaultCentralConfigurationUpdateInterval_input }}
           echo Default Central Configuration TSL URL: ${{ inputs.defaultCentralConfigurationTslUrl_input }}
           echo "TSL member lists: ${{ inputs.memberTsl_input }}"
-          echo Build parameters: ${{ inputs.buildParameters_input }}
           echo Run tests?: ${{ inputs.enableTests_input }}
       - name: Setup dependencies
         script: |
@@ -86,7 +81,7 @@ workflows:
           mkdir -p $TSL_FILES_DIRECTORY
 
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib; do
+          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib MobileIdLib SmartIdLib; do
             mock_dir="Modules/${module}/Tests/Mocks/Generated"
             mkdir -p "$mock_dir"
             echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
@@ -165,23 +160,20 @@ workflows:
           echo "LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER" >> $CM_ENV
           agvtool new-version -all "$LATEST_BUILD_NUMBER"
       - name: Build RIA DigiDoc
-        script: |
-          export OTHER_BUILD_FLAGS="OTHER_SWIFT_FLAGS=${{ inputs.buildParameters_input }}"
-          
+        script: |          
           # Skip fetching configuration for repo.ria as necessary files are already setup
           REPO_RIA_CONF_FLAGS=""
           if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
             REPO_RIA_CONF_FLAGS="DEFAULT_CENTRAL_CONFIGURATION_URL='' DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=4 DEFAULT_CENTRAL_CONFIGURATION_TSL_URL=''"
           fi
           
-          ARCHIVE_FLAGS="$OTHER_BUILD_FLAGS $REPO_RIA_CONF_FLAGS"
+          ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS"
 
           xcode-project build-ipa \
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
             --scheme "$XCODE_SCHEME" \
-            --archive-xcargs "$ARCHIVE_FLAGS" \
-            --export-xcargs "$OTHER_BUILD_FLAGS"
+            --archive-xcargs "$ARCHIVE_FLAGS"
       - name: Rename and move IPA
         script: |
           mv -v build/ios/ipa/RIADigiDoc.ipa build/ios/ipa/"RIA_DigiDoc_dev_$APP_VERSION.$LATEST_BUILD_NUMBER.ipa"
@@ -233,7 +225,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: 26
+      xcode: latest
     scripts:
       - name: Setup dependencies
         script: |
