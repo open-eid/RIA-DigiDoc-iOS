@@ -21,22 +21,30 @@ import SwiftUI
 
 struct TopBarContainer<Content: View>: View {
     @AppTheme private var theme
+
+    @Environment(\.openURL) var openURL
+    @EnvironmentObject private var languageSettings: LanguageSettings
+
     var title: String?
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
     var leftIconAccessibility: String = "Back"
+    var leftIconAccessibilityInput: String?
     var onLeftClick: () -> Void = {}
 
     var rightPrimaryIcon: String = "ic_m3_help_48pt_wght400"
-    var rightPrimaryIconAccessibility: String = "Help"
-    var onRightPrimaryClick: (() -> Void)? = {}
+    var rightPrimaryIconAccessibility: String = "link www.id.ee"
+    var rightPrimaryIconAccessibilityInput: String = "Helpdesk"
+    var onRightPrimaryClick: (() -> Void)?
 
     var rightSecondaryIcon: String = "ic_m3_settings_48pt_wght400"
     var rightSecondaryIconAccessibility: String = "Settings"
-    var onRightSecondaryClick: () -> Void = {}
+    var rightSecondaryIconAccessibilityInput: String?
+    var onRightSecondaryClick: (() -> Void)?
 
     var extraButtonIcon: String = "ic_m3_notifications_48pt_wght400"
     var extraButtonIconAccessibility: String = "Container notifications"
+    var extraButtonIconAccessibilityInput: String?
     var showExtraButton: Bool = false
     var extraBadgeCount: Int = 0
     var onExtraButtonClick: () -> Void = {}
@@ -61,20 +69,28 @@ struct TopBarContainer<Content: View>: View {
                 title: title,
                 leftIcon: leftIcon,
                 leftIconAccessibility: leftIconAccessibility,
+                leftIconAccessibilityInput: leftIconAccessibilityInput,
                 onLeftClick: onLeftClick,
 
                 rightPrimaryIcon: rightPrimaryIcon,
                 rightPrimaryIconAccessibility: rightPrimaryIconAccessibility,
-                onRightPrimaryClick: onRightPrimaryClick,
+                rightPrimaryIconAccessibilityInput: rightPrimaryIconAccessibilityInput,
+                onRightPrimaryClick: onRightPrimaryClick ?? {
+                    if let url = URL(string: languageSettings.localized("Main home menu help url")) {
+                        openURL(url)
+                    }
+                },
 
                 rightSecondaryIcon: rightSecondaryIcon,
                 rightSecondaryIconAccessibility: rightSecondaryIconAccessibility,
-                onRightSecondaryClick: {
+                rightSecondaryIconAccessibilityInput: rightSecondaryIconAccessibilityInput,
+                onRightSecondaryClick: onRightSecondaryClick ?? {
                     showSettingsSheet = true
                 },
 
                 extraButtonIcon: extraButtonIcon,
                 extraButtonIconAccessibility: extraButtonIconAccessibility,
+                extraButtonIconAccessibilityInput: extraButtonIconAccessibilityInput,
                 showExtraButton: showExtraButton,
                 extraBadgeCount: extraBadgeCount,
                 onExtraButtonClick: onExtraButtonClick,
@@ -128,23 +144,34 @@ struct TopBar: View {
 
     var leftIcon: String
     var leftIconAccessibility: String
+    var leftIconAccessibilityInput: String?
     var onLeftClick: () -> Void = {}
 
     var rightPrimaryIcon: String
     var rightPrimaryIconAccessibility: String
+    var rightPrimaryIconAccessibilityInput: String?
     var onRightPrimaryClick: (() -> Void)?
 
     var rightSecondaryIcon: String
     var rightSecondaryIconAccessibility: String
+    var rightSecondaryIconAccessibilityInput: String?
     var onRightSecondaryClick: () -> Void = {}
 
     var extraButtonIcon: String
     var extraButtonIconAccessibility: String
+    var extraButtonIconAccessibilityInput: String?
     var showExtraButton: Bool = false
     var extraBadgeCount: Int = 0
     var onExtraButtonClick: () -> Void = {}
 
     var showRightIcons: Bool = true
+
+    private func getInputLabels(_ input: String?, _ label: String) -> [String] {
+        if let input {
+            return [input, label]
+        }
+        return [label]
+    }
 
     var body: some View {
         HStack {
@@ -156,6 +183,7 @@ struct TopBar: View {
                     .foregroundStyle(theme.onBackground)
             }
             .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
+            .accessibilityInputLabels(getInputLabels(leftIconAccessibilityInput, leftIconAccessibility))
 
             if let title = title {
                 Text(title)
@@ -193,6 +221,8 @@ struct TopBar: View {
                             }
                         }
                         .accessibilityLabel(languageSettings.localized(extraButtonIconAccessibility))
+                        .accessibilityInputLabels(getInputLabels(extraButtonIconAccessibilityInput,
+                                                                 extraButtonIconAccessibility))
                     }
 
                     if let onRightPrimaryClick = onRightPrimaryClick {
@@ -204,6 +234,8 @@ struct TopBar: View {
                                 .foregroundStyle(theme.onBackground)
                         }
                         .accessibilityLabel(languageSettings.localized(rightPrimaryIconAccessibility))
+                        .accessibilityInputLabels(getInputLabels(rightPrimaryIconAccessibilityInput,
+                                                                 rightPrimaryIconAccessibility))
                     }
 
                     Button(action: onRightSecondaryClick) {
@@ -214,6 +246,8 @@ struct TopBar: View {
                             .foregroundStyle(theme.onBackground)
                     }
                     .accessibilityLabel(languageSettings.localized(rightSecondaryIconAccessibility))
+                    .accessibilityInputLabels(getInputLabels(rightSecondaryIconAccessibilityInput,
+                                                             rightSecondaryIconAccessibility))
                 }
             }
         }
