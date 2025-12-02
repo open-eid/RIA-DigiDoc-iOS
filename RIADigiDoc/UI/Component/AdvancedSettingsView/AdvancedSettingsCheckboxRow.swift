@@ -24,7 +24,7 @@ struct AdvancedSettingsCheckboxRow: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var label: String
     @Binding var isChecked: Bool
@@ -68,14 +68,13 @@ struct AdvancedSettingsCheckboxRow: View {
         label: "Row title",
         isChecked: .constant(true)
     )
-    .environmentObject(Container.shared.themeSettings())
-    .environmentObject(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
 
     AdvancedSettingsCheckboxRow(
         label: "Row title",
         isChecked: .constant(false)
     )
-    .environmentObject(Container.shared.themeSettings())
-    .environmentObject(Container.shared.languageSettings())
-
+    .environment(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
 }

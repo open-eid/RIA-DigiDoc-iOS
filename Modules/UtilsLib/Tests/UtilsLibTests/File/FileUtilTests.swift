@@ -63,7 +63,7 @@ struct FileUtilTests {
         defer {
             try? FileManager.default.removeItem(at: zipFileURL)
             try? FileManager.default.removeItem(
-                at: mockFileManager.temporaryDirectory.appendingPathComponent("com.apple.dt.xctest.tool")
+                at: mockFileManager.temporaryDirectory.appending(path: "com.apple.dt.xctest.tool")
             )
         }
 
@@ -210,13 +210,13 @@ struct FileUtilTests {
     func removeSharedFiles_success() async throws {
         let sharedFolderURL = URL(fileURLWithPath: "/mock/shared")
         let files = [
-            sharedFolderURL.appendingPathComponent("file1.txt"),
-            sharedFolderURL.appendingPathComponent("file2.txt")
+            sharedFolderURL.appending(path: "file1.txt"),
+            sharedFolderURL.appending(path: "file2.txt")
         ]
 
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in files }
         mockFileManager.fileExistsAtPathHandler = { path, isDirectoryPtr in
-            if path == sharedFolderURL.path {
+            if path == sharedFolderURL.resolvedPath {
                 isDirectoryPtr?.pointee = ObjCBool(true)
                 return true
             }
@@ -232,13 +232,13 @@ struct FileUtilTests {
     func removeSharedFiles_throwErrorWhenUnableToRemoveItem() async throws {
         let sharedFolderURL = URL(fileURLWithPath: "/mock/shared")
         let files = [
-            sharedFolderURL.appendingPathComponent("file1.txt"),
-            sharedFolderURL.appendingPathComponent("file2.txt")
+            sharedFolderURL.appending(path: "file1.txt"),
+            sharedFolderURL.appending(path: "file2.txt")
         ]
 
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in files }
         mockFileManager.fileExistsAtPathHandler = { path, isDirectoryPtr in
-            if path == sharedFolderURL.path {
+            if path == sharedFolderURL.resolvedPath {
                 isDirectoryPtr?.pointee = ObjCBool(true)
                 return true
             }
@@ -272,7 +272,7 @@ struct FileUtilTests {
     @Test
     func fileExists_returnTrueIfFileExists() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let testFile = testDirectory.appendingPathComponent("testFile.asice")
+        let testFile = testDirectory.appending(path: "testFile.asice")
 
         mockFileManager.fileExistsHandler = { _ in true }
 
@@ -283,7 +283,7 @@ struct FileUtilTests {
     @Test
     func fileExists_returnFalseIfFileDoesNotExist() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let nonExistentFile = testDirectory.appendingPathComponent("nonExistent.asice")
+        let nonExistentFile = testDirectory.appending(path: "nonExistent.asice")
 
         mockFileManager.fileExistsHandler = { _ in false }
 
@@ -300,13 +300,13 @@ struct FileUtilTests {
     @Test
     func removeSavedFilesDirectory_successWhenDirectoryExists() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let savedFilesDirectory = testDirectory.appendingPathComponent(Constants.Folder.SavedFiles)
+        let savedFilesDirectory = testDirectory.appending(path: Constants.Folder.SavedFiles)
 
         mockFileManager.fileExistsHandler = { path in
-            return path == savedFilesDirectory.path
+            return path == savedFilesDirectory.resolvedPath
         }
 
-        #expect(mockFileManager.fileExists(atPath: savedFilesDirectory.path))
+        #expect(mockFileManager.fileExists(atPath: savedFilesDirectory.resolvedPath))
 
         fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
 
@@ -316,12 +316,12 @@ struct FileUtilTests {
     @Test
     func removeSavedFilesDirectory_doesNotThrowErrorWhenRemovingDirectoryAndItDoesntExist() async {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistentDir")
+        let nonExistentDirectory = testDirectory.appending(path: "NonExistentDir")
 
         #expect(throws: Never.self) {
             self.fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
         }
 
-        #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.path))
+        #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.resolvedPath))
     }
 }

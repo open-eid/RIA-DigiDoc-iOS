@@ -137,7 +137,7 @@ struct DataFilesViewModelTests {
 
         viewModel.removeSavedFilesDirectory(savedFilesDirectory: directoryURL)
 
-        #expect(!mockFileManager.fileExists(atPath: directoryURL.path))
+        #expect(!mockFileManager.fileExists(atPath: directoryURL.resolvedPath))
         #expect(mockFileManager.removeItemCallCount == 1)
     }
 
@@ -149,6 +149,6 @@ struct DataFilesViewModelTests {
 
         viewModel.removeSavedFilesDirectory(savedFilesDirectory: nonExistingDirectoryURL)
 
-        #expect(!mockFileManager.fileExists(atPath: nonExistingDirectoryURL.path))
+        #expect(!mockFileManager.fileExists(atPath: nonExistingDirectoryURL.resolvedPath))
     }
 }

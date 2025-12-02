@@ -49,8 +49,8 @@ struct FileOpeningServiceTests {
 
     @Test
     func isFileSizeValid_success() async throws {
-        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
-        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let tempFileURL = tempURL.appending(path: "test.txt")
 
         mockFileInspector.fileSizeHandler = { _ in 100 }
 
@@ -61,8 +61,8 @@ struct FileOpeningServiceTests {
 
     @Test
     func isFileSizeValid_throwInvalidFileSizeErrorWhenFileSizeIsZero() async throws {
-        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
-        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let tempFileURL = tempURL.appending(path: "test.txt")
 
         mockFileInspector.fileSizeHandler = { _ in
             throw FileOpeningError.invalidFileSize
@@ -87,9 +87,9 @@ struct FileOpeningServiceTests {
 
     @Test
     func getValidFiles_success() async throws {
-        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
-        let tempFileURL = tempURL.appendingPathComponent("test.txt")
-        let tempFileURL2 = tempURL.appendingPathComponent("test2.txt")
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let tempFileURL = tempURL.appending(path: "test.txt")
+        let tempFileURL2 = tempURL.appending(path: "test2.txt")
 
         let urls = [tempFileURL, tempFileURL2]
 
@@ -108,8 +108,8 @@ struct FileOpeningServiceTests {
 
     @Test
     func getValidFiles_successWithDuplicateFiles() async throws {
-        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appendingPathComponent("tmp").path)
-        let tempFileURL = tempURL.appendingPathComponent("test.txt")
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let tempFileURL = tempURL.appending(path: "test.txt")
 
         let urls = [tempFileURL, tempFileURL]
 

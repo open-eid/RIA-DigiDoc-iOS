@@ -25,7 +25,7 @@ struct InfoHeaderHelpButton: View {
     @AppTypography private var typography
 
     @Environment(\.openURL) var openURL
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     private var helpLabel: String {
         languageSettings.localized("Main about help center")
@@ -65,6 +65,6 @@ struct InfoHeaderHelpButton: View {
 // MARK: - Preview
 #Preview {
     InfoHeaderHelpButton()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

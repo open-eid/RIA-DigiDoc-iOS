@@ -26,12 +26,14 @@ import CommonsLib
 
 @main
 struct RIADigiDocApp: App {
-    @StateObject private var languageSettings: LanguageSettings
-    @StateObject private var themeSettings: ThemeSettings
+    @State private var languageSettings: LanguageSettings
+    @State private var themeSettings: ThemeSettings
 
     @State private var isSetupComplete = false
     @State private var isJailbroken: Bool = false
     @State private var isInitialLanguageSelected: Bool = false
+
+    @State private var pathManager = NavigationPathManager()
 
     private let configurationProperty: ConfigurationProperty
     private let configurationLoader: ConfigurationLoaderProtocol
@@ -41,8 +43,8 @@ struct RIADigiDocApp: App {
     private let librarySetup: LibrarySetup
 
     init() {
-        _languageSettings = StateObject(wrappedValue: Container.shared.languageSettings())
-        _themeSettings = StateObject(wrappedValue: Container.shared.themeSettings())
+        _languageSettings = State(wrappedValue: Container.shared.languageSettings())
+        _themeSettings = State(wrappedValue: Container.shared.themeSettings())
 
         self.configurationProperty = Container.shared.configurationProperty()
         self.configurationLoader = Container.shared.configurationLoader()
@@ -77,29 +79,35 @@ struct RIADigiDocApp: App {
             if isJailbroken {
                 JailbreakView()
                     .environment(\.typography, Typography.current())
-                    .environmentObject(themeSettings)
+                    .environment(themeSettings)
                     .preferredColorScheme(currentTheme.colorScheme)
             } else if isSetupComplete {
-                NavigationView {
+                NavigationStack(path: $pathManager.path) {
                     if isInitialLanguageSelected {
                         ContentView()
+                            .environment(pathManager)
+                            .appNavigation(pathManager: pathManager)
                     } else {
                         InitView()
+                            .environment(pathManager)
+                            .appNavigation(pathManager: pathManager)
                     }
                 }
-                .navigationViewStyle(StackNavigationViewStyle())
                 .environment(\.typography, Typography.current())
-                .environmentObject(languageSettings)
-                .environmentObject(themeSettings)
+                .environment(languageSettings)
+                .environment(themeSettings)
                 .overlay(
-                    ToastOverlay()
-                        .environmentObject(themeSettings)
+                    alignment: .center,
+                    content: {
+                        ToastOverlay()
+                            .environment(themeSettings)
+                    }
                 )
                 .preferredColorScheme(currentTheme.colorScheme)
             } else {
                 LaunchScreenView()
                     .onAppear { onLaunchScreenViewAppear() }
-                    .environmentObject(themeSettings)
+                    .environment(themeSettings)
                     .preferredColorScheme(.light)
             }
         }

@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct ControlCodeView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -63,6 +63,6 @@ struct ControlCodeView: View {
         icon: "mobile_id_logo",
         controlCode: .constant("1234")
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

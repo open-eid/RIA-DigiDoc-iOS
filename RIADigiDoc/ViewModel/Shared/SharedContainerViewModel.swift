@@ -22,13 +22,15 @@ import CommonsLib
 import CryptoSwift
 import LibdigidocLibSwift
 
+@Observable
 @MainActor
-class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObject {
+class SharedContainerViewModel: SharedContainerViewModelProtocol {
     private var signedContainer: SignedContainerProtocol?
     private var cryptoContainer: CryptoContainerProtocol?
     private var fileOpeningResult: Result<[URL], Error>?
     private var addedFilesCount: Int = 0
     private var nestedContainers: [GeneralContainer] = []
+    private var isSignatureAdded: Bool = false
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
@@ -83,5 +85,13 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol, ObservableObje
 
     func containers() -> [GeneralContainer] {
         return nestedContainers
+    }
+
+    func setIsSignatureAdded(_ isAdded: Bool) {
+        isSignatureAdded = isAdded
+    }
+
+    func getIsSignatureAdded() -> Bool {
+        isSignatureAdded
     }
 }

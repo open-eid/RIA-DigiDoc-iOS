@@ -22,7 +22,7 @@ import SwiftUI
 struct SaveButton: View {
     @AppTheme private var theme
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var action: () -> Void
 

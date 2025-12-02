@@ -22,8 +22,9 @@ import Security
 import CoreNFC
 import IdCardLib
 
+@Observable
 @MainActor
-class SharedNFCViewModel: SharedNFCViewModelProtocol, ObservableObject {
+class SharedNFCViewModel: SharedNFCViewModelProtocol {
     public func isNFCSupported() -> Bool {
         NFCTagReaderSession.readingAvailable
     }

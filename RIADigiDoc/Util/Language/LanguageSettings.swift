@@ -19,9 +19,10 @@
 
 import Foundation
 
+@Observable
 @MainActor
-public final class LanguageSettings: LanguageSettingsProtocol, ObservableObject {
-    @Published private(set) var selectedLanguage: String = DefaultValues.language
+public final class LanguageSettings: LanguageSettingsProtocol {
+    private(set) var selectedLanguage: String = DefaultValues.language
     private let dataStore: DataStoreProtocol
 
     public init(

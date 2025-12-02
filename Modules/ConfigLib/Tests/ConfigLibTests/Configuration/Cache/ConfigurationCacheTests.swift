@@ -48,12 +48,12 @@ struct ConfigurationCacheTests {
     @Test
     func cacheConfigurationFiles_successWithValidData() async throws {
         let configurationCache = ConfigurationCache(fileManager: Container.shared.fileManager())
-        let configDir = FileManager.default.temporaryDirectory.appendingPathComponent(
+        let configDir = FileManager.default.temporaryDirectory.appending(path:
             "ConfigurationCacheTests-\(UUID().uuidString)"
         )
-        let confFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let pubFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let sigFile = configDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let pubFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let sigFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try await configurationCache.cacheConfigurationFiles(
             confData: validConfData,

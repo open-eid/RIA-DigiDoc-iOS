@@ -22,11 +22,11 @@ import Foundation
 public class TextUtil {
 
     public static func removeSlashes(_ text: String) -> String {
-        return text.replacingOccurrences(of: "\\", with: "")
+        return text.replacing("\\", with: "")
     }
 
     public static func formatSerialNumber(_ serialNumber: String) -> String {
-        let noColons = serialNumber.replacingOccurrences(of: ":", with: " ")
+        let noColons = serialNumber.replacing(":", with: " ")
         return noColons.uppercased()
     }
 }

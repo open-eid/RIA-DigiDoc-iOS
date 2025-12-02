@@ -39,41 +39,9 @@ struct SignerDetailView: View {
     let signatureDataItem: SignatureDataItem
 
     var body: some View {
-        if #available(iOS 16.0, *) {
-            VStack {
-                Grid(horizontalSpacing: Dimensions.Padding.XXSPadding, verticalSpacing: Dimensions.Padding.XXSPadding) {
-
-                    GridRow {
-                        VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
-                            Text(verbatim: signatureDataItem.title)
-                                .font(typography.labelSmall)
-                                .foregroundStyle(theme.onSurfaceVariant)
-                            Text(verbatim: signatureDataItem.value)
-                                .foregroundStyle(theme.onSurface)
-                                .font(typography.bodyLarge)
-                        }
-
-                        Spacer()
-
-                        if let extraIcon = signatureDataItem.extraIcon {
-                            Image(extraIcon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                                .foregroundStyle(theme.onBackground)
-                                .accessibilityHidden(true)
-                        }
-                    }
-                }
-                .contentShape(Rectangle())
-                .padding(.vertical, Dimensions.Padding.XSPadding)
-                .accessibilityElement(children: .combine)
-
-                Divider()
-            }
-        } else {
-            VStack {
-                HStack {
+        VStack {
+            Grid(horizontalSpacing: Dimensions.Padding.XXSPadding, verticalSpacing: Dimensions.Padding.XXSPadding) {
+                GridRow {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
                         Text(verbatim: signatureDataItem.title)
                             .font(typography.labelSmall)
@@ -94,8 +62,10 @@ struct SignerDetailView: View {
                             .accessibilityHidden(true)
                     }
                 }
-                .padding(.vertical, Dimensions.Padding.XSPadding)
             }
+            .contentShape(Rectangle())
+            .padding(.vertical, Dimensions.Padding.XSPadding)
+            .accessibilityElement(children: .combine)
 
             Divider()
         }
@@ -111,5 +81,5 @@ struct SignerDetailView: View {
                 extraIcon: "ic_m3_arrow_right_48pt_wght400"
             )
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

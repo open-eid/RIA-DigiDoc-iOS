@@ -335,7 +335,7 @@ struct ContainerWrapperTests {
             subfolder: "ContainerWrapperTests"
         )
 
-        let localExampleContainer = tempDirectory.appendingPathComponent(
+        let localExampleContainer = tempDirectory.appending(path:
             "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
         )
 
@@ -394,7 +394,7 @@ struct ContainerWrapperTests {
             subfolder: "ContainerWrapperTests"
         )
 
-        let localExampleContainer = tempDirectory.appendingPathComponent(
+        let localExampleContainer = tempDirectory.appending(path:
             "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
         )
 

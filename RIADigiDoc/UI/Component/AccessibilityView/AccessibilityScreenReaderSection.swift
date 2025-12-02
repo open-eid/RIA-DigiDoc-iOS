@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct AccessibilityScreenReaderSection: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack(
@@ -83,6 +83,6 @@ struct AccessibilityScreenReaderSection: View {
 // MARK: - Preview
 #Preview {
     AccessibilityScreenReaderSection()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

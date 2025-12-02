@@ -45,6 +45,19 @@ extension URL {
         URL(fileURLWithPath: (path as NSString).standardizingPath)
     }
 
+    public var resolvedPath: String {
+        let path = isFileURL
+        ? standardizedFileURL.path(percentEncoded: false)
+        : path(percentEncoded: false)
+
+        // Remove trailing slash except for root "/"
+        if path.hasSuffix("/") && path.count > 1 {
+            return String(path.dropLast())
+        }
+
+        return path
+    }
+
     public func mimeType(
         fileUtil: FileUtilProtocol = fileUtil(),
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
@@ -247,7 +260,7 @@ extension URL {
         fileManager: FileManagerProtocol = fileManager()
     ) -> Bool {
         var isDirectory: ObjCBool = false
-        let exists = fileManager.fileExists(atPath: self.path, isDirectory: &isDirectory)
+        let exists = fileManager.fileExists(atPath: self.resolvedPath, isDirectory: &isDirectory)
         return exists && isDirectory.boolValue
     }
 
@@ -293,7 +306,7 @@ extension URL {
 
     // Check if file is zip format
     private func isZipFile() throws -> Bool {
-        guard let fileHandle = FileHandle(forReadingAtPath: self.path) else { return false }
+        guard let fileHandle = FileHandle(forReadingAtPath: self.resolvedPath) else { return false }
         let fileData = fileHandle.readData(ofLength: 4)
         let isZip = fileData.starts(with: [0x50, 0x4b, 0x03, 0x04])
         try fileHandle.close()

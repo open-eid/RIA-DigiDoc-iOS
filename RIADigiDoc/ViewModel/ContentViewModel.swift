@@ -23,8 +23,9 @@ import FactoryKit
 import UtilsLib
 import CommonsLib
 
+@Observable
 @MainActor
-class ContentViewModel: ContentViewModelProtocol, ObservableObject {
+class ContentViewModel: ContentViewModelProtocol {
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ContentViewModel")
 

@@ -34,6 +34,6 @@ struct InfoHeader: View {
 // MARK: - Preview
 #Preview {
     InfoHeader()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

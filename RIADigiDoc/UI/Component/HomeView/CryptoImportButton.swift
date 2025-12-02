@@ -28,7 +28,28 @@ struct CryptoImportButton: View {
     @Binding var showBottomSheet: Bool
 
     @Binding var isImporting: Bool
-    @ObservedObject var viewModel: CryptoHomeViewModel
+
+    @State private var viewModel: CryptoHomeViewModel
+
+    init(
+        title: String,
+        description: String,
+        assetImageName: String,
+        isFileOpeningLoading: Binding<Bool>,
+        isNavigatingToNextView: Binding<Bool>,
+        showBottomSheet: Binding<Bool>,
+        isImporting: Binding<Bool>,
+        viewModel: CryptoHomeViewModel
+    ) {
+        self.title = title
+        self.description = description
+        self.assetImageName = assetImageName
+        self._isFileOpeningLoading = isFileOpeningLoading
+        self._isNavigatingToNextView = isNavigatingToNextView
+        self._showBottomSheet = showBottomSheet
+        self._isImporting = isImporting
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         ActionButton(

@@ -21,8 +21,9 @@ import Foundation
 import OSLog
 import CommonsLib
 
+@Observable
 @MainActor
-class RoleViewModel: RoleViewModelProtocol, ObservableObject {
+class RoleViewModel: RoleViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RoleViewModel")
 
     private let dataStore: DataStoreProtocol

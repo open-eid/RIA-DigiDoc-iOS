@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 # ====== Configurable parameters ======
 : ${OPENLDAP:=openldap-2.6.10}
-: ${IPHONEOS_DEPLOYMENT_TARGET:="15.0"}
+: ${IPHONEOS_DEPLOYMENT_TARGET:="17.0"}
 : ${PLATFORM_NAME:="iphonesimulator"}
 
 # Final merged output

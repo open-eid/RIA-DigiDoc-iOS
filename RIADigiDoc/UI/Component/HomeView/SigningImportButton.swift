@@ -18,6 +18,7 @@
  */
 
 import SwiftUI
+import FactoryKit
 
 struct SigningImportButton: View {
     let title: String
@@ -28,7 +29,28 @@ struct SigningImportButton: View {
     @Binding var showBottomSheet: Bool
 
     @Binding var isImporting: Bool
-    @ObservedObject var viewModel: HomeViewModel
+
+    @State private var viewModel: HomeViewModel
+
+    init(
+        title: String,
+        description: String,
+        assetImageName: String,
+        isFileOpeningLoading: Binding<Bool>,
+        isNavigatingToNextView: Binding<Bool>,
+        showBottomSheet: Binding<Bool>,
+        isImporting: Binding<Bool>,
+        viewModel: HomeViewModel
+    ) {
+        self.title = title
+        self.description = description
+        self.assetImageName = assetImageName
+        self._isFileOpeningLoading = isFileOpeningLoading
+        self._isNavigatingToNextView = isNavigatingToNextView
+        self._showBottomSheet = showBottomSheet
+        self._isImporting = isImporting
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         ActionButton(

@@ -18,11 +18,11 @@
  */
 
 import Foundation
-import Combine
 
+@Observable
 @MainActor
-public final class ThemeSettings: ThemeSettingsProtocol, ObservableObject {
-    @Published private(set) var selectedTheme: Theme = .system
+public final class ThemeSettings: ThemeSettingsProtocol {
+    private(set) var selectedTheme: Theme = .system
     private let dataStore: DataStoreProtocol
 
     public init(

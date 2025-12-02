@@ -24,7 +24,7 @@ struct JailbreakView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack {
@@ -42,6 +42,6 @@ struct JailbreakView: View {
 
 #Preview {
     JailbreakView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

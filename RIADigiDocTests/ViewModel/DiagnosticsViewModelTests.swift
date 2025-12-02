@@ -92,8 +92,8 @@ final class DiagnosticsViewModelTests {
         await viewModel.observeConfigurationUpdates()
 
         mockFileManager.contentsOfDirectoryAtHandler = { url, _, _ in
-            let xmlFile = url.appendingPathComponent("test1.xml")
-            let txtFile = url.appendingPathComponent("test1.txt")
+            let xmlFile = url.appending(path: "test1.xml")
+            let txtFile = url.appending(path: "test1.txt")
             return [xmlFile, txtFile]
         }
 
@@ -130,73 +130,59 @@ final class DiagnosticsViewModelTests {
     }
 
     private func checkVersionSection() async {
-        for try await versionSectionContent in viewModel.$versionSectionContent.values {
-            #expect(!versionSectionContent.isEmpty)
-            break
-        }
+        #expect(!viewModel.versionSectionContent.isEmpty)
     }
 
     private func checkOsSection() async {
-        for try await osSectionContent in viewModel.$osSectionContent.values {
-            #expect(!osSectionContent.content.isEmpty)
-            break
-        }
+        #expect(!viewModel.osSectionContent.content.isEmpty)
     }
 
     private func checkUrlSection() async {
-        for try await urlSectionContent in viewModel.$urlSectionContent.values {
-            #expect(urlSectionContent == [
-                "CONFIG_URL: https://someUrl.abc",
-                "TSL_URL: https://tsl.someUrl.abc",
-                "SIVA_URL: https://siva.someUrl.abc",
-                "TSA_URL: https://tsa.someUrl.abc",
-                "LDAP_PERSON_URL: https://ldap-person.someUrl.abc",
-                "LDAP_CORP_URL: https://ldap-corp.someUrl.abc",
-                "MID_PROXY_URL: https://midrest.someUrl.abc",
-                "MID_SK_URL: https://midskrest.someUrl.abc",
-                "SIDV2_PROXY_URL: https://sidv2.someUrl.abc",
-                "SIDV2_SK_URL: https://sidv2skrest.someUrl.abc",
-                "RPUUID: 00000000-0000-0000-0000-000000000000"
-            ])
-            break
-        }
+        #expect(viewModel.urlSectionContent == [
+            "CONFIG_URL: https://someUrl.abc",
+            "TSL_URL: https://tsl.someUrl.abc",
+            "SIVA_URL: https://siva.someUrl.abc",
+            "TSA_URL: https://tsa.someUrl.abc",
+            "LDAP_PERSON_URL: https://ldap-person.someUrl.abc",
+            "LDAP_CORP_URL: https://ldap-corp.someUrl.abc",
+            "MID_PROXY_URL: https://midrest.someUrl.abc",
+            "MID_SK_URL: https://midskrest.someUrl.abc",
+            "SIDV2_PROXY_URL: https://sidv2.someUrl.abc",
+            "SIDV2_SK_URL: https://sidv2skrest.someUrl.abc",
+            "RPUUID: 00000000-0000-0000-0000-000000000000"
+        ])
     }
 
     private func checkCdoc2Section() async {
-        for try await cdoc2SectionContent in viewModel.$cdoc2SectionContent.values {
-            #expect(cdoc2SectionContent == [
-                "CDOC2-DEFAULT: false",
-                "CDOC2-USE-KEYSERVER: false",
-                "CDOC2-DEFAULT-KEYSERVER: https://cdoc2DefaultKeyserver.someUrl.abc"
-            ])
-            break
-        }
+        #expect(viewModel.cdoc2SectionContent == [
+            "CDOC2-DEFAULT: false",
+            "CDOC2-USE-KEYSERVER: false",
+            "CDOC2-DEFAULT-KEYSERVER: https://cdoc2DefaultKeyserver.someUrl.abc"
+        ])
     }
 
     private func checkTslSection() async {
-        for try await tslSectionContent in viewModel.$tslSectionContent.values {
-            #expect(tslSectionContent == ["test1.xml (45)"])
-            break
-        }
+        #expect(viewModel.tslSectionContent == ["test1.xml (45)"])
     }
 
     private func checkCentralConfigurationSection(hasDate: Bool = true) async {
         let date = !hasDate ? "-" : "02.09.2025 15:22:28"
 
-        for try await centralConfigurationSectionContent in viewModel.$centralConfigurationSectionContent.values {
-            let configurationSectionContent = centralConfigurationSectionContent.map { "\($0.key): \($0.content)" }
-            let expected = [
-                "DATE: 1970-01-01",
-                "SERIAL: 1",
-                "URL: https://someUrl.abc",
-                "VERSION: 1",
-                "Main diagnostics configuration update date: \(date)",
-                "Main diagnostics configuration last check date: \(date)"
-            ]
-
-            #expect(expected == configurationSectionContent)
-            break
+        let centralConfigurationSectionContent = viewModel.centralConfigurationSectionContent
+        let configurationSectionContent = centralConfigurationSectionContent.map {
+            "\($0.key): \($0.content)"
         }
+        let expected = [
+            "DATE: 1970-01-01",
+            "SERIAL: 1",
+            "URL: https://someUrl.abc",
+            "VERSION: 1",
+            "Main diagnostics configuration update date: \(date)",
+            "Main diagnostics configuration last check date: \(date)"
+        ]
+
+        #expect(expected == configurationSectionContent)
+
     }
 
     @Test
@@ -216,10 +202,7 @@ final class DiagnosticsViewModelTests {
             )
         }
 
-        for try await tslSectionContent in viewModel.$tslSectionContent.values {
-            #expect(tslSectionContent == [""])
-            break
-        }
+        #expect(viewModel.tslSectionContent == [""])
     }
 
     @Test
@@ -229,8 +212,8 @@ final class DiagnosticsViewModelTests {
         setupLocalizedHandler(for: mockLanguageSettings)
 
         mockFileManager.contentsOfDirectoryAtHandler = { url, _, _ in
-            let xmlFile = url.appendingPathComponent("test1.xml")
-            let txtFile = url.appendingPathComponent("test1.txt")
+            let xmlFile = url.appending(path: "test1.xml")
+            let txtFile = url.appending(path: "test1.txt")
             return [xmlFile, txtFile]
         }
 
@@ -245,10 +228,7 @@ final class DiagnosticsViewModelTests {
             )
         }
 
-        for try await tslSectionContent in viewModel.$tslSectionContent.values {
-            #expect(tslSectionContent == ["test1.xml"])
-            break
-        }
+        #expect(viewModel.tslSectionContent == ["test1.xml"])
     }
 
     @Test
@@ -302,7 +282,7 @@ final class DiagnosticsViewModelTests {
             languageSettings: mockLanguageSettings,
             directory: tempDirectoryURL
         ) {
-            #expect(!logFileUrl.path.isEmpty)
+            #expect(!logFileUrl.resolvedPath.isEmpty)
         }
     }
 

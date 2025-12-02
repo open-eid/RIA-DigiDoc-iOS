@@ -26,7 +26,7 @@ struct SmartIdView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var country = SmartIdCountry.estonia
     @State private var personalCode = ""
@@ -35,7 +35,7 @@ struct SmartIdView: View {
     @State private var isSigning: Bool = false
     @State private var showRoleView: Bool = false
 
-    @StateObject private var viewModel: SmartIdViewModel
+    @State private var viewModel: SmartIdViewModel
 
     @State private var task: Task<Void, Never>?
 
@@ -46,7 +46,7 @@ struct SmartIdView: View {
         signedContainer: SignedContainerProtocol,
         onSuccess: @escaping (SignedContainerProtocol) -> Void
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.smartIdViewModel())
+        _viewModel = State(wrappedValue: Container.shared.smartIdViewModel())
         self.signedContainer = signedContainer
         self.onSuccess = onSuccess
     }
@@ -76,26 +76,19 @@ struct SmartIdView: View {
             },
             content: {
                 if isSigning {
-                    if #available(iOS 17.0, *) {
-                        ControlCodeView(
-                            icon: "smart_id_logo",
-                            controlCode: $viewModel.controlCode
-                        )
-                        .onChange(of: scenePhase) { _, newPhase in
-                            switch newPhase {
-                            case .background:
-                                viewModel.appDidEnterBackground()
-                            case .active:
-                                viewModel.appDidBecomeActive()
-                            default:
-                                break
-                            }
+                    ControlCodeView(
+                        icon: "smart_id_logo",
+                        controlCode: $viewModel.controlCode
+                    )
+                    .onChange(of: scenePhase) { _, newPhase in
+                        switch newPhase {
+                        case .background:
+                            viewModel.appDidEnterBackground()
+                        case .active:
+                            viewModel.appDidBecomeActive()
+                        default:
+                            break
                         }
-                    } else {
-                        ControlCodeView(
-                            icon: "smart_id_logo",
-                            controlCode: $viewModel.controlCode
-                        )
                     }
                 } else {
                     SmartIdInputView(
@@ -228,6 +221,6 @@ struct SmartIdView: View {
         ),
         onSuccess: { _ in }
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

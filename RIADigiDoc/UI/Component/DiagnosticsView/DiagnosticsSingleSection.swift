@@ -79,6 +79,6 @@ extension DiagnosticsSingleSection {
             content: "Line 1"
         )
     }
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

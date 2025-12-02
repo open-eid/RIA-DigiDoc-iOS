@@ -22,7 +22,7 @@ import LibdigidocLibSwift
 
 struct CryptoDataFilesView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 

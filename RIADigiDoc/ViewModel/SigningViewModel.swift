@@ -24,27 +24,28 @@ import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class SigningViewModel: SigningViewModelProtocol, ObservableObject {
+class SigningViewModel: SigningViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModel")
 
-    @Published var dataFiles: [DataFileWrapper] = []
-    @Published var signatures: [SignatureWrapper] = []
-    @Published var timestamps: [SignatureWrapper] = []
-    @Published var containerName: String = CommonsLib.Constants.Container.DefaultName
-    @Published var containerMimetype: String = "N/A"
-    @Published var containerURL: URL?
-    @Published var previewFile: URL?
-    @Published var selectedDataFile: URL?
-    @Published var isShowingContainerFileSaver = false
-    @Published var isShowingFileSaver = false
-    @Published var showSignatureRemoveButton = false
-    @Published var isTimestampedContainer = false
-    @Published var isCadesContainer = false
-    @Published var isXadesContainer = false
-    @Published var isLastDataFileRemoved = false
-    @Published private(set) var containerNotifications: [ContainerNotificationType] = []
-    @Published private(set) var errorMessage: (String, [String])?
+    var dataFiles: [DataFileWrapper] = []
+    var signatures: [SignatureWrapper] = []
+    var timestamps: [SignatureWrapper] = []
+    var containerName: String = CommonsLib.Constants.Container.DefaultName
+    var containerMimetype: String = "N/A"
+    var containerURL: URL?
+    var previewFile: URL?
+    var selectedDataFile: URL?
+    var isShowingContainerFileSaver = false
+    var isShowingFileSaver = false
+    var showSignatureRemoveButton = false
+    var isTimestampedContainer = false
+    var isCadesContainer = false
+    var isXadesContainer = false
+    var isLastDataFileRemoved = false
+    private(set) var containerNotifications: [ContainerNotificationType] = []
+    private(set) var errorMessage: ErrorMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
@@ -55,7 +56,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
     private let fileInspector: FileInspectorProtocol
     private let sivaRepository: SivaRepositoryProtocol
 
-    @Published private(set) var signedContainer: SignedContainerProtocol?
+    private(set) var signedContainer: SignedContainerProtocol?
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
@@ -79,6 +80,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger.debug("Loading container data")
+        sharedContainerViewModel.setIsSignatureAdded(false)
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
@@ -145,9 +147,9 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 ? CommonsLib.Constants.Container.DefaultName
                 : containerLocation.lastPathComponent.sanitized()
 
-            let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(filename)
+            let tempSavedFileLocation = savedFilesDirectory.appending(path: filename)
 
-            if fileManager.fileExists(atPath: tempSavedFileLocation.path) {
+            if fileManager.fileExists(atPath: tempSavedFileLocation.resolvedPath) {
                 do {
                     try fileManager.removeItem(at: tempSavedFileLocation)
                 } catch {
@@ -185,11 +187,18 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         do {
             let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
             SigningViewModel.logger.debug("Added data files to container")
-            errorMessage = (files.count == 1 ? "File successfully added" : "Files successfully added", [])
+            errorMessage = ErrorMessage(
+                key: files.count == 1 ? "File successfully added" : "Files successfully added",
+                args: []
+            )
             await loadContainerData(signedContainer: updatedContainer)
         } catch {
             await handleAddFilesError(error, container: container)
         }
+    }
+
+    public func isSignatureAdded() -> Bool {
+        sharedContainerViewModel.getIsSignatureAdded()
     }
 
     private func validateFiles(_ files: [URL]) throws {
@@ -220,23 +229,23 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             switch digiDocError {
             case .addingFilesToContainerFailed(let detail):
                 let fileName = detail.userInfo["fileName"] ?? ""
-                errorMessage = (detail.message, [fileName])
+                errorMessage = ErrorMessage(key: detail.message, args: [fileName])
             default:
-                errorMessage = ("General error", [])
+                errorMessage = ErrorMessage(key: "General error", args: [])
             }
 
         case let fileError as FileOpeningError:
             switch fileError {
             case .invalidFileSize:
-                errorMessage = ("Invalid file size", [])
+                errorMessage = ErrorMessage(key: "Invalid file size", args: [])
             case .noDataFiles:
-                errorMessage = ("Could not load selected files", [])
+                errorMessage = ErrorMessage(key: "Could not load selected files", args: [])
             default:
-                errorMessage = ("General error", [])
+                errorMessage = ErrorMessage(key: "General error", args: [])
             }
 
         default:
-            errorMessage = ("General error", [])
+            errorMessage = ErrorMessage(key: "General error", args: [])
         }
     }
 
@@ -247,7 +256,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         var failedFileCount = 0
 
         guard let digiDocError = error as? DigiDocError else {
-            errorMessage = ("General error", [])
+            errorMessage = ErrorMessage(key: "General error", args: [])
             return
         }
 
@@ -256,9 +265,9 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             totalFilesCount = Int(errorDetail.userInfo["totalFileCount"] ?? "0") ?? 0
             failedFileCount = Int(errorDetail.userInfo["failedFileCount"] ?? "0") ?? 0
 
-            errorMessage = (errorDetail.message, [String(failedFileCount)])
+            errorMessage = ErrorMessage(key: errorDetail.message, args: [String(failedFileCount)])
         default:
-            errorMessage = ("General error", [])
+            errorMessage = ErrorMessage(key: "General error", args: [])
         }
 
         // Update container when at least one file has been added to container
@@ -275,7 +284,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             )
             await loadContainerData(signedContainer: updatedContainer)
         } catch {
-            errorMessage = ("General error", [])
+            errorMessage = ErrorMessage(key: "General error", args: [])
         }
     }
 
@@ -289,12 +298,15 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                 switch digiDocError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = ("Failed to rename file", [errorDetail.userInfo["fileName"] ?? ""])
+                    errorMessage = ErrorMessage(
+                        key: "Failed to rename file",
+                        args: [errorDetail.userInfo["fileName"] ?? ""]
+                    )
                 default:
-                    errorMessage = ("General error", [])
+                    errorMessage = ErrorMessage(key: "General error", args: [])
                 }
             } else {
-                errorMessage = ("General error", [])
+                errorMessage = ErrorMessage(key: "General error", args: [])
             }
             return nil
         }
@@ -336,7 +348,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
                     SigningViewModel.logger.error("Failed to open nested container: \(error)")
-                    errorMessage = ("Failed to open container", [dataFile.fileName])
+                    errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
                     if error.localizedDescription.contains("Online validation disabled") {
                         SigningViewModel.logger.error(
                             "Unable to open container '\([dataFile.fileName])'. Sending to SiVa not allowed."
@@ -344,14 +356,14 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
                         errorMessage = nil
                     } else {
                         SigningViewModel.logger.error("Failed to open nested container: \(error)")
-                        errorMessage = ("Failed to open container", [dataFile.fileName])
+                        errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
                     }
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ("Failed to open file", [dataFile.fileName])
+            errorMessage = ErrorMessage(key: "Failed to open file", args: [dataFile.fileName])
         }
     }
 
@@ -364,7 +376,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             isShowingFileSaver = true
 
         case .failure:
-            errorMessage = ("Failed to save file", [dataFile.fileName])
+            errorMessage = ErrorMessage(key: "Failed to save file", args: [dataFile.fileName])
             isShowingFileSaver = false
         }
     }
@@ -376,7 +388,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ("Failed to open container", [dataFile.fileName])
+            errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
             return false
         }
     }
@@ -440,7 +452,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             SigningViewModel.logger.error(
                 "Unable to remove signature from container. SignedContainer or containerURL is nil"
             )
-            errorMessage = ("Failed to remove signature from container", [])
+            errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
             return
         }
 
@@ -449,7 +461,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             await loadContainerData(signedContainer: container)
         } catch {
             SigningViewModel.logger.error("Unable to remove signature from container. \(error)")
-            errorMessage = ("Failed to remove signature from container", [])
+            errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
             return
         }
     }
@@ -459,7 +471,10 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             SigningViewModel.logger.error(
                 "Unable to remove file from container. SignedContainer or containerURL is nil"
             )
-            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
+            errorMessage = ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [dataFile.fileName]
+            )
             return
         }
 
@@ -467,7 +482,7 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             SigningViewModel.logger.error(
                 "Unable to remove file from container. File not found in container"
             )
-            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
+            errorMessage = ErrorMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
             return
         }
 
@@ -483,7 +498,10 @@ class SigningViewModel: SigningViewModelProtocol, ObservableObject {
             return
         } catch {
             SigningViewModel.logger.error("Unable to remove file from container. \(error)")
-            errorMessage = ("Failed to remove file from container", [dataFile.fileName])
+            errorMessage = ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [dataFile.fileName]
+            )
             return
         }
     }

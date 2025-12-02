@@ -41,15 +41,15 @@ struct DirectoriesTests {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
         let subfolder = "testSubfolder"
         let expectedURL = tempDirectory
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(subfolder)
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+            .appending(path: subfolder, directoryHint: .isDirectory)
 
         mockFileManager.temporaryDirectory = tempDirectory
         mockFileManager.fileExistsHandler = { _ in false }
 
         let resultURL = try Directories.getTempDirectory(subfolder: subfolder, fileManager: mockFileManager)
 
-        #expect(resultURL.path == expectedURL.path)
+        #expect(resultURL.resolvedPath == expectedURL.resolvedPath)
         #expect(mockFileManager.createDirectoryCallCount == 1)
     }
 
@@ -58,15 +58,15 @@ struct DirectoriesTests {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
         let subfolder = "existingTestSubfolder"
         let expectedURL = tempDirectory
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(subfolder)
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+            .appending(path: subfolder, directoryHint: .isDirectory)
 
         mockFileManager.temporaryDirectory = tempDirectory
         mockFileManager.fileExistsHandler = { _ in true }
 
         let resultURL = try Directories.getTempDirectory(subfolder: subfolder, fileManager: mockFileManager)
 
-        #expect(resultURL.path == expectedURL.path)
+        #expect(resultURL.resolvedPath == expectedURL.resolvedPath)
         #expect(mockFileManager.createDirectoryCallCount == 0)
     }
 
@@ -80,7 +80,7 @@ struct DirectoriesTests {
         }
 
         let testSubFolder = "TestFolder"
-        let expectedFolderURL = sharedContainerURL.appendingPathComponent(testSubFolder)
+        let expectedFolderURL = sharedContainerURL.appending(path: testSubFolder)
 
         mockFileManager.containerURLHandler = { _ in sharedContainerURL }
         mockFileManager.fileExistsHandler = { _ in true }
@@ -104,7 +104,7 @@ struct DirectoriesTests {
         }
 
         let testSubFolder = "TestFolder-\(UUID().uuidString)"
-        let expectedFolderURL = sharedContainerURL.appendingPathComponent(testSubFolder)
+        let expectedFolderURL = sharedContainerURL.appending(path: testSubFolder)
 
         mockFileManager.containerURLHandler = { _ in sharedContainerURL }
         mockFileManager.fileExistsHandler = { _ in false }
@@ -143,8 +143,8 @@ struct DirectoriesTests {
         let cacheDirectory = URL(fileURLWithPath: "/cache")
         let subfolder = "TestFolder"
         let expectedDir = cacheDirectory
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(subfolder, isDirectory: true)
+            .appending(path: BundleUtil.getBundleIdentifier())
+            .appending(path: subfolder, directoryHint: .isDirectory)
 
         mockFileManager.urlHandler = { _, _, _, _ in cacheDirectory }
         mockFileManager.fileExistsHandler = { _ in true }
@@ -160,8 +160,8 @@ struct DirectoriesTests {
         let cacheDirectory = URL(fileURLWithPath: "/cache")
         let subfolder = "NewTestFolder"
         let expectedDir = cacheDirectory
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(subfolder, isDirectory: true)
+            .appending(path: BundleUtil.getBundleIdentifier())
+            .appending(path: subfolder, directoryHint: .isDirectory)
 
         mockFileManager.urlHandler = { _, _, _, _ in cacheDirectory }
         mockFileManager.fileExistsHandler = { _ in false }
@@ -176,14 +176,14 @@ struct DirectoriesTests {
     func getCacheDirectory_returnDirectoryWithoutSubfolder() async throws {
         let cacheDirectory = URL(fileURLWithPath: "/cache")
         let expectedDir = cacheDirectory
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
 
         mockFileManager.urlHandler = { _, _, _, _ in cacheDirectory }
         mockFileManager.fileExistsHandler = { _ in true }
 
         let directory = try Directories.getCacheDirectory(fileManager: mockFileManager)
 
-        #expect(expectedDir.path == directory.path)
+        #expect(expectedDir.resolvedPath == directory.resolvedPath)
         #expect(mockFileManager.createDirectoryCallCount == 0)
     }
 
@@ -191,15 +191,15 @@ struct DirectoriesTests {
     func getCacheDirectory_doesNotRecreateExistingDirectory() async throws {
         let baseCacheURL = URL(fileURLWithPath: "/mock/cache")
         let existingFolderURL = baseCacheURL
-            .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
-            .appendingPathComponent("existingFolder")
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+            .appending(path: "existingFolder", directoryHint: .isDirectory)
 
         mockFileManager.urlHandler = { _, _, _, _ in
             return baseCacheURL
         }
 
         mockFileManager.fileExistsHandler = { path in
-            return path == existingFolderURL.path
+            return path == existingFolderURL.resolvedPath
         }
 
         let result = try Directories.getCacheDirectory(
@@ -207,7 +207,7 @@ struct DirectoriesTests {
             fileManager: mockFileManager
         )
 
-        #expect(result.path == existingFolderURL.path)
+        #expect(result.resolvedPath == existingFolderURL.resolvedPath)
         #expect(mockFileManager.createDirectoryCallCount == 0)
     }
 
@@ -227,11 +227,11 @@ struct DirectoriesTests {
     @Test
     func getLogsDirectory_primaryDirectoryExists() throws {
         let mockDirectory = URL(fileURLWithPath: "/path/to/primary/directory")
-        let expectedDirectory = mockDirectory.appendingPathComponent("logs")
+        let expectedDirectory = mockDirectory.appending(path: "logs")
 
-        let trimmedExpectedDirectoryPath = expectedDirectory.path.hasPrefix("/") ? String(
-            expectedDirectory.path.dropFirst()
-        ) : expectedDirectory.path
+        let trimmedExpectedDirectoryPath = expectedDirectory.resolvedPath.hasPrefix("/") ? String(
+            expectedDirectory.resolvedPath.dropFirst()
+        ) : expectedDirectory.resolvedPath
 
         mockFileManager.fileExistsHandler = { _ in true }
 
@@ -242,9 +242,9 @@ struct DirectoriesTests {
             fileManager: mockFileManager
         )
 
-        let trimmedLogFilePath = expectedDirectory.path.hasPrefix("/") ? String(
-            expectedDirectory.path.dropFirst()
-        ) : expectedDirectory.path
+        let trimmedLogFilePath = expectedDirectory.resolvedPath.hasPrefix("/") ? String(
+            expectedDirectory.resolvedPath.dropFirst()
+        ) : expectedDirectory.resolvedPath
 
         #expect(logFilePath != nil)
         #expect(trimmedExpectedDirectoryPath == trimmedLogFilePath)

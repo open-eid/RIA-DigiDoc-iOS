@@ -23,15 +23,14 @@ import FactoryKit
 struct TimeStampSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    // MARK: - Navigation
-    @State private var navigateToCertificateView = false
+    @Environment(NavigationPathManager.self) private var pathManager
 
-    @StateObject private var viewModel: TimeStampSettingsViewModel
+    @State private var viewModel: TimeStampSettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.timeStampSettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.timeStampSettingsViewModel())
     }
 
     var body: some View {
@@ -67,7 +66,9 @@ struct TimeStampSettingsView: View {
                                 expiredLabel: languageSettings.localized("Main settings cert expired")
                             ),
                             onShowCertificatePressed: {
-                                navigateToCertificateView = true
+                                if let tsaCertData = viewModel.tsaCertData {
+                                    pathManager.navigate(to: .certificateDetailView(certificate: tsaCertData))
+                                }
                             },
                             onAddCertificatePressed: {
                                 viewModel.isImportingTSACert = true
@@ -82,7 +83,6 @@ struct TimeStampSettingsView: View {
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
-                await viewModel.removeObservers()
             }
         }
         .fileImporter(
@@ -101,17 +101,6 @@ struct TimeStampSettingsView: View {
                 viewModel.isImportingTSACert = false
             }
         }
-
-        // MARK: - Navigation links
-        if let tsaCertData = viewModel.tsaCertData {
-            NavigationLink(
-                destination: CertificateDetailView(
-                    certificate: tsaCertData
-                ),
-                isActive: $navigateToCertificateView,
-            ) { EmptyView() }
-                .hidden()
-        }
     }
 }
 
@@ -119,6 +108,7 @@ struct TimeStampSettingsView: View {
 
 #Preview {
     TimeStampSettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

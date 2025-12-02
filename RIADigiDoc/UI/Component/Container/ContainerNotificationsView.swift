@@ -22,7 +22,7 @@ import FactoryKit
 
 struct ContainerNotificationsView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -98,6 +98,6 @@ struct ContainerNotificationsView: View {
             .unknownSignatures(count: 1)
         ]
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

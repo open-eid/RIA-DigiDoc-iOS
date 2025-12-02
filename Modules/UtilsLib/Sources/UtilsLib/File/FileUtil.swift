@@ -46,9 +46,9 @@ public struct FileUtil: FileUtilProtocol {
             let extractedFile = try await Directories
                 .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
                 .validURL(fileUtil: self)
-                .appendingPathComponent(entry.path)
+                .appending(path: entry.path)
 
-            if fileManager.fileExists(atPath: extractedFile.path) {
+            if fileManager.fileExists(atPath: extractedFile.resolvedPath) {
                 try fileManager.removeItem(at: extractedFile)
             }
 
@@ -62,15 +62,15 @@ public struct FileUtil: FileUtilProtocol {
 
     public func fileExists(fileLocation: URL?) -> Bool {
         guard let file = fileLocation else { return false }
-        return fileManager.fileExists(atPath: file.path)
+        return fileManager.fileExists(atPath: file.resolvedPath)
     }
 
     // Check file path so its valid and is not modified by someone else
     public func getValidPath(url: URL) async -> URL? {
         FileUtil.logger.debug("Getting valid path for file: \(url)")
 
-        let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
-        let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
+        let resolvedURL = url.resolvingSymlinksInPath()
+        let filePath = FilePath(resolvedURL.resolvedPath).lexicallyNormalized()
 
         // The simulator uses different directories than a real iOS device
         if SystemUtil.isSimulator {
@@ -95,7 +95,7 @@ public struct FileUtil: FileUtilProtocol {
         for containerBasePath in containerBasePaths {
             let appContainerPath = FilePath(containerBasePath
                 .resolvingSymlinksInPath()
-                .standardizedFileURL.path)
+                .resolvedPath)
                 .lexicallyNormalized()
 
             if filePath.starts(with: appContainerPath) {
@@ -143,8 +143,8 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     public func getFileUrlFromAppGroup(_ url: URL, appGroupIdentifier: String) -> URL? {
-        let resolvedURL = url.resolvingSymlinksInPath().standardizedFileURL
-        let filePath = FilePath(resolvedURL.path).lexicallyNormalized()
+        let resolvedURL = url.resolvingSymlinksInPath()
+        let filePath = FilePath(resolvedURL.resolvedPath).lexicallyNormalized()
 
         guard let appGroupURL = fileManager.containerURL(
             forSecurityApplicationGroupIdentifier: appGroupIdentifier
@@ -154,7 +154,9 @@ public struct FileUtil: FileUtilProtocol {
 
         let resolvedAppGroupURL = appGroupURL.resolvingSymlinksInPath()
         let normalizedURL = URL(fileURLWithPath: String(decoding: filePath))
-        let resolvedAppGroupFilePath = FilePath(stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().path)
+        let resolvedAppGroupFilePath = FilePath(
+            stringLiteral: resolvedAppGroupURL.deletingLastPathComponent().resolvedPath
+        )
 
         let isFromAppGroup = filePath.starts(with: resolvedAppGroupFilePath) ||
         filePath.starts(with: FilePath("/private")
@@ -211,7 +213,7 @@ public struct FileUtil: FileUtilProtocol {
             FileUtil.logger.debug("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
 
             while !isFileDownloadedFromiCloud(fileURL: fileURL) {
-                try await Task.sleep(nanoseconds: 500_000_000)
+                try await Task.sleep(for: .seconds(0.5))
             }
 
             FileUtil.logger.debug("iCloud file '\(fileURL.lastPathComponent)' downloaded")
@@ -226,7 +228,7 @@ public struct FileUtil: FileUtilProtocol {
 
     public func isFileInsideMailFolder(_ url: URL) -> Bool {
         let mailFolderPath = FilePath(stringLiteral: "/var/mobile/Library/Mail").lexicallyNormalized()
-        let filePath = FilePath(stringLiteral: url.path).lexicallyNormalized()
+        let filePath = FilePath(stringLiteral: url.resolvedPath).lexicallyNormalized()
 
         if filePath == mailFolderPath {
             FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")

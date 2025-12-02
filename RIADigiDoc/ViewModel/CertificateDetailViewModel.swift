@@ -26,8 +26,9 @@ import Security
 import LibdigidocLibSwift
 import UtilsLib
 
+@Observable
 @MainActor
-class CertificateDetailViewModel: CertificateDetailViewModelProtocol, ObservableObject {
+class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CertificateDetailViewModel")
 
     private static let oidToExtensionName: [String: String] = [

@@ -50,19 +50,15 @@ public struct TSLUtil: TSLUtilProtocol {
                 fileName
             ), shouldCopyTSL(
                 from: filePath,
-                to: destinationDir.appendingPathComponent(
-                    fileName
-                ).path,
+                to: destinationDir.appending(path: fileName).resolvedPath,
             ) {
                 try copyTSL(
                     from: filePath,
-                    to: destinationDir.appendingPathComponent(fileName).path,
+                    to: destinationDir.appending(path: fileName).resolvedPath,
                 )
 
                 try removeExistingETag(
-                    at: destinationDir.appendingPathComponent(
-                        fileName
-                    ).path,
+                    at: destinationDir.appending(path: fileName).resolvedPath,
                 )
             }
         }
@@ -70,11 +66,11 @@ public struct TSLUtil: TSLUtilProtocol {
 
     public func readSequenceNumber(from inputStreamURL: URL) throws -> Int {
         let parser = XMLParser(contentsOf: inputStreamURL)
-        let tslSequenceNumberElement = "TSLSequenceNumber"
+        let tslSequenceNumberElement = ["TSLSequenceNumber", "tsl:TSLSequenceNumber"]
 
         var sequenceNumber: Int?
 
-        let delegate = TSLParserDelegate(sequenceNumberElement: tslSequenceNumberElement)
+        let delegate = TSLParserDelegate(sequenceNumberElements: tslSequenceNumberElement)
         parser?.delegate = delegate
 
         if parser?.parse() == true, let foundSequenceNumber = delegate.foundSequenceNumber {
@@ -124,15 +120,15 @@ public struct TSLUtil: TSLUtilProtocol {
         at filePath: String,
     ) throws {
         let eTagURL = URL(fileURLWithPath: filePath).appendingPathExtension("etag")
-        if fileManager.fileExists(atPath: eTagURL.path) {
-            try fileManager.removeItem(atPath: eTagURL.path)
+        if fileManager.fileExists(atPath: eTagURL.resolvedPath) {
+            try fileManager.removeItem(atPath: eTagURL.resolvedPath)
         }
     }
 
     private func createDirectoryIfNotExist(
         at url: URL,
     ) throws {
-        if !fileManager.fileExists(atPath: url.path) {
+        if !fileManager.fileExists(atPath: url.resolvedPath) {
             try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
         }
     }

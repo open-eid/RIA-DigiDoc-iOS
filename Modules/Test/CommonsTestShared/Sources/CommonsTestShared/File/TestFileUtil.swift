@@ -45,19 +45,12 @@ public struct TestFileUtil {
         subfolder: String,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) -> URL {
-        var tempDirectory: URL
-        if #available(iOS 16.0, *) {
-            tempDirectory = fileManager.temporaryDirectory
-                .appending(path: bundleIdentifier, directoryHint: .isDirectory)
-                .appending(path: subfolder, directoryHint: .isDirectory)
-        } else {
-            tempDirectory = fileManager.temporaryDirectory
-                .appendingPathComponent(bundleIdentifier, isDirectory: true)
-                .appendingPathComponent(subfolder, isDirectory: true)
-        }
+        let tempDirectory = fileManager.temporaryDirectory
+            .appending(path: bundleIdentifier, directoryHint: .isDirectory)
+            .appending(path: subfolder, directoryHint: .isDirectory)
 
         do {
-            if !fileManager.fileExists(atPath: tempDirectory.path) {
+            if !fileManager.fileExists(atPath: tempDirectory.standardizedFileURL.path(percentEncoded: false)) {
                 try fileManager.createDirectory(
                     at: tempDirectory,
                     withIntermediateDirectories: true,
@@ -80,28 +73,21 @@ public struct TestFileUtil {
         subfolder: String = "TestFileUtil",
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) -> URL {
-        var tempFileDirectory = getTemporaryDirectory(subfolder: subfolder)
-
-        if #available(iOS 16.0, *) {
-            tempFileDirectory = tempFileDirectory
-                .appending(component: name, directoryHint: .notDirectory)
-                .appendingPathExtension(ext)
-        } else {
-            tempFileDirectory = tempFileDirectory
-                .appendingPathComponent(name, isDirectory: false)
-                .appendingPathExtension(ext)
-        }
+        let tempFileDirectory = getTemporaryDirectory(subfolder: subfolder)
+            .appending(path: "\(name).\(ext)", directoryHint: .notDirectory)
 
         let isCreated = fileManager
             .createFile(
-                atPath: tempFileDirectory.path,
+                atPath: tempFileDirectory.standardizedFileURL.path(percentEncoded: false),
                 contents: contents?.data(
                     using: .utf8
                 ), attributes: nil
             )
 
         if !isCreated {
-            logger.error("Unable to create file at path: \(tempFileDirectory.path)")
+            logger.error(
+                "Unable to create file at path: \(tempFileDirectory.standardizedFileURL.path(percentEncoded: false))"
+            )
         }
 
         return tempFileDirectory

@@ -37,25 +37,11 @@ struct ShareButtonBottomBar: View {
         HStack {
             Spacer()
 
-            if #available(iOS 16.0, *) {
-                ShareLink(item: containerUrl) {
-                    ShareButton(
-                        iconName: iconName,
-                        label: label,
-                        accessibilityLabel: accessibilityLabel,
-                        onClick: {
-                            // ShareLink handles sharing
-                        }
-                    )
-                }
-            } else {
+            ShareLink(item: containerUrl) {
                 ShareButton(
                     iconName: iconName,
                     label: label,
-                    accessibilityLabel: accessibilityLabel,
-                    onClick: {
-                        showingShareSheet = true
-                    }
+                    accessibilityLabel: accessibilityLabel
                 )
             }
         }
@@ -87,5 +73,5 @@ struct ShareSheet: UIViewControllerRepresentable {
         accessibilityLabel: "Share",
         containerUrl: URL(fileURLWithPath: "")
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue == Int {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -85,6 +85,6 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
     ) {
         EmptyView()
     }
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

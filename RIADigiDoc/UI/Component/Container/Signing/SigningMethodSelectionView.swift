@@ -23,17 +23,17 @@ import FactoryKit
 struct SigningMethodSelectionView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @StateObject private var viewModel: SigningMethodSelectionViewModel
+    @State private var viewModel: SigningMethodSelectionViewModel
 
     @State private var selectedSigningMethod: SigningMethod = .idCardViaNFC
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.signingMethodSelectionViewModel())
+        _viewModel = State(wrappedValue: Container.shared.signingMethodSelectionViewModel())
     }
 
     var body: some View {
@@ -99,6 +99,6 @@ struct SigningMethodSelectionView: View {
 
 #Preview {
     SigningMethodSelectionView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

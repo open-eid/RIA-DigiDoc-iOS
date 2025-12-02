@@ -38,7 +38,7 @@ struct SignaturesListView: View {
     let signatureUtil: SignatureUtilProtocol
 
     var body: some View {
-        LazyVStack {
+        VStack {
             if #available(iOS 26.0, *) {
                 ForEach(timestamps.enumerated(), id: \.offset) { index, timestamp in
                     SignatureView(
@@ -106,7 +106,6 @@ struct SignaturesListView: View {
                         }
                     )
                 }
-
             }
         }
     }
@@ -146,6 +145,6 @@ struct SignaturesListView: View {
         nameUtil: Container.shared.nameUtil(),
         signatureUtil: Container.shared.signatureUtil()
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

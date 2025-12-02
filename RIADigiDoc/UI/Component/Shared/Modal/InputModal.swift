@@ -20,7 +20,7 @@
 import SwiftUI
 
 struct InputModal: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
 
     var icon: String?

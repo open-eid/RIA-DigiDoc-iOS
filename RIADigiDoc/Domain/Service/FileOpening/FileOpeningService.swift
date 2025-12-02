@@ -97,16 +97,16 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             return sourceURL
         }
 
-        if !fileManager.fileExists(atPath: signedContainersDirectory.path) {
+        if !fileManager.fileExists(atPath: signedContainersDirectory.resolvedPath) {
             try fileManager.createDirectory(
                 at: signedContainersDirectory,
                 withIntermediateDirectories: true,
                 attributes: nil)
         }
 
-        let destinationURL = signedContainersDirectory.appendingPathComponent(sourceURL.lastPathComponent)
+        let destinationURL = signedContainersDirectory.appending(path: sourceURL.lastPathComponent)
 
-        if fileManager.fileExists(atPath: destinationURL.path) {
+        if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
             try fileManager.removeItem(at: destinationURL)
         }
 

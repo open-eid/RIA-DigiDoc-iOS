@@ -23,7 +23,7 @@ import FactoryKit
 struct OutlinedRadioButtonCard<Content: View>: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     let title: String
     let isSelected: Bool
@@ -113,6 +113,6 @@ struct OutlinedRadioButtonCard<Content: View>: View {
             Text("content text")
         }
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

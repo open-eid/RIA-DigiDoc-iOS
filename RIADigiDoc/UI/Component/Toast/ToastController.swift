@@ -19,12 +19,13 @@
 
 import SwiftUI
 
+@Observable
 @MainActor
-final class ToastController: ObservableObject {
+final class ToastController {
     static let shared = ToastController()
 
-    @Published var message: String?
-    @Published var isVisible = false
+    var message: String?
+    var isVisible = false
 
     private var dismissTask: Task<Void, Never>?
 
@@ -38,7 +39,7 @@ final class ToastController: ObservableObject {
 
         dismissTask?.cancel()
         dismissTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+            try? await Task.sleep(for: .seconds(duration))
 
             await MainActor.run {
                 withAnimation(.easeInOut(duration: 0.3)) {
@@ -46,7 +47,7 @@ final class ToastController: ObservableObject {
                 }
 
                 Task {
-                    try? await Task.sleep(nanoseconds: 300_000_000)
+                    try? await Task.sleep(for: .seconds(0.3))
                     self.message = nil
                 }
             }

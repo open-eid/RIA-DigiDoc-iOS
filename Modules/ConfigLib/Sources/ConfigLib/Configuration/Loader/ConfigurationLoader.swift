@@ -65,7 +65,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func initConfiguration(cacheDir: URL, proxyInfo: ProxyInfo) async throws {
         ConfigurationLoader.logger.debug("Initializing configuration")
 
-        if !fileManager.fileExists(atPath: cacheDir.path) {
+        if !fileManager.fileExists(atPath: cacheDir.resolvedPath) {
             try fileManager.createDirectory(
                 at: cacheDir, withIntermediateDirectories: true, attributes: nil)
         }
@@ -113,17 +113,20 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     public func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        let confFile = configDir.appendingPathComponent(
-            CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = configDir.appendingPathComponent(
-            CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = configDir.appendingPathComponent(
-            CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = configDir.appending(
+            path: CommonsLib.Constants.Configuration.CachedConfigJson
+        )
+        let publicKeyFile = configDir.appending(
+            path: CommonsLib.Constants.Configuration.CachedConfigPub
+        )
+        let signatureFile = configDir.appending(
+            path: CommonsLib.Constants.Configuration.CachedConfigRsa
+        )
 
         let configFilesExist =
-            fileManager.fileExists(atPath: confFile.path) &&
-            fileManager.fileExists(atPath: publicKeyFile.path) &&
-            fileManager.fileExists(atPath: signatureFile.path)
+            fileManager.fileExists(atPath: confFile.resolvedPath) &&
+            fileManager.fileExists(atPath: publicKeyFile.resolvedPath) &&
+            fileManager.fileExists(atPath: signatureFile.resolvedPath)
 
         if configFilesExist {
             ConfigurationLoader.logger.debug("Initializing cached configuration")

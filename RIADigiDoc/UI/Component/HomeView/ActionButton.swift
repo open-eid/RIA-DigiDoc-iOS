@@ -99,7 +99,7 @@ private struct TextComponent: View {
             description: "Do something",
             assetImageName: "ic_m3_attach_file_48pt_wght400",
         ) {}
-            .environmentObject(Container.shared.themeSettings())
+            .environment(Container.shared.themeSettings())
     }
     .padding()
 }

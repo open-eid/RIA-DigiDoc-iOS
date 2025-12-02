@@ -24,17 +24,18 @@ import OSLog
 import UniformTypeIdentifiers
 import UtilsLib
 
+@Observable
 @MainActor
-class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, ObservableObject {
+class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ValidationSettingsViewModel")
 
-    @Published var configuration: ConfigurationProvider?
-    @Published var validationServiceUrl: String = ""
-    @Published var selectedOption: ServicesSettingsOption = .defaultSetting
-    @Published var sivaCertData: Data?
-    @Published var isImportingCert: Bool = false
-    @Published var isLoading: Bool = true
+    var configuration: ConfigurationProvider?
+    var validationServiceUrl: String = ""
+    var selectedOption: ServicesSettingsOption = .defaultSetting
+    var sivaCertData: Data?
+    var isImportingCert: Bool = false
+    var isLoading: Bool = true
 
     // MARK: - Dependencies
     private let configurationRepository: ConfigurationRepositoryProtocol
@@ -42,8 +43,6 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let certificateUtil: CertificateUtilProtocol
-
-    private var configurationObservationTask: Task<Void, Never>?
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
@@ -58,35 +57,19 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
         self.advancedSettingsRepository = advancedSettingsRepository
         self.certificateUtil = certificateUtil
 
-        configurationObservationTask = Task {
-            await observeConfigurationUpdates()
-        }
-
         Task {
             await initializeSettings()
         }
     }
 
-    public func removeObservers() async {
-        configurationObservationTask?.cancel()
-    }
-
     // MARK: - Init helpers
 
     public func initializeSettings() async {
-        await ensureConfigurationLoaded()
+        await configuration = configurationRepository.getConfiguration()
         await loadSettings()
         await loadSiVaCert()
 
         isLoading = false
-    }
-
-    private func ensureConfigurationLoaded() async {
-        if configuration == nil {
-            for await config in $configuration.values where config != nil {
-                break
-            }
-        }
     }
 
     private func loadSettings() async {
@@ -151,28 +134,5 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Observab
             certificateFolder: CommonsLib.Constants.Folder.SiVaCert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert
         )
-    }
-
-    // MARK: - Observer
-
-    public func observeConfigurationUpdates() async {
-        guard !Task.isCancelled else {
-            return
-        }
-
-        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
-            ValidationSettingsViewModel.logger.error("Unable to get configuration updates stream")
-            return
-        }
-
-        do {
-            for try await config in configStream {
-                await MainActor.run {
-                    configuration = config
-                }
-            }
-        } catch {
-            ValidationSettingsViewModel.logger.error("Unable to get configuration from stream")
-        }
     }
 }

@@ -18,19 +18,39 @@
  */
 
 import SwiftUI
+import FactoryKit
 import LibdigidocLibSwift
 
 struct CryptoDataFilesSection: View {
     @Environment(\.openURL) private var openURL
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @ObservedObject var viewModel: EncryptViewModel
+    @State private var viewModel: EncryptViewModel
+
     let isContainerUnlocked: Bool
     let isNestedContainer: Bool
     @Binding var selectedDataFile: URL?
     @Binding var showSivaMessage: Bool
     @Binding var isFileSaved: Bool
     @Binding var showRemoveDataFileModal: Bool
+
+    init(
+        viewModel: EncryptViewModel,
+        isContainerUnlocked: Bool,
+        isNestedContainer: Bool,
+        selectedDataFile: Binding<URL?>,
+        showSivaMessage: Binding<Bool>,
+        isFileSaved: Binding<Bool>,
+        showRemoveDataFileModal: Binding<Bool>
+    ) {
+        self.viewModel = viewModel
+        self.isContainerUnlocked = isContainerUnlocked
+        self.isNestedContainer = isNestedContainer
+        self._selectedDataFile = selectedDataFile
+        self._showSivaMessage = showSivaMessage
+        self._isFileSaved = isFileSaved
+        self._showRemoveDataFileModal = showRemoveDataFileModal
+    }
 
     private var sivaMessage: String {
         languageSettings.localized("Siva message")

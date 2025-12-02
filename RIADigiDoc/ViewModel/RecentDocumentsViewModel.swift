@@ -22,14 +22,15 @@ import FactoryKit
 import OSLog
 import CommonsLib
 
+@Observable
 @MainActor
-class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObject {
+class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RecentDocumentsViewModel")
 
-    @Published var isImporting = false
-    @Published var files: [FileItem] = []
-    @Published var searchText: String = ""
-    @Published var errorMessage: String = ""
+    var isImporting = false
+    var files: [FileItem] = []
+    var searchText: String = ""
+    var errorMessage: String = ""
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
 
@@ -58,7 +59,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
     func loadFiles(from folderURL: URL, withExtensions extensions: [String]) {
         do {
             var isDirectory = ObjCBool(true)
-            guard fileManager.fileExists(atPath: folderURL.path, isDirectory: &isDirectory) else { return }
+            guard fileManager.fileExists(atPath: folderURL.resolvedPath, isDirectory: &isDirectory) else { return }
 
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: folderURL,
@@ -66,7 +67,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, ObservableObje
                 options: .skipsHiddenFiles
             )
             files = fileURLs.compactMap { url in
-                if let attributes = try? fileManager.attributesOfItem(atPath: url.path),
+                if let attributes = try? fileManager.attributesOfItem(atPath: url.resolvedPath),
                    let modifiedDate = attributes[.modificationDate] as? Date {
                     if extensions.contains(url.pathExtension.lowercased()) {
                         return FileItem(name: url.lastPathComponent, url: url, modifiedDate: modifiedDate)

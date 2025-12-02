@@ -136,31 +136,21 @@ final class SignedContainerTests {
     @Test
     func openOrCreateContainer_throwContainerCreationFailedErrorWhenFileDoesNotExist() async throws {
         let notExistingFile = "notExistingFile.txt"
-        var notExistingContainerUrl: URL?
-        if #available(iOS 16.0, *) {
-            notExistingContainerUrl = URL(
-                filePath: notExistingFile,
-                directoryHint: .inferFromPath,
-                relativeTo: nil
-            )
-        } else {
-            notExistingContainerUrl = URL(fileURLWithPath: notExistingFile, isDirectory: false, relativeTo: nil)
-        }
-
-        guard let notExistingContainerLocation = notExistingContainerUrl else {
-            Issue.record("Unable to get resource file")
-            return
-        }
+        let notExistingContainerUrl = URL(
+            filePath: notExistingFile,
+            directoryHint: .inferFromPath,
+            relativeTo: nil
+        )
 
         do {
-            _ = try await SignedContainer.openOrCreate(dataFiles: [notExistingContainerLocation], isSivaConfirmed: true)
+            _ = try await SignedContainer.openOrCreate(dataFiles: [notExistingContainerUrl], isSivaConfirmed: true)
             Issue.record("Expected 'addingFilesToContainerFailed' error")
             return
         } catch let error as DigiDocError {
             switch error {
             case .containerCreationFailed(let errorDetail):
                 #expect(
-                    notExistingContainerUrl?
+                    notExistingContainerUrl
                         .deletingPathExtension()
                         .appendingPathExtension(Constants.Extension.Asice).lastPathComponent == errorDetail
                         .userInfo["fileName"]
@@ -177,7 +167,7 @@ final class SignedContainerTests {
         let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
         let newFileName = "renamed.asice"
         let directoryURL = originalURL.deletingLastPathComponent()
-        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+        let uniqueFileURL = directoryURL.appending(path: "renamed_unique.asice")
 
         mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
@@ -234,7 +224,7 @@ final class SignedContainerTests {
         let emptyNewName = ""
         let directoryURL = originalURL.deletingLastPathComponent()
         let defaultFileName = CommonsLib.Constants.Container.DefaultName
-        let uniqueFileURL = directoryURL.appendingPathComponent("\(defaultFileName)_unique.asice")
+        let uniqueFileURL = directoryURL.appending(path: "\(defaultFileName)_unique.asice")
 
         mockContainerUtil.getContainerFileHandler = { url, _ in
             #expect(url.lastPathComponent.starts(with: defaultFileName))
@@ -264,7 +254,7 @@ final class SignedContainerTests {
         let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
         let newFileName = "renamed.asice"
         let directoryURL = originalURL.deletingLastPathComponent()
-        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+        let uniqueFileURL = directoryURL.appending(path: "renamed_unique.asice")
 
         mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
@@ -294,7 +284,7 @@ final class SignedContainerTests {
         let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
         let newFileName = "renamed.asice"
         let directoryURL = originalURL.deletingLastPathComponent()
-        let uniqueFileURL = directoryURL.appendingPathComponent("renamed_unique.asice")
+        let uniqueFileURL = directoryURL.appending(path: "renamed_unique.asice")
         let errorDomain = "TestDomain - unable to save container"
 
         mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }

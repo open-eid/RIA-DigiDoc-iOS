@@ -1,24 +1,25 @@
 import SwiftUI
 import FactoryKit
 import LibdigidocLibSwift
+import CommonsLib
 
 struct SigningRootView: View {
     @Environment(\.dismiss) private var dismiss
 
+    @Environment(NavigationPathManager.self) private var pathManager
+
     @State private var chosenMethod: SigningMethod = .idCardViaNFC
 
-    @StateObject private var viewModel: SigningRootViewModel
+    @State private var viewModel: SigningRootViewModel
 
-    let signedContainer: SignedContainerProtocol
-    let onSuccess: (SignedContainerProtocol) -> Void
+    private let signedContainer: GeneralContainer?
 
-    init(
-        signedContainer: SignedContainerProtocol,
-        onSuccess: @escaping (SignedContainerProtocol) -> Void
-    ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.signingRootViewModel())
-        self.signedContainer = signedContainer
-        self.onSuccess = onSuccess
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
+
+    init() {
+        _viewModel = State(wrappedValue: Container.shared.signingRootViewModel())
+        self.sharedContainerViewModel = Container.shared.sharedContainerViewModel()
+        self.signedContainer = sharedContainerViewModel.currentContainer()
     }
 
     var body: some View {
@@ -49,15 +50,27 @@ struct SigningRootView: View {
                     }
                 )
             case .mobileId:
-                MobileIdView(
-                    signedContainer: signedContainer,
-                    onSuccess: onSuccess
-                )
+                if let container = signedContainer as? SignedContainerProtocol {
+                    MobileIdView(
+                        signedContainer: container,
+                        onSuccess: { container in
+                            sharedContainerViewModel.removeLastContainer()
+                            sharedContainerViewModel.setSignedContainer(container)
+                            sharedContainerViewModel.setIsSignatureAdded(true)
+                        }
+                    )
+                }
             case .smartId:
-                SmartIdView(
-                    signedContainer: signedContainer,
-                    onSuccess: onSuccess
-                )
+                if let container = signedContainer as? SignedContainerProtocol {
+                    SmartIdView(
+                        signedContainer: container,
+                        onSuccess: { container in
+                            sharedContainerViewModel.removeLastContainer()
+                            sharedContainerViewModel.setSignedContainer(container)
+                            sharedContainerViewModel.setIsSignatureAdded(true)
+                        }
+                    )
+                }
             }
         }
         .onAppear {
@@ -69,11 +82,5 @@ struct SigningRootView: View {
 }
 
 #Preview {
-    SigningRootView(
-        signedContainer: SignedContainer(
-            fileManager: Container.shared.fileManager(),
-            containerUtil: Container.shared.containerUtil()
-        ),
-        onSuccess: {_ in }
-    )
+    SigningRootView()
 }

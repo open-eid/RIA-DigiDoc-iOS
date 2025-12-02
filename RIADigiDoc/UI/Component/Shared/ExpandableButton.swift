@@ -80,5 +80,5 @@ struct ExpandableButton: View {
         title: "Technical information",
         detailText: "Technical information about signature"
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

@@ -19,48 +19,55 @@
 
 import FactoryKit
 import SwiftUI
+import ConfigLib
 
 struct DiagnosticsSections: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @EnvironmentObject private var viewModel: DiagnosticsViewModel
+    var versionSectionContent: String
+    var osSectionContent: (key: String, content: String)
+    var libdigidocVersion: String
+    var urlSectionContent: [String]
+    var cdoc2SectionContent: [String]
+    var tslSectionContent: [String]
+    var centralConfigurationSectionContent: [(key: String, content: String)]
 
     var body: some View {
-        if viewModel.configuration != nil {
+        VStack {
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics application version title"),
-                content: viewModel.versionSectionContent
+                content: versionSectionContent
             )
 
             DiagnosticsSingleSection(
-                title: languageSettings.localized(viewModel.osSectionContent.key),
-                content: viewModel.osSectionContent.content,
+                title: languageSettings.localized(osSectionContent.key),
+                content: osSectionContent.content,
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics libraries title"),
-                content: viewModel.libdigidocVersion
+                content: libdigidocVersion
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics urls title"),
-                contentLines: viewModel.urlSectionContent,
+                contentLines: urlSectionContent,
                 showDivider: false,
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics cdoc2 title"),
-                contentLines: viewModel.cdoc2SectionContent,
+                contentLines: cdoc2SectionContent,
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics tsl cache title"),
-                contentLines: viewModel.tslSectionContent,
+                contentLines: tslSectionContent,
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics central configuration title"),
-                contentLines: viewModel.centralConfigurationSectionContent
+                contentLines: centralConfigurationSectionContent
                     .map { "\(languageSettings.localized($0.key)): \($0.content)"
                 }
             )
@@ -70,7 +77,15 @@ struct DiagnosticsSections: View {
 
 // MARK: - Preview
 #Preview {
-    DiagnosticsSections()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+    DiagnosticsSections(
+        versionSectionContent: "",
+        osSectionContent: (key: "", content: ""),
+        libdigidocVersion: "",
+        urlSectionContent: [""],
+        cdoc2SectionContent: [""],
+        tslSectionContent: [""],
+        centralConfigurationSectionContent: [(key: "", content: "")]
+    )
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

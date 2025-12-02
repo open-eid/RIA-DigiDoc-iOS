@@ -22,7 +22,7 @@ import SwiftUI
 struct ModalContainer<Content: View>: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AccessibilityFocusState private var isFocused: Bool
 

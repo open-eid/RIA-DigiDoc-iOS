@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct LoadingView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var isLoading: Bool = false
     @State private var rotationAngle: Double = 0
@@ -33,7 +33,7 @@ struct LoadingView: View {
                 .frame(width: 100, height: 100)
                 .rotationEffect(.degrees(rotationAngle))
                 .accessibilityLabel(languageSettings.localized("Loading"))
-                .onChange(of: isLoading) { _ in
+                .onChange(of: isLoading) {
                     withAnimation(Animation.linear(duration: 1).repeatForever(autoreverses: false)) {
                         rotationAngle += 360
                     }
@@ -49,6 +49,6 @@ struct LoadingView: View {
 
 #Preview {
     LoadingView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

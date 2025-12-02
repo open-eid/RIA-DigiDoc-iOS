@@ -21,8 +21,9 @@ import Foundation
 import OSLog
 import X509
 
+@Observable
 @MainActor
-class SignatureDetailViewModel: SignatureDetailViewModelProtocol, ObservableObject {
+class SignatureDetailViewModel: SignatureDetailViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SignatureDetailViewModel")
 
     func getIssuerName(cert: Data) -> String {

@@ -266,7 +266,7 @@ struct ShareViewModelTests {
 
     private func createTemporaryFile2(contents: String = "Test data") -> URL {
         let tempDirectoryURL = FileManager.default.temporaryDirectory
-        let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+        let tempFileURL = tempDirectoryURL.appending(path: UUID().uuidString)
         try? contents.write(to: tempFileURL, atomically: true, encoding: .utf8)
         return tempFileURL
     }

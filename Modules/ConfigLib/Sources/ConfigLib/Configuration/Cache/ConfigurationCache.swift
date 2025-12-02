@@ -76,9 +76,9 @@ actor ConfigurationCache: ConfigurationCacheProtocol {
         fileName: String,
         configDir: URL
     ) async throws -> URL {
-        let configFile = configDir.appendingPathComponent(fileName)
+        let configFile = configDir.appending(path: fileName)
 
-        guard fileManager.fileExists(atPath: configFile.path) else {
+        guard fileManager.fileExists(atPath: configFile.resolvedPath) else {
             throw ConfigurationCacheError.fileNotFound
         }
         return configFile
@@ -89,7 +89,7 @@ actor ConfigurationCache: ConfigurationCacheProtocol {
         data: Data,
         configDir: URL
     ) async throws {
-        let configFile = configDir.appendingPathComponent(fileName)
+        let configFile = configDir.appending(path: fileName)
 
         do {
             try fileManager.createDirectory(

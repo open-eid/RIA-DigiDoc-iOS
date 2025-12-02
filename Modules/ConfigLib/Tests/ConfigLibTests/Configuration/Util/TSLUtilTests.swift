@@ -37,7 +37,7 @@ struct TSLUtilTests {
     @Test
     func setupTSLFiles_successWithValidXMLFiles() async throws {
         let fileNameURLs = [URL(fileURLWithPath: "file1.xml"), URL(fileURLWithPath: "file2.xml")]
-        let fileNamePaths = fileNameURLs.map { $0.path }
+        let fileNamePaths = fileNameURLs.map { $0.resolvedPath }
 
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
             return fileNameURLs
@@ -65,7 +65,7 @@ struct TSLUtilTests {
     func setupTSLFiles_nonXMLFileNotCopied() throws {
         let mockFileName = "file.txt"
         let tslFile = [URL(fileURLWithPath: mockFileName)]
-        let fileNamePath = tslFile.map { $0.path }
+        let fileNamePath = tslFile.map { $0.resolvedPath }
 
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
             return tslFile
@@ -86,7 +86,7 @@ struct TSLUtilTests {
         let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "tslfiles")
         try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
         let fileName = "test-\(UUID().uuidString).xml"
-        let fileURL = tempDirectoryURL.appendingPathComponent(fileName)
+        let fileURL = tempDirectoryURL.appending(path: fileName)
 
         try fileContents.write(to: fileURL, atomically: true, encoding: .utf8)
 

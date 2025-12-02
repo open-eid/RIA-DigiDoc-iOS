@@ -23,14 +23,13 @@ import Foundation
 import LibdigidocLibSwift
 import OSLog
 
+@Observable
 @MainActor
-class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableObject {
+class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "AdvancedSettingsViewModel")
 
-    @Published var configuration: ConfigurationProvider?
-
-    private var configurationObservationTask: Task<Void, Never>?
+    var configuration: ConfigurationProvider?
 
     private let dataStore: DataStoreProtocol
     private let keychainStore: KeychainStoreProtocol
@@ -48,18 +47,8 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
         self.advancedSettingsRepository = advancedSettingsRepository
         self.configurationRepository = configurationRepository
 
-        configurationObservationTask = Task {
-            await observeConfigurationUpdates()
-        }
-    }
-
-    // MARK: - Init helpers
-
-    private func ensureConfigurationLoaded() async {
-        if configuration == nil {
-            for await config in $configuration.values where config != nil {
-                break
-            }
+        Task {
+            configuration = await configurationRepository.getConfiguration()
         }
     }
 
@@ -81,33 +70,6 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, ObservableOb
             ])
         } catch {
             AdvancedSettingsViewModel.logger.error("Unable to remove all certificates")
-        }
-    }
-
-    // MARK: - Observer
-
-    public func removeObservers() async {
-        configurationObservationTask?.cancel()
-    }
-
-    public func observeConfigurationUpdates() async {
-        guard !Task.isCancelled else {
-            return
-        }
-
-        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
-            AdvancedSettingsViewModel.logger.error("Unable to get configuration updates stream")
-            return
-        }
-
-        do {
-            for try await config in configStream {
-                await MainActor.run {
-                    configuration = config
-                }
-            }
-        } catch {
-            AdvancedSettingsViewModel.logger.error("Unable to get configuration from stream")
         }
     }
 

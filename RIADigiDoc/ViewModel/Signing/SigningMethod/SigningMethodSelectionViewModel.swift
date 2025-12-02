@@ -20,8 +20,9 @@
 import Foundation
 import OSLog
 
+@Observable
 @MainActor
-class SigningMethodSelectionViewModel: SigningMethodSelectionViewModelProtocol, ObservableObject {
+class SigningMethodSelectionViewModel: SigningMethodSelectionViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc",
         category: "SigningMethodSelectionViewModel"

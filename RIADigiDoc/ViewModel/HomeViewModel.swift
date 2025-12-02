@@ -24,12 +24,13 @@ import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class HomeViewModel: HomeViewModelProtocol, ObservableObject {
+class HomeViewModel: HomeViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
 
-    @Published var isImporting = false
-    @Published var signedContainer: SignedContainerProtocol = SignedContainer(
+    var isImporting = false
+    var signedContainer: SignedContainerProtocol = SignedContainer(
         fileManager: Container.shared.fileManager(),
         containerUtil: Container.shared.containerUtil()
     )
@@ -61,7 +62,7 @@ class HomeViewModel: HomeViewModelProtocol, ObservableObject {
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appendingPathComponent(Constants.Container.SignedContainerFolder)
+                .appending(path: Constants.Container.SignedContainerFolder)
         } catch {
             HomeViewModel.logger.error("Unable to get signed containers recent documents folder: \(error)")
             return nil

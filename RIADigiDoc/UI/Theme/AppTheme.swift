@@ -23,7 +23,7 @@ import SwiftUI
 @propertyWrapper
 struct AppTheme: DynamicProperty {
     @Environment(\.colorScheme) private var colorScheme
-    @EnvironmentObject private var themeSettings: ThemeSettings
+    @Environment(ThemeSettings.self) private var themeSettings
 
     var wrappedValue: ColorPalette {
         Theme.getCurrentColorPalette(for: colorScheme, currentTheme: themeSettings.getSelectedTheme())

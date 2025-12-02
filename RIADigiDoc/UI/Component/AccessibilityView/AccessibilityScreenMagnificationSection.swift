@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct AccessibilityScreenMagnificationSection: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack(
@@ -109,6 +109,6 @@ struct AccessibilityScreenMagnificationSection: View {
 // MARK: - Preview
 #Preview {
     AccessibilityScreenMagnificationSection()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

@@ -90,7 +90,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -101,9 +101,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -156,7 +156,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -167,9 +167,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -221,7 +221,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -232,9 +232,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -280,7 +280,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -291,9 +291,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -410,7 +410,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -421,9 +421,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -476,7 +476,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -487,9 +487,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -528,7 +528,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -539,9 +539,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -589,7 +589,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -600,9 +600,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -657,7 +657,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -668,9 +668,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -711,7 +711,7 @@ struct ConfigurationLoaderTests {
         let cacheDirURL = FileManager.default.urls(
             for: .cachesDirectory,
             in: .userDomainMask
-        ).first?.appendingPathComponent(
+        ).first?.appending(path:
             "ConfigurationLoaderTests-\(UUID().uuidString)"
         )
 
@@ -722,9 +722,9 @@ struct ConfigurationLoaderTests {
 
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
-        let confFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appendingPathComponent(CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)

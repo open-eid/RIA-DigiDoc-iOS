@@ -24,7 +24,7 @@ import CommonsLib
 
 struct DataFilesView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -132,6 +132,6 @@ struct DataFilesView: View {
         showRemoveFileButton: true,
         showRemoveDataFileModal: .constant(false)
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

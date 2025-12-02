@@ -32,9 +32,9 @@ struct SignatureVerifier {
 
     private static func parsePublicKey(fromPEM pem: String) -> SecKey? {
         let der = removeAllWhitespace(data: pem
-                                        .replacingOccurrences(of: "-----BEGIN RSA PUBLIC KEY-----", with: "")
-                                        .replacingOccurrences(of: "-----END RSA PUBLIC KEY-----", with: "")
-                                        .replacingOccurrences(of: "\n", with: ""))
+            .replacing("-----BEGIN RSA PUBLIC KEY-----", with: "")
+            .replacing("-----END RSA PUBLIC KEY-----", with: "")
+            .replacing("\n", with: ""))
         guard let pKey = Data(base64Encoded: der) else {
             return nil
         }

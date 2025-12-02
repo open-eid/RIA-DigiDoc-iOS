@@ -23,7 +23,7 @@ import FactoryKit
 struct InfoView: View {
     @AppTheme private var theme
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @Environment(\.dismiss) private var dismiss
 
@@ -51,6 +51,6 @@ struct InfoView: View {
 // MARK: - Preview
 #Preview {
     InfoView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

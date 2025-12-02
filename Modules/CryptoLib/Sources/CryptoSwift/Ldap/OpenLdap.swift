@@ -292,26 +292,26 @@ final public class OpenLdap: OpenLdapProtocol {
 
     static private func getEscapedIdentityCode(identityCode: String) -> String {
         return identityCode
-            .replacingOccurrences(
-                of: "\\",
+            .replacing(
+                "\\",
                 with: "\\\\"
             )
-            .replacingOccurrences(
-                of: "(",
+            .replacing(
+                "(",
                 with: "\\("
             )
-            .replacingOccurrences(
-                of: ")",
+            .replacing(
+                ")",
                 with: "\\)"
             )
-            .replacingOccurrences(
-                of: "*",
+            .replacing(
+                "*",
                 with: "\\*"
             )
     }
 
     static private func getDistinguishedName(from url: URL) -> String {
-        var distinguishedName = url.path
+        var distinguishedName = url.resolvedPath
         if distinguishedName.isEmpty {
             distinguishedName = "c=EE"
         } else {

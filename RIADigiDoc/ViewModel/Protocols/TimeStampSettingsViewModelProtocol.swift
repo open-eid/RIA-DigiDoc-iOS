@@ -41,8 +41,4 @@ public protocol TimeStampSettingsViewModelProtocol: Sendable {
 
     // MARK: - TSA Cert Import
     func importTSACert(from url: URL) async
-
-    // MARK: - Observer
-    func observeConfigurationUpdates() async throws
-    func removeObservers() async
 }

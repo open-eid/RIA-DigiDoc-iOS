@@ -25,9 +25,11 @@ import UtilsLib
 
 struct SignatureView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
+
+    @Environment(NavigationPathManager.self) private var pathManager
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
@@ -56,7 +58,16 @@ struct SignatureView: View {
         SignatureBottomSheetActions.actions(
             showRemoveSignatureButton: showRemoveSignatureButton,
             onDetailsButtonClick: {
-                showDetail = true
+                pathManager
+                    .navigate(
+                        to: .signatureDetailView(
+                            signature: signature,
+                            isTimestamp: isTimestamp,
+                            containerMimetype: containerMimetype,
+                            dataFilesCount: dataFilesCount
+                        )
+                    )
+
             },
             onRemoveSignatureButtonClick: {
                 onSelect?()
@@ -100,7 +111,6 @@ struct SignatureView: View {
             dateTimeString: signature.trustedSigningTime,
             isUTC: false
         )
-
         VStack {
             HStack {
                 Image(isTimestamp ? "ic_m3_approval_48dp_wght400" : "ic_m3_stylus_note_48pt_wght400")
@@ -127,10 +137,10 @@ struct SignatureView: View {
 
                     if showSignedDate {
                         Text(verbatim: languageSettings.localized("Signed at", [signedDate.date, signedDate.time]))
-                        .font(typography.bodyMedium)
-                        .foregroundStyle(theme.onSurfaceVariant)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .multilineTextAlignment(.leading)
+                            .font(typography.bodyMedium)
+                            .foregroundStyle(theme.onSurfaceVariant)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
                     }
 
                     ColoredSignedStatusText(
@@ -184,20 +194,9 @@ struct SignatureView: View {
             .padding(Dimensions.Padding.MSPadding)
         }
         .contentShape(Rectangle())
-        .background(
-            NavigationLink(
-                destination: SignatureDetailView(
-                    signature: signature,
-                    isTimestamp: isTimestamp,
-                    containerMimetype: containerMimetype,
-                    dataFilesCount: dataFilesCount
-                ),
-                isActive: $showDetail
-            ) { EmptyView() }
-                .hidden()
-        )
         .listRowInsets(EdgeInsets())
     }
+
 }
 
 #Preview {
@@ -230,6 +229,6 @@ struct SignatureView: View {
         signatureUtil: Container.shared.signatureUtil(),
         showRemoveSignatureModal: .constant(false)
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

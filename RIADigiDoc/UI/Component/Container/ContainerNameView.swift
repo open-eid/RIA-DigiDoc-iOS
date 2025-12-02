@@ -22,7 +22,7 @@ import SwiftUI
 
 struct ContainerNameView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -169,6 +169,6 @@ struct ContainerNameView: View {
         onSaveContainerButtonClick: {},
         onRenameContainerButtonClick: {}
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

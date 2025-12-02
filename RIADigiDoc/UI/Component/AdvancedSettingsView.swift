@@ -24,21 +24,18 @@ struct AdvancedSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var navigateToSigningServicesSettings: Bool = false
-    @State private var navigateToValidationSettings = false
-    @State private var navigateToCryptoSettings = false
-    @State private var navigateToProxySettings = false
+    @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var checkedAskRoleAndAddress = false
 
-    @StateObject private var viewModel: AdvancedSettingsViewModel
+    @State private var viewModel: AdvancedSettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.advancedSettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.advancedSettingsViewModel())
     }
 
     var body: some View {
@@ -68,7 +65,7 @@ struct AdvancedSettingsView: View {
                                     }
                                 }
                             }
-                            .onChange(of: checkedAskRoleAndAddress) { newValue in
+                            .onChange(of: checkedAskRoleAndAddress) { _, newValue in
                                 Task {
                                     await viewModel.setIsRoleAndAddressEnabled(newValue)
                                 }
@@ -84,47 +81,27 @@ struct AdvancedSettingsView: View {
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings signing services title"),
                                 onClick: {
-                                    navigateToSigningServicesSettings = true
+                                    pathManager.navigate(to: .signingServicesSettingsView)
                                 }
                             )
-                            NavigationLink(
-                                destination: SigningServicesSettingsView(),
-                                isActive: $navigateToSigningServicesSettings
-                            ) { EmptyView() }
-                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings validation services title"),
                                 onClick: {
-                                    navigateToValidationSettings = true
+                                    pathManager.navigate(to: .validationSettingsView)
                                 }
                             )
-                            NavigationLink(
-                                destination: ValidationSettingsView(),
-                                isActive: $navigateToValidationSettings
-                            ) { EmptyView() }
-                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings crypto services title"),
                                 onClick: {
-                                    navigateToCryptoSettings = true
+                                    pathManager.navigate(to: .encryptionSettingsView)
                                 }
                             )
-                            NavigationLink(
-                                destination: EncryptionSettingsView(),
-                                isActive: $navigateToCryptoSettings
-                            ) { EmptyView() }
-                                .hidden()
                             AdvancedSettingsLinkRow(
                                 label: languageSettings.localized("Main settings proxy title"),
                                 onClick: {
-                                    navigateToProxySettings = true
+                                    pathManager.navigate(to: .proxySettingsView)
                                 }
                             )
-                            NavigationLink(
-                                destination: ProxySettingsView(),
-                                isActive: $navigateToProxySettings
-                            ) { EmptyView() }
-                                .hidden()
                         }
 
                         Button(
@@ -150,17 +127,13 @@ struct AdvancedSettingsView: View {
                 }
             }
         )
-        .onDisappear {
-            Task {
-                await viewModel.removeObservers()
-            }
-        }
     }
 }
 
 // MARK: - Preview
 #Preview {
     AdvancedSettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

@@ -26,9 +26,11 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @StateObject private var viewModel: ContentViewModel
+    @Environment(NavigationPathManager.self) private var pathManager
+
+    @State private var viewModel: ContentViewModel
 
     @State private var openedUrls: [URL] = []
     @State private var showHomeMenuBottomSheetFromButton = false
@@ -43,19 +45,19 @@ struct ContentView: View {
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
             onInfoClick: {
-                navigateToInfo = true
+                pathManager.navigate(to: .infoView)
             },
             onAccessibilityClick: {
-                navigateToAccessibility = true
+                pathManager.navigate(to: .accessibilityView)
             },
             onDiagnosticsClick: {
-                navigateToDiagnostics = true
+                pathManager.navigate(to: .diagnosticsView)
             }
         )
     }
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.contentViewModel())
+        _viewModel = State(wrappedValue: Container.shared.contentViewModel())
     }
 
     var body: some View {
@@ -69,23 +71,6 @@ struct ContentView: View {
                 ScrollView {
                     VStack {
                         HomeView(externalFiles: $openedUrls)
-
-                        NavigationLink(
-                            destination: InfoView(),
-                            isActive: $navigateToInfo
-                        ) { EmptyView() }
-                            .hidden()
-                        NavigationLink(
-                            destination: AccessibilityView(),
-                            isActive: $navigateToAccessibility
-                        ) { EmptyView() }
-                            .hidden()
-                        NavigationLink(
-                            destination: DiagnosticsView(),
-                            isActive: $navigateToDiagnostics
-                        ) { EmptyView() }
-                            .hidden()
-
                         Spacer()
                     }
                 }
@@ -103,7 +88,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .onChange(of: scenePhase) { newPhase in
+                .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         sharedFilesLoadingTask?.cancel()
 
@@ -127,6 +112,7 @@ struct ContentView: View {
 // MARK: - Preview
 #Preview {
     ContentView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

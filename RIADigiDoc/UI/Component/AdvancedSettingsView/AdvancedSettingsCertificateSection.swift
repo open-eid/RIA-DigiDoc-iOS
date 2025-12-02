@@ -23,7 +23,7 @@ import FactoryKit
 struct AdvancedSettingsCertificateSection: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     // MARK: Certificate info parameters
     var certificateInfoHeader: String
@@ -116,6 +116,6 @@ struct AdvancedSettingsCertificateSection: View {
         onAddCertificatePressed: {}
     )
     .padding()
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

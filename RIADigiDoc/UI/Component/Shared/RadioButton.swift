@@ -40,10 +40,10 @@ struct RadioButton: View {
     RadioButton(
         isChecked: true,
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 
     RadioButton(
         isChecked: false,
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

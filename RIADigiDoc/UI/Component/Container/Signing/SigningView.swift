@@ -28,7 +28,9 @@ struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
+
+    @Environment(NavigationPathManager.self) private var pathManager
 
     private let nameUtil: NameUtilProtocol
     private let signatureUtil: SignatureUtilProtocol
@@ -39,7 +41,7 @@ struct SigningView: View {
 
     @State private var selectedSignature: SignatureWrapper?
 
-    @StateObject private var viewModel: SigningViewModel
+    @State private var viewModel: SigningViewModel
 
     @State private var tempContainerURL: URL?
     @State private var isFileSaved: Bool = false
@@ -56,7 +58,6 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
-    @State private var isNavigatingToContainerNotificationsView = false
     @State private var isNavigatingToContainerSigningView = false
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
@@ -145,7 +146,7 @@ struct SigningView: View {
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.signingViewModel())
+        _viewModel = State(wrappedValue: Container.shared.signingViewModel())
         self.nameUtil = nameUtil
         self.signatureUtil = signatureUtil
         self.fileUtil = fileUtil
@@ -169,7 +170,9 @@ struct SigningView: View {
                 showExtraButton: !viewModel.containerNotifications.isEmpty,
                 extraBadgeCount: viewModel.containerNotifications.count,
                 onExtraButtonClick: {
-                    isNavigatingToContainerNotificationsView = true
+                    pathManager.navigate(to:
+                            .containerNotificationsView(notifications: viewModel.containerNotifications)
+                    )
                 },
                 content: {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
@@ -188,7 +191,7 @@ struct SigningView: View {
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                     rightActionButtonAccessibilityLabel: encryptAccessibilityLabel.lowercased(),
                                     onLeftActionButtonClick: {
-                                        isNavigatingToContainerSigningView = true
+                                        pathManager.navigate(to: .signingRootView)
                                     },
                                     onRightActionButtonClick: {
                                         // TODO: Implement encrypt functionality
@@ -217,7 +220,7 @@ struct SigningView: View {
                                         isFileSaved: $isFileSaved
                                     )
                                 )
-                                .onChange(of: viewModel.isNestedContainer()) { _ in
+                                .onChange(of: viewModel.isNestedContainer()) {
                                     Task {
                                         await updateSignAndEncryptButtonVisibility()
                                     }
@@ -252,7 +255,7 @@ struct SigningView: View {
                                                 nameUtil: nameUtil,
                                                 signatureUtil: signatureUtil
                                             )
-                                            .environmentObject(languageSettings)
+                                            .environment(languageSettings)
                                         }
                                     }
                                 } else {
@@ -313,7 +316,7 @@ struct SigningView: View {
                                 rightButtonLabel: signLabel,
                                 rightButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                 rightButtonAction: {
-                                    isNavigatingToContainerSigningView = true
+                                    pathManager.navigate(to: .signingRootView)
                                 }
                             )
                             .fileImporter(
@@ -345,6 +348,10 @@ struct SigningView: View {
                         }
                     }
                     .onAppear {
+                        if viewModel.isSignatureAdded() {
+                            selectedTab = .signatures
+                        }
+
                         containerLoadingTask = Task {
                             await viewModel.loadContainerData(
                                 signedContainer: viewModel.signedContainer
@@ -358,31 +365,6 @@ struct SigningView: View {
                     }
                 }
             )
-
-            NavigationLink(
-                destination: ContainerNotificationsView(
-                    notifications: viewModel.containerNotifications
-                ),
-                isActive: $isNavigatingToContainerNotificationsView
-            ) {}
-                .accessibilityHidden(!isNavigatingToContainerNotificationsView)
-
-            if let container = viewModel.signedContainer {
-                NavigationLink(
-                    destination:
-                        SigningRootView(
-                            signedContainer: container,
-                            onSuccess: { updatedContainer in
-                                Task {
-                                    Toast.show(languageSettings.localized("Signature added"))
-                                    await viewModel.loadContainerData(signedContainer: updatedContainer)
-                                    selectedTab = .signatures
-                                }
-                            }),
-                    isActive: $isNavigatingToContainerSigningView
-                ) {}
-                    .accessibilityHidden(!isNavigatingToContainerSigningView)
-            }
 
             if showRenameModal {
                 RenameModalView(
@@ -425,11 +407,10 @@ struct SigningView: View {
         }
         .animation(.easeInOut, value: showRenameModal)
         .animation(.easeInOut, value: showRemoveSignatureModal)
-        .onReceive(viewModel.$errorMessage) { error in
+        .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
-            let (key, args) = error
             Toast.show(
-                languageSettings.localized(key, [args.joined(separator: ", ")])
+                languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
             )
         }
     }
@@ -485,6 +466,7 @@ struct SigningView: View {
 
 #Preview {
     SigningView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

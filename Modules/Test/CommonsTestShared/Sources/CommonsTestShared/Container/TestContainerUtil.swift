@@ -28,7 +28,7 @@ public struct TestContainerUtil {
         let subfolder = "TestContainers"
         let tempDirectory = TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
         let uniqueZipName = "\(UUID().uuidString).\(containerExtension)"
-        let zipURL = tempDirectory.appendingPathComponent(uniqueZipName)
+        let zipURL = tempDirectory.appending(path: uniqueZipName)
 
         do {
             let archive = try Archive(url: zipURL, accessMode: .create)

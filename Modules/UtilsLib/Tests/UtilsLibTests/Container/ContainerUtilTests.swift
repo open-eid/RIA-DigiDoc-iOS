@@ -41,7 +41,7 @@ struct ContainerUtilTests {
     func getSignatureContainerFile_successWithFileNameWithoutChanges() async {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
         let uniqueFileName = "file-\(UUID().uuidString).txt"
-        let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
+        let fileURL = tempDirectory.appending(path: uniqueFileName)
 
         let uniqueFileURL = containerUtil.getContainerFile(
             for: fileURL,
@@ -56,11 +56,11 @@ struct ContainerUtilTests {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
 
         let uniqueFileName = "file-\(UUID().uuidString).txt"
-        let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
+        let fileURL = tempDirectory.appending(path: uniqueFileName)
 
         let existingPaths: Set<String> = [
-            fileURL.path,
-            tempDirectory.appendingPathComponent("\(uniqueFileName)").appendingPathExtension("txt").path
+            fileURL.resolvedPath,
+            tempDirectory.appending(path: "\(uniqueFileName).txt").resolvedPath
         ]
 
         mockFileManager.fileExistsHandler = { path in
@@ -80,12 +80,12 @@ struct ContainerUtilTests {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
 
         let uniqueFileName = "file-\(UUID().uuidString)"
-        let fileURL = tempDirectory.appendingPathComponent("\(uniqueFileName).txt")
+        let fileURL = tempDirectory.appending(path: "\(uniqueFileName).txt")
 
         let existingPaths: Set<String> = [
-            fileURL.path,
-            tempDirectory.appendingPathComponent("\(uniqueFileName)-1").appendingPathExtension("txt").path,
-            tempDirectory.appendingPathComponent("\(uniqueFileName)-2").appendingPathExtension("txt").path
+            fileURL.resolvedPath,
+            tempDirectory.appending(path: "\(uniqueFileName)-1.txt").resolvedPath,
+            tempDirectory.appending(path: "\(uniqueFileName)-2.txt").resolvedPath
         ]
 
         mockFileManager.fileExistsHandler = { path in
@@ -104,10 +104,10 @@ struct ContainerUtilTests {
     func getSignatureContainerFile_successWithNoFileExtension() async {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
         let uniqueFileName = "file-\(UUID().uuidString)"
-        let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
+        let fileURL = tempDirectory.appending(path: uniqueFileName)
 
         let existingPaths: Set<String> = [
-            fileURL.path
+            fileURL.resolvedPath
         ]
 
         mockFileManager.fileExistsHandler = { path in
@@ -127,11 +127,11 @@ struct ContainerUtilTests {
         let tempDirectory = URL(fileURLWithPath: "/tmp")
 
         let uniqueFileName = "file-name_with.symbols-\(UUID().uuidString).txt"
-        let fileURL = tempDirectory.appendingPathComponent(uniqueFileName)
+        let fileURL = tempDirectory.appending(path: uniqueFileName)
 
         let existingPaths: Set<String> = [
-            fileURL.path,
-            tempDirectory.appendingPathComponent("\(uniqueFileName)").appendingPathExtension("txt").path
+            fileURL.resolvedPath,
+            tempDirectory.appending(path: "\(uniqueFileName).txt").resolvedPath
         ]
 
         mockFileManager.fileExistsHandler = { path in
@@ -150,8 +150,8 @@ struct ContainerUtilTests {
     func getSignatureContainersDir_success() throws {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
         let expectedDir = cachesDir
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(Constants.Container.SignedContainerFolder)
+            .appending(path: BundleUtil.getBundleIdentifier())
+            .appending(path: Constants.Container.SignedContainerFolder)
 
         mockFileManager.urlHandler = { directory, _, _, _ in
             #expect(directory == .cachesDirectory)
@@ -161,7 +161,7 @@ struct ContainerUtilTests {
 
         let signatureContainersDir = try containerUtil.getSignatureContainersDir()
 
-        #expect(signatureContainersDir.path == expectedDir.path)
+        #expect(signatureContainersDir.resolvedPath == expectedDir.resolvedPath)
     }
 
     @Test
@@ -184,11 +184,11 @@ struct ContainerUtilTests {
     @Test
     func getContainerDataFilesDir_returnDirectoryWhenFileInSignatureDirAndUseCacheDir() throws {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
-        let signatureDir = cachesDir.appendingPathComponent(Constants.Container.SignedContainerFolder)
-        let containerFile = signatureDir.appendingPathComponent("file.asice")
+        let signatureDir = cachesDir.appending(path: Constants.Container.SignedContainerFolder)
+        let containerFile = signatureDir.appending(path: "file.asice")
         let expectedDataDir = cachesDir
-            .appendingPathComponent(Constants.Container.SignedContainerFolder)
-            .appendingPathComponent("file.asice-data-files")
+            .appending(path: Constants.Container.SignedContainerFolder)
+            .appending(path: "file.asice-data-files")
 
         mockFileManager.urlHandler = { _, _, _, _ in cachesDir }
         mockFileManager.urlsHandler = { _, _ in [cachesDir] }
@@ -198,7 +198,7 @@ struct ContainerUtilTests {
 
         let containerDataFilesDir = try containerUtil.getContainerDataFilesDir(containerFile: containerFile)
 
-        #expect(containerDataFilesDir.path == expectedDataDir.path)
+        #expect(containerDataFilesDir.resolvedPath == expectedDataDir.resolvedPath)
     }
 
     @Test
@@ -206,8 +206,8 @@ struct ContainerUtilTests {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
 
         let containerDir = URL(fileURLWithPath: "/some/other")
-        let containerFile = containerDir.appendingPathComponent("otherfile.asice")
-        let expectedDataDir = containerDir.appendingPathComponent("otherfile.asice-data-files")
+        let containerFile = containerDir.appending(path: "otherfile.asice")
+        let expectedDataDir = containerDir.appending(path: "otherfile.asice-data-files")
 
         mockFileManager.urlsHandler = { _, _ in [cachesDir] }
 
@@ -217,6 +217,6 @@ struct ContainerUtilTests {
 
         let containerDataFilesDir = try containerUtil.getContainerDataFilesDir(containerFile: containerFile)
 
-        #expect(containerDataFilesDir.path == expectedDataDir.path)
+        #expect(containerDataFilesDir.resolvedPath == expectedDataDir.resolvedPath)
     }
 }

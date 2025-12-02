@@ -28,7 +28,7 @@ struct EncryptView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     private let nameUtil: NameUtilProtocol
     private let signatureUtil: SignatureUtilProtocol
@@ -37,7 +37,7 @@ struct EncryptView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: EncryptViewTab = .files
 
-    @StateObject private var viewModel: EncryptViewModel
+    @State private var viewModel: EncryptViewModel
 
     @State private var containerTitle: String = ""
     @State private var encryptDecryptLabel: String = ""
@@ -54,8 +54,6 @@ struct EncryptView: View {
     @State private var selectedDataFile: URL?
 
     @State private var showSivaMessage = false
-
-    @State private var isNavigatingToContainerNotificationsView = false
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
@@ -155,7 +153,7 @@ struct EncryptView: View {
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.encryptViewModel())
+        _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
         self.nameUtil = nameUtil
         self.signatureUtil = signatureUtil
         self.fileUtil = fileUtil
@@ -222,7 +220,7 @@ struct EncryptView: View {
                                         isFileSaved: $isFileSaved
                                     )
                                 )
-                                .onChange(of: viewModel.isNestedContainer()) { _ in
+                                .onChange(of: viewModel.isNestedContainer()) {
                                     Task {
                                         await updateAsyncLabels()
                                         await viewModel.updateAsyncProperties()
@@ -281,7 +279,7 @@ struct EncryptView: View {
                                             }
                                         } else {
                                             // TODO: RecipientListView
-                                            // .environmentObject(languageSettings)
+                                            // .environment(languageSettings)
                                         }
                                     }
                                 }
@@ -357,12 +355,11 @@ struct EncryptView: View {
             }
         }
         .animation(.easeInOut, value: showRenameModal)
-        .onReceive(viewModel.$errorMessage) { error in
+        .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
-            let (key, args) = error
             Toast.show(String(
-                format: languageSettings.localized(key),
-                args.joined(separator: ", "))
+                format: languageSettings.localized(error.key),
+                error.args.joined(separator: ", "))
             )
         }
     }
@@ -399,6 +396,6 @@ struct EncryptView: View {
 
 #Preview {
     EncryptView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

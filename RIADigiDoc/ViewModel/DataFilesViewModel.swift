@@ -23,8 +23,9 @@ import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class DataFilesViewModel: ObservableObject {
+class DataFilesViewModel: DataFilesViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DataFilesViewModel")
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
@@ -53,7 +54,7 @@ class DataFilesViewModel: ObservableObject {
 
     func checkIfContainerFileExists(fileLocation: URL?) -> Bool {
         guard let file = fileLocation else { return false }
-        return fileManager.fileExists(atPath: file.path)
+        return fileManager.fileExists(atPath: file.resolvedPath)
     }
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {

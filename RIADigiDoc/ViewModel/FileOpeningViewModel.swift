@@ -24,17 +24,19 @@ import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class FileOpeningViewModel: FileOpeningViewModelProtocol, ObservableObject {
-    @Published var isFileOpeningLoading: Bool = false
-    @Published var isNavigatingToNextView: Bool = false
-    @Published var isSivaConfirmed = false
+class FileOpeningViewModel: FileOpeningViewModelProtocol {
+    var isFileOpeningLoading: Bool = false
+    var isNavigatingToNextView: Bool = false
+    var isSivaConfirmed = false
 
-    @Published var signedContainer: SignedContainerProtocol = SignedContainer(
+    var signedContainer: SignedContainerProtocol = SignedContainer(
         fileManager: Container.shared.fileManager(),
         containerUtil: Container.shared.containerUtil()
     )
-    @Published var errorMessage: ToastMessage?
+
+    var errorMessage: ToastMessage?
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 

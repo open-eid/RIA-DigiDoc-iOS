@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct RecentDocumentFileView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -88,6 +88,6 @@ struct RecentDocumentFileView: View {
         onOpenContainer: {},
         onRemoveContainer: {}
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

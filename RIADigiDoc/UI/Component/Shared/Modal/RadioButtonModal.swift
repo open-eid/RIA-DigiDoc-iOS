@@ -20,7 +20,7 @@
 import SwiftUI
 
 public struct RadioButtonModal<Option: Identifiable & Hashable>: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 

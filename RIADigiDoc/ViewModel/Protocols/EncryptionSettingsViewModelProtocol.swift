@@ -42,8 +42,4 @@ public protocol EncryptionSettingsViewModelProtocol: Sendable {
 
     // MARK: - Cert Import
     func importCert(from url: URL) async
-
-    // MARK: - Observer
-    func observeConfigurationUpdates() async
-    func removeObservers() async
 }
