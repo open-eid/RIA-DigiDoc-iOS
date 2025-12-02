@@ -172,7 +172,7 @@ struct ConfigurationPropertiesTests {
 
     private func createMockPropertiesFile(content: String) -> URL {
         let directory = FileManager.default.temporaryDirectory
-        let filePath = directory.appendingPathComponent("default.properties")
+        let filePath = directory.appending(path: "default.properties")
         try? content.write(to: filePath, atomically: true, encoding: .utf8)
         return filePath
     }

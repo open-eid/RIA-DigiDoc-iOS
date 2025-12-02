@@ -22,11 +22,11 @@ import SwiftUI
 
 struct LanguageChooserView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
-    @StateObject private var viewModel: LanguageChooserViewModel
+    @Environment(LanguageSettings.self) private var languageSettings
+    @State private var viewModel: LanguageChooserViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.languageChooserViewModel())
+        _viewModel = State(wrappedValue: Container.shared.languageChooserViewModel())
     }
 
     private let supportedLanguages: [SupportedLanguage] = [
@@ -72,6 +72,6 @@ struct LanguageChooserView: View {
 // MARK: - Preview
 #Preview {
     LanguageChooserView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

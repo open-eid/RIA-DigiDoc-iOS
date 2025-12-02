@@ -26,7 +26,7 @@ final class TSLParserDelegateTests {
     private var xmlParser: XMLParser!
 
     init() async throws {
-        parserDelegate = TSLParserDelegate(sequenceNumberElement: "TSLSequenceNumber")
+        parserDelegate = TSLParserDelegate(sequenceNumberElements: ["TSLSequenceNumber"])
     }
 
     deinit {

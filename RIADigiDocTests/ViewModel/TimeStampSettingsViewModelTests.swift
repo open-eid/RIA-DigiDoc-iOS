@@ -35,8 +35,6 @@ final class TimeStampSettingsViewModelTests {
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
     private let mockCertificateUtil: CertificateUtilProtocolMock!
 
-    let mockConfigProvider: ConfigurationProvider!
-
     init() async throws {
         mockDataStore = DataStoreProtocolMock()
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
@@ -51,11 +49,9 @@ final class TimeStampSettingsViewModelTests {
             return .defaultSetting
         }
 
-        mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
-        TestConfigurationSetup.configureMocks(
-            configurationRepository: mockConfigurationRepository,
-            configProvider: mockConfigProvider
-        )
+        mockConfigurationRepository.getConfigurationHandler = {
+            try? TestConfigurationProvider.mockConfigurationProvider()
+        }
 
         viewModel = TimeStampSettingsViewModel(
             configurationRepository: mockConfigurationRepository,
@@ -80,6 +76,10 @@ final class TimeStampSettingsViewModelTests {
             advancedSettingsRepository: mockAdvancedSettingsRepository,
             certificateUtil: mockCertificateUtil
         )
+
+        mockConfigurationRepository.getConfigurationHandler = {
+            try? TestConfigurationProvider.mockConfigurationProvider()
+        }
 
         await testViewModel.initializeSettings()
 
@@ -107,7 +107,7 @@ final class TimeStampSettingsViewModelTests {
         viewModel.selectedOption = .manualSetting
         let testURL = ""
         viewModel.tsaUrl = testURL
-        await viewModel.observeConfigurationUpdates()
+        viewModel.configuration = try? TestConfigurationProvider.mockConfigurationProvider()
 
         await viewModel.saveSettings()
 

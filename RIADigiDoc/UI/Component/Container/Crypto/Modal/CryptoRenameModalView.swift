@@ -21,13 +21,24 @@ import SwiftUI
 import CommonsLib
 
 struct CryptoRenameModalView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @ObservedObject var encryptViewModel: EncryptViewModel
+    @State private var encryptViewModel: EncryptViewModel
+
     @Binding var showRenameModal: Bool
     @Binding var newContainerName: String
+
+    init(
+        encryptViewModel: EncryptViewModel,
+        showRenameModal: Binding<Bool>,
+        newContainerName: Binding<String>
+    ) {
+        self.encryptViewModel = encryptViewModel
+        self._showRenameModal = showRenameModal
+        self._newContainerName = newContainerName
+    }
 
     var body: some View {
         ZStack {

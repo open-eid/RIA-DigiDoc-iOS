@@ -22,7 +22,7 @@ import SwiftUI
 
 struct RadioButtonRow<T: Equatable>: View {
     @AppTheme private var theme
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTypography private var typography
 
     let title: String

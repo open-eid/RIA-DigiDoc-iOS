@@ -47,7 +47,7 @@ extension View {
     ) -> some View {
         self
             .accessibilityFocused(focusedField, equals: field)
-            .onChange(of: condition) { newValue in
+            .onChange(of: condition) { _, newValue in
                 if !newValue {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                         focusedField.wrappedValue = field

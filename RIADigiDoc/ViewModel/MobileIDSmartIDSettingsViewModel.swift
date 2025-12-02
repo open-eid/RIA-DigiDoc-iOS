@@ -20,14 +20,14 @@
 import CommonsLib
 import OSLog
 
+@Observable
 @MainActor
-class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol,
-                                        ObservableObject {
+class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIDAndSmartIDServicesSettingsViewModel")
 
-    @Published var relyingPartyUUID: String = ""
-    @Published var selectedOption: ServicesSettingsOption = .defaultSetting
+    var relyingPartyUUID: String = ""
+    var selectedOption: ServicesSettingsOption = .defaultSetting
 
     private let dataStore: DataStoreProtocol
 

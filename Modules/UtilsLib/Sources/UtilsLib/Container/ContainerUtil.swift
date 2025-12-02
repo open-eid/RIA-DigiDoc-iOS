@@ -43,12 +43,12 @@ public struct ContainerUtil: ContainerUtilProtocol {
         var uniqueFileURL = fileURL
         var fileNameCounter = 1
 
-        while fileManager.fileExists(atPath: uniqueFileURL.path) {
+        while fileManager.fileExists(atPath: uniqueFileURL.resolvedPath) {
             let newFileName = "\(baseName)-\(fileNameCounter)"
             if !fileExtension.isEmpty {
-                uniqueFileURL = directory.appendingPathComponent(newFileName).appendingPathExtension(fileExtension)
+                uniqueFileURL = directory.appending(path: "\(newFileName).\(fileExtension)")
             } else {
-                uniqueFileURL = directory.appendingPathComponent(newFileName)
+                uniqueFileURL = directory.appending(path: newFileName)
             }
             fileNameCounter += 1
         }
@@ -65,7 +65,9 @@ public struct ContainerUtil: ContainerUtilProtocol {
         do {
             try fileManager
                 .createDirectory(at: signedContainersDirectory, withIntermediateDirectories: true, attributes: [:])
-            ContainerUtil.logger.debug("Directories created or already exist for \(signedContainersDirectory.path)")
+            ContainerUtil.logger.debug(
+                "Directories created or already exist for \(signedContainersDirectory.resolvedPath)"
+            )
         } catch {
             ContainerUtil.logger.error("Unable to create signature containers dir: \(error.localizedDescription)")
             throw error
@@ -106,10 +108,10 @@ public struct ContainerUtil: ContainerUtilProtocol {
                 dirName.append("\(index)")
             }
 
-            let targetDirectory = baseDirectory.appendingPathComponent(dirName, isDirectory: true)
+            let targetDirectory = baseDirectory.appending(path: dirName, directoryHint: .isDirectory)
 
             var isDirectory: ObjCBool = false
-            let exists = fileManager.fileExists(atPath: targetDirectory.path, isDirectory: &isDirectory)
+            let exists = fileManager.fileExists(atPath: targetDirectory.resolvedPath, isDirectory: &isDirectory)
 
             if !exists || isDirectory.boolValue {
                 do {
@@ -119,7 +121,7 @@ public struct ContainerUtil: ContainerUtilProtocol {
                         attributes: [:]
                     )
                     if let base = directory {
-                        ContainerUtil.logger.debug("Directories created or already exist for \(base.path)")
+                        ContainerUtil.logger.debug("Directories created or already exist for \(base.resolvedPath)")
                     }
                 } catch {
                     ContainerUtil.logger.error("Failed to create directory: \(error.localizedDescription)")

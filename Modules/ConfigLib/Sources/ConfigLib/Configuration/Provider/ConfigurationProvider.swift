@@ -20,9 +20,8 @@
 import Foundation
 import UtilsLib
 
-public struct ConfigurationProvider: Codable, Sendable {
-
-    public struct MetaInf: Codable, Sendable {
+public struct ConfigurationProvider: Codable, Sendable, Equatable {
+    public struct MetaInf: Codable, Sendable, Equatable {
         public let url: String
         public let date: String
         public let serial: Int
@@ -44,7 +43,7 @@ public struct ConfigurationProvider: Codable, Sendable {
         }
     }
 
-    public struct CDOC2Conf: Codable, Sendable {
+    public struct CDOC2Conf: Codable, Sendable, Equatable {
         public let name: String
         public let postURL: URL
         public let fetchURL: URL

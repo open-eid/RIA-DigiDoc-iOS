@@ -20,7 +20,7 @@
 import SwiftUI
 
 struct ToastOverlay: View {
-    @ObservedObject private var toast = ToastController.shared
+    private var toast = ToastController.shared
 
     @AppTheme private var theme
 
@@ -36,7 +36,7 @@ struct ToastOverlay: View {
                     .padding(.vertical, Dimensions.Padding.MSPadding)
                     .background(theme.onBackground.opacity(0.9))
                     .foregroundStyle(theme.background)
-                    .cornerRadius(Dimensions.Corner.MSCornerRadius)
+                    .clipShape(RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius))
                     .shadow(radius: Dimensions.Corner.XXSCornerRadius)
                     .padding(.horizontal, Dimensions.Padding.SPadding)
                     .transition(

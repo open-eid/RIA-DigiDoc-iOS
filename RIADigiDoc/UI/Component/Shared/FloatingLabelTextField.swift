@@ -24,7 +24,7 @@ struct FloatingLabelTextField: View {
     @Environment(\.sizeCategory) private var sizeCategory
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var floatingLabelHeight: CGFloat = 0
 
@@ -304,7 +304,7 @@ struct FloatingLabelTextField: View {
         .font(typography.bodyLarge)
         .foregroundStyle(textColor)
         .focused($fieldIsFocused)
-        .onChange(of: fieldIsFocused) { newValue in
+        .onChange(of: fieldIsFocused) { _, newValue in
             if isInteractionEnabled {
                 withAnimation(.easeInOut(duration: Dimensions.Duration.focusAnimation)) {
                     isFocused = newValue
@@ -395,7 +395,7 @@ struct FloatingLabelTextField: View {
                         Color.clear.onAppear {
                             floatingLabelHeight = geometry.size.height
                         }
-                        .onChange(of: geometry.size.height) { newHeight in
+                        .onChange(of: geometry.size.height) { _, newHeight in
                             floatingLabelHeight = newHeight
                         }
                     }
@@ -455,6 +455,6 @@ struct FloatingLabelTextField: View {
         )
     }
     .padding()
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

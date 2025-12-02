@@ -25,18 +25,19 @@ import OSLog
 import UniformTypeIdentifiers
 import UtilsLib
 
+@Observable
 @MainActor
-class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, ObservableObject {
+class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TimeStampServicesSettingsViewModel")
 
     // MARK: - Variables
-    @Published var configuration: ConfigurationProvider?
-    @Published var tsaUrl: String = ""
-    @Published var selectedOption: ServicesSettingsOption = .defaultSetting
-    @Published var tsaCertData: Data?
-    @Published var isImportingTSACert: Bool = false
-    @Published var isLoading: Bool = true
+    var configuration: ConfigurationProvider?
+    var tsaUrl: String = ""
+    var selectedOption: ServicesSettingsOption = .defaultSetting
+    var tsaCertData: Data?
+    var isImportingTSACert: Bool = false
+    var isLoading: Bool = true
 
     // MARK: - Dependencies
     private let configurationRepository: ConfigurationRepositoryProtocol
@@ -44,8 +45,6 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
     private let fileManager: FileManagerProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let certificateUtil: CertificateUtilProtocol
-
-    private var configurationObservationTask: Task<Void, Never>?
 
     // MARK: - Init
 
@@ -62,35 +61,19 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
         self.advancedSettingsRepository = advancedSettingsRepository
         self.certificateUtil = certificateUtil
 
-        configurationObservationTask = Task {
-            await observeConfigurationUpdates()
-        }
-
         Task {
             await initializeSettings()
         }
     }
 
-    public func removeObservers() async {
-        configurationObservationTask?.cancel()
-    }
-
     // MARK: - Init helpers
 
     public func initializeSettings() async {
-        await ensureConfigurationLoaded()
+        await configuration = configurationRepository.getConfiguration()
         await loadSettings()
         await loadTSACert()
 
         isLoading = false
-    }
-
-    private func ensureConfigurationLoaded() async {
-        if configuration == nil {
-            for await config in $configuration.values where config != nil {
-                break
-            }
-        }
     }
 
     private func loadSettings() async {
@@ -155,28 +138,5 @@ class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Observable
             certificateFolder: CommonsLib.Constants.Folder.TSACert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.TSACert
         )
-    }
-
-    // MARK: - Observer
-
-    public func observeConfigurationUpdates() async {
-        guard !Task.isCancelled else {
-            return
-        }
-
-        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
-            TimeStampSettingsViewModel.logger.error("Unable to get configuration updates stream")
-            return
-        }
-
-        do {
-            for try await config in configStream {
-                await MainActor.run {
-                    configuration = config
-                }
-            }
-        } catch {
-            TimeStampSettingsViewModel.logger.error("Unable to get configuration from stream")
-        }
     }
 }

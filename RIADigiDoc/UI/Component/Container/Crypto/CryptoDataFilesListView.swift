@@ -22,7 +22,7 @@ import LibdigidocLibSwift
 import FactoryKit
 
 struct CryptoDataFilesListView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -87,6 +87,6 @@ struct CryptoDataFilesListView: View {
         onSaveDataFileButtonClick: { _ in },
         onRemoveFileButtonClick: { _ in }
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

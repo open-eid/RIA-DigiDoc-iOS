@@ -21,7 +21,7 @@ import FactoryKit
 import SwiftUI
 
 struct DiagnosticsHeaderButtons: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     let onCheckUpdateClick: () -> Void
     let onSaveDiagnosticsClick: () -> Void
@@ -50,6 +50,6 @@ struct DiagnosticsHeaderButtons: View {
         onCheckUpdateClick: {},
         onSaveDiagnosticsClick: {},
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

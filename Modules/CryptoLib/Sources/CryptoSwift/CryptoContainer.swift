@@ -149,7 +149,7 @@ public actor CryptoContainer: CryptoContainerProtocol {
 
         let destinationURL = currentURL
             .deletingLastPathComponent()
-            .appendingPathComponent(newFileName)
+            .appending(path: newFileName)
 
         let uniqueFileURL = containerUtil.getContainerFile(
             for: destinationURL,
@@ -173,12 +173,12 @@ public actor CryptoContainer: CryptoContainerProtocol {
             subfolder: CommonsLib.Constants.Folder.SavedFiles,
             fileManager: fileManager
         )
-        let file = savedFilesDirectory.appendingPathComponent(sanitizedName)
+        let file = savedFilesDirectory.appending(path: sanitizedName)
         let dataFiles = await getDataFiles()
 
         for containerDataFile in dataFiles
         where dataFile.lastPathComponent == containerDataFile.lastPathComponent {
-                if !fileManager.fileExists(atPath: file.path) {
+                if !fileManager.fileExists(atPath: file.resolvedPath) {
                     try save(containerDataFile, as: file)
                 }
                 return file
@@ -271,17 +271,17 @@ extension CryptoContainer {
 
             let destinationPath = try Directories
                 .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
-            let fileUrl = destinationPath.appendingPathComponent(dataFile.key)
+            let fileUrl = destinationPath.appending(path: dataFile.key)
 
-            cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.path))
+            cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.resolvedPath))
             urlDataFiles.append(fileUrl)
             let isCreated =
             fileManager.createFile(
-                atPath: destinationPath.path, contents: dataFile.value, attributes: nil
+                atPath: destinationPath.resolvedPath, contents: dataFile.value, attributes: nil
             )
 
             if !isCreated {
-                CryptoContainer.logger.error("Unable to create file at path: \(destinationPath.path)")
+                CryptoContainer.logger.error("Unable to create file at path: \(destinationPath.resolvedPath)")
             }
         }
 
@@ -336,7 +336,7 @@ extension CryptoContainer {
     }
 
     private static func open(containerFile: URL) async throws -> CryptoContainerProtocol {
-        guard let cdocInfo = try Decrypt.cdocInfo(containerFile.path) as? CdocInfo else {
+        guard let cdocInfo = try Decrypt.cdocInfo(containerFile.resolvedPath) as? CdocInfo else {
             throw CryptoError.containerOpeningFailed(
                 CryptoErrorDetail(
                     message: "Cannot open container with invalid CDOC info"
@@ -357,7 +357,7 @@ extension CryptoContainer {
                     )
                 )
             }
-            let fileUrl = URL(fileURLWithPath: filePath).appendingPathComponent(dataFile.filename)
+            let fileUrl = URL(fileURLWithPath: filePath).appending(path: dataFile.filename)
 
             dataFiles.append(fileUrl)
         }

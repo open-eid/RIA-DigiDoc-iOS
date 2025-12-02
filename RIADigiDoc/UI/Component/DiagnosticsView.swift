@@ -24,7 +24,7 @@ import UtilsLib
 struct DiagnosticsView: View {
     @AppTheme private var theme
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @Environment(\.dismiss) private var dismiss
 
@@ -36,12 +36,12 @@ struct DiagnosticsView: View {
     @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
 
-    @StateObject private var viewModel: DiagnosticsViewModel
+    @State private var viewModel: DiagnosticsViewModel
 
     init(
         fileUtil: FileUtilProtocol = Container.shared.fileUtil(),
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.diagnosticsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.diagnosticsViewModel())
         self.fileUtil = fileUtil
     }
 
@@ -83,8 +83,15 @@ struct DiagnosticsView: View {
                                 label: languageSettings.localized("Main diagnostics logging switch")
                             )
 
-                            DiagnosticsSections()
-                                .environmentObject(viewModel)
+                            DiagnosticsSections(
+                                versionSectionContent: viewModel.versionSectionContent,
+                                osSectionContent: viewModel.osSectionContent,
+                                libdigidocVersion: viewModel.libdigidocVersion,
+                                urlSectionContent: viewModel.urlSectionContent,
+                                cdoc2SectionContent: viewModel.cdoc2SectionContent,
+                                tslSectionContent: viewModel.tslSectionContent,
+                                centralConfigurationSectionContent: viewModel.centralConfigurationSectionContent
+                            )
                         }
                     )
                     .padding(Dimensions.Padding.SPadding)
@@ -99,14 +106,17 @@ struct DiagnosticsView: View {
                             isFileSaved: $isFileSaved
                         )
                     )
-                    .onAppear {
-                        Task {
-                            await viewModel
-                                .getConfigurationData(
-                                    configuration: viewModel.configuration
-                                )
-                        }
+                    .task {
+                        await viewModel
+                            .getConfigurationData(
+                                configuration: viewModel.configuration
+                            )
                     }
+                    .onChange(of: viewModel.configuration, { _, newConfig in
+                        if let newConfig {
+                            Task { await viewModel.getConfigurationData(configuration: newConfig) }
+                        }
+                    })
                     .onDisappear {
                         Task {
                             await viewModel.removeObservers()
@@ -121,6 +131,6 @@ struct DiagnosticsView: View {
 // MARK: - Preview
 #Preview {
     DiagnosticsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

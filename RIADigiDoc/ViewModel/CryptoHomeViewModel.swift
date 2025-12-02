@@ -24,12 +24,13 @@ import CryptoSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class CryptoHomeViewModel: CryptoHomeViewModelProtocol, ObservableObject {
+class CryptoHomeViewModel: CryptoHomeViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
 
-    @Published var isImporting = false
-    @Published var signedContainer: CryptoContainerProtocol = CryptoContainer(
+    var isImporting = false
+    var signedContainer: CryptoContainerProtocol = CryptoContainer(
         fileManager: Container.shared.fileManager(),
         containerUtil: Container.shared.containerUtil()
     )
@@ -61,7 +62,7 @@ class CryptoHomeViewModel: CryptoHomeViewModelProtocol, ObservableObject {
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appendingPathComponent(Constants.Container.CryptoContainerFolder)
+                .appending(path: Constants.Container.CryptoContainerFolder)
         } catch {
             CryptoHomeViewModel.logger.error("Unable to get crypto recent documents folder: \(error)")
             return nil

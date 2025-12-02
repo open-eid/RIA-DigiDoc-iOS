@@ -24,21 +24,21 @@ import CryptoSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
-
+class EncryptViewModel: EncryptViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptViewModel")
 
-    @Published var dataFiles: [URL] = []
-    @Published var containerName: String = CommonsLib.Constants.Container.DefaultName
-    @Published var containerMimetype: String = "N/A"
-    @Published var containerURL: URL?
-    @Published var previewFile: URL?
-    @Published var selectedDataFile: URL?
-    @Published var isShowingContainerFileSaver = false
-    @Published var isShowingFileSaver = false
-    @Published var isLastDataFileRemoved = false
-    @Published private(set) var errorMessage: (String, [String])?
+    var dataFiles: [URL] = []
+    var containerName: String = CommonsLib.Constants.Container.DefaultName
+    var containerMimetype: String = "N/A"
+    var containerURL: URL?
+    var previewFile: URL?
+    var selectedDataFile: URL?
+    var isShowingContainerFileSaver = false
+    var isShowingFileSaver = false
+    var isLastDataFileRemoved = false
+    private(set) var errorMessage: ErrorMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
@@ -48,18 +48,18 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
     private let fileManager: FileManagerProtocol
     private let sivaRepository: SivaRepositoryProtocol
 
-    @Published private(set) var cryptoContainer: CryptoContainerProtocol?
+    private(set) var cryptoContainer: CryptoContainerProtocol?
 
-    @Published private(set) var isContainerWithoutRecipients = false
-    @Published private(set) var isContainerEncrypted = false
-    @Published private(set) var isContainerDecrypted = false
-    @Published private(set) var isContainerUnlocked = false
-    @Published private(set) var isEncryptButtonShown = false
-    @Published private(set) var isDecryptButtonShown = false
-    @Published private(set) var isSignButtonShown = false
-    @Published private(set) var isShareButtonShown = false
-    @Published private(set) var isEditButtonShown = false
-    @Published private(set) var shouldShowDatafiles = false
+    private(set) var isContainerWithoutRecipients = false
+    private(set) var isContainerEncrypted = false
+    private(set) var isContainerDecrypted = false
+    private(set) var isContainerUnlocked = false
+    private(set) var isEncryptButtonShown = false
+    private(set) var isDecryptButtonShown = false
+    private(set) var isSignButtonShown = false
+    private(set) var isShareButtonShown = false
+    private(set) var isEditButtonShown = false
+    private(set) var shouldShowDatafiles = false
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
@@ -114,9 +114,9 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
                 ? CommonsLib.Constants.Container.DefaultName
                 : containerLocation.lastPathComponent.sanitized()
 
-            let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(filename)
+            let tempSavedFileLocation = savedFilesDirectory.appending(path: filename)
 
-            if fileManager.fileExists(atPath: tempSavedFileLocation.path) {
+            if fileManager.fileExists(atPath: tempSavedFileLocation.resolvedPath) {
                 do {
                     try fileManager.removeItem(at: tempSavedFileLocation)
                 } catch {
@@ -153,12 +153,15 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
                 switch cryptoError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = ("Failed to rename file", [errorDetail.userInfo["fileName"] ?? ""])
+                    errorMessage = ErrorMessage(
+                        key: "Failed to rename file",
+                        args: [errorDetail.userInfo["fileName"] ?? ""]
+                    )
                 default:
-                    errorMessage = ("General error", [])
+                    errorMessage = ErrorMessage(key: "General error", args: [])
                 }
             } else {
-                errorMessage = ("General error", [])
+                errorMessage = ErrorMessage(key: "General error", args: [])
             }
             return nil
         }
@@ -201,13 +204,13 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
                     // TODO: Open signed container files
                 } catch {
                     EncryptViewModel.logger.error("Failed to open nested container: \(error)")
-                    errorMessage = ("Failed to open container", [dataFile.lastPathComponent])
+                    errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ("Failed to open file", [dataFile.lastPathComponent])
+            errorMessage = ErrorMessage(key: "Failed to open file", args: [dataFile.lastPathComponent])
         }
     }
 
@@ -220,7 +223,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             isShowingFileSaver = true
 
         case .failure:
-            errorMessage = ("Failed to save file", [dataFile.lastPathComponent])
+            errorMessage = ErrorMessage(key: "Failed to save file", args: [dataFile.lastPathComponent])
             isShowingFileSaver = false
         }
     }
@@ -232,7 +235,7 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ("Failed to open container", [dataFile.lastPathComponent])
+            errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
             return false
         }
     }
@@ -374,7 +377,10 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             EncryptViewModel.logger.error(
                 "Unable to remove file from container. CryptoContainer or containerURL is nil"
             )
-            errorMessage = ("Failed to remove file from container", [dataFile.lastPathComponent])
+            errorMessage = ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [dataFile.lastPathComponent]
+            )
             return
         }
 
@@ -390,7 +396,10 @@ class EncryptViewModel: EncryptViewModelProtocol, ObservableObject {
             return
         } catch {
             EncryptViewModel.logger.error("Unable to remove file from container. \(error)")
-            errorMessage = ("Failed to remove file from container", [dataFile.lastPathComponent])
+            errorMessage = ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [dataFile.lastPathComponent]
+            )
             return
         }
     }

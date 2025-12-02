@@ -26,24 +26,25 @@ import UtilsLib
 import ConfigLib
 import CommonsLib
 
+@Observable
 @MainActor
-class MobileIdViewModel: MobileIdViewModelProtocol, ObservableObject {
+class MobileIdViewModel: MobileIdViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIdViewModel")
 
     private static let certificateEndpoint = "/certificate"
     private static let signatureEndpoint = "/signature"
     private static let signatureSessionEndpoint = "\(signatureEndpoint)/session"
 
-    @Published var controlCode: String = "- - - -"
+    var controlCode: String = "- - - -"
 
-    @Published var countryCodeAndPhoneErrorKey: String?
-    @Published var personalCodeErrorKey: String?
+    var countryCodeAndPhoneErrorKey: String?
+    var personalCodeErrorKey: String?
 
-    @Published var mobileIdMessageKey: String?
-    @Published var mobileIdAlertMessageKey: String?
-    @Published var mobileIdAlertMessageExtraArguments: [String] = []
-    @Published var showMobileIdAlertMessage: Bool = false
-    @Published var mobileIdAlertMessageUrl: String?
+    var mobileIdMessageKey: String?
+    var mobileIdAlertMessageKey: String?
+    var mobileIdAlertMessageExtraArguments: [String] = []
+    var showMobileIdAlertMessage: Bool = false
+    var mobileIdAlertMessageUrl: String?
 
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let mobileIdSignService: MobileIdSignServiceProtocol

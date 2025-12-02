@@ -76,13 +76,13 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
             return name.isEmpty ? CommonsLib.Constants.Container.DefaultName : name
         }()
 
-        let tempSavedFileLocation = savedFilesDirectory.appendingPathComponent(sanitizedFilename)
+        let tempSavedFileLocation = savedFilesDirectory.appending(path: sanitizedFilename)
 
         do {
             try await DigiDocContainerWrapper.container(
-                containerFile.path,
+                containerFile.resolvedPath,
                 saveDataFile: dataFile.fileId,
-                to: tempSavedFileLocation.path
+                to: tempSavedFileLocation.resolvedPath
             )
             ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
             return tempSavedFileLocation
@@ -97,7 +97,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     @MainActor
     public func create(file: URL, dataFiles: [String]) async throws {
         do {
-            return try await DigiDocContainerWrapper.create(file.path, withDataFilePaths: dataFiles)
+            return try await DigiDocContainerWrapper.create(file.resolvedPath, withDataFilePaths: dataFiles)
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot create container", code: 1)
             throw DigiDocError.containerCreationFailed(
@@ -112,7 +112,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
         do {
             let container = try DigiDocContainerWrapper.open(
-                containerFile.path,
+                containerFile.resolvedPath,
                 validateOnline: isSivaConfirmed
             )
 
@@ -140,10 +140,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     @discardableResult
     @MainActor
     public func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol {
-        let dataFilesPaths = dataFiles.compactMap { $0.path }
+        let dataFilesPaths = dataFiles.compactMap { $0.resolvedPath }
         do {
             try await DigiDocContainerWrapper.addDataFilesToContainer(
-                withPath: containerFile.path,
+                withPath: containerFile.resolvedPath,
                 withDataFilePaths: dataFilesPaths
             )
 
@@ -163,7 +163,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         do {
             try await DigiDocContainerWrapper.removeSignature(
                 UInt(index),
-                fromContainerWithPath: containerFile.path
+                fromContainerWithPath: containerFile.resolvedPath
             )
 
             return try await open(containerFile: containerFile, isSivaConfirmed: true)
@@ -181,7 +181,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     public func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
         do {
             try await DigiDocContainerWrapper.removeDataFileFromContainer(
-                withPath: containerFile.path,
+                withPath: containerFile.resolvedPath,
                 at: UInt(index)
             )
 
@@ -205,7 +205,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         return try await DigiDocSigningWrapper
             .prepareSignature(
                 cert,
-                containerPath: containerPath.path,
+                containerPath: containerPath.resolvedPath,
                 roleData: DigiDocRoleData(
                     roles: roleData?.roles,
                     city: roleData?.city,

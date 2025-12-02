@@ -22,27 +22,26 @@ import ConfigLib
 import Foundation
 import OSLog
 
+@Observable
 @MainActor
-class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, ObservableObject {
+class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptionSettingsViewModel")
 
-    @Published var configuration: ConfigurationProvider?
-    @Published var certData: Data?
-    @Published var encryptionCdocOption: EncryptionCdocOption = .cdoc1
-    @Published var useKeyTransfer: Bool = false
-    @Published var serverId: EncryptionServerOptionId = .defaultSetting
-    @Published var serverInfo: EncryptionServerInfo = EncryptionServerInfo()
-    @Published var isImportingCert: Bool = false
-    @Published var isLoading: Bool = true
+    var configuration: ConfigurationProvider?
+    var certData: Data?
+    var encryptionCdocOption: EncryptionCdocOption = .cdoc1
+    var useKeyTransfer: Bool = false
+    var serverId: EncryptionServerOptionId = .defaultSetting
+    var serverInfo: EncryptionServerInfo = EncryptionServerInfo()
+    var isImportingCert: Bool = false
+    var isLoading: Bool = true
 
     // MARK: - Dependencies
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let dataStore: DataStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let certificateUtil: CertificateUtilProtocol
-
-    private var configurationObservationTask: Task<Void, Never>?
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
@@ -55,10 +54,6 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Observab
         self.advancedSettingsRepository = advancedSettingsRepository
         self.certificateUtil = certificateUtil
 
-        configurationObservationTask = Task {
-            await observeConfigurationUpdates()
-        }
-
         Task {
             await initializeSettings()
         }
@@ -67,19 +62,11 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Observab
     // MARK: - Init helpers
 
     public func initializeSettings() async {
-        await ensureConfigurationLoaded()
+        configuration = await configurationRepository.getConfiguration()
         await loadSettings()
         await loadCert()
 
         isLoading = false
-    }
-
-    private func ensureConfigurationLoaded() async {
-        if configuration == nil {
-            for await config in $configuration.values where config != nil {
-                break
-            }
-        }
     }
 
     private func loadCert() async {
@@ -162,32 +149,5 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Observab
             certificateFolder: CommonsLib.Constants.Folder.EncryptionKeyTransferCert,
             certificateBaseName: CommonsLib.Constants.FileBaseName.EncryptionKeyTransferCert
         )
-    }
-
-    // MARK: - Observer
-
-    public func observeConfigurationUpdates() async {
-        guard !Task.isCancelled else {
-            return
-        }
-
-        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
-            EncryptionSettingsViewModel.logger.error("Unable to get configuration updates stream")
-            return
-        }
-
-        do {
-            for try await config in configStream {
-                await MainActor.run {
-                    configuration = config
-                }
-            }
-        } catch {
-            EncryptionSettingsViewModel.logger.error("Unable to get configuration from stream")
-        }
-    }
-
-    public func removeObservers() async {
-        configurationObservationTask?.cancel()
     }
 }

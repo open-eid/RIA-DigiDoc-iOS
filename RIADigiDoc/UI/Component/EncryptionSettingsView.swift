@@ -21,19 +21,19 @@ import SwiftUI
 import FactoryKit
 
 struct EncryptionSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(NavigationPathManager.self) private var pathManager
+
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
-    @Environment(\.dismiss) private var dismiss
 
     @AccessibilityFocusState private var isDialogHeaderFocused: Bool
 
     // MARK: - UI State
     @State private var showDialog = false
     @State private var dialogSelectedServerId: EncryptionServerOptionId = .defaultSetting
-
-    // MARK: - Navigation
-    @State private var navigateToCertificateView = false
 
     private let serverOptions: [EncryptionServerOption] = [
         EncryptionServerOption(
@@ -51,10 +51,10 @@ struct EncryptionSettingsView: View {
         serverOptions.first { $0.id == viewModel.serverId }
     }
 
-    @StateObject private var viewModel: EncryptionSettingsViewModel
+    @State private var viewModel: EncryptionSettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.encryptionSettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.encryptionSettingsViewModel())
     }
 
     var body: some View {
@@ -101,7 +101,6 @@ struct EncryptionSettingsView: View {
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
-                await viewModel.removeObservers()
             }
         }
         .fileImporter(
@@ -119,17 +118,6 @@ struct EncryptionSettingsView: View {
             case .failure:
                 viewModel.isImportingCert = false
             }
-        }
-
-        // MARK: - Navigation links
-        if let certData = viewModel.certData {
-            NavigationLink(
-                destination: CertificateDetailView(
-                    certificate: certData
-                ),
-                isActive: $navigateToCertificateView,
-            ) { EmptyView() }
-                .hidden()
         }
     }
 
@@ -176,7 +164,9 @@ struct EncryptionSettingsView: View {
                         expiredLabel: languageSettings.localized("Main settings cert expired")
                     ),
                     onShowCertificatePressed: {
-                        navigateToCertificateView = true
+                        if let certData = viewModel.certData {
+                            pathManager.navigate(to: .certificateDetailView(certificate: certData))
+                        }
                     },
                     onAddCertificatePressed: {
                         viewModel.isImportingCert = true
@@ -275,6 +265,7 @@ struct EncryptionSettingsView: View {
 
 #Preview {
     EncryptionSettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

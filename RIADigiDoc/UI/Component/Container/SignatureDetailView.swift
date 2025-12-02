@@ -27,12 +27,12 @@ struct SignatureDetailView: View {
     @AppTypography private var typography
 
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @Environment(\.openURL) var openURL
 
     @State private var selectedTab: SignatureDetailViewTab = .roleAndAddress
 
-    @StateObject private var viewModel: SignatureDetailViewModel
+    @State private var viewModel: SignatureDetailViewModel
     private var certificateDetailViewModel: CertificateDetailViewModel
 
     private let signature: SignatureWrapper
@@ -125,7 +125,7 @@ struct SignatureDetailView: View {
         dataFilesCount: Int,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil()
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.signatureDetailViewModel())
+        _viewModel = State(wrappedValue: Container.shared.signatureDetailViewModel())
         self.certificateDetailViewModel = certificateDetailViewModel
         self.signature = signature
         self.isTimestamp = isTimestamp
@@ -189,9 +189,8 @@ struct SignatureDetailView: View {
                                         )
 
                                         NavigationLink(
-                                            destination: CertificateDetailView(
-                                                certificate: signature.signingCert
-                                            )
+                                            value: NavigationDestination
+                                                .certificateDetailView(certificate: signature.signingCert)
                                         ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
@@ -270,9 +269,8 @@ struct SignatureDetailView: View {
                                         )
 
                                         NavigationLink(
-                                            destination: CertificateDetailView(
-                                                certificate: signature.timestampCert
-                                            )
+                                            value: NavigationDestination
+                                                .certificateDetailView(certificate: signature.timestampCert)
                                         ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
@@ -292,9 +290,8 @@ struct SignatureDetailView: View {
                                         )
 
                                         NavigationLink(
-                                            destination: CertificateDetailView(
-                                                certificate: signature.ocspCert
-                                            )
+                                            value: NavigationDestination
+                                                .certificateDetailView(certificate: signature.ocspCert)
                                         ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
@@ -362,6 +359,6 @@ struct SignatureDetailView: View {
         containerMimetype: "application/vnd.etsi.asic-e+zip",
         dataFilesCount: 1
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

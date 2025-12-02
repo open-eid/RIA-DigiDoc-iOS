@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct MobileIdInputView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -80,7 +80,7 @@ struct MobileIdInputView: View {
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
-                    .onChange(of: phoneNumber) { _ in
+                    .onChange(of: phoneNumber) {
                         onInputChange()
                     }
                 }
@@ -94,7 +94,7 @@ struct MobileIdInputView: View {
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
-                    .onChange(of: personalCode) { _ in
+                    .onChange(of: personalCode) {
                         onInputChange()
                     }
                 }
@@ -131,6 +131,6 @@ struct MobileIdInputView: View {
         onInputChange: {}
 
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

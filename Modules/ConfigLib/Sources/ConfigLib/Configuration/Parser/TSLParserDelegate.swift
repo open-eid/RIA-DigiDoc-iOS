@@ -20,12 +20,12 @@
 import Foundation
 
 class TSLParserDelegate: NSObject, XMLParserDelegate {
-    private let sequenceNumberElement: String
+    private let sequenceNumberElements: [String]
     var currentElement: String?
     var foundSequenceNumber: Int?
 
-    init(sequenceNumberElement: String) {
-        self.sequenceNumberElement = sequenceNumberElement
+    init(sequenceNumberElements: [String]) {
+        self.sequenceNumberElements = sequenceNumberElements
     }
 
     // swiftlint:disable:next blanket_disable_command
@@ -38,13 +38,13 @@ class TSLParserDelegate: NSObject, XMLParserDelegate {
         attributes: [String: String] = [:]
     ) {
         currentElement = elementName
-        if elementName == sequenceNumberElement {
+        if sequenceNumberElements.contains(elementName) {
             parser.delegate = self
         }
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if currentElement == sequenceNumberElement, let number = Int(string) {
+        if sequenceNumberElements.contains(currentElement ?? ""), let number = Int(string) {
             foundSequenceNumber = number
         }
     }

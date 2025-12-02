@@ -17,27 +17,29 @@
  *
  */
 
+import SwiftUI
 import CommonsLib
 import ConfigLib
 import LibdigidocLibSwift
 import OSLog
 import UtilsLib
 
+@Observable
 @MainActor
-class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
+class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DiagnosticsViewModel")
 
-    @Published var configuration: ConfigurationProvider?
+    var configuration: ConfigurationProvider?
 
     // MARK: - section content
-    @Published var versionSectionContent: String = ""
-    @Published var osSectionContent: (key: String, content: String) = (key: "", content: "")
-    @Published var libdigidocVersion: String = ""
-    @Published var urlSectionContent: [String] = [""]
-    @Published var cdoc2SectionContent: [String] = [""]
-    @Published var tslSectionContent: [String] = [""]
-    @Published var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
+    var versionSectionContent: String = ""
+    var osSectionContent: (key: String, content: String) = (key: "", content: "")
+    var libdigidocVersion: String = ""
+    var urlSectionContent: [String] = [""]
+    var cdoc2SectionContent: [String] = [""]
+    var tslSectionContent: [String] = [""]
+    var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
 
     // MARK: - dependencies
     private let containerWrapper: ContainerWrapperProtocol
@@ -73,12 +75,6 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
 
         Task {
             await loadLibdigidocVersion()
-
-            for await config in $configuration.values {
-                if let config = config {
-                    await getConfigurationData(configuration: config)
-                }
-            }
         }
     }
 
@@ -229,7 +225,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
                 fileManager: fileManager
             )
             let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
-            let fileURL = savedFilesDirectory.appendingPathComponent(diagnosticsFileName)
+            let fileURL = savedFilesDirectory.appending(path: diagnosticsFileName)
 
             try diagnosticsText.write(to: fileURL, atomically: true, encoding: .utf8)
 
@@ -296,7 +292,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
         do {
             let configDirectory = try Directories.getCacheDirectory(
                 fileManager: fileManager
-            ).appendingPathComponent(
+            ).appending(path:
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
             let proxyInfo = await proxyUtil.getProxyInfo()
@@ -318,8 +314,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, ObservableObject {
             return
         }
 
-        guard let configStream = await configurationRepository.observeConfigurationUpdates(
-        ) else {
+        guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
             DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
             return
         }

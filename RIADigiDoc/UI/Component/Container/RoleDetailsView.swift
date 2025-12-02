@@ -25,7 +25,7 @@ struct RoleDetailsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     let signature: SignatureWrapper
 
@@ -112,6 +112,6 @@ struct RoleDetailsView: View {
             diagnosticsInfo: ""
         )
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

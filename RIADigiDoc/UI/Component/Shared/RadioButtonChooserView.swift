@@ -22,7 +22,7 @@ import SwiftUI
 
 struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashable {
     @AppTheme private var theme
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     let options: [T]
     let isSelected: (T) -> Bool

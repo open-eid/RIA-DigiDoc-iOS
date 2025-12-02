@@ -18,16 +18,27 @@
  */
 
 import SwiftUI
+import FactoryKit
 import CommonsLib
 
 struct RenameModalView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @ObservedObject var signingViewModel: SigningViewModel
+    @State private var signingViewModel: SigningViewModel
     @Binding var showRenameModal: Bool
     @Binding var newContainerName: String
+
+    init(
+        signingViewModel: SigningViewModel,
+        showRenameModal: Binding<Bool>,
+        newContainerName: Binding<String>
+    ) {
+        self.signingViewModel = signingViewModel
+        self._showRenameModal = showRenameModal
+        self._newContainerName = newContainerName
+    }
 
     var body: some View {
         ZStack {

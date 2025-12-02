@@ -25,10 +25,12 @@ import UtilsLib
 
 struct HomeView: View {
     @AppTheme private var theme
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @StateObject private var viewModel: HomeViewModel
-    @StateObject private var cryptoViewModel: CryptoHomeViewModel
+    @Environment(NavigationPathManager.self) private var pathManager
+
+    @State private var viewModel: HomeViewModel
+    @State private var cryptoViewModel: CryptoHomeViewModel
     private var fileOpeningViewModel: FileOpeningViewModel
     private var cryptoFileOpeningViewModel: CryptoFileOpeningViewModel
 
@@ -57,7 +59,12 @@ struct HomeView: View {
             onRecentDocumentsClick: {
                 containerType = .asice
                 recentDocumentsExtensions = Constants.Container.ContainerExtensions
-                isNavigatingToRecentDocumentsView = true
+                pathManager.navigate(to:
+                    .recentDocumentsView(
+                        folderURL: getRecentDocumentsFolder(containerType: containerType),
+                        extensions: recentDocumentsExtensions
+                    )
+                )
             }
         )
     }
@@ -70,7 +77,12 @@ struct HomeView: View {
             onRecentDocumentsClick: {
                 containerType = .cdoc
                 recentDocumentsExtensions = Constants.Container.CryptoContainerExtensions
-                isNavigatingToRecentDocumentsView = true
+                pathManager.navigate(to:
+                    .recentDocumentsView(
+                        folderURL: getRecentDocumentsFolder(containerType: containerType),
+                        extensions: recentDocumentsExtensions
+                    )
+                )
             }
         )
     }
@@ -80,8 +92,8 @@ struct HomeView: View {
         cryptoFileOpeningViewModel: CryptoFileOpeningViewModel = Container.shared.cryptoFileOpeningViewModel(),
         externalFiles: Binding<[URL]>
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.homeViewModel())
-        _cryptoViewModel = StateObject(wrappedValue: Container.shared.cryptoHomeViewModel())
+        _viewModel = State(wrappedValue: Container.shared.homeViewModel())
+        _cryptoViewModel = State(wrappedValue: Container.shared.cryptoHomeViewModel())
         self.fileOpeningViewModel = fileOpeningViewModel
         self.cryptoFileOpeningViewModel = cryptoFileOpeningViewModel
         self._externalFiles = externalFiles
@@ -137,30 +149,9 @@ struct HomeView: View {
             }
             .padding(Dimensions.Padding.SPadding)
 
-            NavigationLink(
-                destination: SigningView(),
-                isActive: $isNavigatingToSigningView
-            ) { EmptyView() }
-                .hidden()
-
-            NavigationLink(
-                destination: EncryptView(),
-                isActive: $isNavigatingToEncryptView
-            ) { EmptyView() }
-                .hidden()
-
-            NavigationLink(
-                destination: RecentDocumentsView(
-                    folderURL: getRecentDocumentsFolder(containerType: containerType),
-                    extensions: recentDocumentsExtensions
-                ),
-                isActive: $isNavigatingToRecentDocumentsView
-            ) { EmptyView() }
-                .hidden()
-
             Spacer()
         }
-        .onChange(of: externalFiles) { extFiles in
+        .onChange(of: externalFiles) { _, extFiles in
             if !extFiles.isEmpty {
                 isFileOpeningLoading = true
                 viewModel.isImporting = false
@@ -168,6 +159,18 @@ struct HomeView: View {
                 externalFiles = []
             }
         }
+        .onChange(of: isNavigatingToSigningView, { _, newValue in
+            if newValue {
+                pathManager.navigate(to: .signingView)
+                isNavigatingToSigningView = false
+            }
+        })
+        .onChange(of: isNavigatingToEncryptView, { _, newValue in
+            if newValue {
+                pathManager.navigate(to: .encryptView)
+                isNavigatingToEncryptView = false
+            }
+        })
     }
 
     func getRecentDocumentsFolder(containerType: ContainerType) -> URL? {
@@ -182,6 +185,7 @@ struct HomeView: View {
 
 #Preview {
     HomeView(externalFiles: .constant([]))
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

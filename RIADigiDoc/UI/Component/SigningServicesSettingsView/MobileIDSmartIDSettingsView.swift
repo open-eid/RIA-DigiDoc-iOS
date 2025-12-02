@@ -24,12 +24,12 @@ import FactoryKit
 struct MobileIDSmartIDSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @StateObject private var viewModel: MobileIDSmartIDSettingsViewModel
+    @State private var viewModel: MobileIDSmartIDSettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.mobileIDSmartIDSettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.mobileIDSmartIDSettingsViewModel())
     }
 
     var body: some View {
@@ -74,6 +74,6 @@ struct MobileIDSmartIDSettingsView: View {
 
 #Preview {
     MobileIDSmartIDSettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

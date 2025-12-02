@@ -72,5 +72,5 @@ struct AdvancedSettingsSectionColumn<Content: View>: View {
             onClick: {}
         )
     }
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

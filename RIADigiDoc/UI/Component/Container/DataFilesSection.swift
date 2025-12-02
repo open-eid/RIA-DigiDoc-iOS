@@ -23,9 +23,9 @@ import LibdigidocLibSwift
 
 struct DataFilesSection: View {
     @Environment(\.openURL) private var openURL
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @ObservedObject var viewModel: SigningViewModel
+    @State private var viewModel: SigningViewModel
     let isContainerSigned: Bool
     let isNestedContainer: Bool
     @Binding var selectedDataFile: DataFileWrapper?
@@ -39,6 +39,24 @@ struct DataFilesSection: View {
 
     private var sivaMessageUrl: String {
         languageSettings.localized("Siva message url")
+    }
+
+    init(
+        viewModel: SigningViewModel,
+        isContainerSigned: Bool,
+        isNestedContainer: Bool,
+        selectedDataFile: Binding<DataFileWrapper?>,
+        showSivaMessage: Binding<Bool>,
+        isFileSaved: Binding<Bool>,
+        showRemoveDataFileModal: Binding<Bool>
+    ) {
+        self.viewModel = viewModel
+        self.isContainerSigned = isContainerSigned
+        self.isNestedContainer = isNestedContainer
+        self._selectedDataFile = selectedDataFile
+        self._showSivaMessage = showSivaMessage
+        self._isFileSaved = isFileSaved
+        self._showRemoveDataFileModal = showRemoveDataFileModal
     }
 
     var body: some View {
@@ -122,6 +140,6 @@ struct DataFilesSection: View {
         isFileSaved: .constant(false),
         showRemoveDataFileModal: .constant(false)
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

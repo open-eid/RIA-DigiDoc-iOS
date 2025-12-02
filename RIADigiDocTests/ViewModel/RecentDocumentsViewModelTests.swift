@@ -46,16 +46,16 @@ class RecentDocumentsViewModelTests {
 
     @Test
     func loadFiles_success() async {
-        let file1 = tempFolderURL.appendingPathComponent("test1.asice")
-        let file2 = tempFolderURL.appendingPathComponent("test2.bdoc")
-        let invalidFile = tempFolderURL.appendingPathComponent("invalid.txt")
+        let file1 = tempFolderURL.appending(path: "test1.asice")
+        let file2 = tempFolderURL.appending(path: "test2.bdoc")
+        let invalidFile = tempFolderURL.appending(path: "invalid.txt")
 
         mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in
             return [file1, file2, invalidFile]
         }
 
         mockFileManager.attributesOfItemHandler = { path in
-            if path == file1.path || path == file2.path {
+            if path == file1.resolvedPath || path == file2.resolvedPath {
                 return [.modificationDate: Date()]
             }
 
@@ -153,7 +153,7 @@ class RecentDocumentsViewModelTests {
 
     @Test
     func deleteFile_success() {
-        let file = tempFolderURL.appendingPathComponent("test1.asice")
+        let file = tempFolderURL.appending(path: "test1.asice")
 
         let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
         viewModel.files = [fileItem]
@@ -169,7 +169,7 @@ class RecentDocumentsViewModelTests {
 
     @Test
     func deleteFile_filesNotChangedWhenUnableToDelete() async {
-        let file = tempFolderURL.appendingPathComponent("test1.asice")
+        let file = tempFolderURL.appending(path: "test1.asice")
         let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
         viewModel.files = [fileItem]
 

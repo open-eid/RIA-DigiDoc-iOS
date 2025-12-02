@@ -22,7 +22,7 @@ import SwiftUI
 
 struct BottomSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -79,11 +79,11 @@ struct BottomSheet: View {
                                         .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                         .foregroundStyle(theme.onSurface)
                                         .accessibilityHidden(true)
+                                }
                             }
-                        }
-                        .foregroundStyle(theme.onSurface)
-                        .padding(.horizontal, Dimensions.Padding.MPadding)
-                    })
+                            .foregroundStyle(theme.onSurface)
+                            .padding(.horizontal, Dimensions.Padding.MPadding)
+                        })
                 }
             }
         }
@@ -102,7 +102,7 @@ struct BottomSheetViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $isPresented) {
-                let sheet = BottomSheet(actions: actions)
+                BottomSheet(actions: actions)
                     .background(
                         GeometryReader { geometry in
                             Color.clear
@@ -111,78 +111,10 @@ struct BottomSheetViewModifier: ViewModifier {
                                 }
                         }
                     )
-
-                if #available(iOS 16.0, *) {
-                    Group {
-                        sheet
-                    }
                     .presentationDetents([.height(contentHeight)])
                     .presentationDragIndicator(.visible)
-                } else {
-                    LegacyBottomSheetWrapper(isPresented: $isPresented, actions: actions)
-                }
             }
     }
-}
-
-// MARK: Pre-iOS 16 bottom sheet
-
-class LegacyBottomSheetViewController: UIViewController {
-    private var isPresented: Bool
-    private let actions: [BottomSheetButton]
-    private let tableView = UITableView()
-
-    init(isPresented: Bool, actions: [BottomSheetButton]) {
-        self.isPresented = isPresented
-        self.actions = actions
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupBottomSheet()
-    }
-
-    private func setupBottomSheet() {
-        let bottomSheetView = BottomSheet(actions: actions)
-        let hostingController = UIHostingController(rootView: bottomSheetView)
-
-        hostingController.modalPresentationStyle = .pageSheet
-
-        if let sheet = hostingController.sheetPresentationController {
-            sheet.detents = [.medium()]
-            sheet.prefersGrabberVisible = true
-            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
-        }
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-
-        hostingController.didMove(toParent: self)
-    }
-}
-
-struct LegacyBottomSheetWrapper: UIViewControllerRepresentable {
-    @Binding var isPresented: Bool
-    let actions: [BottomSheetButton]
-
-    func makeUIViewController(context _: Context) -> LegacyBottomSheetViewController {
-        LegacyBottomSheetViewController(isPresented: isPresented, actions: actions)
-    }
-
-    func updateUIViewController(_: LegacyBottomSheetViewController, context _: Context) {}
 }
 
 extension View {
@@ -208,6 +140,6 @@ extension View {
     ]
     Button("Show Sheet") {}
         .bottomSheet(isPresented: .constant(true), actions: sheetActions)
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

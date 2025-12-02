@@ -157,10 +157,10 @@ struct SigningViewModelTests {
 
         let testFileName = "testfile.asice"
         let cacheDirectory = tempFolderURL
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(Constants.Folder.SavedFiles)
+            .appending(path: BundleUtil.getBundleIdentifier())
+            .appending(path: Constants.Folder.SavedFiles)
         let containerFile = cacheDirectory
-            .appendingPathComponent(testFileName)
+            .appending(path: testFileName)
 
         mockFileManager.urlHandler = { _, _, _, _ in tempFolderURL }
         mockFileManager.fileExistsHandler = { _ in false }
@@ -188,7 +188,7 @@ struct SigningViewModelTests {
     @Test
     func createCopyOfContainerForSaving_returnNilWhenFileDoesNotExist() async {
         let testDirectory = URL(string: "/mock/path")
-        let nonExistentFile = testDirectory?.appendingPathComponent("nonexistent.asice")
+        let nonExistentFile = testDirectory?.appending(path: "nonexistent.asice")
 
         mockFileManager.urlHandler = { _, _, _, _ in URL(fileURLWithPath: "") }
 
@@ -212,14 +212,14 @@ struct SigningViewModelTests {
 
         let testFileName = "testfile.asice"
         let cacheDirectory = tempFolderURL
-            .appendingPathComponent(BundleUtil.getBundleIdentifier())
-            .appendingPathComponent(Constants.Folder.SavedFiles)
+            .appending(path: BundleUtil.getBundleIdentifier())
+            .appending(path: Constants.Folder.SavedFiles)
         let containerFile = cacheDirectory
-            .appendingPathComponent(testFileName)
+            .appending(path: testFileName)
 
         mockFileManager.urlHandler = { _, _, _, _ in tempFolderURL }
         mockFileManager.fileExistsHandler = { path in
-            return cacheDirectory.path == path
+            return cacheDirectory.resolvedPath == path
         }
         mockFileManager.copyItemHandler = { _, _ in }
 
@@ -239,7 +239,7 @@ struct SigningViewModelTests {
     @Test
     func removeSavedFilesDirectory_successWhenDirectoryExists() async throws {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let savedFilesDirectory = testDirectory.appendingPathComponent(Constants.Folder.SavedFiles)
+        let savedFilesDirectory = testDirectory.appending(path: Constants.Folder.SavedFiles)
 
         viewModel.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
 
@@ -249,13 +249,13 @@ struct SigningViewModelTests {
     @Test
     func removeSavedFilesDirectory_doesNotThrowErrorWhenRemovingDirectoryAndItDoesntExist() async {
         let testDirectory = URL(fileURLWithPath: "/tmp")
-        let nonExistentDirectory = testDirectory.appendingPathComponent("NonExistentDir")
+        let nonExistentDirectory = testDirectory.appending(path: "NonExistentDir")
 
         #expect(throws: Never.self) {
             self.viewModel.removeSavedFilesDirectory(savedFilesDirectory: nonExistentDirectory)
         }
 
-        #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.path))
+        #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.resolvedPath))
     }
 
     @Test
@@ -288,7 +288,7 @@ struct SigningViewModelTests {
 
         let result = await viewModel.renameContainer(to: "no:name")
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -309,7 +309,7 @@ struct SigningViewModelTests {
 
         let result = await viewModel.renameContainer(to: "no:name")
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -330,7 +330,7 @@ struct SigningViewModelTests {
 
         let result = await viewModel.renameContainer(to: "Some name")
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -448,7 +448,7 @@ struct SigningViewModelTests {
 
         await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -491,7 +491,7 @@ struct SigningViewModelTests {
 
         await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -586,7 +586,7 @@ struct SigningViewModelTests {
 
         await viewModel.handleSaveFile(dataFile: testDataFile)
 
-        guard let (errorKey, args) = viewModel.errorMessage else {
+        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
             Issue.record("Expected error message to not be empty")
             return
         }
@@ -971,9 +971,9 @@ struct SigningViewModelTests {
     func removeSignature_throwErrorWhenContainerDataNotLoaded() async {
         await viewModel.removeSignature(MockSignatureWrapper.mockSignatureWrapper())
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove signature from container", []))
+        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -989,9 +989,9 @@ struct SigningViewModelTests {
 
         await viewModel.removeSignature(MockSignatureWrapper.mockSignatureWrapper())
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove signature from container", []))
+        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -1011,9 +1011,9 @@ struct SigningViewModelTests {
 
         await viewModel.removeSignature(mockSignature)
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove signature from container", []))
+        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -1055,9 +1055,15 @@ struct SigningViewModelTests {
         let mockDataFile = MockDataFileWrapper.mockDataFileWrapper()
         await viewModel.removeDataFile(mockDataFile)
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(
+            errorMessage == ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [mockDataFile.fileName]
+            )
+        )
+
         #expect(mockFileManager.removeItemCallCount == 0)
         #expect(!viewModel.isLastDataFileRemoved)
     }
@@ -1073,9 +1079,15 @@ struct SigningViewModelTests {
 
         await viewModel.removeDataFile(mockDataFile)
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(
+            errorMessage == ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [mockDataFile.fileName]
+            )
+        )
+
         #expect(mockFileManager.removeItemCallCount == 0)
         #expect(!viewModel.isLastDataFileRemoved)
     }
@@ -1099,9 +1111,15 @@ struct SigningViewModelTests {
 
         await viewModel.removeDataFile(mockDataFile)
 
-        let errorMessage = viewModel.errorMessage ?? ("", [])
+        let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ("Failed to remove file from container", [mockDataFile.fileName]))
+        #expect(
+            errorMessage == ErrorMessage(
+                key: "Failed to remove file from container",
+                args: [mockDataFile.fileName]
+            )
+        )
+
         #expect(mockFileManager.removeItemCallCount == 0)
         #expect(!viewModel.isLastDataFileRemoved)
     }
@@ -1136,7 +1154,7 @@ struct SigningViewModelTests {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("File successfully added", []))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "File successfully added", args: []))
         await #expect(updatedMockSignedContainer.getDataFiles().count == 2)
     }
 
@@ -1175,7 +1193,7 @@ struct SigningViewModelTests {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Files successfully added", []))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Files successfully added", args: []))
         await #expect(updatedMockSignedContainer.getDataFiles().count == 3)
     }
 
@@ -1200,7 +1218,7 @@ struct SigningViewModelTests {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Invalid file size", []))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Invalid file size", args: []))
         #expect(mockSignedContainer.addDataFilesCallCount == 0)
     }
 
@@ -1220,7 +1238,7 @@ struct SigningViewModelTests {
 
         await viewModel.addDataFiles([], to: containerFile)
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Could not load selected files", []))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not load selected files", args: []))
         #expect(mockSignedContainer.addDataFilesCallCount == 0)
     }
 
@@ -1255,7 +1273,7 @@ struct SigningViewModelTests {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Document already exists", [mockFileName]))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Document already exists", args: [mockFileName]))
         await #expect(mockSignedContainer.getDataFiles().count == 2)
     }
 
@@ -1275,8 +1293,9 @@ struct SigningViewModelTests {
             subfolder: "SigningViewModelTests-handleErrorWhenPartialAddingSucceeds"
         )
 
-        let localExampleContainer = tempDirectory.appendingPathComponent(
-            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        let localExampleContainer = tempDirectory.appending(
+            path: "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)",
+            directoryHint: .notDirectory
         )
 
         try FileManager.default.copyItem(
@@ -1304,7 +1323,7 @@ struct SigningViewModelTests {
             testFile, testFile2, testFile3
         ], to: localExampleContainer)
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Could not add files", ["2"]))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not add files", args: ["2"]))
         #expect(viewModel.dataFiles.count == 3)
     }
 
@@ -1323,8 +1342,8 @@ struct SigningViewModelTests {
             subfolder: "SigningViewModelTests-handleErrorWhenNoFilesAreAdded"
         )
 
-        let localExampleContainer = tempDirectory.appendingPathComponent(
-            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        let localExampleContainer = tempDirectory.appending(
+            path: "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
         )
 
         try FileManager.default.copyItem(
@@ -1352,7 +1371,7 @@ struct SigningViewModelTests {
             testFile, testFile2
         ], to: localExampleContainer)
 
-        #expect(viewModel.errorMessage ?? ("", []) == ("Could not add files", ["2"]))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not add files", args: ["2"]))
         #expect(viewModel.dataFiles.count == 2)
     }
 }

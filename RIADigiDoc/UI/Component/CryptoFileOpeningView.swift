@@ -25,8 +25,8 @@ struct CryptoFileOpeningView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
-    @StateObject private var viewModel: CryptoFileOpeningViewModel
+    @Environment(LanguageSettings.self) private var languageSettings
+    @State private var viewModel: CryptoFileOpeningViewModel
 
     @Binding var isFileOpeningLoading: Bool
     @Binding var isNavigatingToNextView: Bool
@@ -47,22 +47,20 @@ struct CryptoFileOpeningView: View {
         isFileOpeningLoading: Binding<Bool>,
         isNavigatingToNextView: Binding<Bool>
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.cryptoFileOpeningViewModel())
+        _viewModel = State(wrappedValue: Container.shared.cryptoFileOpeningViewModel())
         _isFileOpeningLoading = isFileOpeningLoading
         _isNavigatingToNextView = isNavigatingToNextView
     }
 
     var body: some View {
-        NavigationView {
-            VStack {
-                LoadingView()
-                    .onAppear {
-                        fileHandlingTask = Task { await startFileHandling() }
-                    }
-                    .onDisappear {
-                        fileHandlingTask?.cancel()
-                    }
-            }
+        VStack {
+            LoadingView()
+                .onAppear {
+                    fileHandlingTask = Task { await startFileHandling() }
+                }
+                .onDisappear {
+                    fileHandlingTask?.cancel()
+                }
         }
     }
 
@@ -105,6 +103,6 @@ struct CryptoFileOpeningView: View {
         isFileOpeningLoading: .constant(true),
         isNavigatingToNextView: .constant(false)
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

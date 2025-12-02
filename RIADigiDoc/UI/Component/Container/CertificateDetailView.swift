@@ -29,9 +29,9 @@ struct CertificateDetailView: View {
     @AppTypography private var typography
 
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
-    @StateObject private var viewModel: CertificateDetailViewModel
+    @State private var viewModel: CertificateDetailViewModel
 
     private let certificate: Data
 
@@ -58,7 +58,7 @@ struct CertificateDetailView: View {
             viewModel.getSubjectAttribute(
                 cert: certificate,
                 attribute: .RDNAttributeType.commonName)
-        ).replacingOccurrences(of: ",", with: ", ")
+        ).replacing(",", with: ", ")
     }
 
     private var subjectSurname: String {
@@ -156,7 +156,7 @@ struct CertificateDetailView: View {
     init(
         certificate: Data
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.certificateDetailViewModel())
+        _viewModel = State(wrappedValue: Container.shared.certificateDetailViewModel())
         self.certificate = certificate
     }
 
@@ -431,31 +431,9 @@ struct CertificateDetailView: View {
 }
 
 #Preview {
-    SignatureDetailView(
-        signature: SignatureWrapper(
-            pos: 0,
-            signingCert: Data(),
-            timestampCert: Data(),
-            ocspCert: Data(),
-            signatureId: "S1",
-            claimedSigningTime: "1970-01-01T00:00:00Z",
-            signatureMethod: "signature-method",
-            ocspProducedAt: "1970-01-01T00:00:00Z",
-            timeStampTime: "1970-01-01T00:00:00Z",
-            signedBy: "Test User",
-            trustedSigningTime: "1970-01-01T00:00:00Z",
-            roles: ["Role 1", "Role 2"],
-            city: "Test City",
-            state: "Test State",
-            country: "Test Country",
-            zipCode: "Test12345",
-            format: "BES/time-stamp",
-            messageImprint: Data(),
-            diagnosticsInfo: ""
-        ),
-        containerMimetype: "application/vnd.etsi.asic-e+zip",
-        dataFilesCount: 1
+    CertificateDetailView(
+        certificate: Data()
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

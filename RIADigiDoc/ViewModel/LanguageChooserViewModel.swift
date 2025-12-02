@@ -19,12 +19,13 @@
 
 import OSLog
 
+@Observable
 @MainActor
-class LanguageChooserViewModel: LanguageChooserViewModelProtocol, ObservableObject {
+class LanguageChooserViewModel: LanguageChooserViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LanguageChooserViewModel")
 
-    @Published var selectedLanguage: String = "en"
+    var selectedLanguage: String = "en"
 
     private let languageSettings: LanguageSettingsProtocol
 

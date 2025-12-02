@@ -78,9 +78,7 @@ struct URLExtensionsTests {
     func isPDF_success() async {
         let tempFileURL = TestFileUtil.getTemporaryDirectory(
             subfolder: "URLExtensionsTests"
-        ).appendingPathComponent(
-            "testFile.pdf"
-        )
+        ).appending(path: "testFile.pdf")
 
         let pdfURL = createTestPDF(at: tempFileURL)
 
@@ -183,9 +181,7 @@ struct URLExtensionsTests {
     func md5Hash_returnEmptyStringIfFileDoesNotExist() {
         let nonexistentFileURL = TestFileUtil.getTemporaryDirectory(
             subfolder: "URLExtensionsTests"
-        ).appendingPathComponent(
-            "nonexistentFile.txt"
-        )
+        ).appending(path: "nonexistentFile.txt")
 
         let md5Hash = nonexistentFileURL.md5Hash()
 
@@ -288,7 +284,7 @@ struct URLExtensionsTests {
     @Test
     func folderContents_returnContentsWhenValidFolder() throws {
         let tempDirectoryURL = URL(fileURLWithPath: "/mock/path")
-        let testFileURL = tempDirectoryURL.appendingPathComponent("test.txt")
+        let testFileURL = tempDirectoryURL.appending(path: "test.txt")
 
         mockFileManager.fileExistsAtPathHandler = { _, isDirectory in
             if let dirPointer = isDirectory {
@@ -336,37 +332,37 @@ struct URLExtensionsTests {
     @Test
     func standardizedPathURL_success() {
         let url = URL(fileURLWithPath: "/tmp/folder/file.txt")
-        let standardized = url.standardizedPathURL
-        #expect(standardized.path == "/tmp/folder/file.txt")
+        let standardized = url.resolvedPath
+        #expect(standardized == "/tmp/folder/file.txt")
     }
 
     @Test
     func standardizedPathURL_removeRedundantSlashes() {
         let url = URL(fileURLWithPath: "/tmp//folder///file.txt")
-        let standardized = url.standardizedPathURL
-        #expect(standardized.path == "/tmp/folder/file.txt")
+        let standardized = url.resolvedPath
+        #expect(standardized == "/tmp/folder/file.txt")
     }
 
     @Test
     func standardizedPathURL_resolveDotComponents() {
         let url = URL(fileURLWithPath: "/tmp/folder/../file.txt")
-        let standardized = url.standardizedPathURL
-        #expect(standardized.path == "/tmp/file.txt")
+        let standardized = url.resolvedPath
+        #expect(standardized == "/tmp/file.txt")
     }
 
     @Test
     func standardizedPathURL_trimTrailingSlashFromFile() {
         let url = URL(fileURLWithPath: "/tmp/folder/file.txt/")
-        let standardized = url.standardizedPathURL
-        #expect(standardized.path == "/tmp/folder/file.txt")
+        let standardized = url.resolvedPath
+        #expect(standardized == "/tmp/folder/file.txt")
     }
 
     @Test
     func standardizedPathURL_emptyPathResolvesToCurrentDirectory() {
         let url = URL(fileURLWithPath: "")
-        let standardized = url.standardizedPathURL
+        let standardized = url.resolvedPath
         let expectedPath = FileManager.default.currentDirectoryPath
-        #expect(standardized.path == expectedPath)
+        #expect(standardized == expectedPath)
     }
 
     @Test

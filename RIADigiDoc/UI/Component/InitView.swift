@@ -22,11 +22,10 @@ import FactoryKit
 
 struct InitView: View {
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(NavigationPathManager.self) private var pathManager
 
-    @StateObject private var viewModel: InitViewModel
-
-    @State private var navigateToContent = false
+    @State private var viewModel: InitViewModel
 
     private let supportedLanguages: [SupportedLanguage] = [
         SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
@@ -37,7 +36,7 @@ struct InitView: View {
     }
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.initViewModel())
+        _viewModel = State(wrappedValue: Container.shared.initViewModel())
     }
 
     var body: some View {
@@ -67,7 +66,7 @@ struct InitView: View {
                             onTap: { languageOption in
                                 Task {
                                     await viewModel.selectLanguage(code: languageOption.code)
-                                    navigateToContent = true
+                                    pathManager.navigate(to: .contentView)
                                 }
                             },
                             accessibilityLabel: { languageOption in
@@ -86,12 +85,6 @@ struct InitView: View {
                             .foregroundStyle(Color.white)
                             .padding(.bottom, Dimensions.Padding.MPadding)
                             .accessibilityLabel("Riigi Infosüsteemide Amet")
-
-                        NavigationLink(
-                            destination: ContentView(),
-                            isActive: $navigateToContent
-                        ) { EmptyView() }
-                            .hidden()
                     }
                     .frame(minHeight: geometry.size.height)
                     .frame(minWidth: geometry.size.width)
@@ -104,5 +97,5 @@ struct InitView: View {
 // MARK: - Preview
 #Preview {
     InitView()
-        .environmentObject(Container.shared.languageSettings())
+        .environment(Container.shared.languageSettings())
 }

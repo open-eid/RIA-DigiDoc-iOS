@@ -26,22 +26,13 @@ public struct Directories {
         subfolder: String,
         fileManager: FileManagerProtocol
     ) throws -> URL {
-        var tempDirectory: URL
-        if #available(iOS 16.0, *) {
-            tempDirectory = fileManager.temporaryDirectory
-                .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
-            if !subfolder.isEmpty {
-                tempDirectory = tempDirectory.appending(path: subfolder, directoryHint: .isDirectory)
-            }
-        } else {
-            tempDirectory = fileManager.temporaryDirectory
-                .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
-            if !subfolder.isEmpty {
-                tempDirectory = tempDirectory.appendingPathComponent(subfolder, isDirectory: true)
-            }
+        var tempDirectory = fileManager.temporaryDirectory
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+        if !subfolder.isEmpty {
+            tempDirectory = tempDirectory.appending(path: subfolder, directoryHint: .isDirectory)
         }
 
-        if !fileManager.fileExists(atPath: tempDirectory.path) {
+        if !fileManager.fileExists(atPath: tempDirectory.resolvedPath) {
             try fileManager
                 .createDirectory(
                     at: tempDirectory,
@@ -64,9 +55,9 @@ public struct Directories {
             throw URLError(.fileDoesNotExist)
         }
 
-        let sharedContainerSubfolder = sharedContainerURL.appendingPathComponent(subfolder)
+        let sharedContainerSubfolder = sharedContainerURL.appending(path: subfolder)
 
-        if !fileManager.fileExists(atPath: sharedContainerSubfolder.path) {
+        if !fileManager.fileExists(atPath: sharedContainerSubfolder.resolvedPath) {
             try fileManager
                 .createDirectory(
                     at: sharedContainerSubfolder,
@@ -82,30 +73,18 @@ public struct Directories {
         subfolder: String = "",
         fileManager: FileManagerProtocol
     ) throws -> URL {
-        var cacheDirectory: URL
-        if #available(iOS 16.0, *) {
-            cacheDirectory = try fileManager.url(
-                for: .cachesDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false)
-                .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
-            if !subfolder.isEmpty {
-                cacheDirectory = cacheDirectory.appending(path: subfolder, directoryHint: .isDirectory)
-            }
-        } else {
-            cacheDirectory = try fileManager.url(
-                for: .cachesDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false)
-                .appendingPathComponent(BundleUtil.getBundleIdentifier(), isDirectory: true)
-            if !subfolder.isEmpty {
-                cacheDirectory = cacheDirectory.appendingPathComponent(subfolder, isDirectory: true)
-            }
+        var cacheDirectory = try fileManager.url(
+            for: .cachesDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false)
+            .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
+
+        if !subfolder.isEmpty {
+            cacheDirectory = cacheDirectory.appending(path: subfolder, directoryHint: .isDirectory)
         }
 
-        if !fileManager.fileExists(atPath: cacheDirectory.path) {
+        if !fileManager.fileExists(atPath: cacheDirectory.resolvedPath) {
             try fileManager
                 .createDirectory(
                     at: cacheDirectory,
@@ -146,9 +125,8 @@ public struct Directories {
 
     public static func getConfigDirectory(from directory: URL? = nil, fileManager: FileManagerProtocol) throws -> URL {
         let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
-        return baseDirectory.appendingPathComponent(
-            Constants.Configuration.CacheConfigFolder,
-            conformingTo: .folder
+        return baseDirectory.appending(path:
+            Constants.Configuration.CacheConfigFolder, directoryHint: .isDirectory
         )
     }
 
@@ -163,24 +141,24 @@ public struct Directories {
         let libdigidocppLogFile = "libdigidocpp.log"
 
         if let mainDirectory = directory {
-            let primaryLogsDirectory = mainDirectory.appendingPathComponent("logs")
+            let primaryLogsDirectory = mainDirectory.appending(path: "logs")
 
-            if !fileManager.fileExists(atPath: primaryLogsDirectory.path) {
+            if !fileManager.fileExists(atPath: primaryLogsDirectory.resolvedPath) {
                 try fileManager.createDirectory(
                     at: primaryLogsDirectory,
                     withIntermediateDirectories: true,
                     attributes: nil
                 )
-                return primaryLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+                return primaryLogsDirectory.appending(path: libdigidocppLogFile)
             } else {
-                return primaryLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+                return primaryLogsDirectory.appending(path: libdigidocppLogFile)
             }
         }
 
         let cacheDirectory = try getCacheDirectory(fileManager: fileManager)
-        let fallbackLogsDirectory = cacheDirectory.appendingPathComponent("logs")
+        let fallbackLogsDirectory = cacheDirectory.appending(path: "logs")
 
-        if !fileManager.fileExists(atPath: fallbackLogsDirectory.path) {
+        if !fileManager.fileExists(atPath: fallbackLogsDirectory.resolvedPath) {
             try fileManager.createDirectory(
                 at: fallbackLogsDirectory,
                 withIntermediateDirectories: true,
@@ -188,7 +166,6 @@ public struct Directories {
             )
         }
 
-        return fallbackLogsDirectory.appendingPathComponent(libdigidocppLogFile)
+        return fallbackLogsDirectory.appending(path: libdigidocppLogFile)
     }
-
 }

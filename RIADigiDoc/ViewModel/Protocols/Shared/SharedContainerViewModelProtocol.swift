@@ -37,4 +37,7 @@ public protocol SharedContainerViewModelProtocol: Sendable {
     func containers() -> [GeneralContainer]
     @discardableResult func removeLastContainer() -> GeneralContainer?
     func clearContainers()
+
+    func setIsSignatureAdded(_ isAdded: Bool)
+    func getIsSignatureAdded() -> Bool
 }

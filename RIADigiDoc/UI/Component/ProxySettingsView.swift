@@ -23,13 +23,13 @@ import FactoryKit
 struct ProxySettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @Environment(\.dismiss) private var dismiss
 
-    @StateObject private var viewModel: ProxySettingsViewModel
+    @State private var viewModel: ProxySettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.proxySettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.proxySettingsViewModel())
     }
 
     var body: some View {
@@ -99,7 +99,7 @@ struct ProxySettingsView: View {
                 await viewModel.saveSettings()
             }
         }
-        .onChange(of: viewModel.portText) { _ in
+        .onChange(of: viewModel.portText) {
             if viewModel.isPortTextValid {
                 guard let port = Int(viewModel.portText) else { return }
                 viewModel.proxyInfo.port = port
@@ -136,6 +136,6 @@ struct ProxySettingsView: View {
 
 #Preview {
     ProxySettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

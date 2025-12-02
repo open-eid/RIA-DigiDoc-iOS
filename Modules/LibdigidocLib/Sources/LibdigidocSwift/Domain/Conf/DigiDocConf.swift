@@ -257,14 +257,14 @@ public actor DigiDocInitializer {
                 .getLibdigidocLogFile(
                     from: Directories.getLibraryDirectory(fileManager: fileManager),
                     fileManager: fileManager
-                )?.path ?? ""
+                )?.resolvedPath ?? ""
         } catch {
             return ""
         }
     }
 
     private func overrideTSLCache() -> String {
-        return Directories.getTslCacheDirectory(fileManager: fileManager)?.path ?? ""
+        return Directories.getTslCacheDirectory(fileManager: fileManager)?.resolvedPath ?? ""
     }
 
     private func overrideTSLUrl(conf: ConfigurationProvider) -> URL {

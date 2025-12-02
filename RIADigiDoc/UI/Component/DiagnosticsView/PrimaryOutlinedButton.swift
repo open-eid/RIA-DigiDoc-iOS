@@ -68,6 +68,6 @@ struct PrimaryOutlinedButton: View {
             action: {}
         )
     }
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

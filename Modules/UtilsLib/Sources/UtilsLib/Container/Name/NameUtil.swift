@@ -96,12 +96,9 @@ public struct NameUtil: NameUtilProtocol {
     }
 
     private func cleanString(_ input: String) -> String {
-        let noSlashes = input.replacingOccurrences(of: "/", with: "")
-        let singleSpaced = noSlashes.replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-
-        // Replace multiple commas with a single comma
-        let singleComma = singleSpaced.replacingOccurrences(of: ",+", with: ",", options: .regularExpression)
-
-        return singleComma
+        input
+            .replacing("/", with: "")
+            .replacing(/\s+/, with: " ")
+            .replacing(/,+/, with: ",")
     }
 }

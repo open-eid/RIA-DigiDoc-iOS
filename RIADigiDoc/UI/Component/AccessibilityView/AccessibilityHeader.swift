@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct AccessibilityHeader: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack(
@@ -51,7 +51,7 @@ struct AccessibilityHeader: View {
 // MARK: - Preview
 #Preview {
     AccessibilityHeader()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 
 }

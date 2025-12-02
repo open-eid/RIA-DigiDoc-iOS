@@ -27,8 +27,9 @@ import ConfigLib
 import CommonsLib
 import CryptoKit
 
+@Observable
 @MainActor
-class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
+class SmartIdViewModel: SmartIdViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc",
         category: "SmartIdViewModel"
@@ -40,15 +41,15 @@ class SmartIdViewModel: SmartIdViewModelProtocol, ObservableObject {
     private static let signatureEndpoint = "/signature/document"
     private static let sessionEndpoint = "/session"
 
-    @Published var controlCode: String = "- - - -"
+    var controlCode: String = "- - - -"
 
-    @Published var personalCodeErrorKey: String?
+    var personalCodeErrorKey: String?
 
-    @Published var smartIdMessageKey: String?
-    @Published var smartIdAlertMessageKey: String?
-    @Published var smartIdAlertMessageExtraArguments: [String] = []
-    @Published var showSmartIdAlertMessage: Bool = false
-    @Published var smartIdAlertMessageUrl: String?
+    var smartIdMessageKey: String?
+    var smartIdAlertMessageKey: String?
+    var smartIdAlertMessageExtraArguments: [String] = []
+    var showSmartIdAlertMessage: Bool = false
+    var smartIdAlertMessageUrl: String?
 
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let smartIdSignService: SmartIdSignServiceProtocol

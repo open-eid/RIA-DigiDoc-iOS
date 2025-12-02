@@ -18,12 +18,15 @@
  */
 
 import SwiftUI
+import FactoryKit
 
 struct TopBarContainer<Content: View>: View {
+    @Environment(NavigationPathManager.self) private var pathManager
+
     @AppTheme private var theme
 
     @Environment(\.openURL) var openURL
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var title: String?
 
@@ -98,14 +101,6 @@ struct TopBarContainer<Content: View>: View {
             )
 
             content()
-
-            NavigationLink(destination: LanguageChooserView(), isActive: $navigateToLanguageChooser) { EmptyView() }
-                .hidden()
-            NavigationLink(destination: ThemeChooserView(), isActive: $navigateToThemeChooser) { EmptyView() }
-                .hidden()
-            NavigationLink(destination: AdvancedSettingsView(), isActive: $navigateToAdvancedSettings) { EmptyView() }
-                .hidden()
-
         }
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())
         .navigationBarHidden(true)
@@ -122,13 +117,13 @@ struct TopBarContainer<Content: View>: View {
                 showThemeChooserButton: !excludeDestinations.contains(.theme),
                 showAdvancedSettingsButton: !excludeDestinations.contains(.advanced),
                 onLanguageChooserClick: {
-                    navigateToLanguageChooser = true
+                    pathManager.navigate(to: .languageChooserView)
                 },
                 onThemeChooserClick: {
-                    navigateToThemeChooser = true
+                    pathManager.navigate(to: .themeChooserView)
                 },
                 onAdvancedSettingsClick: {
-                    navigateToAdvancedSettings = true
+                    pathManager.navigate(to: .advancedSettingsView)
                 }
             )
         }
@@ -138,7 +133,7 @@ struct TopBarContainer<Content: View>: View {
 struct TopBar: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var title: String?
 
@@ -254,4 +249,15 @@ struct TopBar: View {
         .padding(Dimensions.Padding.SPadding)
         .background(theme.surface)
     }
+}
+
+#Preview {
+    TopBarContainer(
+        content: {
+            EmptyView()
+        }
+    )
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
+    .environment(NavigationPathManager())
 }

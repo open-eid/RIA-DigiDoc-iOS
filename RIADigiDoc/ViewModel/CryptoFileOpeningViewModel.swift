@@ -24,16 +24,18 @@ import CryptoSwift
 import CommonsLib
 import UtilsLib
 
+@Observable
 @MainActor
-class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, ObservableObject {
-    @Published var isFileOpeningLoading: Bool = false
-    @Published var isNavigatingToNextView: Bool = false
+class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
+    var isFileOpeningLoading: Bool = false
+    var isNavigatingToNextView: Bool = false
 
-    @Published var cryptoContainer: CryptoContainerProtocol =  CryptoContainer(
+    var cryptoContainer: CryptoContainerProtocol =  CryptoContainer(
         fileManager: Container.shared.fileManager(),
         containerUtil: Container.shared.containerUtil()
     )
-    @Published var errorMessage: ToastMessage?
+
+    var errorMessage: ToastMessage?
 
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 

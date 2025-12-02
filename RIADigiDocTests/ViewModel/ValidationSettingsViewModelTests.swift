@@ -34,8 +34,6 @@ final class ValidationSettingsViewModelTests {
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
     private let mockCertificateUtil: CertificateUtilProtocolMock!
 
-    let mockConfigProvider: ConfigurationProvider!
-
     init() async throws {
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
         mockDataStore = DataStoreProtocolMock()
@@ -51,11 +49,9 @@ final class ValidationSettingsViewModelTests {
             return .defaultSetting
         }
 
-        mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
-        TestConfigurationSetup.configureMocks(
-            configurationRepository: mockConfigurationRepository,
-            configProvider: mockConfigProvider
-        )
+        mockConfigurationRepository.getConfigurationHandler = {
+            try? TestConfigurationProvider.mockConfigurationProvider()
+        }
 
         viewModel = ValidationSettingsViewModel(
             configurationRepository: mockConfigurationRepository,
@@ -72,6 +68,15 @@ final class ValidationSettingsViewModelTests {
     func init_successWithEmptyUrl() async throws {
         mockDataStore.getValidationServiceURLHandler = {
             return ""
+        }
+
+        mockConfigurationRepository.getConfigurationHandler = {
+            do {
+                return try TestConfigurationProvider.mockConfigurationProvider()
+            } catch {
+                print(error)
+                return nil
+            }
         }
 
         let testViewModel = ValidationSettingsViewModel(
@@ -108,7 +113,7 @@ final class ValidationSettingsViewModelTests {
         viewModel.selectedOption = .manualSetting
         let testURL = ""
         viewModel.validationServiceUrl = testURL
-        await viewModel.observeConfigurationUpdates()
+        viewModel.configuration = try? TestConfigurationProvider.mockConfigurationProvider()
 
         await viewModel.saveSettings()
 
@@ -123,6 +128,10 @@ final class ValidationSettingsViewModelTests {
         viewModel.selectedOption = .manualSetting
         let testURL = "http://valid.url.ee"
         viewModel.validationServiceUrl = testURL
+
+        mockDataStore.getValidationServiceURLHandler = {
+            return testURL
+        }
 
         await viewModel.saveSettings()
 

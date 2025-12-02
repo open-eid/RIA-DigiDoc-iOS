@@ -70,7 +70,7 @@ actor LibrarySetup {
             }
             let configDirectory = try Directories.getCacheDirectory(
                 fileManager: fileManager
-            ).appendingPathComponent(
+            ).appending(path:
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
             try await configurationLoader.initConfiguration(

@@ -24,7 +24,9 @@ import CommonsLib
 
 struct RecentDocumentsView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
+
+    @Environment(NavigationPathManager.self) private var pathManager
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -34,13 +36,13 @@ struct RecentDocumentsView: View {
     @State private var selectedFile: FileItem?
     @State private var showRemoveContainerModal = false
 
-    @StateObject private var viewModel: RecentDocumentsViewModel
+    @State private var viewModel: RecentDocumentsViewModel
 
     let folderURL: URL?
     let extensions: [String]
 
     init(folderURL: URL?, extensions: [String]) {
-        _viewModel = StateObject(wrappedValue: Container.shared.recentDocumentsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.recentDocumentsViewModel())
         self.folderURL = folderURL
         self.extensions = extensions
     }
@@ -64,108 +66,96 @@ struct RecentDocumentsView: View {
             showRightIcons: true,
             content: {
                 ZStack {
-                    if #available(iOS 17.0, *) {
-                        VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                            Text(verbatim: languageSettings.localized("Recent documents"))
-                                .foregroundStyle(theme.onSurface)
-                                .font(typography.headlineSmall)
-                                .padding(.top, Dimensions.Padding.SPadding)
-                                .accessibilityHeading(.h1)
-                                .accessibilityAddTraits([.isHeader])
+                    VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+                        Text(verbatim: languageSettings.localized("Recent documents"))
+                            .foregroundStyle(theme.onSurface)
+                            .font(typography.headlineSmall)
+                            .padding(.top, Dimensions.Padding.SPadding)
+                            .accessibilityHeading(.h1)
+                            .accessibilityAddTraits([.isHeader])
 
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundStyle(theme.onSurfaceVariant)
-                                    .accessibilityHidden(true)
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundStyle(theme.onSurfaceVariant)
+                                .accessibilityHidden(true)
 
-                                TextField(
-                                    languageSettings.localized("Search container file"),
-                                    text: $viewModel.searchText
-                                )
-                                .submitLabel(.done)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled(true)
-                                .onChange(of: viewModel.searchText) { _ in
-                                    guard let recentDocumentsFolder = folderURL else { return }
-                                    viewModel.loadFiles(
-                                        from: recentDocumentsFolder,
-                                        withExtensions: extensions
-                                    )
-                                }
-
-                                if !viewModel.searchText.isEmpty {
-                                    Button(
-                                        action: {
-                                            viewModel.searchText = ""
-                                        },
-                                        label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: Dimensions.Icon.IconSizeXXXS,
-                                                       height: Dimensions.Icon.IconSizeXXXS)
-                                                .foregroundStyle(theme.onSurfaceVariant)
-                                        })
-                                    .accessibilityLabel(languageSettings.localized("Clear text"))
-                                }
-                            }
-                            .padding(.horizontal, Dimensions.Padding.SPadding)
-                            .padding(.vertical, Dimensions.Padding.MSPadding)
-                            .background(
-                                RoundedRectangle(cornerRadius: Dimensions.Padding.MPadding, style: .continuous)
-                                    .fill(Color(.systemGray6))
+                            TextField(
+                                languageSettings.localized("Search container file"),
+                                text: $viewModel.searchText
                             )
-                            .padding(.top, Dimensions.Padding.LPadding)
-                            .padding(.bottom, Dimensions.Padding.SPadding)
+                            .submitLabel(.done)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
+                            .onChange(of: viewModel.searchText) {
+                                guard let recentDocumentsFolder = folderURL else { return }
+                                viewModel.loadFiles(
+                                    from: recentDocumentsFolder,
+                                    withExtensions: extensions
+                                )
+                            }
 
-                            NavigationStack {
-                                if noSearchResults {
-                                    ContentUnavailableView {
-                                        Text(verbatim: languageSettings.localized("Document not found"))
-                                    }
-                                    .listRowSeparator(.hidden)
-                                } else if noDocuments {
-                                    ContentUnavailableView {
-                                        Text(verbatim: languageSettings.localized("No recent documents"))
-                                    }
-                                    .listRowSeparator(.hidden)
-                                } else {
-                                    List {
-                                        if #available(iOS 26.0, *) {
-                                            ForEach(filteredFiles.enumerated(), id: \.offset
-                                            ) { index, item in
-                                                fileRow(index: index, item: item)
-                                            }
-                                        } else {
-                                            ForEach(Array(filteredFiles.enumerated()), id: \.offset
-                                            ) { index, item in
-                                                fileRow(index: index, item: item)
-                                            }
-                                        }
-                                    }
-                                    .listStyle(.plain)
-                                    .scrollContentBackground(.hidden)
-                                    .listRowSpacing(0)
-                                    .listSectionSpacing(.compact)
-                                    .fullScreenCover(isPresented: $isFileOpeningLoading) {
-                                        FileOpeningView(
-                                            isFileOpeningLoading: $isFileOpeningLoading,
-                                            isNavigatingToNextView: $isNavigatingToSigningView
-                                        )
-                                    }
-                                }
+                            if !viewModel.searchText.isEmpty {
+                                Button(
+                                    action: {
+                                        viewModel.searchText = ""
+                                    },
+                                    label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: Dimensions.Icon.IconSizeXXXS,
+                                                   height: Dimensions.Icon.IconSizeXXXS)
+                                            .foregroundStyle(theme.onSurfaceVariant)
+                                    })
+                                .accessibilityLabel(languageSettings.localized("Clear text"))
                             }
                         }
                         .padding(.horizontal, Dimensions.Padding.SPadding)
-                    } else {
-                        EmptyView()
-                    }
+                        .padding(.vertical, Dimensions.Padding.MSPadding)
+                        .background(
+                            RoundedRectangle(cornerRadius: Dimensions.Padding.MPadding, style: .continuous)
+                                .fill(Color(.systemGray6))
+                        )
+                        .padding(.top, Dimensions.Padding.LPadding)
+                        .padding(.bottom, Dimensions.Padding.SPadding)
 
-                    NavigationLink(
-                        destination: SigningView(),
-                        isActive: $isNavigatingToSigningView
-                    ) {}
-                        .accessibilityHidden(!isNavigatingToSigningView)
+                        if noSearchResults {
+                            ContentUnavailableView {
+                                Text(verbatim: languageSettings.localized("Document not found"))
+                            }
+                            .listRowSeparator(.hidden)
+                        } else if noDocuments {
+                            ContentUnavailableView {
+                                Text(verbatim: languageSettings.localized("No recent documents"))
+                            }
+                            .listRowSeparator(.hidden)
+                        } else {
+                            List {
+                                if #available(iOS 26.0, *) {
+                                    ForEach(filteredFiles.enumerated(), id: \.offset
+                                    ) { index, item in
+                                        fileRow(index: index, item: item)
+                                    }
+                                } else {
+                                    ForEach(Array(filteredFiles.enumerated()), id: \.offset
+                                    ) { index, item in
+                                        fileRow(index: index, item: item)
+                                    }
+                                }
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                            .listRowSpacing(0)
+                            .listSectionSpacing(.compact)
+                            .fullScreenCover(isPresented: $isFileOpeningLoading) {
+                                FileOpeningView(
+                                    isFileOpeningLoading: $isFileOpeningLoading,
+                                    isNavigatingToNextView: $isNavigatingToSigningView
+                                )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, Dimensions.Padding.SPadding)
 
                     if showRemoveContainerModal {
                         ConfirmModalView(
@@ -200,10 +190,16 @@ struct RecentDocumentsView: View {
                         withExtensions: extensions
                     )
                 }
-                .onReceive(viewModel.$errorMessage) { error in
+                .onChange(of: viewModel.errorMessage) { _, error in
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
                 }
+                .onChange(of: isNavigatingToSigningView, { _, newValue in
+                    if newValue {
+                        pathManager.navigate(to: .signingView)
+                        isNavigatingToSigningView = false
+                    }
+                })
             }
         )
     }
@@ -226,6 +222,7 @@ struct RecentDocumentsView: View {
         .listRowInsets(EdgeInsets())
         .contentShape(Rectangle())
         .buttonStyle(.plain)
+        .background(theme.surface)
     }
 }
 
@@ -234,6 +231,7 @@ struct RecentDocumentsView: View {
         folderURL: URL(fileURLWithPath: "/recentDocumentsFolder/"),
         extensions: Constants.Container.ContainerExtensions
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
+    .environment(NavigationPathManager())
 }

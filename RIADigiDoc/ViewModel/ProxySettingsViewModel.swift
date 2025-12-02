@@ -23,13 +23,14 @@ import Foundation
 import LibdigidocLibSwift
 import OSLog
 
+@Observable
 @MainActor
-class ProxySettingsViewModel: ProxySettingsViewModelProtocol, ObservableObject {
+class ProxySettingsViewModel: ProxySettingsViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ProxySettingsViewModel")
 
-    @Published var proxyInfo: ProxyInfo = ProxyInfo()
-    @Published var portText: String = "80"
+    var proxyInfo: ProxyInfo = ProxyInfo()
+    var portText: String = "80"
 
     // MARK: - Dependencies
     private let proxyUtil: ProxyUtilProtocol

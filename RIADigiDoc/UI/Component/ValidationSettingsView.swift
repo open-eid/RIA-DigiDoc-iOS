@@ -23,16 +23,15 @@ import FactoryKit
 struct ValidationSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
     @Environment(\.dismiss) private var dismiss
 
-    // MARK: - Navigation
-    @State private var navigateToCertificateView = false
+    @Environment(NavigationPathManager.self) private var pathManager
 
-    @StateObject private var viewModel: ValidationSettingsViewModel
+    @State private var viewModel: ValidationSettingsViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: Container.shared.validationSettingsViewModel())
+        _viewModel = State(wrappedValue: Container.shared.validationSettingsViewModel())
     }
 
     var body: some View {
@@ -76,7 +75,10 @@ struct ValidationSettingsView: View {
                                             expiredLabel: languageSettings.localized("Main settings cert expired")
                                         ),
                                         onShowCertificatePressed: {
-                                            navigateToCertificateView = true
+                                            if let sivaCertData = viewModel.sivaCertData {
+                                                pathManager
+                                                    .navigate(to: .certificateDetailView(certificate: sivaCertData))
+                                            }
                                         },
                                         onAddCertificatePressed: {
                                             viewModel.isImportingCert = true
@@ -96,7 +98,6 @@ struct ValidationSettingsView: View {
         .onDisappear {
             Task {
                 await viewModel.saveSettings()
-                await viewModel.removeObservers()
             }
         }
         .fileImporter(
@@ -115,17 +116,6 @@ struct ValidationSettingsView: View {
                 viewModel.isImportingCert = false
             }
         }
-
-        // MARK: - Navigation links
-        if let sivaCertData = viewModel.sivaCertData {
-            NavigationLink(
-                destination: CertificateDetailView(
-                    certificate: sivaCertData
-                ),
-                isActive: $navigateToCertificateView,
-            ) { EmptyView() }
-                .hidden()
-        }
     }
 }
 
@@ -133,6 +123,7 @@ struct ValidationSettingsView: View {
 
 #Preview {
     ValidationSettingsView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

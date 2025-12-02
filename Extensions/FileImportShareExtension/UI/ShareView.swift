@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct ShareView: View {
-    @StateObject private var viewModel: ShareViewModel
+    @State private var viewModel: ShareViewModel
     var statusChanged: (() -> Void)?
     var completeRequest: (() -> Void)?
 
@@ -32,7 +32,7 @@ struct ShareView: View {
         completeRequest: (() -> Void)? = nil,
         languageSettings: LanguageSettings = LanguageSettings(dataStore: DataStore())
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.shareViewModel())
+        _viewModel = State(wrappedValue: Container.shared.shareViewModel())
         self.statusChanged = statusChanged
         self.completeRequest = completeRequest
         self.languageSettings = languageSettings

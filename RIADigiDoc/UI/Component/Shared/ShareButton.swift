@@ -26,23 +26,8 @@ struct ShareButton: View {
     let iconName: String
     let label: String
     let accessibilityLabel: String
-    let onClick: () -> Void
 
     var body: some View {
-        // Set as button on iOS 15 only as ShareLink handles sharing on iOS 16+.
-        // Button would overwrite ShareLink's action
-        Group {
-            if #available(iOS 16.0, *) {
-                content
-            } else {
-                Button(action: onClick, label: {
-                    content
-                })
-            }
-        }
-    }
-
-    private var content: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             Image(iconName)
                 .resizable()

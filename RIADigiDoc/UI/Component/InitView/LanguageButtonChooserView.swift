@@ -20,7 +20,7 @@
 import SwiftUI
 
 struct LanguageButtonChooserView<T: Equatable & Identifiable>: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     let options: [T]
     let titleKey: (T) -> String

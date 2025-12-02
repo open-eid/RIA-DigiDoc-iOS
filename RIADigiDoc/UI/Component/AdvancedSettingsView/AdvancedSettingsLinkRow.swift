@@ -56,5 +56,5 @@ struct AdvancedSettingsLinkRow: View {
         label: "Row title",
         onClick: {}
     )
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.themeSettings())
 }

@@ -23,7 +23,7 @@ import CommonsLib
 
 struct RoleView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -34,14 +34,14 @@ struct RoleView: View {
     @State private var country: String = ""
     @State private var zipCode: String = ""
 
-    @StateObject private var viewModel: RoleViewModel
+    @State private var viewModel: RoleViewModel
 
     let onComplete: (String, String, String, String, String) -> Void
 
     init(
         onComplete: @escaping (String, String, String, String, String) -> Void
     ) {
-        _viewModel = StateObject(wrappedValue: Container.shared.roleViewModel())
+        _viewModel = State(wrappedValue: Container.shared.roleViewModel())
         self.onComplete = onComplete
     }
 
@@ -164,6 +164,6 @@ struct RoleView: View {
     RoleView(
         onComplete: {_, _, _, _, _ in }
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

@@ -40,4 +40,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType]
     func removeSignature(_ signature: SignatureWrapper) async
     func removeDataFile(_ dataFile: DataFileWrapper) async
+    func isSignatureAdded() -> Bool
 }

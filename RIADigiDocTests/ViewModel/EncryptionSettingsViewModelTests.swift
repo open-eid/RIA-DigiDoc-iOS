@@ -117,8 +117,6 @@ final class EncryptionSettingsViewModelTests {
         )
         viewModel.serverInfo = testServerInfo
 
-        await viewModel.observeConfigurationUpdates()
-
         await viewModel.saveSettings()
 
         #expect(mockDataStore.setEncryptionCdocOptionCallCount == 1)

@@ -108,11 +108,7 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
                 return response
             }
 
-            if #available(iOS 16.0, *) {
-                try await Task.sleep(for: .seconds(Double(pollingTimeout)))
-            } else {
-                try await Task.sleep(nanoseconds: UInt64(pollingTimeout * 1_000_000_000))
-            }
+            try await Task.sleep(for: .seconds(Double(pollingTimeout)))
         }
     }
 

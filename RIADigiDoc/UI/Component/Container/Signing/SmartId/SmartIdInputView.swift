@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct SmartIdInputView: View {
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -84,7 +84,7 @@ struct SmartIdInputView: View {
                         keyboardType: .phonePad,
                         showDashButton: true
                     )
-                    .onChange(of: personalCode) { _ in
+                    .onChange(of: personalCode) {
                         onInputChange()
                     }
                 }
@@ -129,30 +129,7 @@ struct SmartIdInputView: View {
                     }
                 )
             }
-            .clearPresentationBackground()
-        }
-    }
-}
-
-// TODO: Remove in iOS 17 minimum version
-// Workaround for iOS 15
-struct BackgroundClearView: UIViewRepresentable {
-    func makeUIView(context _: Context) -> UIView {
-        let view = UIView()
-        DispatchQueue.main.async {
-            view.superview?.superview?.backgroundColor = .clear
-        }
-        return view
-    }
-    func updateUIView(_: UIView, context _: Context) {}
-}
-
-extension View {
-    func clearPresentationBackground() -> some View {
-        if #available(iOS 16.4, *) {
-            return AnyView(self.presentationBackground(.clear))
-        } else {
-            return AnyView(self.background(BackgroundClearView()))
+            .presentationBackground(.clear)
         }
     }
 }
@@ -167,6 +144,6 @@ extension View {
         onInputChange: {}
 
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

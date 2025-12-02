@@ -65,7 +65,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
             subfolder: certificateFolder,
             fileManager: fileManager
         )
-        guard fileManager.fileExists(atPath: certCacheDirectory.path) else { return nil }
+        guard fileManager.fileExists(atPath: certCacheDirectory.resolvedPath) else { return nil }
 
         let files = try fileManager.contentsOfDirectory(
             at: certCacheDirectory,
@@ -104,7 +104,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
 
             let sourceExtension = url.pathExtension
             let extensionToUse = sourceExtension.isEmpty ? "cer" : sourceExtension
-            let destinationURL = certCacheDirectory.appendingPathComponent(
+            let destinationURL = certCacheDirectory.appending(path:
                 "\(certificateBaseName).\(extensionToUse)"
             )
 

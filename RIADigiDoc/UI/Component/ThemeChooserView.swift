@@ -22,8 +22,8 @@ import SwiftUI
 
 struct ThemeChooserView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var languageSettings: LanguageSettings
-    @EnvironmentObject private var themeSettings: ThemeSettings
+    @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(ThemeSettings.self) private var themeSettings
 
     private let supportedThemes: [SupportedTheme] = [
         SupportedTheme(themeKey: .system, titleKey: "Main settings theme system"),
@@ -66,6 +66,6 @@ struct ThemeChooserView: View {
 // MARK: - Preview
 #Preview {
     ThemeChooserView()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

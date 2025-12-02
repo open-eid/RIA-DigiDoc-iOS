@@ -39,7 +39,7 @@ struct HomeHeader: View {
 private struct LogoComponent: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
@@ -60,7 +60,7 @@ private struct LogoComponent: View {
 private struct VersionComponent: View {
     @AppTheme private var theme
     @AppTypography private var typography
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         Text(verbatim: languageSettings.localized(
@@ -75,6 +75,6 @@ private struct VersionComponent: View {
 // MARK: - Preview
 #Preview {
     HomeHeader()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

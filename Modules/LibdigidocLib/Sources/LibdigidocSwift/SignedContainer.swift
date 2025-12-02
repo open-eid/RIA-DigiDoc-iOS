@@ -177,7 +177,7 @@ public actor SignedContainer: SignedContainerProtocol {
 
         let destinationURL = currentURL
             .deletingLastPathComponent()
-            .appendingPathComponent(newFileName)
+            .appending(path: newFileName)
 
         let uniqueFileURL = containerUtil.getContainerFile(
             for: destinationURL,
@@ -373,7 +373,7 @@ extension SignedContainer {
             fileManager: Container.shared.fileManager()
         )
 
-        try await containerWrapper.create(file: containerFile, dataFiles: dataFiles.compactMap { $0.path })
+        try await containerWrapper.create(file: containerFile, dataFiles: dataFiles.compactMap { $0.resolvedPath })
 
         let createdContainer = try await containerWrapper.open(containerFile: containerFile, isSivaConfirmed: true)
 
@@ -382,7 +382,8 @@ extension SignedContainer {
             SignedContainer.logger.debug(
                 "Removing data file (\(index + 1) / \(dataFiles.count)): \(dataFile.lastPathComponent)"
             )
-            if fileManager.fileExists(atPath: dataFile.path) && fileManager.isDeletableFile(atPath: dataFile.path) {
+            if fileManager.fileExists(atPath: dataFile.resolvedPath) &&
+                fileManager.isDeletableFile(atPath: dataFile.resolvedPath) {
                 try fileManager.removeItem(at: dataFile)
                 SignedContainer.logger.debug("Data file: '\(dataFile.lastPathComponent)' removed")
             }

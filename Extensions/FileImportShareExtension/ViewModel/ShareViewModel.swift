@@ -25,8 +25,9 @@ import CommonsLib
 import UtilsLib
 import Alamofire
 
+@Observable
 @MainActor
-class ShareViewModel: ShareViewModelProtocol, ObservableObject {
+class ShareViewModel: ShareViewModelProtocol {
     private static let logger = Logger(
         subsystem: "ee.ria.digidoc.FileImportShareExtension",
         category: "ShareViewController"
@@ -35,7 +36,7 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
     private let fileManager: FileManagerProtocol
     private let resourceChecker: URLResourceCheckerProtocol
 
-    @Published var status: Status = .processing
+    var status: Status = .processing
 
     public init(
         fileManager: FileManagerProtocol,
@@ -112,7 +113,7 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
 
     func convertNSDataToURL(data: Data) throws -> URL {
         let tempDirectoryURL = fileManager.temporaryDirectory
-        let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+        let tempFileURL = tempDirectoryURL.appending(path: UUID().uuidString)
 
         try data.write(to: tempFileURL)
         return tempFileURL
@@ -129,7 +130,7 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
 
                 let groupTempFolderUrl = try Directories.getSharedFolder(fileManager: fileManager)
 
-                let filePath = groupTempFolderUrl.appendingPathComponent(itemUrl.lastPathComponent)
+                let filePath = groupTempFolderUrl.appending(path: itemUrl.lastPathComponent)
 
                 let inputStream = InputStream(url: itemUrl)
                 let outputStream = OutputStream(url: filePath, append: false)
@@ -189,7 +190,7 @@ class ShareViewModel: ShareViewModelProtocol, ObservableObject {
             let destinationURL = try Directories.getTempDirectory(
                 subfolder: Constants.Folder.Shared,
                 fileManager: fileManager
-            ).appendingPathComponent(
+            ).appending(path:
                 itemUrl.lastPathComponent
             )
 

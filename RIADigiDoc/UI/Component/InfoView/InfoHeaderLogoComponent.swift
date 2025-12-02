@@ -23,7 +23,7 @@ import FactoryKit
 struct InfoHeaderLogoComponent: View {
     @AppTypography private var typography
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack {
@@ -53,6 +53,6 @@ struct InfoHeaderLogoComponent: View {
 // MARK: - Preview
 #Preview {
     InfoHeaderLogoComponent()
-        .environmentObject(Container.shared.languageSettings())
-        .environmentObject(Container.shared.themeSettings())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
 }

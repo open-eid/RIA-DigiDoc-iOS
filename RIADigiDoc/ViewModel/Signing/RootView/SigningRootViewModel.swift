@@ -19,9 +19,11 @@
 
 import Foundation
 import OSLog
+import Observation
 
+@Observable
 @MainActor
-class SigningRootViewModel: SigningRootViewModelProtocol, ObservableObject {
+class SigningRootViewModel: SigningRootViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningRootViewModel")
 
     private let dataStore: DataStoreProtocol

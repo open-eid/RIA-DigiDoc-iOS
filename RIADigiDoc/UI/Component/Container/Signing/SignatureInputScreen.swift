@@ -24,7 +24,7 @@ struct SignatureInputScreen<Content: View>: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @EnvironmentObject private var languageSettings: LanguageSettings
+    @Environment(LanguageSettings.self) private var languageSettings
 
     private let selectedSigningMethod: String
 
@@ -81,7 +81,7 @@ struct SignatureInputScreen<Content: View>: View {
                                     .foregroundStyle(theme.onSurfaceVariant)
                                     .accessibilityHidden(true)
 
-                                NavigationLink(destination: SigningMethodSelectionView()) {
+                                NavigationLink(value: NavigationDestination.signingMethodSelectionView) {
                                     HStack {
                                         Text(verbatim: selectedSigningMethodText)
                                             .font(typography.bodyLarge)
@@ -134,6 +134,6 @@ struct SignatureInputScreen<Content: View>: View {
         onSign: {},
         content: {}
     )
-    .environmentObject(Container.shared.languageSettings())
-    .environmentObject(Container.shared.themeSettings())
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }
