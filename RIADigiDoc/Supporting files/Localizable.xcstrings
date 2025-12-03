@@ -446,6 +446,24 @@
         }
       }
     },
+    "ConcatKDF reference method" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ConcatKDF reference method"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ConcatKDF referaatmeetod"
+          }
+        }
+      }
+    },
     "Container encryption" : {
       "comment" : "EncryptView title",
       "extractionState" : "manual",
@@ -711,6 +729,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Riik"
+          }
+        }
+      }
+    },
+    "Crypto files encrypted" : {
+      "comment" : "Crypto container files names locked",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To see the files, select «Decrypt» to identify the recipient and decrypt the envelope contents."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failide nägemiseks vali «Dekrüpteeri», et tuvastada isik ja dekrüpteerida ümbriku sisu."
           }
         }
       }
@@ -3882,6 +3918,24 @@
         }
       }
     },
+    "Next" : {
+      "comment" : "Encryption view bottom bar action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edasi"
+          }
+        }
+      }
+    },
     "No Internet connection" : {
       "comment" : "Error shown whne app is unable to conenct to the Internet to do requests",
       "extractionState" : "manual",
@@ -4277,6 +4331,186 @@
         }
       }
     },
+    "Recipient" : {
+      "comment" : "Home title, signer details title, accessibility recipient prefix",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaat"
+          }
+        }
+      }
+    },
+    "Recipient certificate" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient’s certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaat"
+          }
+        }
+      }
+    },
+    "Recipient certificate expiry date" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient's certificate expiry date"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaadi aegumiskuupäev"
+          }
+        }
+      }
+    },
+    "Recipient certificate issuer" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient’s certificate issuer"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "Recipient details" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient details"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi andmed"
+          }
+        }
+      }
+    },
+    "Recipient" : {
+      "comment" : "Home title, signer details title, accessibility recipient prefix",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaat"
+          }
+        }
+      }
+    },
+    "Recipient certificate" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient’s certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaat"
+          }
+        }
+      }
+    },
+    "Recipient certificate expiry date" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient's certificate expiry date"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaadi aegumiskuupäev"
+          }
+        }
+      }
+    },
+    "Recipient certificate issuer" : {
+      "comment" : "Recipient detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient’s certificate issuer"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "Recipient details" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient details"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi andmed"
+          }
+        }
+      }
+    },
     "Remember me" : {
       "comment" : "Used in signing views to remember values",
       "extractionState" : "manual",
@@ -4435,6 +4669,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oled kustutamas viimast faili ümbrikus, koos sellega eemaldatakse ka ümbrik."
+          }
+        }
+      }
+    },
+    "Remove recipient" : {
+      "comment" : "Bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemaldada adressaat"
+          }
+        }
+      }
+    },
+    "Remove recipient from container" : {
+      "comment" : "Remove recipient message in modal",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove recipient from container?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soovid eemaldada adressaati?"
           }
         }
       }
@@ -5831,6 +6101,24 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Valid to" : {
+      "comment" : "Valid to date",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(valid to %@)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(kehtiv kuni %@)"
           }
         }
       }

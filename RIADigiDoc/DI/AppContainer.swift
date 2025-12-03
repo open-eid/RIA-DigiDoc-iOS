@@ -145,6 +145,7 @@ extension Container {
                 mimeTypeDecoder: self.mimeTypeDecoder(),
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager(),
+                fileInspector: self.fileInspector(),
                 sivaRepository: self.sivaRepository()
             )
         }
@@ -326,6 +327,10 @@ extension Container {
 
     var signatureUtil: Factory<SignatureUtilProtocol> {
         self { SignatureUtil() }
+    }
+
+    var recipientUtil: Factory<RecipientUtilProtocol> {
+        self { RecipientUtil() }
     }
 
     @MainActor

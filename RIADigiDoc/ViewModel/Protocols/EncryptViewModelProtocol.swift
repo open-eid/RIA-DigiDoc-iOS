@@ -40,7 +40,7 @@ public protocol EncryptViewModelProtocol: Sendable {
     func isCDOC1Container(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func shouldShowDataFiles(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func isInitialCryptoContainer(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
-    func isContainerUnlocked(cryptoContainer: CryptoContainerProtocol?) async -> Bool
+    func isUnlockedContainer(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func isEditButtonShown(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isSignButtonShown(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isShareButtonShown(cryptoContainer: CryptoContainerProtocol?) async -> Bool

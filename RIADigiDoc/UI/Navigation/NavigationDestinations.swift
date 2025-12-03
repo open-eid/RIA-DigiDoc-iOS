@@ -67,7 +67,13 @@ struct NavigationDestinations: ViewModifier {
 
         case .encryptView:
             EncryptView()
-
+        case .recipientDetailView(
+            let recipient,
+        ):
+            RecipientDetailView(
+                recipient: recipient,
+            )
+            
         case .languageChooserView:
             LanguageChooserView()
         case .themeChooserView:

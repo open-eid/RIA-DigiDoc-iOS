@@ -23,13 +23,19 @@ import OSLog
 @objc public class CdocInfo: NSObject {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CdocInfo")
     public let format: String
-    public let addressees: [Addressee]
-    public let dataFiles: [CryptoDataFile]
+    @objc public let addressees: [Addressee]
+    @objc public let dataFiles: [CryptoDataFile]
 
     @objc public init(addressees: [Addressee]) {
         format = String()
         self.addressees = addressees
         self.dataFiles = []
+    }
+
+    @objc public init(addressees: [Addressee], dataFiles: [CryptoDataFile]) {
+        format = String()
+        self.addressees = addressees
+        self.dataFiles = dataFiles
     }
 
     @objc public init(cdoc1Path path: String) throws {

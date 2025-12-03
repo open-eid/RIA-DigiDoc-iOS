@@ -26,8 +26,9 @@ struct CryptoDataFilesSection: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var viewModel: EncryptViewModel
-
-    let isContainerUnlocked: Bool
+    let showOpenFileButton: Bool
+    let showSaveFileButton: Bool
+    let showRemoveFileButton: Bool
     let isNestedContainer: Bool
     @Binding var selectedDataFile: URL?
     @Binding var showSivaMessage: Bool
@@ -36,7 +37,9 @@ struct CryptoDataFilesSection: View {
 
     init(
         viewModel: EncryptViewModel,
-        isContainerUnlocked: Bool,
+        showOpenFileButton: Bool,
+        showSaveFileButton: Bool,
+        showRemoveFileButton: Bool,
         isNestedContainer: Bool,
         selectedDataFile: Binding<URL?>,
         showSivaMessage: Binding<Bool>,
@@ -44,7 +47,9 @@ struct CryptoDataFilesSection: View {
         showRemoveDataFileModal: Binding<Bool>
     ) {
         self.viewModel = viewModel
-        self.isContainerUnlocked = isContainerUnlocked
+        self.showOpenFileButton = showOpenFileButton
+        self.showSaveFileButton = showSaveFileButton
+        self.showRemoveFileButton = showRemoveFileButton
         self.isNestedContainer = isNestedContainer
         self._selectedDataFile = selectedDataFile
         self._showSivaMessage = showSivaMessage
@@ -64,7 +69,9 @@ struct CryptoDataFilesSection: View {
         CryptoDataFilesListView(
             dataFiles: viewModel.dataFiles,
             selectedDataFile: $selectedDataFile,
-            showRemoveFileButton: isContainerUnlocked,
+            showOpenFileButton: showOpenFileButton,
+            showSaveFileButton: showSaveFileButton,
+            showRemoveFileButton: showRemoveFileButton,
             showRemoveDataFileModal: $showRemoveDataFileModal,
             onOpenFileButtonClick: openFile,
             onSaveDataFileButtonClick: saveFile,
@@ -72,7 +79,6 @@ struct CryptoDataFilesSection: View {
                 showRemoveDataFileModal = true
             }
         )
-        .alert(sivaMessage, isPresented: $showSivaMessage, actions: alertActions)
         .background(fileSaverBackground)
         .quickLookPreview($viewModel.previewFile)
     }

@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CryptoObjCWrapper
 import LibdigidocLibSwift
 
 public enum NavigationDestination: Hashable {
@@ -43,6 +44,9 @@ public enum NavigationDestination: Hashable {
     case signingMethodSelectionView
 
     case encryptView
+    case recipientDetailView(
+        recipient: Addressee,
+    )
 
     case languageChooserView
     case themeChooserView

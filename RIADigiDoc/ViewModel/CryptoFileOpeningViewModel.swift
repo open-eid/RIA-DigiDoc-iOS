@@ -93,7 +93,7 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
 
             handleLoadingSuccess()
         } catch {
-            CryptoFileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+            CryptoFileOpeningViewModel.logger.error("Unable to handle Crypto container. \(error)")
             handleError(error)
         }
     }

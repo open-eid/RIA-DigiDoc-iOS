@@ -21,6 +21,7 @@ import Foundation
 import FactoryKit
 import OSLog
 import CryptoSwift
+import CryptoObjCWrapper
 import CommonsLib
 import UtilsLib
 
@@ -30,6 +31,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptViewModel")
 
     var dataFiles: [URL] = []
+    var recipients: [Addressee] = []
     var containerName: String = CommonsLib.Constants.Container.DefaultName
     var containerMimetype: String = "N/A"
     var containerURL: URL?
@@ -37,6 +39,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
     var selectedDataFile: URL?
     var isShowingContainerFileSaver = false
     var isShowingFileSaver = false
+    var showRecipientRemoveButton = false
     var isLastDataFileRemoved = false
     private(set) var errorMessage: ErrorMessage?
 
@@ -46,6 +49,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
     private let mimeTypeDecoder: MimeTypeDecoderProtocol
     private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
+    private let fileInspector: FileInspectorProtocol
     private let sivaRepository: SivaRepositoryProtocol
 
     private(set) var cryptoContainer: CryptoContainerProtocol?
@@ -68,6 +72,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         mimeTypeDecoder: MimeTypeDecoderProtocol,
         fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol,
+        fileInspector: FileInspectorProtocol,
         sivaRepository: SivaRepositoryProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
@@ -76,6 +81,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         self.mimeTypeDecoder = mimeTypeDecoder
         self.fileUtil = fileUtil
         self.fileManager = fileManager
+        self.fileInspector = fileInspector
         self.sivaRepository = sivaRepository
     }
 
@@ -92,6 +98,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
 
         self.containerName = await openedContainer.getContainerName()
         self.dataFiles = await openedContainer.getDataFiles()
+        self.recipients = await openedContainer.getRecipients()
         self.containerMimetype = await openedContainer.getContainerMimetype()
         self.containerURL = await openedContainer.getRawContainerFile()
 
@@ -141,6 +148,89 @@ class EncryptViewModel: EncryptViewModelProtocol {
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
         fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
+    }
+
+    public func addDataFiles(_ files: [URL]) async {
+        do {
+            try validateFiles(files)
+        } catch {
+            handleFileValidationError(error)
+            return
+        }
+
+        await cryptoContainer?.addDataFiles(files)
+        EncryptViewModel.logger.debug("Added data files to container")
+        errorMessage = ErrorMessage(
+            key: files.count == 1 ? "File successfully added" : "Files successfully added", 
+            args: []
+        )
+        await loadContainerData(cryptoContainer: cryptoContainer)
+    }
+
+    private func validateFiles(_ files: [URL]) throws {
+        guard let firstFile = files.first else {
+            throw FileOpeningError.noDataFiles
+        }
+
+        // Show specific error message when unable to validate a single file
+        if files.count == 1 {
+            if dataFiles.contains(where: { $0.lastPathComponent == firstFile.lastPathComponent }) {
+                throw CryptoError.addingFilesToContainerFailed(
+                    CryptoErrorDetail(
+                        message: "Document already exists",
+                        userInfo: ["fileName": firstFile.lastPathComponent]
+                    )
+                )
+            }
+
+            if try fileInspector.fileSize(for: firstFile) == 0 {
+                throw FileOpeningError.invalidFileSize
+            }
+        }
+    }
+
+    private func handleFileValidationError(_ error: Error) {
+        switch error {
+        case let cryptoError as CryptoError:
+            switch cryptoError {
+            case .addingFilesToContainerFailed(let detail):
+                let fileName = detail.userInfo["fileName"] ?? ""
+                errorMessage = ErrorMessage(
+                    key: detail.message, 
+                    args: [fileName]
+                )
+            default:
+                errorMessage = ErrorMessage(
+                    key: "General error", 
+                    args: []
+                )
+            }
+
+        case let fileError as FileOpeningError:
+            switch fileError {
+            case .invalidFileSize:
+                errorMessage = ErrorMessage(
+                    key: "Invalid file size", 
+                    args: []
+                )
+            case .noDataFiles:
+                errorMessage = ErrorMessage(
+                    key: "Could not load selected files", 
+                    args: []
+                )
+            default:
+                errorMessage = ErrorMessage(
+                    key: "General error", 
+                    args: []
+                )
+            }
+
+        default:
+            errorMessage = ErrorMessage(
+                key: "General error", 
+                args: []
+            )
+        }
     }
 
     @discardableResult
@@ -290,7 +380,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
             return false
         }
 
-        return await container.getDataFiles().isEmpty
+        return await !container.getDataFiles().isEmpty
     }
 
     func isCDOC1Container(
@@ -319,7 +409,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
             !isNestedContainer
     }
 
-    func isContainerUnlocked(
+    func isUnlockedContainer(
         cryptoContainer: CryptoContainerProtocol?,
     ) async -> Bool {
         let isEncryptedContainer = await isEncryptedContainer(cryptoContainer: cryptoContainer)
@@ -372,8 +462,37 @@ class EncryptViewModel: EncryptViewModelProtocol {
         return await (!isEncryptedContainer(cryptoContainer: cryptoContainer) && isContainerWithoutRecipients)
     }
 
+    func isRecipientRemoveButtonShown() -> Bool {
+        return isContainerDecrypted && isContainerUnlocked
+    }
+
+    func removeRecipient(_ recipient: Addressee) async {
+        guard let container = cryptoContainer else {
+            EncryptViewModel.logger.error(
+                "Unable to remove signature from container. CryptoContainer or containerURL is nil"
+            )
+            errorMessage = ErrorMessage(
+                key: "Failed to remove recipient from container", 
+                args: []
+            )
+            return
+        }
+
+        do {
+            try await container.removeRecipient(recipient)
+            await loadContainerData(cryptoContainer: container)
+        } catch {
+            EncryptViewModel.logger.error("Unable to remove signature from container. \(error)")
+            errorMessage = ErrorMessage(
+                key: "Failed to remove signature from container", 
+                args: []
+            )
+            return
+        }
+    }
+
     func removeDataFile(_ dataFile: URL) async {
-        guard let container = cryptoContainer, let containerFile = containerURL else {
+        guard let container = cryptoContainer else {
             EncryptViewModel.logger.error(
                 "Unable to remove file from container. CryptoContainer or containerURL is nil"
             )
@@ -386,7 +505,6 @@ class EncryptViewModel: EncryptViewModelProtocol {
 
         do {
             if dataFiles.count == 1 {
-                try fileManager.removeItem(at: containerFile)
                 isLastDataFileRemoved = true
                 return
             }
@@ -408,7 +526,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         let isContainerWithoutRecipients = await isContainerWithoutRecipients(cryptoContainer: cryptoContainer)
         let isContainerEncrypted = await isEncryptedContainer(cryptoContainer: cryptoContainer)
         let isContainerDecrypted = await isDecryptedContainer(cryptoContainer: cryptoContainer)
-        let isContainerUnlocked = await isContainerUnlocked(cryptoContainer: cryptoContainer)
+        let isContainerUnlocked = await isUnlockedContainer(cryptoContainer: cryptoContainer)
         let isEncryptButtonShown = await isEncryptButtonShown(
             cryptoContainer: cryptoContainer,
             isNestedContainer: isNestedContainer()
@@ -426,7 +544,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
             cryptoContainer: cryptoContainer,
             isNestedContainer: isNestedContainer()
         )
-        let shouldShowDatafiles = await shouldShowDataFiles(cryptoContainer: cryptoContainer, )
+        let shouldShowDatafiles = await shouldShowDataFiles(cryptoContainer: cryptoContainer)
 
         await MainActor.run {
             self.isContainerWithoutRecipients = isContainerWithoutRecipients

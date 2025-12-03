@@ -20,7 +20,7 @@
 import SwiftUI
 import QuickLook
 import FactoryKit
-import LibdigidocLibSwift
+import CryptoObjCWrapper
 import CommonsLib
 import UtilsLib
 
@@ -31,11 +31,12 @@ struct EncryptView: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
     private let nameUtil: NameUtilProtocol
-    private let signatureUtil: SignatureUtilProtocol
+    private let recipientUtil: RecipientUtilProtocol
     private let fileUtil: FileUtilProtocol
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: EncryptViewTab = .files
+    @State private var selectedRecipient: Addressee?
 
     @State private var viewModel: EncryptViewModel
 
@@ -47,7 +48,9 @@ struct EncryptView: View {
     @State private var isFileSaved: Bool = false
     @State private var showRenameModal = false
     @State private var showRemoveDataFileModal = false
+    @State private var showRemoveRecipientModal = false
     @State private var newContainerName = Constants.Container.DefaultName
+    @State private var isImportingAddedFiles: Bool = false
 
     @State private var showingShareSheet = false
 
@@ -138,6 +141,10 @@ struct EncryptView: View {
         languageSettings.localized("Encrypt")
     }
 
+    private var nextLabel: String {
+        languageSettings.localized("Next")
+    }
+
     private var addMoreFilesLabel: String {
         languageSettings.localized("Add more files")
     }
@@ -150,12 +157,12 @@ struct EncryptView: View {
 
     init(
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
-        signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
+        recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
         _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
         self.nameUtil = nameUtil
-        self.signatureUtil = signatureUtil
+        self.recipientUtil = recipientUtil
         self.fileUtil = fileUtil
     }
 
@@ -194,7 +201,7 @@ struct EncryptView: View {
                                         // TODO: Implement signing functionality
                                     },
                                     onRightActionButtonClick: {
-                                        // TODO: Implement encrypt functionality
+                                        // TODO: Implement decrypt functionality
                                     },
                                     onSaveContainerButtonClick: {
                                         tempContainerURL = viewModel.createCopyOfContainerForSaving(
@@ -237,7 +244,9 @@ struct EncryptView: View {
 
                                         CryptoDataFilesSection(
                                             viewModel: viewModel,
-                                            isContainerUnlocked: true,
+                                            showOpenFileButton: true,
+                                            showSaveFileButton: true,
+                                            showRemoveFileButton: true,
                                             isNestedContainer: isNestedContainer,
                                             selectedDataFile: $selectedDataFile,
                                             showSivaMessage: $showSivaMessage,
@@ -267,7 +276,9 @@ struct EncryptView: View {
                                             if viewModel.shouldShowDatafiles {
                                                 CryptoDataFilesSection(
                                                     viewModel: viewModel,
-                                                    isContainerUnlocked: viewModel.isContainerUnlocked,
+                                                    showOpenFileButton: viewModel.isContainerUnlocked,
+                                                    showSaveFileButton: viewModel.isContainerUnlocked,
+                                                    showRemoveFileButton: viewModel.isContainerWithoutRecipients,
                                                     isNestedContainer: isNestedContainer,
                                                     selectedDataFile: $selectedDataFile,
                                                     showSivaMessage: $showSivaMessage,
@@ -275,11 +286,19 @@ struct EncryptView: View {
                                                     showRemoveDataFileModal: $showRemoveDataFileModal
                                                 )
                                             } else {
-                                                // TODO: CryptoDataFilesLockedSection
+                                                CryptoDataFilesLockedSection()
+                                                    .environment(languageSettings)
                                             }
                                         } else {
-                                            // TODO: RecipientListView
-                                            // .environment(languageSettings)
+                                            RecipientsListView(
+                                                recipients: viewModel.recipients,
+                                                selectedRecipient: $selectedRecipient,
+                                                showRemoveRecipientButton: viewModel.isRecipientRemoveButtonShown(),
+                                                showRemoveRecipientModal: $showRemoveRecipientModal,
+                                                nameUtil: nameUtil,
+                                                recipientUtil: recipientUtil
+                                            )
+                                            .environment(languageSettings)
                                         }
                                     }
                                 }
@@ -295,22 +314,51 @@ struct EncryptView: View {
                                     containerUrl: containerFile
                                 )
                             }
-                        } else {
+                        } else if !viewModel.isContainerEncrypted && !viewModel.isContainerDecrypted {
+                            let rightButtonLabel = viewModel.isContainerWithoutRecipients ? nextLabel : encryptLabel
+                            let rightButtonIconName = viewModel.isContainerWithoutRecipients
+                                ? "ic_m3_arrow_forward_ios_48pt_wght400"
+                                : "ic_m3_encrypted_48pt_wght400"
                             UnsignedBottomBarView(
+                                showLeftButton: viewModel.isContainerWithoutRecipients,
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
                                 leftButtonAction: {
-                                    // TODO: Implement add more files functionality
+                                    isImportingAddedFiles = true
                                 },
 
-                                rightButtonIconName: "ic_m3_encrypted_48pt_wght400",
-                                rightButtonLabel: encryptLabel,
-                                rightButtonAccessibilityLabel: encryptLabel.lowercased(),
+                                rightButtonIconName: rightButtonIconName,
+                                rightButtonLabel: rightButtonLabel,
+                                rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
                                     // TODO: Implement encrypt functionality
                                 }
                             )
+                            .fileImporter(
+                                isPresented: $isImportingAddedFiles,
+                                allowedContentTypes: [.item],
+                                allowsMultipleSelection: true
+                            ) { result in
+                                switch result {
+                                case .success(let urls):
+                                    Task {
+                                        for url in urls {
+                                            guard url.startAccessingSecurityScopedResource() else { continue }
+                                        }
+
+                                        isImportingAddedFiles = false
+                                        await viewModel.addDataFiles(urls)
+
+                                        for url in urls {
+                                            url.stopAccessingSecurityScopedResource()
+                                        }
+                                    }
+
+                                case .failure:
+                                    isImportingAddedFiles = false
+                                }
+                            }
                         }
                     }
                     .onAppear {
@@ -334,6 +382,20 @@ struct EncryptView: View {
                     encryptViewModel: viewModel,
                     showRenameModal: $showRenameModal,
                     newContainerName: $newContainerName
+                )
+            }
+
+            if showRemoveRecipientModal {
+                ConfirmModalView(
+                    title: languageSettings.localized("Remove recipient"),
+                    message: languageSettings.localized("Remove recipient from container"),
+                    onConfirm: {
+                        Task {
+                            await handleRemoveRecipient()
+                        }
+                    }, onCancel: {
+                        showRemoveRecipientModal = false
+                    }
                 )
             }
 
@@ -374,6 +436,17 @@ struct EncryptView: View {
             self.encryptDecryptLabel = encryptDecryptLabel
             self.encryptDecryptAccessibilityLabel = encryptDecryptAccessibilityLabel
         }
+    }
+
+    private func handleRemoveRecipient() async {
+        guard let recipient = selectedRecipient else {
+            Toast.show(languageSettings.localized("Failed to remove recipient from container"))
+            return
+        }
+
+        await viewModel.removeRecipient(recipient)
+        selectedRecipient = nil
+        showRemoveRecipientModal = false
     }
 
     private func handleRemoveDataFile() async {

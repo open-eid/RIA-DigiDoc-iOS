@@ -17,37 +17,25 @@
  *
  */
 
-struct DataFileBottomSheetActions {
+struct RecipientBottomSheetActions {
     static func actions(
-        showOpenFileButton: Bool = false,
-        showSaveFileButton: Bool = false,
-        showRemoveFileButton: Bool = false,
-        onOpenFileButtonClick: @escaping () -> Void,
-        onSaveFileButtonClick: @escaping () -> Void,
-        onRemoveFileButtonClick: @escaping () -> Void
+        showRemoveRecipientButton: Bool,
+        onDetailsButtonClick: @escaping () -> Void,
+        onRemoveRecipientButtonClick: @escaping () -> Void,
     ) -> [BottomSheetButton] {
-
-        return [
+        [
             BottomSheetButton(
-                showButton: showOpenFileButton,
                 icon: "ic_m3_edit_48pt_wght400",
-                title: "Open file",
-                accessibilityLabel: "Open file",
-                onClick: onOpenFileButtonClick
+                title: "Recipient details",
+                accessibilityLabel: "Recipient details",
+                onClick: onDetailsButtonClick
             ),
             BottomSheetButton(
-                showButton: showSaveFileButton,
-                icon: "ic_m3_download_48pt_wght400",
-                title: "Save file",
-                accessibilityLabel: "Save file",
-                onClick: onSaveFileButtonClick
-            ),
-            BottomSheetButton(
-                showButton: showRemoveFileButton,
+                showButton: showRemoveRecipientButton,
                 icon: "ic_m3_encrypted_48pt_wght400",
-                title: "Remove file",
-                accessibilityLabel: "Remove file",
-                onClick: onRemoveFileButtonClick
+                title: "Remove recipient",
+                accessibilityLabel: "Remove recipient",
+                onClick: onRemoveRecipientButtonClick
             )
         ]
     }

@@ -305,6 +305,7 @@ struct SigningView: View {
                             }
                         } else {
                             UnsignedBottomBarView(
+                                showLeftButton: true,
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
