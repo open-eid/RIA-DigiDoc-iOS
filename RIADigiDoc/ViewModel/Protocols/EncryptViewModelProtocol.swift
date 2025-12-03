@@ -19,6 +19,7 @@
 
 import Foundation
 import CryptoSwift
+import CryptoObjCWrapper
 
 /// @mockable
 @MainActor
@@ -26,6 +27,7 @@ public protocol EncryptViewModelProtocol: Sendable {
     func loadContainerData(cryptoContainer: CryptoContainerProtocol?) async
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL?
     func removeSavedFilesDirectory(savedFilesDirectory: URL?)
+    func addDataFiles(_ files: [URL]) async
     @discardableResult func renameContainer(to newName: String) async -> URL?
     func getDataFileURL(_ dataFile: URL) async -> Result<URL, Error>
     func handleFileOpening(dataFile: URL, isSivaConfirmed: Bool) async
@@ -46,5 +48,8 @@ public protocol EncryptViewModelProtocol: Sendable {
     func isShareButtonShown(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func isDecryptButtonShown(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isEncryptButtonShown(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
+    func isRecipientRemoveButtonShown() -> Bool
+    func removeRecipient(_ recipient: Addressee) async
     func removeDataFile(_ dataFile: URL) async
+    func updateAsyncProperties() async
 }

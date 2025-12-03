@@ -566,7 +566,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
                 .openOrCreateCryptoContainer(dataFiles: [fileURL])
             await loadContainerData(cryptoContainer: container)
         } else {
-            // TODO: Load nested signed containers
+            // TODO: Load nested crypto containers
         }
     }
 }
