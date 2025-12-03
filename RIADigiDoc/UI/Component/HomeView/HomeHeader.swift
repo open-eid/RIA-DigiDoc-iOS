@@ -24,45 +24,40 @@ import FactoryKit
 struct HomeHeader: View {
     @AppTheme private var theme
     @AppTypography private var typography
+    @Environment(LanguageSettings.self) private var languageSettings
 
     var body: some View {
         VStack(spacing: Dimensions.Padding.XXSPadding ) {
-            LogoComponent()
-            VersionComponent()
+            logoComponent
+            versionComponent
         }
         .padding(.vertical, Dimensions.Padding.XXSPadding)
         .padding(.horizontal, Dimensions.Padding.XSPadding)
     }
-}
 
-// MARK: - Logo Component
-private struct LogoComponent: View {
-    @AppTheme private var theme
-    @AppTypography private var typography
-    @Environment(LanguageSettings.self) private var languageSettings
+    private var logoText: String {
+        languageSettings.localized("DigiDoc")
+    }
 
-    var body: some View {
+    @ViewBuilder
+    private var logoComponent: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             Image("image_id_ee")
                 .resizable()
                 .scaledToFit()
                 .frame(width: Dimensions.Icon.IconSizeM)
-                .accessibilityLabel(languageSettings.localized("DigiDoc"))
 
-            Text(verbatim: languageSettings.localized("DigiDoc"))
+            Text(verbatim: logoText)
                 .font(typography.displayMedium)
                 .foregroundStyle(theme.onSurface)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(logoText)
+        .accessibilityAddTraits(.isImage)
     }
-}
 
-// MARK: - Version Component
-private struct VersionComponent: View {
-    @AppTheme private var theme
-    @AppTypography private var typography
-    @Environment(LanguageSettings.self) private var languageSettings
-
-    var body: some View {
+    @ViewBuilder
+    private var versionComponent: some View {
         Text(verbatim: languageSettings.localized(
             "Main home version",
             [BundleUtil.getAppVersion()])

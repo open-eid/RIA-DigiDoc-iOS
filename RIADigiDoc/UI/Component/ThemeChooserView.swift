@@ -52,7 +52,7 @@ struct ThemeChooserView: View {
                         let title = languageSettings.localized(themeOption.titleKey)
                         let selected = isSelected
                         ? languageSettings.localized("Menu theme selected")
-                        : languageSettings.localized("Menu theme")
+                        : languageSettings.localized("Menu theme unselected")
                         return "\(title) \(selected)"
                     }
                 )
@@ -68,4 +68,5 @@ struct ThemeChooserView: View {
     ThemeChooserView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

@@ -71,4 +71,7 @@ struct MyEidRootView: View {
 
 #Preview {
     MyEidRootView()
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

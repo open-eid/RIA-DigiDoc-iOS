@@ -34,13 +34,16 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileManager: FileManagerProtocol
+    private let fileUtil: FileUtilProtocol
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        fileManager: FileManagerProtocol
+        fileManager: FileManagerProtocol,
+        fileUtil: FileUtilProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileManager = fileManager
+        self.fileUtil = fileUtil
     }
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
@@ -63,6 +66,30 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
         } catch {
             HomeViewModel.logger().error("Unable to get signed containers recent documents folder: \(error)")
             return nil
+        }
+    }
+
+    func getSharedFiles() async -> [URL] {
+        do {
+            HomeViewModel.logger().info("Checking for shared files...")
+            let sharedFolderURL = try await Directories.getSharedFolder(fileManager: fileManager)
+                .validURL(fileUtil: fileUtil)
+
+            let contents = try fileManager.contentsOfDirectory(
+                at: sharedFolderURL,
+                includingPropertiesForKeys: nil,
+                options: .skipsHiddenFiles)
+
+            if contents.isEmpty {
+                HomeViewModel.logger().info("Shared files folder is empty")
+            } else {
+                HomeViewModel.logger().info("Found \(contents.count) shared files")
+            }
+
+            return contents
+        } catch {
+            HomeViewModel.logger().error("Unable to get shared files: \(error.localizedDescription)")
+            return []
         }
     }
 }

@@ -26,6 +26,8 @@ struct BottomSheet: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @AccessibilityFocusState private var focusedButtonTitle: String?
+
     let actions: [BottomSheetButton]
 
     var body: some View {
@@ -84,12 +86,20 @@ struct BottomSheet: View {
                             .foregroundStyle(theme.onSurface)
                             .padding(.horizontal, Dimensions.Padding.MPadding)
                         })
+                    .accessibilityFocused($focusedButtonTitle, equals: item.title)
                 }
             }
         }
         .padding(.vertical, Dimensions.Padding.MSPadding)
         .padding(.bottom, Dimensions.Padding.MPadding)
         .frame(maxWidth: .infinity)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                if let firstAction = actions.first(where: { $0.showButton }) {
+                    focusedButtonTitle = firstAction.title
+                }
+            }
+        }
     }
 }
 

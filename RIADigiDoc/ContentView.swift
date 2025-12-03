@@ -19,92 +19,10 @@
 
 import FactoryKit
 import SwiftUI
-import UtilsLib
 
 struct ContentView: View {
-    @Environment(\.scenePhase) private var scenePhase
-    @AppTheme private var theme
-    @AppTypography private var typography
-    @Environment(LanguageSettings.self) private var languageSettings
-
-    @Environment(NavigationPathManager.self) private var pathManager
-
-    @State private var viewModel: ContentViewModel
-
-    @State private var openedUrls: [URL] = []
-    @State private var showHomeMenuBottomSheetFromButton = false
-    @State private var showSettingsBottomSheetFromButton = false
-
-    @State private var navigateToAccessibility = false
-    @State private var navigateToInfo = false
-    @State private var navigateToDiagnostics = false
-
-    @State private var sharedFilesLoadingTask: Task<Void, Never>?
-
-    private var homeMenuBottomSheetActions: [BottomSheetButton] {
-        HomeMenuBottomSheetActions.actions(
-            onInfoClick: {
-                pathManager.navigate(to: .infoView)
-            },
-            onAccessibilityClick: {
-                pathManager.navigate(to: .accessibilityView)
-            },
-            onDiagnosticsClick: {
-                pathManager.navigate(to: .diagnosticsView)
-            }
-        )
-    }
-
-    init() {
-        _viewModel = State(wrappedValue: Container.shared.contentViewModel())
-    }
-
     var body: some View {
-        TopBarContainer(
-            leftIcon: "ic_m3_menu_48pt_wght400",
-            leftIconAccessibility: "Menu",
-            onLeftClick: {
-                showHomeMenuBottomSheetFromButton = true
-            },
-            content: {
-                ScrollView {
-                    VStack {
-                        HomeView(externalFiles: $openedUrls)
-                        Spacer()
-                    }
-                }
-                .background(theme.surface)
-                .onOpenURL { url in
-                    openedUrls = [url]
-                }
-                .onAppear {
-                    if scenePhase == .active {
-                        sharedFilesLoadingTask = Task {
-                            let sharedFiles = await viewModel.getSharedFiles()
-                            if !sharedFiles.isEmpty {
-                                openedUrls = sharedFiles
-                            }
-                        }
-                    }
-                }
-                .onChange(of: scenePhase) { _, newPhase in
-                    if newPhase == .active {
-                        sharedFilesLoadingTask?.cancel()
-
-                        sharedFilesLoadingTask = Task {
-                            let sharedFiles = await viewModel.getSharedFiles()
-                            if !sharedFiles.isEmpty {
-                                openedUrls = sharedFiles
-                            }
-                        }
-                    }
-                }
-                .onDisappear {
-                    sharedFilesLoadingTask?.cancel()
-                }
-            }
-        )
-        .bottomSheet(isPresented: $showHomeMenuBottomSheetFromButton, actions: homeMenuBottomSheetActions)
+        HomeView()
     }
 }
 

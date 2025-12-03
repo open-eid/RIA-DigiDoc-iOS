@@ -305,7 +305,7 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         let responseData = try (try AES.CBC(key: ksEnc, ivVal: ivValue)
             .decrypt(tlvEnc.tag == 0x85 ? tlvEnc.value : tlvEnc.value[1...]))
             .removePadding()
-        CardReaderNFC.logger().debug("Plain <:  \(responseData.toHex) \(tlvRes.value.toHex)")
+        CardReaderNFC.logger().info("Plain <:  \(responseData.toHex) \(tlvRes.value.toHex)")
         return (Bytes(responseData), UInt16(tlvRes.value[0], tlvRes.value[1]))
     }
     // swiftlint:enable cyclomatic_complexity

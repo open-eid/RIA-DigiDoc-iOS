@@ -64,6 +64,8 @@ struct SingleLicenseButton: View {
             }
         )
         .buttonStyle(.plain)
+        .accessibilityRemoveTraits(.isButton)
+        .accessibilityAddTraits(.isLink)
     }
 }
 

@@ -54,4 +54,5 @@ struct AccessibilityView: View {
     AccessibilityView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

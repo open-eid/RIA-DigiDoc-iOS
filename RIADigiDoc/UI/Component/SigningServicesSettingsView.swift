@@ -35,9 +35,6 @@ struct SigningServicesSettingsView: View {
         TopBarContainer(
             title: languageSettings.localized("Main settings signing services title"),
             onLeftClick: { dismiss() },
-            onRightSecondaryClick: {
-                showSettingsBottomSheetFromButton = true
-            },
             excludeDestinations: [.advanced],
             content: {
                 ScrollView {
@@ -71,4 +68,5 @@ struct SigningServicesSettingsView: View {
     SigningServicesSettingsView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

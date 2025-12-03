@@ -4676,24 +4676,6 @@
         }
       }
     },
-    "Menu language" : {
-      "comment" : "Menu language",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keel"
-          }
-        }
-      }
-    },
     "Menu language selected" : {
       "comment" : "Menu language selected",
       "extractionState" : "manual",
@@ -4701,31 +4683,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Language selected"
+            "value" : "selected"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keel valitud"
+            "value" : "valitud"
           }
         }
       }
     },
-    "Menu theme" : {
-      "comment" : "Menu theme for accessibility",
+    "Menu language unselected" : {
+      "comment" : "Menu language",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Theme"
+            "value" : "unselected"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teema"
+            "value" : "valimata"
           }
         }
       }
@@ -4744,6 +4726,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teema valitud"
+          }
+        }
+      }
+    },
+    "Menu theme unselected" : {
+      "comment" : "Menu theme for accessibility",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theme unselected"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teema valimata"
           }
         }
       }

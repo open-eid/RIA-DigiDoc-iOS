@@ -55,7 +55,7 @@ struct LanguageChooserView: View {
                         let title = languageSettings.localized(languageOption.titleKey)
                         let selected = isSelected
                         ? languageSettings.localized("Menu language selected")
-                        : languageSettings.localized("Menu language")
+                        : languageSettings.localized("Menu language unselected")
                         return "\(title) \(selected)"
                     },
                     accessibilityInputLabel: { languageOption in
@@ -74,4 +74,5 @@ struct LanguageChooserView: View {
     LanguageChooserView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }
