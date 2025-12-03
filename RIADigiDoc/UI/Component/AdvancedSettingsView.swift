@@ -24,10 +24,9 @@ struct AdvancedSettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(LanguageSettings.self) private var languageSettings
-
     @Environment(\.dismiss) private var dismiss
-
     @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var checkedAskRoleAndAddress = false
@@ -105,14 +104,7 @@ struct AdvancedSettingsView: View {
                         }
 
                         Button(
-                            action: {
-                                Task {
-                                    await viewModel.restoreDefaultSettings()
-                                    Toast.show(
-                                        languageSettings.localized("Main settings use default settings message")
-                                    )
-                                }
-                            },
+                            action: onRestoreDefaultSettingsClick,
                             label: {
                                 Text(languageSettings.localized("Main settings use default settings button title"))
                                     .font(typography.labelLarge)
@@ -127,6 +119,20 @@ struct AdvancedSettingsView: View {
                 }
             }
         )
+    }
+
+    private func onRestoreDefaultSettingsClick() {
+        Task {
+            await viewModel.restoreDefaultSettings()
+            let message =
+                languageSettings.localized("Main settings use default settings message")
+            if voiceOverEnabled {
+                var saveButtonAccessibilityAnnouncement = AttributedString(message)
+                saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
+                AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
+            }
+            Toast.show(message)
+        }
     }
 }
 

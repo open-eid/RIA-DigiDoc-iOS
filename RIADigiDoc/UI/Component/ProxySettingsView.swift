@@ -23,6 +23,7 @@ import FactoryKit
 struct ProxySettingsView: View {
     @AppTheme private var theme
     @AppTypography private var typography
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(\.dismiss) private var dismiss
 
@@ -94,6 +95,12 @@ struct ProxySettingsView: View {
                                 ? languageSettings.localized("Main settings proxy check connection success")
                                 : languageSettings.localized("Main settings proxy check connection unsuccessful")
                                 Toast.show(message)
+
+                                if voiceOverEnabled {
+                                    var saveButtonAccessibilityAnnouncement = AttributedString(message)
+                                    saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
+                                    AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
+                                }
                             }
                         },
                         label: {
@@ -162,4 +169,5 @@ struct ProxySettingsView: View {
     ProxySettingsView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

@@ -116,4 +116,7 @@ struct SigningRootView: View {
 
 #Preview {
     SigningRootView()
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

@@ -37,14 +37,16 @@ struct TopBarContainer<Content: View>: View {
     var onLeftClick: () -> Void = {}
 
     var rightPrimaryIcon: String = "ic_m3_help_48pt_wght400"
-    var rightPrimaryIconAccessibility: String = "link www.id.ee"
+    var rightPrimaryIconAccessibility: String = ""
     var rightPrimaryIconAccessibilityInput: String = "Helpdesk"
+    var isRightPrimaryLink: Bool = true
     var onRightPrimaryClick: (() -> Void)?
 
     var rightSecondaryIcon: String = "ic_m3_settings_48pt_wght400"
     var rightSecondaryIconAccessibility: String = "Settings"
     var rightSecondaryIconAccessibilityInput: String?
     var onRightSecondaryClick: (() -> Void)?
+    var onSettingsSheetDismiss: (() -> Void)?
 
     var extraButtonIcon: String = "ic_m3_notifications_48pt_wght400"
     var extraButtonIconAccessibility: String = "Container notifications"
@@ -67,6 +69,17 @@ struct TopBarContainer<Content: View>: View {
 
     @State private var showSettingsSheet = false
 
+    private var helpUrlString: String {
+        languageSettings.localized("Main home menu help url")
+    }
+
+    private var rightPrimaryIconAccessibilityLabel: String {
+        if !rightPrimaryIconAccessibility.isEmpty {
+            return rightPrimaryIconAccessibility
+        }
+        return "\(languageSettings.localized("Open Button")) \(helpUrlString)"
+    }
+
     var body: some View {
         VStack(spacing: Dimensions.Padding.ZeroPadding) {
             if !isTopBarHidden {
@@ -78,10 +91,11 @@ struct TopBarContainer<Content: View>: View {
                     onLeftClick: onLeftClick,
 
                     rightPrimaryIcon: rightPrimaryIcon,
-                    rightPrimaryIconAccessibility: rightPrimaryIconAccessibility,
+                    rightPrimaryIconAccessibility: rightPrimaryIconAccessibilityLabel,
                     rightPrimaryIconAccessibilityInput: rightPrimaryIconAccessibilityInput,
+                    isRightPrimaryLink: isRightPrimaryLink,
                     onRightPrimaryClick: onRightPrimaryClick ?? {
-                        if let url = URL(string: languageSettings.localized("Main home menu help url")) {
+                        if let url = URL(string: helpUrlString) {
                             openURL(url)
                         }
                     },
@@ -106,6 +120,11 @@ struct TopBarContainer<Content: View>: View {
             content()
         }
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())
+        .onChange(of: showSettingsSheet) { oldValue, newValue in
+            if oldValue && !newValue {
+                onSettingsSheetDismiss?()
+            }
+        }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .background(theme.surface)
@@ -148,6 +167,7 @@ struct TopBar: View {
     var rightPrimaryIcon: String
     var rightPrimaryIconAccessibility: String
     var rightPrimaryIconAccessibilityInput: String?
+    var isRightPrimaryLink: Bool
     var onRightPrimaryClick: (() -> Void)?
 
     var rightSecondaryIcon: String
@@ -234,6 +254,8 @@ struct TopBar: View {
                         .accessibilityLabel(languageSettings.localized(rightPrimaryIconAccessibility))
                         .accessibilityInputLabels(getInputLabels(rightPrimaryIconAccessibilityInput,
                                                                  rightPrimaryIconAccessibility))
+                        .accessibilityAddTraits(isRightPrimaryLink ? .isLink : [])
+                        .accessibilityRemoveTraits(isRightPrimaryLink ? .isButton : [])
                     }
 
                     Button(action: onRightSecondaryClick) {

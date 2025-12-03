@@ -436,4 +436,5 @@ struct CertificateDetailView: View {
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())
+    .environment(NavigationPathManager())
 }

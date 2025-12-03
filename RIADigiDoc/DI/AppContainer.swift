@@ -90,7 +90,8 @@ extension Container {
         self { @MainActor in
             HomeViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
-                fileManager: self.fileManager()
+                fileManager: self.fileManager(),
+                fileUtil: self.fileUtil()
             )
         }
     }
@@ -205,17 +206,6 @@ extension Container {
             InitViewModel(
                 languageSettings: self.languageSettings(),
                 dataStore: self.dataStore()
-            )
-        }
-    }
-
-    @MainActor
-    var contentViewModel: Factory<ContentViewModel> {
-        self {
-            @MainActor in
-            ContentViewModel(
-                fileUtil: self.fileUtil(),
-                fileManager: self.fileManager()
             )
         }
     }

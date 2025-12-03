@@ -234,4 +234,5 @@ struct SmartIdView: View {
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())
+    .environment(NavigationPathManager())
 }

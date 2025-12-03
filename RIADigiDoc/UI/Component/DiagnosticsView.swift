@@ -26,6 +26,7 @@ struct DiagnosticsView: View {
     @AppTypography private var typography
 
     @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) var openURL
 
@@ -68,16 +69,7 @@ struct DiagnosticsView: View {
                         spacing: Dimensions.Padding.XXSPadding,
                         content: {
                             DiagnosticsHeaderButtons(
-                                onCheckUpdateClick: {
-                                    Task {
-                                        let status = await viewModel.updateConfiguration()
-                                        if !status {
-                                            Toast.show(
-                                                languageSettings.localized("No Internet connection")
-                                            )
-                                        }
-                                    }
-                                },
+                                onCheckUpdateClick: onCheckUpdateClick,
                                 onSaveDiagnosticsClick: {
                                     Task {
                                         tempFileURL = await viewModel.createDiagnosticsFile(
@@ -174,6 +166,21 @@ struct DiagnosticsView: View {
                 }
             }
         )
+    }
+
+    private func onCheckUpdateClick() {
+        Task {
+            let status = await viewModel.updateConfiguration()
+            if !status {
+                let message = languageSettings.localized("No Internet connection")
+                if voiceOverEnabled {
+                    var saveButtonAccessibilityAnnouncement = AttributedString(message)
+                    saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
+                    AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
+                }
+                Toast.show(message)
+            }
+        }
     }
 
     @ViewBuilder

@@ -31,10 +31,18 @@ struct InfoHeaderHelpButton: View {
         languageSettings.localized("Main about help center")
     }
 
+    private var urlString: String {
+        languageSettings.localized("Main home menu help url")
+    }
+
+    private var accessibilityLabel: String {
+        "\(languageSettings.localized("Open Button")) \(urlString)"
+    }
+
     var body: some View {
         Button(
             action: {
-                if let url = URL(string: languageSettings.localized("Main home menu help url")) {
+                if let url = URL(string: urlString) {
                     openURL(url)
                 }
             },
@@ -59,6 +67,9 @@ struct InfoHeaderHelpButton: View {
         )
         .buttonStyle(.plain)
         .accessibilityInputLabels(["Helpdesk", helpLabel])
+        .accessibilityRemoveTraits(.isButton)
+        .accessibilityAddTraits(.isLink)
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 

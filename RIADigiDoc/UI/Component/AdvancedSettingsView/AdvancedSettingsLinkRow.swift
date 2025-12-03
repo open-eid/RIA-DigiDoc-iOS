@@ -41,12 +41,13 @@ struct AdvancedSettingsLinkRow: View {
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                     .foregroundStyle(theme.onSurface)
-                    .accessibilityLabel(label.lowercased())
+                    .accessibilityHidden(true)
             }
             .contentShape(Rectangle())
             .padding(.vertical, Dimensions.Padding.SPadding)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(label.lowercased())
     }
 }
 

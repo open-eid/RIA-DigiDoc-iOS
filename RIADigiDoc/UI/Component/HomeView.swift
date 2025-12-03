@@ -25,8 +25,10 @@ import UtilsLib
 
 struct HomeView: View {
     @AppTheme private var theme
-    @Environment(LanguageSettings.self) private var languageSettings
+    @AppTypography private var typography
 
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var viewModel: HomeViewModel
@@ -45,11 +47,13 @@ struct HomeView: View {
     @State private var showFilesBottomSheet: Bool = false
     @State private var showSignatureBottomSheet: Bool = false
     @State private var showCryptoBottomSheet: Bool = false
+    @State private var showHomeMenuBottomSheet: Bool = false
 
     @State private var containerType: ContainerType = .asice
     @State private var recentDocumentsExtensions: [String] = Constants.Container.ContainerExtensions
 
-    @Binding private var externalFiles: [URL]
+    @State private var sharedFilesLoadingTask: Task<Void, Never>?
+    @AccessibilityFocusState private var isFilesButtonFocused: Bool
 
     private var filesBottomSheetActions: [BottomSheetButton] {
         HomeViewBottomSheetActions.actions(
@@ -60,10 +64,10 @@ struct HomeView: View {
                 containerType = .asice
                 recentDocumentsExtensions = Constants.Container.ContainerExtensions
                 pathManager.navigate(to:
-                    .recentDocumentsView(
-                        folderURL: getRecentDocumentsFolder(containerType: containerType),
-                        extensions: recentDocumentsExtensions
-                    )
+                        .recentDocumentsView(
+                            folderURL: getRecentDocumentsFolder(containerType: containerType),
+                            extensions: recentDocumentsExtensions
+                        )
                 )
             }
         )
@@ -78,88 +82,119 @@ struct HomeView: View {
                 containerType = .cdoc
                 recentDocumentsExtensions = Constants.Container.CryptoContainerExtensions
                 pathManager.navigate(to:
-                    .recentDocumentsView(
-                        folderURL: getRecentDocumentsFolder(containerType: containerType),
-                        extensions: recentDocumentsExtensions
-                    )
+                        .recentDocumentsView(
+                            folderURL: getRecentDocumentsFolder(containerType: containerType),
+                            extensions: recentDocumentsExtensions
+                        )
                 )
             }
         )
     }
 
+    private var homeMenuBottomSheetActions: [BottomSheetButton] {
+        HomeMenuBottomSheetActions.actions(
+            onInfoClick: {
+                pathManager.navigate(to: .infoView)
+            },
+            onAccessibilityClick: {
+                pathManager.navigate(to: .accessibilityView)
+            },
+            onDiagnosticsClick: {
+                pathManager.navigate(to: .diagnosticsView)
+            }
+        )
+    }
+
+    private var isBottomSheetPresented: Bool {
+        showFilesBottomSheet || showSignatureBottomSheet || showCryptoBottomSheet || showHomeMenuBottomSheet
+    }
+
     init(
         fileOpeningViewModel: FileOpeningViewModel = Container.shared.fileOpeningViewModel(),
         cryptoFileOpeningViewModel: CryptoFileOpeningViewModel = Container.shared.cryptoFileOpeningViewModel(),
-        externalFiles: Binding<[URL]>
     ) {
         _viewModel = State(wrappedValue: Container.shared.homeViewModel())
         _cryptoViewModel = State(wrappedValue: Container.shared.cryptoHomeViewModel())
         self.fileOpeningViewModel = fileOpeningViewModel
         self.cryptoFileOpeningViewModel = cryptoFileOpeningViewModel
-        self._externalFiles = externalFiles
     }
 
     var body: some View {
-        VStack {
-            HomeHeader()
-                .padding(.bottom, Dimensions.Padding.LPadding)
+        TopBarContainer(
+            leftIcon: "ic_m3_menu_48pt_wght400",
+            leftIconAccessibility: "Menu",
+            onLeftClick: {
+                showHomeMenuBottomSheet = true
+            },
+            onSettingsSheetDismiss: {
+                focusFilesButtonWithDelay()
+            },
+            content: {
+                ScrollView {
+                    HomeHeader()
+                        .padding(.bottom, Dimensions.Padding.LPadding)
 
-            VStack(spacing: Dimensions.Padding.SPadding) {
-                SigningImportButton(
-                    title: languageSettings.localized("Main home open document title"),
-                    description: languageSettings.localized("Main home open document description"),
-                    assetImageName: "ic_m3_attach_file_48pt_wght400",
-                    isFileOpeningLoading: $isFileOpeningLoading,
-                    isNavigatingToNextView: $isNavigatingToSigningView,
-                    showBottomSheet: $showFilesBottomSheet,
-                    isImporting: $isImporting,
-                    viewModel: viewModel
-                )
-                .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
+                    VStack(spacing: Dimensions.Padding.SPadding) {
+                        SigningImportButton(
+                            title: languageSettings.localized("Main home open document title"),
+                            description: languageSettings.localized("Main home open document description"),
+                            assetImageName: "ic_m3_attach_file_48pt_wght400",
+                            isFileOpeningLoading: $isFileOpeningLoading,
+                            isNavigatingToNextView: $isNavigatingToSigningView,
+                            showBottomSheet: $showFilesBottomSheet,
+                            isImporting: $isImporting,
+                            viewModel: viewModel
+                        )
+                        .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
+                        .accessibilityFocused($isFilesButtonFocused)
 
-                SigningImportButton(
-                    title: languageSettings.localized("Signature"),
-                    description: languageSettings.localized("Main home signature description"),
-                    assetImageName: "ic_m3_stylus_note_48pt_wght400",
-                    isFileOpeningLoading: $isFileOpeningLoading,
-                    isNavigatingToNextView: $isNavigatingToSigningView,
-                    showBottomSheet: $showSignatureBottomSheet,
-                    isImporting: $isImporting,
-                    viewModel: viewModel
-                )
-                .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
+                        SigningImportButton(
+                            title: languageSettings.localized("Signature"),
+                            description: languageSettings.localized("Main home signature description"),
+                            assetImageName: "ic_m3_stylus_note_48pt_wght400",
+                            isFileOpeningLoading: $isFileOpeningLoading,
+                            isNavigatingToNextView: $isNavigatingToSigningView,
+                            showBottomSheet: $showSignatureBottomSheet,
+                            isImporting: $isImporting,
+                            viewModel: viewModel
+                        )
+                        .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
 
-                CryptoImportButton(
-                    title: languageSettings.localized("Main home crypto title"),
-                    description: languageSettings.localized("Main home crypto description"),
-                    assetImageName: "ic_m3_encrypted_48pt_wght400",
-                    isFileOpeningLoading: $isCryptoFileOpeningLoading,
-                    isNavigatingToNextView: $isNavigatingToEncryptView,
-                    showBottomSheet: $showCryptoBottomSheet,
-                    isImporting: $isCryptoImporting,
-                    viewModel: cryptoViewModel
-                )
-                .bottomSheet(isPresented: $showCryptoBottomSheet, actions: cryptoFilesBottomSheetActions)
+                        CryptoImportButton(
+                            title: languageSettings.localized("Main home crypto title"),
+                            description: languageSettings.localized("Main home crypto description"),
+                            assetImageName: "ic_m3_encrypted_48pt_wght400",
+                            isFileOpeningLoading: $isCryptoFileOpeningLoading,
+                            isNavigatingToNextView: $isNavigatingToEncryptView,
+                            showBottomSheet: $showCryptoBottomSheet,
+                            isImporting: $isCryptoImporting,
+                            viewModel: cryptoViewModel
+                        )
+                        .bottomSheet(isPresented: $showCryptoBottomSheet, actions: cryptoFilesBottomSheetActions)
 
-                ActionButton(
-                    title: languageSettings.localized("Main home my eid title"),
-                    description: languageSettings.localized("Main home my eid description"),
-                    assetImageName: "ic_m3_co_present_48pt_wght400",
-                    action: {
-                        pathManager.navigate(to: .myEidRootView)
+                        ActionButton(
+                            title: languageSettings.localized("Main home my eid title"),
+                            description: languageSettings.localized("Main home my eid description"),
+                            assetImageName: "ic_m3_co_present_48pt_wght400",
+                            action: {
+                                pathManager.navigate(to: .myEidRootView)
+                            }
+                        )
                     }
-                )
-            }
-            .padding(Dimensions.Padding.SPadding)
+                    .padding(Dimensions.Padding.SPadding)
 
-            Spacer()
+                    Spacer()
+                }
+            }
+        )
+        .bottomSheet(isPresented: $showHomeMenuBottomSheet, actions: homeMenuBottomSheetActions)
+        .onOpenURL { url in
+            handleFiles([url])
         }
-        .onChange(of: externalFiles) { _, extFiles in
-            if !extFiles.isEmpty {
-                isFileOpeningLoading = true
-                viewModel.isImporting = false
-                self.viewModel.setChosenFiles(.success(extFiles))
-                externalFiles = []
+        .onAppear {
+            focusFilesButtonWithDelay()
+            if scenePhase == .active {
+                loadSharedFiles()
             }
         }
         .onChange(of: isNavigatingToSigningView, { _, newValue in
@@ -176,6 +211,26 @@ struct HomeView: View {
                 isNavigatingToEncryptView = false
             }
         })
+        .onChange(of: isBottomSheetPresented) { oldValue, newValue in
+            if oldValue && !newValue {
+                focusFilesButtonWithDelay()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                sharedFilesLoadingTask?.cancel()
+                loadSharedFiles()
+            }
+        }
+        .onDisappear {
+            sharedFilesLoadingTask?.cancel()
+        }
+    }
+
+    private func focusFilesButtonWithDelay() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            isFilesButtonFocused = true
+        }
     }
 
     func getRecentDocumentsFolder(containerType: ContainerType) -> URL? {
@@ -186,10 +241,25 @@ struct HomeView: View {
             return viewModel.getRecentDocumentsFolder()
         }
     }
+
+    private func loadSharedFiles() {
+        sharedFilesLoadingTask = Task {
+            let sharedFiles = await viewModel.getSharedFiles()
+            handleFiles(sharedFiles)
+        }
+    }
+
+    private func handleFiles(_ files: [URL]) {
+        if !files.isEmpty {
+            isFileOpeningLoading = true
+            viewModel.isImporting = false
+            viewModel.setChosenFiles(.success(files))
+        }
+    }
 }
 
 #Preview {
-    HomeView(externalFiles: .constant([]))
+    HomeView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
         .environment(NavigationPathManager())

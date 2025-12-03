@@ -55,10 +55,9 @@ struct PrimaryOutlinedButton: View {
                 Text(verbatim: text)
                     .foregroundStyle(isButtonEnabled ? theme.primary : theme.surfaceContainerHighest)
                     .font(typography.labelLarge)
-                    .lineLimit(nil)
                     .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(height: Dimensions.Icon.IconSizeXXS)
+                    .lineLimit(nil)
+                    .frame(minHeight: Dimensions.Icon.IconSizeXXS)
                     .padding(Dimensions.Padding.XSPadding)
             }
             .frame(maxWidth: .infinity)
