@@ -176,6 +176,8 @@
 				Util/Language/LanguageSettingsProtocol.swift,
 				Util/Proxy/ProxyUtil.swift,
 				Util/Proxy/ProxyUtilProtocol.swift,
+				Util/Recipient/RecipientUtil.swift,
+				Util/Recipient/RecipientUtilProtocol.swift,
 				Util/Signature/SignatureUtil.swift,
 				Util/Signature/SignatureUtilProtocol.swift,
 				Util/Theme/ThemeSettings.swift,

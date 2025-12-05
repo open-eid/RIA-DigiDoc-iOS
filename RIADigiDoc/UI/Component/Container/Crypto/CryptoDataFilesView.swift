@@ -37,12 +37,16 @@ struct CryptoDataFilesView: View {
     let onRemoveFileButtonClick: (URL) -> Void
 
     let dataFile: URL
+    let showOpenFileButton: Bool
+    let showSaveFileButton: Bool
     let showRemoveFileButton: Bool
     @Binding var showRemoveDataFileModal: Bool
     var onSelect: (() -> Void)?
 
     private var bottomSheetActions: [BottomSheetButton] {
         DataFileBottomSheetActions.actions(
+            showOpenFileButton: showOpenFileButton,
+            showSaveFileButton: showSaveFileButton,
             showRemoveFileButton: showRemoveFileButton,
             onOpenFileButtonClick: { onOpenFileButtonClick(dataFile) },
             onSaveFileButtonClick: { onSaveDataFileButtonClick(dataFile) },
@@ -78,37 +82,40 @@ struct CryptoDataFilesView: View {
                     )
 
                 Spacer()
-
-                Button(action: accessibleAction(
-                    voiceOverEnabled: voiceOverEnabled,
-                    focusedField: $focusedField
-                ) {
-                    showBottomSheetFromButton = true
-                }, label: {
-                    Image("ic_m3_more_vert_48pt_wght400")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .foregroundStyle(theme.onBackground)
-                        .accessibilityLabel(
-                            Text(
-                                verbatim: "\(languageSettings.localized("File")) " +
-                                "\(fileIndex), \(languageSettings.localized("More options"))"
+                if showOpenFileButton {
+                    Button(action: accessibleAction(
+                        voiceOverEnabled: voiceOverEnabled,
+                        focusedField: $focusedField
+                    ) {
+                        showBottomSheetFromButton = true
+                    }, label: {
+                        Image("ic_m3_more_vert_48pt_wght400")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .foregroundStyle(theme.onBackground)
+                            .accessibilityLabel(
+                                Text(
+                                    verbatim: "\(languageSettings.localized("File")) " +
+                                    "\(fileIndex), \(languageSettings.localized("More options"))"
+                                )
                             )
-                        )
-                })
-                .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
-                .accessibilityFocusRestore(
-                    focusedField: $focusedField,
-                    field: .dataFile(.openDataFileOptionsButton),
-                    when: showBottomSheetFromButton
-                )
+                    })
+                    .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                    .accessibilityFocusRestore(
+                        focusedField: $focusedField,
+                        field: .dataFile(.openDataFileOptionsButton),
+                        when: showBottomSheetFromButton
+                    )
+                }
             }
             .padding(Dimensions.Padding.MSPadding)
         }
         .listRowInsets(EdgeInsets())
         .onTapGesture {
-            onOpenFileButtonClick(dataFile)
+            if showOpenFileButton {
+                onOpenFileButtonClick(dataFile)
+            }
         }
         .accessibilityAddTraits([.isButton])
         .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)

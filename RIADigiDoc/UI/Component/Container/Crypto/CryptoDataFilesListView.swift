@@ -28,6 +28,8 @@ struct CryptoDataFilesListView: View {
 
     let dataFiles: [URL]
     @Binding var selectedDataFile: URL?
+    let showOpenFileButton: Bool
+    let showSaveFileButton: Bool
     let showRemoveFileButton: Bool
     @Binding var showRemoveDataFileModal: Bool
 
@@ -45,6 +47,8 @@ struct CryptoDataFilesListView: View {
                         onSaveDataFileButtonClick: onSaveDataFileButtonClick,
                         onRemoveFileButtonClick: onRemoveFileButtonClick,
                         dataFile: dataFile,
+                        showOpenFileButton: showOpenFileButton,
+                        showSaveFileButton: showSaveFileButton,
                         showRemoveFileButton: showRemoveFileButton,
                         showRemoveDataFileModal: $showRemoveDataFileModal,
                         onSelect: {
@@ -60,6 +64,8 @@ struct CryptoDataFilesListView: View {
                         onSaveDataFileButtonClick: onSaveDataFileButtonClick,
                         onRemoveFileButtonClick: onRemoveFileButtonClick,
                         dataFile: dataFile,
+                        showOpenFileButton: showOpenFileButton,
+                        showSaveFileButton: showSaveFileButton,
                         showRemoveFileButton: showRemoveFileButton,
                         showRemoveDataFileModal: $showRemoveDataFileModal,
                         onSelect: {
@@ -81,6 +87,8 @@ struct CryptoDataFilesListView: View {
     CryptoDataFilesListView(
         dataFiles: dataFiles,
         selectedDataFile: .constant(dataFiles.first),
+        showOpenFileButton: true,
+        showSaveFileButton: true,
         showRemoveFileButton: true,
         showRemoveDataFileModal: .constant(false),
         onOpenFileButtonClick: { _ in },

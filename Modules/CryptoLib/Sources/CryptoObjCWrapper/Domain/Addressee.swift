@@ -28,7 +28,9 @@ import Foundation
     public let serialNumber: String?
     public let certType: CertType
     public let validTo: Date?
-
+    @MainActor
+    @objc public var concatKDFAlgorithmURI: String
+    
     @objc public init(
         data: Data,
         cnVal: String,
@@ -36,7 +38,8 @@ import Foundation
         surname: String?,
         serialNumber: String?,
         certType: CertType,
-        validTo: Date?
+        validTo: Date?,
+        concatKDFAlgorithmURI: String = ""
     ) {
         self.identifier = cnVal
         self.data = data
@@ -45,6 +48,7 @@ import Foundation
         self.serialNumber = serialNumber
         self.certType = certType
         self.validTo = validTo
+        self.concatKDFAlgorithmURI = concatKDFAlgorithmURI
     }
 
     @objc public convenience init(data: Data, cnVal: String) {
@@ -75,6 +79,7 @@ import Foundation
         serialNumber = x509?.subject(oid: .serialNumber)?.joined(separator: ",")
         certType = x509?.certType() ?? .unknownType
         validTo = x509?.notAfter
+        concatKDFAlgorithmURI = ""
     }
 
     convenience public init(cert: Data) {

@@ -19,7 +19,9 @@
 
 struct DataFileBottomSheetActions {
     static func actions(
-        showRemoveFileButton: Bool,
+        showOpenFileButton: Bool = false,
+        showSaveFileButton: Bool = false,
+        showRemoveFileButton: Bool = false,
         onOpenFileButtonClick: @escaping () -> Void,
         onSaveFileButtonClick: @escaping () -> Void,
         onRemoveFileButtonClick: @escaping () -> Void
@@ -27,12 +29,14 @@ struct DataFileBottomSheetActions {
 
         return [
             BottomSheetButton(
+                showButton: showOpenFileButton,
                 icon: "ic_m3_edit_48pt_wght400",
                 title: "Open file",
                 accessibilityLabel: "Open file",
                 onClick: onOpenFileButtonClick
             ),
             BottomSheetButton(
+                showButton: showSaveFileButton,
                 icon: "ic_m3_download_48pt_wght400",
                 title: "Save file",
                 accessibilityLabel: "Save file",

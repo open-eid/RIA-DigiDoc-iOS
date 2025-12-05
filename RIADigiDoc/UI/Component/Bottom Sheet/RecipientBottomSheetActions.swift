@@ -17,38 +17,25 @@
  *
  */
 
-struct ContainerNameBottomSheetActions {
+struct RecipientBottomSheetActions {
     static func actions(
-        isEditContainerButtonShown: Bool,
-        isSaveButtonShown: Bool = true,
-        isEncryptButtonShown: Bool,
-        onRenameContainerButtonClick: @escaping () -> Void,
-        onSaveContainerButtonClick: @escaping () -> Void,
+        showRemoveRecipientButton: Bool,
+        onDetailsButtonClick: @escaping () -> Void,
+        onRemoveRecipientButtonClick: @escaping () -> Void,
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
-                showButton: isEditContainerButtonShown,
                 icon: "ic_m3_edit_48pt_wght400",
-                title: "Change container name",
-                accessibilityLabel: "Change container name",
-                onClick: onRenameContainerButtonClick
+                title: "Recipient details",
+                accessibilityLabel: "Recipient details",
+                onClick: onDetailsButtonClick
             ),
             BottomSheetButton(
-                showButton: isSaveButtonShown,
-                icon: "ic_m3_download_48pt_wght400",
-                title: "Save container",
-                accessibilityLabel: "Save container",
-                onClick: onSaveContainerButtonClick
-            ),
-            BottomSheetButton(
-                showButton: isEncryptButtonShown,
+                showButton: showRemoveRecipientButton,
                 icon: "ic_m3_encrypted_48pt_wght400",
-                title: "Encrypt",
-                accessibilityLabel: "Encrypt",
-                showExtraIcon: true,
-                onClick: {
-                    // TODO: Implement encrypt action
-                }
+                title: "Remove recipient",
+                accessibilityLabel: "Remove recipient",
+                onClick: onRemoveRecipientButtonClick
             )
         ]
     }

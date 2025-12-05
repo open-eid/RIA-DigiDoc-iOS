@@ -30,7 +30,7 @@
 
 @implementation Addressee (label)
 
-- (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub {
+- (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
     std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(label);
     id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : nil;
     id first = info.contains("first_name") ? [NSString stringWithStdString:info["first_name"]] : nil;
@@ -50,7 +50,7 @@
         long long epochTime = [[NSString stringWithStdString:info["server_exp"]] longLongValue];
         validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
     }
-    if (self = [self initWithData:pub cnVal:cn givenName:first surname:last serialNumber:serial certType:certType validTo:validTo]) {
+    if (self = [self initWithData:pub cnVal:cn givenName:first surname:last serialNumber:serial certType:certType validTo:validTo concatKDFAlgorithmURI:concatKDFAlgorithmURI]) {
     }
     return self;
 }
@@ -60,8 +60,10 @@
 @implementation Decrypt
 
 + (CdocInfo*)cdocInfo:(NSString *)fullPath error:(NSError**)error {
+    CdocInfo* cdocInfo = nil;
+    
     if([fullPath.pathExtension caseInsensitiveCompare:@"cdoc"] == NSOrderedSame) {
-        return [[CdocInfo alloc] initWithCdoc1Path:fullPath error:error];
+        cdocInfo = [[CdocInfo alloc] initWithCdoc1Path:fullPath error:error];
     }
 
     std::unique_ptr<libcdoc::CDocReader> reader(libcdoc::CDocReader::createReader(fullPath.UTF8String, nullptr, nullptr, nullptr));
@@ -72,16 +74,31 @@
     for(const libcdoc::Lock &lock: reader->getLocks())
     {
         if(lock.isCertificate()) {
-            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::CERT)]]];
+            NSString* concatKDFAlgorithmURI = @"";
+            if (!lock.isRSA()) {
+                concatKDFAlgorithmURI = [NSString stringWithStdString:lock.getString(libcdoc::Lock::CONCAT_DIGEST)];
+            }
+            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::CERT)] concatKDFAlgorithmURI:concatKDFAlgorithmURI]];
         } else if(lock.isPKI()) {
-            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)]]];
+            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)] concatKDFAlgorithmURI:@""]];
         } else if(lock.isSymmetric()) {
             [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:[NSString stringWithStdString:lock.label]]];
         } else {
             [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:@"Unknown capsule"]];
         }
     }
-
+    if (cdocInfo != nil) {
+        NSMutableArray<Addressee*> *recipients = [cdocInfo.addressees mutableCopy];
+        for (Addressee *addressee in addressees) {
+            for (Addressee *recipient in recipients) {
+                if ([addressee.data isEqualToData:recipient.data]) {
+                    recipient.concatKDFAlgorithmURI = addressee.concatKDFAlgorithmURI;
+                }
+            }
+        }
+        
+        return [[CdocInfo alloc] initWithAddressees:recipients dataFiles:cdocInfo.dataFiles];
+    }
     return [[CdocInfo alloc] initWithAddressees:addressees];
 }
 
@@ -185,3 +202,4 @@
 }
 
 @end
+

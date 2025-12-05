@@ -183,6 +183,7 @@ struct SigningView: View {
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
+                                    isSaveButtonShown: true,
                                     isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
                                     showLeftActionButton: isContainerSigned && isSignButtonShown,
                                     showRightActionButton: isContainerSigned && !isNestedContainer,
@@ -305,6 +306,7 @@ struct SigningView: View {
                             }
                         } else {
                             UnsignedBottomBarView(
+                                showLeftButton: true,
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),

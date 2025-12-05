@@ -25,6 +25,7 @@ struct UnsignedBottomBarView: View {
     @AppTypography private var typography
     @Environment(LanguageSettings.self) private var languageSettings
 
+    let showLeftButton: Bool
     let leftButtonIconName: String
     let leftButtonLabel: String
     let leftButtonAccessibilityLabel: String
@@ -37,22 +38,24 @@ struct UnsignedBottomBarView: View {
 
     var body: some View {
         HStack {
-            Button(action: leftButtonAction, label: {
-                HStack(spacing: Dimensions.Padding.XSPadding, content: {
-                    Image(leftButtonIconName)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(theme.onSurface)
-                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .accessibilityHidden(true)
+            if showLeftButton {
+                Button(action: leftButtonAction, label: {
+                    HStack(spacing: Dimensions.Padding.XSPadding, content: {
+                        Image(leftButtonIconName)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(theme.onSurface)
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .accessibilityHidden(true)
 
-                    Text(languageSettings.localized(leftButtonLabel))
-                        .foregroundStyle(theme.primary)
-                        .font(typography.titleMedium)
-                        .accessibilityLabel(leftButtonAccessibilityLabel)
+                        Text(languageSettings.localized(leftButtonLabel))
+                            .foregroundStyle(theme.primary)
+                            .font(typography.titleMedium)
+                            .accessibilityLabel(leftButtonAccessibilityLabel)
+                    })
+                    .foregroundStyle(theme.surfaceContainer)
                 })
-                .foregroundStyle(theme.surfaceContainer)
-            })
+            }
 
             Spacer()
 
@@ -86,6 +89,7 @@ struct UnsignedBottomBarView: View {
 
 #Preview {
     UnsignedBottomBarView(
+        showLeftButton: true,
         leftButtonIconName: "ic_m3_add_48pt_wght400",
         leftButtonLabel: "Add more files",
         leftButtonAccessibilityLabel: "Add more files",

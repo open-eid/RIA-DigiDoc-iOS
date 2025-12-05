@@ -104,7 +104,7 @@ public actor CryptoContainer: CryptoContainerProtocol {
         guard !localRecipients.isEmpty else { return }
 
         for (index, rec) in localRecipients.enumerated()
-            where recipient.identifier == rec.identifier {
+            where recipient.data == rec.data {
                 recipients?.remove(at: index)
                 break
         }
@@ -155,8 +155,6 @@ public actor CryptoContainer: CryptoContainerProtocol {
             for: destinationURL,
             in: destinationURL.deletingLastPathComponent()
         )
-
-        try fileManager.moveItem(at: currentURL, to: uniqueFileURL)
 
         containerFile = uniqueFileURL
 
@@ -350,14 +348,7 @@ extension CryptoContainer {
         var dataFiles: [URL] = []
 
         for dataFile in cryptoDataFiles {
-            guard let filePath = dataFile.filePath else {
-                throw CryptoError.containerOpeningFailed(
-                    CryptoErrorDetail(
-                        message: "Cannot open container with datafile path nil"
-                    )
-                )
-            }
-            let fileUrl = URL(fileURLWithPath: filePath).appending(path: dataFile.filename)
+            let fileUrl = URL(fileURLWithPath: dataFile.filePath ?? "").appending(path: dataFile.filename)
 
             dataFiles.append(fileUrl)
         }
