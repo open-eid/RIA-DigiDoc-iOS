@@ -28,8 +28,6 @@ import Foundation
     public let serialNumber: String?
     public let certType: CertType
     public let validTo: Date?
-//    @objc public nonisolated(unsafe) var concatKDFAlgorithmURI: String
-
     @MainActor
     @objc public var concatKDFAlgorithmURI: String
     
