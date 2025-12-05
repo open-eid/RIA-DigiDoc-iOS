@@ -183,6 +183,7 @@ struct SigningView: View {
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
+                                    isSaveButtonShown: true,
                                     isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
                                     showLeftActionButton: isContainerSigned && isSignButtonShown,
                                     showRightActionButton: isContainerSigned && !isNestedContainer,

@@ -156,8 +156,6 @@ public actor CryptoContainer: CryptoContainerProtocol {
             in: destinationURL.deletingLastPathComponent()
         )
 
-        try fileManager.moveItem(at: currentURL, to: uniqueFileURL)
-
         containerFile = uniqueFileURL
 
         return uniqueFileURL

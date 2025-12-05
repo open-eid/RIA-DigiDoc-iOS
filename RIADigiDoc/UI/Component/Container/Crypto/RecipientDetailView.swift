@@ -107,9 +107,8 @@ struct RecipientDetailView: View {
                                         )
 
                                         NavigationLink(
-                                            destination: CertificateDetailView(
-                                                certificate: recipient.data,
-                                            )
+                                            value: NavigationDestination
+                                                .certificateDetailView(certificate: recipient.data)
                                         ) {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(

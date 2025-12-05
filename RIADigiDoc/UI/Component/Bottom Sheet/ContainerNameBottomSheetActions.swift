@@ -20,6 +20,7 @@
 struct ContainerNameBottomSheetActions {
     static func actions(
         isEditContainerButtonShown: Bool,
+        isSaveButtonShown: Bool = true,
         isEncryptButtonShown: Bool,
         onRenameContainerButtonClick: @escaping () -> Void,
         onSaveContainerButtonClick: @escaping () -> Void,
@@ -33,6 +34,7 @@ struct ContainerNameBottomSheetActions {
                 onClick: onRenameContainerButtonClick
             ),
             BottomSheetButton(
+                showButton: isSaveButtonShown,
                 icon: "ic_m3_download_48pt_wght400",
                 title: "Save container",
                 accessibilityLabel: "Save container",

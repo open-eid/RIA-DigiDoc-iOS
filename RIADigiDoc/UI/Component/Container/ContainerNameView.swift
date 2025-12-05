@@ -38,6 +38,7 @@ struct ContainerNameView: View {
     let containerNameTitle: String
     @Binding var name: String
     let isEditContainerButtonShown: Bool
+    let isSaveButtonShown: Bool
     let isEncryptButtonShown: Bool
     let showLeftActionButton: Bool
     let showRightActionButton: Bool
@@ -53,6 +54,7 @@ struct ContainerNameView: View {
     private var bottomSheetActions: [BottomSheetButton] {
         ContainerNameBottomSheetActions.actions(
             isEditContainerButtonShown: isEditContainerButtonShown,
+            isSaveButtonShown: isSaveButtonShown,
             isEncryptButtonShown: isEncryptButtonShown,
             onRenameContainerButtonClick: onRenameContainerButtonClick,
             onSaveContainerButtonClick: onSaveContainerButtonClick
@@ -157,6 +159,7 @@ struct ContainerNameView: View {
         containerNameTitle: "Container name",
         name: .constant("Test.asice"),
         isEditContainerButtonShown: true,
+        isSaveButtonShown: true,
         isEncryptButtonShown: false,
         showLeftActionButton: true,
         showRightActionButton: true,

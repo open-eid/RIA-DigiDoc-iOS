@@ -189,6 +189,7 @@ struct EncryptView: View {
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
+                                    isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
                                     isEncryptButtonShown: viewModel.isEncryptButtonShown,
                                     showLeftActionButton: viewModel.isSignButtonShown,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
