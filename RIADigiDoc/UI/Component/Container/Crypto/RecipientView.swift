@@ -137,11 +137,10 @@ struct RecipientView: View {
                             Text(verbatim: nameText.lowercased())
                         )
 
+                    let certType = recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
                     Text(verbatim:
-                            languageSettings.localized(
-                                recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
-                            ) + " " +
-                            languageSettings.localized("Valid to", [validToDate]))
+                            "\(languageSettings.localized(certType)) " +
+                            "\(languageSettings.localized("Valid to", [validToDate]))")
                     .font(typography.bodyMedium)
                     .foregroundStyle(theme.onSurfaceVariant)
                     .fixedSize(horizontal: false, vertical: true)

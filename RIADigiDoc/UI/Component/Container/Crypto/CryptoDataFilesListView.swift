@@ -79,7 +79,6 @@ struct CryptoDataFilesListView: View {
 }
 
 #Preview {
-    // swiftlint:disable force_unwrapping
     let dataFiles = [
         URL(fileURLWithPath: "/preview/path1"),
         URL(fileURLWithPath: "/preview/path2")
