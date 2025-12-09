@@ -28,6 +28,7 @@ struct EncryptView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
+    @Environment(NavigationPathManager.self) private var pathManager
     @Environment(LanguageSettings.self) private var languageSettings
 
     private let nameUtil: NameUtilProtocol
@@ -333,7 +334,13 @@ struct EncryptView: View {
                                 rightButtonLabel: rightButtonLabel,
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
-                                    // TODO: Implement encrypt functionality
+                                    if viewModel.isContainerWithoutRecipients {
+                                        pathManager.navigate(to:
+                                            .encryptRecipientView
+                                        )
+                                    } else {
+                                        // TODO: Implement encrypt functionality
+                                    }
                                 }
                             )
                             .fileImporter(

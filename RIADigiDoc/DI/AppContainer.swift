@@ -216,6 +216,17 @@ extension Container {
     }
 
     @MainActor
+    var encryptRecipientViewModel: Factory<EncryptRecipientViewModel> {
+        self {
+            @MainActor in
+            EncryptRecipientViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                openLdap: self.openLdap()
+            )
+        }
+    }
+
+    @MainActor
     var diagnosticsViewModel: Factory<DiagnosticsViewModel> {
         self { @MainActor in
             DiagnosticsViewModel(

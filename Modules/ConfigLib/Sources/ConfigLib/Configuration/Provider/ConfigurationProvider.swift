@@ -127,6 +127,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         try container.encode(sidV2RestUrl, forKey: .sidV2RestUrl)
         try container.encode(sidV2SkRestUrl, forKey: .sidV2SkRestUrl)
         try container.encode(certBundle, forKey: .certBundle)
+        try container.encode(ldapCerts, forKey: .ldapCerts)
         try container.encode(cdoc2DefaultKeyserver, forKey: .cdoc2DefaultKeyserver)
         try container.encode(cdoc2UseKeyserver, forKey: .cdoc2UseKeyserver)
         try container.encode(cdoc2Conf, forKey: .cdoc2Conf)

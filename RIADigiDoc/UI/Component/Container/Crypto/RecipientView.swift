@@ -28,9 +28,9 @@ struct RecipientView: View {
     @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     @Environment(NavigationPathManager.self) private var pathManager
-    
+
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
     let recipientIndex: Int
@@ -47,7 +47,7 @@ struct RecipientView: View {
     @State private var showBottomSheetFromButton = false
     @State private var isVoiceOverObserverAdded = false
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
-    
+
     private var bottomSheetActions: [BottomSheetButton] {
         RecipientBottomSheetActions.actions(
             showRemoveRecipientButton: showRemoveRecipientButton,
@@ -67,16 +67,41 @@ struct RecipientView: View {
         )
     }
 
+    var iconRes: String {
+        if (recipient.surname?.isEmpty ?? true) && (recipient.givenName?.isEmpty ?? true) {
+            return "ic_m3_domain_48pt_wght400"
+        } else {
+            return "ic_m3_encrypted_48pt_wght400"
+        }
+    }
+
+    var nameText: String {
+        return {
+            if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
+                return nameUtil.formatName(
+                    surname: recipient.surname,
+                    givenName: recipient.givenName,
+                    identifier: recipient.identifier
+                )
+            } else {
+                return nameUtil.formatCompanyName(
+                    identifier: recipient.identifier,
+                    serialNumber: recipient.serialNumber
+                )
+            }
+        }()
+    }
+
     var validToDate: String {
         guard let validToDate = recipient.validTo else { return "" }
-        
+
         let validToDateString = DateUtil.getFormattedDateTime(
             date: validToDate,
             isUTC: false
         ).date
         return "\(validToDateString)"
     }
-    
+
     init(
         recipientIndex: Int,
         recipient: Addressee,
@@ -99,24 +124,9 @@ struct RecipientView: View {
     }
 
     var body: some View {
-        let nameText: String = {
-            if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
-                return nameUtil.formatName(
-                    surname: recipient.surname,
-                    givenName: recipient.givenName,
-                    identifier: recipient.identifier
-                )
-            } else {
-                return nameUtil.formatCompanyName(
-                    identifier: recipient.identifier,
-                    serialNumber: recipient.serialNumber
-                )
-            }
-        }()
-
         VStack {
             HStack {
-                Image("ic_m3_encrypted_48pt_wght400")
+                Image(iconRes)
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)

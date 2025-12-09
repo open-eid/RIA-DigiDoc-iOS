@@ -63,6 +63,7 @@ actor LibrarySetup {
             try DigiDocConf.observeConfigurationUpdates(
                 configurationRepository: configurationRepository
             )
+
             if let schemaDirectory = Directories.getLibraryDirectory(fileManager: fileManager) {
                 try tslUtil.setupTSLFiles(tsls: [], destinationDir: schemaDirectory)
             } else {
@@ -77,6 +78,7 @@ actor LibrarySetup {
                 cacheDir: configDirectory,
                 proxyInfo: proxyInfo
             )
+
             LibrarySetup.logger.debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
                 tsaOption: getTSAOption(),
@@ -88,6 +90,9 @@ actor LibrarySetup {
                 proxyInfo: proxyInfo
             )
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
+
+            let configurationProvider = await configurationRepository.getConfiguration()
+            try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {
             switch error {
             case DigiDocError.initializationFailed(let errorDetail):
@@ -98,6 +103,48 @@ actor LibrarySetup {
                 "Unknown initialization error: \(error.localizedDescription). Error: \(error)")
             }
         }
+    }
+
+    private func saveLDAPCertsToLibrary(
+        ldapCertsBundle: [Data]?
+    ) throws {
+        guard let ldapCerts = ldapCertsBundle else {
+            return
+        }
+
+        let libraryDir = try fileManager.url(
+            for: .libraryDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+
+        let certsDir = libraryDir.appendingPathComponent("LDAPCerts", isDirectory: true)
+
+        if !fileManager.fileExists(atPath: certsDir.path) {
+            try fileManager.createDirectory(
+                at: certsDir,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+        }
+
+        let pemString = ldapCerts.map { certData -> String in
+            let base64 = certData.base64EncodedString(options: [.lineLength64Characters])
+            return """
+            -----BEGIN CERTIFICATE-----
+            \(base64)
+            -----END CERTIFICATE-----
+            """
+        }.joined(separator: "\n\n")
+
+        let pemURL = certsDir.appendingPathComponent("ldapCerts.pem")
+
+        try pemString.write(
+            to: pemURL,
+            atomically: true,
+            encoding: .utf8
+        )
     }
 
     private func getTSAOption() async -> ServicesSettingsOption {

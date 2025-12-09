@@ -161,7 +161,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         await cryptoContainer?.addDataFiles(files)
         EncryptViewModel.logger.debug("Added data files to container")
         errorMessage = ErrorMessage(
-            key: files.count == 1 ? "File successfully added" : "Files successfully added", 
+            key: files.count == 1 ? "File successfully added" : "Files successfully added",
             args: []
         )
         await loadContainerData(cryptoContainer: cryptoContainer)
@@ -196,12 +196,12 @@ class EncryptViewModel: EncryptViewModelProtocol {
             case .addingFilesToContainerFailed(let detail):
                 let fileName = detail.userInfo["fileName"] ?? ""
                 errorMessage = ErrorMessage(
-                    key: detail.message, 
+                    key: detail.message,
                     args: [fileName]
                 )
             default:
                 errorMessage = ErrorMessage(
-                    key: "General error", 
+                    key: "General error",
                     args: []
                 )
             }
@@ -210,24 +210,24 @@ class EncryptViewModel: EncryptViewModelProtocol {
             switch fileError {
             case .invalidFileSize:
                 errorMessage = ErrorMessage(
-                    key: "Invalid file size", 
+                    key: "Invalid file size",
                     args: []
                 )
             case .noDataFiles:
                 errorMessage = ErrorMessage(
-                    key: "Could not load selected files", 
+                    key: "Could not load selected files",
                     args: []
                 )
             default:
                 errorMessage = ErrorMessage(
-                    key: "General error", 
+                    key: "General error",
                     args: []
                 )
             }
 
         default:
             errorMessage = ErrorMessage(
-                key: "General error", 
+                key: "General error",
                 args: []
             )
         }
@@ -472,7 +472,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
                 "Unable to remove signature from container. CryptoContainer or containerURL is nil"
             )
             errorMessage = ErrorMessage(
-                key: "Failed to remove recipient from container", 
+                key: "Failed to remove recipient from container",
                 args: []
             )
             return
@@ -484,7 +484,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         } catch {
             EncryptViewModel.logger.error("Unable to remove signature from container. \(error)")
             errorMessage = ErrorMessage(
-                key: "Failed to remove signature from container", 
+                key: "Failed to remove signature from container",
                 args: []
             )
             return

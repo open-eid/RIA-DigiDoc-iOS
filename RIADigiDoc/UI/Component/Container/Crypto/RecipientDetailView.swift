@@ -33,7 +33,7 @@ struct RecipientDetailView: View {
     @State private var selectedTab: RecipientDetailViewTab = .recipientDetails
 
     @State private var viewModel: SignatureDetailViewModel
-    
+
     private let recipient: Addressee
 
     private let nameUtil: NameUtilProtocol
@@ -61,7 +61,7 @@ struct RecipientDetailView: View {
 
     var validToDate: String {
         guard let validToDate = recipient.validTo else { return "" }
-        
+
         let validToDateString = DateUtil.getFormattedDateTime(
             date: validToDate,
             isUTC: false
@@ -99,50 +99,59 @@ struct RecipientDetailView: View {
                             content: {
                                 VStack(alignment: .leading) {
                                     if selectedTab == .recipientDetails {
-                                        SignerDetailView(
-                                            signatureDataItem: SignatureDataItem(
-                                                title: languageSettings.localized("Recipient certificate issuer"),
-                                                value: viewModel.getIssuerName(cert: recipient.data)
-                                            )
-                                        )
-
-                                        NavigationLink(
-                                            value: NavigationDestination
-                                                .certificateDetailView(certificate: recipient.data)
-                                        ) {
+                                        let issuerName = viewModel.getIssuerName(cert: recipient.data)
+                                        if !issuerName.isEmpty {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
-                                                    title: languageSettings.localized("Recipient certificate"),
-                                                    value: nameText,
-                                                    extraIcon: "ic_m3_expand_content_48pt_wght400",
+                                                    title: languageSettings.localized("Recipient certificate issuer"),
+                                                    value: viewModel.getIssuerName(cert: recipient.data)
                                                 )
                                             )
                                         }
-                                        .buttonStyle(.plain)
 
-                                        Button {
-                                            if let url = URL(string: recipient.concatKDFAlgorithmURI) {
-                                                openURL(url)
+                                        if !nameText.isEmpty {
+                                            NavigationLink(
+                                                value: NavigationDestination
+                                                    .certificateDetailView(certificate: recipient.data)
+                                            ) {
+                                                SignerDetailView(
+                                                    signatureDataItem: SignatureDataItem(
+                                                        title: languageSettings.localized("Recipient certificate"),
+                                                        value: nameText,
+                                                        extraIcon: "ic_m3_expand_content_48pt_wght400",
+                                                    )
+                                                )
                                             }
-                                        } label: {
+                                            .buttonStyle(.plain)
+                                        }
+                                        if !recipient.concatKDFAlgorithmURI.isEmpty {
+                                            Button {
+                                                if let url = URL(string: recipient.concatKDFAlgorithmURI) {
+                                                    openURL(url)
+                                                }
+                                            } label: {
+                                                SignerDetailView(
+                                                    signatureDataItem: SignatureDataItem(
+                                                        title: languageSettings.localized("ConcatKDF reference method"),
+                                                        value: recipient.concatKDFAlgorithmURI,
+                                                        extraIcon: "ic_m3_open_in_new_48pt_wght400",
+                                                    )
+                                                )
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityRemoveTraits([.isButton])
+                                            .accessibilityAddTraits([.isLink])
+                                        }
+                                        if !validToDate.isEmpty {
                                             SignerDetailView(
                                                 signatureDataItem: SignatureDataItem(
-                                                    title: languageSettings.localized("ConcatKDF reference method"),
-                                                    value: recipient.concatKDFAlgorithmURI,
-                                                    extraIcon: "ic_m3_open_in_new_48pt_wght400",
+                                                    title: languageSettings.localized(
+                                                        "Recipient certificate expiry date"
+                                                    ),
+                                                    value: validToDate
                                                 )
                                             )
                                         }
-                                        .buttonStyle(.plain)
-                                        .accessibilityRemoveTraits([.isButton])
-                                        .accessibilityAddTraits([.isLink])
-
-                                        SignerDetailView(
-                                            signatureDataItem: SignatureDataItem(
-                                                title: languageSettings.localized("Recipient certificate expiry date"),
-                                                value: validToDate
-                                            )
-                                        )
                                     }
                                 }
                             })

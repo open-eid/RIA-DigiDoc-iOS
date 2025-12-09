@@ -40,6 +40,9 @@ struct NavigationDestinations: ViewModifier {
         case .recentDocumentsView(let folderURL, let extensions):
             RecentDocumentsView(folderURL: folderURL, extensions: extensions)
 
+        case .encryptRecipientView:
+            EncryptRecipientView()
+
         case .signingView:
             SigningView()
         case .signatureDetailView(
@@ -73,7 +76,7 @@ struct NavigationDestinations: ViewModifier {
             RecipientDetailView(
                 recipient: recipient,
             )
-            
+
         case .languageChooserView:
             LanguageChooserView()
         case .themeChooserView:

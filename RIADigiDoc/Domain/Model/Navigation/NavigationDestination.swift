@@ -29,6 +29,8 @@ public enum NavigationDestination: Hashable {
         extensions: [String]
     )
 
+    case encryptRecipientView
+
     case signingView
     case signatureDetailView(
         signature: SignatureWrapper,
