@@ -152,15 +152,21 @@ struct RecipientsView: View {
 }
 
 #Preview {
-    RecentDocumentFileView(
-        file: FileItem(
-            name: "test.asice",
-            url: URL(fileURLWithPath: "/path/test.asice"),
-            modifiedDate: Date.now
-        ),
-        fileIndex: 0,
-        onOpenContainer: {},
-        onRemoveContainer: {}
+    let recipient = Addressee(
+        data: Data(),
+        cnVal: "String",
+        givenName: "Bob",
+        surname: "Grey",
+        serialNumber: "38208263812",
+        certType: CertType.iDCardType,
+        validTo: Date.distantFuture
+    )
+    RecipientsView(
+        recipient: recipient,
+        recipientIndex: 0,
+        showRemoveButton: true,
+        onOpenRecipient: {},
+        onRemoveRecipient: {}
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())
