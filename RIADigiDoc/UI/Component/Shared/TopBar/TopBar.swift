@@ -69,14 +69,14 @@ struct TopBarContainer<Content: View>: View {
 
     var body: some View {
         VStack(spacing: Dimensions.Padding.ZeroPadding) {
-            if (!isTopBarHidden) {
+            if !isTopBarHidden {
                 TopBar(
                     title: title,
                     leftIcon: leftIcon,
                     leftIconAccessibility: leftIconAccessibility,
                     leftIconAccessibilityInput: leftIconAccessibilityInput,
                     onLeftClick: onLeftClick,
-                    
+
                     rightPrimaryIcon: rightPrimaryIcon,
                     rightPrimaryIconAccessibility: rightPrimaryIconAccessibility,
                     rightPrimaryIconAccessibilityInput: rightPrimaryIconAccessibilityInput,
@@ -85,14 +85,14 @@ struct TopBarContainer<Content: View>: View {
                             openURL(url)
                         }
                     },
-                    
+
                     rightSecondaryIcon: rightSecondaryIcon,
                     rightSecondaryIconAccessibility: rightSecondaryIconAccessibility,
                     rightSecondaryIconAccessibilityInput: rightSecondaryIconAccessibilityInput,
                     onRightSecondaryClick: onRightSecondaryClick ?? {
                         showSettingsSheet = true
                     },
-                    
+
                     extraButtonIcon: extraButtonIcon,
                     extraButtonIconAccessibility: extraButtonIconAccessibility,
                     extraButtonIconAccessibilityInput: extraButtonIconAccessibilityInput,
@@ -101,7 +101,7 @@ struct TopBarContainer<Content: View>: View {
                     onExtraButtonClick: onExtraButtonClick,
                     showRightIcons: showRightIcons
                 )
-                
+
             }
             content()
         }

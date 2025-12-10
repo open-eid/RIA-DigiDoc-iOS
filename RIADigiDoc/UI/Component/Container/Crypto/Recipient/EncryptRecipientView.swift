@@ -34,7 +34,7 @@ struct EncryptRecipientView: View {
 
     @FocusState private var isSearchFocused: Bool
     @State private var isSearchExpanded = false
-    
+
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
     @State private var selectedRecipient: Addressee?
@@ -69,7 +69,7 @@ struct EncryptRecipientView: View {
             content: {
                 ZStack {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                        if (!isSearchExpanded) {
+                        if !isSearchExpanded {
                             Text(verbatim: languageSettings.localized("Container recipients"))
                                 .foregroundStyle(theme.onSurface)
                                 .font(typography.headlineSmall)
@@ -173,7 +173,7 @@ struct EncryptRecipientView: View {
                             .listSectionSpacing(.compact)
                         }
                         if addedRecipients.count > 0 {
-                            if (noSearchResults) {
+                            if noSearchResults {
                                 Text(verbatim: languageSettings.localized("Added recipients"))
                             } else {
                                 Text(verbatim: languageSettings.localized("Recently added"))
