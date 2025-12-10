@@ -20,41 +20,75 @@
 import SwiftUI
 import FactoryKit
 
-struct SignatureInputScreen<Content: View>: View {
+struct ActionInputScreen<Content: View>: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
     @Environment(LanguageSettings.self) private var languageSettings
 
-    private let selectedSigningMethod: String
+    private let selectedActionMethod: String
 
-    @Binding var isSigningEnabled: Bool
-    @Binding var isSigning: Bool
+    @State private var actionType: ActionType
+    @State private var actionMethods: [ActionMethod]
+    @Binding var isActionEnabled: Bool
+    @Binding var isInProgress: Bool
     let onBackClick: () -> Void
-    let onSign: () -> Void
+    let onSubmit: () -> Void
     let content: Content
 
-    private var selectedSigningMethodLabel: String {
-        languageSettings.localized("Signing method")
+    private var headerTitle: String {
+        switch actionType {
+        case .signing:
+            languageSettings.localized("Container signing")
+        case .myeid:
+            languageSettings.localized("Identification title")
+        }
+    }
+
+    private var selectedActionMethodLabels: String {
+        switch actionType {
+        case .signing:
+            languageSettings.localized("Signing method")
+        case .myeid:
+            languageSettings.localized("Identification method")
+        }
     }
 
     private var selectedSigningMethodText: String {
-        languageSettings.localized(selectedSigningMethod)
+        languageSettings.localized(selectedActionMethod)
+    }
+
+    private var buttonTitle: String {
+        switch actionType {
+        case .signing:
+            languageSettings.localized("Sign")
+        case .myeid:
+            languageSettings.localized("Identify")
+        }
     }
 
     init(
-        selectedSigningMethod: String,
-        isSigningEnabled: Binding<Bool>,
-        isSigning: Binding<Bool>,
+        actionType: ActionType = .signing,
+        actionMethods: [ActionMethod] = [
+            .idCardViaNFC,
+            .idCardViaUSB,
+            .mobileId,
+            .smartId
+        ],
+        selectedActionMethod: String,
+        isActionEnabled: Binding<Bool>,
+        isInProgress: Binding<Bool>,
         onBackClick: @escaping () -> Void,
-        onSign: @escaping () -> Void,
+        onSubmit: @escaping () -> Void,
         @ViewBuilder content: () -> Content
     ) {
-        self.selectedSigningMethod = selectedSigningMethod
-        self._isSigningEnabled = isSigningEnabled
-        self._isSigning = isSigning
+        self.actionType = actionType
+        self.actionMethods = actionMethods
+        self.selectedActionMethod = selectedActionMethod
+        self._isActionEnabled = isActionEnabled
+        self._isInProgress = isInProgress
         self.onBackClick = onBackClick
-        self.onSign = onSign
+        self.onSubmit = onSubmit
         self.content = content()
     }
 
@@ -62,11 +96,11 @@ struct SignatureInputScreen<Content: View>: View {
         TopBarContainer(
             title: nil,
             onLeftClick: onBackClick,
-            showRightIcons: !isSigning,
+            showRightIcons: !isInProgress,
             content: {
                 VStack(alignment: .leading) {
                     ScrollView {
-                        Text(verbatim: languageSettings.localized("Container signing"))
+                        Text(verbatim: headerTitle)
                             .font(typography.headlineSmall)
                             .foregroundStyle(theme.onSurface)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -74,20 +108,25 @@ struct SignatureInputScreen<Content: View>: View {
                             .accessibilityHeading(.h1)
                             .accessibilityAddTraits([.isHeader])
 
-                        if !isSigning {
+                        if !isInProgress {
                             VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
-                                Text(verbatim: selectedSigningMethodLabel)
+                                Text(verbatim: selectedActionMethodLabels)
                                     .font(typography.labelLarge)
                                     .foregroundStyle(theme.onSurfaceVariant)
                                     .accessibilityHidden(true)
 
-                                NavigationLink(value: NavigationDestination.signingMethodSelectionView) {
+                                NavigationLink(
+                                    value: NavigationDestination.signingMethodSelectionView(
+                                        actionType: actionType,
+                                        methods: actionMethods
+                                    )
+                                ) {
                                     HStack {
                                         Text(verbatim: selectedSigningMethodText)
                                             .font(typography.bodyLarge)
                                             .foregroundStyle(theme.onSurface)
                                             .accessibilityLabel(Text(verbatim:
-                                                "\(selectedSigningMethodLabel) \(selectedSigningMethodText)")
+                                                "\(selectedActionMethodLabels) \(selectedSigningMethodText)")
                                             )
                                         Spacer()
                                         Image("ic_m3_arrow_right_48pt_wght400")
@@ -109,11 +148,11 @@ struct SignatureInputScreen<Content: View>: View {
 
                         content
 
-                        if !isSigning {
+                        if !isInProgress {
                             PrimaryButton(
-                                text: languageSettings.localized("Sign"),
-                                isButtonEnabled: isSigningEnabled,
-                                action: onSign
+                                text: buttonTitle,
+                                isButtonEnabled: isActionEnabled,
+                                action: onSubmit
                             )
                             .padding(.vertical, Dimensions.Padding.MPadding)
                         }
@@ -126,12 +165,13 @@ struct SignatureInputScreen<Content: View>: View {
 }
 
 #Preview {
-    SignatureInputScreen(
-        selectedSigningMethod: "ID-card via NFC",
-        isSigningEnabled: .constant(true),
-        isSigning: .constant(false),
+    ActionInputScreen(
+        actionType: .signing,
+        selectedActionMethod: "ID-card via NFC",
+        isActionEnabled: .constant(true),
+        isInProgress: .constant(false),
         onBackClick: {},
-        onSign: {},
+        onSubmit: {},
         content: {}
     )
     .environment(Container.shared.languageSettings())

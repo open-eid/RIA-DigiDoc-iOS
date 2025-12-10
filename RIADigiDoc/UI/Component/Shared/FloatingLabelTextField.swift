@@ -26,6 +26,8 @@ struct FloatingLabelTextField: View {
     @AppTypography private var typography
     @Environment(LanguageSettings.self) private var languageSettings
 
+    @AccessibilityFocusState private var isAccessibilityFocused: Bool
+
     @State private var floatingLabelHeight: CGFloat = 0
 
     // MARK: - Parameters
@@ -147,8 +149,9 @@ struct FloatingLabelTextField: View {
             mainContainer
             if isError {
                 Text(errorText)
-                    .font(typography.bodyLarge)
+                    .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
+                    .padding(.vertical, Dimensions.Padding.XXSPadding)
                     .accessibilityHidden(true)
             }
         }
@@ -247,8 +250,10 @@ struct FloatingLabelTextField: View {
                     .disabled(isDisabled)
                     .keyboardType(keyboardType)
                     .submitLabel(submitLabel)
+                    .accessibilityFocused($isAccessibilityFocused)
                     .onSubmit {
                         isFocused = false
+                        isAccessibilityFocused = true
                     }
                     .toolbar {
                         ToolbarItem(placement: .keyboard) {
@@ -262,7 +267,10 @@ struct FloatingLabelTextField: View {
                                     }
 
                                     Button(
-                                        action: { fieldIsFocused = false },
+                                        action: {
+                                            fieldIsFocused = false
+                                            isAccessibilityFocused = true
+                                        },
                                         label: { Text(verbatim: languageSettings.localized("Done")) }
                                     )
                                 }
@@ -276,8 +284,10 @@ struct FloatingLabelTextField: View {
                     .disabled(isDisabled)
                     .keyboardType(keyboardType)
                     .submitLabel(submitLabel)
+                    .accessibilityFocused($isAccessibilityFocused)
                     .onSubmit {
                         fieldIsFocused = false
+                        isAccessibilityFocused = true
                     }
                     .toolbar {
                         ToolbarItem(placement: .keyboard) {
@@ -291,7 +301,10 @@ struct FloatingLabelTextField: View {
                                     }
 
                                     Button(
-                                        action: { fieldIsFocused = false },
+                                        action: {
+                                            fieldIsFocused = false
+                                            isAccessibilityFocused = true
+                                        },
                                         label: { Text(verbatim: languageSettings.localized("Done")) }
                                     )
                                 }

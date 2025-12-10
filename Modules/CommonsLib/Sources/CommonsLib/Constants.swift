@@ -137,6 +137,7 @@ public struct Constants {
         public static let MaximumLatvianPersonalCodeLength = 12
         public static let MinimumPhoneNumberLength = 10
         public static let AllowedPhoneNumberCountryCodes = ["370", "372"]
+        public static let CANNumberLength = 6
     }
 
     public struct Signing {

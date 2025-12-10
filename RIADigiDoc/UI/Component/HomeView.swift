@@ -145,7 +145,10 @@ struct HomeView: View {
                     title: languageSettings.localized("Main home my eid title"),
                     description: languageSettings.localized("Main home my eid description"),
                     assetImageName: "ic_m3_co_present_48pt_wght400",
-                ) {}
+                    action: {
+                        pathManager.navigate(to: .myEidRootView)
+                    }
+                )
             }
             .padding(Dimensions.Padding.SPadding)
 

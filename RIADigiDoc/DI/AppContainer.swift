@@ -390,9 +390,9 @@ extension Container {
     }
 
     @MainActor
-    var signingMethodSelectionViewModel: Factory<SigningMethodSelectionViewModel> {
+    var actionMethodSelectionViewModel: Factory<ActionMethodSelectionViewModel> {
         self { @MainActor in
-            SigningMethodSelectionViewModel(
+            ActionMethodSelectionViewModel(
                 dataStore: self.dataStore()
             )
         }
@@ -414,5 +414,29 @@ extension Container {
                 dataStore: self.dataStore()
             )
         }
+    }
+
+    @MainActor
+    var nfcViewModel: Factory<NFCViewModel> {
+        self { @MainActor in
+            NFCViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
+    var myEidRootViewModel: Factory<MyEidRootViewModel> {
+        self { @MainActor in
+            MyEidRootViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
+    var sharedNfcViewModel: Factory<SharedNFCViewModel> {
+        self { @MainActor in SharedNFCViewModel() }
+            .shared
     }
 }

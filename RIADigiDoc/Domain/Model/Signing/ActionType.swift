@@ -19,9 +19,7 @@
 
 import Foundation
 
-/// @mockable
-@MainActor
-public protocol SigningMethodSelectionViewModelProtocol: Sendable {
-    func setSelectedSigningMethod(_ method: SigningMethod) async
-    func getSelectedSigningMethod() async -> SigningMethod
+public enum ActionType {
+    case signing
+    case myeid
 }

@@ -1,0 +1,82 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import SwiftUI
+import FactoryKit
+import LibdigidocLibSwift
+import CommonsLib
+
+struct MyEidRootView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    @Environment(NavigationPathManager.self) private var pathManager
+
+    @State private var chosenMethod: ActionMethod = .idCardViaNFC
+
+    @State private var viewModel: MyEidRootViewModel
+
+    init() {
+        _viewModel = State(wrappedValue: Container.shared.myEidRootViewModel())
+    }
+
+    var body: some View {
+        ZStack {
+            switch chosenMethod {
+            case .idCardViaNFC:
+                NFCView(
+                    actionType: .myeid,
+                    actionMethods: [
+                        .idCardViaNFC,
+                        .idCardViaUSB
+                    ],
+                    signedContainer: nil,
+                    onSuccess: { _ in }
+                )
+            case .idCardViaUSB:
+                // TODO: Replace with ID-card USB view
+                ActionInputScreen(
+                    actionType: .myeid,
+                    actionMethods: [
+                        .idCardViaNFC,
+                        .idCardViaUSB
+                    ],
+                    selectedActionMethod: "ID-card via USB",
+                    isActionEnabled: .constant(false),
+                    isInProgress: .constant(false),
+                    onBackClick: { dismiss() },
+                    onSubmit: {},
+                    content: {
+                        EmptyView()
+                    }
+                )
+            default:
+                EmptyView()
+            }
+        }
+        .onAppear {
+            Task {
+                chosenMethod = await viewModel.getSelectedMyEidMethod()
+            }
+        }
+    }
+}
+
+#Preview {
+    MyEidRootView()
+}
