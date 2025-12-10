@@ -134,67 +134,78 @@ struct EncryptRecipientView: View {
                         )
                         .padding(.top, Dimensions.Padding.LPadding)
                         .padding(.bottom, Dimensions.Padding.SPadding)
-
-                        if noSearchResults && !isSearchExpanded {
-                            List {
-                                Text(languageSettings.localized("Crypto recipients description"))
-                                    .font(typography.bodyLarge)
-                                    .foregroundStyle(theme.onSurfaceVariant)
-                                    .multilineTextAlignment(.leading)
-                                    .listRowBackground(Color.clear)
-                                    .listRowSeparator(.hidden)
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
-                        } else if noRecipients {
-                            ContentUnavailableView {
-                                Text(verbatim: languageSettings.localized("No recipients found"))
-                                    .font(typography.bodyLarge)
-                                    .foregroundStyle(theme.onSurfaceVariant)
-                            }
-                            .listRowSeparator(.hidden)
-                        } else {
-                            List {
-                                if #available(iOS 26.0, *) {
-                                    ForEach(filteredRecipients.enumerated(), id: \.offset
-                                    ) { index, item in
-                                        recipientRow(index: index, item: item)
-                                    }
-                                } else {
-                                    ForEach(Array(filteredRecipients.enumerated()), id: \.offset
-                                    ) { index, item in
-                                        recipientRow(index: index, item: item)
-                                    }
+                        ScrollView {
+                            if noSearchResults && !isSearchExpanded {
+                                VStack {
+                                    Text(languageSettings.localized("Crypto recipients description"))
+                                        .font(typography.bodyLarge)
+                                        .foregroundStyle(theme.onSurfaceVariant)
+                                        .multilineTextAlignment(.leading)
+                                        .listRowBackground(Color.clear)
+                                        .listRowSeparator(.hidden)
                                 }
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
-                            .listRowSpacing(0)
-                            .listSectionSpacing(.compact)
-                        }
-                        if addedRecipients.count > 0 {
-                            if noSearchResults {
-                                Text(verbatim: languageSettings.localized("Added recipients"))
+                                .listStyle(.plain)
+                                .scrollDisabled(true)
+                                .scrollContentBackground(.hidden)
+                            } else if noRecipients {
+                                ContentUnavailableView {
+                                    Text(verbatim: languageSettings.localized("No recipients found"))
+                                        .font(typography.bodyLarge)
+                                        .foregroundStyle(theme.onSurfaceVariant)
+                                }
+                                .listRowSeparator(.hidden)
                             } else {
-                                Text(verbatim: languageSettings.localized("Recently added"))
-                            }
-                            List {
-                                if #available(iOS 26.0, *) {
-                                    ForEach(addedRecipients.enumerated(), id: \.offset
-                                    ) { index, item in
-                                        addedRecipientRow(index: index, item: item)
-                                    }
-                                } else {
-                                    ForEach(Array(addedRecipients.enumerated()), id: \.offset
-                                    ) { index, item in
-                                        addedRecipientRow(index: index, item: item)
+                                VStack {
+                                    if #available(iOS 26.0, *) {
+                                        ForEach(filteredRecipients.enumerated(), id: \.offset
+                                        ) { index, item in
+                                            recipientRow(index: index, item: item)
+                                        }
+                                    } else {
+                                        ForEach(Array(filteredRecipients.enumerated()), id: \.offset
+                                        ) { index, item in
+                                            recipientRow(index: index, item: item)
+                                        }
                                     }
                                 }
+                                .listStyle(.plain)
+                                .scrollDisabled(true)
+                                .scrollContentBackground(.hidden)
+                                .listRowSpacing(0)
+                                .listSectionSpacing(.compact)
                             }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
-                            .listRowSpacing(0)
-                            .listSectionSpacing(.compact)
+
+                            Spacer().frame(height: Dimensions.Padding.MSPadding)
+
+                            if addedRecipients.count > 0 {
+                                VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+                                    if noSearchResults {
+                                        Text(verbatim: languageSettings.localized("Added recipients"))
+                                    } else {
+                                        Text(verbatim: languageSettings.localized("Recently added"))
+                                    }
+
+                                    Spacer().frame(height: Dimensions.Padding.MSPadding)
+
+                                    if #available(iOS 26.0, *) {
+                                        ForEach(addedRecipients.enumerated(), id: \.offset
+                                        ) { index, item in
+                                            addedRecipientRow(index: index, item: item)
+                                        }
+                                    } else {
+                                        ForEach(Array(addedRecipients.enumerated()), id: \.offset
+                                        ) { index, item in
+                                            addedRecipientRow(index: index, item: item)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, Dimensions.Padding.SPadding)
+                                .listStyle(.plain)
+                                .scrollDisabled(true)
+                                .scrollContentBackground(.hidden)
+                                .listRowSpacing(0)
+                                .listSectionSpacing(.compact)
+                            }
                         }
                     }
                     .padding(.horizontal, Dimensions.Padding.SPadding)
@@ -222,6 +233,24 @@ struct EncryptRecipientView: View {
                             }
                         )
                     }
+                }
+                .safeAreaInset(edge: .bottom) {
+                    UnsignedBottomBarView(
+                        showLeftButton: false,
+                        leftButtonIconName: "ic_m3_add_48pt_wght400",
+                        leftButtonLabel: "",
+                        leftButtonAccessibilityLabel: "",
+                        leftButtonAction: {
+                            // do nothing
+                        },
+
+                        rightButtonIconName: "ic_m3_encrypted_48pt_wght400",
+                        rightButtonLabel: languageSettings.localized("Encrypt"),
+                        rightButtonAccessibilityLabel: languageSettings.localized("Encrypt").lowercased(),
+                        rightButtonAction: {
+                            // TODO: Implement encrypt functionality
+                        }
+                    )
                 }
                 .onAppear {
                     viewModel.loadRecipients()

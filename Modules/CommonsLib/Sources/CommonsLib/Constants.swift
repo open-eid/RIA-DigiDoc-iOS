@@ -96,6 +96,10 @@ public struct Constants {
         public static let EncryptionKeyTransferCert = "keytransfercert"
     }
 
+    public struct File {
+        public static let LDAPCertsPem = "ldapCerts.pem"
+    }
+
     public struct FileBaseName {
         public static let SiVaCert = "siva_cert"
         public static let TSACert = "tsa_cert"

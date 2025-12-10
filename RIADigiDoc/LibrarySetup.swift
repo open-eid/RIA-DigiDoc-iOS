@@ -119,7 +119,8 @@ actor LibrarySetup {
             create: true
         )
 
-        let certsDir = libraryDir.appendingPathComponent(Constants.Folder.LDAPCerts, isDirectory: true)
+        let certsDir = libraryDir
+            .appending(path: Constants.Folder.LDAPCerts)
 
         if !fileManager.fileExists(atPath: certsDir.path) {
             try fileManager.createDirectory(
@@ -138,7 +139,7 @@ actor LibrarySetup {
             """
         }.joined(separator: "\n\n")
 
-        let pemURL = certsDir.appendingPathComponent("ldapCerts.pem")
+        let pemURL = certsDir.appendingPathComponent(Constants.File.LDAPCertsPem)
 
         try pemString.write(
             to: pemURL,
