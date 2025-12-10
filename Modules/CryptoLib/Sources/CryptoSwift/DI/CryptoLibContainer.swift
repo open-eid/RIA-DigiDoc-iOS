@@ -44,7 +44,7 @@ extension Container {
         self {
             @MainActor in OpenLdap(
                 fileManager: self.fileManager(),
-                moppLdapConfiguration: self.ldapConfiguration()
+                ldapConfiguration: self.ldapConfiguration()
             )
         }
     }

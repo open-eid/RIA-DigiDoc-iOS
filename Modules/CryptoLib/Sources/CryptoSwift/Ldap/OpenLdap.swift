@@ -36,10 +36,10 @@ final public class OpenLdap: OpenLdapProtocol {
 
     public init(
         fileManager: FileManagerProtocol,
-        moppLdapConfiguration: LdapConfigurationProtocol
+        ldapConfiguration: LdapConfigurationProtocol
     ) {
         self.fileManager = fileManager
-        self.ldapConfiguration = moppLdapConfiguration
+        self.ldapConfiguration = ldapConfiguration
     }
 
     typealias LDAP = OpaquePointer
