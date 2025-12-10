@@ -27,7 +27,7 @@ public protocol EncryptRecipientViewModelProtocol: Sendable {
     func filteredRecipients() -> [Addressee]
     func filteredAddedRecipients() async -> [Addressee]
     func addRecipients(_ chosenRecipient: Addressee) async
-    func loadRecipients()
+    func loadRecipients() async
     func getContainerRecipientList() async -> [Addressee]
     func deleteRecipient(_ recipient: Addressee) async
 }

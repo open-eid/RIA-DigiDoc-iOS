@@ -104,8 +104,10 @@ struct EncryptRecipientView: View {
                                     return
                                 }
 
-                                viewModel.loadRecipients()
-                                isSearchFocused = true
+                                Task {
+                                    await viewModel.loadRecipients()
+                                    isSearchFocused = true
+                                }
                             }
 
                             if isSearchExpanded {
@@ -113,7 +115,10 @@ struct EncryptRecipientView: View {
                                     action: {
                                         isSearchFocused = false
                                         viewModel.searchText = ""
-                                        viewModel.loadRecipients()
+
+                                        Task {
+                                            await viewModel.loadRecipients()
+                                        }
                                     },
                                     label: {
                                         Image(systemName: "xmark.circle.fill")
@@ -224,7 +229,7 @@ struct EncryptRecipientView: View {
                                     addedRecipients = await viewModel.filteredAddedRecipients()
                                     selectedRecipient = nil
                                     showRemoveRecipientModal = false
-                                    viewModel.loadRecipients()
+                                    await viewModel.loadRecipients()
                                 }
                             },
                             onCancel: {
@@ -253,8 +258,8 @@ struct EncryptRecipientView: View {
                     )
                 }
                 .onAppear {
-                    viewModel.loadRecipients()
                     Task { @MainActor in
+                        await viewModel.loadRecipients()
                         addedRecipients = await viewModel.filteredAddedRecipients()
                     }
                 }

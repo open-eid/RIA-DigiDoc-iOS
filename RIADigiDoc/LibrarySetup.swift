@@ -97,10 +97,17 @@ actor LibrarySetup {
 
             let configurationProvider = await configurationRepository.getConfiguration()
 
-            try await ldapConfiguration.setLdapPersonURLS(
-                configurationProvider?.ldapPersonUrls ?? [configurationProvider?.ldapPersonUrl]
-            )
-            try await ldapConfiguration.setLdapCorpURL(configurationProvider?.ldapCorpUrl)
+            if let ldapPersonUrl = configurationProvider?.ldapPersonUrl {
+                await ldapConfiguration.setLdapPersonURLS([ldapPersonUrl])
+            }
+
+            if let ldapPersonUrls = configurationProvider?.ldapPersonUrls {
+                await ldapConfiguration.setLdapPersonURLS(ldapPersonUrls)
+            }
+
+            if let ldapCorpUrl = configurationProvider?.ldapCorpUrl {
+                await ldapConfiguration.setLdapCorpURL(ldapCorpUrl)
+            }
 
             try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {

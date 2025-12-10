@@ -73,9 +73,9 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
         await cryptoContainer.addRecipients([chosenRecipient])
     }
 
-    func loadRecipients() {
+    func loadRecipients() async {
         if !searchText.isEmpty {
-            let result = openLdap.search(identityCode: searchText)
+            let result = await openLdap.search(identityCode: searchText)
             if result.tooManyResults {
                 recipients = []
                 errorMessage = "Too many results"

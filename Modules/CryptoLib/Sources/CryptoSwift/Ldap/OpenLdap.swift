@@ -88,12 +88,12 @@ final public class OpenLdap: OpenLdapProtocol {
         }
     }
 
-    @MainActor public func search(identityCode: String) -> (
+    @MainActor public func search(identityCode: String) async -> (
         addressees: [Addressee],
         tooManyResults: Bool
     ) {
         var filePath: String?
-        if let ldapCertFilePath = self.ldapConfiguration.ldapCertsPath() {
+        if let ldapCertFilePath = await self.ldapConfiguration.ldapCertsPath() {
             if fileManager.fileExists(atPath: ldapCertFilePath) {
                 filePath = ldapCertFilePath
             } else {
@@ -107,22 +107,21 @@ final public class OpenLdap: OpenLdapProtocol {
             OpenLdap.logger.debug("Searching with personal code from LDAP")
             var result = [Addressee]()
             var tooManyResults = false
-            for url in LdapConfiguration.ldapPersonURLS {
-                if let ldapPersonUrl = url {
-                    let (addresses, found) = OpenLdap.search(
-                        searchType: searchType,
-                        url: ldapPersonUrl,
-                        certificatePath: filePath
-                    )
-                    result.append(contentsOf: addresses)
-                    if found >= 50 {
-                        tooManyResults = true
-                    }
+            for url in await self.ldapConfiguration.getLdapPersonURLS() {
+                let ldapPersonUrl = url
+                let (addresses, found) = OpenLdap.search(
+                    searchType: searchType,
+                    url: ldapPersonUrl,
+                    certificatePath: filePath
+                )
+                result.append(contentsOf: addresses)
+                if found >= 50 {
+                    tooManyResults = true
                 }
             }
             return (result, tooManyResults)
         } else {
-            if let ldapCorpURL = LdapConfiguration.ldapCorpURL {
+            if let ldapCorpURL = await self.ldapConfiguration.getLdapCorpURL() {
                 OpenLdap.logger.debug("Searching with corporation keyword from LDAP")
                 let (addresses, found) = OpenLdap.search(
                     searchType: searchType,

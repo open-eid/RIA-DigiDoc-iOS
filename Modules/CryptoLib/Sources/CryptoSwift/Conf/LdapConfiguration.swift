@@ -21,9 +21,9 @@ import Foundation
 import CommonsLib
 import UtilsLib
 
-public struct LdapConfiguration: LdapConfigurationProtocol {
-    @MainActor static public var ldapPersonURLS = [URL(string: "ldaps://esteid.ldap.sk.ee")]
-    @MainActor static public var ldapCorpURL = URL(string: "ldaps://k3.ldap.sk.ee")
+public actor LdapConfiguration: LdapConfigurationProtocol {
+    public private(set) var ldapPersonURLS: [URL] = []
+    public private(set) var ldapCorpURL: URL?
 
     private let fileManager: FileManagerProtocol
 
@@ -33,17 +33,23 @@ public struct LdapConfiguration: LdapConfigurationProtocol {
         self.fileManager = fileManager
     }
 
-    @MainActor
-    public func setLdapPersonURLS(_ urls: [URL?]) async throws {
-        Self.ldapPersonURLS = urls
+    public func getLdapPersonURLS() async -> [URL] {
+        return self.ldapPersonURLS
     }
 
-    @MainActor
-    public func setLdapCorpURL(_ url: URL?) async throws {
-        Self.ldapCorpURL = url
+    public func getLdapCorpURL() async -> URL? {
+        return self.ldapCorpURL
     }
 
-    public func ldapCertsPath() -> String? {
+    public func setLdapPersonURLS(_ urls: [URL]) async {
+        self.ldapPersonURLS = urls
+    }
+
+    public func setLdapCorpURL(_ url: URL) async {
+        self.ldapCorpURL = url
+    }
+
+    public func ldapCertsPath() async -> String? {
         return Directories
             .getLibraryDirectory(fileManager: fileManager)?
             .appending(path: Constants.Folder.LDAPCerts, directoryHint: .isDirectory)

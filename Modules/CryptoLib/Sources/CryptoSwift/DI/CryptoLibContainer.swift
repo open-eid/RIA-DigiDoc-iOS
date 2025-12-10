@@ -18,6 +18,7 @@
  */
 
 import FactoryKit
+import Foundation
 
 extension Container {
     public var cryptoContainer: Factory<CryptoContainerProtocol> {
@@ -29,17 +30,19 @@ extension Container {
         }
     }
 
+    @MainActor
     public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
         self {
-            LdapConfiguration(
+            @MainActor in LdapConfiguration(
                 fileManager: self.fileManager()
             )
-        }
+        }.singleton
     }
 
+    @MainActor
     public var openLdap: Factory<OpenLdapProtocol> {
         self {
-            OpenLdap(
+            @MainActor in OpenLdap(
                 fileManager: self.fileManager(),
                 moppLdapConfiguration: self.ldapConfiguration()
             )
