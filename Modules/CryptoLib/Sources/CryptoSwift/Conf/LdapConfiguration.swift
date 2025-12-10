@@ -33,6 +33,16 @@ public struct LdapConfiguration: LdapConfigurationProtocol {
         self.fileManager = fileManager
     }
 
+    @MainActor
+    public func setLdapPersonURLS(_ urls: [URL?]) async throws {
+        Self.ldapPersonURLS = urls
+    }
+
+    @MainActor
+    public func setLdapCorpURL(_ url: URL?) async throws {
+        Self.ldapCorpURL = url
+    }
+
     public func ldapCertsPath() -> String? {
         return Directories
             .getLibraryDirectory(fileManager: fileManager)?

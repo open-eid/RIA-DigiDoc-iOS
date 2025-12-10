@@ -35,7 +35,8 @@ extension Container {
                 dataStore: self.dataStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
                 keychainStore: self.keychainStore(),
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                ldapConfiguration: self.ldapConfiguration()
             )
         }
         .shared

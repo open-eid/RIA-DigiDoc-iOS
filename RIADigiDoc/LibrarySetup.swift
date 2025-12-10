@@ -20,6 +20,7 @@
 import Foundation
 import OSLog
 import LibdigidocLibSwift
+import CryptoSwift
 import ConfigLib
 import CommonsLib
 import UtilsLib
@@ -35,6 +36,7 @@ actor LibrarySetup {
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let keychainStore: KeychainStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
+    private let ldapConfiguration: LdapConfigurationProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
@@ -44,7 +46,8 @@ actor LibrarySetup {
         dataStore: DataStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         keychainStore: KeychainStoreProtocol,
-        proxyUtil: ProxyUtilProtocol
+        proxyUtil: ProxyUtilProtocol,
+        ldapConfiguration: LdapConfigurationProtocol
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
@@ -54,6 +57,7 @@ actor LibrarySetup {
         self.advancedSettingsRepository = advancedSettingsRepository
         self.keychainStore = keychainStore
         self.proxyUtil = proxyUtil
+        self.ldapConfiguration = ldapConfiguration
     }
 
     func setupLibraries() async {
@@ -92,6 +96,12 @@ actor LibrarySetup {
             LibrarySetup.logger.info("Libdigidocpp initialized successfully")
 
             let configurationProvider = await configurationRepository.getConfiguration()
+
+            try await ldapConfiguration.setLdapPersonURLS(
+                configurationProvider?.ldapPersonUrls ?? [configurationProvider?.ldapPersonUrl]
+            )
+            try await ldapConfiguration.setLdapCorpURL(configurationProvider?.ldapCorpUrl)
+
             try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {
             switch error {

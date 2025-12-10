@@ -17,7 +17,14 @@
  *
  */
 
+import Foundation
+
 /// @mockable
 public protocol LdapConfigurationProtocol: Sendable {
     func ldapCertsPath() -> String?
+    @MainActor
+    func setLdapPersonURLS(_ urls: [URL?]) async throws
+    @MainActor
+    func setLdapCorpURL(_ url: URL?) async throws
+
 }
