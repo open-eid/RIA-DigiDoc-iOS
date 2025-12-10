@@ -233,11 +233,6 @@ struct EncryptRecipientView: View {
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
                 }
-//                .onChange(of: viewModel.searchText) { _, _ in
-//                    Task { @MainActor in
-//                        addedRecipients = await viewModel.filteredAddedRecipients()
-//                    }
-//                }
                 .onChange(of: isNavigatingToSigningView, { _, newValue in
                     if newValue {
                         pathManager.navigate(to: .signingView)
