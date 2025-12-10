@@ -81,10 +81,10 @@ final public class OpenLdap: OpenLdapProtocol {
 
         func escape(_ data: String) -> String {
             data
-               .replacingOccurrences(of: "\\", with: "\\\\")
-               .replacingOccurrences(of: "(", with: "\\(")
-               .replacingOccurrences(of: ")", with: "\\)")
-               .replacingOccurrences(of: "*", with: "\\*")
+                .replacing("\\", with: "\\\\")
+                .replacing("(", with: "\\(")
+                .replacing(")", with: "\\)")
+                .replacing("*", with: "\\*")
         }
     }
 

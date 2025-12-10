@@ -67,11 +67,10 @@ struct RecipientsView: View {
     var validToDate: String {
         guard let validToDate = recipient.validTo else { return "" }
 
-        let validToDateString = DateUtil.getFormattedDateTime(
+        return DateUtil.getFormattedDateTime(
             date: validToDate,
             isUTC: false
         ).date
-        return "\(validToDateString)"
     }
 
     init(

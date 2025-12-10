@@ -37,6 +37,24 @@
         }
       }
     },
+    "Added recipients" : {
+      "comment" : "Encrypt Recipient Added recipients text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added recipients"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisatud adressaadid"
+          }
+        }
+      }
+    },
     "Additional information" : {
       "comment" : "Additional information button",
       "extractionState" : "manual",

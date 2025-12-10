@@ -89,6 +89,7 @@ public struct Constants {
         public static let Temp = "tempfiles"
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
+        public static let LDAPCerts = "LDAPCerts"
         public static let Logs = "logfiles"
         public static let SiVaCert = "sivacert"
         public static let TSACert = "tsacert"

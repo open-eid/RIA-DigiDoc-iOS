@@ -36,6 +36,6 @@ public struct LdapConfiguration: LdapConfigurationProtocol {
     public func ldapCertsPath() -> String? {
         return Directories
             .getLibraryDirectory(fileManager: fileManager)?
-            .appending(path: "LDAPCerts/ldapCerts.pem").resolvedPath
+            .appending(path: Constants.Folder.LDAPCerts + "/ldapCerts.pem").resolvedPath
     }
 }

@@ -319,7 +319,7 @@ struct EncryptView: View {
                         } else if !viewModel.isContainerEncrypted && !viewModel.isContainerDecrypted {
                             let rightButtonLabel = viewModel.isContainerWithoutRecipients ? nextLabel : encryptLabel
                             let rightButtonIconName = viewModel.isContainerWithoutRecipients
-                                ? "ic_m3_arrow_forward_ios_48pt_wght400"
+                                ? "ic_m3_arrow_forward_48pt_wght400"
                                 : "ic_m3_encrypted_48pt_wght400"
                             UnsignedBottomBarView(
                                 showLeftButton: viewModel.isContainerWithoutRecipients,

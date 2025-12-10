@@ -119,7 +119,7 @@ actor LibrarySetup {
             create: true
         )
 
-        let certsDir = libraryDir.appendingPathComponent("LDAPCerts", isDirectory: true)
+        let certsDir = libraryDir.appendingPathComponent(Constants.Folder.LDAPCerts, isDirectory: true)
 
         if !fileManager.fileExists(atPath: certsDir.path) {
             try fileManager.createDirectory(

@@ -87,6 +87,10 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
             recipients = []
         }
     }
+    
+    func handleSearchTextChange() {
+        recipients = []
+    }
 
     func getContainerRecipientList() async -> [Addressee] {
         let cryptoContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol

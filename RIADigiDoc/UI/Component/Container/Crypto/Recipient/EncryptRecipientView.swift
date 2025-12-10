@@ -32,6 +32,9 @@ struct EncryptRecipientView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @FocusState private var isSearchFocused: Bool
+    @State private var isSearchExpanded = false
+    
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
     @State private var selectedRecipient: Addressee?
@@ -59,19 +62,21 @@ struct EncryptRecipientView: View {
 
     var body: some View {
         TopBarContainer(
+            isTopBarHidden: isSearchExpanded,
             title: nil,
             onLeftClick: { dismiss() },
             showRightIcons: true,
             content: {
                 ZStack {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                        Text(verbatim: languageSettings.localized("Container recipients"))
-                            .foregroundStyle(theme.onSurface)
-                            .font(typography.headlineSmall)
-                            .padding(.top, Dimensions.Padding.SPadding)
-                            .accessibilityHeading(.h1)
-                            .accessibilityAddTraits([.isHeader])
-
+                        if (!isSearchExpanded) {
+                            Text(verbatim: languageSettings.localized("Container recipients"))
+                                .foregroundStyle(theme.onSurface)
+                                .font(typography.headlineSmall)
+                                .padding(.top, Dimensions.Padding.SPadding)
+                                .accessibilityHeading(.h1)
+                                .accessibilityAddTraits([.isHeader])
+                        }
                         HStack {
                             Image(systemName: "magnifyingglass")
                                 .foregroundStyle(theme.onSurfaceVariant)
@@ -84,6 +89,13 @@ struct EncryptRecipientView: View {
                             .submitLabel(.done)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled(true)
+                            .focused($isSearchFocused)
+                            .onChange(of: isSearchFocused) {  _, newValue in
+                                isSearchExpanded = newValue
+                            }
+                            .onChange(of: viewModel.searchText) {
+                                viewModel.handleSearchTextChange()
+                            }
                             .onSubmit {
                                 if viewModel.searchText.allSatisfy(\.isNumber) &&
                                     viewModel.searchText.count == 11 &&
@@ -93,11 +105,13 @@ struct EncryptRecipientView: View {
                                 }
 
                                 viewModel.loadRecipients()
+                                isSearchFocused = true
                             }
 
-                            if !viewModel.searchText.isEmpty {
+                            if isSearchExpanded {
                                 Button(
                                     action: {
+                                        isSearchFocused = false
                                         viewModel.searchText = ""
                                         viewModel.loadRecipients()
                                     },
@@ -121,14 +135,22 @@ struct EncryptRecipientView: View {
                         .padding(.top, Dimensions.Padding.LPadding)
                         .padding(.bottom, Dimensions.Padding.SPadding)
 
-                        if noSearchResults {
-                            ContentUnavailableView {
-                                Text(verbatim: languageSettings.localized("Crypto recipients description"))
+                        if noSearchResults && !isSearchExpanded {
+                            List {
+                                Text(languageSettings.localized("Crypto recipients description"))
+                                    .font(typography.bodyLarge)
+                                    .foregroundStyle(theme.onSurfaceVariant)
+                                    .multilineTextAlignment(.leading)
+                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
                             }
-                            .listRowSeparator(.hidden)
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
                         } else if noRecipients {
                             ContentUnavailableView {
                                 Text(verbatim: languageSettings.localized("No recipients found"))
+                                    .font(typography.bodyLarge)
+                                    .foregroundStyle(theme.onSurfaceVariant)
                             }
                             .listRowSeparator(.hidden)
                         } else {
@@ -151,7 +173,11 @@ struct EncryptRecipientView: View {
                             .listSectionSpacing(.compact)
                         }
                         if addedRecipients.count > 0 {
-                            Text(verbatim: languageSettings.localized("Recently added"))
+                            if (noSearchResults) {
+                                Text(verbatim: languageSettings.localized("Added recipients"))
+                            } else {
+                                Text(verbatim: languageSettings.localized("Recently added"))
+                            }
                             List {
                                 if #available(iOS 26.0, *) {
                                     ForEach(addedRecipients.enumerated(), id: \.offset
@@ -207,11 +233,11 @@ struct EncryptRecipientView: View {
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
                 }
-                .onChange(of: viewModel.searchText) { _, _ in
-                    Task { @MainActor in
-                        addedRecipients = await viewModel.filteredAddedRecipients()
-                    }
-                }
+//                .onChange(of: viewModel.searchText) { _, _ in
+//                    Task { @MainActor in
+//                        addedRecipients = await viewModel.filteredAddedRecipients()
+//                    }
+//                }
                 .onChange(of: isNavigatingToSigningView, { _, newValue in
                     if newValue {
                         pathManager.navigate(to: .signingView)
