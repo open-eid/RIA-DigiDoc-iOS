@@ -22,5 +22,5 @@ import Foundation
 /// @mockable
 @MainActor
 public protocol SigningRootViewModelProtocol: Sendable {
-    func getSelectedSigningMethod() async -> SigningMethod
+    func getSelectedSigningMethod() async -> ActionMethod
 }

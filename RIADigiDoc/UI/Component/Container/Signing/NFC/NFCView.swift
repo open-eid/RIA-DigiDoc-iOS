@@ -1,0 +1,169 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import SwiftUI
+import FactoryKit
+import LibdigidocLibSwift
+import CommonsLib
+
+struct NFCView: View {
+    @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
+    @Environment(LanguageSettings.self) private var languageSettings
+
+    @State private var actionType: ActionType
+    @State private var actionMethods: [ActionMethod]
+    @State private var canNumber = ""
+    @State private var rememberMe: Bool = true
+    @State private var isActionEnabled = false
+    @State private var isInProgress: Bool = false
+
+    @State private var nfcActionMessage: String = "NFC hold card"
+
+    @State private var viewModel: NFCViewModel
+    @State private var sharedNfcViewModel: SharedNFCViewModel
+
+    private var isNFCSupported: Bool {
+        sharedNfcViewModel.isNFCSupported()
+    }
+
+    private var canNumberError: Binding<String?> {
+        Binding(
+            get: { languageSettings.localized(
+                viewModel.canNumberErrorKey ?? "",
+                viewModel.canNumberErrorExtraArguments
+            ) },
+            set: { _ in }
+        )
+    }
+
+    private var displayedMessage: Binding<String> {
+        Binding(
+            get: {
+                isNFCSupported ? nfcActionMessage : "NFC not supported"
+            },
+            set: { newValue in
+                nfcActionMessage = newValue
+            }
+        )
+    }
+
+    let signedContainer: SignedContainerProtocol?
+    let onSuccess: (SignedContainerProtocol) -> Void
+
+    init(
+        actionType: ActionType,
+        actionMethods: [ActionMethod],
+        signedContainer: SignedContainerProtocol?,
+        onSuccess: @escaping (SignedContainerProtocol) -> Void
+    ) {
+        _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
+        _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
+        self.actionType = actionType
+        self.actionMethods = actionMethods
+        self.signedContainer = signedContainer
+        self.onSuccess = onSuccess
+    }
+
+    var body: some View {
+        ActionInputScreen(
+            actionType: actionType,
+            actionMethods: actionMethods,
+            selectedActionMethod: ActionMethod.idCardViaNFC.rawValue,
+            isActionEnabled: $isActionEnabled,
+            isInProgress: $isInProgress,
+            onBackClick: {
+                guard isInProgress else {
+                    dismiss()
+                    return
+                }
+                isInProgress = false
+            },
+            onSubmit: {
+                switch actionType {
+                case .signing:
+                    saveInputData()
+
+                    // TODO: Implement signing action
+                    isInProgress = true
+                case .myeid:
+                    saveInputData()
+                    // TODO: Implement My eID personal data loading action
+                    isInProgress = true
+                }
+            },
+            content: {
+                if isInProgress {
+                    NFCActionView(
+                        leftIcon: "ic_m3_phonelink_ring_48pt_wght400",
+                        rightIcon: "ic_m3_id_card_48pt_wght400",
+                        message: displayedMessage
+                    )
+                } else {
+                    NFCInputView(
+                        canNumber: $canNumber,
+                        rememberMe: $rememberMe,
+                        isActionEnabled: $isActionEnabled,
+                        canNumberError: canNumberError,
+                        onInputChange: {
+                            isActionEnabled = viewModel
+                                .isActionEnabled(canNumber: canNumber)
+                        }
+                    )
+                }
+            }
+        )
+        .onAppear {
+            Task {
+                let inputData = await viewModel.getInputData()
+                canNumber = inputData.canNumber
+                rememberMe = inputData.rememberMe
+            }
+        }
+    }
+
+    func saveInputData() {
+        Task {
+            let (inputCANNumber) = rememberMe ? (canNumber) : ("")
+            await viewModel.saveInputData(
+                canNumber: inputCANNumber,
+                rememberMe: rememberMe
+            )
+        }
+    }
+}
+
+#Preview {
+    NFCView(
+        actionType: .signing,
+        actionMethods: [
+            .idCardViaNFC,
+            .idCardViaUSB,
+            .mobileId,
+            .smartId
+        ],
+        signedContainer: SignedContainer(
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        ),
+        onSuccess: { _ in }
+    )
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
+}

@@ -69,8 +69,11 @@ public protocol DataStoreProtocol: Sendable {
     func setProxyInfo(_ info: ProxyInfo) async
 
     // MARK: - Signing Selection Methods
-    func getSelectedSigningMethod() async -> SigningMethod
-    func setSelectedSigningMethod(_ method: SigningMethod) async
+    func getSelectedSigningMethod() async -> ActionMethod
+    func setSelectedSigningMethod(_ method: ActionMethod) async
+
+    func getSelectedMyEidMethod() async -> ActionMethod
+    func setSelectedMyEidMethod(_ method: ActionMethod) async
 
     // MARK: - Mobile-ID Input Methods
     func getMobileIdInputData() async -> MobileIdInputData
@@ -85,4 +88,8 @@ public protocol DataStoreProtocol: Sendable {
     func setIsRoleAndAddressEnabled(_ isEnabled: Bool) async
     func getRoleData() async -> RoleData
     func setRoleData(_ roleData: RoleData) async
+
+    // MARK: - NFC Input Methods
+    func getNFCInputData() async -> NFCInputData
+    func setNFCInputData(_ inputData: NFCInputData) async
 }

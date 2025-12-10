@@ -19,11 +19,7 @@
 
 import Foundation
 
-public enum ActionMethod: String, Sendable, CaseIterable, Identifiable {
-    case idCardViaNFC = "ID-card via NFC"
-    case idCardViaUSB = "ID-card via USB"
-    case mobileId = "Mobile-ID"
-    case smartId = "Smart-ID"
-
-    public var id: String { rawValue }
+public struct NFCInputData: Sendable {
+    let canNumber: String
+    let rememberMe: Bool
 }

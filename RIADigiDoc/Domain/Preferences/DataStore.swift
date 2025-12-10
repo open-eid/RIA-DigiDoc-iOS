@@ -226,16 +226,28 @@ public actor DataStore: DataStoreProtocol {
 
     // MARK: - Signing Selection Methods
 
-    public func getSelectedSigningMethod() async -> SigningMethod {
-        if let rawValue = userDefaults().string(forKey: "selectedSigningMethod") {
-            return SigningMethod(rawValue: rawValue) ??
+    public func getSelectedSigningMethod() async -> ActionMethod {
+        if let rawValue = userDefaults().string(forKey: Keys.selectedSigningMethod) {
+            return ActionMethod(rawValue: rawValue) ??
             DefaultValues.selectedSigningMethod
         }
         return DefaultValues.selectedSigningMethod
     }
 
-    public func setSelectedSigningMethod(_ method: SigningMethod) async {
+    public func setSelectedSigningMethod(_ method: ActionMethod) async {
         userDefaults().set(method.rawValue, forKey: Keys.selectedSigningMethod)
+    }
+
+    public func getSelectedMyEidMethod() async -> ActionMethod {
+        if let rawValue = userDefaults().string(forKey: Keys.selectedMyEidMethod) {
+            return ActionMethod(rawValue: rawValue) ??
+            DefaultValues.selectedMyEidMethod
+        }
+        return DefaultValues.selectedMyEidMethod
+    }
+
+    public func setSelectedMyEidMethod(_ method: ActionMethod) async {
+        userDefaults().set(method.rawValue, forKey: Keys.selectedMyEidMethod)
     }
 
     // MARK: - Mobile-ID Methods
@@ -311,6 +323,23 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(roleData.zipCode, forKey: Keys.roleZipCode)
     }
 
+    public func getNFCInputData() async -> NFCInputData {
+        let canNumber = userDefaults().string(
+            forKey: Keys.nfcCanNumber
+        ) ?? DefaultValues.nfcCanNumber
+        let rememberMe = userDefaults().object(forKey: Keys.nfcRememberMe) as? Bool ?? true
+
+        return NFCInputData(
+            canNumber: canNumber,
+            rememberMe: rememberMe
+        )
+    }
+
+    public func setNFCInputData(_ inputData: NFCInputData) async {
+        userDefaults().set(inputData.canNumber, forKey: Keys.nfcCanNumber)
+        userDefaults().set(inputData.rememberMe, forKey: Keys.nfcRememberMe)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -328,7 +357,8 @@ public actor DataStore: DataStoreProtocol {
         static let proxyInfoHost = ""
         static let proxyInfoPort = 80
         static let proxyInfoUsername = ""
-        static let selectedSigningMethod: SigningMethod = .idCardViaNFC
+        static let selectedSigningMethod: ActionMethod = .idCardViaNFC
+        static let selectedMyEidMethod: ActionMethod = .idCardViaNFC
         static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
         static let mobileIdPersonalCode = ""
         static let smartIdCountry = SmartIdCountry.estonia
@@ -338,6 +368,7 @@ public actor DataStore: DataStoreProtocol {
         static let roleState = ""
         static let roleCountry = ""
         static let roleZipCode = ""
+        static let nfcCanNumber = ""
     }
 
     private enum Keys {
@@ -361,6 +392,7 @@ public actor DataStore: DataStoreProtocol {
         static let proxyInfoPort = "proxyInfoPort"
         static let proxyInfoUsername = "proxyInfoUsername"
         static let selectedSigningMethod = "selectedSigningMethod"
+        static let selectedMyEidMethod = "selectedMyEidMethod"
         static let mobileIdPhoneNumber = "mobileIdPhoneNumber"
         static let mobileIdPersonalCode = "mobileIdPersonalCode"
         static let mobileIdRememberMe = "mobileIdRememberMe"
@@ -373,5 +405,7 @@ public actor DataStore: DataStoreProtocol {
         static let roleState = "roleState"
         static let roleCountry = "roleCountry"
         static let roleZipCode = "roleZipCode"
+        static let nfcCanNumber = "nfcCanNumber"
+        static let nfcRememberMe = "nfcRememberMe"
     }
 }

@@ -73,11 +73,11 @@ public class TestConfigurationProvider {
         let sivaURL = try TestFileUtil.getURL(string: sivaUrl)
         let tslURL = try TestFileUtil.getURL(string: tslUrl)
         let tsaURL = try TestFileUtil.getURL(string: tsaUrl)
-        
+
         let ldapPersonURLs: [URL] = ldapPersonUrls.compactMap {
                 try? TestFileUtil.getURL(string: $0)
         }
-        
+
         let ldapPersonURL = try TestFileUtil.getURL(string: ldapPersonUrl)
         let ldapCorpURL = try TestFileUtil.getURL(string: ldapCorpUrl)
         let midRestURL = try TestFileUtil.getURL(string: midRestUrl)

@@ -18,12 +18,21 @@
  */
 
 import Foundation
+import OSLog
+import Observation
 
-public enum ActionMethod: String, Sendable, CaseIterable, Identifiable {
-    case idCardViaNFC = "ID-card via NFC"
-    case idCardViaUSB = "ID-card via USB"
-    case mobileId = "Mobile-ID"
-    case smartId = "Smart-ID"
+@Observable
+@MainActor
+class MyEidRootViewModel: MyEidRootViewModelProtocol {
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MyEidRootViewModel")
 
-    public var id: String { rawValue }
+    private let dataStore: DataStoreProtocol
+
+    init(dataStore: DataStoreProtocol) {
+        self.dataStore = dataStore
+    }
+
+    func getSelectedMyEidMethod() async -> ActionMethod {
+        return await dataStore.getSelectedMyEidMethod()
+    }
 }
