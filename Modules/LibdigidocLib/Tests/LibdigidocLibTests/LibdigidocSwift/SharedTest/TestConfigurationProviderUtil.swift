@@ -50,6 +50,7 @@ public struct TestConfigurationProviderUtil {
             tslCerts: [],
             tsaUrl: tsaUrl,
             ocspIssuers: [:],
+            ldapPersonUrls: [],
             ldapPersonUrl: ldapPersonUrl,
             ldapCorpUrl: ldapCorpUrl,
             midRestUrl: midRestUrl,

@@ -25,7 +25,7 @@ struct CryptoDataFilesLockedSection: View {
     @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     var body: some View {
         VStack {
             HStack {

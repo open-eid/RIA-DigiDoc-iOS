@@ -17,35 +17,17 @@
  *
  */
 
-import FactoryKit
 import Foundation
+import CryptoObjCWrapper
+import CommonsLib
 
-extension Container {
-    public var cryptoContainer: Factory<CryptoContainerProtocol> {
-        self {
-            CryptoContainer(
-                fileManager: self.fileManager(),
-                containerUtil: self.containerUtil()
-            )
-        }
-    }
-
-    @MainActor
-    public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
-        self {
-            @MainActor in LdapConfiguration(
-                fileManager: self.fileManager()
-            )
-        }.singleton
-    }
-
-    @MainActor
-    public var openLdap: Factory<OpenLdapProtocol> {
-        self {
-            @MainActor in OpenLdap(
-                fileManager: self.fileManager(),
-                ldapConfiguration: self.ldapConfiguration()
-            )
-        }
-    }
+/// @mockable
+@MainActor
+public protocol EncryptRecipientViewModelProtocol: Sendable {
+    func filteredRecipients() -> [Addressee]
+    func filteredAddedRecipients() async -> [Addressee]
+    func addRecipients(_ chosenRecipient: Addressee) async
+    func loadRecipients() async
+    func getContainerRecipientList() async -> [Addressee]
+    func deleteRecipient(_ recipient: Addressee) async
 }

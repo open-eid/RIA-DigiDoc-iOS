@@ -28,6 +28,7 @@ struct EncryptView: View {
     @Environment(\.presentationMode) var presentationMode
     @AppTheme private var theme
     @AppTypography private var typography
+    @Environment(NavigationPathManager.self) private var pathManager
     @Environment(LanguageSettings.self) private var languageSettings
 
     private let nameUtil: NameUtilProtocol
@@ -318,7 +319,7 @@ struct EncryptView: View {
                         } else if !viewModel.isContainerEncrypted && !viewModel.isContainerDecrypted {
                             let rightButtonLabel = viewModel.isContainerWithoutRecipients ? nextLabel : encryptLabel
                             let rightButtonIconName = viewModel.isContainerWithoutRecipients
-                                ? "ic_m3_arrow_forward_ios_48pt_wght400"
+                                ? "ic_m3_arrow_forward_48pt_wght400"
                                 : "ic_m3_encrypted_48pt_wght400"
                             UnsignedBottomBarView(
                                 showLeftButton: viewModel.isContainerWithoutRecipients,
@@ -333,7 +334,13 @@ struct EncryptView: View {
                                 rightButtonLabel: rightButtonLabel,
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
-                                    // TODO: Implement encrypt functionality
+                                    if viewModel.isContainerWithoutRecipients {
+                                        pathManager.navigate(to:
+                                            .encryptRecipientView
+                                        )
+                                    } else {
+                                        // TODO: Implement encrypt functionality
+                                    }
                                 }
                             )
                             .fileImporter(

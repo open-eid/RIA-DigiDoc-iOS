@@ -37,6 +37,24 @@
         }
       }
     },
+    "Added recipients" : {
+      "comment" : "Encrypt Recipient Added recipients text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added recipients"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisatud adressaadid"
+          }
+        }
+      }
+    },
     "Additional information" : {
       "comment" : "Additional information button",
       "extractionState" : "manual",
@@ -428,24 +446,6 @@
         }
       }
     },
-    "Confirm container removal" : {
-      "comment" : "Recent documents remove container accessibility confirm button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confirm container removal"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kinnita ümbriku eemaldamine"
-          }
-        }
-      }
-    },
     "ConcatKDF reference method" : {
       "comment" : "Recipient detail",
       "extractionState" : "manual",
@@ -460,6 +460,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ConcatKDF referaatmeetod"
+          }
+        }
+      }
+    },
+    "Confirm container removal" : {
+      "comment" : "Recent documents remove container accessibility confirm button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm container removal"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kinnita ümbriku eemaldamine"
           }
         }
       }
@@ -747,6 +765,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failide nägemiseks vali «Dekrüpteeri», et tuvastada isik ja dekrüpteerida ümbriku sisu."
+          }
+        }
+      }
+    },
+    "Crypto recipients description" : {
+      "comment" : "Crypto recipients description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For encryption, at least one recipient must be included - the person (personal identification number) or authority (registration number, name or part of the name) authorised to decrypt the data. Add your own personal identification number if you want to decrypt the envelope later."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteerimiseks tuleb lisada vähemalt üks adressaat – isik (isikukood) või asutus (registrikood, nimi või nimeosa), kellel on õigus andmeid dekrüpteerida. Lisa enda isikukood, kui soovid hiljem ümbrikku dekrüpteerida."
           }
         }
       }
@@ -1125,6 +1161,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili %@ eemaldamine ümbrikust ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Failed to remove recipient" : {
+      "comment" : "Error shown in Encrypt Recipients view when deleting fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaati eemaldamine ebaõnnestus"
           }
         }
       }
@@ -3972,6 +4026,24 @@
         }
       }
     },
+    "No recipients found" : {
+      "comment" : "Text for when no recipients are found",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recipients found"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaati ei leitud"
+          }
+        }
+      }
+    },
     "Not a mobile-id client" : {
       "comment" : "Mobile-ID error when user is not found or not active",
       "extractionState" : "manual",
@@ -4169,6 +4241,24 @@
         }
       }
     },
+    "Personal code is not valid" : {
+      "comment" : "Personal code invalid error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal code is not valid."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isikukood pole korrektne."
+          }
+        }
+      }
+    },
     "Phone is not in coverage area" : {
       "comment" : "Mobile-ID error for phoneAbsent",
       "extractionState" : "manual",
@@ -4331,92 +4421,20 @@
         }
       }
     },
-    "Recipient" : {
-      "comment" : "Home title, signer details title, accessibility recipient prefix",
+    "Recently added" : {
+      "comment" : "Recently added Encrypt Recipient view text",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recipient"
+            "value" : "Recently added"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adressaat"
-          }
-        }
-      }
-    },
-    "Recipient certificate" : {
-      "comment" : "Recipient detail",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recipient’s certificate"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adressaadi sertifikaat"
-          }
-        }
-      }
-    },
-    "Recipient certificate expiry date" : {
-      "comment" : "Recipient detail",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recipient's certificate expiry date"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adressaadi sertifikaadi aegumiskuupäev"
-          }
-        }
-      }
-    },
-    "Recipient certificate issuer" : {
-      "comment" : "Recipient detail",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recipient’s certificate issuer"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adressaadi sertifikaadi väljaandja"
-          }
-        }
-      }
-    },
-    "Recipient details" : {
-      "comment" : "Bottom sheet action",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recipient details"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adressaadi andmed"
+            "value" : "Viimati lisatud"
           }
         }
       }
@@ -4435,6 +4453,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adressaat"
+          }
+        }
+      }
+    },
+    "Recipient already exists in the container" : {
+      "comment" : "Error shown in Encrypt Recipients view when adding recipient fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient already exists in the container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaat on konteineris juba olemas"
           }
         }
       }
@@ -4904,6 +4940,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otsi ümbrikku..."
+          }
+        }
+      }
+    },
+    "Search recipients" : {
+      "comment" : "Placeholder for encrypt recipients search field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search recipients…"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leia adressaat…"
           }
         }
       }
@@ -5927,6 +5981,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "https://www.id.ee/artikkel/asutustele-kus-allkirjastatakse-digidoc4-kliendi-kaudu-suuremates-kogustes-dokumente/"
+          }
+        }
+      }
+    },
+    "Too many results" : {
+      "comment" : "Encrypt Recipient error when LDAP search returns to many results",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The name you were looking for gave too many results, please refine your search"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu otsitud nimi andis liiga palju vastuseid, palun täpsusta otsingut"
           }
         }
       }

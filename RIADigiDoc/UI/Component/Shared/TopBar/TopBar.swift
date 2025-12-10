@@ -28,6 +28,7 @@ struct TopBarContainer<Content: View>: View {
     @Environment(\.openURL) var openURL
     @Environment(LanguageSettings.self) private var languageSettings
 
+    var isTopBarHidden = false
     var title: String?
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
@@ -68,38 +69,40 @@ struct TopBarContainer<Content: View>: View {
 
     var body: some View {
         VStack(spacing: Dimensions.Padding.ZeroPadding) {
-            TopBar(
-                title: title,
-                leftIcon: leftIcon,
-                leftIconAccessibility: leftIconAccessibility,
-                leftIconAccessibilityInput: leftIconAccessibilityInput,
-                onLeftClick: onLeftClick,
+            if !isTopBarHidden {
+                TopBar(
+                    title: title,
+                    leftIcon: leftIcon,
+                    leftIconAccessibility: leftIconAccessibility,
+                    leftIconAccessibilityInput: leftIconAccessibilityInput,
+                    onLeftClick: onLeftClick,
 
-                rightPrimaryIcon: rightPrimaryIcon,
-                rightPrimaryIconAccessibility: rightPrimaryIconAccessibility,
-                rightPrimaryIconAccessibilityInput: rightPrimaryIconAccessibilityInput,
-                onRightPrimaryClick: onRightPrimaryClick ?? {
-                    if let url = URL(string: languageSettings.localized("Main home menu help url")) {
-                        openURL(url)
-                    }
-                },
+                    rightPrimaryIcon: rightPrimaryIcon,
+                    rightPrimaryIconAccessibility: rightPrimaryIconAccessibility,
+                    rightPrimaryIconAccessibilityInput: rightPrimaryIconAccessibilityInput,
+                    onRightPrimaryClick: onRightPrimaryClick ?? {
+                        if let url = URL(string: languageSettings.localized("Main home menu help url")) {
+                            openURL(url)
+                        }
+                    },
 
-                rightSecondaryIcon: rightSecondaryIcon,
-                rightSecondaryIconAccessibility: rightSecondaryIconAccessibility,
-                rightSecondaryIconAccessibilityInput: rightSecondaryIconAccessibilityInput,
-                onRightSecondaryClick: onRightSecondaryClick ?? {
-                    showSettingsSheet = true
-                },
+                    rightSecondaryIcon: rightSecondaryIcon,
+                    rightSecondaryIconAccessibility: rightSecondaryIconAccessibility,
+                    rightSecondaryIconAccessibilityInput: rightSecondaryIconAccessibilityInput,
+                    onRightSecondaryClick: onRightSecondaryClick ?? {
+                        showSettingsSheet = true
+                    },
 
-                extraButtonIcon: extraButtonIcon,
-                extraButtonIconAccessibility: extraButtonIconAccessibility,
-                extraButtonIconAccessibilityInput: extraButtonIconAccessibilityInput,
-                showExtraButton: showExtraButton,
-                extraBadgeCount: extraBadgeCount,
-                onExtraButtonClick: onExtraButtonClick,
-                showRightIcons: showRightIcons
-            )
+                    extraButtonIcon: extraButtonIcon,
+                    extraButtonIconAccessibility: extraButtonIconAccessibility,
+                    extraButtonIconAccessibilityInput: extraButtonIconAccessibilityInput,
+                    showExtraButton: showExtraButton,
+                    extraBadgeCount: extraBadgeCount,
+                    onExtraButtonClick: onExtraButtonClick,
+                    showRightIcons: showRightIcons
+                )
 
+            }
             content()
         }
         .bottomSheet(isPresented: $showSettingsSheet, actions: buildBottomSheetActions())

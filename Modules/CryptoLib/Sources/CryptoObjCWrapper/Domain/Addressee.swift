@@ -30,7 +30,7 @@ import Foundation
     public let validTo: Date?
     @MainActor
     @objc public var concatKDFAlgorithmURI: String
-    
+
     @objc public init(
         data: Data,
         cnVal: String,

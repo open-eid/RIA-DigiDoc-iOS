@@ -36,6 +36,10 @@ public class TestConfigurationProvider {
         tslCerts: [String] = ["cert1", "cert2"],
         tsaUrl: String = "https://tsa.someUrl.abc",
         ocspIssuers: [String: String] = ["url1": "issuer1"],
+        ldapPersonUrls: [String] = [
+            "https://ldap-person.someUrl.abc",
+            "https://ldap-person.someUrl2.abc"
+        ],
         ldapPersonUrl: String = "https://ldap-person.someUrl.abc",
         ldapCorpUrl: String = "https://ldap-corp.someUrl.abc",
         midRestUrl: String = "https://midrest.someUrl.abc",
@@ -69,6 +73,11 @@ public class TestConfigurationProvider {
         let sivaURL = try TestFileUtil.getURL(string: sivaUrl)
         let tslURL = try TestFileUtil.getURL(string: tslUrl)
         let tsaURL = try TestFileUtil.getURL(string: tsaUrl)
+        
+        let ldapPersonURLs: [URL] = ldapPersonUrls.compactMap {
+                try? TestFileUtil.getURL(string: $0)
+        }
+        
         let ldapPersonURL = try TestFileUtil.getURL(string: ldapPersonUrl)
         let ldapCorpURL = try TestFileUtil.getURL(string: ldapCorpUrl)
         let midRestURL = try TestFileUtil.getURL(string: midRestUrl)
@@ -94,6 +103,7 @@ public class TestConfigurationProvider {
             tslCerts: tslCertsData,
             tsaUrl: tsaURL,
             ocspIssuers: ocspIssuers,
+            ldapPersonUrls: ldapPersonURLs,
             ldapPersonUrl: ldapPersonURL,
             ldapCorpUrl: ldapCorpURL,
             midRestUrl: midRestURL,

@@ -35,7 +35,8 @@ extension Container {
                 dataStore: self.dataStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
                 keychainStore: self.keychainStore(),
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                ldapConfiguration: self.ldapConfiguration()
             )
         }
         .shared
@@ -211,6 +212,17 @@ extension Container {
             RecentDocumentsViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileManager: self.fileManager()
+            )
+        }
+    }
+
+    @MainActor
+    var encryptRecipientViewModel: Factory<EncryptRecipientViewModel> {
+        self {
+            @MainActor in
+            EncryptRecipientViewModel(
+                sharedContainerViewModel: self.sharedContainerViewModel(),
+                openLdap: self.openLdap()
             )
         }
     }

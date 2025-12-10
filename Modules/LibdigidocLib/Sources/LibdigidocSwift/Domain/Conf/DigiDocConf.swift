@@ -222,6 +222,7 @@ public actor DigiDocInitializer {
         digiDocConfiguration.sivaurl = overrideSiVaUrl(conf: configurationProvider)
         digiDocConfiguration.ocspissuers = overrideOCSPIssuers(conf: configurationProvider)
         digiDocConfiguration.certbundle = overrideCertBundle(conf: configurationProvider)
+        digiDocConfiguration.ldapcerts = overrideLDAPCerts(conf: configurationProvider)
 
         return digiDocConfiguration
     }

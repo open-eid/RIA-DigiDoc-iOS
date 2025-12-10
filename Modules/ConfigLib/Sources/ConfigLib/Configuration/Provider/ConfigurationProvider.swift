@@ -68,6 +68,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public let tslCerts: [Data]
     public let tsaUrl: URL
     public let ocspIssuers: [String: String]
+    public let ldapPersonUrls: [URL]
     public let ldapPersonUrl: URL
     public let ldapCorpUrl: URL
     public let midRestUrl: URL
@@ -89,6 +90,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         case tslCerts = "TSL-CERTS"
         case tsaUrl = "TSA-URL"
         case ocspIssuers = "OCSP-URL-ISSUER"
+        case ldapPersonUrls = "LDAP-PERSON-URLS"
         case ldapPersonUrl = "LDAP-PERSON-URL"
         case ldapCorpUrl = "LDAP-CORP-URL"
         case midRestUrl = "MID-PROXY-URL"
@@ -121,12 +123,14 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         try container.encode(tsaUrl, forKey: .tsaUrl)
         try container.encode(ocspIssuers, forKey: .ocspIssuers)
         try container.encode(ldapPersonUrl, forKey: .ldapPersonUrl)
+        try container.encode(ldapPersonUrls, forKey: .ldapPersonUrls)
         try container.encode(ldapCorpUrl, forKey: .ldapCorpUrl)
         try container.encode(midRestUrl, forKey: .midRestUrl)
         try container.encode(midSkRestUrl, forKey: .midSkRestUrl)
         try container.encode(sidV2RestUrl, forKey: .sidV2RestUrl)
         try container.encode(sidV2SkRestUrl, forKey: .sidV2SkRestUrl)
         try container.encode(certBundle, forKey: .certBundle)
+        try container.encode(ldapCerts, forKey: .ldapCerts)
         try container.encode(cdoc2DefaultKeyserver, forKey: .cdoc2DefaultKeyserver)
         try container.encode(cdoc2UseKeyserver, forKey: .cdoc2UseKeyserver)
         try container.encode(cdoc2Conf, forKey: .cdoc2Conf)
@@ -141,6 +145,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         tslCerts = try container.decode([Data].self, forKey: .tslCerts)
         tsaUrl = try container.decode(URL.self, forKey: .tsaUrl)
         ocspIssuers = try container.decode([String: String].self, forKey: .ocspIssuers)
+        ldapPersonUrls = try container.decode([URL].self, forKey: .ldapPersonUrls)
         ldapPersonUrl = try container.decode(URL.self, forKey: .ldapPersonUrl)
         ldapCorpUrl = try container.decode(URL.self, forKey: .ldapCorpUrl)
         midRestUrl = try container.decode(URL.self, forKey: .midRestUrl)
@@ -170,6 +175,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         tslCerts: [Data],
         tsaUrl: URL,
         ocspIssuers: [String: String],
+        ldapPersonUrls: [URL],
         ldapPersonUrl: URL,
         ldapCorpUrl: URL,
         midRestUrl: URL,
@@ -190,6 +196,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         self.tslCerts = tslCerts
         self.tsaUrl = tsaUrl
         self.ocspIssuers = ocspIssuers
+        self.ldapPersonUrls = ldapPersonUrls
         self.ldapPersonUrl = ldapPersonUrl
         self.ldapCorpUrl = ldapCorpUrl
         self.midRestUrl = midRestUrl
