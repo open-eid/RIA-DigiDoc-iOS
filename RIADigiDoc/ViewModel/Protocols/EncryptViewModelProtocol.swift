@@ -28,6 +28,7 @@ public protocol EncryptViewModelProtocol: Sendable {
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL?
     func removeSavedFilesDirectory(savedFilesDirectory: URL?)
     func addDataFiles(_ files: [URL]) async
+    func encryptContainer() async
     @discardableResult func renameContainer(to newName: String) async -> URL?
     func getDataFileURL(_ dataFile: URL) async -> Result<URL, Error>
     func handleFileOpening(dataFile: URL, isSivaConfirmed: Bool) async

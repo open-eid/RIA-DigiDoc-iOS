@@ -37,7 +37,7 @@ struct CDOC_EXPORT Recipient {
     /**
      * @brief The recipient type
      */
-	enum Type : unsigned char {
+	enum Type : uint8_t {
         /**
          * Uninitialized recipient
          */
@@ -59,7 +59,7 @@ struct CDOC_EXPORT Recipient {
     /**
      * @brief The public key type
      */
-    enum PKType : unsigned char {
+    enum PKType : uint8_t {
         /**
          * Elliptic curve
          */
@@ -69,16 +69,6 @@ struct CDOC_EXPORT Recipient {
          */
 		RSA
 	};
-
-    /**
-     * @brief The EID type
-     */
-    enum EIDType : unsigned char {
-        Unknown,
-        IDCard,
-        DigiID,
-        DigiID_EResident
-    };
 
 	Recipient() = default;
 
@@ -193,7 +183,7 @@ struct CDOC_EXPORT Recipient {
      * @param pk_type the algorithm type (either ECC or RSA)
      * @return a new Recipient structure
      */
-    static Recipient makePublicKey(std::string label, const std::vector<uint8_t>& public_key, PKType pk_type);
+    static Recipient makePublicKey(std::string label, std::vector<uint8_t> public_key, PKType pk_type);
     /**
      * @brief Create a new certificate based Recipient
      * @param label the label text
@@ -233,7 +223,7 @@ struct CDOC_EXPORT Recipient {
      * @param recipient_id the recipient id (PNOEE-01234567890)
      * @return Recipient a new Recipient structure
      */
-    static Recipient makeShare(const std::string& label, const std::string& server_id, const std::string& recipient_id);
+    static Recipient makeShare(std::string label, std::string server_id, std::string recipient_id);
 
     /**
      * @brief Get the label for this recipient

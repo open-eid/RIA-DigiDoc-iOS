@@ -35,17 +35,19 @@ struct EncryptRecipientView: View {
     @FocusState private var isSearchFocused: Bool
     @State private var isSearchExpanded = false
 
-    @State private var isFileOpeningLoading = false
-    @State private var isNavigatingToSigningView = false
+    @State private var encryptionButtonEnabled = true
+
     @State private var selectedRecipient: Addressee?
     @State private var showRemoveRecipientModal = false
 
     @State private var addedRecipients: [Addressee] = []
 
     @State private var viewModel: EncryptRecipientViewModel
+    @State private var encryptViewModel: EncryptViewModel
 
     init() {
         _viewModel = State(wrappedValue: Container.shared.encryptRecipientViewModel())
+        _encryptViewModel = State(wrappedValue: Container.shared.encryptViewModel())
     }
 
     var filteredRecipients: [Addressee] {
@@ -249,11 +251,18 @@ struct EncryptRecipientView: View {
                             // do nothing
                         },
 
+                        rightButtonEnabled: encryptionButtonEnabled,
                         rightButtonIconName: "ic_m3_encrypted_48pt_wght400",
                         rightButtonLabel: languageSettings.localized("Encrypt"),
                         rightButtonAccessibilityLabel: languageSettings.localized("Encrypt").lowercased(),
                         rightButtonAction: {
-                            // TODO: Implement encrypt functionality
+                            if encryptionButtonEnabled {
+                                encryptionButtonEnabled = false
+                                Task {
+                                    pathManager.navigate(to: .encryptView(isWithEncryption: true))
+                                    encryptionButtonEnabled = true
+                                }
+                            }
                         }
                     )
                 }
@@ -266,13 +275,8 @@ struct EncryptRecipientView: View {
                 .onChange(of: viewModel.errorMessage) { _, error in
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
+                    encryptionButtonEnabled = true
                 }
-                .onChange(of: isNavigatingToSigningView, { _, newValue in
-                    if newValue {
-                        pathManager.navigate(to: .signingView)
-                        isNavigatingToSigningView = false
-                    }
-                })
             }
         )
     }

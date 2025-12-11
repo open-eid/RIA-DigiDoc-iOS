@@ -45,7 +45,9 @@ public enum NavigationDestination: Hashable {
     case signingRootView
     case signingMethodSelectionView
 
-    case encryptView
+    case encryptView(
+        isWithEncryption: Bool
+    )
     case recipientDetailView(
         recipient: Addressee,
     )
@@ -62,4 +64,6 @@ public enum NavigationDestination: Hashable {
     case validationSettingsView
     case encryptionSettingsView
     case proxySettingsView
+
+    case homeView
 }

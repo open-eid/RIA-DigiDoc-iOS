@@ -167,7 +167,7 @@ struct HomeView: View {
         })
         .onChange(of: isNavigatingToEncryptView, { _, newValue in
             if newValue {
-                pathManager.navigate(to: .encryptView)
+                pathManager.navigate(to: .encryptView(isWithEncryption: false))
                 isNavigatingToEncryptView = false
             }
         })

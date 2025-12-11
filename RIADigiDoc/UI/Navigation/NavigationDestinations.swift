@@ -68,8 +68,12 @@ struct NavigationDestinations: ViewModifier {
         case .signingMethodSelectionView:
             SigningMethodSelectionView()
 
-        case .encryptView:
-            EncryptView()
+        case .encryptView(
+            let isWithEncryption
+        ):
+            EncryptView(
+                isWithEncryption: isWithEncryption,
+            )
         case .recipientDetailView(
             let recipient,
         ):
@@ -99,6 +103,9 @@ struct NavigationDestinations: ViewModifier {
             EncryptionSettingsView()
         case .proxySettingsView:
             ProxySettingsView()
+
+        case .homeView:
+            HomeView(externalFiles: .constant([]))
         }
     }
 }
