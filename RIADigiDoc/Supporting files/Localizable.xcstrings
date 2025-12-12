@@ -1451,6 +1451,60 @@
         }
       }
     },
+    "ID card connect card reader" : {
+      "comment" : "ID-card view initial message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect the card reader and insert your ID-card into the reader."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ühenda kaardilugeja nutiseadmega ja sisesta ID-kaart lugejasse."
+          }
+        }
+      }
+    },
+    "ID card detected" : {
+      "comment" : "ID-card view card detected message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card found. Requesting information..."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart leitud. Pärin andmeid..."
+          }
+        }
+      }
+    },
+    "ID card reader connected" : {
+      "comment" : "ID-card view reader detected message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reader found. Insert your ID-card into the reader."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaardilugeja leitud. Sisesta ID-kaart lugejasse."
+          }
+        }
+      }
+    },
     "ID-card via NFC" : {
       "comment" : "ID-card via NFC signing method",
       "extractionState" : "manual",
@@ -1501,6 +1555,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Identifitseerimismeetod"
+          }
+        }
+      }
+    },
+    "Identification method changed" : {
+      "comment" : "Identification method selection button accessibility label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identification method changed"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifitseerimismeetod muudetud"
           }
         }
       }
@@ -5813,6 +5885,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkirjastamise meetod"
+          }
+        }
+      }
+    },
+    "Signing method changed" : {
+      "comment" : "Signing method selection button accessibility label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing method changed"
           }
         }
       }

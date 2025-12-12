@@ -21,6 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct ActionMethodSelectionView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
 
     @Environment(LanguageSettings.self) private var languageSettings
@@ -34,12 +35,32 @@ struct ActionMethodSelectionView: View {
     @State private var selectedMethod: ActionMethod = .idCardViaNFC
     @State private var methods: [ActionMethod]
 
+    @State private var shouldSetMethod: Bool = false
+
     var actionMethodTitle: String {
         switch actionType {
         case .signing:
             languageSettings.localized("Choose a signing method")
         case .myeid:
             languageSettings.localized("Identification method title")
+        }
+    }
+
+    private var selectedActionMethodLabel: String {
+        switch actionType {
+        case .signing:
+            languageSettings.localized("Signing method")
+        case .myeid:
+            languageSettings.localized("Identification method")
+        }
+    }
+
+    var saveButtonAccessibilityLabel: String {
+        switch actionType {
+        case .signing:
+            languageSettings.localized("Signing method changed")
+        case .myeid:
+            languageSettings.localized("Identification method changed")
         }
     }
 
@@ -55,7 +76,8 @@ struct ActionMethodSelectionView: View {
     var body: some View {
         TopBarContainer(
             title: nil,
-            onLeftClick: { dismiss() },
+            onLeftClick: { dismiss()
+            },
             content: {
                 VStack(alignment: .leading) {
                     ScrollView {
@@ -69,28 +91,30 @@ struct ActionMethodSelectionView: View {
 
                         RadioButtonChooserView<ActionMethod>(
                             options: methods,
-                            isSelected: { signingMethod in
-                                signingMethod == selectedMethod
+                            isSelected: { actionMethod in
+                                actionMethod == selectedMethod
                             },
-                            titleKey: { signingMethod in
-                                languageSettings.localized(signingMethod.rawValue)
+                            titleKey: { actionMethod in
+                                languageSettings.localized(actionMethod.rawValue)
                             },
-                            onSelect: { signingMethod in
-                                selectedMethod = signingMethod
+                            onSelect: { actionMethod in
+                                selectedMethod = actionMethod
                             },
-                            accessibilityLabel: { signingMethod, _ in
-                                let method = languageSettings.localized(signingMethod.rawValue)
-                                let selected = signingMethod == selectedMethod
+                            accessibilityLabel: { actionMethod, _ in
+                                let method = languageSettings.localized(actionMethod.rawValue)
+                                let selected = actionMethod == selectedMethod
                                 ? languageSettings.localized("Radiobutton selected")
                                 : languageSettings.localized("Radiobutton unselected")
-                                return "\(method) \(selected)"
+                                return "\(selectedActionMethodLabel) \(method) \(selected)"
                             }
                         )
 
                         PrimaryButton(
                             text: languageSettings.localized("Save selection"),
                             isButtonEnabled: true,
-                            action: { setActionMethod(selectedMethod) }
+                            action: {
+                                shouldSetMethod = true
+                            }
                         )
                         .padding(.vertical, Dimensions.Padding.MPadding)
                     }
@@ -108,21 +132,31 @@ struct ActionMethodSelectionView: View {
                 }
             }
         }
+        .onChange(of: shouldSetMethod) { _, newValue in
+            if newValue {
+                if voiceOverEnabled {
+                    var saveButtonAccessibilityAnnouncement = AttributedString(saveButtonAccessibilityLabel)
+                    saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
+                    AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
+                }
+
+                setActionMethod(selectedMethod)
+            }
+        }
     }
 
     func setActionMethod(_ selectedMethod: ActionMethod) {
-        let setSelectedSigningMethodTask: () async -> Void = {
+        Task {
             switch actionType {
             case .signing:
                 await viewModel.setSelectedSigningMethod(selectedMethod)
             case .myeid:
                 await viewModel.setSelectedMyEidMethod(selectedMethod)
             }
-        }
 
-        Task {
-            await setSelectedSigningMethodTask()
-            await MainActor.run { dismiss() }
+            await MainActor.run {
+                dismiss()
+            }
         }
     }
 }
