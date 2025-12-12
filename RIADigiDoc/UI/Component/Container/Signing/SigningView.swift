@@ -314,6 +314,7 @@ struct SigningView: View {
                                     isImportingAddedFiles = true
                                 },
 
+                                rightButtonEnabled: true,
                                 rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
                                 rightButtonLabel: signLabel,
                                 rightButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),

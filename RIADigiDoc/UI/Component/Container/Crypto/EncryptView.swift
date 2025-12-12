@@ -47,6 +47,10 @@ struct EncryptView: View {
 
     @State private var tempContainerURL: URL?
     @State private var isFileSaved: Bool = false
+
+    @State private var isWithEncryption: Bool = false
+    @State private var encryptionButtonEnabled = true
+
     @State private var showRenameModal = false
     @State private var showRemoveDataFileModal = false
     @State private var showRemoveRecipientModal = false
@@ -157,11 +161,13 @@ struct EncryptView: View {
     @State private var containerLoadingTask: Task<Void, Never>?
 
     init(
+        isWithEncryption: Bool = false,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
         _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
+        self.isWithEncryption = isWithEncryption
         self.nameUtil = nameUtil
         self.recipientUtil = recipientUtil
         self.fileUtil = fileUtil
@@ -177,7 +183,7 @@ struct EncryptView: View {
                 onLeftClick: {
                     Task {
                         if await viewModel.handleBackButton() {
-                            dismiss()
+                            pathManager.navigate(to: .homeView)
                         }
                     }
                 },
@@ -203,7 +209,24 @@ struct EncryptView: View {
                                         // TODO: Implement signing functionality
                                     },
                                     onRightActionButtonClick: {
-                                        // TODO: Implement decrypt functionality
+                                        if viewModel.isEncryptButtonShown {
+                                            if encryptionButtonEnabled {
+                                                encryptionButtonEnabled = false
+                                                Task {
+                                                    await viewModel.encryptContainer()
+                                                    await updateAsyncLabels()
+                                                    await viewModel.updateAsyncProperties()
+
+                                                    Toast.show(languageSettings.localized(
+                                                        "Container successfully encrypted"
+                                                    ))
+
+                                                    encryptionButtonEnabled = true
+                                                }
+                                            }
+                                        } else if viewModel.isDecryptButtonShown {
+                                            // TODO: Implement decrypt functionality
+                                        }
                                     },
                                     onSaveContainerButtonClick: {
                                         tempContainerURL = viewModel.createCopyOfContainerForSaving(
@@ -329,7 +352,7 @@ struct EncryptView: View {
                                 leftButtonAction: {
                                     isImportingAddedFiles = true
                                 },
-
+                                rightButtonEnabled: viewModel.isContainerWithoutRecipients || encryptionButtonEnabled,
                                 rightButtonIconName: rightButtonIconName,
                                 rightButtonLabel: rightButtonLabel,
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
@@ -339,7 +362,20 @@ struct EncryptView: View {
                                             .encryptRecipientView
                                         )
                                     } else {
-                                        // TODO: Implement encrypt functionality
+                                        if encryptionButtonEnabled {
+                                            encryptionButtonEnabled = false
+                                            Task {
+                                                await viewModel.encryptContainer()
+                                                await updateAsyncLabels()
+                                                await viewModel.updateAsyncProperties()
+
+                                                Toast.show(languageSettings.localized(
+                                                    "Container successfully encrypted"
+                                                ))
+
+                                                encryptionButtonEnabled = true
+                                            }
+                                        }
                                     }
                                 }
                             )
@@ -371,12 +407,24 @@ struct EncryptView: View {
                     }
                     .onAppear {
                         containerLoadingTask = Task {
-                            await viewModel.loadContainerData(
-                                cryptoContainer: viewModel.cryptoContainer
-                            )
+                            if isWithEncryption {
+                                await viewModel.encryptContainer()
+                                await updateAsyncLabels()
+                                await viewModel.updateAsyncProperties()
 
-                            await updateAsyncLabels()
-                            await viewModel.updateAsyncProperties()
+                                Toast.show(languageSettings.localized(
+                                    "Container successfully encrypted"
+                                ))
+
+                                encryptionButtonEnabled = true
+                            } else {
+                                await viewModel.loadContainerData(
+                                    cryptoContainer: viewModel.cryptoContainer
+                                )
+
+                                await updateAsyncLabels()
+                                await viewModel.updateAsyncProperties()
+                            }
                         }
                     }
                     .onDisappear {
@@ -431,6 +479,7 @@ struct EncryptView: View {
                 format: languageSettings.localized(error.key),
                 error.args.joined(separator: ", "))
             )
+            encryptionButtonEnabled = true
         }
     }
 

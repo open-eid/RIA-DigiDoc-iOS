@@ -316,16 +316,17 @@ extension CryptoContainer {
         var cryptoDataFiles: [CryptoDataFile] = []
 
         for dataFile in dataFiles {
+
             cryptoDataFiles.append(
                 CryptoDataFile(
                     filename: dataFile.lastPathComponent,
-                    filePath: dataFile.absoluteString
+                    filePath: dataFile.resolvedPath
                 )
             )
         }
 
         try await Encrypt.encryptFile(
-            containerFile.absoluteString,
+            containerFile.resolvedPath,
             withDataFiles: cryptoDataFiles,
             withAddressees: recipients
         )

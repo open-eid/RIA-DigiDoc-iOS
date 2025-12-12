@@ -48,7 +48,9 @@ public enum NavigationDestination: Hashable {
         methods: [ActionMethod]
     )
 
-    case encryptView
+    case encryptView(
+        isWithEncryption: Bool
+    )
     case recipientDetailView(
         recipient: Addressee,
     )
@@ -66,5 +68,6 @@ public enum NavigationDestination: Hashable {
     case encryptionSettingsView
     case proxySettingsView
 
+    case homeView
     case myEidRootView
 }

@@ -233,6 +233,46 @@ class EncryptViewModel: EncryptViewModelProtocol {
         }
     }
 
+    public func encryptContainer() async {
+        await loadContainerData(cryptoContainer: nil)
+        guard let cryptoContainer else { return }
+        guard let containerFile = await cryptoContainer.getRawContainerFile() else { return }
+        do {
+            let encryptedContainer = try await CryptoContainer.encrypt(
+                containerFile: containerFile,
+                dataFiles: dataFiles,
+                recipients: recipients
+            )
+            sharedContainerViewModel.clearContainers()
+            sharedContainerViewModel.setCryptoContainer(encryptedContainer)
+            await loadContainerData(
+                cryptoContainer: encryptedContainer
+            )
+        } catch {
+            EncryptViewModel.logger.error("Unable to encrypt container: \(error)")
+            handleEncryptionError(error)
+        }
+    }
+
+    private func handleEncryptionError(_ error: Error) {
+        if let cryptoError = error as? CryptoError {
+            switch cryptoError {
+            case .containerCreationFailed(let detail):
+                errorMessage = ErrorMessage(key: detail.message, args: [])
+            default:
+                errorMessage = ErrorMessage(key: "General error", args: [])
+            }
+            return
+        }
+
+        if let nsError = error as NSError? {
+            errorMessage = ErrorMessage(key: nsError.localizedDescription, args: [])
+            return
+        }
+
+        errorMessage = ErrorMessage(key: "General error", args: [])
+    }
+
     @discardableResult
     public func renameContainer(to newName: String) async -> URL? {
         do {
@@ -439,7 +479,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
     ) async -> Bool {
         let isEncryptedContainer = await isEncryptedContainer(cryptoContainer: cryptoContainer)
         let isDecryptedContainer = await isDecryptedContainer(cryptoContainer: cryptoContainer)
-        return isEncryptedContainer && isDecryptedContainer
+        return isEncryptedContainer || isDecryptedContainer
     }
 
     func isDecryptButtonShown(
@@ -463,7 +503,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
     }
 
     func isRecipientRemoveButtonShown() -> Bool {
-        return isContainerDecrypted && isContainerUnlocked
+        return !isContainerDecrypted && isContainerUnlocked
     }
 
     func removeRecipient(_ recipient: Addressee) async {

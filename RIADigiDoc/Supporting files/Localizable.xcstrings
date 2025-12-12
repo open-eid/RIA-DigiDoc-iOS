@@ -697,6 +697,24 @@
         }
       }
     },
+    "Container successfully encrypted" : {
+      "comment" : "Container encrypted success text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container successfully encrypted!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbrik edukalt krüpteeritud!"
+          }
+        }
+      }
+    },
     "Control code" : {
       "comment" : "Control code text in Mobile-ID and Smart-ID views",
       "extractionState" : "manual",

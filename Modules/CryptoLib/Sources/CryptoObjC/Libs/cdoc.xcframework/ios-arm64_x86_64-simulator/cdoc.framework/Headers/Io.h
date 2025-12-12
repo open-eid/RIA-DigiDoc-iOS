@@ -21,6 +21,7 @@
 
 #include <cdoc/CDoc.h>
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 
@@ -311,7 +312,7 @@ struct CDOC_EXPORT VectorSource : public DataSource {
 
     result_t read(uint8_t *dst, size_t size) override {
 		size = std::min<size_t>(size, _data.size() - _ptr);
-		std::copy(_data.cbegin() + _ptr, _data.cbegin() + _ptr + size, dst);
+		std::copy_n(_data.cbegin() + _ptr, size, dst);
 		_ptr += size;
 		return size;
 	}

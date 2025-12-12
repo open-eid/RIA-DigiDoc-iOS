@@ -31,6 +31,7 @@ struct UnsignedBottomBarView: View {
     let leftButtonAccessibilityLabel: String
     let leftButtonAction: () -> Void
 
+    let rightButtonEnabled: Bool
     let rightButtonIconName: String
     let rightButtonLabel: String
     let rightButtonAccessibilityLabel: String
@@ -80,6 +81,7 @@ struct UnsignedBottomBarView: View {
                         .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
                 )
             })
+            .disabled(!rightButtonEnabled)
             .foregroundStyle(theme.surfaceContainer)
         }
         .padding(Dimensions.Padding.SPadding)
@@ -95,6 +97,7 @@ struct UnsignedBottomBarView: View {
         leftButtonAccessibilityLabel: "Add more files",
         leftButtonAction: {},
 
+        rightButtonEnabled: true,
         rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
         rightButtonLabel: "Sign container",
         rightButtonAccessibilityLabel: "Sign container",
