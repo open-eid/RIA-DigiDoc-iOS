@@ -220,7 +220,6 @@ struct EncryptView: View {
                                                     Toast.show(languageSettings.localized(
                                                         "Container successfully encrypted"
                                                     ))
-                                                    try await Task.sleep(nanoseconds: 500_000_000)
 
                                                     encryptionButtonEnabled = true
                                                 }
@@ -373,7 +372,6 @@ struct EncryptView: View {
                                                 Toast.show(languageSettings.localized(
                                                     "Container successfully encrypted"
                                                 ))
-                                                try await Task.sleep(nanoseconds: 500_000_000)
 
                                                 encryptionButtonEnabled = true
                                             }

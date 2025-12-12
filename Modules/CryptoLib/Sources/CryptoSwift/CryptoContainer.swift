@@ -320,13 +320,13 @@ extension CryptoContainer {
             cryptoDataFiles.append(
                 CryptoDataFile(
                     filename: dataFile.lastPathComponent,
-                    filePath: dataFile.standardizedFileURL.path()
+                    filePath: dataFile.resolvedPath
                 )
             )
         }
 
         try await Encrypt.encryptFile(
-            containerFile.standardizedFileURL.path(),
+            containerFile.resolvedPath,
             withDataFiles: cryptoDataFiles,
             withAddressees: recipients
         )
