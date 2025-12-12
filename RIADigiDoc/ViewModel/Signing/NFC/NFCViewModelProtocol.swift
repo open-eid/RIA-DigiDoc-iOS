@@ -18,27 +18,28 @@
  */
 
 import Foundation
-import OSLog
+import LibdigidocLibSwift
+import CommonsLib
 
-@Observable
+/// @mockable
 @MainActor
-class SigningMethodSelectionViewModel: SigningMethodSelectionViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "SigningMethodSelectionViewModel"
-    )
+public protocol NFCViewModelProtocol: Sendable {
+    func isActionEnabled(
+        canNumber: String,
+    ) -> Bool
 
-    private let dataStore: DataStoreProtocol
+    func saveInputData(
+        canNumber: String,
+        rememberMe: Bool
+    ) async
 
-    init(dataStore: DataStoreProtocol) {
-        self.dataStore = dataStore
-    }
+    func getInputData() async -> NFCInputData
 
-    func setSelectedSigningMethod(_ method: SigningMethod) async {
-        await dataStore.setSelectedSigningMethod(method)
-    }
+    func resetErrors()
 
-    func getSelectedSigningMethod() async -> SigningMethod {
-        await dataStore.getSelectedSigningMethod()
-    }
+    func sign() async -> SignedContainerProtocol?
+
+    func loadPersonalData()
+
+    func isRoleDataEnabled() async -> Bool
 }

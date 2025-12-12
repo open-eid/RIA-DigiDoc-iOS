@@ -65,8 +65,8 @@ struct NavigationDestinations: ViewModifier {
         case .signingRootView:
             SigningRootView()
 
-        case .signingMethodSelectionView:
-            SigningMethodSelectionView()
+        case .signingMethodSelectionView(let actionType, let methods):
+            ActionMethodSelectionView(actionType: actionType, methods: methods)
 
         case .encryptView(
             let isWithEncryption
@@ -106,6 +106,8 @@ struct NavigationDestinations: ViewModifier {
 
         case .homeView:
             HomeView(externalFiles: .constant([]))
+        case .myEidRootView:
+            MyEidRootView()
         }
     }
 }

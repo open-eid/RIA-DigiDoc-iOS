@@ -51,10 +51,10 @@ struct MobileIdView: View {
     }
 
     var body: some View {
-        SignatureInputScreen(
-            selectedSigningMethod: "Mobile-ID",
-            isSigningEnabled: $isSigningEnabled,
-            isSigning: $isSigning,
+        ActionInputScreen(
+            selectedActionMethod: ActionMethod.mobileId.rawValue,
+            isActionEnabled: $isSigningEnabled,
+            isInProgress: $isSigning,
             onBackClick: {
                 cancelSigning()
                 guard isSigning else {
@@ -63,7 +63,7 @@ struct MobileIdView: View {
                 }
                 isSigning = false
             },
-            onSign: {
+            onSubmit: {
                 Task {
                     let isRoleDataEnabled = await viewModel.isRoleDataEnabled()
                     if isRoleDataEnabled {

@@ -143,6 +143,60 @@
         }
       }
     },
+    "CAN length requirement" : {
+      "comment" : "Error message if CAN number length is not correct",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CAN-code must be %@ digits long"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääsu number (CAN) peab olema %@-kohaline"
+          }
+        }
+      }
+    },
+    "CAN number" : {
+      "comment" : "NFC CAN number title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card access number (CAN)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaardi ligipääsu number (CAN)"
+          }
+        }
+      }
+    },
+    "CAN number location" : {
+      "comment" : "Info about CAN number location in NFC view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The 6-digit number is located under the document photo"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6-kohaline number asub dokumendil foto all"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "Cancel button",
       "extractionState" : "manual",
@@ -1447,6 +1501,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID-kaart kaardilugeja abil"
+          }
+        }
+      }
+    },
+    "Identification method" : {
+      "comment" : "Identification method selection label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identification method"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifitseerimismeetod"
+          }
+        }
+      }
+    },
+    "Identification method title" : {
+      "comment" : "Header in My eID identification chooser view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a method of identification"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali isiku tuvastamise meetod"
+          }
+        }
+      }
+    },
+    "Identification title" : {
+      "comment" : "Header in My eID view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identification"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifitseerimine"
+          }
+        }
+      }
+    },
+    "Identify" : {
+      "comment" : "Identify button in My eID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identify"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifitseeri"
           }
         }
       }
@@ -4004,6 +4130,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edasi"
+          }
+        }
+      }
+    },
+    "NFC card detected" : {
+      "comment" : "NFC card authentication message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold your phone near the ID-card"
+          }
+        }
+      }
+    },
+    "NFC hold card" : {
+      "comment" : "NFC hold card message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hold your phone near the ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoia ID-kaarti telefoni lähedal"
+          }
+        }
+      }
+    },
+    "NFC not supported" : {
+      "comment" : "NFC not supported message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This device does not support contactless connection"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See seade ei toeta kontaktivaba ühendust"
           }
         }
       }

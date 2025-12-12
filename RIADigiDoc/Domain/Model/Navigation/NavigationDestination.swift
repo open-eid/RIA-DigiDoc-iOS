@@ -43,7 +43,10 @@ public enum NavigationDestination: Hashable {
         notifications: [ContainerNotificationType]
     )
     case signingRootView
-    case signingMethodSelectionView
+    case signingMethodSelectionView(
+        actionType: ActionType,
+        methods: [ActionMethod]
+    )
 
     case encryptView(
         isWithEncryption: Bool
@@ -66,4 +69,5 @@ public enum NavigationDestination: Hashable {
     case proxySettingsView
 
     case homeView
+    case myEidRootView
 }

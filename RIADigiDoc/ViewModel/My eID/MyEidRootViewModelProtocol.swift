@@ -19,11 +19,8 @@
 
 import Foundation
 
-public enum ActionMethod: String, Sendable, CaseIterable, Identifiable {
-    case idCardViaNFC = "ID-card via NFC"
-    case idCardViaUSB = "ID-card via USB"
-    case mobileId = "Mobile-ID"
-    case smartId = "Smart-ID"
-
-    public var id: String { rawValue }
+/// @mockable
+@MainActor
+public protocol MyEidRootViewModelProtocol: Sendable {
+    func getSelectedMyEidMethod() async -> ActionMethod
 }

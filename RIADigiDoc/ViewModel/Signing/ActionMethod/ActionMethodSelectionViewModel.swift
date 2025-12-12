@@ -19,12 +19,14 @@
 
 import Foundation
 import OSLog
-import Observation
 
 @Observable
 @MainActor
-class SigningRootViewModel: SigningRootViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningRootViewModel")
+class ActionMethodSelectionViewModel: ActionMethodSelectionViewModelProtocol {
+    private static let logger = Logger(
+        subsystem: "ee.ria.digidoc.RIADigiDoc",
+        category: "ActionMethodSelectionViewModel"
+    )
 
     private let dataStore: DataStoreProtocol
 
@@ -32,7 +34,19 @@ class SigningRootViewModel: SigningRootViewModelProtocol {
         self.dataStore = dataStore
     }
 
+    func setSelectedSigningMethod(_ method: ActionMethod) async {
+        await dataStore.setSelectedSigningMethod(method)
+    }
+
     func getSelectedSigningMethod() async -> ActionMethod {
-        return await dataStore.getSelectedSigningMethod()
+        await dataStore.getSelectedSigningMethod()
+    }
+
+    func setSelectedMyEidMethod(_ method: ActionMethod) async {
+        await dataStore.setSelectedMyEidMethod(method)
+    }
+
+    func getSelectedMyEidMethod() async -> ActionMethod {
+        await dataStore.getSelectedMyEidMethod()
     }
 }
