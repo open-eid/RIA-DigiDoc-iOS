@@ -63,17 +63,23 @@ struct SigningRootView: View {
                     )
                 }
             case .idCardViaUSB:
-                // TODO: Replace with ID-card USB view
-                ActionInputScreen(
-                    selectedActionMethod: "ID-card via USB",
-                    isActionEnabled: .constant(false),
-                    isInProgress: .constant(false),
-                    onBackClick: { dismiss() },
-                    onSubmit: {},
-                    content: {
-                        EmptyView()
-                    }
-                )
+                if let container = signedContainer as? SignedContainerProtocol {
+                    IdCardView(
+                        actionType: .signing,
+                        actionMethods: [
+                            .idCardViaNFC,
+                            .idCardViaUSB,
+                            .mobileId,
+                            .smartId
+                        ],
+                        signedContainer: container,
+                        onSuccess: { container in
+                            sharedContainerViewModel.removeLastContainer()
+                            sharedContainerViewModel.setSignedContainer(container)
+                            sharedContainerViewModel.setIsSignatureAdded(true)
+                        }
+                    )
+                }
             case .mobileId:
                 if let container = signedContainer as? SignedContainerProtocol {
                     MobileIdView(

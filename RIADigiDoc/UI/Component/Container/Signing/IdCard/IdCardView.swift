@@ -20,48 +20,16 @@
 import SwiftUI
 import FactoryKit
 import LibdigidocLibSwift
-import CommonsLib
 
-struct NFCView: View {
+struct IdCardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
-    @State private var canNumber = ""
-    @State private var rememberMe: Bool = true
-    @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
 
-    @State private var nfcActionMessage: String = "NFC hold card"
-
-    @State private var viewModel: NFCViewModel
-    @State private var sharedNfcViewModel: SharedNFCViewModel
-
-    private var isNFCSupported: Bool {
-        sharedNfcViewModel.isNFCSupported()
-    }
-
-    private var canNumberError: Binding<String?> {
-        Binding(
-            get: { languageSettings.localized(
-                viewModel.canNumberErrorKey ?? "",
-                viewModel.canNumberErrorExtraArguments
-            ) },
-            set: { _ in }
-        )
-    }
-
-    private var displayedMessage: Binding<String> {
-        Binding(
-            get: {
-                isNFCSupported ? nfcActionMessage : "NFC not supported"
-            },
-            set: { newValue in
-                nfcActionMessage = newValue
-            }
-        )
-    }
+    @State private var idCardActionMessage: String = "ID card connect card reader"
 
     let signedContainer: SignedContainerProtocol?
     let onSuccess: (SignedContainerProtocol) -> Void
@@ -72,8 +40,6 @@ struct NFCView: View {
         signedContainer: SignedContainerProtocol?,
         onSuccess: @escaping (SignedContainerProtocol) -> Void
     ) {
-        _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
-        _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
         self.actionType = actionType
         self.actionMethods = actionMethods
         self.signedContainer = signedContainer
@@ -84,9 +50,10 @@ struct NFCView: View {
         ActionInputScreen(
             actionType: actionType,
             actionMethods: actionMethods,
-            selectedActionMethod: ActionMethod.idCardViaNFC.rawValue,
-            isActionEnabled: $isActionEnabled,
+            selectedActionMethod: ActionMethod.idCardViaUSB.rawValue,
+            isActionEnabled: .constant(true),
             isInProgress: $isInProgress,
+            showSubmitButton: false,
             onBackClick: {
                 guard isInProgress else {
                     dismiss()
@@ -97,59 +64,25 @@ struct NFCView: View {
             onSubmit: {
                 switch actionType {
                 case .signing:
-                    saveInputData()
-
                     // TODO: Implement signing action
                     isInProgress = true
                 case .myeid:
-                    saveInputData()
                     // TODO: Implement My eID personal data loading action
                     isInProgress = true
                 }
             },
             content: {
-                if isInProgress {
-                    NFCActionView(
-                        leftIcon: "ic_m3_phonelink_ring_48pt_wght400",
-                        rightIcon: "ic_m3_id_card_48pt_wght400",
-                        message: displayedMessage
-                    )
-                } else {
-                    NFCInputView(
-                        canNumber: $canNumber,
-                        rememberMe: $rememberMe,
-                        isActionEnabled: $isActionEnabled,
-                        canNumberError: canNumberError,
-                        onInputChange: {
-                            isActionEnabled = viewModel
-                                .isActionEnabled(canNumber: canNumber)
-                        }
-                    )
-                }
+                IdCardActionView(
+                    icon: "ic_m3_smart_card_reader_48pt_wght400",
+                    message: $idCardActionMessage
+                )
             }
         )
-        .onAppear {
-            Task {
-                let inputData = await viewModel.getInputData()
-                canNumber = inputData.canNumber
-                rememberMe = inputData.rememberMe
-            }
-        }
-    }
-
-    func saveInputData() {
-        Task {
-            let (inputCANNumber) = rememberMe ? (canNumber) : ("")
-            await viewModel.saveInputData(
-                canNumber: inputCANNumber,
-                rememberMe: rememberMe
-            )
-        }
     }
 }
 
 #Preview {
-    NFCView(
+    IdCardView(
         actionType: .signing,
         actionMethods: [
             .idCardViaNFC,

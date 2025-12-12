@@ -49,21 +49,14 @@ struct MyEidRootView: View {
                     onSuccess: { _ in }
                 )
             case .idCardViaUSB:
-                // TODO: Replace with ID-card USB view
-                ActionInputScreen(
+                IdCardView(
                     actionType: .myeid,
                     actionMethods: [
                         .idCardViaNFC,
                         .idCardViaUSB
                     ],
-                    selectedActionMethod: "ID-card via USB",
-                    isActionEnabled: .constant(false),
-                    isInProgress: .constant(false),
-                    onBackClick: { dismiss() },
-                    onSubmit: {},
-                    content: {
-                        EmptyView()
-                    }
+                    signedContainer: nil,
+                    onSuccess: { _ in }
                 )
             default:
                 EmptyView()

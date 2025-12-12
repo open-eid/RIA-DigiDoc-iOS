@@ -21,12 +21,24 @@ import SwiftUI
 import FactoryKit
 
 struct PrimaryButton: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+
     @AppTheme private var theme
     @AppTypography private var typography
 
     let text: String
     let isButtonEnabled: Bool
     let action: () -> Void
+
+    init(
+        text: String,
+        isButtonEnabled: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.text = text
+        self.isButtonEnabled = isButtonEnabled
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {

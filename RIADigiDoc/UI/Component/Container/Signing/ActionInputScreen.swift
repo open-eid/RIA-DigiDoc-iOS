@@ -32,6 +32,7 @@ struct ActionInputScreen<Content: View>: View {
     @State private var actionMethods: [ActionMethod]
     @Binding var isActionEnabled: Bool
     @Binding var isInProgress: Bool
+    let showSubmitButton: Bool
     let onBackClick: () -> Void
     let onSubmit: () -> Void
     let content: Content
@@ -45,7 +46,7 @@ struct ActionInputScreen<Content: View>: View {
         }
     }
 
-    private var selectedActionMethodLabels: String {
+    private var selectedActionMethodLabel: String {
         switch actionType {
         case .signing:
             languageSettings.localized("Signing method")
@@ -78,6 +79,7 @@ struct ActionInputScreen<Content: View>: View {
         selectedActionMethod: String,
         isActionEnabled: Binding<Bool>,
         isInProgress: Binding<Bool>,
+        showSubmitButton: Bool = true,
         onBackClick: @escaping () -> Void,
         onSubmit: @escaping () -> Void,
         @ViewBuilder content: () -> Content
@@ -87,6 +89,7 @@ struct ActionInputScreen<Content: View>: View {
         self.selectedActionMethod = selectedActionMethod
         self._isActionEnabled = isActionEnabled
         self._isInProgress = isInProgress
+        self.showSubmitButton = showSubmitButton
         self.onBackClick = onBackClick
         self.onSubmit = onSubmit
         self.content = content()
@@ -110,7 +113,7 @@ struct ActionInputScreen<Content: View>: View {
 
                         if !isInProgress {
                             VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
-                                Text(verbatim: selectedActionMethodLabels)
+                                Text(verbatim: selectedActionMethodLabel)
                                     .font(typography.labelLarge)
                                     .foregroundStyle(theme.onSurfaceVariant)
                                     .accessibilityHidden(true)
@@ -126,7 +129,7 @@ struct ActionInputScreen<Content: View>: View {
                                             .font(typography.bodyLarge)
                                             .foregroundStyle(theme.onSurface)
                                             .accessibilityLabel(Text(verbatim:
-                                                "\(selectedActionMethodLabels) \(selectedSigningMethodText)")
+                                                "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
                                             )
                                         Spacer()
                                         Image("ic_m3_arrow_right_48pt_wght400")
@@ -148,7 +151,7 @@ struct ActionInputScreen<Content: View>: View {
 
                         content
 
-                        if !isInProgress {
+                        if !isInProgress && showSubmitButton {
                             PrimaryButton(
                                 text: buttonTitle,
                                 isButtonEnabled: isActionEnabled,
