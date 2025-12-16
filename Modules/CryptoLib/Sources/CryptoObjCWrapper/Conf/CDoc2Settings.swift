@@ -20,6 +20,7 @@
  *
  */
 
+import CommonsLib
 import Foundation
 import OSLog
 
@@ -30,13 +31,12 @@ public final class CDoc2Settings: NSObject, Sendable {
         category: "CDoc2Settings"
     )
 
-    public static let kUseCDoc2Encryption = "kUseCDoc2Encryption"
-    public static let kUseCDoc2OnlineEncryption = "kUseCDoc2OnlineEncryption"
-    public static let kCDoc2SelectedService = "kCDoc2SelectedService"
-    public static let kCDoc2UUID = "kCDoc2UUID"
-    public static let kCDoc2PostURL = "kCDoc2PostURL"
-    public static let kCDoc2FetchURL = "kCDoc2FetchURL"
-    public static let kCDoc2Cert = "kCDoc2Cert"
+    public static let kUseCDoc2Encryption = Constants.CryptoKeys.encryptionUseCdoc2
+    public static let kUseCDoc2OnlineEncryption = Constants.CryptoKeys.encryptionUseKeyTransfer
+    public static let kCDoc2UUID = Constants.CryptoKeys.encryptionServerInfoUUID
+    public static let kCDoc2FetchURL = Constants.CryptoKeys.encryptionServerInfoFetchURL
+    public static let kCDoc2PostURL = Constants.CryptoKeys.encryptionServerInfoPostURL
+    public static let kCDoc2Cert = Constants.CryptoKeys.encryptionCert
     @objc public static let kProxyHost = "kProxyHost"
     @objc public static let kProxyPort = "kProxyPort"
     @objc public static let kProxyUsername = "kProxyUsername"
@@ -50,6 +50,14 @@ public final class CDoc2Settings: NSObject, Sendable {
         return UserDefaults.standard.object(forKey: key) as? T
     }
 
+    private static func keyExists(_ key: String) -> Bool {
+        guard UserDefaults.standard.object(forKey: key) != nil else {
+            return false
+        }
+
+        return true
+    }
+
     public static var useEncryption: Bool {
         get { get(kUseCDoc2Encryption) ?? false }
         set { set(kUseCDoc2Encryption, value: newValue) }
@@ -58,11 +66,6 @@ public final class CDoc2Settings: NSObject, Sendable {
     public static var useOnlineEncryption: Bool {
         get { get(kUseCDoc2OnlineEncryption) ?? true }
         set { set(kUseCDoc2OnlineEncryption, value: newValue) }
-    }
-
-    public static var cdoc2SelectedService: String? {
-        get { get(kCDoc2SelectedService) }
-        set { set(kCDoc2SelectedService, value: newValue) }
     }
 
     public static var cdoc2UUID: String? {
@@ -95,10 +98,6 @@ public final class CDoc2Settings: NSObject, Sendable {
         return useOnlineEncryption
     }
 
-    @objc public static func getSelectedService() -> String? {
-        return cdoc2SelectedService
-    }
-
     @objc public static func getUUID() -> String? {
         return cdoc2UUID
     }
@@ -109,6 +108,22 @@ public final class CDoc2Settings: NSObject, Sendable {
 
     @objc public static func getFetchURL() -> String? {
         return cdoc2FetchURL
+    }
+
+    @objc public static func getEncryptionServerInfoFetchURL(domain: String) -> String? {
+        if keyExists(Constants.CryptoKeys.encryptionServerInfoFetchURL + "_" + domain) {
+            return get(Constants.CryptoKeys.encryptionServerInfoFetchURL + "_" + domain)
+        }
+
+        return getFetchURL()
+    }
+
+    @objc public static func getEncryptionServerInfoPostURL(domain: String) -> String? {
+        if keyExists(Constants.CryptoKeys.encryptionServerInfoPostURL + "_" + domain) {
+            return get(Constants.CryptoKeys.encryptionServerInfoPostURL + "_" + domain)
+        }
+
+        return getPostURL()
     }
 
     @objc public static func getCert() -> Data? {

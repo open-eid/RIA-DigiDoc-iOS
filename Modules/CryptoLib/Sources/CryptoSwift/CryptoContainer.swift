@@ -210,11 +210,18 @@ extension CryptoContainer {
         let isFirstDataFileContainer = await firstFile.isCryptoContainer()
         var containerFile: URL? = firstFile
 
+        var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
+        if CDoc2Settings.isEncryptionEnabled() {
+            defaultExtension = CommonsLib.Constants.Extension.Cdoc2
+        } else {
+            defaultExtension = CommonsLib.Constants.Extension.Cdoc
+        }
+
         if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
-            firstFile.pathExtension != CommonsLib.Constants.Extension.DefaultCrypto {
+            firstFile.pathExtension != defaultExtension {
             let uniqueContainerFile = firstFile
                 .deletingPathExtension()
-                .appendingPathExtension(CommonsLib.Constants.Extension.DefaultCrypto)
+                .appendingPathExtension(defaultExtension)
             containerFile = containerUtil.getContainerFile(
                 for: uniqueContainerFile,
                 in: uniqueContainerFile.deletingLastPathComponent()

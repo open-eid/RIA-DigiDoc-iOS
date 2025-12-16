@@ -85,7 +85,7 @@ final class DataStoreTests {
     // MARK: - Restore Default Services Settings Tests
     @Test
     func restoreDefaultServicesSettings_success() async throws {
-        await dataStore.restoreDefaultServicesSettings()
+        await dataStore.restoreDefaultServicesSettings(nil)
 
         #expect(await dataStore.getValidationServiceURL() == "")
         #expect(await dataStore.getValidationServiceOption() == .defaultSetting)
@@ -93,11 +93,12 @@ final class DataStoreTests {
         #expect(await dataStore.getTSAUrlOption() == .defaultSetting)
         #expect(await dataStore.getRelyingPartyUUID() == CommonsLib.Constants.Signing.RelyingPartyUUID)
         #expect(await dataStore.getRelyingPartyOption() == .defaultSetting)
-        #expect(await dataStore.getEncryptionCdocOption() == .cdoc1)
-        #expect(await dataStore.getEncryptionUseKeyTransfer() == false)
-        #expect(await dataStore.getEncryptionServerId() == .defaultSetting)
-        let encryptionServerInfo: EncryptionServerInfo = await dataStore.getEncryptionServerInfo()
-        #expect(encryptionServerInfo.uuid == "")
+        #expect(await dataStore.getEncryptionCdocOption(false) == .cdoc1)
+        #expect(await dataStore.getEncryptionUseKeyTransfer(false) == false)
+        #expect(await dataStore.getEncryptionServerId(nil) == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        let encryptionServerInfo: EncryptionServerInfo = await dataStore.getEncryptionServerInfo(nil)
+        #expect(encryptionServerInfo.uuid == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        #expect(encryptionServerInfo.name == "")
         #expect(encryptionServerInfo.fetchURL == "")
         #expect(encryptionServerInfo.postURL == "")
         let proxyInfo = await dataStore.getProxyInfo()
@@ -214,7 +215,7 @@ final class DataStoreTests {
 
     @Test
     func getEncryptionCdocOption_success() async throws {
-        let retrievedOption = await dataStore.getEncryptionCdocOption()
+        let retrievedOption = await dataStore.getEncryptionCdocOption(false)
         let allowedOptions: [EncryptionCdocOption] = [
             .cdoc1,
             .cdoc2
@@ -225,50 +226,51 @@ final class DataStoreTests {
     @Test
     func setEncryptionCdocOption_success() async throws {
         await dataStore.setEncryptionCdocOption(.cdoc1)
-        #expect(await dataStore.getEncryptionCdocOption() == .cdoc1)
+        #expect(await dataStore.getEncryptionCdocOption(false) == .cdoc1)
         await dataStore.setEncryptionCdocOption(.cdoc2)
-        #expect(await dataStore.getEncryptionCdocOption() == .cdoc2)
+        #expect(await dataStore.getEncryptionCdocOption(false) == .cdoc2)
     }
 
     @Test
     func getEncryptionUseKeyTransfer_success() async throws {
-        let retrieved = await dataStore.getEncryptionUseKeyTransfer()
+        let retrieved = await dataStore.getEncryptionUseKeyTransfer(false)
         #expect(retrieved == false)
     }
 
     @Test
     func setEncryptionUseKeyTransfer_success() async throws {
         await dataStore.setEncryptionUseKeyTransfer(true)
-        #expect(await dataStore.getEncryptionUseKeyTransfer() == true)
+        #expect(await dataStore.getEncryptionUseKeyTransfer(false) == true)
         await dataStore.setEncryptionUseKeyTransfer(false)
-        #expect(await dataStore.getEncryptionUseKeyTransfer() == false)
+        #expect(await dataStore.getEncryptionUseKeyTransfer(false) == false)
     }
 
     @Test
     func getEncryptionServerId_success() async throws {
-        let retrievedOption = await dataStore.getEncryptionServerId()
-        let allowedOptions: [EncryptionServerOptionId] = [
-            .defaultSetting,
-            .manualSetting
+        let retrievedOption = await dataStore.getEncryptionServerId(nil)
+        let allowedOptions: [String] = [
+            "10000000-0000-0000-0000-000000000000",
+            Constants.CryptoDefaultValues.encryptionServerInfoUUID
         ]
         #expect(allowedOptions.contains(retrievedOption))
     }
 
     @Test
     func setEncryptionServerId_success() async throws {
-        await dataStore.setEncryptionServerId(.defaultSetting)
-        #expect(await dataStore.getEncryptionServerId() == .defaultSetting)
-        await dataStore.setEncryptionServerId(.manualSetting)
-        #expect(await dataStore.getEncryptionServerId() == .manualSetting)
+        await dataStore.setEncryptionServerId(Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        #expect(await dataStore.getEncryptionServerId(nil) == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        await dataStore.setEncryptionServerId("10000000-0000-0000-0000-000000000000")
+        #expect(await dataStore.getEncryptionServerId(nil) == "10000000-0000-0000-0000-000000000000")
     }
 
     @Test
     func getEncryptionServerInfo_success() async throws {
-        let retrievedInfo = await dataStore.getEncryptionServerInfo()
+        let retrievedInfo = await dataStore.getEncryptionServerInfo(nil)
 
-        #expect(retrievedInfo.uuid == "")
-        #expect(retrievedInfo.fetchURL == "")
-        #expect(retrievedInfo.postURL == "")
+        #expect(retrievedInfo.uuid == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        #expect(retrievedInfo.name == Constants.CryptoDefaultValues.encryptionServerInfoName)
+        #expect(retrievedInfo.fetchURL == Constants.CryptoDefaultValues.encryptionServerInfoFetchURL)
+        #expect(retrievedInfo.postURL == Constants.CryptoDefaultValues.encryptionServerInfoPostURL)
 
     }
 
@@ -276,13 +278,15 @@ final class DataStoreTests {
     func setEncryptionServerInfo_success() async throws {
         let testInfo = EncryptionServerInfo(
             uuid: "testUUID",
+            name: "testName",
             fetchURL: "testFetchURL",
             postURL: "testPostURL"
         )
 
         await dataStore.setEncryptionServerInfo(testInfo)
-        let retrievedInfo = await dataStore.getEncryptionServerInfo()
+        let retrievedInfo = await dataStore.getEncryptionServerInfo(nil)
         #expect(testInfo.uuid == retrievedInfo.uuid)
+        #expect(testInfo.name == retrievedInfo.name)
         #expect(testInfo.fetchURL == retrievedInfo.fetchURL)
         #expect(testInfo.postURL == retrievedInfo.postURL)
     }

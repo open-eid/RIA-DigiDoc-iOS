@@ -298,7 +298,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             let centralConfigurationProvider = try JSONDecoder().decode(
                 ConfigurationProvider.self, from: Data(centralConfig.utf8)
             )
-
             ConfigurationLoader.logger.debug(
                 "Initializing configuration version \(centralConfigurationProvider.metaInf.serial)"
             )
@@ -338,6 +337,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                     await configurationProperties.getConfigurationUpdatedDate()
 
                 updateConfiguration(configuration)
+
             } else {
                 try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)
             }

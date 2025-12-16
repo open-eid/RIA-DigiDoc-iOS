@@ -25,7 +25,7 @@ public protocol EncryptionSettingsViewModelProtocol: Sendable {
     var certData: Data? { get }
     var encryptionCdocOption: EncryptionCdocOption { get }
     var useKeyTransfer: Bool { get }
-    var serverId: EncryptionServerOptionId { get }
+    var serverId: String { get }
     var serverInfo: EncryptionServerInfo { get }
     var isImportingCert: Bool { get }
     var isLoading: Bool { get }

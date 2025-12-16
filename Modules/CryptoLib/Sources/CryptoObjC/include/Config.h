@@ -25,12 +25,28 @@
 #include <cdoc/Configuration.h>
 #include <cdoc/NetworkBackend.h>
 
-struct Settings: public libcdoc::Configuration {
-    std::string getValue(std::string_view domain, std::string_view param) const final {
-        if(param == KEYSERVER_FETCH_URL)
-            return [CDoc2Settings.getFetchURL toString];
-        if(param == KEYSERVER_SEND_URL)
-            return [CDoc2Settings.getPostURL toString];
+struct Settings : public libcdoc::Configuration {
+
+    std::string getValue(std::string_view domain,
+                         std::string_view param) const final {
+
+        NSString *nsDomain =
+            [[NSString alloc] initWithBytes:domain.data()
+                                      length:domain.size()
+                                    encoding:NSUTF8StringEncoding];
+
+        if (param == KEYSERVER_FETCH_URL) {
+            NSString *url =
+                [CDoc2Settings getEncryptionServerInfoFetchURLWithDomain:nsDomain];
+            return url ? std::string(url.toString) : std::string{};
+        }
+
+        if (param == KEYSERVER_SEND_URL) {
+            NSString *url =
+                [CDoc2Settings getEncryptionServerInfoPostURLWithDomain:nsDomain];
+            return url ? std::string(url.toString) : std::string{};
+        }
+
         return {};
     }
 };

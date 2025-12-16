@@ -147,4 +147,32 @@ public struct Constants {
         public static let Timeout = 120 // Seconds
         public static let DefaultTimeout = 5 // Seconds
     }
+
+    public struct CryptoDefaultValues {
+        public static let encryptionUseCdoc2: Bool = false
+        public static let encryptionUseKeyTransfer: Bool = false
+        public static let encryptionServerInfoUUID = "00000000-0000-0000-0000-000000000000"
+        public static let encryptionServerInfoName = "Manual"
+        public static let encryptionServerInfoFetchURL = "https://cdoc2-keyserver-get"
+        public static let encryptionServerInfoPostURL = "https://cdoc2-keyserver-post"
+    }
+
+    public struct CryptoKeys {
+        public static let encryptionCdocOption = "encryptionCdocOption"
+        public static let encryptionUseCdoc2 = "encryptionUseCdoc2"
+        public static let encryptionUseKeyTransfer = "encryptionUseKeyTransfer"
+        public static let encryptionServerId = "encryptionServerId"
+        public static let encryptionServerInfoUUID = "encryptionServerInfoUUID"
+        public static let encryptionServerInfoName = "encryptionServerInfoName"
+        public static let encryptionServerInfoFetchURL = "encryptionServerInfoFetchURL"
+        public static let encryptionServerInfoPostURL = "encryptionServerInfoPostURL"
+        public static let encryptionCert = "encryptionCert"
+    }
+
+    public struct ProxyKeys {
+        public static let proxyOption = "proxyOption"
+        public static let proxyInfoHost = "proxyInfoHost"
+        public static let proxyInfoPort = "proxyInfoPort"
+        public static let proxyInfoUsername = "proxyInfoUsername"
+    }
 }

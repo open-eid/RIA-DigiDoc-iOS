@@ -18,9 +18,12 @@
  */
 
 import CommonsLib
+import ConfigLib
 
 /// @mockable
 public protocol DataStoreProtocol: Sendable {
+    func keyExists(_ key: String) async -> Bool
+
     // MARK: - Skip Language Selector
     func getIsInitialLanguageSelected() async -> Bool
     func setIsInitialLanguageSelected(_ value: Bool) async
@@ -34,7 +37,11 @@ public protocol DataStoreProtocol: Sendable {
     func setSelectedTheme(_ rawValue: Int) async
 
     // MARK: - Restore Default Services Settings
-    func restoreDefaultServicesSettings() async
+    func getCentralCDOC2Conf(
+        _ uuid: String,
+        configuration: ConfigurationProvider?
+    ) async -> EncryptionServerInfo
+    func restoreDefaultServicesSettings(_ configuration: ConfigurationProvider?) async
 
     // MARK: - Validation Service Settings Methods
     func getValidationServiceURL() async -> String
@@ -55,14 +62,18 @@ public protocol DataStoreProtocol: Sendable {
     func setRelyingPartyOption(_ option: ServicesSettingsOption) async
 
     // MARK: - Encryption Service Settings Methods
-    func getEncryptionCdocOption() async -> EncryptionCdocOption
+    func getEncryptionCdocOption(_ cdoc2Default: Bool) async -> EncryptionCdocOption
     func setEncryptionCdocOption(_ option: EncryptionCdocOption) async
-    func getEncryptionUseKeyTransfer() async -> Bool
+    func getUseCdoc2Encryption(_ cdoc2Default: Bool) async -> Bool
+    func setUseCdoc2Encryption(_ value: Bool) async
+    func getEncryptionUseKeyTransfer(_ cdoc2UseKeyserver: Bool) async -> Bool
     func setEncryptionUseKeyTransfer(_ value: Bool) async
-    func getEncryptionServerId() async -> EncryptionServerOptionId
-    func setEncryptionServerId(_ option: EncryptionServerOptionId) async
-    func getEncryptionServerInfo() async -> EncryptionServerInfo
+    func getEncryptionServerId(_ defaultVal: String?) async -> String
+    func setEncryptionServerId(_ option: String) async
+    func getEncryptionServerInfo(_ encryptionServerInfoUUID: String?) async -> EncryptionServerInfo
     func setEncryptionServerInfo(_ info: EncryptionServerInfo) async
+    func setEncryptionServerInfoFetchURL(_ url: String, domain: String) async
+    func setEncryptionServerInfoPostURL(_ url: String, domain: String) async
 
     // MARK: - Proxy Service Settings Methods
     func getProxyInfo() async -> ProxyInfo

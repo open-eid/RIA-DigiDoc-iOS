@@ -26,4 +26,9 @@ class NavigationPathManager {
     func navigate(to destination: NavigationDestination) {
         path.append(destination)
     }
+
+    func removeLast(_ numberOfValues: Int = 1) {
+        guard !path.isEmpty else { return }
+        path.removeLast(numberOfValues)
+    }
 }

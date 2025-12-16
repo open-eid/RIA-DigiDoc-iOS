@@ -60,6 +60,68 @@ actor LibrarySetup {
         self.ldapConfiguration = ldapConfiguration
     }
 
+    fileprivate func setLdapConfig(_ configurationProvider: ConfigurationProvider?) async {
+        if let ldapPersonUrl = configurationProvider?.ldapPersonUrl {
+            await ldapConfiguration.setLdapPersonURLS([ldapPersonUrl])
+        }
+
+        if let ldapPersonUrls = configurationProvider?.ldapPersonUrls {
+            await ldapConfiguration.setLdapPersonURLS(ldapPersonUrls)
+        }
+
+        if let ldapCorpUrl = configurationProvider?.ldapCorpUrl {
+            await ldapConfiguration.setLdapCorpURL(ldapCorpUrl)
+        }
+    }
+
+    fileprivate func setCdoc2Config(_ configurationProvider: ConfigurationProvider?) async {
+        if let useCdoc2Encryption = configurationProvider?.cdoc2Default {
+            if await !dataStore.keyExists(Constants.CryptoKeys.encryptionUseCdoc2) {
+                await dataStore.setUseCdoc2Encryption(useCdoc2Encryption)
+            }
+        }
+
+        if let useCdoc2Online = configurationProvider?.cdoc2UseKeyserver {
+            if await !dataStore.keyExists(Constants.CryptoKeys.encryptionUseKeyTransfer) {
+                await dataStore.setEncryptionUseKeyTransfer(useCdoc2Online)
+            }
+        }
+
+        if let cdoc2UUID = configurationProvider?.cdoc2DefaultKeyserver,
+           let cdoc2Conf = configurationProvider?.cdoc2Conf {
+
+            let conf = cdoc2Conf[cdoc2UUID]
+            if let cdoc2ConfFetchUrl = conf?.fetchURL,
+               let cdoc2ConfPostUrl = conf?.postURL,
+               let cdoc2ConfName = conf?.name {
+                let encryptionServerInfo = await EncryptionServerInfo(
+                    uuid: cdoc2UUID,
+                    name: cdoc2ConfName,
+                    fetchURL: cdoc2ConfFetchUrl.absoluteString,
+                    postURL: cdoc2ConfPostUrl.absoluteString
+                )
+
+                if await !dataStore.keyExists(Constants.CryptoKeys.encryptionServerInfoUUID) {
+                    await dataStore.setEncryptionServerInfo(encryptionServerInfo)
+                }
+            }
+        }
+
+        if let cdoc2Conf = configurationProvider?.cdoc2Conf {
+            let allKeys = cdoc2Conf.keys
+            for uuid in allKeys {
+                let conf = cdoc2Conf[uuid]
+                if let cdoc2ConfFetchUrl = conf?.fetchURL,
+                   let cdoc2ConfPostUrl = conf?.postURL {
+                    await dataStore.setEncryptionServerInfoFetchURL(
+                        cdoc2ConfFetchUrl.absoluteString, domain: uuid)
+                    await dataStore.setEncryptionServerInfoPostURL(
+                        cdoc2ConfPostUrl.absoluteString, domain: uuid)
+                }
+            }
+        }
+    }
+
     func setupLibraries() async {
         do {
             let proxyInfo = await proxyUtil.getProxyInfo()
@@ -97,17 +159,8 @@ actor LibrarySetup {
 
             let configurationProvider = await configurationRepository.getConfiguration()
 
-            if let ldapPersonUrl = configurationProvider?.ldapPersonUrl {
-                await ldapConfiguration.setLdapPersonURLS([ldapPersonUrl])
-            }
-
-            if let ldapPersonUrls = configurationProvider?.ldapPersonUrls {
-                await ldapConfiguration.setLdapPersonURLS(ldapPersonUrls)
-            }
-
-            if let ldapCorpUrl = configurationProvider?.ldapCorpUrl {
-                await ldapConfiguration.setLdapCorpURL(ldapCorpUrl)
-            }
+            await setLdapConfig(configurationProvider)
+            await setCdoc2Config(configurationProvider)
 
             try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {

@@ -55,7 +55,7 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
     // MARK: - Restore Default Settings
 
     public func restoreDefaultSettings() async {
-        await dataStore.restoreDefaultServicesSettings()
+        await dataStore.restoreDefaultServicesSettings(configuration)
         await keychainStore.removeAll()
         await removeCertificates()
         await DigiDocConf.restoreDefaultSettings()

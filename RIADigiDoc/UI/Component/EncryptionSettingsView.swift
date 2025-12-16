@@ -17,6 +17,7 @@
  *
  */
 
+import CommonsLib
 import SwiftUI
 import FactoryKit
 
@@ -33,22 +34,10 @@ struct EncryptionSettingsView: View {
 
     // MARK: - UI State
     @State private var showDialog = false
-    @State private var dialogSelectedServerId: EncryptionServerOptionId = .defaultSetting
+    @State private var dialogSelectedServerId: String = Constants.CryptoDefaultValues.encryptionServerInfoUUID
 
-    private let serverOptions: [EncryptionServerOption] = [
-        EncryptionServerOption(
-            id: .defaultSetting,
-            titleKey: "Main settings crypto server option ria",
-            accessibilityInputLabel: "Ria"
-        ),
-        EncryptionServerOption(
-            id: .manualSetting,
-            titleKey: "Main settings crypto server option manual",
-            accessibilityInputLabel: "Manual"
-        )
-    ]
     private var selectedServerOption: EncryptionServerOption? {
-        serverOptions.first { $0.id == viewModel.serverId }
+        viewModel.getServerOptions().first { $0.id == viewModel.serverId }
     }
 
     @State private var viewModel: EncryptionSettingsViewModel
@@ -140,22 +129,26 @@ struct EncryptionSettingsView: View {
                     isDialogHeaderFocused = true
                 }
             )
+
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto uuid"),
                 text: $viewModel.serverInfo.uuid,
-                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
+                isDisabled: !viewModel.useKeyTransfer
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
             )
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto fetch url"),
                 text: $viewModel.serverInfo.fetchURL,
-                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
+                isDisabled: !viewModel.useKeyTransfer
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
             )
             FloatingLabelTextField(
                 title: languageSettings.localized("Main settings crypto post url"),
                 text: $viewModel.serverInfo.postURL,
-                isDisabled: !viewModel.useKeyTransfer || viewModel.serverId == .defaultSetting
+                isDisabled: !viewModel.useKeyTransfer
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
             )
-            if viewModel.serverId == .manualSetting {
+            if viewModel.serverId == viewModel.cdoc2ManualKeyTransferServerUUID {
                 AdvancedSettingsCertificateSection(
                     certificateInfoHeader: languageSettings.localized("Main settings crypto certificate title"),
                     showCertificateInfo: viewModel.certData != nil,
@@ -194,7 +187,7 @@ struct EncryptionSettingsView: View {
                     .accessibilityFocused($isDialogHeaderFocused)
 
                 RadioButtonChooserView<EncryptionServerOption>(
-                    options: serverOptions,
+                    options: viewModel.getServerOptions(),
                     isSelected: { serverOption in
                         serverOption.id == dialogSelectedServerId
                     },
@@ -246,6 +239,10 @@ struct EncryptionSettingsView: View {
                 Button(
                     action: {
                         viewModel.serverId = dialogSelectedServerId
+                        Task {
+                            await viewModel.refreshServerInfo()
+                        }
+
                         showDialog = false
                     },
                     label: {
