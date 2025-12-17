@@ -157,22 +157,10 @@ public struct Constants {
         public static let encryptionServerInfoPostURL = "https://cdoc2-keyserver-post"
     }
 
-    public struct CryptoKeys {
-        public static let encryptionCdocOption = "encryptionCdocOption"
-        public static let encryptionUseCdoc2 = "encryptionUseCdoc2"
-        public static let encryptionUseKeyTransfer = "encryptionUseKeyTransfer"
-        public static let encryptionServerId = "encryptionServerId"
-        public static let encryptionServerInfoUUID = "encryptionServerInfoUUID"
-        public static let encryptionServerInfoName = "encryptionServerInfoName"
-        public static let encryptionServerInfoFetchURL = "encryptionServerInfoFetchURL"
-        public static let encryptionServerInfoPostURL = "encryptionServerInfoPostURL"
-        public static let encryptionCert = "encryptionCert"
-    }
-
-    public struct ProxyKeys {
-        public static let proxyOption = "proxyOption"
-        public static let proxyInfoHost = "proxyInfoHost"
-        public static let proxyInfoPort = "proxyInfoPort"
-        public static let proxyInfoUsername = "proxyInfoUsername"
+    public struct ProxyDefaultValues {
+        public static let proxyInfoHost = ""
+        public static let proxyInfoPort = 80
+        public static let proxyInfoUsername = ""
+        public static let proxyInfoPassword = ""
     }
 }

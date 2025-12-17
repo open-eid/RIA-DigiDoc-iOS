@@ -124,9 +124,9 @@ public actor DataStore: DataStoreProtocol {
         )
         await setProxyInfo(ProxyInfo(
             option: DefaultValues.proxyOption,
-            host: DefaultValues.proxyInfoHost,
-            port: DefaultValues.proxyInfoPort,
-            username: DefaultValues.proxyInfoUsername,
+            host: Constants.ProxyDefaultValues.proxyInfoHost,
+            port: Constants.ProxyDefaultValues.proxyInfoPort,
+            username: Constants.ProxyDefaultValues.proxyInfoUsername,
         ))
     }
 
@@ -197,22 +197,22 @@ public actor DataStore: DataStoreProtocol {
         let defaultValue: EncryptionCdocOption =
             cdoc2Default ? .cdoc2 : DefaultValues.encryptionCdocOption
 
-        guard defaults.object(forKey: Constants.CryptoKeys.encryptionCdocOption) != nil else {
+        guard defaults.object(forKey: Keys.encryptionCdocOption) != nil else {
             return defaultValue
         }
 
-        let raw = defaults.integer(forKey: Constants.CryptoKeys.encryptionCdocOption)
+        let raw = defaults.integer(forKey: Keys.encryptionCdocOption)
         return EncryptionCdocOption(rawValue: raw) ?? defaultValue
     }
 
     public func setEncryptionCdocOption(_ option: EncryptionCdocOption) async {
         if option == .cdoc1 {
-            userDefaults().set(false, forKey: Constants.CryptoKeys.encryptionUseCdoc2)
+            userDefaults().set(false, forKey: Keys.encryptionUseCdoc2)
         } else {
-            userDefaults().set(true, forKey: Constants.CryptoKeys.encryptionUseCdoc2)
+            userDefaults().set(true, forKey: Keys.encryptionUseCdoc2)
         }
 
-        userDefaults().set(option.rawValue, forKey: Constants.CryptoKeys.encryptionCdocOption)
+        userDefaults().set(option.rawValue, forKey: Keys.encryptionCdocOption)
     }
 
     public func getUseCdoc2Encryption(
@@ -221,15 +221,22 @@ public actor DataStore: DataStoreProtocol {
 
         let defaults = userDefaults()
 
-        guard defaults.object(forKey: Constants.CryptoKeys.encryptionUseCdoc2) != nil else {
+        guard defaults.object(forKey: Keys.encryptionUseCdoc2) != nil else {
             return cdoc2Default
         }
 
-        return defaults.bool(forKey: Constants.CryptoKeys.encryptionUseCdoc2)
+        return defaults.bool(forKey: Keys.encryptionUseCdoc2)
+    }
+
+    public func keyExistsUseCdoc2Encryption() async -> Bool {
+        if await keyExists(Keys.encryptionUseCdoc2) {
+            return true
+        }
+        return false
     }
 
     public func setUseCdoc2Encryption(_ value: Bool) async {
-        userDefaults().set(value, forKey: Constants.CryptoKeys.encryptionUseCdoc2)
+        userDefaults().set(value, forKey: Keys.encryptionUseCdoc2)
     }
 
     public func getEncryptionUseKeyTransfer(
@@ -238,77 +245,91 @@ public actor DataStore: DataStoreProtocol {
 
         let defaults = userDefaults()
 
-        guard defaults.object(forKey: Constants.CryptoKeys.encryptionUseKeyTransfer) != nil else {
+        guard defaults.object(forKey: Keys.encryptionUseKeyTransfer) != nil else {
             return cdoc2UseKeyserver
         }
 
-        return defaults.bool(forKey: Constants.CryptoKeys.encryptionUseKeyTransfer)
+        return defaults.bool(forKey: Keys.encryptionUseKeyTransfer)
+    }
+
+    public func keyExistsEncryptionUseKeyTransfer() async -> Bool {
+        if await keyExists(Keys.encryptionUseKeyTransfer) {
+            return true
+        }
+        return false
     }
 
     public func setEncryptionUseKeyTransfer(_ value: Bool) async {
-        userDefaults().set(value, forKey: Constants.CryptoKeys.encryptionUseKeyTransfer)
+        userDefaults().set(value, forKey: Keys.encryptionUseKeyTransfer)
     }
 
     public func getEncryptionServerId(_ defaultVal: String?) async -> String {
         let defaults = userDefaults()
 
-        guard defaults.object(forKey: Constants.CryptoKeys.encryptionServerId) != nil else {
+        guard defaults.object(forKey: Keys.encryptionServerId) != nil else {
             return defaultVal ?? Constants.CryptoDefaultValues.encryptionServerInfoUUID
         }
 
-        let raw = defaults.string(forKey: Constants.CryptoKeys.encryptionServerId)
+        let raw = defaults.string(forKey: Keys.encryptionServerId)
         return raw ?? (defaultVal ?? Constants.CryptoDefaultValues.encryptionServerInfoUUID)
     }
 
     public func setEncryptionServerId(_ option: String) async {
-        userDefaults().set(option, forKey: Constants.CryptoKeys.encryptionServerId)
+        userDefaults().set(option, forKey: Keys.encryptionServerId)
     }
 
     public func getEncryptionServerInfo(_ encryptionServerInfoUUID: String?) async -> EncryptionServerInfo {
-        let uuid = userDefaults().string(forKey: Constants.CryptoKeys.encryptionServerInfoUUID) ??
+        let uuid = userDefaults().string(forKey: Keys.encryptionServerInfoUUID) ??
         (encryptionServerInfoUUID ?? Constants.CryptoDefaultValues.encryptionServerInfoUUID)
 
-        let name = userDefaults().string(forKey: Constants.CryptoKeys.encryptionServerInfoName) ??
+        let name = userDefaults().string(forKey: Keys.encryptionServerInfoName) ??
         Constants.CryptoDefaultValues.encryptionServerInfoName
 
-        let fetchURL = userDefaults().string(forKey: Constants.CryptoKeys.encryptionServerInfoFetchURL) ??
+        let fetchURL = userDefaults().string(forKey: Keys.encryptionServerInfoFetchURL) ??
         Constants.CryptoDefaultValues.encryptionServerInfoFetchURL
 
-        let postURL = userDefaults().string(forKey: Constants.CryptoKeys.encryptionServerInfoPostURL) ??
+        let postURL = userDefaults().string(forKey: Keys.encryptionServerInfoPostURL) ??
         Constants.CryptoDefaultValues.encryptionServerInfoPostURL
 
         return await EncryptionServerInfo(uuid: uuid, name: name, fetchURL: fetchURL, postURL: postURL)
     }
 
     public func setEncryptionServerInfo(_ info: EncryptionServerInfo) async {
-        userDefaults().set(info.uuid, forKey: Constants.CryptoKeys.encryptionServerInfoUUID)
-        userDefaults().set(info.name, forKey: Constants.CryptoKeys.encryptionServerInfoName)
-        userDefaults().set(info.fetchURL, forKey: Constants.CryptoKeys.encryptionServerInfoFetchURL)
-        userDefaults().set(info.postURL, forKey: Constants.CryptoKeys.encryptionServerInfoPostURL)
+        userDefaults().set(info.uuid, forKey: Keys.encryptionServerInfoUUID)
+        userDefaults().set(info.name, forKey: Keys.encryptionServerInfoName)
+        userDefaults().set(info.fetchURL, forKey: Keys.encryptionServerInfoFetchURL)
+        userDefaults().set(info.postURL, forKey: Keys.encryptionServerInfoPostURL)
+    }
+
+    public func keyExistsEncryptionServerInfo() async -> Bool {
+        if await keyExists(Keys.encryptionServerInfoUUID) {
+            return true
+        }
+        return false
     }
 
     public func setEncryptionServerInfoFetchURL(_ url: String, domain: String) async {
-        userDefaults().set(url, forKey: Constants.CryptoKeys.encryptionServerInfoFetchURL + "_" + domain)
+        userDefaults().set(url, forKey: Keys.encryptionServerInfoFetchURL + "_" + domain)
     }
 
     public func setEncryptionServerInfoPostURL(_ url: String, domain: String) async {
-        userDefaults().set(url, forKey: Constants.CryptoKeys.encryptionServerInfoPostURL + "_" + domain)
+        userDefaults().set(url, forKey: Keys.encryptionServerInfoPostURL + "_" + domain)
     }
 
     // MARK: - Proxy Service Settings Methods
 
     public func getProxyInfo() async -> ProxyInfo {
-        let rawOption = userDefaults().integer(forKey: Constants.ProxyKeys.proxyOption)
+        let rawOption = userDefaults().integer(forKey: Keys.proxyOption)
         let option = ProxySettingsOption(rawValue: rawOption) ?? DefaultValues.proxyOption
 
-        let host = userDefaults().string(forKey: Constants.ProxyKeys.proxyInfoHost) ??
-        DefaultValues.proxyInfoHost
+        let host = userDefaults().string(forKey: Keys.proxyInfoHost) ??
+        Constants.ProxyDefaultValues.proxyInfoHost
 
-        var port = userDefaults().integer(forKey: Constants.ProxyKeys.proxyInfoPort)
-        if port == 0 { port = DefaultValues.proxyInfoPort }
+        var port = userDefaults().integer(forKey: Keys.proxyInfoPort)
+        if port == 0 { port = Constants.ProxyDefaultValues.proxyInfoPort }
 
-        let username = userDefaults().string(forKey: Constants.ProxyKeys.proxyInfoUsername) ??
-        DefaultValues.proxyInfoUsername
+        let username = userDefaults().string(forKey: Keys.proxyInfoUsername) ??
+        Constants.ProxyDefaultValues.proxyInfoUsername
 
         return ProxyInfo(
             option: option,
@@ -319,10 +340,10 @@ public actor DataStore: DataStoreProtocol {
     }
 
     public func setProxyInfo(_ info: ProxyInfo) async {
-        userDefaults().set(info.option.rawValue, forKey: Constants.ProxyKeys.proxyOption)
-        userDefaults().set(info.host, forKey: Constants.ProxyKeys.proxyInfoHost)
-        userDefaults().set(info.port, forKey: Constants.ProxyKeys.proxyInfoPort)
-        userDefaults().set(info.username, forKey: Constants.ProxyKeys.proxyInfoUsername)
+        userDefaults().set(info.option.rawValue, forKey: Keys.proxyOption)
+        userDefaults().set(info.host, forKey: Keys.proxyInfoHost)
+        userDefaults().set(info.port, forKey: Keys.proxyInfoPort)
+        userDefaults().set(info.username, forKey: Keys.proxyInfoUsername)
     }
 
     // MARK: - Signing Selection Methods
@@ -450,9 +471,6 @@ public actor DataStore: DataStoreProtocol {
         static let relyingPartyUUID = CommonsLib.Constants.Signing.RelyingPartyUUID
         static let encryptionCdocOption: EncryptionCdocOption = .cdoc1
         static let proxyOption: ProxySettingsOption = .disabled
-        static let proxyInfoHost = ""
-        static let proxyInfoPort = 80
-        static let proxyInfoUsername = ""
         static let selectedSigningMethod: ActionMethod = .idCardViaNFC
         static let selectedMyEidMethod: ActionMethod = .idCardViaNFC
         static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
@@ -468,6 +486,19 @@ public actor DataStore: DataStoreProtocol {
     }
 
     private enum Keys {
+        static let encryptionCdocOption = "encryptionCdocOption"
+        static let encryptionUseCdoc2 = "encryptionUseCdoc2"
+        static let encryptionUseKeyTransfer = "encryptionUseKeyTransfer"
+        static let encryptionServerId = "encryptionServerId"
+        static let encryptionServerInfoUUID = "encryptionServerInfoUUID"
+        static let encryptionServerInfoName = "encryptionServerInfoName"
+        static let encryptionServerInfoFetchURL = "encryptionServerInfoFetchURL"
+        static let encryptionServerInfoPostURL = "encryptionServerInfoPostURL"
+        static let encryptionCert = "encryptionCert"
+        static let proxyOption = "proxyOption"
+        static let proxyInfoHost = "proxyInfoHost"
+        static let proxyInfoPort = "proxyInfoPort"
+        static let proxyInfoUsername = "proxyInfoUsername"
         static let isInitialLanguageSelected = "isInitialLanguageSelected"
         static let selectedLanguage = "selectedLanguage"
         static let selectedTheme = "selectedTheme"

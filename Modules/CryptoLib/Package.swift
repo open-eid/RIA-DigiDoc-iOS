@@ -38,6 +38,7 @@ let package = Package(
                 "LDAP",
                 "ASN1Decoder",
                 "CommonsLib",
+                "ConfigLib",
                 "IdCardLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],

@@ -43,17 +43,20 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
     private let dataStore: DataStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let certificateUtil: CertificateUtilProtocol
+    private let cryptoSetup: CryptoSetup
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
         dataStore: DataStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
-        certificateUtil: CertificateUtilProtocol
+        certificateUtil: CertificateUtilProtocol,
+        cryptoSetup: CryptoSetup,
     ) {
         self.configurationRepository = configurationRepository
         self.dataStore = dataStore
         self.advancedSettingsRepository = advancedSettingsRepository
         self.certificateUtil = certificateUtil
+        self.cryptoSetup = cryptoSetup
 
         Task {
             await initializeSettings()
@@ -117,7 +120,7 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
             let allKeys = cdoc2Conf.keys
             for uuid in allKeys {
                 let conf = cdoc2Conf[uuid]
-                let name = conf?.name ?? "Ria"
+                let name = conf?.name ?? "Unknown"
                 let serverOption: EncryptionServerOption = EncryptionServerOption(
                     id: uuid,
                     titleKey: name,
@@ -174,6 +177,7 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
             serverInfo.postURL = serverInfo.postURL.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         await dataStore.setEncryptionServerInfo(serverInfo)
+        await cryptoSetup.setCdoc2Settings(configuration)
     }
 
     // MARK: - Cert Info Getters

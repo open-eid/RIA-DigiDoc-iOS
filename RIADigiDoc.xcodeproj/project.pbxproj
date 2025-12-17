@@ -133,6 +133,7 @@
 		DF1DE0582CCB18790068283D /* Exceptions for "RIADigiDoc" folder in "RIADigiDocTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CryptoSetup.swift,
 				DI/AppContainer.swift,
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,

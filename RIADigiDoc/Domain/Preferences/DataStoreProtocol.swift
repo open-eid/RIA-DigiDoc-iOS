@@ -66,12 +66,15 @@ public protocol DataStoreProtocol: Sendable {
     func setEncryptionCdocOption(_ option: EncryptionCdocOption) async
     func getUseCdoc2Encryption(_ cdoc2Default: Bool) async -> Bool
     func setUseCdoc2Encryption(_ value: Bool) async
+    func keyExistsUseCdoc2Encryption() async -> Bool
     func getEncryptionUseKeyTransfer(_ cdoc2UseKeyserver: Bool) async -> Bool
     func setEncryptionUseKeyTransfer(_ value: Bool) async
+    func keyExistsEncryptionUseKeyTransfer() async -> Bool
     func getEncryptionServerId(_ defaultVal: String?) async -> String
     func setEncryptionServerId(_ option: String) async
     func getEncryptionServerInfo(_ encryptionServerInfoUUID: String?) async -> EncryptionServerInfo
     func setEncryptionServerInfo(_ info: EncryptionServerInfo) async
+    func keyExistsEncryptionServerInfo() async -> Bool
     func setEncryptionServerInfoFetchURL(_ url: String, domain: String) async
     func setEncryptionServerInfoPostURL(_ url: String, domain: String) async
 

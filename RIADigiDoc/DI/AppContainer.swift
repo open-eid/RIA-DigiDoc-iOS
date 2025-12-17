@@ -36,6 +36,17 @@ extension Container {
                 advancedSettingsRepository: self.advancedSettingsRepository(),
                 keychainStore: self.keychainStore(),
                 proxyUtil: self.proxyUtil(),
+                cryptoSetup: self.cryptoSetup()
+            )
+        }
+        .shared
+    }
+
+    @MainActor
+    var cryptoSetup: Factory<CryptoSetup> {
+        self { @MainActor in
+            CryptoSetup(
+                dataStore: self.dataStore(),
                 ldapConfiguration: self.ldapConfiguration()
             )
         }
@@ -289,7 +300,8 @@ extension Container {
                 configurationRepository: self.configurationRepository(),
                 dataStore: self.dataStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
-                certificateUtil: self.certificateUtil()
+                certificateUtil: self.certificateUtil(),
+                cryptoSetup: self.cryptoSetup()
             )
         }
     }
@@ -310,7 +322,8 @@ extension Container {
                 dataStore: self.dataStore(),
                 keychainStore: self.keychainStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
-                configurationRepository: self.configurationRepository()
+                configurationRepository: self.configurationRepository(),
+                cryptoSetup: self.cryptoSetup()
             )
         }
     }

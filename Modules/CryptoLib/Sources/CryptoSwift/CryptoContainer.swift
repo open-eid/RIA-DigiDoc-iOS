@@ -211,7 +211,7 @@ extension CryptoContainer {
         var containerFile: URL? = firstFile
 
         var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
-        if CDoc2Settings.isEncryptionEnabled() {
+        if CDoc2Setting.isEncryptionEnabled {
             defaultExtension = CommonsLib.Constants.Extension.Cdoc2
         } else {
             defaultExtension = CommonsLib.Constants.Extension.Cdoc

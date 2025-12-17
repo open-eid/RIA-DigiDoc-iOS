@@ -2,7 +2,7 @@
 //  Config.h
 //  CryptoLib
 /*
- * Copyright 2017 - 2024 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,13 +37,13 @@ struct Settings : public libcdoc::Configuration {
 
         if (param == KEYSERVER_FETCH_URL) {
             NSString *url =
-                [CDoc2Settings getEncryptionServerInfoFetchURLWithDomain:nsDomain];
+                [CDoc2Setting getEncryptionServerInfoFetchURLWithDomain:nsDomain];
             return url ? std::string(url.toString) : std::string{};
         }
 
         if (param == KEYSERVER_SEND_URL) {
             NSString *url =
-                [CDoc2Settings getEncryptionServerInfoPostURLWithDomain:nsDomain];
+                [CDoc2Setting getEncryptionServerInfoPostURLWithDomain:nsDomain];
             return url ? std::string(url.toString) : std::string{};
         }
 
@@ -54,22 +54,22 @@ struct Settings : public libcdoc::Configuration {
 struct Network: public libcdoc::NetworkBackend {
     libcdoc::result_t getPeerTLSCertificates(std::vector<std::vector<uint8_t>> &dst, const std::string& url) final {
         libcdoc::NetworkBackend::getPeerTLSCertificates(dst);
-        for (NSData *cert in CDoc2Settings.cdoc2Certs) {
+        for (NSData *cert in CDoc2Setting.cdoc2Certs) {
             dst.push_back([cert toVector]);
         }
-        if (auto cert = [CDoc2Settings.getCert toVector]; !cert.empty()) {
+        if (auto cert = [CDoc2Setting.getCert toVector]; !cert.empty()) {
             dst.push_back(std::move(cert));
         }
         return libcdoc::OK;
     }
 
     libcdoc::result_t getProxyCredentials(ProxyCredentials &cred) const final {
-        if (NSDictionary<NSString *, id> *data = [CDoc2Settings proxyCredentials]) {
+        if (NSDictionary<NSString *, id> *data = [CDoc2Setting proxyCredentials]) {
             cred = {
-                .host = [(NSString*)data[CDoc2Settings.kProxyHost] toString],
-                .port = [data[CDoc2Settings.kProxyPort] unsignedShortValue],
-                .username = [(NSString*)data[CDoc2Settings.kProxyUsername] toString],
-                .password = [(NSString*)data[CDoc2Settings.kProxyPassword] toString]
+                .host = [(NSString*)data[CDoc2Setting.kProxyHost] toString],
+                .port = [data[CDoc2Setting.kProxyPort] unsignedShortValue],
+                .username = [(NSString*)data[CDoc2Setting.kProxyUsername] toString],
+                .password = [(NSString*)data[CDoc2Setting.kProxyPassword] toString]
             };
         }
         return libcdoc::OK;
