@@ -31,7 +31,7 @@ struct RIADigiDocApp: App {
     @State private var crashReportManager: CrashReportManager
 
     @State private var isSetupComplete = false
-    @State private var isJailbroken: Bool = false
+//    @State private var isJailbroken: Bool = false
     @State private var isInitialLanguageSelected: Bool = false
 
     @State private var pathManager = NavigationPathManager()
@@ -60,12 +60,12 @@ struct RIADigiDocApp: App {
 
     private func onLaunchScreenViewAppear() {
         Task {
-            if await JailbreakDetection.isDeviceJailbroken(fileManager: fileManager) {
-                await MainActor.run {
-                    self.isJailbroken = true
-                }
-                return
-            }
+//            if await JailbreakDetection.isDeviceJailbroken(fileManager: fileManager) {
+//                await MainActor.run {
+//                    self.isJailbroken = true
+//                }
+//                return
+//            }
 
             await librarySetup.setupLibraries()
             await crashReportManager.evaluateCrashReporting()
@@ -89,12 +89,7 @@ struct RIADigiDocApp: App {
         WindowGroup {
             let currentTheme = themeSettings.getSelectedTheme()
 
-            if isJailbroken {
-                JailbreakView()
-                    .environment(\.typography, Typography.current())
-                    .environment(themeSettings)
-                    .preferredColorScheme(currentTheme.colorScheme)
-            } else if isSetupComplete {
+            if isSetupComplete {
                 NavigationStack(path: $pathManager.path) {
                     if isInitialLanguageSelected {
                         ContentView()
