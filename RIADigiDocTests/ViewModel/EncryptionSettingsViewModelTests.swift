@@ -32,6 +32,7 @@ final class EncryptionSettingsViewModelTests {
     private let mockDataStore: DataStoreProtocolMock!
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
     private let mockCertificateUtil: CertificateUtilProtocolMock!
+    private let mockCryptoSetup: CryptoSetupProtocolMock!
 
     let mockConfigProvider: ConfigurationProvider!
 
@@ -40,6 +41,7 @@ final class EncryptionSettingsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
         mockAdvancedSettingsRepository = AdvancedSettingsRepositoryProtocolMock()
         mockCertificateUtil = CertificateUtilProtocolMock()
+        mockCryptoSetup = CryptoSetupProtocolMock()
 
         mockDataStore.getEncryptionCdocOptionHandler = { _ in
             return .cdoc1
@@ -71,7 +73,8 @@ final class EncryptionSettingsViewModelTests {
             configurationRepository: mockConfigurationRepository,
             dataStore: mockDataStore,
             advancedSettingsRepository: mockAdvancedSettingsRepository,
-            certificateUtil: mockCertificateUtil
+            certificateUtil: mockCertificateUtil,
+            cryptoSetup: mockCryptoSetup
         )
     }
 
@@ -96,7 +99,8 @@ final class EncryptionSettingsViewModelTests {
             configurationRepository: mockConfigurationRepository,
             dataStore: mockDataStore,
             advancedSettingsRepository: mockAdvancedSettingsRepository,
-            certificateUtil: mockCertificateUtil
+            certificateUtil: mockCertificateUtil,
+            cryptoSetup: mockCryptoSetup
         )
 
         mockDataStore.getCentralCDOC2ConfHandler = { _, _ in

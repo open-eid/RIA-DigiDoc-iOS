@@ -72,12 +72,6 @@ public final class CDoc2Setting: NSObject, Sendable {
        Self.cdoc2Conf = val
     }
 
-//    @objc @MainActor static public var kProxyHost: String = Constants.ProxyDefaultValues.proxyInfoHost
-//    @objc @MainActor static public var kProxyPort: Int =  Constants.ProxyDefaultValues.proxyInfoPort
-//    @objc @MainActor static public var kProxyUsername: String = Constants.ProxyDefaultValues.proxyInfoUsername
-//    @objc @MainActor static public var kProxyPassword: String = Constants.ProxyDefaultValues.proxyInfoPassword
-//    
-
     @objc public static let kProxyHost = "kProxyHost"
     @objc public static let kProxyPort = "kProxyPort"
     @objc public static let kProxyUsername = "kProxyUsername"

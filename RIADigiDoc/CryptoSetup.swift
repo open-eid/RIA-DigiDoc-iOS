@@ -18,17 +18,11 @@
  */
 
 import Foundation
-import OSLog
-import LibdigidocLibSwift
 import CryptoObjCWrapper
 import CryptoSwift
 import ConfigLib
-import CommonsLib
-import UtilsLib
 
-actor CryptoSetup {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CryptoSetup")
-
+actor CryptoSetup: CryptoSetupProtocol {
     private let dataStore: DataStoreProtocol
     private let ldapConfiguration: LdapConfigurationProtocol
 

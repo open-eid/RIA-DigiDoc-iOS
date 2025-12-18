@@ -37,7 +37,7 @@ actor LibrarySetup {
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let keychainStore: KeychainStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
-    private let cryptoSetup: CryptoSetup
+    private let cryptoSetup: CryptoSetupProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
@@ -48,7 +48,7 @@ actor LibrarySetup {
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         keychainStore: KeychainStoreProtocol,
         proxyUtil: ProxyUtilProtocol,
-        cryptoSetup: CryptoSetup
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository

@@ -134,6 +134,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CryptoSetup.swift,
+				CryptoSetupProtocol.swift,
 				DI/AppContainer.swift,
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,

@@ -35,14 +35,14 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
     private let keychainStore: KeychainStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
-    private let cryptoSetup: CryptoSetup
+    private let cryptoSetup: CryptoSetupProtocol
 
     public init(
         dataStore: DataStoreProtocol,
         keychainStore: KeychainStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
-        cryptoSetup: CryptoSetup
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.dataStore = dataStore
         self.keychainStore = keychainStore

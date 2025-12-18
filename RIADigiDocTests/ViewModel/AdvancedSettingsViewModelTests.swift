@@ -17,6 +17,7 @@
  *
  */
 
+import FactoryKit
 import CommonsLib
 import ConfigLib
 import ConfigLibMocks
@@ -31,6 +32,7 @@ final class AdvancedSettingsViewModelTests {
     private let mockKeychainStore: KeychainStoreProtocolMock!
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
     private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock!
+    private let mockCryptoSetup: CryptoSetupProtocolMock!
 
     let mockConfigProvider: ConfigurationProvider!
 
@@ -39,6 +41,7 @@ final class AdvancedSettingsViewModelTests {
         mockKeychainStore = KeychainStoreProtocolMock()
         mockAdvancedSettingsRepository = AdvancedSettingsRepositoryProtocolMock()
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
+        mockCryptoSetup = CryptoSetupProtocolMock()
 
         mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
         TestConfigurationSetup.configureMocks(
@@ -50,7 +53,8 @@ final class AdvancedSettingsViewModelTests {
             dataStore: mockDataStore,
             keychainStore: mockKeychainStore,
             advancedSettingsRepository: mockAdvancedSettingsRepository,
-            configurationRepository: mockConfigurationRepository
+            configurationRepository: mockConfigurationRepository,
+            cryptoSetup: mockCryptoSetup
         )
     }
 

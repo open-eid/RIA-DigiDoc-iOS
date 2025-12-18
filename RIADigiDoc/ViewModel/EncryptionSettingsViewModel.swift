@@ -43,14 +43,14 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
     private let dataStore: DataStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let certificateUtil: CertificateUtilProtocol
-    private let cryptoSetup: CryptoSetup
+    private let cryptoSetup: CryptoSetupProtocol
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
         dataStore: DataStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         certificateUtil: CertificateUtilProtocol,
-        cryptoSetup: CryptoSetup,
+        cryptoSetup: CryptoSetupProtocol,
     ) {
         self.configurationRepository = configurationRepository
         self.dataStore = dataStore

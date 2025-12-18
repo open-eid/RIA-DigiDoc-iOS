@@ -43,7 +43,7 @@ extension Container {
     }
 
     @MainActor
-    var cryptoSetup: Factory<CryptoSetup> {
+    var cryptoSetup: Factory<CryptoSetupProtocol> {
         self { @MainActor in
             CryptoSetup(
                 dataStore: self.dataStore(),
