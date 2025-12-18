@@ -183,7 +183,7 @@ struct EncryptView: View {
                 onLeftClick: {
                     Task {
                         if await viewModel.handleBackButton() {
-                            pathManager.navigate(to: .homeView)
+                            dismiss()
                         }
                     }
                 },
@@ -358,6 +358,7 @@ struct EncryptView: View {
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
                                     if viewModel.isContainerWithoutRecipients {
+                                        pathManager.removeLast()
                                         pathManager.navigate(to:
                                             .encryptRecipientView
                                         )

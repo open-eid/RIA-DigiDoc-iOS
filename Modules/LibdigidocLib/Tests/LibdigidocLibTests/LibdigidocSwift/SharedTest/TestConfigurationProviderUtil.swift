@@ -61,6 +61,7 @@ public struct TestConfigurationProviderUtil {
             ldapCerts: [],
             configurationLastUpdateCheckDate: Date(),
             configurationUpdateDate: Date(),
+            cdoc2Default: false,
             cdoc2DefaultKeyserver: "https://cdoc2DefaultKeyserver.example.abc",
             cdoc2UseKeyserver: false,
             cdoc2Conf: [

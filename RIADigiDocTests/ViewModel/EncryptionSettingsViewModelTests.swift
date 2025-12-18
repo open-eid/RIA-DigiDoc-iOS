@@ -17,6 +17,7 @@
  *
  */
 
+import CommonsLib
 import CommonsTestShared
 import ConfigLib
 import ConfigLibMocks
@@ -31,6 +32,7 @@ final class EncryptionSettingsViewModelTests {
     private let mockDataStore: DataStoreProtocolMock!
     private let mockAdvancedSettingsRepository: AdvancedSettingsRepositoryProtocolMock!
     private let mockCertificateUtil: CertificateUtilProtocolMock!
+    private let mockCryptoSetup: CryptoSetupProtocolMock!
 
     let mockConfigProvider: ConfigurationProvider!
 
@@ -39,20 +41,21 @@ final class EncryptionSettingsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
         mockAdvancedSettingsRepository = AdvancedSettingsRepositoryProtocolMock()
         mockCertificateUtil = CertificateUtilProtocolMock()
+        mockCryptoSetup = CryptoSetupProtocolMock()
 
-        mockDataStore.getEncryptionCdocOptionHandler = {
+        mockDataStore.getEncryptionCdocOptionHandler = { _ in
             return .cdoc1
         }
 
-        mockDataStore.getEncryptionUseKeyTransferHandler = {
+        mockDataStore.getEncryptionUseKeyTransferHandler = { _ in
             return false
         }
 
-        mockDataStore.getEncryptionServerIdHandler = {
-            return .defaultSetting
+        mockDataStore.getEncryptionServerIdHandler = { _ in
+            return Constants.CryptoDefaultValues.encryptionServerInfoUUID
         }
 
-        mockDataStore.getEncryptionServerInfoHandler = {
+        mockDataStore.getEncryptionServerInfoHandler = { _ in
             return EncryptionServerInfo()
         }
 
@@ -62,11 +65,16 @@ final class EncryptionSettingsViewModelTests {
             configProvider: mockConfigProvider
         )
 
+        mockDataStore.getCentralCDOC2ConfHandler = { _, _ in
+            return EncryptionServerInfo()
+        }
+
         viewModel = EncryptionSettingsViewModel(
             configurationRepository: mockConfigurationRepository,
             dataStore: mockDataStore,
             advancedSettingsRepository: mockAdvancedSettingsRepository,
-            certificateUtil: mockCertificateUtil
+            certificateUtil: mockCertificateUtil,
+            cryptoSetup: mockCryptoSetup
         )
     }
 
@@ -74,8 +82,8 @@ final class EncryptionSettingsViewModelTests {
 
     @Test
     func init_successManualServerId() async throws {
-        mockDataStore.getEncryptionServerIdHandler = {
-            return .manualSetting
+        mockDataStore.getEncryptionServerIdHandler = { _ in
+            return "00000000-0000-0000-0000-100000000000"
         }
 
         let testServerInfo = EncryptionServerInfo(
@@ -83,7 +91,7 @@ final class EncryptionSettingsViewModelTests {
             fetchURL: "testFetchURL",
             postURL: "testPostURL"
         )
-        mockDataStore.getEncryptionServerInfoHandler = {
+        mockDataStore.getEncryptionServerInfoHandler = { _ in
             return testServerInfo
         }
 
@@ -91,8 +99,13 @@ final class EncryptionSettingsViewModelTests {
             configurationRepository: mockConfigurationRepository,
             dataStore: mockDataStore,
             advancedSettingsRepository: mockAdvancedSettingsRepository,
-            certificateUtil: mockCertificateUtil
+            certificateUtil: mockCertificateUtil,
+            cryptoSetup: mockCryptoSetup
         )
+
+        mockDataStore.getCentralCDOC2ConfHandler = { _, _ in
+            return testServerInfo
+        }
 
         await testViewModel.initializeSettings()
 
@@ -108,7 +121,7 @@ final class EncryptionSettingsViewModelTests {
     func saveSettings_successWithCDOC1() async throws {
         viewModel.encryptionCdocOption = .cdoc1
         viewModel.useKeyTransfer = true
-        viewModel.serverId = .manualSetting
+        viewModel.serverId = "00000000-0000-0000-0000-100000000000"
 
         let testServerInfo = EncryptionServerInfo(
             uuid: "testUUID",
@@ -126,7 +139,7 @@ final class EncryptionSettingsViewModelTests {
 
         #expect(viewModel.encryptionCdocOption == .cdoc1)
         #expect(viewModel.useKeyTransfer == false)
-        #expect(viewModel.serverId == .defaultSetting)
+        #expect(viewModel.serverId == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
         #expect(viewModel.serverInfo.uuid != testServerInfo.uuid)
         #expect(viewModel.serverInfo.fetchURL != testServerInfo.fetchURL)
         #expect(viewModel.serverInfo.postURL != testServerInfo.postURL)
@@ -134,18 +147,29 @@ final class EncryptionSettingsViewModelTests {
 
     @Test
     func saveSettings_successWithCDOC2AndUseKeyTransferFalse() async throws {
-        await viewModel.initializeSettings()
-
-        viewModel.encryptionCdocOption = .cdoc2
-        viewModel.useKeyTransfer = false
-        viewModel.serverId = .manualSetting
-
         let testServerInfo = EncryptionServerInfo(
             uuid: "testUUID",
             fetchURL: "testFetchURL",
             postURL: "testPostURL"
         )
-        viewModel.serverInfo = testServerInfo
+
+        let testServerInfo2 = EncryptionServerInfo(
+            uuid: "testUUID2",
+            fetchURL: "testFetchURL2",
+            postURL: "testPostURL2"
+        )
+
+        mockDataStore.getCentralCDOC2ConfHandler = { _, _ in
+            return testServerInfo
+        }
+
+        await viewModel.initializeSettings()
+
+        viewModel.encryptionCdocOption = .cdoc2
+        viewModel.useKeyTransfer = false
+        viewModel.serverId = "00000000-0000-0000-0000-100000000000"
+
+        viewModel.serverInfo = testServerInfo2
 
         await viewModel.saveSettings()
 
@@ -156,26 +180,36 @@ final class EncryptionSettingsViewModelTests {
 
         #expect(viewModel.encryptionCdocOption == .cdoc2)
         #expect(viewModel.useKeyTransfer == false)
-        #expect(viewModel.serverId == .defaultSetting)
-        #expect(viewModel.serverInfo.uuid != testServerInfo.uuid)
-        #expect(viewModel.serverInfo.fetchURL != testServerInfo.fetchURL)
-        #expect(viewModel.serverInfo.postURL != testServerInfo.postURL)
+        #expect(viewModel.serverId == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        #expect(viewModel.serverInfo.uuid != testServerInfo2.uuid)
+        #expect(viewModel.serverInfo.fetchURL != testServerInfo2.fetchURL)
+        #expect(viewModel.serverInfo.postURL != testServerInfo2.postURL)
     }
 
     @Test
     func saveSettings_successWithCDOC2AndUseKeyTransferTrueAndServerIdDefault() async throws {
-        await viewModel.initializeSettings()
-
-        viewModel.encryptionCdocOption = .cdoc2
-        viewModel.useKeyTransfer = true
-        viewModel.serverId = .defaultSetting
-
         let testServerInfo = EncryptionServerInfo(
             uuid: "testUUID",
             fetchURL: "testFetchURL",
             postURL: "testPostURL"
         )
-        viewModel.serverInfo = testServerInfo
+
+        let testServerInfo2 = EncryptionServerInfo(
+            uuid: "testUUID2",
+            fetchURL: "testFetchURL2",
+            postURL: "testPostURL2"
+        )
+
+        mockDataStore.getCentralCDOC2ConfHandler = { _, _ in
+            return testServerInfo
+        }
+
+        await viewModel.initializeSettings()
+
+        viewModel.encryptionCdocOption = .cdoc2
+        viewModel.useKeyTransfer = true
+        viewModel.serverId = Constants.CryptoDefaultValues.encryptionServerInfoUUID
+        viewModel.serverInfo = testServerInfo2
 
         await viewModel.saveSettings()
 
@@ -186,25 +220,29 @@ final class EncryptionSettingsViewModelTests {
 
         #expect(viewModel.encryptionCdocOption == .cdoc2)
         #expect(viewModel.useKeyTransfer == true)
-        #expect(viewModel.serverId == .defaultSetting)
-        #expect(viewModel.serverInfo.uuid != testServerInfo.uuid)
-        #expect(viewModel.serverInfo.fetchURL != testServerInfo.fetchURL)
-        #expect(viewModel.serverInfo.postURL != testServerInfo.postURL)
+        #expect(viewModel.serverId == Constants.CryptoDefaultValues.encryptionServerInfoUUID)
+        #expect(viewModel.serverInfo.uuid != testServerInfo2.uuid)
+        #expect(viewModel.serverInfo.fetchURL != testServerInfo2.fetchURL)
+        #expect(viewModel.serverInfo.postURL != testServerInfo2.postURL)
     }
 
     @Test
     func saveSettings_successWithCDOC2AllManual() async throws {
-        await viewModel.initializeSettings()
-
-        viewModel.encryptionCdocOption = .cdoc2
-        viewModel.useKeyTransfer = true
-        viewModel.serverId = .manualSetting
-
         let testServerInfo = EncryptionServerInfo(
             uuid: "testUUID",
             fetchURL: "testFetchURL",
             postURL: "testPostURL"
         )
+        mockDataStore.getCentralCDOC2ConfHandler = { _, _ in
+            return testServerInfo
+        }
+
+        await viewModel.initializeSettings()
+
+        viewModel.encryptionCdocOption = .cdoc2
+        viewModel.useKeyTransfer = true
+        viewModel.serverId = "00000000-0000-0000-0000-100000000000"
+
         viewModel.serverInfo = testServerInfo
 
         await viewModel.saveSettings()
@@ -216,7 +254,7 @@ final class EncryptionSettingsViewModelTests {
 
         #expect(viewModel.encryptionCdocOption == .cdoc2)
         #expect(viewModel.useKeyTransfer == true)
-        #expect(viewModel.serverId == .manualSetting)
+        #expect(viewModel.serverId == "00000000-0000-0000-0000-100000000000")
         #expect(viewModel.serverInfo.uuid == testServerInfo.uuid)
         #expect(viewModel.serverInfo.fetchURL == testServerInfo.fetchURL)
         #expect(viewModel.serverInfo.postURL == testServerInfo.postURL)

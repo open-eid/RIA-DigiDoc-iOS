@@ -35,17 +35,20 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
     private let keychainStore: KeychainStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
+    private let cryptoSetup: CryptoSetupProtocol
 
     public init(
         dataStore: DataStoreProtocol,
         keychainStore: KeychainStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
-        configurationRepository: ConfigurationRepositoryProtocol
+        configurationRepository: ConfigurationRepositoryProtocol,
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.dataStore = dataStore
         self.keychainStore = keychainStore
         self.advancedSettingsRepository = advancedSettingsRepository
         self.configurationRepository = configurationRepository
+        self.cryptoSetup = cryptoSetup
 
         Task {
             configuration = await configurationRepository.getConfiguration()
@@ -55,10 +58,14 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
     // MARK: - Restore Default Settings
 
     public func restoreDefaultSettings() async {
-        await dataStore.restoreDefaultServicesSettings()
+        await dataStore.restoreDefaultServicesSettings(configuration)
         await keychainStore.removeAll()
         await removeCertificates()
         await DigiDocConf.restoreDefaultSettings()
+
+        await cryptoSetup.setLdapConfig(configuration)
+        await cryptoSetup.setCdoc2Config(configuration)
+        await cryptoSetup.setCdoc2Settings(configuration)
     }
 
     private func removeCertificates() async {

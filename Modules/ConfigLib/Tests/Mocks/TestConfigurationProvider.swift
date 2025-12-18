@@ -56,6 +56,7 @@ public class TestConfigurationProvider {
             identifier: .gregorian)
             .date(from: DateComponents(year: 2025, month: 9, day: 2, hour: 15, minute: 22, second: 28)
         ),
+        cdoc2Default: Bool = false,
         cdoc2DefaultKeyserver: String = "https://cdoc2DefaultKeyserver.someUrl.abc",
         cdoc2UseKeyserver: Bool = false,
         cdoc2ConfUUID: String = "00000000-0000-0000-0000-000000000000",
@@ -114,6 +115,7 @@ public class TestConfigurationProvider {
             ldapCerts: ldapCertsData,
             configurationLastUpdateCheckDate: configurationLastUpdateCheckDate,
             configurationUpdateDate: configurationUpdateDate,
+            cdoc2Default: cdoc2Default,
             cdoc2DefaultKeyserver: cdoc2DefaultKeyserver,
             cdoc2UseKeyserver: cdoc2UseKeyserver,
             cdoc2Conf: cdoc2Conf

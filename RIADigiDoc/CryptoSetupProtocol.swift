@@ -17,16 +17,12 @@
  *
  */
 
-public struct EncryptionServerInfo: Sendable {
-    var uuid: String
-    var name: String
-    var fetchURL: String
-    var postURL: String
+import Foundation
+import ConfigLib
 
-    init(uuid: String = "", name: String = "", fetchURL: String = "", postURL: String = "") {
-        self.uuid = uuid
-        self.name = name
-        self.fetchURL = fetchURL
-        self.postURL = postURL
-    }
+/// @mockable
+public protocol CryptoSetupProtocol: Sendable {
+    func setLdapConfig(_ configurationProvider: ConfigurationProvider?) async
+    func setCdoc2Config(_ configurationProvider: ConfigurationProvider?) async
+    func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?) async
 }

@@ -38,14 +38,10 @@
     if (!writer) {
         return completion([NSError cryptoError:@"Failed to create writer"]);
     }
+  
     
-    
-    if (writer->beginEncryption() != 0) {
-        return completion([NSError cryptoError:@"Failed to start encryption"]);
-    }
-
-    if (version == 2 && CDoc2Settings.isOnlineEncryptionEnabled) {
-        NSString *server_id = CDoc2Settings.getSelectedService;
+    if (version == 2 && CDoc2Setting.isOnlineEncryptionEnabled) {
+        NSString *server_id = CDoc2Setting.getUUID;
         for (Addressee *addressee in addressees) {
             if (writer->addRecipient(libcdoc::Recipient::makeServer({}, [addressee.data toVector], [server_id toString])) != 0) {
                 return completion([NSError cryptoError:@"Failed to add recipient"]);
@@ -57,6 +53,10 @@
                 return completion([NSError cryptoError:@"Failed to add recipient"]);
             }
         }
+    }
+    
+    if (writer->beginEncryption() != 0) {
+        return completion([NSError cryptoError:@"Failed to start encryption"]);
     }
 
     for (CryptoDataFile *dataFile in dataFiles) {

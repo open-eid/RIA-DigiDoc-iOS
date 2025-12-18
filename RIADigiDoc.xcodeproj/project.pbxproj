@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
+		1A4A775E2EF19823001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775D2EF19823001747D8 /* ConfigLib */; };
+		1A4A77602EF1983F001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775F2EF1983F001747D8 /* ConfigLib */; };
+		1A4A77622EF1983F001747D8 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A77612EF1983F001747D8 /* ConfigLibMocks */; };
 		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
 		DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
@@ -130,6 +133,8 @@
 		DF1DE0582CCB18790068283D /* Exceptions for "RIADigiDoc" folder in "RIADigiDocTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CryptoSetup.swift,
+				CryptoSetupProtocol.swift,
 				DI/AppContainer.swift,
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
@@ -379,6 +384,7 @@
 				DFA3EE5B2D14C4C2001D951B /* Alamofire in Frameworks */,
 				DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */,
 				DF9AFE992E0358C20062C64D /* FactoryKit in Frameworks */,
+				1A4A775E2EF19823001747D8 /* ConfigLib in Frameworks */,
 				DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,9 +393,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A4A77622EF1983F001747D8 /* ConfigLibMocks in Frameworks */,
 				DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */,
 				DFA3EE412D1495EE001D951B /* UtilsLib in Frameworks */,
 				DFAABCF92E82AE1E00906874 /* CommonsLibMocks in Frameworks */,
+				1A4A77602EF1983F001747D8 /* ConfigLib in Frameworks */,
 				DF9AFE9B2E0358C70062C64D /* FactoryTesting in Frameworks */,
 				DF4652362E82B7C100335BA3 /* CommonsTestShared in Frameworks */,
 				DFA3EE3F2D1495EC001D951B /* CommonsLib in Frameworks */,
@@ -549,6 +557,7 @@
 				DF4E6D832D120CFC00F6111A /* UtilsLib */,
 				DFA3EE5A2D14C4C2001D951B /* Alamofire */,
 				DF9AFE982E0358C20062C64D /* FactoryKit */,
+				1A4A775D2EF19823001747D8 /* ConfigLib */,
 			);
 			productName = FileImportShareExtension;
 			productReference = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */;
@@ -578,6 +587,8 @@
 				DF9AFE9A2E0358C70062C64D /* FactoryTesting */,
 				DFAABCF82E82AE1E00906874 /* CommonsLibMocks */,
 				DF4652352E82B7C100335BA3 /* CommonsTestShared */,
+				1A4A775F2EF1983F001747D8 /* ConfigLib */,
+				1A4A77612EF1983F001747D8 /* ConfigLibMocks */,
 			);
 			productName = FileImportShareExtensionTest;
 			productReference = DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */;
@@ -1460,6 +1471,18 @@
 		1A438FD82E72CF1900546B86 /* CryptoLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CryptoLib;
+		};
+		1A4A775D2EF19823001747D8 /* ConfigLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLib;
+		};
+		1A4A775F2EF1983F001747D8 /* ConfigLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLib;
+		};
+		1A4A77612EF1983F001747D8 /* ConfigLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ConfigLibMocks;
 		};
 		1A5026EC2E8BFCF400C184D7 /* IdCardLib */ = {
 			isa = XCSwiftPackageProductDependency;

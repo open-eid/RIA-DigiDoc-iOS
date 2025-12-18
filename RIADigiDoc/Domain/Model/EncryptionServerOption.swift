@@ -18,7 +18,7 @@
  */
 
 struct EncryptionServerOption: Identifiable, Equatable, Hashable {
-    let id: EncryptionServerOptionId
+    let id: String
     let titleKey: String
     let accessibilityInputLabel: String
 }

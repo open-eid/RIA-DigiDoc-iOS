@@ -2,7 +2,7 @@
 //  Config.h
 //  CryptoLib
 /*
- * Copyright 2017 - 2024 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,12 +25,28 @@
 #include <cdoc/Configuration.h>
 #include <cdoc/NetworkBackend.h>
 
-struct Settings: public libcdoc::Configuration {
-    std::string getValue(std::string_view domain, std::string_view param) const final {
-        if(param == KEYSERVER_FETCH_URL)
-            return [CDoc2Settings.getFetchURL toString];
-        if(param == KEYSERVER_SEND_URL)
-            return [CDoc2Settings.getPostURL toString];
+struct Settings : public libcdoc::Configuration {
+
+    std::string getValue(std::string_view domain,
+                         std::string_view param) const final {
+
+        NSString *nsDomain =
+            [[NSString alloc] initWithBytes:domain.data()
+                                      length:domain.size()
+                                    encoding:NSUTF8StringEncoding];
+
+        if (param == KEYSERVER_FETCH_URL) {
+            NSString *url =
+                [CDoc2Setting getEncryptionServerInfoFetchURLWithDomain:nsDomain];
+            return url ? std::string(url.toString) : std::string{};
+        }
+
+        if (param == KEYSERVER_SEND_URL) {
+            NSString *url =
+                [CDoc2Setting getEncryptionServerInfoPostURLWithDomain:nsDomain];
+            return url ? std::string(url.toString) : std::string{};
+        }
+
         return {};
     }
 };
@@ -38,22 +54,22 @@ struct Settings: public libcdoc::Configuration {
 struct Network: public libcdoc::NetworkBackend {
     libcdoc::result_t getPeerTLSCertificates(std::vector<std::vector<uint8_t>> &dst, const std::string& url) final {
         libcdoc::NetworkBackend::getPeerTLSCertificates(dst);
-        for (NSData *cert in CDoc2Settings.cdoc2Certs) {
+        for (NSData *cert in CDoc2Setting.cdoc2Certs) {
             dst.push_back([cert toVector]);
         }
-        if (auto cert = [CDoc2Settings.getCert toVector]; !cert.empty()) {
+        if (auto cert = [CDoc2Setting.getCert toVector]; !cert.empty()) {
             dst.push_back(std::move(cert));
         }
         return libcdoc::OK;
     }
 
     libcdoc::result_t getProxyCredentials(ProxyCredentials &cred) const final {
-        if (NSDictionary<NSString *, id> *data = [CDoc2Settings proxyCredentials]) {
+        if (NSDictionary<NSString *, id> *data = [CDoc2Setting proxyCredentials]) {
             cred = {
-                .host = [(NSString*)data[CDoc2Settings.kProxyHost] toString],
-                .port = [data[CDoc2Settings.kProxyPort] unsignedShortValue],
-                .username = [(NSString*)data[CDoc2Settings.kProxyUsername] toString],
-                .password = [(NSString*)data[CDoc2Settings.kProxyPassword] toString]
+                .host = [(NSString*)data[CDoc2Setting.kProxyHost] toString],
+                .port = [data[CDoc2Setting.kProxyPort] unsignedShortValue],
+                .username = [(NSString*)data[CDoc2Setting.kProxyUsername] toString],
+                .password = [(NSString*)data[CDoc2Setting.kProxyPassword] toString]
             };
         }
         return libcdoc::OK;

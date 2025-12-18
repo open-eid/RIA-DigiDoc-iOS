@@ -20,6 +20,7 @@
 import Foundation
 import OSLog
 import LibdigidocLibSwift
+import CryptoObjCWrapper
 import CryptoSwift
 import ConfigLib
 import CommonsLib
@@ -36,7 +37,7 @@ actor LibrarySetup {
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
     private let keychainStore: KeychainStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
-    private let ldapConfiguration: LdapConfigurationProtocol
+    private let cryptoSetup: CryptoSetupProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
@@ -47,7 +48,7 @@ actor LibrarySetup {
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         keychainStore: KeychainStoreProtocol,
         proxyUtil: ProxyUtilProtocol,
-        ldapConfiguration: LdapConfigurationProtocol
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
@@ -57,7 +58,7 @@ actor LibrarySetup {
         self.advancedSettingsRepository = advancedSettingsRepository
         self.keychainStore = keychainStore
         self.proxyUtil = proxyUtil
-        self.ldapConfiguration = ldapConfiguration
+        self.cryptoSetup = cryptoSetup
     }
 
     func setupLibraries() async {
@@ -97,17 +98,9 @@ actor LibrarySetup {
 
             let configurationProvider = await configurationRepository.getConfiguration()
 
-            if let ldapPersonUrl = configurationProvider?.ldapPersonUrl {
-                await ldapConfiguration.setLdapPersonURLS([ldapPersonUrl])
-            }
-
-            if let ldapPersonUrls = configurationProvider?.ldapPersonUrls {
-                await ldapConfiguration.setLdapPersonURLS(ldapPersonUrls)
-            }
-
-            if let ldapCorpUrl = configurationProvider?.ldapCorpUrl {
-                await ldapConfiguration.setLdapCorpURL(ldapCorpUrl)
-            }
+            await cryptoSetup.setLdapConfig(configurationProvider)
+            await cryptoSetup.setCdoc2Config(configurationProvider)
+            await cryptoSetup.setCdoc2Settings(configurationProvider)
 
             try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {

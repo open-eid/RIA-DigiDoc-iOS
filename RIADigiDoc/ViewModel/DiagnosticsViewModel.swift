@@ -139,7 +139,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
         guard let config = configuration else { return }
 
         let lines: [(label: String, value: String)] = [
-            ("CDOC2-DEFAULT", String(config.cdoc2UseKeyserver)),
+            ("CDOC2-DEFAULT", String(config.cdoc2Default ?? false)),
             ("CDOC2-USE-KEYSERVER", String(config.cdoc2UseKeyserver)),
             ("CDOC2-DEFAULT-KEYSERVER", config.cdoc2DefaultKeyserver)
         ]

@@ -79,6 +79,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public let ldapCerts: [Data]
     public var configurationLastUpdateCheckDate: Date?
     public var configurationUpdateDate: Date?
+    public let cdoc2Default: Bool?
     public let cdoc2DefaultKeyserver: String
     public let cdoc2UseKeyserver: Bool
     public let cdoc2Conf: [String: CDOC2Conf]
@@ -101,6 +102,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         case ldapCerts = "LDAP-CERTS"
         case configurationLastUpdateCheckDate = "configurationLastUpdateCheckDate"
         case configurationUpdateDate = "configurationUpdateDate"
+        case cdoc2Default = "CDOC2-DEFAULT"
         case cdoc2DefaultKeyserver = "CDOC2-DEFAULT-KEYSERVER"
         case cdoc2UseKeyserver = "CDOC2-USE-KEYSERVER"
         case cdoc2Conf = "CDOC2-CONF"
@@ -131,6 +133,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         try container.encode(sidV2SkRestUrl, forKey: .sidV2SkRestUrl)
         try container.encode(certBundle, forKey: .certBundle)
         try container.encode(ldapCerts, forKey: .ldapCerts)
+        try container.encode(cdoc2Default, forKey: .cdoc2Default)
         try container.encode(cdoc2DefaultKeyserver, forKey: .cdoc2DefaultKeyserver)
         try container.encode(cdoc2UseKeyserver, forKey: .cdoc2UseKeyserver)
         try container.encode(cdoc2Conf, forKey: .cdoc2Conf)
@@ -154,6 +157,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         sidV2SkRestUrl = try container.decode(URL.self, forKey: .sidV2SkRestUrl)
         certBundle = try container.decode([Data].self, forKey: .certBundle)
         ldapCerts = try container.decode([Data].self, forKey: .ldapCerts)
+        cdoc2Default = try container.decodeIfPresent(Bool.self, forKey: .cdoc2Default)
         cdoc2DefaultKeyserver = try container.decode(String.self, forKey: .cdoc2DefaultKeyserver)
         cdoc2UseKeyserver = try container.decode(Bool.self, forKey: .cdoc2UseKeyserver)
         cdoc2Conf = try container.decode([String: CDOC2Conf].self, forKey: .cdoc2Conf)
@@ -186,6 +190,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         ldapCerts: [Data],
         configurationLastUpdateCheckDate: Date?,
         configurationUpdateDate: Date?,
+        cdoc2Default: Bool?,
         cdoc2DefaultKeyserver: String,
         cdoc2UseKeyserver: Bool,
         cdoc2Conf: [String: CDOC2Conf],
@@ -207,6 +212,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         self.ldapCerts = ldapCerts
         self.configurationLastUpdateCheckDate = configurationLastUpdateCheckDate
         self.configurationUpdateDate = configurationUpdateDate
+        self.cdoc2Default = cdoc2Default
         self.cdoc2DefaultKeyserver = cdoc2DefaultKeyserver
         self.cdoc2UseKeyserver = cdoc2UseKeyserver
         self.cdoc2Conf = cdoc2Conf
