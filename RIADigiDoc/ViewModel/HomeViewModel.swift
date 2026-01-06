@@ -62,7 +62,7 @@ class HomeViewModel: HomeViewModelProtocol {
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appending(path: Constants.Container.SignedContainerFolder)
+                .appending(path: Constants.Folder.SignedContainerFolder)
         } catch {
             HomeViewModel.logger.error("Unable to get signed containers recent documents folder: \(error)")
             return nil

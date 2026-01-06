@@ -27,10 +27,6 @@ public extension Container {
             .singleton
     }
 
-    var fileInspector: Factory<FileInspectorProtocol> {
-        self { FileInspector() }
-    }
-
     var urlResourceChecker: Factory<URLResourceCheckerProtocol> {
         self { URLResourceChecker() }
     }

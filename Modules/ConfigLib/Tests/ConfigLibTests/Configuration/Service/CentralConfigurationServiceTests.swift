@@ -105,7 +105,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        await #expect(throws: Alamofire.AFError.self) {
+        await #expect(throws: Error.self) {
             try await errorService.fetchConfiguration(proxyInfo: ProxyInfo())
         }
     }
@@ -175,7 +175,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        await #expect(throws: Alamofire.AFError.self) {
+        await #expect(throws: Error.self) {
             try await errorService.fetchPublicKey(proxyInfo: ProxyInfo())
         }
     }
@@ -245,7 +245,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        await #expect(throws: Alamofire.AFError.self) {
+        await #expect(throws: Error.self) {
             try await errorService.fetchSignature(proxyInfo: ProxyInfo())
         }
     }

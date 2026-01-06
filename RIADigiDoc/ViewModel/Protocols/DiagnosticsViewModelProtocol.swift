@@ -28,7 +28,7 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
     var versionSectionContent: String { get }
     var osSectionContent: (key: String, content: String) { get }
     var libdigidocVersion: String { get }
-    var urlSectionContent: [String] { get }
+    var urlSectionContent: [(key: String, content: String)] { get }
     var cdoc2SectionContent: [String] { get }
     var tslSectionContent: [String] { get }
     var centralConfigurationSectionContent: [(key: String, content: String)] { get }

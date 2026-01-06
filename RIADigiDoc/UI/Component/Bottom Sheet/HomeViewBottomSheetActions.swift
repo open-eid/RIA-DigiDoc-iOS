@@ -25,8 +25,8 @@ struct HomeViewBottomSheetActions {
         [
             BottomSheetButton(
                 icon: "ic_m3_attach_file_48pt_wght400",
-                title: "Open file",
-                accessibilityLabel: "Open file",
+                title: "Add file",
+                accessibilityLabel: "Add file",
                 showExtraIcon: true,
                 extraIcon: "ic_m3_arrow_right_48pt_wght400",
                 onClick: onOpenFilesClick,

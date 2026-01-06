@@ -222,7 +222,8 @@ extension Container {
             @MainActor in
             RecentDocumentsViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
-                fileManager: self.fileManager()
+                fileManager: self.fileManager(),
+                fileInspector: self.fileInspector()
             )
         }
     }
@@ -268,6 +269,11 @@ extension Container {
     @MainActor
     var certificateDetailViewModel: Factory<CertificateDetailViewModel> {
         self { @MainActor in CertificateDetailViewModel() }
+    }
+
+    @MainActor
+    var fileInspector: Factory<FileInspectorProtocol> {
+        self { @MainActor in FileInspector() }
     }
 
     @MainActor
@@ -384,7 +390,8 @@ extension Container {
                 configurationRepository: self.configurationRepository(),
                 mobileIdSignService: self.mobileIdSignService(),
                 certificateUtil: self.certificateUtil(),
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                proxyUtil: self.proxyUtil()
             )
         }
     }
@@ -397,7 +404,8 @@ extension Container {
                 smartIdSignService: self.smartIdSignService(),
                 certificateUtil: self.certificateUtil(),
                 notificationUtil: self.notificationUtil(),
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                proxyUtil: self.proxyUtil()
             )
         }
     }

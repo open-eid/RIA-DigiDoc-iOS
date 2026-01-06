@@ -149,7 +149,7 @@ public actor SignedContainer: SignedContainerProtocol {
     }
 
     @discardableResult
-    public func renameContainer(to newName: String) async throws -> URL {
+    public func renameContainer(to newName: String) async throws -> SignedContainerProtocol {
 
         let fileName = newName.isEmpty ? CommonsLib.Constants.Container.DefaultName : newName
 
@@ -186,9 +186,17 @@ public actor SignedContainer: SignedContainerProtocol {
 
         try fileManager.moveItem(at: currentURL, to: uniqueFileURL)
 
-        containerFile = uniqueFileURL
+        let container = try await ContainerWrapper(
+            fileManager: fileManager
+        ).open(containerFile: uniqueFileURL, isSivaConfirmed: true)
 
-        return uniqueFileURL
+        return SignedContainer(
+            containerFile: uniqueFileURL,
+            isExistingContainer: true,
+            container: container,
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        )
     }
 
     public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
@@ -331,32 +339,60 @@ extension SignedContainer {
 
         guard let containerFile else {
             let error = isFirstDataFileContainer
-                ? DigiDocError.containerOpeningFailed(
-                    ErrorDetail(
-                        message: "Cannot open container. Container file is nil"))
-                : DigiDocError.containerCreationFailed(
-                    ErrorDetail(
-                        message: "Cannot create container. Container file is nil"
-                    )
+            ? DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot open container. Container file is nil"))
+            : DigiDocError.containerCreationFailed(
+                ErrorDetail(
+                    message: "Cannot create container. Container file is nil"
                 )
+            )
             throw error
         }
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
             SignedContainer.logger.debug("Opening existing container")
             return try await open(file: containerFile, isSivaConfirmed: isSivaConfirmed)
-        } else {
-            SignedContainer.logger.debug("Creating a new container")
-            return try await create(containerFile: containerFile, dataFiles: dataFiles)
         }
+
+        SignedContainer.logger.debug("Creating a new container")
+        return try await create(containerFile: containerFile, dataFiles: dataFiles)
     }
 
     private static func open(file: URL, isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
+        let fileManager = Container.shared.fileManager()
+
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolder: Constants.Folder.SignedContainerFolder,
+            fileManager: fileManager
+        )
+
+        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
+            signedContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
+            signedContainersDirectory.absoluteString
+        ) && !isFileInTempSignedContainerDirectory
+
+        var renamedContainerFile = file
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: file,
+                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
+                    file.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        }
+
         let container = try await ContainerWrapper(
-            fileManager: Container.shared.fileManager()
-        ).open(containerFile: file, isSivaConfirmed: isSivaConfirmed)
+            fileManager: fileManager
+        ).open(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
+
         return SignedContainer(
-            containerFile: file,
+            containerFile: renamedContainerFile,
             isExistingContainer: true,
             container: container,
             fileManager: Container.shared.fileManager(),
@@ -370,15 +406,42 @@ extension SignedContainer {
     ) async throws -> SignedContainerProtocol {
         let fileManager = Container.shared.fileManager()
         let containerWrapper = ContainerWrapper(
-            fileManager: Container.shared.fileManager()
+            fileManager: fileManager
         )
 
-        try await containerWrapper.create(file: containerFile, dataFiles: dataFiles.compactMap { $0.resolvedPath })
+        let renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+            for: containerFile,
+            in: containerFile.deletingLastPathComponent().deletingLastPathComponent()
+        )
 
-        let createdContainer = try await containerWrapper.open(containerFile: containerFile, isSivaConfirmed: true)
+        try await containerWrapper
+            .create(
+                file: renamedContainerFile,
+                dataFiles: dataFiles.compactMap {
+                    $0.resolvedPath
+                }
+            )
+
+        let createdContainer = try await containerWrapper.open(
+            containerFile: renamedContainerFile,
+            isSivaConfirmed: true
+        )
+
+        let signedContainer = SignedContainer(
+            containerFile: renamedContainerFile,
+            isExistingContainer: false,
+            container: createdContainer,
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        )
 
         SignedContainer.logger.debug("Container created. Removing \(dataFiles.count) saved data files")
         for (index, dataFile) in dataFiles.enumerated() {
+            let containerName = await signedContainer.getContainerName()
+            if await dataFile.isContainer() && containerName == dataFile.lastPathComponent {
+                continue
+            }
+
             SignedContainer.logger.debug(
                 "Removing data file (\(index + 1) / \(dataFiles.count)): \(dataFile.lastPathComponent)"
             )
@@ -389,12 +452,6 @@ extension SignedContainer {
             }
         }
 
-        return SignedContainer(
-            containerFile: containerFile,
-            isExistingContainer: false,
-            container: createdContainer,
-            fileManager: Container.shared.fileManager(),
-            containerUtil: Container.shared.containerUtil()
-        )
+        return signedContainer
     }
 }

@@ -164,30 +164,57 @@ final class SignedContainerTests {
 
     @Test
     func renameContainer_success() async throws {
-        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let newFileName = "renamed.asice"
-        let directoryURL = originalURL.deletingLastPathComponent()
-        let uniqueFileURL = directoryURL.appending(path: "renamed_unique.asice")
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(
+            subfolder: "SignedContainerTests"
+        )
+        let uniqueFileURL = tempDirectoryURL.appending(path: "renamed_unique.asice")
+
+        let localExampleContainer = tempDirectoryURL.appending(path:
+            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        )
+
+        try FileManager.default.copyItem(
+            at: exampleContainer,
+            to: localExampleContainer
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: localExampleContainer)
+            try? FileManager.default.removeItem(at: tempDirectoryURL)
+        }
 
         mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
         mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
 
+        mockFileManager.moveItemHandler = { _, _ in
+            do {
+                try FileManager.default.moveItem(at: localExampleContainer, to: uniqueFileURL)
+            } catch {
+                Issue.record("Expected moveItem to succeed")
+                return
+            }
+        }
+
         let container = SignedContainer(
-            containerFile: originalURL,
+            containerFile: localExampleContainer,
             isExistingContainer: true,
             container: mockContainerWrapper,
             fileManager: mockFileManager,
             containerUtil: mockContainerUtil
         )
 
-        let result = try await container.renameContainer(to: newFileName)
+        let renamedContainer = try await container.renameContainer(to: newFileName)
 
         #expect(mockFileManager.moveItemCallCount == 1)
-        #expect(mockFileManager.moveItemArgValues.first?.srcURL == originalURL)
+        #expect(mockFileManager.moveItemArgValues.first?.srcURL == localExampleContainer)
         #expect(mockFileManager.moveItemArgValues.first?.dstURL == uniqueFileURL)
 
-        #expect(result == uniqueFileURL)
+        let containerUrl = await renamedContainer.getRawContainerFile()
+
+        #expect(containerUrl == uniqueFileURL)
     }
 
     @Test
@@ -220,11 +247,27 @@ final class SignedContainerTests {
 
     @Test
     func renameContainer_returnURLWithDefaultNameWhenEmptyNewFileName() async throws {
-        let originalURL = URL(fileURLWithPath: "/tmp/original.asice")
+        let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let emptyNewName = ""
-        let directoryURL = originalURL.deletingLastPathComponent()
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(
+            subfolder: "SignedContainerTests"
+        )
         let defaultFileName = CommonsLib.Constants.Container.DefaultName
-        let uniqueFileURL = directoryURL.appending(path: "\(defaultFileName)_unique.asice")
+        let uniqueFileURL = tempDirectoryURL.appending(path: "\(defaultFileName)_unique.asice")
+
+        let localExampleContainer = tempDirectoryURL.appending(path:
+            "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)"
+        )
+
+        try FileManager.default.copyItem(
+            at: exampleContainer,
+            to: localExampleContainer
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: localExampleContainer)
+            try? FileManager.default.removeItem(at: tempDirectoryURL)
+        }
 
         mockContainerUtil.getContainerFileHandler = { url, _ in
             #expect(url.lastPathComponent.starts(with: defaultFileName))
@@ -233,20 +276,32 @@ final class SignedContainerTests {
 
         mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
 
-        let container = SignedContainer(
-            containerFile: originalURL,
+        mockFileManager.moveItemHandler = { _, _ in
+            do {
+                try FileManager.default.moveItem(at: localExampleContainer, to: uniqueFileURL)
+            } catch {
+                Issue.record("Expected moveItem to succeed")
+                return
+            }
+        }
+
+        let containerToRename = SignedContainer(
+            containerFile: localExampleContainer,
             isExistingContainer: false,
             container: mockContainerWrapper,
             fileManager: mockFileManager,
             containerUtil: mockContainerUtil
         )
 
-        let resultURL = try await container.renameContainer(to: emptyNewName)
+        let renamedContainer = try await containerToRename.renameContainer(to: emptyNewName)
 
         #expect(mockFileManager.moveItemCallCount == 1)
-        #expect(mockFileManager.moveItemArgValues.first?.srcURL == originalURL)
+        #expect(mockFileManager.moveItemArgValues.first?.srcURL == localExampleContainer)
         #expect(mockFileManager.moveItemArgValues.first?.dstURL == uniqueFileURL)
-        #expect(resultURL == uniqueFileURL)
+
+        let containerUrl = await renamedContainer.getRawContainerFile()
+
+        #expect(containerUrl == uniqueFileURL)
     }
 
     @Test

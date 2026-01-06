@@ -36,6 +36,14 @@ struct SmartIdInputView: View {
 
     let onInputChange: () -> Void
 
+    private var countryTitle: String {
+        languageSettings.localized("Country title")
+    }
+
+    private var personalCodeTitle: String {
+        languageSettings.localized("Personal code")
+    }
+
     private var personalCodeErrorText: String {
         return languageSettings.localized(personalCodeError ?? "")
     }
@@ -65,24 +73,28 @@ struct SmartIdInputView: View {
             VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
                 VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                     FloatingLabelTextField(
-                        title: languageSettings.localized("Country title"),
+                        title: countryTitle,
+                        placeholder: countryTitle,
                         text: .constant(languageSettings.localized(country.rawValue)),
                         isDropdown: true,
                         isDisabled: false,
                         onDropdownTap: {
                             showCountryChooser = true
-                        }
+                        },
+                        identifier: "smartIdCountry"
                     )
                 }
 
                 VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                     FloatingLabelTextField(
-                        title: languageSettings.localized("Personal code"),
+                        title: personalCodeTitle,
+                        placeholder: personalCodeTitle,
                         text: $personalCode,
                         isError: !personalCodeErrorText.isEmpty,
                         errorText: personalCodeErrorText,
                         keyboardType: .phonePad,
-                        showDashButton: true
+                        showDashButton: true,
+                        identifier: "smartIdPersonalCode"
                     )
                     .onChange(of: personalCode) {
                         onInputChange()

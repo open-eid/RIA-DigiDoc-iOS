@@ -40,11 +40,11 @@ public struct ContainerUtil: ContainerUtilProtocol {
     ) -> URL {
         let fileExtension = fileURL.pathExtension
         let baseName = fileURL.deletingPathExtension().lastPathComponent
-        var uniqueFileURL = fileURL
+        var uniqueFileURL = directory.appending(path: fileURL.lastPathComponent)
         var fileNameCounter = 1
 
-        while fileManager.fileExists(atPath: uniqueFileURL.resolvedPath) {
-            let newFileName = "\(baseName)-\(fileNameCounter)"
+        while fileManager.fileExists(atPath: uniqueFileURL.path) {
+            let newFileName = "\(baseName) (\(fileNameCounter))"
             if !fileExtension.isEmpty {
                 uniqueFileURL = directory.appending(path: "\(newFileName).\(fileExtension)")
             } else {
@@ -58,7 +58,7 @@ public struct ContainerUtil: ContainerUtilProtocol {
 
     public func getSignatureContainersDir() throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolder: Constants.Container.SignedContainerFolder,
+            subfolder: Constants.Folder.SignedContainerFolder,
             fileManager: fileManager
         )
 

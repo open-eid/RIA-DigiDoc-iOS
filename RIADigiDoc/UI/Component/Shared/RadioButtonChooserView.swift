@@ -62,6 +62,7 @@ struct RadioButtonChooserView<T: Equatable & Identifiable>: View where T: Hashab
                         accessibilityLabel: accessibilityLabel(option, isSelected(option)),
                         accessibilityInputLabel: accessibilityInputLabel(option)
                     )
+                    .accessibilityIdentifier(String(describing: option))
                     Divider()
                 }
                 if trailingSpacer {

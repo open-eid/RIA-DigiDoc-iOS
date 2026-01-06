@@ -108,7 +108,11 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
                 "\(certificateBaseName).\(extensionToUse)"
             )
 
+            _ = url.startAccessingSecurityScopedResource()
+
             try fileManager.copyItem(at: url, to: destinationURL)
+
+            url.stopAccessingSecurityScopedResource()
 
             return try await getCertificateContent(certFileURL: destinationURL)
         } catch {

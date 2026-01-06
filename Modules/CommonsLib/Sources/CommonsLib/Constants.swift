@@ -21,8 +21,6 @@ import Foundation
 
 public struct Constants {
     public struct Container {
-        public static let SignedContainerFolder = "SignedContainers"
-        public static let CryptoContainerFolder = "CryptoContainers"
         public static let DefaultName = "newFile"
         public static let ContainerExtensions = [
             Extension.Asice,
@@ -83,9 +81,12 @@ public struct Constants {
     public struct Identifier {
         public static let Group = "group.ee.ria.digidoc.ios"
         public static let GroupDownload = "group.ee.ria.digidoc.ios.download"
+        public static let GroupLastOpenedAttribute = "group.ee.ria.digidoc.ios.lastOpened"
     }
 
     public struct Folder {
+        public static let SignedContainerFolder = "SignedContainers"
+        public static let CryptoContainerFolder = "CryptoContainers"
         public static let Temp = "tempfiles"
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"

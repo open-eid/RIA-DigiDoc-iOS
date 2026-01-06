@@ -30,6 +30,7 @@ struct MobileIdViewModelTests {
     private let mockMobileIdSignService: MobileIdSignServiceProtocolMock
     private let mockCertificatUtil: CertificateUtilProtocolMock
     private let mockDataStore: DataStoreProtocolMock
+    private let mockProxyUtil: ProxyUtilProtocolMock
 
     private let viewModel: MobileIdViewModel
 
@@ -38,12 +39,14 @@ struct MobileIdViewModelTests {
         self.mockMobileIdSignService = MobileIdSignServiceProtocolMock()
         self.mockCertificatUtil = CertificateUtilProtocolMock()
         self.mockDataStore = DataStoreProtocolMock()
+        self.mockProxyUtil = ProxyUtilProtocolMock()
 
         viewModel = MobileIdViewModel(
             configurationRepository: mockConfigurationRepository,
             mobileIdSignService: mockMobileIdSignService,
             certificateUtil: mockCertificatUtil,
-            dataStore: mockDataStore
+            dataStore: mockDataStore,
+            proxyUtil: mockProxyUtil
         )
     }
 

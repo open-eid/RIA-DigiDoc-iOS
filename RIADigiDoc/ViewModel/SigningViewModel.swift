@@ -201,6 +201,14 @@ class SigningViewModel: SigningViewModelProtocol {
         sharedContainerViewModel.getIsSignatureAdded()
     }
 
+    public func removeLastOpenedXattr(from url: URL) {
+        do {
+            try url.removeLastOpenedXattr()
+        } catch {
+            SigningViewModel.logger.error("Unable to remove last opened xattr: \(error)")
+        }
+    }
+
     private func validateFiles(_ files: [URL]) throws {
         guard let firstFile = files.first else {
             throw FileOpeningError.noDataFiles
@@ -254,6 +262,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
         var totalFilesCount = 0
         var failedFileCount = 0
+        var duplicateFileCount = 0
 
         guard let digiDocError = error as? DigiDocError else {
             errorMessage = ErrorMessage(key: "General error", args: [])
@@ -264,8 +273,14 @@ class SigningViewModel: SigningViewModelProtocol {
         case .addingFilesToContainerFailed(let errorDetail):
             totalFilesCount = Int(errorDetail.userInfo["totalFileCount"] ?? "0") ?? 0
             failedFileCount = Int(errorDetail.userInfo["failedFileCount"] ?? "0") ?? 0
+            duplicateFileCount = Int(errorDetail.userInfo["duplicateFileCount"] ?? "0") ?? 0
 
-            errorMessage = ErrorMessage(key: errorDetail.message, args: [String(failedFileCount)])
+            if duplicateFileCount > 1 {
+                errorMessage = ErrorMessage(key: errorDetail.message, args: [String(duplicateFileCount)])
+            } else {
+                errorMessage = ErrorMessage(key: errorDetail.message, args: [String(failedFileCount)])
+            }
+
         default:
             errorMessage = ErrorMessage(key: "General error", args: [])
         }
@@ -291,7 +306,11 @@ class SigningViewModel: SigningViewModelProtocol {
     @discardableResult
     public func renameContainer(to newName: String) async -> URL? {
         do {
-            return try await signedContainer?.renameContainer(to: newName)
+            let renamedContainer = try await signedContainer?.renameContainer(to: newName)
+            sharedContainerViewModel.removeLastContainer()
+            sharedContainerViewModel.setSignedContainer(renamedContainer)
+            await loadContainerData(signedContainer: renamedContainer)
+            return await renamedContainer?.getRawContainerFile()
         } catch {
             SigningViewModel.logger.error("Unable to rename container: \(error)")
             if let digiDocError = error as? DigiDocError {

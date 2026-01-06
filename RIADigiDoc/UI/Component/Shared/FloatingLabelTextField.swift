@@ -43,6 +43,7 @@ struct FloatingLabelTextField: View {
     let submitLabel: SubmitLabel
     let keyboardType: UIKeyboardType
     let showDashButton: Bool
+    let identifier: String
 
     init(
         title: String,
@@ -56,7 +57,8 @@ struct FloatingLabelTextField: View {
         errorText: String = "",
         submitLabel: SubmitLabel = .done,
         keyboardType: UIKeyboardType = .default,
-        showDashButton: Bool = false
+        showDashButton: Bool = false,
+        identifier: String = ""
     ) {
         self.title = title
         self.placeholder = placeholder
@@ -70,6 +72,7 @@ struct FloatingLabelTextField: View {
         self.submitLabel = submitLabel
         self.keyboardType = keyboardType
         self.showDashButton = showDashButton
+        self.identifier = identifier
     }
 
     // MARK: - State
@@ -140,6 +143,13 @@ struct FloatingLabelTextField: View {
         }
     }
 
+    private var textFieldAccessibility: String {
+        let components = [title, text, errorText]
+            .filter { !$0.isEmpty }
+
+        return components.joined(separator: " ")
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -207,7 +217,7 @@ struct FloatingLabelTextField: View {
         )
         .buttonStyle(.plain)
         .disabled(isDisabled)
-        .accessibilityLabel(Text(verbatim: "\(title) \(text) \(errorText)"))
+        .accessibilityLabel(Text(verbatim: textFieldAccessibility))
         .accessibilityValue(Text(verbatim: ""))
     }
 
@@ -217,7 +227,7 @@ struct FloatingLabelTextField: View {
     private var inputContainer: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             inputField
-                .accessibilityLabel(Text(verbatim: "\(title) \(text) \(errorText)"))
+                .accessibilityLabel(Text(verbatim: textFieldAccessibility))
                 .accessibilityValue(Text(verbatim: ""))
             Spacer()
             trailingIcon
@@ -245,73 +255,83 @@ struct FloatingLabelTextField: View {
     private var inputField: some View {
         Group {
             if isSecure && !isPasswordVisible {
-                SecureField(placeholder, text: $text)
-                    .multilineTextAlignment(.leading)
-                    .disabled(isDisabled)
-                    .keyboardType(keyboardType)
-                    .submitLabel(submitLabel)
-                    .accessibilityFocused($isAccessibilityFocused)
-                    .onSubmit {
-                        isFocused = false
-                        isAccessibilityFocused = true
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .keyboard) {
-                            if fieldIsFocused {
-                                HStack {
-                                    if showDashButton {
-                                        Button(
-                                            action: { text.append("-") },
-                                            label: { Text(verbatim: "-") }
-                                        )
-                                    }
-
+                SecureField(
+                    placeholder,
+                    text: $text,
+                    prompt: Text(verbatim: placeholder)
+                        .foregroundStyle(theme.onSurfaceVariant)
+                )
+                .multilineTextAlignment(.leading)
+                .disabled(isDisabled)
+                .keyboardType(keyboardType)
+                .submitLabel(submitLabel)
+                .accessibilityFocused($isAccessibilityFocused)
+                .onSubmit {
+                    isFocused = false
+                    isAccessibilityFocused = true
+                }
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        if fieldIsFocused {
+                            HStack {
+                                if showDashButton {
                                     Button(
-                                        action: {
-                                            fieldIsFocused = false
-                                            isAccessibilityFocused = true
-                                        },
-                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                        action: { text.append("-") },
+                                        label: { Text(verbatim: "-") }
                                     )
                                 }
+
+                                Button(
+                                    action: {
+                                        fieldIsFocused = false
+                                        isAccessibilityFocused = true
+                                    },
+                                    label: { Text(verbatim: languageSettings.localized("Done")) }
+                                )
                             }
                         }
                     }
-                    .accessibilityValue(Text(verbatim: ""))
+                }
+                .accessibilityValue(Text(verbatim: ""))
             } else {
-                TextField(placeholder, text: $text)
-                    .multilineTextAlignment(.leading)
-                    .disabled(isDisabled)
-                    .keyboardType(keyboardType)
-                    .submitLabel(submitLabel)
-                    .accessibilityFocused($isAccessibilityFocused)
-                    .onSubmit {
-                        fieldIsFocused = false
-                        isAccessibilityFocused = true
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .keyboard) {
-                            if fieldIsFocused {
-                                HStack {
-                                    if showDashButton {
-                                        Button(
-                                            action: { text.append("-") },
-                                            label: { Text(verbatim: "-") }
-                                        )
-                                    }
-
+                TextField(
+                    placeholder,
+                    text: $text,
+                    prompt: Text(verbatim: placeholder)
+                        .foregroundStyle(theme.onSurfaceVariant)
+                )
+                .multilineTextAlignment(.leading)
+                .disabled(isDisabled)
+                .keyboardType(keyboardType)
+                .submitLabel(submitLabel)
+                .accessibilityFocused($isAccessibilityFocused)
+                .onSubmit {
+                    fieldIsFocused = false
+                    isAccessibilityFocused = true
+                }
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        if fieldIsFocused {
+                            HStack {
+                                if showDashButton {
                                     Button(
-                                        action: {
-                                            fieldIsFocused = false
-                                            isAccessibilityFocused = true
-                                        },
-                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                        action: { text.append("-") },
+                                        label: { Text(verbatim: "-") }
                                     )
                                 }
+
+                                Button(
+                                    action: {
+                                        fieldIsFocused = false
+                                        isAccessibilityFocused = true
+                                    },
+                                    label: { Text(verbatim: languageSettings.localized("Done")) }
+                                )
                             }
                         }
                     }
-                    .accessibilityValue(Text(verbatim: ""))
+                }
+                .accessibilityValue(Text(verbatim: ""))
             }
         }
         .font(typography.bodyLarge)
@@ -438,6 +458,7 @@ struct FloatingLabelTextField: View {
     VStack(spacing: 20) {
         FloatingLabelTextField(
             title: "field label",
+            placeholder: "field placeholder",
             text: .constant("text inside field")
         )
 

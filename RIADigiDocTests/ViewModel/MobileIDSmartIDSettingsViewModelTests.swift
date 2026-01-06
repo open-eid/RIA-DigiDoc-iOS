@@ -73,18 +73,16 @@ final class MobileIDSmartIDSettingsViewModelTests {
 
     @Test
     func saveSettings_successWithManualSettingWithValidUUID() async throws {
+        let testUUID = "00000000-0000-0000-0000-000000000001"
         let viewModel = MobileIDSmartIDSettingsViewModel(dataStore: mockDataStore)
 
         mockDataStore.getRelyingPartyOptionHandler = {
             return .manualSetting
         }
 
+        mockDataStore.getRelyingPartyUUIDHandler = { testUUID }
+
         await viewModel.loadSettings()
-
-        viewModel.selectedOption = .manualSetting
-        let testUUID = "00000000-0000-0000-0000-000000000001"
-        viewModel.relyingPartyUUID = testUUID
-
         await viewModel.saveSettings()
 
         #expect(mockDataStore.setRelyingPartyUUIDCallCount == 1)

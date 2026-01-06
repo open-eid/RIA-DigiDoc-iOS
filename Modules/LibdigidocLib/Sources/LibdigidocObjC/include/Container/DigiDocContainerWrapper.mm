@@ -269,7 +269,10 @@ public:
                 std::vector<digidoc::Exception> causes = e.causes();
                 NSDictionary *userInfo = @{
                     NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
-                    @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
+                    @"causes": @{
+                        @"exceptions": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)],
+                        @"fileName": dataFilePath.lastPathComponent
+                    }
                 };
 
                 NSError *addFileError = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
@@ -289,7 +292,9 @@ public:
                     NSLocalizedDescriptionKey: summary,
                     @"failedFileCount": @(failedCount),
                     @"totalFileCount": @(totalFileCount),
-                    @"causes": errors
+                    @"causes": @{
+                        @"errors": errors
+                    }
                 };
                 NSError *combined = [NSError errorWithDomain:@"LibdigidocLib" code:1 userInfo:info];
                 completion(combined);

@@ -16,7 +16,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
-        .package(path: "../CommonsLib")
+        .package(path: "../CommonsLib"),
+        .package(path: "../UtilsLib")
     ],
     targets: [
         .target(
@@ -24,6 +25,7 @@ let package = Package(
             dependencies: [
                 "Alamofire",
                 "CommonsLib",
+                "UtilsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
             swiftSettings: [
@@ -43,6 +45,7 @@ let package = Package(
             dependencies: [
                 "MobileIdLib",
                 "CommonsLib",
+                "UtilsLib",
                 .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")
             ]

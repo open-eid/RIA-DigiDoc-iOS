@@ -42,6 +42,22 @@ struct EncryptionSettingsView: View {
 
     @State private var viewModel: EncryptionSettingsViewModel
 
+    private var cryptoServerTitle: String {
+        languageSettings.localized("Main settings crypto server")
+    }
+
+    private var cryptoUuidTitle: String {
+        languageSettings.localized("Main settings crypto uuid")
+    }
+
+    private var cryptoFetchUrlTitle: String {
+        languageSettings.localized("Main settings crypto fetch url")
+    }
+
+    private var cryptoPostUrlTitle: String {
+        languageSettings.localized("Main settings crypto post url")
+    }
+
     init() {
         _viewModel = State(wrappedValue: Container.shared.encryptionSettingsViewModel())
     }
@@ -119,7 +135,8 @@ struct EncryptionSettingsView: View {
         )
         if viewModel.useKeyTransfer {
             FloatingLabelTextField(
-                title: languageSettings.localized("Main settings crypto server"),
+                title: cryptoServerTitle,
+                placeholder: cryptoServerTitle,
                 text: .constant(languageSettings.localized(selectedServerOption?.titleKey ?? "")),
                 isDropdown: true,
                 isDisabled: !viewModel.useKeyTransfer,
@@ -127,26 +144,33 @@ struct EncryptionSettingsView: View {
                     dialogSelectedServerId = viewModel.serverId
                     showDialog = true
                     isDialogHeaderFocused = true
-                }
+                },
+                identifier: "cryptoServer"
             )
 
             FloatingLabelTextField(
-                title: languageSettings.localized("Main settings crypto uuid"),
+                title: cryptoUuidTitle,
+                placeholder: cryptoUuidTitle,
                 text: $viewModel.serverInfo.uuid,
                 isDisabled: !viewModel.useKeyTransfer
-                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID,
+                identifier: "cryptoUuid"
             )
             FloatingLabelTextField(
-                title: languageSettings.localized("Main settings crypto fetch url"),
+                title: cryptoFetchUrlTitle,
+                placeholder: cryptoFetchUrlTitle,
                 text: $viewModel.serverInfo.fetchURL,
                 isDisabled: !viewModel.useKeyTransfer
-                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID,
+                identifier: "cryptoFetchUrl"
             )
             FloatingLabelTextField(
-                title: languageSettings.localized("Main settings crypto post url"),
+                title: cryptoPostUrlTitle,
+                placeholder: cryptoPostUrlTitle,
                 text: $viewModel.serverInfo.postURL,
                 isDisabled: !viewModel.useKeyTransfer
-                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID
+                    || viewModel.serverId != viewModel.cdoc2ManualKeyTransferServerUUID,
+                identifier: "cryptoPostUrl"
             )
             if viewModel.serverId == viewModel.cdoc2ManualKeyTransferServerUUID {
                 AdvancedSettingsCertificateSection(

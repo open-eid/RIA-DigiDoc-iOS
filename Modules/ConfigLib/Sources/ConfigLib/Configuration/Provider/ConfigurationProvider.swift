@@ -67,7 +67,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public let tslUrl: URL
     public let tslCerts: [Data]
     public let tsaUrl: URL
-    public let ocspIssuers: [String: String]
     public let ldapPersonUrls: [URL]
     public let ldapPersonUrl: URL
     public let ldapCorpUrl: URL
@@ -90,7 +89,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         case tslUrl = "TSL-URL"
         case tslCerts = "TSL-CERTS"
         case tsaUrl = "TSA-URL"
-        case ocspIssuers = "OCSP-URL-ISSUER"
         case ldapPersonUrls = "LDAP-PERSON-URLS"
         case ldapPersonUrl = "LDAP-PERSON-URL"
         case ldapCorpUrl = "LDAP-CORP-URL"
@@ -123,7 +121,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         try container.encode(tslUrl, forKey: .tslUrl)
         try container.encode(tslCerts, forKey: .tslCerts)
         try container.encode(tsaUrl, forKey: .tsaUrl)
-        try container.encode(ocspIssuers, forKey: .ocspIssuers)
         try container.encode(ldapPersonUrl, forKey: .ldapPersonUrl)
         try container.encode(ldapPersonUrls, forKey: .ldapPersonUrls)
         try container.encode(ldapCorpUrl, forKey: .ldapCorpUrl)
@@ -147,7 +144,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         tslUrl = try container.decode(URL.self, forKey: .tslUrl)
         tslCerts = try container.decode([Data].self, forKey: .tslCerts)
         tsaUrl = try container.decode(URL.self, forKey: .tsaUrl)
-        ocspIssuers = try container.decode([String: String].self, forKey: .ocspIssuers)
         ldapPersonUrls = try container.decode([URL].self, forKey: .ldapPersonUrls)
         ldapPersonUrl = try container.decode(URL.self, forKey: .ldapPersonUrl)
         ldapCorpUrl = try container.decode(URL.self, forKey: .ldapCorpUrl)
@@ -178,7 +174,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         tslUrl: URL,
         tslCerts: [Data],
         tsaUrl: URL,
-        ocspIssuers: [String: String],
         ldapPersonUrls: [URL],
         ldapPersonUrl: URL,
         ldapCorpUrl: URL,
@@ -200,7 +195,6 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         self.tslUrl = tslUrl
         self.tslCerts = tslCerts
         self.tsaUrl = tsaUrl
-        self.ocspIssuers = ocspIssuers
         self.ldapPersonUrls = ldapPersonUrls
         self.ldapPersonUrl = ldapPersonUrl
         self.ldapCorpUrl = ldapCorpUrl

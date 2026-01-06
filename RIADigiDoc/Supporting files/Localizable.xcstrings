@@ -1,6 +1,24 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add file" : {
+      "comment" : "Home screen bottom sheet action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisa fail"
+          }
+        }
+      }
+    },
     "Add more files" : {
       "comment" : "Add more files button in signature view and crypto view",
       "extractionState" : "manual",
@@ -1416,23 +1434,6 @@
         }
       }
     },
-    "Help" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Help"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abi"
-          }
-        }
-      }
-    },
     "Hide password" : {
       "comment" : "Hide password",
       "extractionState" : "manual",
@@ -1645,6 +1646,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Identifitseeri"
+          }
+        }
+      }
+    },
+    "Information system authority" : {
+      "comment" : "RIA name. Used in initial language screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estonian Information System Authority"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riigi Infosüsteemi Amet"
           }
         }
       }
@@ -4188,6 +4207,24 @@
         }
       }
     },
+    "Multiple documents already exist" : {
+      "comment" : "When trying to add multiple data files that already exist in the container",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ files already exist in the container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ faili on juba ümbrikus olemas"
+          }
+        }
+      }
+    },
     "Next" : {
       "comment" : "Encryption view bottom bar action",
       "extractionState" : "manual",
@@ -4285,7 +4322,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dokumendid puuduvad"
+            "value" : "Ümbrikud puuduvad"
           }
         }
       }
@@ -5080,9 +5117,6 @@
           }
         }
       }
-    },
-    "Riigi Infosüsteemide Amet" : {
-
     },
     "Role and address title" : {
       "comment" : "Role and address view title",

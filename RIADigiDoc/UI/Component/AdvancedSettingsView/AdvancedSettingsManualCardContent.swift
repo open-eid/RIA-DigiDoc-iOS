@@ -39,13 +39,17 @@ struct AdvancedSettingsManualCardContent: View {
     var onShowCertificatePressed: () -> Void
     var onAddCertificatePressed: () -> Void
 
+    var identifier: String
+
     var body: some View {
         VStack(
             spacing: Dimensions.Padding.LPadding,
             content: {
                 FloatingLabelTextField(
                     title: textFieldTitle,
+                    placeholder: textFieldTitle,
                     text: $textFieldText,
+                    identifier: identifier
                 )
                 AdvancedSettingsCertificateSection(
                     certificateInfoHeader: certificateInfoHeader,
@@ -70,7 +74,8 @@ struct AdvancedSettingsManualCardContent: View {
         certificateIssuedTo: "",
         certificateValidTo: "",
         onShowCertificatePressed: {},
-        onAddCertificatePressed: {}
+        onAddCertificatePressed: {},
+        identifier: "certificateHeader"
     )
     .padding()
     .environment(Container.shared.languageSettings())

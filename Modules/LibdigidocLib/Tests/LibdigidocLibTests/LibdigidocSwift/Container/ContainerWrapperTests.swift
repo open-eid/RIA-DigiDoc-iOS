@@ -180,7 +180,7 @@ struct ContainerWrapperTests {
             try? FileManager.default.removeItem(at: containerFile)
         }
 
-        let expectedErrorMessage = "Could not add files"
+        let expectedErrorMessage = "Multiple documents already exist"
 
         do {
             try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)

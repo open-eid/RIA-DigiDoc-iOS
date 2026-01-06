@@ -34,30 +34,40 @@
 #import "../Model/DigiDocRoleData.h"
 #import "Exception/Util/ExceptionUtil.h"
 
-@implementation DigiDocSigningWrapper {}
+@implementation DigiDocSigningWrapper {
+    std::unique_ptr<digidoc::Container> _docContainer;
+    digidoc::Signature *_signature;
+    std::unique_ptr<digidoc::Signer> _signer;
+}
 
-static std::unique_ptr<digidoc::Container> docContainer = nil;
-static digidoc::Signature *signature = nil;
-static std::unique_ptr<digidoc::Signer> signer{};
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _docContainer = nil;
+        _signature = nil;
+        _signer = {};
+    }
+    return self;
+}
 
-+ (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
+- (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSError *error = nil;
     try {
-        signer = std::make_unique<WebSigner>(digidoc::X509Cert(reinterpret_cast<const unsigned char *>(cert.bytes), cert.length));
-        signature = NULL;
+        _signer = std::make_unique<WebSigner>(digidoc::X509Cert(reinterpret_cast<const unsigned char *>(cert.bytes), cert.length));
+        _signature = NULL;
 
         DigiDocContainerOpenCB cb(TRUE);
 
-        docContainer = digidoc::Container::openPtr(containerPath.UTF8String, &cb);
+        _docContainer = digidoc::Container::openPtr(containerPath.UTF8String, &cb);
 
-        signer->setProfile("time-stamp");
+        _signer->setProfile("time-stamp");
 
-        signer->setSignatureProductionPlace(roleData.city.UTF8String ?: "",
+        _signer->setSignatureProductionPlace(roleData.city.UTF8String ?: "",
                                             roleData.state.UTF8String ?: "",
                                             roleData.zipcode.UTF8String ?: "",
                                             roleData.country.UTF8String ?: "");
 
-        signer->setUserAgent(userAgent.UTF8String);
+        _signer->setUserAgent(userAgent.UTF8String);
 
         std::vector<std::string> rolesList;
         for (NSString *role in roleData.roles) {
@@ -65,10 +75,11 @@ static std::unique_ptr<digidoc::Signer> signer{};
                 rolesList.push_back(role.UTF8String);
             }
         }
-        signer->setSignerRoles(rolesList);
 
-        signature = docContainer->prepareSignature(signer.get());
-        NSData *data = [DigiDocSigningWrapper getNSDataFromVector:signature->dataToSign()];
+        _signer->setSignerRoles(rolesList);
+
+        _signature = _docContainer->prepareSignature(_signer.get());
+        NSData *data = [DigiDocSigningWrapper getNSDataFromVector:_signature->dataToSign()];
         if (completion) completion(data, nil);
     } catch(const digidoc::Exception &e) {
         std::vector<digidoc::Exception> causes = e.causes();
@@ -83,25 +94,25 @@ static std::unique_ptr<digidoc::Signer> signer{};
     }
 }
 
-+ (void)addSignature:(NSData *)data completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
+- (void)addSignature:(NSData *)data completion:(void (^)(BOOL success, NSError * _Nullable error))completion {
     NSError *error = nil;
-    if (!signature) {
+    if (!_signature) {
         error = [NSError errorWithDomain:@"LibdigidocLib" code:2 userInfo:@{
             NSLocalizedDescriptionKey: @"Did not find signature"
         }];
         if (completion) completion(NO, error);
     }
 
-    if (auto timeStampTime = signature->TimeStampTime(); !timeStampTime.empty()) {
+    if (auto timeStampTime = _signature->TimeStampTime(); !timeStampTime.empty()) {
         if (completion) completion(YES, error);
     }
 
     try {
         auto *bytes = reinterpret_cast<const unsigned char*>(data.bytes);
-        signature->setSignatureValue({bytes, bytes + data.length});
-        signature->extendSignatureProfile(signer.get());
-        signature->validate();
-        docContainer->save();
+        _signature->setSignatureValue({bytes, bytes + data.length});
+        _signature->extendSignatureProfile(_signer.get());
+        _signature->validate();
+        _docContainer->save();
         if (completion) completion(YES, error);
     } catch(const digidoc::Exception &e) {
         std::vector<digidoc::Exception> causes = e.causes();

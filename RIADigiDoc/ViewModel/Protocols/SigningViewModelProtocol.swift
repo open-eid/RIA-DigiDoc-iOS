@@ -41,4 +41,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func removeSignature(_ signature: SignatureWrapper) async
     func removeDataFile(_ dataFile: DataFileWrapper) async
     func isSignatureAdded() -> Bool
+    func removeLastOpenedXattr(from url: URL)
 }

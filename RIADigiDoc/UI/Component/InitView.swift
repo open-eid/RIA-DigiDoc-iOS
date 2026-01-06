@@ -84,7 +84,9 @@ struct InitView: View {
                             .font(typography.titleMedium)
                             .foregroundStyle(Color.white)
                             .padding(.bottom, Dimensions.Padding.MPadding)
-                            .accessibilityLabel("Riigi Infosüsteemide Amet")
+                            .accessibilityLabel(
+                                Text(verbatim: languageSettings.localized("Information system authority"))
+                            )
                     }
                     .frame(minHeight: geometry.size.height)
                     .frame(minWidth: geometry.size.width)

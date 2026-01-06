@@ -202,6 +202,10 @@ struct SigningView: View {
                                             containerURL: viewModel.containerURL
                                         )
 
+                                        if let containerURL = tempContainerURL {
+                                            viewModel.removeLastOpenedXattr(from: containerURL)
+                                        }
+
                                         if fileUtil.fileExists(fileLocation: tempContainerURL) {
                                             viewModel.isShowingContainerFileSaver = true
                                         }

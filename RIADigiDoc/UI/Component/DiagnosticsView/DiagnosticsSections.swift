@@ -27,7 +27,7 @@ struct DiagnosticsSections: View {
     var versionSectionContent: String
     var osSectionContent: (key: String, content: String)
     var libdigidocVersion: String
-    var urlSectionContent: [String]
+    var urlSectionContent: [(key: String, content: String)]
     var cdoc2SectionContent: [String]
     var tslSectionContent: [String]
     var centralConfigurationSectionContent: [(key: String, content: String)]
@@ -36,40 +36,48 @@ struct DiagnosticsSections: View {
         VStack {
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics application version title"),
-                content: versionSectionContent
+                content: versionSectionContent,
+                identifier: "applicationVersion"
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized(osSectionContent.key),
                 content: osSectionContent.content,
+                identifier: "osVersion",
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics libraries title"),
-                content: libdigidocVersion
+                content: libdigidocVersion,
+                identifier: "library"
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics urls title"),
-                contentLines: urlSectionContent,
+                contentLines: urlSectionContent
+                    .map { "\($0.key): \(languageSettings.localized($0.content))" },
+                identifier: "url",
                 showDivider: false,
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics cdoc2 title"),
                 contentLines: cdoc2SectionContent,
+                identifier: "cdoc2",
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics tsl cache title"),
                 contentLines: tslSectionContent,
+                identifier: "tslCache",
             )
 
             DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics central configuration title"),
                 contentLines: centralConfigurationSectionContent
                     .map { "\(languageSettings.localized($0.key)): \($0.content)"
-                }
+                    },
+                identifier: "centralConfiguration"
             )
         }
     }
@@ -81,7 +89,7 @@ struct DiagnosticsSections: View {
         versionSectionContent: "",
         osSectionContent: (key: "", content: ""),
         libdigidocVersion: "",
-        urlSectionContent: [""],
+        urlSectionContent: [(key: "", content: "")],
         cdoc2SectionContent: [""],
         tslSectionContent: [""],
         centralConfigurationSectionContent: [(key: "", content: "")]

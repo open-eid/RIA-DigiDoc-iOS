@@ -36,7 +36,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
     var versionSectionContent: String = ""
     var osSectionContent: (key: String, content: String) = (key: "", content: "")
     var libdigidocVersion: String = ""
-    var urlSectionContent: [String] = [""]
+    var urlSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
     var cdoc2SectionContent: [String] = [""]
     var tslSectionContent: [String] = [""]
     var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
@@ -118,7 +118,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
     private func loadUrlSectionContent(configuration: ConfigurationProvider?) async {
         guard let config = configuration else { return }
 
-        let lines: [(label: String, value: String)] = await [
+        let rpUuid = await getRpUuid()
+
+        self.urlSectionContent = [
             ("CONFIG_URL", config.metaInf.url),
             ("TSL_URL", config.tslUrl.absoluteString),
             ("SIVA_URL", config.sivaUrl.absoluteString),
@@ -129,10 +131,11 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
             ("MID_SK_URL", config.midSkRestUrl.absoluteString),
             ("SIDV2_PROXY_URL", config.sidV2RestUrl.absoluteString),
             ("SIDV2_SK_URL", config.sidV2SkRestUrl.absoluteString),
-            ("RPUUID", getRpUuid())
+            ("RPUUID", rpUuid == Constants.Signing.RelyingPartyUUID
+             ? "Main diagnostics rpuuid default"
+             : rpUuid
+            )
         ]
-
-        self.urlSectionContent = lines.map { "\($0.label): \($0.value)" }
     }
 
     private func loadCdoc2SectionContent(configuration: ConfigurationProvider?) {
@@ -267,7 +270,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics urls title"))
-        lines.append(contentsOf: self.urlSectionContent)
+        lines.append(contentsOf: self.urlSectionContent.map {
+            "\($0.key): \(languageSettings.localized($0.content))"
+        })
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics cdoc2 title"))

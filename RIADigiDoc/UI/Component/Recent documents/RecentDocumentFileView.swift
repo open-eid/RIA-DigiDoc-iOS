@@ -82,7 +82,7 @@ struct RecentDocumentFileView: View {
         file: FileItem(
             name: "test.asice",
             url: URL(fileURLWithPath: "/path/test.asice"),
-            modifiedDate: Date.now
+            lastOpened: Date.now
         ),
         fileIndex: 0,
         onOpenContainer: {},

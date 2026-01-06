@@ -28,6 +28,10 @@ struct MobileIDSmartIDSettingsView: View {
 
     @State private var viewModel: MobileIDSmartIDSettingsViewModel
 
+    private var relyingPartyTitle: String {
+        languageSettings.localized("Main settings relying party title")
+    }
+
     init() {
         _viewModel = State(wrappedValue: Container.shared.mobileIDSmartIDSettingsViewModel())
     }
@@ -54,9 +58,11 @@ struct MobileIDSmartIDSettingsView: View {
                 accessibilityInputLabel: .manualSetting,
                 content: {
                     FloatingLabelTextField(
-                        title: languageSettings.localized("Main settings relying party title"),
+                        title: relyingPartyTitle,
+                        placeholder: relyingPartyTitle,
                         text: $viewModel.relyingPartyUUID,
                         isSecure: true,
+                        identifier: "relyingPartyUUID"
                     )
                 }
             )

@@ -79,10 +79,16 @@ actor LibrarySetup {
             ).appending(path:
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
-            try await configurationLoader.initConfiguration(
-                cacheDir: configDirectory,
-                proxyInfo: proxyInfo
-            )
+
+            // Make sure "initDigiDoc" is still run even if configuration has an error
+            do {
+                try await configurationLoader.initConfiguration(
+                    cacheDir: configDirectory,
+                    proxyInfo: proxyInfo
+                )
+            } catch {
+                LibrarySetup.logger.error("Unable to initialize configuration: \(error)")
+            }
 
             LibrarySetup.logger.debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(

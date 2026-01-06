@@ -94,27 +94,32 @@ struct RoleView: View {
                         FloatingLabelTextField(
                             title: roleTitle,
                             placeholder: roleTitle,
-                            text: $roles
+                            text: $roles,
+                            identifier: "roles"
                         )
                         FloatingLabelTextField(
                             title: cityTitle,
                             placeholder: cityTitle,
-                            text: $city
+                            text: $city,
+                            identifier: "roleCity"
                         )
                         FloatingLabelTextField(
                             title: stateTitle,
                             placeholder: stateTitle,
-                            text: $state
+                            text: $state,
+                            identifier: "roleState"
                         )
                         FloatingLabelTextField(
                             title: countryTitle,
                             placeholder: countryTitle,
-                            text: $country
+                            text: $country,
+                            identifier: "roleCountry"
                         )
                         FloatingLabelTextField(
                             title: zipCodeTitle,
                             placeholder: zipCodeTitle,
-                            text: $zipCode
+                            text: $zipCode,
+                            identifier: "roleZipCode"
                         )
 
                         PrimaryButton(

@@ -56,19 +56,22 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
     private let certificateUtil: CertificateUtilProtocol
     private let notificationUtil: NotificationUtilProtocol
     private let dataStore: DataStoreProtocol
+    private let proxyUtil: ProxyUtilProtocol
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
         smartIdSignService: SmartIdSignServiceProtocol,
         certificateUtil: CertificateUtilProtocol,
         notificationUtil: NotificationUtilProtocol,
-        dataStore: DataStoreProtocol
+        dataStore: DataStoreProtocol,
+        proxyUtil: ProxyUtilProtocol
     ) {
         self.configurationRepository = configurationRepository
         self.smartIdSignService = smartIdSignService
         self.certificateUtil = certificateUtil
         self.notificationUtil = notificationUtil
         self.dataStore = dataStore
+        self.proxyUtil = proxyUtil
     }
 
     func appDidEnterBackground() {
@@ -141,6 +144,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
 
         let trustedCertificates = getTrustedCertificates(certificates: certBundle)
 
+        let proxyInfo = await proxyUtil.getProxyInfo()
+
         let containerFile: URL
         do {
             containerFile = try await getContainerFile(signedContainer: signedContainer)
@@ -159,7 +164,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
                 country: country,
                 personalCode: personalCode,
                 pollingTimeout: Constants.Signing.DefaultTimeout,
-                trustedCertificates: trustedCertificates
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
             )
         } catch {
             SmartIdViewModel.logger.debug("Smart-ID: Unable to request certificate or get response")
@@ -228,7 +234,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
                 allowedInteractionsOrderType: "confirmationMessageAndVerificationCodeChoice",
                 displayText: NSLocalizedString("Sign document", comment: ""),
                 pollingTimeout: Constants.Signing.DefaultTimeout,
-                trustedCertificates: trustedCertificates
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
             )
         } catch {
             endBackgroundTask()
@@ -283,12 +290,14 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
         }
     }
 
+    // swiftlint:disable:next function_parameter_count
     private func requestCertificate(
         sidUrl: URL,
         country: SmartIdCountry,
         personalCode: String,
         pollingTimeout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> SmartIdSessionResponse {
         SmartIdViewModel.logger.debug("Smart-ID: Getting certificate")
         let certResponse = try await smartIdSignService
@@ -298,7 +307,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
                 relyingPartyUUID: Constants.Signing.RelyingPartyUUID,
                 country: getCountry(smartIdCountry: country),
                 nationalIdentityNumber: personalCode,
-                trustedCertificates: trustedCertificates
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
             )
 
         guard let sessionId = certResponse.sessionID else {
@@ -311,7 +321,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
             sidUrl: "\(sidUrl)\(SmartIdViewModel.sessionEndpoint)",
             sessionId: sessionId,
             pollingTimout: pollingTimeout,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
     }
 
@@ -324,7 +335,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
         allowedInteractionsOrderType: String,
         displayText: String,
         pollingTimeout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> Data {
         SmartIdViewModel.logger.debug("Smart-ID: Getting signature")
 
@@ -338,7 +350,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
                 hashType: hashType,
                 allowedInteractionsOrderType: allowedInteractionsOrderType,
                 displayText200: displayText,
-                trustedCertificates: trustedCertificates
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
             )
 
         guard let sessionId = certResponse.sessionID else {
@@ -351,7 +364,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
             sidUrl: "\(sidUrl)\(SmartIdViewModel.sessionEndpoint)",
             sessionId: sessionId,
             pollingTimout: pollingTimeout,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
 
         guard let signature = sessionResponse.signature?.value else {
@@ -378,14 +392,16 @@ class SmartIdViewModel: SmartIdViewModelProtocol {
         sidUrl: String,
         sessionId: String,
         pollingTimout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> SmartIdSessionResponse {
         SmartIdViewModel.logger.debug("Smart-ID: Getting session")
         return try await smartIdSignService.getSessionRequest(
             url: sidUrl,
             sessionId: sessionId,
             pollingTimeout: pollingTimout,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
     }
 
