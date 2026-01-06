@@ -46,7 +46,7 @@ struct InfoHeaderHelpButton: View {
                         .frame(width: Dimensions.Icon.IconSizeXXS)
                         .foregroundStyle(theme.onPrimary)
                         .accessibilityHidden(true)
-                    Text(helpLabel)
+                    Text(verbatim: helpLabel)
                         .font(typography.labelMedium)
                         .foregroundStyle(theme.onPrimary)
 

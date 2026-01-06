@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CommonsLib
 
 // swiftlint:disable function_parameter_count
 /// @mockable
@@ -29,7 +30,8 @@ public protocol SmartIdSignServiceProtocol: Sendable {
         relyingPartyUUID: String,
         country: String,
         nationalIdentityNumber: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> SmartIdSessionIdResponse
 
     func getSignatureRequest(
@@ -41,14 +43,16 @@ public protocol SmartIdSignServiceProtocol: Sendable {
         hashType: String,
         allowedInteractionsOrderType: String,
         displayText200: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> SmartIdSessionIdResponse
 
     func getSessionRequest(
         url: String,
         sessionId: String,
         pollingTimeout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> SmartIdSessionResponse
 
     func getVerificationCode(digest: Data) async -> String

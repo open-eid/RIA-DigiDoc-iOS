@@ -82,7 +82,8 @@ struct ValidationSettingsView: View {
                                         },
                                         onAddCertificatePressed: {
                                             viewModel.isImportingCert = true
-                                        }
+                                        },
+                                        identifier: "sivaUrl"
                                     )
                                 }
 

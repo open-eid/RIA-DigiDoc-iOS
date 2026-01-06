@@ -23,5 +23,5 @@ public struct FileItem: Identifiable {
     public let id = UUID()
     public let name: String
     public let url: URL
-    public let modifiedDate: Date
+    public let lastOpened: Date
 }

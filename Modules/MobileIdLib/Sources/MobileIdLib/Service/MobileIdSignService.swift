@@ -21,11 +21,13 @@ import Foundation
 import OSLog
 import Alamofire
 import CommonsLib
+import UtilsLib
 
 actor MobileIdSignService: MobileIdSignServiceProtocol {
     private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIdSignService")
 
     private var session: Session?
+    private var currentProxy: ProxyInfo?
 
     // swiftlint:disable:next function_parameter_count
     public func getCertificateRequest(
@@ -34,7 +36,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         relyingPartyUUID: String,
         phoneNumber: String,
         nationalIdentityNumber: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdCertificateResponse {
         let request = MobileIdCertificateRequest(
             relyingPartyName: relyingPartyName,
@@ -47,7 +50,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
             url: url,
             method: .post,
             parameters: request,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
     }
 
@@ -63,7 +67,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         language: String,
         displayText: String,
         displayTextFormat: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdSignatureResponse {
         let request = MobileIdSignatureRequest(
             certificateRequest: .init(
@@ -83,7 +88,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
             url: url,
             method: .post,
             parameters: request,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
     }
 
@@ -91,7 +97,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         url: String,
         sessionId: String,
         pollingTimeout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdSessionResponse {
         let pollingTimeoutMs = pollingTimeout * 1000
 
@@ -100,7 +107,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
                 url: "\(url)/\(sessionId)",
                 method: .get,
                 parameters: ["timeoutMs": pollingTimeoutMs],
-                trustedCertificates: trustedCertificates
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
             )
 
             if let response = sessionResponse,
@@ -122,14 +130,19 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         url: String,
         method: HTTPMethod,
         parameters: P? = nil,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> T {
         let encoder: ParameterEncoder = method == .get ?
         URLEncodedFormParameterEncoder.default :
         JSONParameterEncoder.default
 
         do {
-            let session = try await ensureSession(url: url, trustedCertificates: trustedCertificates)
+            let session = try await ensureSession(
+                url: url,
+                trustedCertificates: trustedCertificates,
+                proxyInfo: proxyInfo
+            )
             let headers = MobileIdSignService.defaultHeaders()
 
             let response = await session.request(
@@ -161,8 +174,16 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         }
     }
 
-    private func ensureSession(url: String, trustedCertificates: [SecCertificate]) async throws -> Session {
-        if let existing = session { return existing }
+    private func ensureSession(
+        url: String,
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
+    ) async throws -> Session {
+        if currentProxy == proxyInfo {
+            if let existing = session { return existing }
+        }
+
+        currentProxy = proxyInfo
 
         guard let host = URL(string: url)?.host else {
             MobileIdSignService.logger.error(
@@ -173,7 +194,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
 
         let newSession = MobileIdSignService.createAlamofireSession(
             host: host,
-            trustedCertificates: trustedCertificates
+            trustedCertificates: trustedCertificates,
+            proxyInfo: proxyInfo
         )
         session = newSession
         return newSession
@@ -187,7 +209,11 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         ]
     }
 
-    private static func createAlamofireSession(host: String, trustedCertificates: [SecCertificate]) -> Session {
+    private static func createAlamofireSession(
+        host: String,
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
+    ) -> Session {
         let evaluators = [host: PinnedCertificatesTrustEvaluator(certificates: trustedCertificates)]
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = TimeInterval(Constants.Signing.Timeout)
@@ -195,7 +221,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         config.urlCache = nil
 
-        return Session(
+        return Session.withProxy(
+            proxyInfo: proxyInfo,
             configuration: config,
             serverTrustManager: ServerTrustManager(evaluators: evaluators)
         )

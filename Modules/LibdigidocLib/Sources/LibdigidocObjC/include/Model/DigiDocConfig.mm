@@ -30,7 +30,6 @@
                     TSLCERTS:(NSArray<NSData *> *)TSLCERTS
                    LDAPCERTS:(NSArray<NSData *> *)LDAPCERTS
                       TSAURL:(NSURL *)TSAURL
-                 OCSPISSUERS:(NSDictionary *)OCSPISSUERS
                   CERTBUNDLE:(NSArray<NSData *> *)CERTBUNDLE {
     self = [super init];
     if (self) {
@@ -42,7 +41,6 @@
         _TSLCERTS = TSLCERTS;
         _LDAPCERTS = LDAPCERTS;
         _TSAURL = TSAURL;
-        _OCSPISSUERS = OCSPISSUERS;
         _CERTBUNDLE = CERTBUNDLE;
     }
     return self;

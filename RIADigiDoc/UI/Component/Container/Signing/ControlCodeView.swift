@@ -50,6 +50,7 @@ struct ControlCodeView: View {
                     .font(typography.displayMedium)
                     .foregroundStyle(theme.onSurface)
                     .scaleEffect(x: Dimensions.Scaling.WideScaling, y: Dimensions.Scaling.DefaultScaling)
+                    .accessibilityIdentifier("controlCode")
             }
         }
         .onDisappear {

@@ -33,6 +33,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     private let fileManager: FileManagerProtocol
 
+    private let digiDocSigningWrapper: DigiDocSigningWrapper = DigiDocSigningWrapper()
+
     public init(
         containerURL: URL = URL(fileURLWithPath: ""),
         dataFiles: [DataFileWrapper] = [],
@@ -149,12 +151,36 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
             return try await open(containerFile: containerFile, isSivaConfirmed: true)
         } catch {
-            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot add data files", code: 4)
-            throw DigiDocError.addingFilesToContainerFailed(
-                ErrorDetail(
-                    nsError: nsError
+            ContainerWrapper.logger.error("Unable to add data files. \(error)")
+
+            let nsError = error as NSError
+
+            let errors = (nsError.userInfo["causes"] as? [String: Any])?["errors"] as? [NSError] ?? []
+
+            let duplicatePrefix = "Document with same file name"
+
+            let duplicateCount = errors.filter { $0.localizedDescription.hasPrefix(duplicatePrefix) }.count
+            let totalCount = errors.count
+
+            if duplicateCount == totalCount && totalCount > 1 {
+                throw DigiDocError.addingFilesToContainerFailed(
+                    ErrorDetail(message: "Multiple documents already exist", code: 4, userInfo: [
+                        "totalFileCount": String(totalCount),
+                        "duplicateFileCount": String(duplicateCount)
+                    ])
                 )
-            )
+            } else {
+                let nsError = (error as NSError?) ?? NSError(
+                    domain: "ContainerWrapper - cannot add data files",
+                    code: 5
+                )
+
+                throw DigiDocError.addingFilesToContainerFailed(
+                    ErrorDetail(
+                        nsError: nsError
+                    )
+                )
+            }
         }
     }
 
@@ -202,7 +228,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
         roleData: RoleData?,
         userAgent: String
     ) async throws -> Data {
-        return try await DigiDocSigningWrapper
+        return try await digiDocSigningWrapper
             .prepareSignature(
                 cert,
                 containerPath: containerPath.resolvedPath,
@@ -220,7 +246,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
     public func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol {
 
         do {
-            try await DigiDocSigningWrapper.addSignature(signature)
+            try await digiDocSigningWrapper.addSignature(signature)
 
             return try await open(containerFile: containerFile, isSivaConfirmed: true)
         } catch {

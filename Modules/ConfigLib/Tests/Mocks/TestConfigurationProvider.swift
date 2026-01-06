@@ -35,7 +35,6 @@ public class TestConfigurationProvider {
         tslUrl: String = "https://tsl.someUrl.abc",
         tslCerts: [String] = ["cert1", "cert2"],
         tsaUrl: String = "https://tsa.someUrl.abc",
-        ocspIssuers: [String: String] = ["url1": "issuer1"],
         ldapPersonUrls: [String] = [
             "https://ldap-person.someUrl.abc",
             "https://ldap-person.someUrl2.abc"
@@ -103,7 +102,6 @@ public class TestConfigurationProvider {
             tslUrl: tslURL,
             tslCerts: tslCertsData,
             tsaUrl: tsaURL,
-            ocspIssuers: ocspIssuers,
             ldapPersonUrls: ldapPersonURLs,
             ldapPersonUrl: ldapPersonURL,
             ldapCorpUrl: ldapCorpURL,

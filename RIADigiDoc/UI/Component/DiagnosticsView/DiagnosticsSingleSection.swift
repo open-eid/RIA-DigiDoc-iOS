@@ -26,6 +26,7 @@ struct DiagnosticsSingleSection: View {
 
     let title: String
     let contentLines: [String]
+    let identifier: String
     var showDivider: Bool = true
 
     var body: some View {
@@ -35,10 +36,20 @@ struct DiagnosticsSingleSection: View {
                     .foregroundStyle(theme.onSurface)
                     .font(typography.titleMedium)
 
-                ForEach(contentLines, id: \.self) { line in
-                    Text(verbatim: line)
-                        .font(typography.bodyMedium)
-                        .foregroundColor(theme.onSurfaceVariant)
+                if #available(iOS 26.0, *) {
+                    ForEach(contentLines.enumerated(), id: \.offset) { index, line in
+                        Text(verbatim: line)
+                            .font(typography.bodyMedium)
+                            .foregroundColor(theme.onSurfaceVariant)
+                            .accessibilityIdentifier("\(identifier)-\(index + 1)")
+                    }
+                } else {
+                    ForEach(Array(contentLines.enumerated()), id: \.offset) { index, line in
+                        Text(verbatim: line)
+                            .font(typography.bodyMedium)
+                            .foregroundColor(theme.onSurfaceVariant)
+                            .accessibilityIdentifier("\(identifier)-\(index + 1)")
+                    }
                 }
             }
 
@@ -54,9 +65,10 @@ struct DiagnosticsSingleSection: View {
 
 // MARK: - Initializer for String input
 extension DiagnosticsSingleSection {
-    init(title: String, content: String, showDivider: Bool = true) {
+    init(title: String, content: String, identifier: String, showDivider: Bool = true) {
         self.title = title
         self.contentLines = content.components(separatedBy: .newlines)
+        self.identifier = identifier
         self.showDivider = showDivider
     }
 }
@@ -66,17 +78,20 @@ extension DiagnosticsSingleSection {
     VStack {
         DiagnosticsSingleSection(
             title: "Section with Array",
-            contentLines: ["Line 1", "Line 2", "Line 3"]
+            contentLines: ["Line 1", "Line 2", "Line 3"],
+            identifier: "sectionWithArray"
         )
 
         DiagnosticsSingleSection(
             title: "Section with String",
-            content: "Line 1\nLine 2\nLine 3"
+            content: "Line 1\nLine 2\nLine 3",
+            identifier: "sectionWithString"
         )
 
         DiagnosticsSingleSection(
             title: "Section with String",
-            content: "Line 1"
+            content: "Line 1",
+            identifier: "sectionWithString"
         )
     }
     .environment(Container.shared.languageSettings())

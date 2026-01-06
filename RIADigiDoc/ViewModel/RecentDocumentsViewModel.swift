@@ -35,17 +35,20 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
 
     private let fileManager: FileManagerProtocol
+    private let fileInspector: FileInspectorProtocol
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        fileManager: FileManagerProtocol
+        fileManager: FileManagerProtocol,
+        fileInspector: FileInspectorProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileManager = fileManager
+        self.fileInspector = fileInspector
     }
 
     func filteredFiles(using extensions: [String]) -> [FileItem] {
-        let sortedFiles = files.sorted { $0.modifiedDate > $1.modifiedDate }
+        let sortedFiles = files.sorted { $0.lastOpened > $1.lastOpened }
         return sortedFiles.filter { file in
             extensions.contains(file.url.pathExtension.lowercased()) &&
                 (searchText.isEmpty || file.name.localizedCaseInsensitiveContains(searchText))
@@ -63,17 +66,21 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
 
             let fileURLs = try fileManager.contentsOfDirectory(
                 at: folderURL,
-                includingPropertiesForKeys: [.contentModificationDateKey],
+                includingPropertiesForKeys: [.contentAccessDateKey],
                 options: .skipsHiddenFiles
             )
-            files = fileURLs.compactMap { url in
-                if let attributes = try? fileManager.attributesOfItem(atPath: url.resolvedPath),
-                   let modifiedDate = attributes[.modificationDate] as? Date {
-                    if extensions.contains(url.pathExtension.lowercased()) {
-                        return FileItem(name: url.lastPathComponent, url: url, modifiedDate: modifiedDate)
-                    }
+            files = try fileURLs.compactMap { url in
+                guard extensions.contains(url.pathExtension.lowercased()) else {
+                    return nil
                 }
-                return nil
+
+                let lastOpened = try fileInspector.lastOpened(for: url)
+
+                return FileItem(
+                    name: url.lastPathComponent,
+                    url: url,
+                    lastOpened: lastOpened
+                )
             }
         } catch {
             files = []

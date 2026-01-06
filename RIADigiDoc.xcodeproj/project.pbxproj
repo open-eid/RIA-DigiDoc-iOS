@@ -144,6 +144,7 @@
 				Domain/Model/EncryptionServerOption.swift,
 				Domain/Model/EncryptionServerOptionId.swift,
 				Domain/Model/Error/ErrorMessage.swift,
+				Domain/Model/Error/FileOpeningErrors.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/KeychainKey.swift,
 				Domain/Model/Notification/ContainerNotificationType.swift,
@@ -178,6 +179,8 @@
 				UI/Theme/Theme.swift,
 				Util/Certificate/CertificateUtil.swift,
 				Util/Certificate/CertificateUtilProtocol.swift,
+				Util/File/FileInspector.swift,
+				Util/File/FileInspectorProtocol.swift,
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
 				Util/Proxy/ProxyUtil.swift,
@@ -890,9 +893,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Extensions/FileImportShareExtension/FileImportShareExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Extensions/FileImportShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Import to RIA DigiDoc";
@@ -921,9 +924,9 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Extensions/FileImportShareExtension/FileImportShareExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Extensions/FileImportShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Import to RIA DigiDoc";
@@ -1138,11 +1141,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RIADigiDoc/RIADigiDoc.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -1194,11 +1197,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = RIADigiDoc/RIADigiDoc.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;

@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CommonsLib
 
 // swiftlint:disable function_parameter_count
 /// @mockable
@@ -29,7 +30,8 @@ public protocol MobileIdSignServiceProtocol: Sendable {
         relyingPartyUUID: String,
         phoneNumber: String,
         nationalIdentityNumber: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdCertificateResponse
 
     func getSignatureRequest(
@@ -43,14 +45,16 @@ public protocol MobileIdSignServiceProtocol: Sendable {
         language: String,
         displayText: String,
         displayTextFormat: String,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdSignatureResponse
 
     func getSessionRequest(
         url: String,
         sessionId: String,
         pollingTimeout: Int,
-        trustedCertificates: [SecCertificate]
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
     ) async throws -> MobileIdSessionResponse
 
     func getVerificationCode(hash: Data) async -> String?

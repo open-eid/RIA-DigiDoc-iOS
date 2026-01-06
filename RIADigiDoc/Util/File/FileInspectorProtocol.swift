@@ -17,24 +17,11 @@
  *
  */
 
-public struct ProxyInfo: Sendable, Equatable {
-    public var option: ProxySettingsOption
-    public var host: String
-    public var port: Int
-    public var username: String
-    public var password: String
+import Foundation
 
-    public init(
-        option: ProxySettingsOption = .disabled,
-        host: String = "",
-        port: Int = 80,
-        username: String = "",
-        password: String = ""
-    ) {
-        self.option = option
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
-    }
+/// @mockable
+public protocol FileInspectorProtocol: Sendable {
+    func fileSize(for url: URL) throws -> Int
+    func contentAccessDate(for url: URL) throws -> Date
+    func lastOpened(for url: URL) throws -> Date
 }

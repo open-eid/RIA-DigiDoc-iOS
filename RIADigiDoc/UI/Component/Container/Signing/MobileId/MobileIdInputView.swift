@@ -37,6 +37,10 @@ struct MobileIdInputView: View {
 
     let onInputChange: () -> Void
 
+    private var personalCodeTitle: String {
+        languageSettings.localized("Personal code")
+    }
+
     private var countryCodeAndPhoneErrorText: String {
         return languageSettings.localized(countryCodeAndPhoneError ?? "")
     }
@@ -78,7 +82,8 @@ struct MobileIdInputView: View {
                         isError: !countryCodeAndPhoneErrorText.isEmpty,
                         errorText: countryCodeAndPhoneErrorText,
                         keyboardType: .phonePad,
-                        showDashButton: true
+                        showDashButton: true,
+                        identifier: "mobileIdCountryCodeAndPhoneNumber"
                     )
                     .onChange(of: phoneNumber) {
                         onInputChange()
@@ -87,12 +92,14 @@ struct MobileIdInputView: View {
 
                 VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                     FloatingLabelTextField(
-                        title: languageSettings.localized("Personal code"),
+                        title: personalCodeTitle,
+                        placeholder: personalCodeTitle,
                         text: $personalCode,
                         isError: !personalCodeErrorText.isEmpty,
                         errorText: personalCodeErrorText,
                         keyboardType: .phonePad,
-                        showDashButton: true
+                        showDashButton: true,
+                        identifier: "mobileIdPersonalCode"
                     )
                     .onChange(of: personalCode) {
                         onInputChange()

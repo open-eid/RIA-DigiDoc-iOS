@@ -321,3 +321,51 @@ extension URL {
         return preferredMimeType.lowercased()
     }
 }
+
+extension URL {
+
+    private var lastOpenedXattrName: String { Constants.Identifier.GroupLastOpenedAttribute }
+
+    public func markAsOpened() throws {
+        var timestamp = Date().timeIntervalSince1970
+        let data = Data(bytes: &timestamp, count: MemoryLayout.size(ofValue: timestamp))
+
+        let result = data.withUnsafeBytes { ptr in
+            setxattr(
+                self.path,
+                lastOpenedXattrName,
+                ptr.baseAddress,
+                data.count,
+                0,
+                0
+            )
+        }
+        guard result == 0 else {
+            throw FileLastOpenedError.writeFailed(errno: errno)
+        }
+    }
+
+    public func lastOpened() throws -> Date? {
+        var buffer = [UInt8](repeating: 0, count: MemoryLayout<Double>.size)
+        let size = getxattr(self.path, lastOpenedXattrName, &buffer, buffer.count, 0, 0)
+
+        guard size != -1 else {
+            if errno == ENOATTR { return nil }
+            throw FileLastOpenedError.readFailed(errno: errno)
+        }
+        guard size == buffer.count else { throw FileLastOpenedError.invalidData }
+
+        let interval = buffer.withUnsafeBytes { $0.load(as: Double.self) }
+        return Date(timeIntervalSince1970: interval)
+    }
+
+    public func removeLastOpenedXattr() throws {
+        let result = removexattr(self.path, lastOpenedXattrName, 0)
+
+        if result != 0 {
+            if errno == ENOATTR { return } else {
+                throw FileLastOpenedError.removeFailed(errno: errno)
+            }
+        }
+    }
+}

@@ -18,10 +18,13 @@
  */
 
 import Foundation
+import OSLog
 import Alamofire
 import CommonsLib
 
 public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
+
+    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CentralConfigurationService")
 
     private let userAgent: String
     private let configurationProperty: ConfigurationProperty
@@ -46,12 +49,19 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.json"
-        let response: String = try await session.request(url)
-            .validate()
-            .serializingString()
-            .value
 
-        return response
+        do {
+            let response: String = try await session.request(url)
+                .validate()
+                .serializingString()
+                .value
+
+            return response
+        } catch {
+            CentralConfigurationService.logger
+                .error("Unable to fetch central configuration: \(error)")
+            throw URLError(.resourceUnavailable)
+        }
     }
 
     public func fetchPublicKey(
@@ -63,12 +73,19 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.pub"
-        let response: String = try await session.request(url)
-            .validate()
-            .serializingString()
-            .value
 
-        return response
+        do {
+            let response: String = try await session.request(url)
+                .validate()
+                .serializingString()
+                .value
+
+            return response
+        } catch {
+            CentralConfigurationService.logger
+                .error("Unable to fetch central configuration public key: \(error)")
+            throw URLError(.resourceUnavailable)
+        }
     }
 
     public func fetchSignature(
@@ -80,16 +97,22 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.rsa"
-        let responseData: Data = try await session.request(url)
-            .validate()
-            .serializingData()
-            .value
+        do {
+            let responseData: Data = try await session.request(url)
+                .validate()
+                .serializingData()
+                .value
 
-        guard let responseString = String(data: responseData, encoding: .utf8) else {
-            throw URLError(.cannotDecodeContentData)
+            guard let responseString = String(data: responseData, encoding: .utf8) else {
+                throw URLError(.cannotDecodeContentData)
+            }
+
+            return responseString
+        } catch {
+            CentralConfigurationService.logger
+                .error("Unable to fetch central configuration signature: \(error)")
+            throw URLError(.resourceUnavailable)
         }
-
-        return responseString
     }
 
     private func constructHttpClient(

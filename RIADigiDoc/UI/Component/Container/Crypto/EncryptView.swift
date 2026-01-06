@@ -358,7 +358,6 @@ struct EncryptView: View {
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
                                     if viewModel.isContainerWithoutRecipients {
-                                        pathManager.removeLast()
                                         pathManager.navigate(to:
                                             .encryptRecipientView
                                         )

@@ -220,7 +220,6 @@ public actor DigiDocInitializer {
         digiDocConfiguration.tslcerts = overrideTSLCerts(conf: configurationProvider)
         digiDocConfiguration.tsaurl = overrideTSAUrl(conf: configurationProvider)
         digiDocConfiguration.sivaurl = overrideSiVaUrl(conf: configurationProvider)
-        digiDocConfiguration.ocspissuers = overrideOCSPIssuers(conf: configurationProvider)
         digiDocConfiguration.certbundle = overrideCertBundle(conf: configurationProvider)
         digiDocConfiguration.ldapcerts = overrideLDAPCerts(conf: configurationProvider)
 
@@ -282,10 +281,6 @@ public actor DigiDocInitializer {
 
     private func overrideSiVaUrl(conf: ConfigurationProvider) -> URL {
         return conf.sivaUrl
-    }
-
-    private func overrideOCSPIssuers(conf: ConfigurationProvider) -> [String: String] {
-        return conf.ocspIssuers
     }
 
     private func overrideCertBundle(conf: ConfigurationProvider) -> [Data] {

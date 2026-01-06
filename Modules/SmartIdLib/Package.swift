@@ -45,6 +45,7 @@ let package = Package(
             dependencies: [
                 "SmartIdLib",
                 "UtilsLib",
+                "CommonsLib",
                 .product(name: "UtilsLibMocks", package: "utilslib"),
                 .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")

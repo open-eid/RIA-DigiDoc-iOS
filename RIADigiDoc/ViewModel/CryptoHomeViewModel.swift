@@ -62,7 +62,7 @@ class CryptoHomeViewModel: CryptoHomeViewModelProtocol {
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appending(path: Constants.Container.CryptoContainerFolder)
+                .appending(path: Constants.Folder.CryptoContainerFolder)
         } catch {
             CryptoHomeViewModel.logger.error("Unable to get crypto recent documents folder: \(error)")
             return nil

@@ -96,6 +96,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
                 sharedContainerViewModel.setSignedContainer(container)
             }
 
+            try await container.getRawContainerFile()?.markAsOpened()
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
             FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")

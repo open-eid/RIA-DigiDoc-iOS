@@ -267,7 +267,6 @@ workflows:
           echo "Moving TSLs to app's TSL files directory"
           mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
           echo "Done moving TSLs"
-      - *get_app_version
       - name: Fetch default configuration
         script: |
           echo "Cleaning swift-sh cache"
@@ -284,11 +283,13 @@ workflows:
                 --project RIADigiDoc.xcodeproj \
                 --scheme AllTests \
                 --device "iPhone 17"
+      - *get_app_version
       - name: Increment build number
         script: |
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number $APP_STORE_APP_ID)
-          echo LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER >> $CM_ENV
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+          LATEST_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          echo "LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER" >> $CM_ENV
+          agvtool new-version -all "$LATEST_BUILD_NUMBER"
       - name: Build RIA DigiDoc
         script: |
           xcode-project build-ipa \

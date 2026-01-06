@@ -263,11 +263,12 @@ struct SigningViewModelTests {
         let expectedURL = URL(fileURLWithPath: "/tmp/renamed.asice")
 
         let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.renameContainerHandler = { _ in expectedURL }
+        mockSignedContainer.getRawContainerFileHandler = { expectedURL }
+        mockSignedContainer.renameContainerHandler = { _ in mockSignedContainer }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        let result = await viewModel.renameContainer(to: "renamed.asice")
+        let result = await viewModel.renameContainer(to: expectedURL.lastPathComponent)
 
         #expect(result == expectedURL)
         #expect(viewModel.errorMessage == nil)
@@ -1319,11 +1320,20 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: signedContainer)
 
+        let rawContainerFile = await signedContainer.getRawContainerFile()
+
+        guard let containerFile = rawContainerFile else {
+            Issue.record("Unable to get raw container file")
+            return
+        }
+
         await viewModel.addDataFiles([
             testFile, testFile2, testFile3
-        ], to: localExampleContainer)
+        ], to: containerFile)
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not add files", args: ["2"]))
+        print(signedContainer)
+
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Multiple documents already exist", args: ["2"]))
         #expect(viewModel.dataFiles.count == 3)
     }
 
@@ -1367,11 +1377,18 @@ struct SigningViewModelTests {
 
         await viewModel.loadContainerData(signedContainer: signedContainer)
 
+        let rawContainerFile = await signedContainer.getRawContainerFile()
+
+        guard let containerFile = rawContainerFile else {
+            Issue.record("Unable to get raw container file")
+            return
+        }
+
         await viewModel.addDataFiles([
             testFile, testFile2
-        ], to: localExampleContainer)
+        ], to: containerFile)
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not add files", args: ["2"]))
+        #expect(viewModel.errorMessage == ErrorMessage(key: "Multiple documents already exist", args: ["2"]))
         #expect(viewModel.dataFiles.count == 2)
     }
 }

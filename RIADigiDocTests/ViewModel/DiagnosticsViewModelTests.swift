@@ -72,15 +72,6 @@ final class DiagnosticsViewModelTests {
         )
     }
 
-    private static func mockAsyncStream(
-        configProvider: ConfigurationProvider
-    ) -> AsyncThrowingStream<ConfigurationProvider?, Error> {
-        AsyncThrowingStream { continuation in
-            continuation.yield(configProvider)
-            continuation.finish()
-        }
-    }
-
     // MARK: - Get Configuration Data Tests
 
     @Test
@@ -138,7 +129,9 @@ final class DiagnosticsViewModelTests {
     }
 
     private func checkUrlSection() async {
-        #expect(viewModel.urlSectionContent == [
+        let sectionContent = viewModel.urlSectionContent.map { "\($0.key): \($0.content)" }
+
+        let expected = [
             "CONFIG_URL: https://someUrl.abc",
             "TSL_URL: https://tsl.someUrl.abc",
             "SIVA_URL: https://siva.someUrl.abc",
@@ -149,8 +142,10 @@ final class DiagnosticsViewModelTests {
             "MID_SK_URL: https://midskrest.someUrl.abc",
             "SIDV2_PROXY_URL: https://sidv2.someUrl.abc",
             "SIDV2_SK_URL: https://sidv2skrest.someUrl.abc",
-            "RPUUID: 00000000-0000-0000-0000-000000000000"
-        ])
+            "RPUUID: Main diagnostics rpuuid default"
+        ]
+
+        #expect(expected == sectionContent)
     }
 
     private func checkCdoc2Section() async {

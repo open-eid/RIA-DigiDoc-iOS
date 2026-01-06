@@ -87,6 +87,16 @@ public:
         return digidoc::ConfCurrent::TSLUrl();
     }
 
+    std::vector<digidoc::X509Cert> TSLCerts() const final {
+        NSMutableArray<NSData *> *certBundle = [NSMutableArray arrayWithArray:currentConf.TSLCERTS];
+
+        if (certBundle != nil && certBundle.count > 0) {
+            return toX509Certs(certBundle);
+        }
+
+        return digidoc::ConfCurrent::TSLCerts();
+    }
+
     std::vector<digidoc::X509Cert> TSCerts() const override {
         NSMutableArray<NSData *> *certBundle = [NSMutableArray arrayWithArray:currentConf.CERTBUNDLE];
 
@@ -110,15 +120,6 @@ public:
         }
         
         return digidoc::ConfCurrent::TSUrl();
-    }
-
-    std::string ocsp(const std::string &issuer) const final {
-        NSString *ocspIssuer = [NSString stringWithUTF8String:issuer.c_str()];
-        NSString *ocspUrl = currentConf.OCSPISSUERS[ocspIssuer];
-        if (ocspUrl != nil && ocspUrl.length > 0) {
-            return ocspUrl.UTF8String;
-        }
-        return digidoc::ConfCurrent::ocsp(issuer);
     }
     
     std::string proxyHost() const final {

@@ -27,9 +27,7 @@ import CryptoSwift
 actor FileOpeningService: FileOpeningServiceProtocol {
 
     private let fileUtil: FileUtilProtocol
-
     private let fileInspector: FileInspectorProtocol
-
     private let fileManager: FileManagerProtocol
 
     init(
@@ -43,7 +41,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
     }
 
     func isFileSizeValid(url: URL) async throws -> Bool {
-        return try fileInspector.fileSize(for: url) > 0
+        return try await fileInspector.fileSize(for: url) > 0
     }
 
     func getValidFiles(
@@ -54,10 +52,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             var validFiles: [URL] = []
 
             for url in urls {
-                guard url
-                    .startAccessingSecurityScopedResource() else {
-                    continue
-                }
+                _ = url.startAccessingSecurityScopedResource()
 
                 let validUrl = try await url.validURL(fileUtil: fileUtil)
 
@@ -66,7 +61,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
                 }
 
                 if try await isFileSizeValid(url: validUrl) {
-                    validFiles.append(try cacheFile(from: validUrl))
+                    await validFiles.append(try cacheFile(from: validUrl))
                 }
             }
 
@@ -86,9 +81,9 @@ actor FileOpeningService: FileOpeningServiceProtocol {
 
     private func cacheFile(
         from sourceURL: URL,
-    ) throws -> URL {
+    ) async throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolder: Constants.Container.SignedContainerFolder,
+            subfolder: Constants.Folder.SignedContainerFolder,
             fileManager: fileManager
         )
 
@@ -97,14 +92,18 @@ actor FileOpeningService: FileOpeningServiceProtocol {
             return sourceURL
         }
 
-        if !fileManager.fileExists(atPath: signedContainersDirectory.resolvedPath) {
+        let signedContainersDataFilesDirectory = signedContainersDirectory
+            .appending(path: Constants.Folder.Temp, directoryHint: .isDirectory)
+
+        if !fileManager.fileExists(atPath: signedContainersDirectory.resolvedPath) ||
+            !fileManager.fileExists(atPath: signedContainersDataFilesDirectory.resolvedPath) {
             try fileManager.createDirectory(
-                at: signedContainersDirectory,
+                at: signedContainersDataFilesDirectory,
                 withIntermediateDirectories: true,
                 attributes: nil)
         }
 
-        let destinationURL = signedContainersDirectory.appending(path: sourceURL.lastPathComponent)
+        let destinationURL = signedContainersDataFilesDirectory.appending(path: sourceURL.lastPathComponent)
 
         if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
             try fileManager.removeItem(at: destinationURL)

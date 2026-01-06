@@ -28,6 +28,22 @@ struct ProxySettingsView: View {
 
     @State private var viewModel: ProxySettingsViewModel
 
+    private var proxyHostTitle: String {
+        languageSettings.localized("Main settings proxy host")
+    }
+
+    private var proxyPortTitle: String {
+        languageSettings.localized("Main settings proxy port")
+    }
+
+    private var proxyUsernameTitle: String {
+        languageSettings.localized("Main settings proxy username")
+    }
+
+    private var proxyPasswordTitle: String {
+        languageSettings.localized("Main settings proxy password")
+    }
+
     init() {
         _viewModel = State(wrappedValue: Container.shared.proxySettingsViewModel())
     }
@@ -110,24 +126,32 @@ struct ProxySettingsView: View {
     @ViewBuilder
     private var manualCardContent: some View {
         FloatingLabelTextField(
-            title: languageSettings.localized("Main settings proxy host"),
+            title: proxyHostTitle,
+            placeholder: proxyHostTitle,
             text: $viewModel.proxyInfo.host,
+            identifier: "proxyHost"
         )
         FloatingLabelTextField(
-            title: languageSettings.localized("Main settings proxy port"),
+            title: proxyPortTitle,
+            placeholder: proxyPortTitle,
             text: $viewModel.portText,
             isError: !viewModel.isPortTextValid,
             errorText: languageSettings.localized("Main settings proxy port error"),
-            keyboardType: .numberPad
+            keyboardType: .numberPad,
+            identifier: "proxyPort"
         )
         FloatingLabelTextField(
-            title: languageSettings.localized("Main settings proxy username"),
+            title: proxyUsernameTitle,
+            placeholder: proxyUsernameTitle,
             text: $viewModel.proxyInfo.username,
+            identifier: "proxyUsername"
         )
         FloatingLabelTextField(
-            title: languageSettings.localized("Main settings proxy password"),
+            title: proxyPasswordTitle,
+            placeholder: proxyPasswordTitle,
             text: $viewModel.proxyInfo.password,
-            isSecure: true
+            isSecure: true,
+            identifier: "proxyPassword"
         )
     }
 }

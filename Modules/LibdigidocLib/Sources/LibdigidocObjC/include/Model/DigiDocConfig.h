@@ -31,7 +31,6 @@
 @property (nonatomic, strong) NSArray<NSData *> *TSLCERTS;
 @property (nonatomic, strong) NSArray<NSData *> *LDAPCERTS;
 @property (nonatomic, strong) NSURL *TSAURL;
-@property (nonatomic, strong) NSDictionary *OCSPISSUERS;
 @property (nonatomic, strong) NSArray<NSData *> *CERTBUNDLE;
 
 - (instancetype)initWithConf:(int)logLevel
@@ -42,7 +41,6 @@
                     TSLCERTS:(NSArray<NSData *> *)TSLCERTS
                    LDAPCERTS:(NSArray<NSData *> *)LDAPCERTS
                       TSAURL:(NSURL *)TSAURL
-                 OCSPISSUERS:(NSDictionary *)OCSPISSUERS
                   CERTBUNDLE:(NSArray<NSData *> *)CERTBUNDLE;
 
 @end

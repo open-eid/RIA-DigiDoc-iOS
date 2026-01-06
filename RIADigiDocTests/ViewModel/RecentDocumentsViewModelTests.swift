@@ -25,8 +25,9 @@ import CommonsLibMocks
 
 @MainActor
 class RecentDocumentsViewModelTests {
-    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock!
-    private let mockFileManager: FileManagerProtocolMock!
+    private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
+    private let mockFileManager: FileManagerProtocolMock
+    private let mockFileInspector: FileInspectorProtocolMock
 
     private let viewModel: RecentDocumentsViewModel!
 
@@ -35,17 +36,19 @@ class RecentDocumentsViewModelTests {
     init() async throws {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockFileManager = FileManagerProtocolMock()
+        mockFileInspector = FileInspectorProtocolMock()
 
         tempFolderURL = URL(fileURLWithPath: "/mock/path")
 
         viewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            fileManager: mockFileManager
+            fileManager: mockFileManager,
+            fileInspector: mockFileInspector
         )
     }
 
     @Test
-    func loadFiles_success() async {
+    func loadFiles_success() async throws {
         let file1 = tempFolderURL.appending(path: "test1.asice")
         let file2 = tempFolderURL.appending(path: "test2.bdoc")
         let invalidFile = tempFolderURL.appending(path: "invalid.txt")
@@ -54,15 +57,17 @@ class RecentDocumentsViewModelTests {
             return [file1, file2, invalidFile]
         }
 
-        mockFileManager.attributesOfItemHandler = { path in
-            if path == file1.resolvedPath || path == file2.resolvedPath {
-                return [.modificationDate: Date()]
-            }
-
-            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError, userInfo: nil)
-        }
+//        mockFileManager.attributesOfItemHandler = { path in
+//            if path == file1.resolvedPath || path == file2.resolvedPath {
+//                return [.modificationDate: Date()]
+//            }
+//
+//            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError, userInfo: nil)
+//        }
 
         mockFileManager.fileExistsAtPathHandler = { _, _ in true }
+
+        mockFileInspector.lastOpenedHandler = { _ in Date() }
 
         viewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
 
@@ -82,7 +87,8 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenNoFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            fileManager: mockFileManager
+            fileManager: mockFileManager,
+            fileInspector: mockFileInspector
         )
 
         recentDocumentsViewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
@@ -96,7 +102,8 @@ class RecentDocumentsViewModelTests {
     func loadFiles_emptyFilesWhenInvalidFolderLocation() async {
         let recentDocumentsViewModel = RecentDocumentsViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            fileManager: mockFileManager
+            fileManager: mockFileManager,
+            fileInspector: mockFileInspector
         )
 
         recentDocumentsViewModel.loadFiles(from: tempFolderURL, withExtensions: Constants.Container.ContainerExtensions)
@@ -110,17 +117,17 @@ class RecentDocumentsViewModelTests {
     func filteredFiles_successWithFilteringContainerFiles() async {
         let date = Date()
         viewModel.files = [
-            FileItem(name: "File1.asice", url: URL(fileURLWithPath: "file1.asice"), modifiedDate: date),
+            FileItem(name: "File1.asice", url: URL(fileURLWithPath: "file1.asice"), lastOpened: date),
             FileItem(
                 name: "File2.bdoc",
                 url: URL(
                     fileURLWithPath: "file2.bdoc"
                 ),
-                modifiedDate: date.addingTimeInterval(
+                lastOpened: date.addingTimeInterval(
                     -1000
                 )
             ),
-            FileItem(name: "test.txt", url: URL(fileURLWithPath: "test.txt"), modifiedDate: date)
+            FileItem(name: "test.txt", url: URL(fileURLWithPath: "test.txt"), lastOpened: date)
         ]
         viewModel.searchText = "file"
 
@@ -155,7 +162,7 @@ class RecentDocumentsViewModelTests {
     func deleteFile_success() {
         let file = tempFolderURL.appending(path: "test1.asice")
 
-        let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
+        let fileItem = FileItem(name: "test1.asice", url: file, lastOpened: Date())
         viewModel.files = [fileItem]
 
         mockFileManager.removeItemHandler = { _ in }
@@ -170,7 +177,7 @@ class RecentDocumentsViewModelTests {
     @Test
     func deleteFile_filesNotChangedWhenUnableToDelete() async {
         let file = tempFolderURL.appending(path: "test1.asice")
-        let fileItem = FileItem(name: "test1.asice", url: file, modifiedDate: Date())
+        let fileItem = FileItem(name: "test1.asice", url: file, lastOpened: Date())
         viewModel.files = [fileItem]
 
         mockFileManager.removeItemHandler = { _ in

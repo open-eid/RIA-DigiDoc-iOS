@@ -72,7 +72,8 @@ struct TimeStampSettingsView: View {
                             },
                             onAddCertificatePressed: {
                                 viewModel.isImportingTSACert = true
-                            }
+                            },
+                            identifier: "tsaUrl"
                         )
                     }
                 }
