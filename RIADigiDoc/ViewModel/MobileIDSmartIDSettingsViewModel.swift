@@ -18,14 +18,11 @@
  */
 
 import CommonsLib
-import OSLog
+import Foundation
 
 @Observable
 @MainActor
-class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIDAndSmartIDServicesSettingsViewModel")
-
+class MobileIDSmartIDSettingsViewModel: MobileIDSmartIDSettingsViewModelProtocol, Loggable {
     var relyingPartyUUID: String = ""
     var selectedOption: ServicesSettingsOption = .defaultSetting
 

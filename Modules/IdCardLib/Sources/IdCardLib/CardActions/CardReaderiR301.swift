@@ -17,12 +17,10 @@
  *
  */
 
+import CommonsLib
 import iR301
-import OSLog
 
-class CardReaderiR301: CardReader {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CardReaderiR301")
-
+class CardReaderiR301: CardReader, Loggable {
     let atr: Bytes
     private var cardHandle: SCARDHANDLE = 0
     private var pioSendPci = SCARD_IO_REQUEST(dwProtocol: UInt32(SCARD_PROTOCOL_UNDEFINED),
@@ -36,22 +34,22 @@ class CardReaderiR301: CardReader {
 
     init?(contextHandle: SCARDCONTEXT) throws {
         guard contextHandle != 0 else {
-            CardReaderiR301.logger.error("ID-CARD: Invalid context handle: \(contextHandle)")
+            CardReaderiR301.logger().error("ID-CARD: Invalid context handle: \(contextHandle)")
             return nil
         }
 
         var modelNameLength: UInt32 = 100
         let modelName = String(unsafeUninitializedCapacity: Int(modelNameLength)) { buffer in
             guard FtGetAccessoryModelName(contextHandle, &modelNameLength, buffer.baseAddress) == 0 else {
-                CardReaderiR301.logger.error("ID-CARD: Failed to identify reader")
+                CardReaderiR301.logger().error("ID-CARD: Failed to identify reader")
                 return 0
             }
             return Int(modelNameLength)
         }
 
-        CardReaderiR301.logger.debug("ID-CARD: Checking if card reader is supported: \(modelName)")
+        CardReaderiR301.logger().debug("ID-CARD: Checking if card reader is supported: \(modelName)")
         guard modelName.hasPrefix("iR301") else {
-            CardReaderiR301.logger.error("ID-CARD: Unsupported reader: \(modelName)")
+            CardReaderiR301.logger().error("ID-CARD: Unsupported reader: \(modelName)")
             return nil
         }
 
@@ -59,7 +57,7 @@ class CardReaderiR301: CardReader {
         let mszReaders = try String(unsafeUninitializedCapacity: Int(dwReaders)) { buffer in
             let listReadersResult = SCardListReaders(contextHandle, nil, buffer.baseAddress, &dwReaders)
             guard listReadersResult == SCARD_S_SUCCESS else {
-                CardReaderiR301.logger.error("SCardListReaders error \(listReadersResult)")
+                CardReaderiR301.logger().error("SCardListReaders error \(listReadersResult)")
                 throw IdCardInternalError.readerProcessFailed
             }
             return Int(dwReaders)
@@ -91,21 +89,21 @@ class CardReaderiR301: CardReader {
                 buffer.baseAddress,
                 &atrSize
             ) == SCARD_S_SUCCESS else {
-                CardReaderiR301.logger.error("ID-CARD: Failed to get card status")
+                CardReaderiR301.logger().error("ID-CARD: Failed to get card status")
                 throw IdCardInternalError.readerProcessFailed
             }
             initializedCount = Int(atrSize)
         }
-        CardReaderiR301.logger.debug("SCardStatus status: \(dwStatus) ATR: \(self.atr.hex))")
+        CardReaderiR301.logger().debug("SCardStatus status: \(dwStatus) ATR: \(self.atr.hex))")
 
         guard dwStatus == SCARD_PRESENT else {
-            CardReaderiR301.logger.error("ID-CARD: Did not successfully power on card")
+            CardReaderiR301.logger().error("ID-CARD: Did not successfully power on card")
             throw IdCardInternalError.readerProcessFailed
         }
     }
 
     func transmit(_ apdu: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
-        CardReaderiR301.logger.debug("ID-CARD Transmitting: \(apdu.hex)")
+        CardReaderiR301.logger().debug("ID-CARD Transmitting: \(apdu.hex)")
         var responseSize: DWORD = 512
         var response = try Bytes(unsafeUninitializedCapacity: Int(responseSize)) { buffer, initializedCount in
             guard SCardTransmit(
@@ -118,16 +116,17 @@ class CardReaderiR301: CardReader {
                 &responseSize
             ) == SCARD_S_SUCCESS
             else {
-                CardReaderiR301.logger.error("ID-CARD: Failed to send APDU data")
+                CardReaderiR301.logger().error("ID-CARD: Failed to send APDU data")
                 throw IdCardInternalError.readerProcessFailed
             }
             initializedCount = Int(responseSize)
         }
         guard response.count >= 2 else {
-            CardReaderiR301.logger.error("ID-CARD: Response size must be at least 2. Response size: \(response.count)")
+            CardReaderiR301.logger().error(
+                "ID-CARD: Response size must be at least 2. Response size: \(response.count)")
             throw IdCardInternalError.readerProcessFailed
         }
-        CardReaderiR301.logger.debug("ID-CARD Response: \(response.hex)")
+        CardReaderiR301.logger().debug("ID-CARD Response: \(response.hex)")
         let swVal = UInt16(response[response.count - 2], response[response.count - 1])
         response.removeLast(2)
         return (response, swVal)

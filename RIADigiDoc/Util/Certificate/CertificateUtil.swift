@@ -17,15 +17,13 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 import SwiftASN1
 import X509
 import UtilsLib
 
-public struct CertificateUtil: CertificateUtilProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CertificateUtil")
-
+public struct CertificateUtil: CertificateUtilProtocol, Loggable {
     public init() {}
 
     public func pemToDerData(fromPEM pem: Data) -> Data? {
@@ -50,7 +48,7 @@ public struct CertificateUtil: CertificateUtilProtocol {
                             .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
                             .Value(utf8String: ""))
         } catch {
-            CertificateUtil.logger.error(
+            CertificateUtil.logger().error(
                 "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -77,7 +75,7 @@ public struct CertificateUtil: CertificateUtilProtocol {
                 return dateTime.date
             }
         } catch {
-            CertificateUtil.logger.error(
+            CertificateUtil.logger().error(
                 "Unable to get not valid after from certificate: \(error.localizedDescription)"
             )
             return ""

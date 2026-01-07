@@ -19,13 +19,11 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import CommonsLib
 
 @Observable
 @MainActor
-class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RecentDocumentsViewModel")
+class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, Loggable {
 
     var isImporting = false
     var files: [FileItem] = []
@@ -85,7 +83,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
         } catch {
             files = []
             errorMessage = "Could not load selected files"
-            RecentDocumentsViewModel.logger.error("Unable to load files: \(error)")
+            RecentDocumentsViewModel.logger().error("Unable to load files: \(error)")
         }
     }
 
@@ -95,7 +93,7 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol {
             files.removeAll { $0.url == file.url }
         } catch {
             errorMessage = "Failed to remove file"
-            RecentDocumentsViewModel.logger.error("Unable to delete file: \(error)")
+            RecentDocumentsViewModel.logger().error("Unable to delete file: \(error)")
         }
     }
 }

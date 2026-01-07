@@ -19,20 +19,10 @@
 
 import Foundation
 
-public struct SystemUtil: Loggable {
-    public static var isSimulator: Bool {
-        #if targetEnvironment(simulator)
-            logger().debug("App is running on a simulator")
-            return true
-        #else
-            return false
-        #endif
-    }
+public struct LoggingConfiguration: Sendable {
+    public let isLoggingEnabled: Bool
 
-    public static func getOSVersion() -> String {
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let versionString = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-        logger().debug("Operating system version: \(versionString)")
-        return versionString
+    public init(isLoggingEnabled: Bool) {
+        self.isLoggingEnabled = isLoggingEnabled
     }
 }

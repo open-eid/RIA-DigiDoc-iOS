@@ -19,15 +19,13 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import CommonsLib
 import CryptoSwift
 import CryptoObjCWrapper
 
 @Observable
 @MainActor
-class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptRecipientViewModel")
+class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
 
     var isImporting = false
     var recipients: [Addressee] = []
@@ -59,14 +57,14 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
         let cryptoContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
 
         guard let cryptoContainer else {
-            EncryptRecipientViewModel.logger.error("Cannot load container data. Crypto container is nil.")
+            EncryptRecipientViewModel.logger().error("Cannot load container data. Crypto container is nil.")
             return
         }
         let recipients = await cryptoContainer.getRecipients()
 
         for recipient in recipients where chosenRecipient.data == recipient.data {
             errorMessage = "Recipient already exists in the container"
-            EncryptRecipientViewModel.logger.error("Recipient already exists in the container")
+            EncryptRecipientViewModel.logger().error("Recipient already exists in the container")
             return
         }
 
@@ -79,7 +77,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
             if result.tooManyResults {
                 recipients = []
                 errorMessage = "Too many results"
-                EncryptRecipientViewModel.logger.error("Too many results for \(self.searchText)")
+                EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
             } else {
                 recipients = result.addressees
             }
@@ -96,7 +94,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
         let cryptoContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
 
         guard let cryptoContainer else {
-            EncryptRecipientViewModel.logger.error("Cannot load container data. Crypto container is nil.")
+            EncryptRecipientViewModel.logger().error("Cannot load container data. Crypto container is nil.")
             return []
         }
 
@@ -111,14 +109,14 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol {
             let cryptoContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
 
             guard let cryptoContainer else {
-                EncryptRecipientViewModel.logger.error("Cannot load container data. Crypto container is nil.")
+                EncryptRecipientViewModel.logger().error("Cannot load container data. Crypto container is nil.")
                 return
             }
 
             try await cryptoContainer.removeRecipient(recipient)
         } catch {
             errorMessage = "Failed to remove recipient"
-            EncryptRecipientViewModel.logger.error("Unable to delete recipient: \(error)")
+            EncryptRecipientViewModel.logger().error("Unable to delete recipient: \(error)")
         }
     }
 }

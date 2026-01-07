@@ -17,13 +17,11 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 
 @MainActor
-class InitViewModel: InitViewModelProtocol, ObservableObject {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "InitViewModel")
-
+class InitViewModel: InitViewModelProtocol, ObservableObject, Loggable {
     private let languageSettings: LanguageSettingsProtocol
     private let dataStore: DataStoreProtocol
 

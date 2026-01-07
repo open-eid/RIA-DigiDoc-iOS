@@ -21,7 +21,6 @@ import Foundation
 import CryptoKit
 import PDFKit
 import UniformTypeIdentifiers
-import OSLog
 import System
 import ZIPFoundation
 import FactoryKit

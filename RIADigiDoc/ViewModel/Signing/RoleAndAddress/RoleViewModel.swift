@@ -18,13 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import CommonsLib
 
 @Observable
 @MainActor
-class RoleViewModel: RoleViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "RoleViewModel")
+class RoleViewModel: RoleViewModelProtocol, Loggable {
 
     private let dataStore: DataStoreProtocol
 

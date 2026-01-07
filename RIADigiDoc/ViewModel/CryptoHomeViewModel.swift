@@ -19,15 +19,13 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import CryptoSwift
 import CommonsLib
 import UtilsLib
 
 @Observable
 @MainActor
-class CryptoHomeViewModel: CryptoHomeViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
+class CryptoHomeViewModel: CryptoHomeViewModelProtocol, Loggable {
 
     var isImporting = false
     var signedContainer: CryptoContainerProtocol = CryptoContainer(
@@ -48,7 +46,7 @@ class CryptoHomeViewModel: CryptoHomeViewModelProtocol {
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
         if !isImportingValue && !isFileOpeningLoading {
-            CryptoHomeViewModel.logger.info("User cancelled the file chooser")
+            CryptoHomeViewModel.logger().info("User cancelled the file chooser")
             return true
         }
 
@@ -64,7 +62,7 @@ class CryptoHomeViewModel: CryptoHomeViewModelProtocol {
             return try Directories.getCacheDirectory(fileManager: fileManager)
                 .appending(path: Constants.Folder.CryptoContainerFolder)
         } catch {
-            CryptoHomeViewModel.logger.error("Unable to get crypto recent documents folder: \(error)")
+            CryptoHomeViewModel.logger().error("Unable to get crypto recent documents folder: \(error)")
             return nil
         }
     }

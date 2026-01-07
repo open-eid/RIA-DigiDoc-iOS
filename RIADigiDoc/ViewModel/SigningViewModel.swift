@@ -19,15 +19,13 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
 @Observable
 @MainActor
-class SigningViewModel: SigningViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModel")
+class SigningViewModel: SigningViewModelProtocol, Loggable {
 
     var dataFiles: [DataFileWrapper] = []
     var signatures: [SignatureWrapper] = []
@@ -79,12 +77,12 @@ class SigningViewModel: SigningViewModelProtocol {
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
-        SigningViewModel.logger.debug("Loading container data")
+        SigningViewModel.logger().debug("Loading container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
-            SigningViewModel.logger.error("Cannot load container data. Signed container is nil.")
+            SigningViewModel.logger().error("Cannot load container data. Signed container is nil.")
             return
         }
 
@@ -102,7 +100,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
-        SigningViewModel.logger.debug("Container data loaded")
+        SigningViewModel.logger().debug("Container data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
@@ -133,7 +131,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
         guard let containerLocation = containerURL else {
-            SigningViewModel.logger.error("Unable to get container to create copy for saving")
+            SigningViewModel.logger().error("Unable to get container to create copy for saving")
             return nil
         }
 
@@ -153,7 +151,7 @@ class SigningViewModel: SigningViewModelProtocol {
                 do {
                     try fileManager.removeItem(at: tempSavedFileLocation)
                 } catch {
-                    SigningViewModel.logger.error("Unable to remove existing file: \(error.localizedDescription)")
+                    SigningViewModel.logger().error("Unable to remove existing file: \(error.localizedDescription)")
                     return nil
                 }
             }
@@ -161,13 +159,13 @@ class SigningViewModel: SigningViewModelProtocol {
             do {
                 try fileManager.copyItem(at: containerLocation, to: tempSavedFileLocation)
             } catch {
-                SigningViewModel.logger.error("Unable to copy file: \(error.localizedDescription)")
+                SigningViewModel.logger().error("Unable to copy file: \(error.localizedDescription)")
                 return nil
             }
 
             return tempSavedFileLocation
         } catch {
-            SigningViewModel.logger.error("Unable to get cache directory: \(error.localizedDescription)")
+            SigningViewModel.logger().error("Unable to get cache directory: \(error.localizedDescription)")
             return nil
         }
     }
@@ -186,7 +184,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
         do {
             let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
-            SigningViewModel.logger.debug("Added data files to container")
+            SigningViewModel.logger().debug("Added data files to container")
             errorMessage = ErrorMessage(
                 key: files.count == 1 ? "File successfully added" : "Files successfully added",
                 args: []
@@ -205,7 +203,7 @@ class SigningViewModel: SigningViewModelProtocol {
         do {
             try url.removeLastOpenedXattr()
         } catch {
-            SigningViewModel.logger.error("Unable to remove last opened xattr: \(error)")
+            SigningViewModel.logger().error("Unable to remove last opened xattr: \(error)")
         }
     }
 
@@ -258,7 +256,7 @@ class SigningViewModel: SigningViewModelProtocol {
     }
 
     private func handleAddFilesError(_ error: Error, container: URL) async {
-        SigningViewModel.logger.error("Unable to add data files to container: \(error.localizedDescription)")
+        SigningViewModel.logger().error("Unable to add data files to container: \(error.localizedDescription)")
 
         var totalFilesCount = 0
         var failedFileCount = 0
@@ -312,7 +310,7 @@ class SigningViewModel: SigningViewModelProtocol {
             await loadContainerData(signedContainer: renamedContainer)
             return await renamedContainer?.getRawContainerFile()
         } catch {
-            SigningViewModel.logger.error("Unable to rename container: \(error)")
+            SigningViewModel.logger().error("Unable to rename container: \(error)")
             if let digiDocError = error as? DigiDocError {
                 switch digiDocError {
                 case .containerRenamingFailed(let errorDetail),
@@ -366,15 +364,15 @@ class SigningViewModel: SigningViewModelProtocol {
                 do {
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
-                    SigningViewModel.logger.error("Failed to open nested container: \(error)")
+                    SigningViewModel.logger().error("Failed to open nested container: \(error)")
                     errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
                     if error.localizedDescription.contains("Online validation disabled") {
-                        SigningViewModel.logger.error(
+                        SigningViewModel.logger().error(
                             "Unable to open container '\([dataFile.fileName])'. Sending to SiVa not allowed."
                         )
                         errorMessage = nil
                     } else {
-                        SigningViewModel.logger.error("Failed to open nested container: \(error)")
+                        SigningViewModel.logger().error("Failed to open nested container: \(error)")
                         errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
                     }
                 }
@@ -468,7 +466,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
     func removeSignature(_ signature: SignatureWrapper) async {
         guard let container = signedContainer, let containerFile = containerURL else {
-            SigningViewModel.logger.error(
+            SigningViewModel.logger().error(
                 "Unable to remove signature from container. SignedContainer or containerURL is nil"
             )
             errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
@@ -479,7 +477,7 @@ class SigningViewModel: SigningViewModelProtocol {
             let container = try await container.removeSignature(index: signature.pos, containerFile: containerFile)
             await loadContainerData(signedContainer: container)
         } catch {
-            SigningViewModel.logger.error("Unable to remove signature from container. \(error)")
+            SigningViewModel.logger().error("Unable to remove signature from container. \(error)")
             errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
             return
         }
@@ -487,7 +485,7 @@ class SigningViewModel: SigningViewModelProtocol {
 
     func removeDataFile(_ dataFile: DataFileWrapper) async {
         guard let container = signedContainer, let containerFile = containerURL else {
-            SigningViewModel.logger.error(
+            SigningViewModel.logger().error(
                 "Unable to remove file from container. SignedContainer or containerURL is nil"
             )
             errorMessage = ErrorMessage(
@@ -498,7 +496,7 @@ class SigningViewModel: SigningViewModelProtocol {
         }
 
         guard let index = dataFiles.firstIndex(where: { $0.fileId == dataFile.fileId }) else {
-            SigningViewModel.logger.error(
+            SigningViewModel.logger().error(
                 "Unable to remove file from container. File not found in container"
             )
             errorMessage = ErrorMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
@@ -516,7 +514,7 @@ class SigningViewModel: SigningViewModelProtocol {
             await loadContainerData(signedContainer: container)
             return
         } catch {
-            SigningViewModel.logger.error("Unable to remove file from container. \(error)")
+            SigningViewModel.logger().error("Unable to remove file from container. \(error)")
             errorMessage = ErrorMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.fileName]

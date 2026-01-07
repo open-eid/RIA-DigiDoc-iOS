@@ -18,13 +18,10 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import CommonsLib
 
-public struct ContainerUtil: ContainerUtilProtocol {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.UtilsLib", category: "ContainerUtil")
+public struct ContainerUtil: ContainerUtilProtocol, Loggable {
 
     private let dataFileDirectory = "%@-data-files"
 
@@ -65,11 +62,11 @@ public struct ContainerUtil: ContainerUtilProtocol {
         do {
             try fileManager
                 .createDirectory(at: signedContainersDirectory, withIntermediateDirectories: true, attributes: [:])
-            ContainerUtil.logger.debug(
+            ContainerUtil.logger().debug(
                 "Directories created or already exist for \(signedContainersDirectory.resolvedPath)"
             )
         } catch {
-            ContainerUtil.logger.error("Unable to create signature containers dir: \(error.localizedDescription)")
+            ContainerUtil.logger().error("Unable to create signature containers dir: \(error.localizedDescription)")
             throw error
         }
 
@@ -121,10 +118,10 @@ public struct ContainerUtil: ContainerUtilProtocol {
                         attributes: [:]
                     )
                     if let base = directory {
-                        ContainerUtil.logger.debug("Directories created or already exist for \(base.resolvedPath)")
+                        ContainerUtil.logger().debug("Directories created or already exist for \(base.resolvedPath)")
                     }
                 } catch {
-                    ContainerUtil.logger.error("Failed to create directory: \(error.localizedDescription)")
+                    ContainerUtil.logger().error("Failed to create directory: \(error.localizedDescription)")
                 }
 
                 return targetDirectory

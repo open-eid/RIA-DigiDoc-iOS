@@ -18,11 +18,9 @@
  */
 
 import Foundation
-import OSLog
 import CommonsLib
 
 extension String {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "String extension")
 
     public func sanitized() -> String {
         var forbidden = CharacterSet.illegalCharacters

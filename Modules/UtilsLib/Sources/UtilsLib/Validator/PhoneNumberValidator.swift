@@ -18,34 +18,31 @@
  */
 
 import Foundation
-import OSLog
 import CommonsLib
 
-public struct PhoneNumberValidator {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "PhoneNumberValidator")
-
+public struct PhoneNumberValidator: Loggable {
     private static let minimumPhoneNumberLength = Constants.Validation.MinimumPhoneNumberLength
     private static let allowedPhoneNumberCountryCodes = Constants.Validation.AllowedPhoneNumberCountryCodes
 
     public static func isCountryCodeMissing(_ phoneNumber: String) -> Bool {
         let isCountryCodeMissing = (4..<minimumPhoneNumberLength).contains(phoneNumber.count) &&
                !isCountryCodeCorrect(phoneNumber)
-        PhoneNumberValidator.logger.debug("isCountryCodeMissing: \(isCountryCodeMissing)")
+        PhoneNumberValidator.logger().debug("isCountryCodeMissing: \(isCountryCodeMissing)")
         return isCountryCodeMissing
     }
 
     public static func isCountryCodeCorrect(_ phoneNumber: String) -> Bool {
         for allowedCountryCode in allowedPhoneNumberCountryCodes where phoneNumber.hasPrefix(allowedCountryCode) {
-            PhoneNumberValidator.logger.debug("Phone number country code is correct")
+            PhoneNumberValidator.logger().debug("Phone number country code is correct")
             return true
         }
-        PhoneNumberValidator.logger.debug("Phone number country code is NOT correct")
+        PhoneNumberValidator.logger().debug("Phone number country code is NOT correct")
         return false
     }
 
     public static func isPhoneNumberCorrect(_ phoneNumber: String) -> Bool {
         let isCorrect = phoneNumber.count >= minimumPhoneNumberLength
-        PhoneNumberValidator.logger.debug("Is phone number correct: \(isCorrect)")
+        PhoneNumberValidator.logger().debug("Is phone number correct: \(isCorrect)")
         return isCorrect
     }
 }

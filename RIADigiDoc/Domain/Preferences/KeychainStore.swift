@@ -19,11 +19,8 @@
 
 import CommonsLib
 import Foundation
-import OSLog
 
-public actor KeychainStore: KeychainStoreProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "KeychainStore")
-
+public actor KeychainStore: KeychainStoreProtocol, Loggable {
     private let bundleIdentifier: String
 
     public init(bundleIdentifier: String? = nil) {
@@ -51,7 +48,7 @@ public actor KeychainStore: KeychainStoreProtocol {
             let addStatus = SecItemAdd(queryWithAttributes as CFDictionary, nil)
             return addStatus == errSecSuccess
         } else {
-            await KeychainStore.logger.error("Unable to save \(key.rawValue): \(status)")
+            KeychainStore.logger().error("Unable to save \(key.rawValue): \(status)")
             return false
         }
     }
@@ -80,7 +77,7 @@ public actor KeychainStore: KeychainStoreProtocol {
         let status = SecItemDelete(query as CFDictionary)
 
         if status != errSecSuccess {
-            await KeychainStore.logger.error("Error removing key from Keychain: \(status)")
+            KeychainStore.logger().error("Error removing key from Keychain: \(status)")
         }
     }
 

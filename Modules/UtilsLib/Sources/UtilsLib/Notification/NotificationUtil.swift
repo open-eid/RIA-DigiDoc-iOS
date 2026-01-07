@@ -17,31 +17,26 @@
  *
  */
 
+import CommonsLib
 import Foundation
 import NotificationCenter
-import OSLog
 
 @MainActor
-public final class NotificationUtil: NSObject, NotificationUtilProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "NotificationUtil"
-    )
-
+public final class NotificationUtil: NSObject, NotificationUtilProtocol, Loggable {
     override init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
 
     public func requestAuthorization() async -> Bool {
-        NotificationUtil.logger.debug("Requesting authorization to send notifications")
+        NotificationUtil.logger().debug("Requesting authorization to send notifications")
         let center = UNUserNotificationCenter.current()
         do {
             let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-            NotificationUtil.logger.debug("Notification sending authorized: \(granted)")
+            NotificationUtil.logger().debug("Notification sending authorized: \(granted)")
             return granted
         } catch {
-            NotificationUtil.logger.debug("Unable to request authorization to send notifications. \(error)")
+            NotificationUtil.logger().debug("Unable to request authorization to send notifications. \(error)")
             return false
         }
     }
@@ -50,7 +45,7 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol {
         title: String,
         body: String
     ) async throws -> String {
-        NotificationUtil.logger.debug("Sending notification (\(title))")
+        NotificationUtil.logger().debug("Sending notification (\(title))")
 
         let notificationId = UUID().uuidString
         let content = UNMutableNotificationContent()
@@ -62,17 +57,17 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol {
 
         try await UNUserNotificationCenter.current().add(request)
 
-        NotificationUtil.logger.debug("Notification sent. ID: \(notificationId)")
+        NotificationUtil.logger().debug("Notification sent. ID: \(notificationId)")
 
         return notificationId
     }
 
     public func removeNotification(id: String) {
-        NotificationUtil.logger.debug("Removing notification (\(id))")
+        NotificationUtil.logger().debug("Removing notification (\(id))")
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id])
         center.removeDeliveredNotifications(withIdentifiers: [id])
-        NotificationUtil.logger.debug("Removed notification \(id)")
+        NotificationUtil.logger().debug("Removed notification \(id)")
     }
 }
 

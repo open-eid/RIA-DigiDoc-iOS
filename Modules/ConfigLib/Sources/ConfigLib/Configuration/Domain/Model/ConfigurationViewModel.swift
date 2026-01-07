@@ -18,13 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import UtilsLib
 import CommonsLib
 
 @MainActor
-class ConfigurationViewModel {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ConfigurationViewModel")
+class ConfigurationViewModel: Loggable {
 
     private(set) var configuration: ConfigurationProvider?
 
@@ -45,7 +43,7 @@ class ConfigurationViewModel {
                 cacheDir: Directories.getConfigDirectory(fileManager: fileManager),
                 proxyInfo: proxyInfo
             ) else {
-                ConfigurationViewModel.logger.error("No configuration updates available.")
+                ConfigurationViewModel.logger().error("No configuration updates available.")
                 return
             }
 
@@ -58,14 +56,14 @@ class ConfigurationViewModel {
                 }
             }
         } catch {
-            ConfigurationViewModel.logger.error("Unable to fetch configuration: \(error.localizedDescription)")
+            ConfigurationViewModel.logger().error("Unable to fetch configuration: \(error.localizedDescription)")
         }
     }
 
     func getConfiguration() async -> ConfigurationProvider? {
         do {
             guard let updates = await repository.getConfigurationUpdates() else {
-                ConfigurationViewModel.logger.error("Configuration updates provider is nil")
+                ConfigurationViewModel.logger().error("Configuration updates provider is nil")
                 return nil
             }
 
@@ -75,7 +73,7 @@ class ConfigurationViewModel {
                 }
             }
         } catch {
-            ConfigurationViewModel.logger.error("Unable to get configuration: \(error.localizedDescription)")
+            ConfigurationViewModel.logger().error("Unable to get configuration: \(error.localizedDescription)")
             return nil
         }
         return nil

@@ -17,14 +17,12 @@
  *
  */
 
-import OSLog
+import CommonsLib
+import Foundation
 
 @Observable
 @MainActor
-class LanguageChooserViewModel: LanguageChooserViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LanguageChooserViewModel")
-
+class LanguageChooserViewModel: LanguageChooserViewModelProtocol, Loggable {
     var selectedLanguage: String = "en"
 
     private let languageSettings: LanguageSettingsProtocol

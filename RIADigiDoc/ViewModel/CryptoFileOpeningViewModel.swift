@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import CryptoSwift
 import CommonsLib
@@ -26,7 +25,7 @@ import UtilsLib
 
 @Observable
 @MainActor
-class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
+class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
     var isFileOpeningLoading: Bool = false
     var isNavigatingToNextView: Bool = false
 
@@ -36,8 +35,6 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
     )
 
     var errorMessage: ToastMessage?
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 
     private let fileOpeningRepository: FileOpeningRepositoryProtocol
     private let sivaRepository: SivaRepositoryProtocol
@@ -63,23 +60,23 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
 
     func handleFiles() async {
         do {
-            CryptoFileOpeningViewModel.logger.debug("Handling chosen files from file system or from external sources")
+            CryptoFileOpeningViewModel.logger().debug("Handling chosen files from file system or from external sources")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            CryptoFileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
+            CryptoFileOpeningViewModel.logger().debug("Found \(validFiles.count) valid file(s)")
 
             if validFiles.isEmpty {
-                CryptoFileOpeningViewModel.logger.debug("No valid files found")
+                CryptoFileOpeningViewModel.logger().debug("No valid files found")
                 throw FileOpeningError.noDataFiles
             }
 
             files = validFiles
         } catch {
-            CryptoFileOpeningViewModel.logger.error("Unable to handle files. \(error)")
+            CryptoFileOpeningViewModel.logger().error("Unable to handle files. \(error)")
             handleError(error)
         }
     }
@@ -93,7 +90,7 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
 
             handleLoadingSuccess()
         } catch {
-            CryptoFileOpeningViewModel.logger.error("Unable to handle Crypto container. \(error)")
+            CryptoFileOpeningViewModel.logger().error("Unable to handle Crypto container. \(error)")
             handleError(error)
         }
     }
@@ -121,10 +118,10 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol {
 
     private func handleError(_ error: Error) {
         let ddeMessage = (error as? CryptoError)?.description ?? error.localizedDescription
-        CryptoFileOpeningViewModel.logger.error("\(ddeMessage)")
+        CryptoFileOpeningViewModel.logger().error("\(ddeMessage)")
 
         if let dde = error as? CryptoError {
-            CryptoFileOpeningViewModel.logger.error("\(dde)")
+            CryptoFileOpeningViewModel.logger().error("\(dde)")
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)

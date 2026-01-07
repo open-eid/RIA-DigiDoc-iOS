@@ -18,15 +18,12 @@
  */
 
 import Foundation
-import OSLog
 import System
 import ZIPFoundation
 import FactoryKit
 import CommonsLib
 
-public struct FileUtil: FileUtilProtocol {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.UtilsLib", category: "FileUtil")
+public struct FileUtil: FileUtilProtocol, Loggable {
 
     private let fileManager: FileManagerProtocol
 
@@ -67,7 +64,7 @@ public struct FileUtil: FileUtilProtocol {
 
     // Check file path so its valid and is not modified by someone else
     public func getValidPath(url: URL) async -> URL? {
-        FileUtil.logger.debug("Getting valid path for file: \(url)")
+        FileUtil.logger().debug("Getting valid path for file: \(url)")
 
         let resolvedURL = url.resolvingSymlinksInPath()
         let filePath = FilePath(resolvedURL.resolvedPath).lexicallyNormalized()
@@ -99,7 +96,7 @@ public struct FileUtil: FileUtilProtocol {
                 .lexicallyNormalized()
 
             if filePath.starts(with: appContainerPath) {
-                FileUtil.logger.debug("Resolved valid file path: \(resolvedURL)")
+                FileUtil.logger().debug("Resolved valid file path: \(resolvedURL)")
                 return resolvedURL
             }
         }
@@ -107,38 +104,39 @@ public struct FileUtil: FileUtilProtocol {
         // Check if file is opened externally (outside of application)
         let fileFromAppGroup = getFileUrlFromAppGroup(resolvedURL, appGroupIdentifier: Constants.Identifier.Group)
         if let fileUrl = fileFromAppGroup {
-            FileUtil.logger.debug("File is from app group: \(fileUrl)")
+            FileUtil.logger().debug("File is from app group: \(fileUrl)")
             return fileUrl
         }
 
         if isFileInsideMailFolder(resolvedURL) {
-            FileUtil.logger.debug("File is from Mail app")
+            FileUtil.logger().debug("File is from Mail app")
             return resolvedURL
         } else {
-            FileUtil.logger.debug("Checking if file is from iCloud")
+            FileUtil.logger().debug("Checking if file is from iCloud")
             // Check if file is opened from iCloud
             if isFileFromiCloud(fileURL: resolvedURL) {
                 if !isFileDownloadedFromiCloud(fileURL: resolvedURL) {
-                    FileUtil.logger.debug(
+                    FileUtil.logger().debug(
                         "File '\(resolvedURL.lastPathComponent)' from iCloud is not downloaded. Downloading..."
                     )
 
                     let downloadedFileUrl = await downloadFileFromiCloud(fileURL: resolvedURL)
                     if let fileUrl = downloadedFileUrl {
-                        FileUtil.logger.debug("File '\(resolvedURL.lastPathComponent)' downloaded from iCloud")
+                        FileUtil.logger().debug("File '\(resolvedURL.lastPathComponent)' downloaded from iCloud")
                         return fileUrl
                     } else {
-                        FileUtil.logger.debug("Unable to download file '\(resolvedURL.lastPathComponent)' from iCloud")
+                        FileUtil.logger().debug(
+                            "Unable to download file '\(resolvedURL.lastPathComponent)' from iCloud")
                         return nil
                     }
                 } else {
-                    FileUtil.logger.debug("File '\(resolvedURL.lastPathComponent)' from iCloud is already downloaded")
+                    FileUtil.logger().debug("File '\(resolvedURL.lastPathComponent)' from iCloud is already downloaded")
                     return url
                 }
             }
         }
 
-        FileUtil.logger.debug("File is NOT from iCloud")
+        FileUtil.logger().debug("File is NOT from iCloud")
         return nil
     }
 
@@ -164,7 +162,7 @@ public struct FileUtil: FileUtilProtocol {
         )
 
         if isFromAppGroup {
-            FileUtil.logger.debug("File is from app group: \(normalizedURL)")
+            FileUtil.logger().debug("File is from app group: \(normalizedURL)")
             return normalizedURL
         }
 
@@ -179,7 +177,7 @@ public struct FileUtil: FileUtilProtocol {
                 return true
             }
         } catch {
-            FileUtil.logger.error(
+            FileUtil.logger().error(
                 "Unable to check iCloud file '\(fileURL.lastPathComponent)' status: \(error.localizedDescription)"
             )
         }
@@ -192,7 +190,7 @@ public struct FileUtil: FileUtilProtocol {
             let values = try fileURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
 
             if let downloadingStatus = values.ubiquitousItemDownloadingStatus, downloadingStatus == .current {
-                FileUtil.logger.debug("File downloaded from iCloud")
+                FileUtil.logger().debug("File downloaded from iCloud")
                 return true
             }
         } catch {
@@ -201,7 +199,7 @@ public struct FileUtil: FileUtilProtocol {
                 fileURL.lastPathComponent,
                 error.localizedDescription
             )
-            FileUtil.logger.error("\(errorMessage)")
+            FileUtil.logger().error("\(errorMessage)")
         }
 
         return false
@@ -210,16 +208,16 @@ public struct FileUtil: FileUtilProtocol {
     public func downloadFileFromiCloud(fileURL: URL) async -> URL? {
         do {
             try fileManager.startDownloadingUbiquitousItem(at: fileURL)
-            FileUtil.logger.debug("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
+            FileUtil.logger().debug("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
 
             while !isFileDownloadedFromiCloud(fileURL: fileURL) {
                 try await Task.sleep(for: .seconds(0.5))
             }
 
-            FileUtil.logger.debug("iCloud file '\(fileURL.lastPathComponent)' downloaded")
+            FileUtil.logger().debug("iCloud file '\(fileURL.lastPathComponent)' downloaded")
             return fileURL
         } catch {
-            FileUtil.logger.error(
+            FileUtil.logger().error(
                 "Unable to start iCloud file '\(fileURL.lastPathComponent)' download: \(error.localizedDescription)"
             )
             return nil
@@ -231,7 +229,7 @@ public struct FileUtil: FileUtilProtocol {
         let filePath = FilePath(stringLiteral: url.resolvedPath).lexicallyNormalized()
 
         if filePath == mailFolderPath {
-            FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+            FileUtil.logger().debug("File '\(url.lastPathComponent)' is from Mail app")
             return true
         }
 
@@ -240,18 +238,18 @@ public struct FileUtil: FileUtilProtocol {
             let filePathString = filePath.string
 
             if filePathString.count == mailPathString.count {
-                FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+                FileUtil.logger().debug("File '\(url.lastPathComponent)' is from Mail app")
                 return true
             }
 
             let index = filePathString.index(filePathString.startIndex, offsetBy: mailPathString.count)
             if filePathString[index] == "/" {
-                FileUtil.logger.debug("File '\(url.lastPathComponent)' is from Mail app")
+                FileUtil.logger().debug("File '\(url.lastPathComponent)' is from Mail app")
                 return true
             }
         }
 
-        FileUtil.logger.debug("File '\(url.lastPathComponent)' is NOT from Mail app")
+        FileUtil.logger().debug("File '\(url.lastPathComponent)' is NOT from Mail app")
 
         return false
     }
@@ -270,7 +268,7 @@ public struct FileUtil: FileUtilProtocol {
     }
 
     public func removeSharedFiles(url: URL?) throws {
-        FileUtil.logger.debug("Removing shared files")
+        FileUtil.logger().debug("Removing shared files")
 
         let sharedFilesFolder = try url ?? Directories.getSharedFolder(fileManager: fileManager)
 
@@ -280,20 +278,20 @@ public struct FileUtil: FileUtilProtocol {
             try fileManager.removeItem(at: fileURL)
         }
 
-        FileUtil.logger.debug("Shared files removed")
+        FileUtil.logger().debug("Shared files removed")
     }
 
     public func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
-        FileUtil.logger.debug("Removing saved files directory")
+        FileUtil.logger().debug("Removing saved files directory")
         do {
             let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
                 subfolder: CommonsLib.Constants.Folder.SavedFiles,
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)
-            FileUtil.logger.debug("Saved Files directory removed")
+            FileUtil.logger().debug("Saved Files directory removed")
         } catch {
-            FileUtil.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
+            FileUtil.logger().error("Unable to delete saved files directory: \(error.localizedDescription)")
         }
     }
 }

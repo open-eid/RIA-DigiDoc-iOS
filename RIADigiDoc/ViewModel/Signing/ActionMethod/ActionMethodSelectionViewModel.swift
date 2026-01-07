@@ -17,17 +17,12 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 
 @Observable
 @MainActor
-class ActionMethodSelectionViewModel: ActionMethodSelectionViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "ActionMethodSelectionViewModel"
-    )
-
+class ActionMethodSelectionViewModel: ActionMethodSelectionViewModelProtocol, Loggable {
     private let dataStore: DataStoreProtocol
 
     init(dataStore: DataStoreProtocol) {

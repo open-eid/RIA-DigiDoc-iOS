@@ -18,13 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import CommonsTestShared
 
 @testable import ConfigLib
 
 public class TestConfigurationProvider {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TestConfigurationProvider")
 
     public static func mockConfigurationProvider(
         metaInfUrl: String = "https://someUrl.abc",

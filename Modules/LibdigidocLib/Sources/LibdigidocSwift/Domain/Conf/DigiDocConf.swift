@@ -18,15 +18,13 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import LibdigidocLibObjC
 import ConfigLib
 import UtilsLib
 import CommonsLib
 
-public struct DigiDocConf: DigiDocConfProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DigiDocConf")
+public struct DigiDocConf: DigiDocConfProtocol, Loggable {
 
     @MainActor static let sharedInitializer = DigiDocInitializer(
         configurationRepository: Container.shared.configurationRepository(),
@@ -35,6 +33,7 @@ public struct DigiDocConf: DigiDocConfProtocol {
 
     public static func initDigiDoc(
         configuration: ConfigurationProvider? = nil,
+        isLoggingEnabled: Bool = false,
         tsaOption: ServicesSettingsOption? = nil,
         tsaUrl: URL? = nil,
         tsaCert: Data? = nil,
@@ -43,7 +42,10 @@ public struct DigiDocConf: DigiDocConfProtocol {
         sivaCert: Data? = nil,
         proxyInfo: ProxyInfo? = nil
     ) async throws {
-        try await sharedInitializer.initializeDigiDoc(configuration: configuration)
+        try await sharedInitializer.initializeDigiDoc(
+            configuration: configuration,
+            isLoggingEnabled: isLoggingEnabled
+        )
 
         if let tsaOption {
             setTSAInfo(url: tsaUrl, cert: tsaCert, option: tsaOption, isInit: true)
@@ -60,7 +62,7 @@ public struct DigiDocConf: DigiDocConfProtocol {
         Task {
             guard let configStream = await configurationRepository.observeConfigurationUpdates(
             ) else {
-                logger.error("Unable to get configuration updates stream")
+                logger().error("Unable to get configuration updates stream")
                 return
             }
             do {
@@ -68,7 +70,7 @@ public struct DigiDocConf: DigiDocConfProtocol {
                     try await sharedInitializer.overrideConfiguration(newConfig: config)
                 }
             } catch {
-                logger.error("Unable to override configuration updates: \(error)")
+                logger().error("Unable to override configuration updates: \(error)")
             }
         }
     }
@@ -165,7 +167,7 @@ public struct DigiDocConf: DigiDocConfProtocol {
     }
 }
 
-public actor DigiDocInitializer {
+public actor DigiDocInitializer: Loggable {
     private var isInitialized = false
     private var initializationError: ErrorDetail?
 
@@ -185,22 +187,25 @@ public actor DigiDocInitializer {
         self.fileManager = fileManager
     }
 
-    func initializeDigiDoc(configuration: ConfigurationProvider? = nil) async throws {
+    func initializeDigiDoc(configuration: ConfigurationProvider? = nil, isLoggingEnabled: Bool) async throws {
 
         guard !isInitialized else {
             throw DigiDocError.alreadyInitialized
         }
 
+        let logLevel = isLoggingEnabled ? DigiDocInitializer.libdigidocppLogLevel : 0
+
         if let customConf = configuration {
             try await initDigiDoc(
                 conf: toDigiDocConfig(
-                    logLevel: DigiDocInitializer.libdigidocppLogLevel,
+                    logLevel: logLevel,
                     logFile: overrideLogFile(),
                     tslCache: overrideTSLCache(),
                     configurationProvider: customConf
                 )
             )
         } else {
+            digidocConf.logLevel = overrideLogLevel(logLevel: logLevel)
             try await initDigiDoc(conf: digidocConf)
         }
         isInitialized = true

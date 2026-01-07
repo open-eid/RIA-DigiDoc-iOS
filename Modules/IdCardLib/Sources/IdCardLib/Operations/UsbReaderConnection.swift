@@ -17,9 +17,9 @@
  *
  */
 
+import CommonsLib
 import Foundation
 import iR301
-import OSLog
 
 public protocol UsbReaderConnectionDelegate: AnyObject {
     func readerStatusDidChange(_ status: UsbReaderStatus)
@@ -35,8 +35,7 @@ public enum UsbReaderStatus {
 }
 
 @MainActor
-public class UsbReaderConnection {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ReaderConnection")
+public class UsbReaderConnection: Loggable {
     public static let shared = UsbReaderConnection()
 
     public weak var delegate: UsbReaderConnectionDelegate?
@@ -49,22 +48,22 @@ public class UsbReaderConnection {
 
     public func startDiscoveringReaders() {
         guard handle == 0 else {
-            UsbReaderConnection.logger.error("ID-CARD: Reader discovery is already running")
+            UsbReaderConnection.logger().error("ID-CARD: Reader discovery is already running")
             return
         }
-        UsbReaderConnection.logger.debug("ID-CARD: Starting reader discovery")
+        UsbReaderConnection.logger().debug("ID-CARD: Starting reader discovery")
         updateStatus(status)
         SCardEstablishContext(DWORD(SCARD_SCOPE_SYSTEM), nil, nil, &handle)
-        UsbReaderConnection.logger.debug("ID-CARD: Started reader discovery: \(self.handle)")
+        UsbReaderConnection.logger().debug("ID-CARD: Started reader discovery: \(self.handle)")
     }
 
     public func stopDiscoveringReaders(with status: UsbReaderStatus = .sInitial) {
-        UsbReaderConnection.logger.debug("ID-CARD: Stopping reader discovery")
+        UsbReaderConnection.logger().debug("ID-CARD: Stopping reader discovery")
         self.status = status
         FtDidEnterBackground(1)
         SCardCancel(handle)
         SCardReleaseContext(handle)
-        UsbReaderConnection.logger.debug("ID-CARD: Stopped reader discovery with status: \(self.handle)")
+        UsbReaderConnection.logger().debug("ID-CARD: Stopped reader discovery with status: \(self.handle)")
         handle = 0
     }
 
@@ -77,8 +76,7 @@ public class UsbReaderConnection {
 }
 
 @MainActor
-private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDelegate {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ReaderInterfaceDelegate")
+private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDelegate, Loggable {
     private let readerInterface = ReaderInterface()
 
     override init() {
@@ -87,12 +85,12 @@ private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDel
     }
 
     func readerInterfaceDidChange(_ attached: Bool, bluetoothID _: String?) {
-        UsbReaderInterfaceHandler.logger.debug("ID-CARD attached: \(attached)")
+        UsbReaderInterfaceHandler.logger().debug("ID-CARD attached: \(attached)")
         UsbReaderConnection.shared.updateStatus(attached ? .sReaderConnected : .sReaderNotConnected)
     }
 
     func cardInterfaceDidDetach(_ attached: Bool) {
-        UsbReaderInterfaceHandler.logger.debug("ID-CARD: Card (interface) attached: \(attached)")
+        UsbReaderInterfaceHandler.logger().debug("ID-CARD: Card (interface) attached: \(attached)")
         do {
             guard attached, let reader = try CardReaderiR301(contextHandle: UsbReaderConnection.shared.handle) else {
                 return UsbReaderConnection.shared.updateStatus(.sReaderConnected)
@@ -102,7 +100,7 @@ private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDel
                 UsbReaderConnection.shared.updateStatus(.sCardConnected(handler))
             }
         } catch {
-            UsbReaderInterfaceHandler.logger.debug("ID-CARD: Unable to power on card")
+            UsbReaderInterfaceHandler.logger().debug("ID-CARD: Unable to power on card")
             UsbReaderConnection.shared.updateStatus(.sReaderProcessFailed)
         }
     }
@@ -112,6 +110,6 @@ private class UsbReaderInterfaceHandler: NSObject, @MainActor ReaderInterfaceDel
     }
 
     func findPeripheralReader(_ readerName: String) {
-        UsbReaderInterfaceHandler.logger.debug("ID-CARD: Reader name: \(readerName)")
+        UsbReaderInterfaceHandler.logger().debug("ID-CARD: Reader name: \(readerName)")
     }
 }

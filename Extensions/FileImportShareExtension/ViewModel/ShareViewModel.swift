@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import UniformTypeIdentifiers
 import FactoryKit
 import CommonsLib
@@ -27,12 +26,7 @@ import Alamofire
 
 @Observable
 @MainActor
-class ShareViewModel: ShareViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.FileImportShareExtension",
-        category: "ShareViewController"
-    )
-
+class ShareViewModel: ShareViewModelProtocol, Loggable {
     private let fileManager: FileManagerProtocol
     private let resourceChecker: URLResourceCheckerProtocol
 
@@ -48,7 +42,7 @@ class ShareViewModel: ShareViewModelProtocol {
 
     @discardableResult
     func importFiles(_ items: [ImportedFileItem]) async -> Bool {
-        ShareViewModel.logger.debug("Importing files...")
+        ShareViewModel.logger().debug("Importing files...")
         guard !items.isEmpty else {
             await MainActor.run { [weak self] in
                 self?.status = .failed
@@ -63,9 +57,9 @@ class ShareViewModel: ShareViewModelProtocol {
             )
 
             if isImported {
-                ShareViewModel.logger.debug("Files imported successfully")
+                ShareViewModel.logger().debug("Files imported successfully")
             } else {
-                ShareViewModel.logger.error("Could not import files")
+                ShareViewModel.logger().error("Could not import files")
             }
 
             await MainActor.run { [weak self] in
@@ -74,7 +68,7 @@ class ShareViewModel: ShareViewModelProtocol {
 
             return isImported
         } catch {
-            ShareViewModel.logger.error("Unable to import files: \(error.localizedDescription)")
+            ShareViewModel.logger().error("Unable to import files: \(error.localizedDescription)")
             await MainActor.run { [weak self] in
                 self?.status = .failed
             }
@@ -174,7 +168,7 @@ class ShareViewModel: ShareViewModelProtocol {
 
                 return true
             } catch {
-                ShareViewModel.logger.error("Unable to cache file: \(error.localizedDescription)")
+                ShareViewModel.logger().error("Unable to cache file: \(error.localizedDescription)")
             }
         } else if itemUrl.isValidURL() {
             return await downloadFileFromUrl(itemUrl)
@@ -184,7 +178,7 @@ class ShareViewModel: ShareViewModelProtocol {
     }
 
     func downloadFileFromUrl(_ itemUrl: URL) async -> Bool {
-        ShareViewModel.logger.debug("Downloading file from \(itemUrl.absoluteString)")
+        ShareViewModel.logger().debug("Downloading file from \(itemUrl.absoluteString)")
 
         do {
             let destinationURL = try Directories.getTempDirectory(
@@ -204,7 +198,7 @@ class ShareViewModel: ShareViewModelProtocol {
                 for await progress in request.downloadProgress() {
                     let fileName = itemUrl.lastPathComponent
                     let downloadProgress = progress.fractionCompleted * 100
-                    ShareViewModel.logger.debug(
+                    ShareViewModel.logger().debug(
                         "\(String(format: "Download progress for file '%@': %.2f%%", fileName, downloadProgress))"
                     )
                 }
@@ -216,7 +210,7 @@ class ShareViewModel: ShareViewModelProtocol {
             return await cacheFileOnUrl(fileURL)
         } catch let error {
             let errorDescription = error.localizedDescription
-            ShareViewModel.logger.error(
+            ShareViewModel.logger().error(
                 "\(String(format: "Unable to download file %@: %@", itemUrl.absoluteString, errorDescription))"
             )
             return false

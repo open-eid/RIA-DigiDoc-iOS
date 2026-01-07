@@ -18,14 +18,12 @@
  */
 
 import Foundation
-import OSLog
 import LibdigidocLibSwift
 import CommonsLib
 
 @Observable
 @MainActor
-class NFCViewModel: NFCViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "NFCViewModel")
+class NFCViewModel: NFCViewModelProtocol, Loggable {
 
     var canNumberErrorKey: String?
     var canNumberErrorExtraArguments: [String] = []

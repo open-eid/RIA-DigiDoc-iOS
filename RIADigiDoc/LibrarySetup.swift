@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import OSLog
+import FactoryKit
 import LibdigidocLibSwift
 import CryptoObjCWrapper
 import CryptoSwift
@@ -26,9 +26,7 @@ import ConfigLib
 import CommonsLib
 import UtilsLib
 
-actor LibrarySetup {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "LibrarySetup")
-
+actor LibrarySetup: Loggable {
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let fileManager: FileManagerProtocol
@@ -62,6 +60,9 @@ actor LibrarySetup {
     }
 
     func setupLibraries() async {
+        let isLoggingEnabled = await dataStore.getIsLoggingEnabled()
+        await initializeLogging(isLoggingEnabled: isLoggingEnabled)
+
         do {
             let proxyInfo = await proxyUtil.getProxyInfo()
 
@@ -72,7 +73,7 @@ actor LibrarySetup {
             if let schemaDirectory = Directories.getLibraryDirectory(fileManager: fileManager) {
                 try tslUtil.setupTSLFiles(tsls: [], destinationDir: schemaDirectory)
             } else {
-                LibrarySetup.logger.error("Unable to setup TSL files. Library directory does not exist")
+                LibrarySetup.logger().error("Unable to setup TSL files. Library directory does not exist")
             }
             let configDirectory = try Directories.getCacheDirectory(
                 fileManager: fileManager
@@ -87,11 +88,12 @@ actor LibrarySetup {
                     proxyInfo: proxyInfo
                 )
             } catch {
-                LibrarySetup.logger.error("Unable to initialize configuration: \(error)")
+                LibrarySetup.logger().error("Unable to initialize configuration: \(error)")
             }
 
-            LibrarySetup.logger.debug("Initializing Libdigidocpp")
+            LibrarySetup.logger().debug("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
+                isLoggingEnabled: isLoggingEnabled,
                 tsaOption: getTSAOption(),
                 tsaUrl: getTSAUrl(),
                 tsaCert: getTSACert(),
@@ -100,7 +102,7 @@ actor LibrarySetup {
                 sivaCert: getSiVaCert(),
                 proxyInfo: proxyInfo
             )
-            LibrarySetup.logger.info("Libdigidocpp initialized successfully")
+            LibrarySetup.logger().info("Libdigidocpp initialized successfully")
 
             let configurationProvider = await configurationRepository.getConfiguration()
 
@@ -112,10 +114,10 @@ actor LibrarySetup {
         } catch let error {
             switch error {
             case DigiDocError.initializationFailed(let errorDetail):
-                LibrarySetup.logger.error("\(errorDetail.description)")
+                LibrarySetup.logger().error("\(errorDetail.description)")
             case DigiDocError.alreadyInitialized:
-                LibrarySetup.logger.error("Cannot initialize Libdigidocpp: Already initialized")
-            default: LibrarySetup.logger.error(
+                LibrarySetup.logger().error("Cannot initialize Libdigidocpp: Already initialized")
+            default: LibrarySetup.logger().error(
                 "Unknown initialization error: \(error.localizedDescription). Error: \(error)")
             }
         }
@@ -162,6 +164,10 @@ actor LibrarySetup {
             atomically: true,
             encoding: .utf8
         )
+    }
+
+    private func initializeLogging(isLoggingEnabled: Bool) async {
+        Container.shared.isLoggingEnabled.register { isLoggingEnabled }
     }
 
     private func getTSAOption() async -> ServicesSettingsOption {

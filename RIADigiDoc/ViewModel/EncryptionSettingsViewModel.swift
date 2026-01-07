@@ -20,14 +20,10 @@
 import CommonsLib
 import ConfigLib
 import Foundation
-import OSLog
 
 @Observable
 @MainActor
-class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptionSettingsViewModel")
-
+class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Loggable {
     var configuration: ConfigurationProvider?
     var certData: Data?
     var encryptionCdocOption: EncryptionCdocOption = .cdoc1

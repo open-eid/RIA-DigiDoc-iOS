@@ -18,28 +18,18 @@
  */
 
 import Foundation
-import OSLog
 
-public struct BundleUtil {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.CommonsLib", category: "BundleUtil")
-
+public struct BundleUtil: Loggable {
     public static func getBundleIdentifier() -> String {
-        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "ee.ria.digidoc"
-        logger.debug("Using bundle identifier: \(bundleIdentifier)")
-        return bundleIdentifier
+        return Bundle.main.bundleIdentifier ?? "ee.ria.digidoc"
     }
 
     public static func getBundleShortVersionString(bundle: Bundle = Bundle.main) -> String {
-        let versionString = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.0.0"
-        logger.debug("Bundle short version string from info.plist: \(versionString)")
-        return versionString
+        return bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.0.0"
     }
 
     public static func getBundleVersion(bundle: Bundle = Bundle.main) -> String {
-        let appVersion = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        logger.debug("Bundle version from info.plist: \(appVersion)")
-        return appVersion
+        return bundle.infoDictionary?["CFBundleVersion"] as? String ?? "1"
     }
 
     public static func getAppVersion(bundle: Bundle = Bundle.main) -> String {

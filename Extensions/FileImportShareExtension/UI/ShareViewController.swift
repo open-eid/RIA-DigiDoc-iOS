@@ -17,16 +17,13 @@
  *
  */
 
+import CommonsLib
 import UIKit
 import SwiftUI
-import OSLog
 import UniformTypeIdentifiers
 import FactoryKit
 
-class ShareViewController: UIViewController, Sendable {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ShareViewController")
-
+class ShareViewController: UIViewController, Sendable, Loggable {
     let viewModel = Container.shared.shareViewModel()
 
     override func viewDidLoad() {
@@ -127,7 +124,7 @@ class ShareViewController: UIViewController, Sendable {
                             ))
                         }
                     } catch let error {
-                        ShareViewController.logger.error("Unable to load item: \(error.localizedDescription)")
+                        ShareViewController.logger().error("Unable to load item: \(error.localizedDescription)")
                     }
                 }
             }

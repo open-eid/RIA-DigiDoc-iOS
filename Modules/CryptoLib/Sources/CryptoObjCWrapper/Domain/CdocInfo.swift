@@ -17,11 +17,10 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 
-@objc public class CdocInfo: NSObject {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CdocInfo")
+@objc public final class CdocInfo: NSObject, Loggable {
     public let format: String
     @objc public let addressees: [Addressee]
     @objc public let dataFiles: [CryptoDataFile]
@@ -40,7 +39,7 @@ import OSLog
 
     @objc public init(cdoc1Path path: String) throws {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else {
-            CdocInfo.logger.error("Error: Unable to read file at \(path)")
+            CdocInfo.logger().error("Error: Unable to read file at \(path)")
             throw NSError(domain: XMLParser.errorDomain, code: XMLParser.ErrorCode.internalError.rawValue, userInfo: [
                 NSLocalizedDescriptionKey: "Failed to create XML parser for file at \(path)"
             ])
@@ -49,7 +48,7 @@ import OSLog
         parser.externalEntityResolvingPolicy = .never
         parser.delegate = delegate
         guard parser.parse() else {
-            CdocInfo.logger.error("Error: Failed to parse XML")
+            CdocInfo.logger().error("Error: Failed to parse XML")
             throw parser.parserError ?? NSError(
                 domain: XMLParser.errorDomain,
                 code: XMLParser.ErrorCode.internalError.rawValue,

@@ -17,8 +17,8 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 import X509
 import SwiftASN1
 import CryptoKit
@@ -28,8 +28,7 @@ import UtilsLib
 
 @Observable
 @MainActor
-class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CertificateDetailViewModel")
+class CertificateDetailViewModel: CertificateDetailViewModelProtocol, Loggable {
 
     private static let oidToExtensionName: [String: String] = [
         "2.5.29.14": "SubjectKeyIdentifier",
@@ -56,7 +55,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
                             .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
                             .Value(utf8String: ""))
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -72,7 +71,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
                             .first { $0.type == attribute }?.value ?? RelativeDistinguishedName.Attribute
                             .Value(utf8String: ""))
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -85,7 +84,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
 
             return String(describing: certificate.serialNumber)
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get serial number from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -97,7 +96,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
             return String(describing: certificate.version)
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get version from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -109,7 +108,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
             return String(describing: certificate.signatureAlgorithm).description
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get signature algorithm from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -121,7 +120,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
             return String(describing: certificate.notValidBefore)
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get not valid before from certificate: \(error.localizedDescription)"
             )
             return ""
@@ -133,7 +132,7 @@ class CertificateDetailViewModel: CertificateDetailViewModelProtocol {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
             return String(describing: certificate.notValidAfter)
         } catch {
-            CertificateDetailViewModel.logger.error(
+            CertificateDetailViewModel.logger().error(
                 "Unable to get not valid after from certificate: \(error.localizedDescription)"
             )
             return ""

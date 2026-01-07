@@ -18,17 +18,13 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import UtilsLib
 import CommonsLib
 
 @Observable
 @MainActor
-class ContentViewModel: ContentViewModelProtocol {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ContentViewModel")
-
+class ContentViewModel: ContentViewModelProtocol, Loggable {
     private let fileUtil: FileUtilProtocol
     private let fileManager: FileManagerProtocol
 
@@ -42,7 +38,7 @@ class ContentViewModel: ContentViewModelProtocol {
 
     func getSharedFiles() async -> [URL] {
         do {
-            ContentViewModel.logger.debug("Checking for shared files...")
+            ContentViewModel.logger().debug("Checking for shared files...")
             let sharedFolderURL = try await Directories.getSharedFolder(fileManager: fileManager)
                 .validURL(fileUtil: fileUtil)
 
@@ -52,14 +48,14 @@ class ContentViewModel: ContentViewModelProtocol {
                 options: .skipsHiddenFiles)
 
             if contents.isEmpty {
-                ContentViewModel.logger.debug("Shared files folder is empty")
+                ContentViewModel.logger().debug("Shared files folder is empty")
             } else {
-                ContentViewModel.logger.debug("Found \(contents.count) shared files")
+                ContentViewModel.logger().debug("Found \(contents.count) shared files")
             }
 
             return contents
         } catch {
-            ContentViewModel.logger.error("Unable to get shared files: \(error.localizedDescription)")
+            ContentViewModel.logger().error("Unable to get shared files: \(error.localizedDescription)")
             return []
         }
     }

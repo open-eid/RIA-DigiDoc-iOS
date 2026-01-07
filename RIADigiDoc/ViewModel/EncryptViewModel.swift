@@ -19,7 +19,6 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import CryptoSwift
 import CryptoObjCWrapper
 import CommonsLib
@@ -27,8 +26,7 @@ import UtilsLib
 
 @Observable
 @MainActor
-class EncryptViewModel: EncryptViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "EncryptViewModel")
+class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
     var dataFiles: [URL] = []
     var recipients: [Addressee] = []
@@ -86,11 +84,11 @@ class EncryptViewModel: EncryptViewModelProtocol {
     }
 
     func loadContainerData(cryptoContainer: CryptoContainerProtocol?) async {
-        EncryptViewModel.logger.debug("Loading container data")
+        EncryptViewModel.logger().debug("Loading container data")
         let openedContainer = (cryptoContainer ?? sharedContainerViewModel.currentContainer())
             as? any CryptoContainerProtocol
         guard let openedContainer else {
-            EncryptViewModel.logger.error("Cannot load container data. Crypto container is nil.")
+            EncryptViewModel.logger().error("Cannot load container data. Crypto container is nil.")
             return
         }
 
@@ -102,12 +100,12 @@ class EncryptViewModel: EncryptViewModelProtocol {
         self.containerMimetype = await openedContainer.getContainerMimetype()
         self.containerURL = await openedContainer.getRawContainerFile()
 
-        EncryptViewModel.logger.debug("Container data loaded")
+        EncryptViewModel.logger().debug("Container data loaded")
     }
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
         guard let containerLocation = containerURL else {
-            EncryptViewModel.logger.error("Unable to get container to create copy for saving")
+            EncryptViewModel.logger().error("Unable to get container to create copy for saving")
             return nil
         }
 
@@ -127,7 +125,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
                 do {
                     try fileManager.removeItem(at: tempSavedFileLocation)
                 } catch {
-                    EncryptViewModel.logger.error("Unable to remove existing file: \(error.localizedDescription)")
+                    EncryptViewModel.logger().error("Unable to remove existing file: \(error.localizedDescription)")
                     return nil
                 }
             }
@@ -135,13 +133,13 @@ class EncryptViewModel: EncryptViewModelProtocol {
             do {
                 try fileManager.copyItem(at: containerLocation, to: tempSavedFileLocation)
             } catch {
-                EncryptViewModel.logger.error("Unable to copy file: \(error.localizedDescription)")
+                EncryptViewModel.logger().error("Unable to copy file: \(error.localizedDescription)")
                 return nil
             }
 
             return tempSavedFileLocation
         } catch {
-            EncryptViewModel.logger.error("Unable to get cache directory: \(error.localizedDescription)")
+            EncryptViewModel.logger().error("Unable to get cache directory: \(error.localizedDescription)")
             return nil
         }
     }
@@ -159,7 +157,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         }
 
         await cryptoContainer?.addDataFiles(files)
-        EncryptViewModel.logger.debug("Added data files to container")
+        EncryptViewModel.logger().debug("Added data files to container")
         errorMessage = ErrorMessage(
             key: files.count == 1 ? "File successfully added" : "Files successfully added",
             args: []
@@ -249,7 +247,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
                 cryptoContainer: encryptedContainer
             )
         } catch {
-            EncryptViewModel.logger.error("Unable to encrypt container: \(error)")
+            EncryptViewModel.logger().error("Unable to encrypt container: \(error)")
             handleEncryptionError(error)
         }
     }
@@ -278,7 +276,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
         do {
             return try await cryptoContainer?.renameContainer(to: newName)
         } catch {
-            EncryptViewModel.logger.error("Unable to rename container: \(error)")
+            EncryptViewModel.logger().error("Unable to rename container: \(error)")
             if let cryptoError = error as? CryptoError {
                 switch cryptoError {
                 case .containerRenamingFailed(let errorDetail),
@@ -333,7 +331,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
                     try await openNestedContainer(fileURL: fileURL)
                     // TODO: Open signed container files
                 } catch {
-                    EncryptViewModel.logger.error("Failed to open nested container: \(error)")
+                    EncryptViewModel.logger().error("Failed to open nested container: \(error)")
                     errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
                 }
             } else {
@@ -508,7 +506,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
 
     func removeRecipient(_ recipient: Addressee) async {
         guard let container = cryptoContainer else {
-            EncryptViewModel.logger.error(
+            EncryptViewModel.logger().error(
                 "Unable to remove signature from container. CryptoContainer or containerURL is nil"
             )
             errorMessage = ErrorMessage(
@@ -522,7 +520,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
             try await container.removeRecipient(recipient)
             await loadContainerData(cryptoContainer: container)
         } catch {
-            EncryptViewModel.logger.error("Unable to remove signature from container. \(error)")
+            EncryptViewModel.logger().error("Unable to remove signature from container. \(error)")
             errorMessage = ErrorMessage(
                 key: "Failed to remove signature from container",
                 args: []
@@ -533,7 +531,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
 
     func removeDataFile(_ dataFile: URL) async {
         guard let container = cryptoContainer else {
-            EncryptViewModel.logger.error(
+            EncryptViewModel.logger().error(
                 "Unable to remove file from container. CryptoContainer or containerURL is nil"
             )
             errorMessage = ErrorMessage(
@@ -553,7 +551,7 @@ class EncryptViewModel: EncryptViewModelProtocol {
             await loadContainerData(cryptoContainer: container)
             return
         } catch {
-            EncryptViewModel.logger.error("Unable to remove file from container. \(error)")
+            EncryptViewModel.logger().error("Unable to remove file from container. \(error)")
             errorMessage = ErrorMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.lastPathComponent]

@@ -21,14 +21,10 @@ import Alamofire
 import CommonsLib
 import Foundation
 import LibdigidocLibSwift
-import OSLog
 
 @Observable
 @MainActor
-class ProxySettingsViewModel: ProxySettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ProxySettingsViewModel")
-
+class ProxySettingsViewModel: ProxySettingsViewModelProtocol, Loggable {
     var proxyInfo: ProxyInfo = ProxyInfo()
     var portText: String = "80"
 

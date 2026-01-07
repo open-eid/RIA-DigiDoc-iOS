@@ -18,24 +18,17 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import CommonsLib
 
-public struct TestFileUtil {
-
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.CommonsLib.CommonsTestShared",
-        category: "TestFileUtil"
-    )
-
+public struct TestFileUtil: Loggable {
     private static let bundleIdentifier =  Bundle.main.bundleIdentifier ?? "ee.ria.digidoc"
 
     public init() {}
 
     public static func getURL(string: String) throws -> URL {
         guard let url = URL(string: string) else {
-            TestFileUtil.logger.error("'\(string)' is not a valid URL")
+            TestFileUtil.logger().error("'\(string)' is not a valid URL")
             throw URLError(.badURL)
         }
         return url
@@ -58,7 +51,7 @@ public struct TestFileUtil {
                 )
             }
         } catch {
-            logger.error(
+            logger().error(
                 "Unable to create temporary file directory or remove existing file: \(error.localizedDescription)"
             )
         }
@@ -85,7 +78,7 @@ public struct TestFileUtil {
             )
 
         if !isCreated {
-            logger.error(
+            logger().error(
                 "Unable to create file at path: \(tempFileDirectory.standardizedFileURL.path(percentEncoded: false))"
             )
         }

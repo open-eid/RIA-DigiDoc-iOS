@@ -17,22 +17,10 @@
  *
  */
 
-import Foundation
+import FactoryKit
 
-public struct SystemUtil: Loggable {
-    public static var isSimulator: Bool {
-        #if targetEnvironment(simulator)
-            logger().debug("App is running on a simulator")
-            return true
-        #else
-            return false
-        #endif
-    }
-
-    public static func getOSVersion() -> String {
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let versionString = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-        logger().debug("Operating system version: \(versionString)")
-        return versionString
-    }
+public struct LoggingSystem: Sendable {
+    public static let configuration: LoggingConfiguration = LoggingConfiguration(
+        isLoggingEnabled: Container.shared.isLoggingEnabled()
+    )
 }
