@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import LibdigidocLibSwift
 import Testing
 import UtilsLib
@@ -29,8 +28,7 @@ import UtilsLibMocks
 import LibdigidocLibSwiftMocks
 
 @MainActor
-struct SigningViewModelTests {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SigningViewModelTests")
+struct SigningViewModelTests: Loggable {
 
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
     private let viewModel: SigningViewModel

@@ -18,14 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import UniformTypeIdentifiers
 import UtilsLib
 import CommonsLib
 
-actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "AdvancedSettingsRepository")
-
+actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol, Loggable {
     private let fileManager: FileManagerProtocol
     private let certificateUtil: CertificateUtilProtocol
 
@@ -52,7 +49,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
             else { return nil }
             return try await getCertificateContent(certFileURL: certFileURL)
         } catch {
-            await AdvancedSettingsRepository.logger.error("Unable to load certificate: \(error)")
+            AdvancedSettingsRepository.logger().error("Unable to load certificate: \(error)")
             return nil
         }
     }
@@ -116,7 +113,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol {
 
             return try await getCertificateContent(certFileURL: destinationURL)
         } catch {
-            await AdvancedSettingsRepository.logger.error("Unable to import certificate: \(error)")
+            AdvancedSettingsRepository.logger().error("Unable to import certificate: \(error)")
             return nil
         }
     }

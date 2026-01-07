@@ -18,14 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import IdCardLib
 
 @MainActor
 @Observable
 final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MyEidPinChangeViewModel")
-
     private(set) var pinAction: MyEidPinCodeAction
     private(set) var codeType: CodeType
 

@@ -19,7 +19,6 @@
 
 import FactoryKit
 import SwiftUI
-import OSLog
 import UtilsLib
 
 struct ContentView: View {

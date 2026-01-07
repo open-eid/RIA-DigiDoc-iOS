@@ -18,14 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import CommonsLib
 import UtilsLib
 
-actor ConfigurationCache: ConfigurationCacheProtocol {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.ConfigLib", category: "ConfigurationCache")
+actor ConfigurationCache: ConfigurationCacheProtocol, Loggable {
 
     private let fileManager: FileManagerProtocol
 
@@ -100,7 +97,7 @@ actor ConfigurationCache: ConfigurationCacheProtocol {
 
             try data.write(to: configFile)
         } catch {
-            ConfigurationCache.logger.error("\(error.localizedDescription)")
+            ConfigurationCache.logger().error("\(error.localizedDescription)")
             throw ConfigurationCacheError.unableToCacheFile(fileName)
         }
     }

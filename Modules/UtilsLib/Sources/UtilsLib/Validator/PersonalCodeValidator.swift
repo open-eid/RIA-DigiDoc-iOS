@@ -18,11 +18,9 @@
  */
 
 import Foundation
-import OSLog
 import CommonsLib
 
-public struct PersonalCodeValidator {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "PersonalCodeValidator")
+public struct PersonalCodeValidator: Loggable {
 
     public static func isPersonalCodeValid(_ personalCode: String) -> Bool {
         return (
@@ -40,7 +38,7 @@ public struct PersonalCodeValidator {
 
         guard !personalCode.isEmpty,
               personalCode.count == Constants.Validation.MaximumLatvianPersonalCodeLength else {
-            PersonalCodeValidator.logger.debug("Personal code is NOT Latvian")
+            PersonalCodeValidator.logger().debug("Personal code is NOT Latvian")
             return false
         }
 
@@ -60,14 +58,14 @@ public struct PersonalCodeValidator {
             let dateOfBirth = try parseDateOfBirth(personalCode)
             return dateOfBirth < Date()
         } catch {
-            PersonalCodeValidator.logger.error("Invalid personal code or birth date: \(error)")
+            PersonalCodeValidator.logger().error("Invalid personal code or birth date: \(error)")
             return false
         }
     }
 
     private static func parseDateOfBirth(_ personalCode: String) throws -> Date {
         guard let firstDigit = personalCode.first?.wholeNumberValue else {
-            PersonalCodeValidator.logger.error("Personal code cannot be empty")
+            PersonalCodeValidator.logger().error("Personal code cannot be empty")
             throw PersonalCodeError.invalidPersonalCode("Personal code cannot be empty")
         }
 
@@ -82,7 +80,7 @@ public struct PersonalCodeValidator {
         case 7, 8:
             century = 2100
         default:
-            PersonalCodeValidator.logger.error("Unable to get century from: \(firstDigit)")
+            PersonalCodeValidator.logger().error("Unable to get century from: \(firstDigit)")
             throw PersonalCodeError.invalidPersonalCode("Unable to get century from: \(firstDigit)")
         }
 
@@ -93,7 +91,7 @@ public struct PersonalCodeValidator {
         guard let yearOffset = Int(yearString),
               let month = Int(monthString),
               let day = Int(dayString) else {
-            PersonalCodeValidator.logger.error("Invalid date \(dayString).\(monthString).\(yearString)")
+            PersonalCodeValidator.logger().error("Invalid date \(dayString).\(monthString).\(yearString)")
             throw PersonalCodeError.invalidDate("Invalid date \(dayString).\(monthString).\(yearString)")
         }
 
@@ -105,7 +103,7 @@ public struct PersonalCodeValidator {
         components.day = day
 
         guard let date = Calendar.current.date(from: components) else {
-            PersonalCodeValidator.logger.error("Invalid date \(components)")
+            PersonalCodeValidator.logger().error("Invalid date \(components)")
             throw PersonalCodeError.invalidDate("Invalid date \(components)")
         }
 
@@ -124,7 +122,7 @@ public struct PersonalCodeValidator {
             let char = personalCode[index]
 
             guard let personalCodeNumber = Int(String(char)) else {
-                PersonalCodeValidator.logger.error("Unable to parse personal code number at index \(digitIndex)")
+                PersonalCodeValidator.logger().error("Unable to parse personal code number at index \(digitIndex)")
                 continue
             }
 
@@ -145,7 +143,7 @@ public struct PersonalCodeValidator {
 
         guard let lastChar = personalCode.last,
               let lastNumber = Int(String(lastChar)) else {
-            PersonalCodeValidator.logger.error("Personal code checksum is NOT valid")
+            PersonalCodeValidator.logger().error("Personal code checksum is NOT valid")
             return false
         }
 

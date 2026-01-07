@@ -462,6 +462,16 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(inputData.rememberMe, forKey: Keys.nfcRememberMe)
     }
 
+    // MARK: - Logging
+
+    public func getIsLoggingEnabled() async -> Bool {
+        userDefaults().bool(forKey: Keys.isLoggingEnabled)
+    }
+
+    public func setIsLoggingEnabled(_ isEnabled: Bool) async {
+        userDefaults().set(isEnabled, forKey: Keys.isLoggingEnabled)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -524,5 +534,6 @@ public actor DataStore: DataStoreProtocol {
         static let roleZipCode = "roleZipCode"
         static let nfcCanNumber = "nfcCanNumber"
         static let nfcRememberMe = "nfcRememberMe"
+        static let isLoggingEnabled = "isLoggingEnabled"
     }
 }

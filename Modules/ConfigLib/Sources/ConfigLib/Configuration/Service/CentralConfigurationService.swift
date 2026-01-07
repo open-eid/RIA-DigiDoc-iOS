@@ -18,14 +18,10 @@
  */
 
 import Foundation
-import OSLog
 import Alamofire
 import CommonsLib
 
-public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "CentralConfigurationService")
-
+public actor CentralConfigurationService: CentralConfigurationServiceProtocol, Loggable {
     private let userAgent: String
     private let configurationProperty: ConfigurationProperty
     private let session: Session?
@@ -58,7 +54,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
 
             return response
         } catch {
-            CentralConfigurationService.logger
+            CentralConfigurationService.logger()
                 .error("Unable to fetch central configuration: \(error)")
             throw URLError(.resourceUnavailable)
         }
@@ -82,7 +78,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
 
             return response
         } catch {
-            CentralConfigurationService.logger
+            CentralConfigurationService.logger()
                 .error("Unable to fetch central configuration public key: \(error)")
             throw URLError(.resourceUnavailable)
         }
@@ -109,7 +105,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
 
             return responseString
         } catch {
-            CentralConfigurationService.logger
+            CentralConfigurationService.logger()
                 .error("Unable to fetch central configuration signature: \(error)")
             throw URLError(.resourceUnavailable)
         }

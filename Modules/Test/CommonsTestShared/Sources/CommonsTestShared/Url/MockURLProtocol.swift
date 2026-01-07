@@ -19,8 +19,8 @@
 
 // swiftlint:disable static_over_final_class unused_parameter
 
+import CommonsLib
 import Foundation
-import OSLog
 import Alamofire
 
 public final class MockURLProtocol: URLProtocol {
@@ -56,12 +56,7 @@ public final class MockURLProtocol: URLProtocol {
     public override func stopLoading() { }
 }
 
-final class MockInterceptor: RequestInterceptor {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc.CommonsTestShared",
-        category: "MockInterceptor"
-    )
-
+final class MockInterceptor: RequestInterceptor, Loggable {
     let handler: MockURLProtocol.Handler
 
     init(handler: @escaping MockURLProtocol.Handler) {
@@ -76,7 +71,7 @@ final class MockInterceptor: RequestInterceptor {
         let mutableRequest = (urlRequest as NSURLRequest).mutableCopy() as? NSMutableURLRequest
 
         guard let request = mutableRequest else {
-            MockInterceptor.logger.error("Unable to get mutable URLRequest")
+            MockInterceptor.logger().error("Unable to get mutable URLRequest")
             return
         }
 

@@ -30,4 +30,10 @@ public extension Container {
     var urlResourceChecker: Factory<URLResourceCheckerProtocol> {
         self { URLResourceChecker() }
     }
+
+    var isLoggingEnabled: Factory<Bool> {
+        // Default value, will be overridden on app initialization
+        self { false }
+            .singleton
+    }
 }

@@ -20,16 +20,12 @@
 import CommonsLib
 import ConfigLib
 import LibdigidocLibSwift
-import OSLog
 import UniformTypeIdentifiers
 import UtilsLib
 
 @Observable
 @MainActor
-class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ValidationSettingsViewModel")
-
+class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Loggable {
     var configuration: ConfigurationProvider?
     var validationServiceUrl: String = ""
     var selectedOption: ServicesSettingsOption = .defaultSetting

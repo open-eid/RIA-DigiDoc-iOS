@@ -21,15 +21,11 @@ import SwiftUI
 import CommonsLib
 import ConfigLib
 import LibdigidocLibSwift
-import OSLog
 import UtilsLib
 
 @Observable
 @MainActor
-class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DiagnosticsViewModel")
-
+class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     var configuration: ConfigurationProvider?
 
     // MARK: - section content
@@ -153,7 +149,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
     private func loadTslSectionContent(schemaDirectory: URL? = nil) {
         let directory = schemaDirectory ?? Directories.getLibraryDirectory(fileManager: fileManager)
         guard let schemaDirectory = directory else {
-            DiagnosticsViewModel.logger.error("Unable to get the schema directory")
+            DiagnosticsViewModel.logger().error("Unable to get the schema directory")
             return
         }
 
@@ -174,7 +170,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
 
                     filesWithSequenceNumber.append("\(fileName) (\(sequenceNumber))")
                 } catch {
-                    DiagnosticsViewModel.logger.error(
+                    DiagnosticsViewModel.logger().error(
                         "Failed to parse \(fileURL): \(error.localizedDescription)")
                     filesWithSequenceNumber.append(fileName)
                 }
@@ -183,7 +179,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
             self.tslSectionContent = filesWithSequenceNumber
 
         } catch {
-            DiagnosticsViewModel.logger.error("Could not list TSL directory: \(error)")
+            DiagnosticsViewModel.logger().error("Could not list TSL directory: \(error)")
         }
     }
 
@@ -234,7 +230,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
 
             return fileURL
         } catch {
-            DiagnosticsViewModel.logger.error(
+            DiagnosticsViewModel.logger().error(
                 "Failed to write diagnostics file: \(error.localizedDescription)")
         }
         return nil
@@ -247,9 +243,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)
-            DiagnosticsViewModel.logger.debug("Saved Files directory removed")
+            DiagnosticsViewModel.logger().debug("Saved Files directory removed")
         } catch {
-            DiagnosticsViewModel.logger.error(
+            DiagnosticsViewModel.logger().error(
                 "Unable to delete saved files directory: \(error.localizedDescription)")
         }
     }
@@ -307,7 +303,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
             )
             return true
         } catch {
-            DiagnosticsViewModel.logger.error("Unable to update configuration: \(error)")
+            DiagnosticsViewModel.logger().error("Unable to update configuration: \(error)")
             return false
         }
     }
@@ -320,7 +316,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
         }
 
         guard let configStream = await configurationRepository.observeConfigurationUpdates() else {
-            DiagnosticsViewModel.logger.error("Unable to get configuration updates stream")
+            DiagnosticsViewModel.logger().error("Unable to get configuration updates stream")
             return
         }
 
@@ -331,7 +327,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol {
                 }
             }
         } catch {
-            DiagnosticsViewModel.logger.error("Unable to get configuration from stream")
+            DiagnosticsViewModel.logger().error("Unable to get configuration from stream")
         }
     }
 }

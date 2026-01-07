@@ -17,14 +17,13 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 import X509
 
 @Observable
 @MainActor
-class SignatureDetailViewModel: SignatureDetailViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "SignatureDetailViewModel")
+class SignatureDetailViewModel: SignatureDetailViewModelProtocol, Loggable {
 
     func getIssuerName(cert: Data) -> String {
         do {
@@ -36,7 +35,7 @@ class SignatureDetailViewModel: SignatureDetailViewModelProtocol {
                     .first { $0.type == .RDNAttributeType.commonName }?.value ??
                     RelativeDistinguishedName.Attribute.Value(utf8String: ""))
         } catch {
-            SignatureDetailViewModel.logger
+            SignatureDetailViewModel.logger()
                 .error("Unable to get issuer CommonName from certificate: \(error.localizedDescription)")
             return ""
         }
@@ -52,7 +51,7 @@ class SignatureDetailViewModel: SignatureDetailViewModelProtocol {
                     .first { $0.type == .RDNAttributeType.commonName }?.value ??
                     RelativeDistinguishedName.Attribute.Value(utf8String: ""))
         } catch {
-            SignatureDetailViewModel.logger
+            SignatureDetailViewModel.logger()
                 .error("Unable to get subject CommonName from certificate: \(error.localizedDescription)")
             return ""
         }

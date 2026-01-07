@@ -20,14 +20,9 @@
 import CommonsLib
 import FactoryKit
 import Foundation
-import OSLog
 import UtilsLib
 
-public actor ConfigurationLoader: ConfigurationLoaderProtocol {
-
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "ConfigurationLoader")
-
+public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
     private var configuration: ConfigurationProvider?
 
     public typealias ConfigStream = AsyncThrowingStream<ConfigurationProvider?, Error>
@@ -63,7 +58,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
     }
 
     public func initConfiguration(cacheDir: URL, proxyInfo: ProxyInfo) async throws {
-        ConfigurationLoader.logger.debug("Initializing configuration")
+        ConfigurationLoader.logger().debug("Initializing configuration")
 
         if !fileManager.fileExists(atPath: cacheDir.resolvedPath) {
             try fileManager.createDirectory(
@@ -75,11 +70,11 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         try await loadConfigurationProperty()
 
         if try await shouldCheckForUpdates() {
-            ConfigurationLoader.logger.debug("Checking for configuration updates...")
+            ConfigurationLoader.logger().debug("Checking for configuration updates...")
             try await loadCentralConfiguration(cacheDir: cacheDir, proxyInfo: proxyInfo)
         }
 
-        ConfigurationLoader.logger.debug("Finished initializing configuration")
+        ConfigurationLoader.logger().debug("Finished initializing configuration")
 
         finishConfigurationUpdate()
     }
@@ -129,7 +124,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             fileManager.fileExists(atPath: signatureFile.resolvedPath)
 
         if configFilesExist {
-            ConfigurationLoader.logger.debug("Initializing cached configuration")
+            ConfigurationLoader.logger().debug("Initializing cached configuration")
 
             let confFileContents = try String(contentsOf: confFile, encoding: .utf8)
             let publicKeyContents = try String(contentsOf: publicKeyFile, encoding: .utf8)
@@ -146,7 +141,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 from: Data(contentsOf: confFile)
             )
 
-            ConfigurationLoader.logger.debug(
+            ConfigurationLoader.logger().debug(
                 "Using cached configuration version \(configurationProvider.metaInf.serial)"
             )
 
@@ -184,7 +179,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 updateConfiguration(configurationProvider)
             }
         } else {
-            ConfigurationLoader.logger.debug(
+            ConfigurationLoader.logger().debug(
                 "Cached configuration not found. Initializing default configuration")
             try await loadDefaultConfiguration(cacheDir: configDir)
         }
@@ -244,7 +239,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             ConfigurationProvider.self, from: Data(contentsOf: confDataURL)
         )
 
-        ConfigurationLoader.logger.debug(
+        ConfigurationLoader.logger().debug(
             "Initializing default configuration version \(configurationProvider.metaInf.serial)"
         )
 
@@ -286,7 +281,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         ).trimmingCharacters(in: .whitespaces)
 
         if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
-            ConfigurationLoader.logger.debug("Found new configuration")
+            ConfigurationLoader.logger().debug("Found new configuration")
 
             let centralConfig = try await centralConfigurationRepository.fetchConfiguration(
                 proxyInfo: proxyInfo
@@ -298,7 +293,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             let centralConfigurationProvider = try JSONDecoder().decode(
                 ConfigurationProvider.self, from: Data(centralConfig.utf8)
             )
-            ConfigurationLoader.logger.debug(
+            ConfigurationLoader.logger().debug(
                 "Initializing configuration version \(centralConfigurationProvider.metaInf.serial)"
             )
 
@@ -342,7 +337,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
                 try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)
             }
         } else {
-            ConfigurationLoader.logger.debug(
+            ConfigurationLoader.logger().debug(
                 "New configuration not found. Using cached configuration"
             )
             try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)

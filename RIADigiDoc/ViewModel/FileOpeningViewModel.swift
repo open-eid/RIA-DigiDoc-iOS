@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
@@ -26,7 +25,7 @@ import UtilsLib
 
 @Observable
 @MainActor
-class FileOpeningViewModel: FileOpeningViewModelProtocol {
+class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     var isFileOpeningLoading: Bool = false
     var isNavigatingToNextView: Bool = false
     var isSivaConfirmed = false
@@ -37,8 +36,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
     )
 
     var errorMessage: ToastMessage?
-
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "FileOpeningViewModel")
 
     private let fileOpeningRepository: FileOpeningRepositoryProtocol
     private let sivaRepository: SivaRepositoryProtocol
@@ -64,23 +61,23 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
 
     func handleFiles() async {
         do {
-            FileOpeningViewModel.logger.debug("Handling chosen files from file system or from external sources")
+            FileOpeningViewModel.logger().debug("Handling chosen files from file system or from external sources")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            FileOpeningViewModel.logger.debug("Found \(validFiles.count) valid file(s)")
+            FileOpeningViewModel.logger().debug("Found \(validFiles.count) valid file(s)")
 
             if validFiles.isEmpty {
-                FileOpeningViewModel.logger.debug("No valid files found")
+                FileOpeningViewModel.logger().debug("No valid files found")
                 throw FileOpeningError.noDataFiles
             }
 
             files = validFiles
         } catch {
-            FileOpeningViewModel.logger.error("Unable to handle files. \(error)")
+            FileOpeningViewModel.logger().error("Unable to handle files. \(error)")
             handleError(error)
         }
     }
@@ -99,7 +96,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
             try await container.getRawContainerFile()?.markAsOpened()
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
-            FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+            FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(error)")
             handleError(error)
         }
     }
@@ -121,10 +118,10 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
                 let container = try await fileOpeningRepository
                     .openOrCreateContainer(urls: files, isSivaConfirmed: false)
                 sharedContainerViewModel.setSignedContainer(container)
-                FileOpeningViewModel.logger.debug("Asics signed container set successfully")
+                FileOpeningViewModel.logger().debug("Asics signed container set successfully")
                 handleLoadingSuccess(isSivaConfirmed: false)
             } catch {
-                FileOpeningViewModel.logger.error("Unable to handle SiVa container. \(error)")
+                FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(error)")
                 handleError(error)
             }
         }
@@ -171,10 +168,10 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol {
 
     private func handleError(_ error: Error) {
         let ddeMessage = (error as? DigiDocError)?.description ?? error.localizedDescription
-        FileOpeningViewModel.logger.error("\(ddeMessage)")
+        FileOpeningViewModel.logger().error("\(ddeMessage)")
 
         if let dde = error as? DigiDocError {
-            FileOpeningViewModel.logger.error("\(dde)")
+            FileOpeningViewModel.logger().error("\(dde)")
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)

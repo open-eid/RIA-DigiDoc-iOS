@@ -18,13 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import LibdigidocLibObjC
 import CommonsLib
 import UtilsLib
 
-public actor ContainerWrapper: ContainerWrapperProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.LibdigidocLib", category: "ContainerWrapper")
+public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     private var containerURL: URL
     private var dataFiles: [DataFileWrapper]
@@ -86,7 +84,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
                 saveDataFile: dataFile.fileId,
                 to: tempSavedFileLocation.resolvedPath
             )
-            ContainerWrapper.logger.debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
+            ContainerWrapper.logger().debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
             return tempSavedFileLocation
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot save data file", code: 2)
@@ -110,7 +108,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
-        ContainerWrapper.logger.debug("Opening container file '\(containerFile.lastPathComponent)'")
+        ContainerWrapper.logger().debug("Opening container file '\(containerFile.lastPathComponent)'")
 
         do {
             let container = try DigiDocContainerWrapper.open(
@@ -151,7 +149,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
             return try await open(containerFile: containerFile, isSivaConfirmed: true)
         } catch {
-            ContainerWrapper.logger.error("Unable to add data files. \(error)")
+            ContainerWrapper.logger().error("Unable to add data files. \(error)")
 
             let nsError = error as NSError
 
@@ -300,7 +298,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol {
 
         return dataFiles.compactMap { item in
             guard let dataFile = item as? DigiDocDataFile else {
-                ContainerWrapper.logger.error("Unexpected type: \(type(of: item))")
+                ContainerWrapper.logger().error("Unexpected type: \(type(of: item))")
                 return DataFileWrapper(fileId: "", fileName: "", fileSize: 0, mediaType: "")
             }
 

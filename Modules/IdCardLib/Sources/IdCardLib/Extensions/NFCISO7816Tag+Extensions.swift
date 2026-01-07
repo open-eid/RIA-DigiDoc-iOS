@@ -17,12 +17,13 @@
  *
  */
 
+import CommonsLib
 import CoreNFC
 import CryptoTokenKit
-import OSLog
+
+private struct NFCISO7816TagLogger: Loggable {}
 
 extension NFCISO7816Tag {
-
     func sendCommand(
         cls: UInt8,
         ins: UInt8,
@@ -91,8 +92,7 @@ extension NFCISO7816Tag {
                 throw IdCardInternalError.invalidResponse(message: "response conversion failed")
             }
         } catch let error as IdCardInternalError {
-            let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "NFCISO7816Tag")
-            logger.error("sendPaceCommand \(error.localizedDescription)")
+            NFCISO7816TagLogger.logger().error("sendPaceCommand \(error.localizedDescription)")
             switch error {
             case .sendCommandFailed(message: let message):
                 throw IdCardInternalError.invalidResponse(message: message)

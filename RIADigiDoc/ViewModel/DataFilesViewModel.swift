@@ -18,15 +18,13 @@
  */
 
 import Foundation
-import OSLog
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
 @Observable
 @MainActor
-class DataFilesViewModel: DataFilesViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "DataFilesViewModel")
+class DataFilesViewModel: DataFilesViewModelProtocol, Loggable {
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileManager: FileManagerProtocol
@@ -45,7 +43,7 @@ class DataFilesViewModel: DataFilesViewModelProtocol {
                 .currentContainer() as? any SignedContainerProtocol)?
                 .saveDataFile(dataFile: dataFile, to: nil)
         } catch {
-            DataFilesViewModel.logger.error(
+            DataFilesViewModel.logger().error(
                 "Unable to save datafile \(dataFile.fileName): \(error.localizedDescription)"
             )
             return nil
@@ -64,9 +62,9 @@ class DataFilesViewModel: DataFilesViewModelProtocol {
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)
-            DataFilesViewModel.logger.debug("Saved Files directory removed")
+            DataFilesViewModel.logger().debug("Saved Files directory removed")
         } catch {
-            DataFilesViewModel.logger.error("Unable to delete saved files directory: \(error.localizedDescription)")
+            DataFilesViewModel.logger().error("Unable to delete saved files directory: \(error.localizedDescription)")
         }
     }
 }

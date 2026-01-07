@@ -18,18 +18,12 @@
  */
 
 import Foundation
-import OSLog
 import Alamofire
 import CommonsLib
 import UtilsLib
 import UIKit
 
-public actor SmartIdSignService: SmartIdSignServiceProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "SmartIdSignService"
-    )
-
+public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
     private var session: Session?
     private var currentProxy: ProxyInfo?
 
@@ -217,7 +211,7 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol {
         currentProxy = proxyInfo
 
         guard let host = URL(string: url)?.host else {
-            SmartIdSignService.logger.error(
+            SmartIdSignService.logger().error(
                 "Unable to parse host from URL: \(url)"
             )
             throw URLError(.badURL)

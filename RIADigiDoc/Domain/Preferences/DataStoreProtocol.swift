@@ -106,4 +106,8 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - NFC Input Methods
     func getNFCInputData() async -> NFCInputData
     func setNFCInputData(_ inputData: NFCInputData) async
+
+    // MARK: - Logging
+    func getIsLoggingEnabled() async -> Bool
+    func setIsLoggingEnabled(_ isEnabled: Bool) async
 }

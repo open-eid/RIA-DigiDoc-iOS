@@ -21,14 +21,10 @@ import CommonsLib
 import ConfigLib
 import Foundation
 import LibdigidocLibSwift
-import OSLog
 
 @Observable
 @MainActor
-class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "AdvancedSettingsViewModel")
-
+class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, Loggable {
     var configuration: ConfigurationProvider?
 
     private let dataStore: DataStoreProtocol
@@ -76,7 +72,7 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol {
                 CommonsLib.Constants.Folder.EncryptionKeyTransferCert
             ])
         } catch {
-            AdvancedSettingsViewModel.logger.error("Unable to remove all certificates")
+            AdvancedSettingsViewModel.logger().error("Unable to remove all certificates")
         }
     }
 

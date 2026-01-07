@@ -19,16 +19,13 @@
 
 import Foundation
 import FactoryKit
-import OSLog
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
 
 @Observable
 @MainActor
-class HomeViewModel: HomeViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "HomeViewModel")
-
+class HomeViewModel: HomeViewModelProtocol, Loggable {
     var isImporting = false
     var signedContainer: SignedContainerProtocol = SignedContainer(
         fileManager: Container.shared.fileManager(),
@@ -48,7 +45,7 @@ class HomeViewModel: HomeViewModelProtocol {
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
         if !isImportingValue && !isFileOpeningLoading {
-            HomeViewModel.logger.info("User cancelled the file chooser")
+            HomeViewModel.logger().info("User cancelled the file chooser")
             return true
         }
 
@@ -64,7 +61,7 @@ class HomeViewModel: HomeViewModelProtocol {
             return try Directories.getCacheDirectory(fileManager: fileManager)
                 .appending(path: Constants.Folder.SignedContainerFolder)
         } catch {
-            HomeViewModel.logger.error("Unable to get signed containers recent documents folder: \(error)")
+            HomeViewModel.logger().error("Unable to get signed containers recent documents folder: \(error)")
             return nil
         }
     }

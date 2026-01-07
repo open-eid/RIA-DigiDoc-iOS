@@ -18,14 +18,11 @@
  */
 
 import Foundation
-import OSLog
 import Alamofire
 import CommonsLib
 import UtilsLib
 
-actor MobileIdSignService: MobileIdSignServiceProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIdSignService")
-
+actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
     private var session: Session?
     private var currentProxy: ProxyInfo?
 
@@ -160,7 +157,7 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
 
             return try response.result.get()
         } catch {
-            MobileIdSignService.logger.error(
+            MobileIdSignService.logger().error(
                 "Unable to perform Mobile-ID request: \(error)"
             )
 
@@ -186,7 +183,7 @@ actor MobileIdSignService: MobileIdSignServiceProtocol {
         currentProxy = proxyInfo
 
         guard let host = URL(string: url)?.host else {
-            MobileIdSignService.logger.error(
+            MobileIdSignService.logger().error(
                 "Unable to parse host from URL: \(url)"
             )
             throw URLError(.badURL)

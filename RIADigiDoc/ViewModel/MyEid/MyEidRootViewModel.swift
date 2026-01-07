@@ -17,15 +17,13 @@
  *
  */
 
+import CommonsLib
 import Foundation
-import OSLog
 import Observation
 
 @Observable
 @MainActor
-class MyEidRootViewModel: MyEidRootViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MyEidRootViewModel")
-
+class MyEidRootViewModel: MyEidRootViewModelProtocol, Loggable {
     private let dataStore: DataStoreProtocol
 
     init(dataStore: DataStoreProtocol) {

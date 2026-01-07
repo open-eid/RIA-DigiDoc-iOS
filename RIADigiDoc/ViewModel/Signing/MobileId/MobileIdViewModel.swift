@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import Alamofire
 import MobileIdLib
 import LibdigidocLibSwift
@@ -28,8 +27,7 @@ import CommonsLib
 
 @Observable
 @MainActor
-class MobileIdViewModel: MobileIdViewModelProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.RIADigiDoc", category: "MobileIdViewModel")
+class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
     private static let certificateEndpoint = "/certificate"
     private static let signatureEndpoint = "/signature"
@@ -111,11 +109,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async -> SignedContainerProtocol? {
-        MobileIdViewModel.logger.debug("Mobile-ID: Signing with Mobile-ID")
+        MobileIdViewModel.logger().debug("Mobile-ID: Signing with Mobile-ID")
         let currentConfiguration = await configurationRepository.getConfiguration()
 
         guard let configuration = currentConfiguration else {
-            MobileIdViewModel.logger.error(
+            MobileIdViewModel.logger().error(
                 "Mobile-ID: Unable to get configuration to sign with Mobile-ID"
             )
             mobileIdMessageKey = "General error"
@@ -137,7 +135,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         do {
             containerFile = try await getContainerFile(signedContainer: signedContainer)
         } catch {
-            MobileIdViewModel.logger.debug("Mobile-ID: Unable to get container file from container")
+            MobileIdViewModel.logger().debug("Mobile-ID: Unable to get container file from container")
             handleSigningError(error)
             return nil
         }
@@ -152,7 +150,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
                 proxyInfo: proxyInfo
             )
         } catch {
-            MobileIdViewModel.logger.debug("Mobile-ID: Unable to request certificate or get cert from response")
+            MobileIdViewModel.logger().debug("Mobile-ID: Unable to request certificate or get cert from response")
             handleSigningError(error)
             return nil
         }
@@ -166,7 +164,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
                 signedContainer: signedContainer
             )
         } catch {
-            MobileIdViewModel.logger.debug("Mobile-ID: Unable to prepare signature for signing")
+            MobileIdViewModel.logger().debug("Mobile-ID: Unable to prepare signature for signing")
             handleSigningError(error)
             return nil
         }
@@ -175,14 +173,14 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         do {
             verificationCode = try await getVerificationCode(hash: hash)
         } catch {
-            MobileIdViewModel.logger.debug("Mobile-ID: Unable to get verification code (control code)")
+            MobileIdViewModel.logger().debug("Mobile-ID: Unable to get verification code (control code)")
             handleSigningError(error)
             return nil
         }
 
         controlCode = verificationCode
 
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting language")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting language")
         let language = await dataStore.getSelectedLanguage()
 
         let sessionId: String
@@ -197,7 +195,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
                 proxyInfo: proxyInfo
             )
         } catch {
-            MobileIdViewModel.logger.debug("Mobile-ID: Unable to request signature")
+            MobileIdViewModel.logger().debug("Mobile-ID: Unable to request signature")
             handleSigningError(error)
             return nil
         }
@@ -211,7 +209,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
                 proxyInfo: proxyInfo
             )
         } catch {
-            MobileIdViewModel.logger.debug(
+            MobileIdViewModel.logger().debug(
                 "Mobile-ID: Unable to request session"
             )
             handleSigningError(error)
@@ -226,11 +224,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
                 containerFile: containerFile
             )
 
-            MobileIdViewModel.logger.debug("Signature added successfully (Mobile-ID)")
+            MobileIdViewModel.logger().debug("Signature added successfully (Mobile-ID)")
             mobileIdMessageKey = "Signature added"
             return updatedContainer
         } catch {
-            MobileIdViewModel.logger.error("Unable to sign container with Mobile-ID: \(error)")
+            MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
             handleSignatureAddingError(error)
             return nil
         }
@@ -247,7 +245,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         trustedCertificates: [SecCertificate],
         proxyInfo: ProxyInfo
     ) async throws -> Data {
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting certificate")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting certificate")
         let certResponse = try await mobileIdSignService
             .getCertificateRequest(
                 url: "\(midUrl)\(MobileIdViewModel.certificateEndpoint)",
@@ -262,7 +260,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         guard let certData = Data(
             base64Encoded: certResponse.cert ?? ""
         ) else {
-            MobileIdViewModel.logger.error("Unable to get Mobile-ID certificate as data")
+            MobileIdViewModel.logger().error("Unable to get Mobile-ID certificate as data")
             mobileIdMessageKey = "General error"
             throw MobileIdError.generalError
         }
@@ -280,7 +278,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         trustedCertificates: [SecCertificate],
         proxyInfo: ProxyInfo
     ) async throws -> String {
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting signature")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting signature")
         let signatureResponse = try await mobileIdSignService.getSignatureRequest(
             url: "\(midUrl)\(MobileIdViewModel.signatureEndpoint)",
             relyingPartyName: Constants.Signing.RelyingPartyName,
@@ -296,9 +294,9 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
             proxyInfo: proxyInfo
         )
 
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting sessionID")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting sessionID")
         guard let sessionId = signatureResponse.sessionID else {
-            MobileIdViewModel.logger.error("Unable to get Mobile-ID sessionID")
+            MobileIdViewModel.logger().error("Unable to get Mobile-ID sessionID")
             mobileIdMessageKey = "Technical error"
             throw MobileIdError.technicalError
         }
@@ -312,7 +310,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         trustedCertificates: [SecCertificate],
         proxyInfo: ProxyInfo
     ) async throws -> Data {
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting session request")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting session request")
         let sessionResponse = try await mobileIdSignService.getSessionRequest(
             url: "\(midUrl)\(MobileIdViewModel.signatureSessionEndpoint)",
             sessionId: sessionId,
@@ -334,7 +332,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
         roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async throws -> Data {
-        MobileIdViewModel.logger.debug(
+        MobileIdViewModel.logger().debug(
             "Mobile-ID: Preparing signature. Calculating hash"
         )
 
@@ -347,11 +345,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
     }
 
     private func getVerificationCode(hash: Data) async throws -> String {
-        MobileIdViewModel.logger.debug(
+        MobileIdViewModel.logger().debug(
             "Mobile-ID: Calculating verification code (control code)"
         )
         guard let verificationCode = await mobileIdSignService.getVerificationCode(hash: hash) else {
-            MobileIdViewModel.logger.error("Unable to get Mobile-ID verification code")
+            MobileIdViewModel.logger().error("Unable to get Mobile-ID verification code")
             mobileIdMessageKey = "General error"
             throw MobileIdError.generalError
         }
@@ -361,7 +359,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
 
     private func getContainerFile(signedContainer: SignedContainerProtocol) async throws -> URL {
         guard let containerFile = await signedContainer.getRawContainerFile() else {
-            MobileIdViewModel.logger.error(
+            MobileIdViewModel.logger().error(
                 "Unable to sign with Mobile-ID. Unable to get container file"
             )
             mobileIdMessageKey = "General error"
@@ -376,7 +374,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
     }
 
     private func getTrustedCertificates(certificates: [Data]) -> [SecCertificate] {
-        MobileIdViewModel.logger.debug("Mobile-ID: Getting trusted certificates list")
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting trusted certificates list")
         return certificates.compactMap { certificateUtil.certificate(from: $0) }
     }
 
@@ -389,10 +387,10 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
 
     // swiftlint:disable:next cyclomatic_complexity
     private func handleSigningError(_ error: Error) {
-        MobileIdViewModel.logger.error("Unable to sign container with Mobile-ID: \(error)")
+        MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
 
         if let cancellationError = error as? CancellationError {
-            MobileIdViewModel.logger.error("Mobile-ID signing manually cancelled: \(cancellationError)")
+            MobileIdViewModel.logger().error("Mobile-ID signing manually cancelled: \(cancellationError)")
             // Do not throw an error if user cancelled signing with back button
             return
         }
@@ -411,7 +409,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
 
         case .explicitlyCancelled:
             // Do not throw an error if user cancelled signing with back button
-            MobileIdViewModel.logger.debug("Mobile-ID signing manually cancelled")
+            MobileIdViewModel.logger().debug("Mobile-ID signing manually cancelled")
             mobileIdMessageKey = nil
 
         case .timeout:
@@ -461,10 +459,10 @@ class MobileIdViewModel: MobileIdViewModelProtocol {
 
     // swiftlint:disable:next cyclomatic_complexity
     private func handleSignatureAddingError(_ error: Error) {
-        MobileIdViewModel.logger.error("Unable to sign container with Mobile-ID: \(error)")
+        MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
 
         if let cancellationError = error as? CancellationError {
-            MobileIdViewModel.logger.error("Mobile-ID signing manually cancelled: \(cancellationError)")
+            MobileIdViewModel.logger().error("Mobile-ID signing manually cancelled: \(cancellationError)")
             return
         }
 

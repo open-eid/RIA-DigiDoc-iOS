@@ -25,7 +25,6 @@ import ConfigLibMocks
 import Foundation
 import LibdigidocLibSwift
 import LibdigidocLibSwiftMocks
-import OSLog
 import Testing
 import UtilsLib
 import UtilsLibMocks

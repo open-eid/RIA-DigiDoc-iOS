@@ -21,16 +21,12 @@ import CommonsLib
 import ConfigLib
 import LibdigidocLibSwift
 import LibdigidocLibObjC
-import OSLog
 import UniformTypeIdentifiers
 import UtilsLib
 
 @Observable
 @MainActor
-class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol {
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc", category: "TimeStampServicesSettingsViewModel")
-
+class TimeStampSettingsViewModel: TimeStampSettingsViewModelProtocol, Loggable {
     // MARK: - Variables
     var configuration: ConfigurationProvider?
     var tsaUrl: String = ""

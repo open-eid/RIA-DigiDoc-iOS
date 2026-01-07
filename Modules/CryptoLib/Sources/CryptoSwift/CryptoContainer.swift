@@ -18,7 +18,6 @@
  */
 
 import Foundation
-import OSLog
 import FactoryKit
 import CryptoObjC
 import CryptoObjCWrapper
@@ -26,8 +25,7 @@ import IdCardLib
 import CommonsLib
 import UtilsLib
 
-public actor CryptoContainer: CryptoContainerProtocol {
-    private static let logger = Logger(subsystem: "ee.ria.digidoc.CryptoLib", category: "CryptoContainer")
+public actor CryptoContainer: CryptoContainerProtocol, Loggable {
 
     private static let cryptoContainerLogTag: String = "CryptoContainer"
 
@@ -197,9 +195,9 @@ extension CryptoContainer {
         dataFiles: [URL],
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
     ) async throws -> CryptoContainerProtocol {
-        logger.debug("Opening or creating crypto container. Found \(dataFiles.count) datafile(s)")
+        logger().debug("Opening or creating crypto container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
-            logger.error("Unable to create or open crypto container. First datafile is nil")
+            logger().error("Unable to create or open crypto container. First datafile is nil")
             throw CryptoError.containerCreationFailed(
                 CryptoErrorDetail(
                     message: "Cannot create or open crypto container. Datafiles are empty"
@@ -242,10 +240,10 @@ extension CryptoContainer {
         }
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
-            CryptoContainer.logger.debug("Opening existing crypto container")
+            CryptoContainer.logger().debug("Opening existing crypto container")
             return try await open(containerFile: containerFile)
         } else {
-            CryptoContainer.logger.debug("Creating a new crypto container")
+            CryptoContainer.logger().debug("Creating a new crypto container")
             return try await create(
                 containerFile: containerFile,
                 dataFiles: dataFiles,
@@ -286,7 +284,7 @@ extension CryptoContainer {
             )
 
             if !isCreated {
-                CryptoContainer.logger.error("Unable to create file at path: \(destinationPath.resolvedPath)")
+                CryptoContainer.logger().error("Unable to create file at path: \(destinationPath.resolvedPath)")
             }
         }
 

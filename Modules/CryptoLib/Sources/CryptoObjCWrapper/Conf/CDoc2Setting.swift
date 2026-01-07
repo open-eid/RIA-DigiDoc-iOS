@@ -20,15 +20,8 @@
 import Foundation
 import CommonsLib
 import ConfigLib
-import OSLog
 
-public final class CDoc2Setting: NSObject, Sendable {
-
-    private static let logger = Logger(
-        subsystem: "ee.ria.digidoc.RIADigiDoc",
-        category: "CDoc2Setting"
-    )
-
+public final class CDoc2Setting: NSObject, Sendable, Loggable {
     @objc @MainActor static public var isEncryptionEnabled: Bool = Constants.CryptoDefaultValues.encryptionUseCdoc2
     @objc @MainActor static public var isOnlineEncryptionEnabled: Bool =
         Constants.CryptoDefaultValues.encryptionUseKeyTransfer
@@ -131,7 +124,7 @@ public final class CDoc2Setting: NSObject, Sendable {
                 return nil
             default:
                 let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-                logger.error("Keychain lookup failed (\(status)): \(message)")
+                logger().error("Keychain lookup failed (\(status)): \(message)")
                 return nil
             }
         }

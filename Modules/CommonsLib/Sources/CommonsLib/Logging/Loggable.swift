@@ -18,21 +18,29 @@
  */
 
 import Foundation
+import OSLog
 
-public struct SystemUtil: Loggable {
-    public static var isSimulator: Bool {
-        #if targetEnvironment(simulator)
-            logger().debug("App is running on a simulator")
-            return true
-        #else
-            return false
-        #endif
+public protocol Loggable: Sendable {}
+
+public extension Loggable {
+    static func logger(file: String = #fileID) -> Logger {
+        guard LoggingSystem.configuration.isLoggingEnabled else {
+            return Logger(.disabled)
+        }
+
+        let filePath = String(file)
+        let moduleName = URL(fileURLWithPath: filePath)
+            .lastPathComponent
+            .split(separator: ".")
+            .first
+            .map(String.init) ?? "UnknownModule"
+
+        let subsystem = "\(BundleUtil.getBundleIdentifier()).\(moduleName)"
+
+        return Logger(subsystem: subsystem, category: category)
     }
 
-    public static func getOSVersion() -> String {
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let versionString = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-        logger().debug("Operating system version: \(versionString)")
-        return versionString
+    static var category: String {
+        String(describing: Self.self)
     }
 }
