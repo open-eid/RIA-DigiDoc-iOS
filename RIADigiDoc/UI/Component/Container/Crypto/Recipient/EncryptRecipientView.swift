@@ -258,12 +258,8 @@ struct EncryptRecipientView: View {
                         rightButtonAction: {
                             if encryptionButtonEnabled {
                                 encryptionButtonEnabled = false
-                                Task {
-
-                                    pathManager.removeLast()
-                                    pathManager.navigate(to: .encryptView(isWithEncryption: true))
-                                    encryptionButtonEnabled = true
-                                }
+                                pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
+                                encryptionButtonEnabled = true
                             }
                         }
                     )

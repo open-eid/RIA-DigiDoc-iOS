@@ -23,6 +23,7 @@ struct ConfirmModalView: View {
     var title: String
     var message: String
     var confirmButtonTitle: String = "Remove"
+    var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
     var cancelButtonAccessibility: String?
     var onConfirm: () -> Void
@@ -39,6 +40,7 @@ struct ConfirmModalView: View {
                 title: title,
                 message: message,
                 confirmButtonTitle: confirmButtonTitle,
+                cancelButtonTitle: cancelButtonTitle,
                 confirmButtonAccessibility: confirmButtonAccessibility,
                 cancelButtonAccessibility: cancelButtonAccessibility,
                 onConfirm: onConfirm,

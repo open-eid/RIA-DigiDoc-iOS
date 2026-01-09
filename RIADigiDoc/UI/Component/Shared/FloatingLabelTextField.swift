@@ -44,6 +44,7 @@ struct FloatingLabelTextField: View {
     let keyboardType: UIKeyboardType
     let showDashButton: Bool
     let identifier: String
+    let onDone: (() -> Void)
 
     init(
         title: String,
@@ -58,7 +59,8 @@ struct FloatingLabelTextField: View {
         submitLabel: SubmitLabel = .done,
         keyboardType: UIKeyboardType = .default,
         showDashButton: Bool = false,
-        identifier: String = ""
+        identifier: String = "",
+        onDone: @escaping (() -> Void) = {}
     ) {
         self.title = title
         self.placeholder = placeholder
@@ -73,6 +75,7 @@ struct FloatingLabelTextField: View {
         self.keyboardType = keyboardType
         self.showDashButton = showDashButton
         self.identifier = identifier
+        self.onDone = onDone
     }
 
     // MARK: - State
@@ -269,6 +272,7 @@ struct FloatingLabelTextField: View {
                 .onSubmit {
                     isFocused = false
                     isAccessibilityFocused = true
+                    onDone()
                 }
                 .toolbar {
                     ToolbarItem(placement: .keyboard) {
@@ -285,6 +289,7 @@ struct FloatingLabelTextField: View {
                                     action: {
                                         fieldIsFocused = false
                                         isAccessibilityFocused = true
+                                        onDone()
                                     },
                                     label: { Text(verbatim: languageSettings.localized("Done")) }
                                 )
@@ -308,6 +313,7 @@ struct FloatingLabelTextField: View {
                 .onSubmit {
                     fieldIsFocused = false
                     isAccessibilityFocused = true
+                    onDone()
                 }
                 .toolbar {
                     ToolbarItem(placement: .keyboard) {
@@ -324,6 +330,7 @@ struct FloatingLabelTextField: View {
                                     action: {
                                         fieldIsFocused = false
                                         isAccessibilityFocused = true
+                                        onDone()
                                     },
                                     label: { Text(verbatim: languageSettings.localized("Done")) }
                                 )

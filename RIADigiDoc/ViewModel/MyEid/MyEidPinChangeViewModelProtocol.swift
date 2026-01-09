@@ -17,22 +17,14 @@
  *
  */
 
-import SwiftUI
+import Foundation
 
-@Observable
-class NavigationPathManager {
-    var path = NavigationPath()
+@MainActor
+protocol MyEidPinChangeViewModelProtocol: Sendable {
+    var step: MyEidPinCodeStep { get }
+    var input: String { get set }
+    var errorMessage: String? { get }
+    var errorMessageExtraArguments: [String] { get }
 
-    func navigate(to destination: NavigationDestination) {
-        path.append(destination)
-    }
-
-    func replaceLast(_ numberOfValues: Int = 1, to destination: NavigationDestination) {
-        path.removeLast(numberOfValues)
-        navigate(to: destination)
-    }
-
-    func popToRoot() {
-        path = NavigationPath()
-    }
+    func submit() async
 }

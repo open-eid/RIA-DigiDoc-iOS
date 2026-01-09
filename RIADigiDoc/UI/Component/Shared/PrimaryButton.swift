@@ -43,7 +43,7 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(verbatim: text)
-                .font(typography.titleMedium)
+                .font(typography.labelLarge)
                 .foregroundStyle(isButtonEnabled ? theme.onPrimary : theme.surfaceContainerHighest)
                 .padding(Dimensions.Padding.MSPadding)
                 .frame(maxWidth: .infinity)

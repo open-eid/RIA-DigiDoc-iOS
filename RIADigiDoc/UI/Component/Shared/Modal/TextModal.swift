@@ -27,6 +27,7 @@ struct TextModal: View {
     var title: String
     var message: String
     var confirmButtonTitle: String = "OK"
+    var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
     var cancelButtonAccessibility: String?
     var onConfirm: () -> Void
@@ -37,6 +38,7 @@ struct TextModal: View {
             icon: icon,
             title: title,
             confirmButtonTitle: confirmButtonTitle,
+            cancelButtonTitle: cancelButtonTitle,
             confirmButtonAccessibility: confirmButtonAccessibility,
             cancelButtonAccessibility: cancelButtonAccessibility,
             onConfirm: onConfirm,

@@ -26,7 +26,20 @@ struct PrimaryOutlinedButton: View {
 
     let text: String
     let assetImageName: String?
+    let isButtonEnabled: Bool
     let action: () -> Void
+
+    init(
+        text: String,
+        assetImageName: String?,
+        isButtonEnabled: Bool = true,
+        action: @escaping () -> Void
+    ) {
+        self.text = text
+        self.assetImageName = assetImageName
+        self.isButtonEnabled = isButtonEnabled
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
@@ -39,18 +52,27 @@ struct PrimaryOutlinedButton: View {
                         .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                         .accessibilityHidden(true)
                 }
-                Text(text)
-                    .foregroundStyle(theme.primary)
+                Text(verbatim: text)
+                    .foregroundStyle(isButtonEnabled ? theme.primary : theme.surfaceContainerHighest)
                     .font(typography.labelLarge)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(height: Dimensions.Icon.IconSizeXXS)
+                    .padding(Dimensions.Padding.XSPadding)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, Dimensions.Padding.XSPadding)
             .background(
                 Capsule()
+                    .fill(isButtonEnabled ? theme.surface : Color.gray)
+            )
+            .overlay(
+                Capsule()
                     .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
             )
         }
+        .disabled(!isButtonEnabled)
     }
 }
 

@@ -29,6 +29,7 @@ struct ModalContainer<Content: View>: View {
     var icon: String?
     var title: String
     var confirmButtonTitle: String = "OK"
+    var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
     var cancelButtonAccessibility: String?
     var onConfirm: () -> Void
@@ -60,12 +61,12 @@ struct ModalContainer<Content: View>: View {
                 .padding(.horizontal, Dimensions.Padding.MSPadding)
 
             HStack(spacing: Dimensions.Padding.MPadding) {
-                Button(languageSettings.localized("Cancel")) { onCancel() }
+                Button(languageSettings.localized(cancelButtonTitle)) { onCancel() }
                     .font(typography.labelLarge)
                     .foregroundStyle(theme.primary)
                     .accessibilityLabel(
                         cancelButtonAccessibility ??
-                        languageSettings.localized(languageSettings.localized("Cancel")).lowercased()
+                        languageSettings.localized(cancelButtonTitle).lowercased()
                     )
 
                 Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }

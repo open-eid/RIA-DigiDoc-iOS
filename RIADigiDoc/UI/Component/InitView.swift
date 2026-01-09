@@ -66,6 +66,7 @@ struct InitView: View {
                             onTap: { languageOption in
                                 Task {
                                     await viewModel.selectLanguage(code: languageOption.code)
+                                    pathManager.popToRoot()
                                     pathManager.navigate(to: .contentView)
                                 }
                             },

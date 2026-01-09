@@ -20,6 +20,7 @@
 import Foundation
 import CryptoObjCWrapper
 import LibdigidocLibSwift
+import IdCardLib
 
 public enum NavigationDestination: Hashable {
     case contentView
@@ -68,6 +69,10 @@ public enum NavigationDestination: Hashable {
     case encryptionSettingsView
     case proxySettingsView
 
-    case homeView
     case myEidRootView
+    case myEidDataView
+    case myEidPinView(
+        pinAction: MyEidPinCodeAction,
+        codeType: CodeType
+    )
 }
