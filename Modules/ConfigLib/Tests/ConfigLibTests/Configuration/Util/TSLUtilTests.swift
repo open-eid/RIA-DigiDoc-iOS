@@ -83,7 +83,7 @@ struct TSLUtilTests {
 
     @Test func readSequenceNumber_success() async throws {
         let fileContents = "<root><TSLSequenceNumber>123</TSLSequenceNumber></root>"
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "tslfiles")
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "tslfiles")
         try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
         let fileName = "test-\(UUID().uuidString).xml"
         let fileURL = tempDirectoryURL.appending(path: fileName)

@@ -46,18 +46,6 @@ struct CentralConfigurationRepositoryTests {
     }
 
     @Test
-    func fetchPublicKey_success() async throws {
-        let expectedPublicKey = "MockPublicKey"
-
-        mockConfigurationService.fetchPublicKeyHandler = { _, _ in expectedPublicKey }
-
-        let result = try await repository.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
-
-        #expect(expectedPublicKey == result)
-        #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
-    }
-
-    @Test
     func fetchSignature_success() async throws {
         let expectedSignature = "MockSignature"
 
@@ -79,18 +67,6 @@ struct CentralConfigurationRepositoryTests {
             try await repository.fetchConfiguration(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         }
         #expect(mockConfigurationService.fetchConfigurationCallCount == 1)
-    }
-
-    @Test
-    func fetchPublicKey_throwsErrorWhenFetchingFails() async throws {
-        let expectedError = NSError(domain: "Test", code: 2, userInfo: nil)
-
-        mockConfigurationService.fetchPublicKeyHandler = { _, _ in throw expectedError }
-
-        await #expect(throws: (any Error).self) {
-            try await repository.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
-        }
-        #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
     }
 
     @Test

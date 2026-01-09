@@ -173,7 +173,7 @@ final class TimeStampSettingsViewModelTests {
 
     @Test
     func importTSACert_success() async throws {
-        let certURL = TestCertificateUtil.createSampleCertFile()
+        let certURL = try TestCertificateUtil.createSampleCertFile()
         defer {
             try? FileManager.default.removeItem(at: certURL)
         }

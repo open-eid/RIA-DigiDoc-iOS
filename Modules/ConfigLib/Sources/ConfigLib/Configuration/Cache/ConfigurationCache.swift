@@ -34,7 +34,6 @@ actor ConfigurationCache: ConfigurationCacheProtocol, Loggable {
 
     public func cacheConfigurationFiles(
         confData: String,
-        publicKey: String,
         signature: String,
         configDir: URL
     ) async throws {
@@ -45,16 +44,6 @@ actor ConfigurationCache: ConfigurationCacheProtocol, Loggable {
         try await cacheFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigJson,
             data: confDataBytes,
-            configDir: configDir
-        )
-
-        guard let publicKeyBytes = publicKey.data(using: .utf8) else {
-            throw ConfigurationCacheError.invalidData("Invalid UTF-8 encoding for publicKey")
-        }
-
-        try await cacheFile(
-            fileName: CommonsLib.Constants.Configuration.CachedConfigEcPub,
-            data: publicKeyBytes,
             configDir: configDir
         )
 

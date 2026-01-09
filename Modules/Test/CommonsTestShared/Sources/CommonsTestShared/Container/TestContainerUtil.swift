@@ -26,7 +26,7 @@ public struct TestContainerUtil {
 
     public static func createMockContainer(with files: [String: String], containerExtension: String) throws -> URL {
         let subfolder = "TestContainers"
-        let tempDirectory = TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(subfolder: subfolder)
         let uniqueZipName = "\(UUID().uuidString).\(containerExtension)"
         let zipURL = tempDirectory.appending(path: uniqueZipName)
 

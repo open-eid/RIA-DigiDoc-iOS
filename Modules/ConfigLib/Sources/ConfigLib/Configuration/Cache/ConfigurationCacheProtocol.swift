@@ -24,7 +24,6 @@ import CommonsLib
 public protocol ConfigurationCacheProtocol: Sendable {
     func cacheConfigurationFiles(
         confData: String,
-        publicKey: String,
         signature: String,
         configDir: URL
     ) async throws

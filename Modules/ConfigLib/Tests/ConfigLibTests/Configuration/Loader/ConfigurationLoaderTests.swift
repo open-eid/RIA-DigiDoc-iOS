@@ -76,7 +76,6 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
         mockCentralConfigurationRepository.fetchConfigurationHandler = { _, _ in configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _, _ in "some key" }
         mockCentralConfigurationRepository.fetchSignatureHandler = { _, _ in "some signature" }
 
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
@@ -102,11 +101,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -128,9 +126,7 @@ struct ConfigurationLoaderTests {
             userAgent: "TestUserAgent"
         )
 
-        defer {
-            try? FileManager.default.removeItem(at: cacheDir)
-        }
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
 
         #expect(mockConfigurationCache.cacheConfigurationFilesCallCount == 1)
         #expect(mockConfigurationProperties.getConfigurationPropertiesCallCount == 1)
@@ -154,7 +150,6 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
         mockCentralConfigurationRepository.fetchConfigurationHandler = { _, _ in configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _, _ in "some key" }
         mockCentralConfigurationRepository.fetchSignatureHandler = { _, _ in "some signature" }
 
         let cacheDirURL = FileManager.default.urls(
@@ -172,11 +167,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -196,14 +190,12 @@ struct ConfigurationLoaderTests {
 
         try await configurationLoader.loadDefaultConfiguration(cacheDir: nil)
 
-        defer {
-            try? FileManager.default.removeItem(at: cacheDir)
-        }
-
         for try await config in updates {
             #expect(config != nil)
             return
         }
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -237,11 +229,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -258,6 +249,8 @@ struct ConfigurationLoaderTests {
         }
 
         try await configurationLoader.loadDefaultConfiguration(cacheDir: nil)
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
 
         #expect(mockConfigurationSignatureVerifier.verifyConfigurationSignatureCallCount == 1)
     }
@@ -296,11 +289,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -332,6 +324,8 @@ struct ConfigurationLoaderTests {
             Issue.record("Unexpected error thrown: \(error)")
             return
         }
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     func initConfiguration_createsDirectoryWhenCacheDirectoryDoesNotExist() async throws {
@@ -350,7 +344,6 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
         mockCentralConfigurationRepository.fetchConfigurationHandler = { _, _ in configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _, _ in "some key" }
         mockCentralConfigurationRepository.fetchSignatureHandler = { _, _ in "some signature" }
 
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
@@ -430,11 +423,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -464,6 +456,8 @@ struct ConfigurationLoaderTests {
                 "validSignature"
             )
         )
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -496,11 +490,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -529,6 +522,8 @@ struct ConfigurationLoaderTests {
                 "validSignature"
             )
         )
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -548,11 +543,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -590,6 +584,8 @@ struct ConfigurationLoaderTests {
                 "validSignature"
             )
         )
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -609,11 +605,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -643,7 +638,6 @@ struct ConfigurationLoaderTests {
         mockConfigurationProperties.setConfigurationUpdatedDateHandler = { _ in }
 
         mockCentralConfigurationRepository.fetchConfigurationHandler = { _, _ in configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _, _ in "publicKey" }
         mockCentralConfigurationRepository.fetchSignatureHandler = { _, _ in "validSignature" }
 
         mockConfigurationCache.getCachedFileHandler = { _, _ in signatureFile }
@@ -662,6 +656,8 @@ struct ConfigurationLoaderTests {
                 "validSignature"
             )
         )
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -681,11 +677,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -710,15 +705,14 @@ struct ConfigurationLoaderTests {
         mockConfigurationCache.getCachedFileHandler = { _, _ in signatureFile }
 
         mockCentralConfigurationRepository.fetchConfigurationHandler = { _, _ in configurationResponse }
-        mockCentralConfigurationRepository.fetchPublicKeyHandler = { _, _ in "some key" }
         mockCentralConfigurationRepository.fetchSignatureHandler = { _, _ in "some signature" }
 
         await #expect(throws: ConfigurationLoaderError.configurationVerificationFailed) {
-            try await configurationLoader.loadCentralConfiguration(
-                cacheDir: nil,
-                proxyInfo: ProxyInfo(),
-                userAgent: "TestUserAgent"
-            )
+            try await configurationLoader
+                .loadCentralConfiguration(cacheDir: nil, proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
+
+            try cleanupFiles(files: [publicKeyFile, cacheDir])
+
         }
     }
 
@@ -739,11 +733,10 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let publicKeyFile = try createSamplePublicKeyFile()
         let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
-        try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
         try "validSignature".write(to: signatureFile, atomically: true, encoding: .utf8)
 
         let fileMap: [String: URL] = [
@@ -781,6 +774,8 @@ struct ConfigurationLoaderTests {
                 "validSignature"
             )
         )
+
+        try cleanupFiles(files: [publicKeyFile, cacheDir])
     }
 
     @Test
@@ -827,5 +822,20 @@ struct ConfigurationLoaderTests {
             versionSerial: 100,
             downloadDate: Date()
         )
+    }
+
+    private func createSamplePublicKeyFile() throws -> URL {
+        return try TestFileUtil.createSampleFile(
+            name: "default-config",
+            withExtension: "ecpub",
+            contents: "publicKey",
+            subfolder: "ConfigurationLoaderTests-\(UUID().uuidString)"
+        )
+    }
+
+    private func cleanupFiles(files: [URL]) throws {
+        for file in files {
+            try FileManager.default.removeItem(at: file)
+        }
     }
 }

@@ -1279,9 +1279,9 @@ struct SigningViewModelTests: Loggable {
 
     @Test
     func addDataFiles_handleErrorWhenPartialAddingSucceeds() async throws {
-        let testFile = TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
-        let testFile2 = TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
-        let testFile3 = TestFileUtil.createSampleFile(name: "test", withExtension: "txt")
+        let testFile = try TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
+        let testFile2 = try TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
+        let testFile3 = try TestFileUtil.createSampleFile(name: "test", withExtension: "txt")
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
 
         guard let exampleContainer = containerFile else {
@@ -1289,7 +1289,7 @@ struct SigningViewModelTests: Loggable {
             return
         }
 
-        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
             subfolder: "SigningViewModelTests-handleErrorWhenPartialAddingSucceeds"
         )
 
@@ -1336,8 +1336,8 @@ struct SigningViewModelTests: Loggable {
 
     @Test
     func addDataFiles_handleErrorWhenNoFilesAreAdded() async throws {
-        let testFile = TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
-        let testFile2 = TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
+        let testFile = try TestFileUtil.createSampleFile(name: "text", withExtension: "txt")
+        let testFile2 = try TestFileUtil.createSampleFile(name: "text2", withExtension: "txt")
         let containerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
 
         guard let exampleContainer = containerFile else {
@@ -1345,7 +1345,7 @@ struct SigningViewModelTests: Loggable {
             return
         }
 
-        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
             subfolder: "SigningViewModelTests-handleErrorWhenNoFilesAreAdded"
         )
 

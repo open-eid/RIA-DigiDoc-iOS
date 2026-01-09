@@ -40,7 +40,7 @@ public struct TestFileUtil {
     public static func getTemporaryDirectory(
         subfolder: String,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
-    ) -> URL {
+    ) throws -> URL {
         let tempDirectory = fileManager.temporaryDirectory
             .appending(path: bundleIdentifier, directoryHint: .isDirectory)
             .appending(path: subfolder, directoryHint: .isDirectory)
@@ -57,6 +57,8 @@ public struct TestFileUtil {
             TestFileUtil.logger.error(
                 "Unable to create temporary file directory or remove existing file: \(error.localizedDescription)"
             )
+
+            throw URLError(.fileDoesNotExist)
         }
 
         return tempDirectory
@@ -68,8 +70,8 @@ public struct TestFileUtil {
         contents: String? = "Test content",
         subfolder: String = "TestFileUtil",
         fileManager: FileManagerProtocol = Container.shared.fileManager()
-    ) -> URL {
-        let tempFileDirectory = getTemporaryDirectory(subfolder: subfolder)
+    ) throws -> URL {
+        let tempFileDirectory = try getTemporaryDirectory(subfolder: subfolder)
             .appending(path: "\(name).\(ext)", directoryHint: .notDirectory)
 
         let isCreated = fileManager
@@ -84,6 +86,8 @@ public struct TestFileUtil {
             TestFileUtil.logger.error(
                 "Unable to create file at path: \(tempFileDirectory.standardizedFileURL.path(percentEncoded: false))"
             )
+
+            throw URLError(.fileDoesNotExist)
         }
 
         return tempFileDirectory

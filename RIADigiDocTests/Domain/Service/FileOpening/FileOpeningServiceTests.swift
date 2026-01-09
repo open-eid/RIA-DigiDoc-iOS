@@ -149,8 +149,8 @@ struct FileOpeningServiceTests {
             fileInspector: mockFileInspector,
             fileManager: Container.shared.fileManager()
         )
-        let tempFileURL = TestFileUtil.createSampleFile()
-        let tempFileURL2 = TestFileUtil.createSampleFile()
+        let tempFileURL = try TestFileUtil.createSampleFile()
+        let tempFileURL2 = try TestFileUtil.createSampleFile()
         let urls = [tempFileURL, tempFileURL2]
 
         let container = try await fileOpeningService.openOrCreateContainer(

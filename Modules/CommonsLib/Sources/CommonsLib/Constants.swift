@@ -111,7 +111,6 @@ public struct Constants {
 
     public struct Configuration {
         public static let CachedConfigJson = "active-config.json"
-        public static let CachedConfigEcPub = "active-config.ecpub"
         public static let CachedConfigEcc = "active-config.ecc"
         public static let CacheConfigFolder = "config"
 

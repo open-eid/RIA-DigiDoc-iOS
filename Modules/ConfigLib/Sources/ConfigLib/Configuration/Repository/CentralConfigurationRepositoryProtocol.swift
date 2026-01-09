@@ -27,11 +27,6 @@ public protocol CentralConfigurationRepositoryProtocol: Sendable {
         userAgent: String
     ) async throws -> String
 
-    func fetchPublicKey(
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws -> String
-
     func fetchSignature(
         proxyInfo: ProxyInfo,
         userAgent: String

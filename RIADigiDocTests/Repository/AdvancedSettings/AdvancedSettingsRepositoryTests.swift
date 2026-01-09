@@ -44,7 +44,7 @@ struct AdvancedSettingsRepositoryTests {
 
     @Test
     func getCertificate_success() async throws {
-        let sampleFileURL = TestCertificateUtil.createSampleCertFile()
+        let sampleFileURL = try TestCertificateUtil.createSampleCertFile()
         let sampleFileBaseName = sampleFileURL.deletingPathExtension().lastPathComponent
         let sampleFolder = sampleFileURL
             .deletingPathExtension().deletingPathExtension().lastPathComponent
@@ -92,7 +92,7 @@ struct AdvancedSettingsRepositoryTests {
 
     @Test
     func getCertificate_doesNotThrowWhenGetCertificateFileURLThrows() async throws {
-        let sampleFileURL = TestCertificateUtil.createSampleCertFile()
+        let sampleFileURL = try TestCertificateUtil.createSampleCertFile()
         let sampleFileBaseName = sampleFileURL.deletingPathExtension().lastPathComponent
         let sampleFolder = sampleFileURL
             .deletingPathExtension().deletingPathExtension().lastPathComponent
@@ -120,7 +120,7 @@ struct AdvancedSettingsRepositoryTests {
 
     @Test
     func importCertificate_success() async throws {
-        let sampleFileURL = TestCertificateUtil.createSampleCertFile(
+        let sampleFileURL = try TestCertificateUtil.createSampleCertFile(
             subfolder: BundleUtil.getBundleIdentifier()
         )
         let sampleFileBaseName = sampleFileURL.deletingPathExtension().lastPathComponent
@@ -145,7 +145,7 @@ struct AdvancedSettingsRepositoryTests {
 
     @Test
     func importCertificate_doesNotThrowWhenCreateDirectoryThrows() async throws {
-        let sampleFileURL = TestCertificateUtil.createSampleCertFile()
+        let sampleFileURL = try TestCertificateUtil.createSampleCertFile()
         let sampleFileBaseName = sampleFileURL.deletingPathExtension().lastPathComponent
         defer {
             try? FileManager.default.removeItem(at: sampleFileURL)
@@ -167,7 +167,7 @@ struct AdvancedSettingsRepositoryTests {
 
     @Test
     func importCertificate_doesNotThrowWhenRemoveAllCertFilesThrows() async throws {
-        let sampleFileURL = TestCertificateUtil.createSampleCertFile()
+        let sampleFileURL = try TestCertificateUtil.createSampleCertFile()
         let sampleFileBaseName = sampleFileURL.deletingPathExtension().lastPathComponent
         defer {
             try? FileManager.default.removeItem(at: sampleFileURL)

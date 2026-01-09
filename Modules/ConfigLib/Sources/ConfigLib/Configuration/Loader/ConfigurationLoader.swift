@@ -119,28 +119,34 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         let confFile = configDir.appending(
             path: CommonsLib.Constants.Configuration.CachedConfigJson
         )
-        let publicKeyFile = configDir.appending(
-            path: CommonsLib.Constants.Configuration.CachedConfigEcPub
-        )
+
+        guard
+            let publicKeyURL = bundle.url(
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigEcPub,
+                withExtension: nil
+            ),
+            let publicKey = try? String(contentsOf: publicKeyURL)
+        else {
+            throw ConfigurationLoaderError.publicKeyNotFound
+        }
+        
         let signatureFile = configDir.appending(
             path: CommonsLib.Constants.Configuration.CachedConfigEcc
         )
 
         let configFilesExist =
             fileManager.fileExists(atPath: confFile.resolvedPath) &&
-            fileManager.fileExists(atPath: publicKeyFile.resolvedPath) &&
             fileManager.fileExists(atPath: signatureFile.resolvedPath)
 
         if configFilesExist {
             ConfigurationLoader.logger().info("Initializing cached configuration")
 
             let confFileContents = try String(contentsOf: confFile, encoding: .utf8)
-            let publicKeyContents = try String(contentsOf: publicKeyFile, encoding: .utf8)
             let signatureContents = try String(contentsOf: signatureFile, encoding: .utf8)
 
             try configurationSignatureVerifier.verifyConfigurationSignature(
                 config: confFileContents,
-                publicKey: publicKeyContents,
+                publicKey: publicKey,
                 signature: signatureContents
             )
 
@@ -155,7 +161,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
 
             try await configurationCache.cacheConfigurationFiles(
                 confData: confFileContents,
-                publicKey: publicKeyContents,
                 signature: signatureContents,
                 configDir: configDir
             )
@@ -238,7 +243,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
 
         try await configurationCache.cacheConfigurationFiles(
             confData: confData,
-            publicKey: publicKey,
             signature: signatureText,
             configDir: configDir
         )
@@ -298,11 +302,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 userAgent: userAgent
             )
 
-            let centralPublicKey = try await centralConfigurationRepository.fetchPublicKey(
-                proxyInfo: proxyInfo,
-                userAgent: userAgent
-            )
-
             let centralConfigurationProvider = try JSONDecoder().decode(
                 ConfigurationProvider.self, from: Data(centralConfig.utf8)
             )
@@ -310,10 +309,20 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 "Initializing configuration version \(centralConfigurationProvider.metaInf.serial)"
             )
 
+            guard
+                let publicKeyURL = bundle.url(
+                    forResource: CommonsLib.Constants.Configuration.DefaultConfigEcPub,
+                    withExtension: nil
+                ),
+                let publicKey = try? String(contentsOf: publicKeyURL)
+            else {
+                throw ConfigurationLoaderError.publicKeyNotFound
+            }
+
             do {
                 try configurationSignatureVerifier.verifyConfigurationSignature(
                     config: centralConfig,
-                    publicKey: centralPublicKey,
+                    publicKey: publicKey,
                     signature: centralSignature
                 )
             } catch {
@@ -326,7 +335,6 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
             ) {
                 try await configurationCache.cacheConfigurationFiles(
                     confData: centralConfig,
-                    publicKey: centralPublicKey,
                     signature: centralSignature,
                     configDir: configDir
                 )
