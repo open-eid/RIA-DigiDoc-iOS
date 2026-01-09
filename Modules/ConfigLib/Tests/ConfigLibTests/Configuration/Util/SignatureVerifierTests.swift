@@ -19,21 +19,23 @@
 
 import Foundation
 import Testing
-import Security
+import CryptoKit
 @testable import ConfigLib
+
+// MARK: - Tests
 
 final class SignatureVerifierTests {
 
     @Test
     func generateKeysAndSign_success() {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "This is the content that was signed."
-        guard let signature = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -48,13 +50,14 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithInvalidSignature() {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        _ = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey)
+        _ = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey)
+
         let invalidSignature = "InvalidBase64Signature=="
 
         let result = SignatureVerifier.verify(
@@ -68,14 +71,14 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithModifiedContent() {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let originalContent = "Valid content to sign."
-        guard let signature = TestRSAKeyGenerator.sign(data: originalContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: originalContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -92,15 +95,20 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithInvalidPublicKey() {
-        guard let (_, privateKey) = TestRSAKeyGenerator.generateKeyPair(),
-              let (invalidPublicKeyPEM, _) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        // Sign with one keypair...
+        guard let (_, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate signing EC key pair")
+            return
+        }
+        // ...verify with a different public key (same curve) so PEM parsing succeeds, but signature check fails.
+        guard let (invalidPublicKeyPEM, _) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate verification EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        guard let signature = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -115,8 +123,8 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithEmptySignature() {
-        guard let (publicKeyPEM, _) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, _) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
@@ -134,14 +142,14 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithEmptyPublicKey() {
-        guard let (_, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (_, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        guard let signature = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -158,17 +166,14 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithEmptySignedContent() {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        guard let signature = TestRSAKeyGenerator.sign(
-            data: signedContent,
-            privateKey: privateKey
-        ) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -185,18 +190,23 @@ final class SignatureVerifierTests {
 
     @Test
     func verify_returnFalseWithCorruptedPEMFormat() {
-        guard let (_, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (_, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        guard let signature = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
-        let corruptedPEM = "-----BEGIN RSA PUBLIC KEY-----\nInvalidKeyData\n-----END RSA PUBLIC KEY-----"
+        // Corrupt / unsupported PEM header (your verifier only accepts PUBLIC KEY / EC PUBLIC KEY)
+        let corruptedPEM = """
+        -----BEGIN PUBLIC KEY-----
+        InvalidKeyData
+        -----END PUBLIC KEY-----
+        """
 
         let result = SignatureVerifier.verify(
             signature: signature,
@@ -207,3 +217,4 @@ final class SignatureVerifierTests {
         #expect(!result)
     }
 }
+

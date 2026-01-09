@@ -72,7 +72,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
             proxyInfo: proxyInfo
         )
 
-        let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.pub"
+        let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.ecpub"
 
         do {
             let response: String = try await session.request(url)
@@ -96,7 +96,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol {
             proxyInfo: proxyInfo
         )
 
-        let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.rsa"
+        let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.ecc"
         do {
             let responseData: Data = try await session.request(url)
                 .validate()
