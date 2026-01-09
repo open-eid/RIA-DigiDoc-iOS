@@ -23,6 +23,14 @@ public enum CodeType: UInt {
     case puk = 0
     case pin1 = 1
     case pin2 = 2
+
+    public var name: String {
+        switch self {
+        case .puk: return "PUK"
+        case .pin1: return "PIN1"
+        case .pin2: return "PIN2"
+        }
+    }
 }
 
 /**

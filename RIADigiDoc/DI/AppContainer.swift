@@ -22,6 +22,7 @@ import ConfigLib
 import FactoryKit
 import Foundation
 import UtilsLib
+import IdCardLib
 
 extension Container {
     @MainActor
@@ -459,5 +460,15 @@ extension Container {
     var sharedNfcViewModel: Factory<SharedNFCViewModel> {
         self { @MainActor in SharedNFCViewModel() }
             .shared
+    }
+
+    @MainActor
+    var myEidPinChangeViewModel: ParameterFactory<(MyEidPinCodeAction, CodeType), MyEidPinChangeViewModel> {
+        self { @MainActor (pinAction: MyEidPinCodeAction, codeType: CodeType) -> MyEidPinChangeViewModel in
+            MyEidPinChangeViewModel(
+                pinAction: pinAction,
+                codeType: codeType
+            )
+        }
     }
 }

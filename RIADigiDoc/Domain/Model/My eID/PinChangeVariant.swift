@@ -17,22 +17,14 @@
  *
  */
 
-import SwiftUI
+import Foundation
 
-@Observable
-class NavigationPathManager {
-    var path = NavigationPath()
+enum PinChangeVariant: Sendable, Identifiable {
+    case pin1Change
+    case pin1Unblock
+    case pin2Change
+    case pin2Unblock
+    case pukChange
 
-    func navigate(to destination: NavigationDestination) {
-        path.append(destination)
-    }
-
-    func replaceLast(_ numberOfValues: Int = 1, to destination: NavigationDestination) {
-        path.removeLast(numberOfValues)
-        navigate(to: destination)
-    }
-
-    func popToRoot() {
-        path = NavigationPath()
-    }
+    var id: String { String(describing: self) }
 }

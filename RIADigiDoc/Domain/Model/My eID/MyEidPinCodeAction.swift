@@ -17,22 +17,20 @@
  *
  */
 
-import SwiftUI
+import Foundation
+import IdCardLib
 
-@Observable
-class NavigationPathManager {
-    var path = NavigationPath()
+public enum MyEidPinCodeAction: Sendable, Codable {
+    case change
+    case unblock
 
-    func navigate(to destination: NavigationDestination) {
-        path.append(destination)
-    }
+    func steps() -> [MyEidPinCodeStep] {
+        switch self {
+        case .change:
+            return [.current, .new, .confirm]
 
-    func replaceLast(_ numberOfValues: Int = 1, to destination: NavigationDestination) {
-        path.removeLast(numberOfValues)
-        navigate(to: destination)
-    }
-
-    func popToRoot() {
-        path = NavigationPath()
+        case .unblock:
+            return [.current, .new, .confirm]
+        }
     }
 }

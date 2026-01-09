@@ -17,22 +17,21 @@
  *
  */
 
-import SwiftUI
+enum MyEidDocumentStatus {
+    case valid
+    case expired
+    case unknown
+}
 
-@Observable
-class NavigationPathManager {
-    var path = NavigationPath()
-
-    func navigate(to destination: NavigationDestination) {
-        path.append(destination)
-    }
-
-    func replaceLast(_ numberOfValues: Int = 1, to destination: NavigationDestination) {
-        path.removeLast(numberOfValues)
-        navigate(to: destination)
-    }
-
-    func popToRoot() {
-        path = NavigationPath()
+extension MyEidDocumentStatus {
+    var localizationKey: String {
+        switch self {
+        case .valid:
+            return "My eid status valid"
+        case .expired:
+            return "My eid status expired"
+        case .unknown:
+            return "My eid status unknown"
+        }
     }
 }

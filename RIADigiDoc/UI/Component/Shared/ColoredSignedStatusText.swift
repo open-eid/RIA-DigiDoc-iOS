@@ -48,48 +48,12 @@ struct ColoredSignedStatusText: View {
     }
 
     var body: some View {
-        let parts = text.components(separatedBy: " (")
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center) {
-                Text(parts[0])
-                    .font(typography.bodyMedium)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, Dimensions.Padding.XSPadding)
-                    .padding(.vertical, Dimensions.Padding.XXSPadding)
-                    .background(tagBackgroundColor)
-                    .foregroundStyle(tagContentColor)
-                    .clipShape(Capsule())
-
-                if parts.count > 1 {
-                    Text(verbatim: "(\(parts[1])")
-                        .font(typography.bodyMedium)
-                        .foregroundStyle(additionalTextColor)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-
-            VStack(alignment: .leading) {
-                Text(parts[0])
-                    .font(typography.bodyMedium)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, Dimensions.Padding.XSPadding)
-                    .padding(.vertical, Dimensions.Padding.XXSPadding)
-                    .background(tagBackgroundColor)
-                    .foregroundStyle(tagContentColor)
-                    .clipShape(Capsule())
-
-                if parts.count > 1 {
-                    Text(verbatim: "(\(parts[1])")
-                        .font(typography.bodyMedium)
-                        .foregroundStyle(additionalTextColor)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
+        TagBadge(
+            text: text,
+            tagBackgroundColor: tagBackgroundColor,
+            tagContentColor: tagContentColor,
+            additionalTextColor: additionalTextColor
+        )
     }
 }
 

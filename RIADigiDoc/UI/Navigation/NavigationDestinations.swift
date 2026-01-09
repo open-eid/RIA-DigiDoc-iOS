@@ -104,10 +104,13 @@ struct NavigationDestinations: ViewModifier {
         case .proxySettingsView:
             ProxySettingsView()
 
-        case .homeView:
-            HomeView(externalFiles: .constant([]))
         case .myEidRootView:
             MyEidRootView()
+
+        case .myEidDataView:
+            MyEidDataView()
+        case .myEidPinView(let pinAction, let codeType):
+            MyEidPinChangeView(pinAction: pinAction, codeType: codeType)
         }
     }
 }

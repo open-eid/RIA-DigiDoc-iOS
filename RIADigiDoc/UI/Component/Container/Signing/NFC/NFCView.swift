@@ -25,6 +25,7 @@ import CommonsLib
 struct NFCView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
@@ -105,6 +106,12 @@ struct NFCView: View {
                     saveInputData()
                     // TODO: Implement My eID personal data loading action
                     isInProgress = true
+
+                    // TODO: Replace with real loading
+                    Task {
+                        try? await Task.sleep(for: .seconds(1))
+                        pathManager.replaceLast(to: .myEidDataView)
+                    }
                 }
             },
             content: {

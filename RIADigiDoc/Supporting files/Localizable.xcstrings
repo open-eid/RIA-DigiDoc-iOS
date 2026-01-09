@@ -91,6 +91,24 @@
         }
       }
     },
+    "Additional information 2" : {
+      "comment" : "My eID Thales url hyperlink",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Additional information"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisainfo"
+          }
+        }
+      }
+    },
     "App name" : {
       "comment" : "App name",
       "extractionState" : "manual",
@@ -105,6 +123,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "RIA DigiDoc"
+          }
+        }
+      }
+    },
+    "Authentication certificate" : {
+      "comment" : "My eID PIN 1 title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isikutuvastamise sertifikaat"
           }
         }
       }
@@ -286,6 +322,24 @@
         }
       }
     },
+    "Certificate is valid until" : {
+      "comment" : "My eID PIN 1 and 2 subtitle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate is valid until %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaat kehtib kuni %@"
+          }
+        }
+      }
+    },
     "Certificate not yet valid" : {
       "comment" : "OperationAuthenticateWithWebEID Certificate validity check",
       "extractionState" : "manual",
@@ -336,6 +390,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Muuda ümbriku nime"
+          }
+        }
+      }
+    },
+    "Change PIN" : {
+      "comment" : "My eID change PIN button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muuda %@"
           }
         }
       }
@@ -733,6 +805,23 @@
         }
       }
     },
+    "Continue" : {
+      "comment" : "My eID PIN change or unblock view step button",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jätka"
+          }
+        }
+      }
+    },
     "Control code" : {
       "comment" : "Control code text in Mobile-ID and Smart-ID views",
       "extractionState" : "manual",
@@ -1053,6 +1142,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Enter current PIN code" : {
+      "comment" : "My eID current PIN or PUK code step title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter current %1$@ code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisesta praegune %1$@-kood"
+          }
+        }
+      }
+    },
+    "Enter new PIN code" : {
+      "comment" : "My eID new PIN or PUK code step title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter new %1$@ code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisesta uus %1$@-kood"
           }
         }
       }
@@ -1395,6 +1520,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failid edukalt lisatud"
+          }
+        }
+      }
+    },
+    "Forgot PIN" : {
+      "comment" : "My eID forgot PIN button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot %@?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unustasid %@-koodi?"
           }
         }
       }
@@ -4225,6 +4368,96 @@
         }
       }
     },
+    "My data" : {
+      "comment" : "My eID tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My data"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minu andmed"
+          }
+        }
+      }
+    },
+    "My eid status expired" : {
+      "comment" : "My eID document status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aegunud"
+          }
+        }
+      }
+    },
+    "My eid status unknown" : {
+      "comment" : "My eID document status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teadmata"
+          }
+        }
+      }
+    },
+    "My eid status valid" : {
+      "comment" : "My eID document status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtib"
+          }
+        }
+      }
+    },
+    "New PIN difference requirement" : {
+      "comment" : "My eID new PIN or PUK difference description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New %1$@ must be different from current %1$@."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus %1$@ peab olema erinev eelmisest."
+          }
+        }
+      }
+    },
     "Next" : {
       "comment" : "Encryption view bottom bar action",
       "extractionState" : "manual",
@@ -4251,6 +4484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hold your phone near the ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoia ID-kaarti telefoni lähedal"
           }
         }
       }
@@ -4578,6 +4817,24 @@
         }
       }
     },
+    "PIN blocked" : {
+      "comment" : "My eID PIN blocked error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ is blocked, because %1$@ has been inserted 3 times incorrectly."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ on blokeeritud, kuna %1$@-koodi on sisestatud 3 korda valesti."
+          }
+        }
+      }
+    },
     "PIN change failed" : {
       "comment" : "OperationUnblockPin error",
       "extractionState" : "manual",
@@ -4603,13 +4860,271 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIN changed"
+            "value" : "%@ changed"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PIN vahetatud"
+            "value" : "%@ muudetud"
+          }
+        }
+      }
+    },
+    "PIN code" : {
+      "comment" : "My eID PIN changing textfield title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@-kood"
+          }
+        }
+      }
+    },
+    "PIN guideline title" : {
+      "comment" : "My eID PIN changing or unlocking guideline title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ change guidelines"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ muutmise juhend"
+          }
+        }
+      }
+    },
+    "PIN length requirement" : {
+      "comment" : "My eID current PIN or PUK length description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ code must be at least %2$@ and a maximum of %3$@ digits long."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@-kood peab olema vähemalt %2$@-kohaline ja maksimaalselt %3$@-kohaline."
+          }
+        }
+      }
+    },
+    "PIN repeat error" : {
+      "comment" : "My eID repeat new PIN or PUK codes mismatch error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New %1$@ codes must match"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uued %1$@-koodid peavad olema samad"
+          }
+        }
+      }
+    },
+    "PIN unblocked" : {
+      "comment" : "My eID PIN unblocked message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ unblocked"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ blokeering tühistatud"
+          }
+        }
+      }
+    },
+    "PIN verification error" : {
+      "comment" : "My eID PIN or PUK wrong code error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Wrong %1$@ code. You can try 1 more time."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Wrong %1$@ code. You can try %2$d more times."
+                }
+              }
+            }
+          }
+        },
+        "et" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vale %1$@-kood. Saad veel proovida 1 kord."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Vale %1$@-kood. Saad veel proovida %2$d korda."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "PIN1 guideline 1" : {
+      "comment" : "My eID PIN1 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New PIN1 must be different from current PIN1."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus PIN1 peab olema erinev eelmisest."
+          }
+        }
+      }
+    },
+    "PIN1 guideline 2" : {
+      "comment" : "My eID PIN1 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN1 code is used for authentication."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN1-koodi kasutatakse isikutuvastamiseks."
+          }
+        }
+      }
+    },
+    "PIN1 guideline 3" : {
+      "comment" : "My eID PIN1 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If PIN1 is inserted incorrectly 3 times, the identification certificate will be blocked and it will be impossible to use ID-card to verify identification, until it is unblocked via the PUK code."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kui sisestad PIN1-koodi kolm korda valesti, siis isikutuvastamise sertifikaat blokeeritakse ning ID-kaarti pole võimalik isikutuvastamiseks kasutada enne blokeeringu tühistamist PUK-koodi abil."
+          }
+        }
+      }
+    },
+    "PIN2 guideline 1" : {
+      "comment" : "My eID PIN2 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New PIN2 must be different from current PIN2."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus PIN2 peab olema erinev eelmisest."
+          }
+        }
+      }
+    },
+    "PIN2 guideline 2" : {
+      "comment" : "My eID PIN2 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN2 code is used to digitally sign documents."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN2-koodi kasutatakse digitaalallkirja andmiseks."
+          }
+        }
+      }
+    },
+    "PIN2 guideline 3" : {
+      "comment" : "My eID PIN2 guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If PIN2 is inserted incorrectly 3 times, the signing certificate will be blocked and it will be impossible to use ID-card for digital signatures, until it is unblocked via the PUK code."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kui sisestad PIN2-koodi kolm korda valesti, siis allkirjastamise sertifikaat blokeeritakse ning ID-kaarti pole võimalik allkirjastamiseks kasutada enne blokeeringu tühistamist PUK-koodi abil."
+          }
+        }
+      }
+    },
+    "PINs and certificates" : {
+      "comment" : "My eID tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN's and certificates"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN-koodid ja sertifikaadid"
           }
         }
       }
@@ -4628,6 +5143,132 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Palun asetage oma ID-kaart vastu nutiseadet."
+          }
+        }
+      }
+    },
+    "PUK blocked" : {
+      "comment" : "My eID PUK blocked message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK has been blocked because PUK code has been entered incorrectly 3 times. You can not unblock the PUK code yourself.\n\nAs long as the PUK code is blocked, all eID options can be used, except transactions that need PUK code.\n\nPlease visit the service center to obtain new codes."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK on blokeeritud, kuna PUK-koodi on sisestatud 3 korda valesti. PUK-koodi ei saa ise lahti blokeerida.\n\nKuigi PUK-kood on blokeeritud, saab kõiki eID võimalusi kasutada, välja arvatud PUK-koodi vajavaid.\n\nUue PUK-koodi saamiseks külasta klienditeeninduspunkti, kust saad uue koodiümbriku uute koodidega."
+          }
+        }
+      }
+    },
+    "PUK blocked URL" : {
+      "comment" : "My eID PUK blocked URL",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/changing-id-card-pin-codes-and-puk-code/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/id-kaardi-pin-ja-puk-koodide-muutmine/"
+          }
+        }
+      }
+    },
+    "PUK code" : {
+      "comment" : "My eID Thales PUK code title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK-kood"
+          }
+        }
+      }
+    },
+    "PUK code info" : {
+      "comment" : "My eID PUK code subtitle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The PUK code is in the ID card's code envelope."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK-kood on ID-kaardi koodiümbrikus."
+          }
+        }
+      }
+    },
+    "PUK code info 2" : {
+      "comment" : "My eID Thales card PUK code info",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The PUK code cannot be changed for an identified card. If the code is lost, you can view it in the self-service portal of the Police and Border Guard Board."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuvastatud kaardil ei saa PUK-koodi muuta. Kaotatud koodi saad vaadata Politsei- ja Piirivalveameti iseteenindusest."
+          }
+        }
+      }
+    },
+    "PUK guideline 1" : {
+      "comment" : "My eID PUK guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK code is used for unblocking the certificates when PIN1 or PIN2 has been entered 3 times incorrectly."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK-koodi abil saab tühistada sertifikaadi blokeeringu, kui PIN1- või PIN2-koodi on 3 korda järjest valesti sisestatud."
+          }
+        }
+      }
+    },
+    "PUK guideline 2" : {
+      "comment" : "My eID PUK guideline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you forget the PUK code or the certificates remain blocked, you have to visit the service center to obtain new codes."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kui peale vahetamist PUK-kood ununeb ja sertifikaat jääb blokeerituks kolme vale PIN1 või PIN2 sisestamise järel, siis ainus võimalus ID-kaart jälle tööle saada on pöörduda klienditeeninduspunkti poole."
           }
         }
       }
@@ -5082,6 +5723,24 @@
         }
       }
     },
+    "Repeat new PIN code" : {
+      "comment" : "My eID repeat new PIN or PUK code step title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repeat new %1$@ code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korda uut %1$@-koodi"
+          }
+        }
+      }
+    },
     "Request sending error" : {
       "comment" : "Mobile-ID error for deliveryError",
       "extractionState" : "manual",
@@ -5202,6 +5861,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvesta fail"
+          }
+        }
+      }
+    },
+    "Save new PIN" : {
+      "comment" : "My eID save new PIN or PUK button name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save new %1$@ code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta uus %1$@-kood"
           }
         }
       }
@@ -5905,6 +6582,24 @@
         }
       }
     },
+    "Signing certificate" : {
+      "comment" : "My eID PIN 2 title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamise sertifikaat"
+          }
+        }
+      }
+    },
     "Signing in progress please wait" : {
       "comment" : "NFC alert message step 4",
       "extractionState" : "manual",
@@ -5949,6 +6644,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Signing method changed"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamise meetod muudetud"
           }
         }
       }
@@ -6345,6 +7046,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajatempliteenuse sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
+    "Unblock PIN" : {
+      "comment" : "My eID unblock PIN button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tühista %@ blokeering"
           }
         }
       }

@@ -1,0 +1,96 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import SwiftUI
+import LibdigidocLibSwift
+
+struct TagBadge: View {
+    @AppTypography private var typography
+
+    let text: String
+    let tagBackgroundColor: Color
+    let tagContentColor: Color
+    let additionalTextColor: Color
+
+    init(
+        text: String,
+        tagBackgroundColor: Color,
+        tagContentColor: Color,
+        additionalTextColor: Color = .clear
+    ) {
+        self.text = text
+        self.tagBackgroundColor = tagBackgroundColor
+        self.tagContentColor = tagContentColor
+        self.additionalTextColor = additionalTextColor
+    }
+
+    var body: some View {
+        let parts = text.components(separatedBy: " (")
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center) {
+                Text(parts[0])
+                    .font(typography.bodyMedium)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, Dimensions.Padding.XSPadding)
+                    .padding(.vertical, Dimensions.Padding.XXSPadding)
+                    .background(tagBackgroundColor)
+                    .foregroundStyle(tagContentColor)
+                    .clipShape(Capsule())
+
+                if parts.count > 1 {
+                    Text(verbatim: "(\(parts[1])")
+                        .font(typography.bodyMedium)
+                        .foregroundStyle(additionalTextColor)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            VStack(alignment: .leading) {
+                Text(parts[0])
+                    .font(typography.bodyMedium)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, Dimensions.Padding.XSPadding)
+                    .padding(.vertical, Dimensions.Padding.XXSPadding)
+                    .background(tagBackgroundColor)
+                    .foregroundStyle(tagContentColor)
+                    .clipShape(Capsule())
+
+                if parts.count > 1 {
+                    Text(verbatim: "(\(parts[1])")
+                        .font(typography.bodyMedium)
+                        .foregroundStyle(additionalTextColor)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    TagBadge(
+        text: "TagBadge",
+        tagBackgroundColor: AppColors.Green50,
+        tagContentColor: AppColors.Green700,
+        additionalTextColor: AppColors.Yellow800
+    )
+}
