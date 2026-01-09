@@ -63,8 +63,8 @@ struct SignatureVerifier {
         }
 
         let base64Payload = cleaned
-            .replacingOccurrences(of: begin, with: "")
-            .replacingOccurrences(of: end, with: "")
+            .replacing(begin, with: "")
+            .replacing(end, with: "")
 
         return try decodeBase64(base64Payload)
     }

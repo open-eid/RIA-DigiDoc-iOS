@@ -92,8 +92,8 @@ extension SettingsConfiguration {
             throw ConfigurationError.signatureVerificationFailed
         }
         guard let pubKey = Data(base64Encoded: publicKey
-            .replacingOccurrences(of: "-----BEGIN PUBLIC KEY-----", with: "")
-            .replacingOccurrences(of: "-----END PUBLIC KEY-----", with: ""), options: .ignoreUnknownCharacters) else {
+            .replacing("-----BEGIN PUBLIC KEY-----", with: "")
+            .replacing("-----END PUBLIC KEY-----", with: ""), options: .ignoreUnknownCharacters) else {
             log("Failed to parse key")
             throw ConfigurationError.signatureVerificationFailed
         }
