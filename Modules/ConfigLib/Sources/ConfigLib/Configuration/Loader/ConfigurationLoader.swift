@@ -57,7 +57,11 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         self.bundle = bundle ?? Bundle.module
     }
 
-    public func initConfiguration(cacheDir: URL, proxyInfo: ProxyInfo) async throws {
+    public func initConfiguration(
+        cacheDir: URL,
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws {
         ConfigurationLoader.logger().debug("Initializing configuration")
 
         if !fileManager.fileExists(atPath: cacheDir.resolvedPath) {
@@ -71,7 +75,11 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
 
         if try await shouldCheckForUpdates() {
             ConfigurationLoader.logger().debug("Checking for configuration updates...")
-            try await loadCentralConfiguration(cacheDir: cacheDir, proxyInfo: proxyInfo)
+            try await loadCentralConfiguration(
+                cacheDir: cacheDir,
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
+            )
         }
 
         ConfigurationLoader.logger().debug("Finished initializing configuration")
@@ -261,7 +269,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
 
     public func loadCentralConfiguration(
         cacheDir: URL?,
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
@@ -277,17 +286,21 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         var centralSignature = ""
 
         centralSignature = try await centralConfigurationRepository.fetchSignature(
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         ).trimmingCharacters(in: .whitespaces)
 
         if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
             ConfigurationLoader.logger().debug("Found new configuration")
 
             let centralConfig = try await centralConfigurationRepository.fetchConfiguration(
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
+
             let centralPublicKey = try await centralConfigurationRepository.fetchPublicKey(
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
 
             let centralConfigurationProvider = try JSONDecoder().decode(

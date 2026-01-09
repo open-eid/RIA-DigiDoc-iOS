@@ -28,21 +28,33 @@ public struct CentralConfigurationRepository: CentralConfigurationRepositoryProt
         self.centralConfigurationService = centralConfigurationService
     }
 
-    public func fetchConfiguration(proxyInfo: ProxyInfo) async throws -> String {
+    public func fetchConfiguration(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String {
         return try await centralConfigurationService.fetchConfiguration(
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
-    public func fetchPublicKey(proxyInfo: ProxyInfo) async throws -> String {
+    public func fetchPublicKey(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String {
         return try await centralConfigurationService.fetchPublicKey(
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
-    public func fetchSignature(proxyInfo: ProxyInfo) async throws -> String {
+    public func fetchSignature(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String {
         return try await centralConfigurationService.fetchSignature(
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 }

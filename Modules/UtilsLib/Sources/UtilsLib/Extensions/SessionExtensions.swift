@@ -29,7 +29,7 @@ extension Session {
         interceptor: RequestInterceptor? = nil,
         serverTrustManager: ServerTrustManager? = nil
     ) -> Session {
-        let configuration = configuration ?? URLSessionConfiguration.default
+        let configuration = configuration ?? URLSessionConfiguration.af.default
 
         if proxyInfo.option != .disabled, !proxyInfo.host.isEmpty {
             configuration.requestCachePolicy = URLRequest.CachePolicy.reloadIgnoringLocalCacheData

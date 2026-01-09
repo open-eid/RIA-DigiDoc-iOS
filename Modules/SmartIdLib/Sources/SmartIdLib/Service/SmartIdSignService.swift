@@ -35,7 +35,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         country: String,
         nationalIdentityNumber: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionIdResponse {
         let request = SmartIdCertificateRequest(
             relyingPartyName: relyingPartyName,
@@ -49,7 +50,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
             method: .post,
             parameters: request,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
@@ -64,7 +66,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         allowedInteractionsOrderType: String,
         displayText200: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionIdResponse {
         let request = SmartIdSignatureRequest(
             relyingPartyName: relyingPartyName,
@@ -82,16 +85,19 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
             method: .post,
             parameters: request,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
+    // swiftlint:disable:next function_parameter_count
     public func getSessionRequest(
         url: String,
         sessionId: String,
         pollingTimeout: Int,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionResponse {
         let pollingTimeoutMs = pollingTimeout * 1000
 
@@ -101,7 +107,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
                 method: .get,
                 parameters: ["timeoutMs": pollingTimeoutMs],
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
 
             if let response = sessionResponse,
@@ -123,7 +130,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         method: HTTPMethod,
         parameters: P? = nil,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> T {
         return try await withCheckedThrowingContinuation { continuation in
             Task {
@@ -135,16 +143,15 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
                     let session = try await ensureSession(
                         url: url,
                         trustedCertificates: trustedCertificates,
-                        proxyInfo: proxyInfo
+                        proxyInfo: proxyInfo,
+                        userAgent: userAgent
                     )
-                    let headers = SmartIdSignService.defaultHeaders()
 
                     let response = await session.request(
                         url,
                         method: method,
                         parameters: parameters,
-                        encoder: encoder,
-                        headers: headers
+                        encoder: encoder
                     )
                         .validate()
                         .serializingDecodable(T.self)
@@ -191,18 +198,11 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         }
     }
 
-    private static func defaultHeaders() -> HTTPHeaders {
-        [
-            .contentType("application/json; charset=utf-8"),
-            .init(name: "Cache-Control", value: "no-cache"),
-            .init(name: "Pragma", value: "no-cache")
-        ]
-    }
-
     private func ensureSession(
         url: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String,
     ) async throws -> Session {
         if currentProxy == proxyInfo {
             if let existing = session { return existing }
@@ -220,7 +220,8 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         let newSession = SmartIdSignService.createAlamofireSession(
             host: host,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         session = newSession
@@ -230,15 +231,23 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
     private static func createAlamofireSession(
         host: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) -> Session {
         let evaluators = [host: PinnedCertificatesTrustEvaluator(certificates: trustedCertificates)]
 
-        let config = URLSessionConfiguration.default
+        let config = URLSessionConfiguration.af.default
         config.timeoutIntervalForRequest = TimeInterval(Constants.Signing.Timeout)
         config.timeoutIntervalForResource = TimeInterval(Constants.Signing.Timeout)
         config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         config.urlCache = nil
+
+        var headers = config.httpAdditionalHeaders ?? [:]
+        headers["User-Agent"] = userAgent
+        headers["Content-Type"] = "application/json; charset=utf-8"
+        headers["Cache-Control"] = "no-cache"
+        headers["Pragma"] = "no-cache"
+        config.httpAdditionalHeaders = headers
 
         return Session.withProxy(
             proxyInfo: proxyInfo,

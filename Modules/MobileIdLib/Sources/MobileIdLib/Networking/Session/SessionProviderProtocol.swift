@@ -26,6 +26,7 @@ public protocol SessionProviderProtocol: Sendable {
     func ensureSession(
         url: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> Session
 }

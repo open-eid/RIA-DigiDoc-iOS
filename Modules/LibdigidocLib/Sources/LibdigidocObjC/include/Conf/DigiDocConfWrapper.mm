@@ -229,13 +229,14 @@ private:
     }
     
 public:
-    static void initConf(DigiDocConfig *conf, void (^completion)(NSError * _Nullable error)) {
+    static void initConf(DigiDocConfig *conf, NSString *userAgent, void (^completion)(NSError * _Nullable error)) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSError *error = nil;
             try {
+                std::string userAgentInfo = userAgent.UTF8String;
                 DigiDocConfCurrent *currentConf = new DigiDocConfCurrent(conf);
                 digidoc::Conf::init(currentConf);
-                digidoc::initialize("RIA DigiDoc 3.0", "RIA DigiDoc");
+                digidoc::initialize(userAgentInfo, userAgentInfo);
             } catch (const digidoc::Exception &e) {
                 std::vector<digidoc::Exception> causes = e.causes();
                 NSDictionary *userInfo = @{
@@ -318,11 +319,11 @@ public:
     return self;
 }
 
-- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL, NSError * _Nullable))completion {
+- (void)initWithConf:(DigiDocConfig *)conf userAgent:(NSString *)userAgent completion:(void (^)(BOOL, NSError * _Nullable))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = nil;
         try {
-            DigiDocConfWrapperImpl::initConf(conf, ^(NSError *error) {
+            DigiDocConfWrapperImpl::initConf(conf, userAgent, ^(NSError *error) {
                 if (error) {
                     error = [NSError errorWithDomain:@"LibdigidocLib"
                                                 code:1

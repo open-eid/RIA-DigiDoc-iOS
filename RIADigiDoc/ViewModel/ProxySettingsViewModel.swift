@@ -21,6 +21,7 @@ import Alamofire
 import CommonsLib
 import Foundation
 import LibdigidocLibSwift
+import UtilsLib
 
 @Observable
 @MainActor
@@ -30,11 +31,17 @@ class ProxySettingsViewModel: ProxySettingsViewModelProtocol, Loggable {
 
     // MARK: - Dependencies
     private let proxyUtil: ProxyUtilProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
+    private let dataStore: DataStoreProtocol
 
     init(
-        proxyUtil: ProxyUtilProtocol
+        proxyUtil: ProxyUtilProtocol,
+        userAgentUtil: UserAgentUtilProtocol,
+        dataStore: DataStoreProtocol
     ) {
         self.proxyUtil = proxyUtil
+        self.userAgentUtil = userAgentUtil
+        self.dataStore = dataStore
 
         Task {
             await loadSettings()
@@ -75,7 +82,18 @@ class ProxySettingsViewModel: ProxySettingsViewModelProtocol, Loggable {
         let url = "https://id.eesti.ee/config.json"
         let session = session ?? Session.withProxy(proxyInfo: requestProxyInfo)
 
-        let response = await session.request(url)
+        let appLanguage = await dataStore.getSelectedLanguage()
+        let userAgent = userAgentUtil.userAgent(
+            diagnostics: .none,
+            language: appLanguage
+        )
+
+        let response = await session.request(
+            url,
+            headers: [
+                .userAgent(userAgent)
+            ]
+        )
             .validate()
             .serializingData()
             .response

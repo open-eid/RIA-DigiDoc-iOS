@@ -47,7 +47,7 @@ struct MobileIdSignServiceTests {
             traceId: "TestTraceId"
         )
 
-        mockRequestPerfomer.performRequestHandler = { _, method, parameters, _, _ in
+        mockRequestPerfomer.performRequestHandler = { _, method, parameters, _, _, _ in
 
             #expect(method == .post)
 
@@ -65,7 +65,8 @@ struct MobileIdSignServiceTests {
             phoneNumber: "372000000",
             nationalIdentityNumber: "12345678901",
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "MobileIdSignServiceTestsUserAgent"
         )
 
         #expect(response.result == .ok)
@@ -79,7 +80,7 @@ struct MobileIdSignServiceTests {
             sessionID: expectedSessionID
         )
 
-        mockRequestPerfomer.performRequestHandler = { _, _, parameters, _, _ in
+        mockRequestPerfomer.performRequestHandler = { _, _, parameters, _, _, _ in
 
             let request = parameters as? MobileIdSignatureRequest
 
@@ -102,7 +103,8 @@ struct MobileIdSignServiceTests {
             displayText: "Sign",
             displayTextFormat: "GSM-7",
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "MobileIdSignServiceTestsUserAgent"
         )
 
         #expect(response.sessionID == expectedSessionID)
@@ -122,7 +124,7 @@ struct MobileIdSignServiceTests {
             traceId: "TestTraceId"
         )
 
-        mockRequestPerfomer.performRequestHandler = { _, method, _, _, _ in
+        mockRequestPerfomer.performRequestHandler = { _, method, _, _, _, _ in
             #expect(method == .get)
             return completedResponse
         }
@@ -132,7 +134,8 @@ struct MobileIdSignServiceTests {
             sessionId: "abc",
             pollingTimeout: 1,
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "MobileIdSignServiceTestsUserAgent"
         )
 
         #expect(response.state == .complete)

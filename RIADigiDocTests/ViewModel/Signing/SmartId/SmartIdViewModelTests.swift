@@ -33,6 +33,7 @@ struct SmartIdViewModelTests {
     private let mockNotificationUtil: NotificationUtilProtocolMock
     private let mockDataStore: DataStoreProtocolMock
     private let mockProxyUtil: ProxyUtilProtocolMock
+    private let mockUserAgentUtil: UserAgentUtilProtocolMock
 
     private let viewModel: SmartIdViewModel
 
@@ -43,6 +44,7 @@ struct SmartIdViewModelTests {
         self.mockNotificationUtil = NotificationUtilProtocolMock()
         self.mockDataStore = DataStoreProtocolMock()
         self.mockProxyUtil = ProxyUtilProtocolMock()
+        self.mockUserAgentUtil = UserAgentUtilProtocolMock()
 
         viewModel = SmartIdViewModel(
             configurationRepository: mockConfigurationRepository,
@@ -50,7 +52,8 @@ struct SmartIdViewModelTests {
             certificateUtil: mockCertificatUtil,
             notificationUtil: mockNotificationUtil,
             dataStore: mockDataStore,
-            proxyUtil: mockProxyUtil
+            proxyUtil: mockProxyUtil,
+            userAgentUtil: mockUserAgentUtil
         )
     }
 

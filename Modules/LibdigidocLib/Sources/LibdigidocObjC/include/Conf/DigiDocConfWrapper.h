@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DigiDocConfWrapper : NSObject
 
-- (void)initWithConf:(DigiDocConfig *)conf completion:(void (^)(BOOL, NSError * _Nullable))completion;
+- (void)initWithConf:(DigiDocConfig *)conf userAgent:(NSString *)userAgent completion:(void (^)(BOOL, NSError * _Nullable))completion;
 - (void)updateConfiguration:(DigiDocConfig *)conf;
 - (void)setSiVaUrl:(NSURL * _Nullable)url;
 - (void)addSiVaCert:(NSData * _Nullable)cert;

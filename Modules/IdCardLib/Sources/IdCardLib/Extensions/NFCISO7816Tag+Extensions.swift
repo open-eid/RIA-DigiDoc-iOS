@@ -17,7 +17,7 @@
  *
  */
 
-import CommonsLib
+import UtilsLib
 import CoreNFC
 import CryptoTokenKit
 

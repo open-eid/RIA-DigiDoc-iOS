@@ -31,7 +31,8 @@ public protocol MobileIdSignServiceProtocol: Sendable {
         phoneNumber: String,
         nationalIdentityNumber: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdCertificateResponse
 
     func getSignatureRequest(
@@ -46,7 +47,8 @@ public protocol MobileIdSignServiceProtocol: Sendable {
         displayText: String,
         displayTextFormat: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdSignatureResponse
 
     func getSessionRequest(
@@ -54,7 +56,8 @@ public protocol MobileIdSignServiceProtocol: Sendable {
         sessionId: String,
         pollingTimeout: Int,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdSessionResponse
 
     func getVerificationCode(hash: Data) async -> String?

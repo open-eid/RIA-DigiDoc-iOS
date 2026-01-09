@@ -17,8 +17,8 @@
  *
  */
 
-import CommonsLib
 import Foundation
+import UtilsLib
 
 @objc public final class CdocInfo: NSObject, Loggable {
     public let format: String

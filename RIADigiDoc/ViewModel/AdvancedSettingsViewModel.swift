@@ -21,6 +21,7 @@ import CommonsLib
 import ConfigLib
 import Foundation
 import LibdigidocLibSwift
+import UtilsLib
 
 @Observable
 @MainActor

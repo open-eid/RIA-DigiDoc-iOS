@@ -20,6 +20,7 @@
 import Foundation
 import LibdigidocLibSwift
 import CommonsLib
+import UtilsLib
 
 @Observable
 @MainActor

@@ -21,6 +21,7 @@ import CommonsLib
 import Foundation
 import Testing
 import Security
+import UtilsLib
 @testable import ConfigLib
 
 struct TestRSAKeyGenerator: Loggable {

@@ -42,7 +42,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
         phoneNumber: String,
         nationalIdentityNumber: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdCertificateResponse {
         let request = MobileIdCertificateRequest(
             relyingPartyName: relyingPartyName,
@@ -56,7 +57,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
             method: .post,
             parameters: request,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
@@ -73,7 +75,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
         displayText: String,
         displayTextFormat: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdSignatureResponse {
         let request = MobileIdSignatureRequest(
             certificateRequest: .init(
@@ -94,16 +97,19 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
             method: .post,
             parameters: request,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
     }
 
+    // swiftlint:disable:next function_parameter_count
     public func getSessionRequest(
         url: String,
         sessionId: String,
         pollingTimeout: Int,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> MobileIdSessionResponse {
         let pollingTimeoutMs = pollingTimeout * 1000
 
@@ -113,7 +119,8 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
                 method: .get,
                 parameters: ["timeoutMs": pollingTimeoutMs],
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
 
             if let response = sessionResponse,

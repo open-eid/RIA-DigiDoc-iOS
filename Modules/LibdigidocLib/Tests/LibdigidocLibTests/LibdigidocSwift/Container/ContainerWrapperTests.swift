@@ -55,8 +55,15 @@ struct ContainerWrapperTests {
         configurationProvider = try TestConfigurationProviderUtil.getConfigurationProvider()
 
         do {
-            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
-            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
+            try await DigiDocConf.initDigiDoc(
+                configuration: configurationProvider,
+                userAgent: "TestUserAgent"
+            )
+
+            try await DigiDocConf.initDigiDoc(
+                configuration: configurationProvider,
+                userAgent: "TestUserAgent"
+            )
         } catch let error as DigiDocError {
             switch error {
             case .alreadyInitialized:

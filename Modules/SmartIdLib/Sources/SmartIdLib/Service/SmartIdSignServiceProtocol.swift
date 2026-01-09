@@ -31,7 +31,8 @@ public protocol SmartIdSignServiceProtocol: Sendable {
         country: String,
         nationalIdentityNumber: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionIdResponse
 
     func getSignatureRequest(
@@ -44,7 +45,8 @@ public protocol SmartIdSignServiceProtocol: Sendable {
         allowedInteractionsOrderType: String,
         displayText200: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionIdResponse
 
     func getSessionRequest(
@@ -52,7 +54,8 @@ public protocol SmartIdSignServiceProtocol: Sendable {
         sessionId: String,
         pollingTimeout: Int,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> SmartIdSessionResponse
 
     func getVerificationCode(digest: Data) async -> String

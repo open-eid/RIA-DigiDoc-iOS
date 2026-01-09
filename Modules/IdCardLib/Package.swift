@@ -16,7 +16,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
         .package(url: "https://github.com/apple/swift-certificates.git", exact: .init(1, 7, 0)),
         .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
-        .package(path: "../CommonsLib")
+        .package(path: "../UtilsLib")
     ],
     targets: [
         .target(
@@ -38,7 +38,7 @@ let package = Package(
                 "Digest",
                 "SwiftECC",
                 "iR301",
-                "CommonsLib"
+                "UtilsLib"
             ],
             path: "Sources/IdCardLib",
             swiftSettings: [

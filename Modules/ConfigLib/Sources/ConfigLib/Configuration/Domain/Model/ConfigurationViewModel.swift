@@ -37,11 +37,16 @@ class ConfigurationViewModel: Loggable {
         self.fileManager = fileManager
     }
 
-    func fetchConfiguration(lastUpdate: TimeInterval, proxyInfo: ProxyInfo) async {
+    func fetchConfiguration(
+        lastUpdate: TimeInterval,
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async {
         do {
             guard let updates = try await repository.getCentralConfigurationUpdates(
                 cacheDir: Directories.getConfigDirectory(fileManager: fileManager),
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             ) else {
                 ConfigurationViewModel.logger().error("No configuration updates available.")
                 return

@@ -20,6 +20,7 @@
 import Foundation
 import CommonsLib
 import ConfigLib
+import UtilsLib
 
 public final class CDoc2Setting: NSObject, Sendable, Loggable {
     @objc @MainActor static public var isEncryptionEnabled: Bool = Constants.CryptoDefaultValues.encryptionUseCdoc2

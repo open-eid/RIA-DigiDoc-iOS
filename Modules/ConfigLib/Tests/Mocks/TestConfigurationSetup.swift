@@ -45,7 +45,7 @@ public struct TestConfigurationSetup {
             return mockAsyncStream(configProvider: mockConfig)
         }
 
-        configurationRepository.getCentralConfigurationUpdatesHandler = { [configProvider] _, _ async throws in
+        configurationRepository.getCentralConfigurationUpdatesHandler = { [configProvider] _, _, _ async throws in
             guard let mockConfig = configProvider else {
                 return AsyncThrowingStream { continuation in
                     continuation.yield(nil)

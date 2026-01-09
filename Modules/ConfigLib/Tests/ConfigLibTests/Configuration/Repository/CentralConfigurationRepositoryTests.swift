@@ -37,9 +37,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchConfiguration_success() async throws {
         let expectedConfiguration = "MockConfiguration"
 
-        mockConfigurationService.fetchConfigurationHandler = { _ in expectedConfiguration }
+        mockConfigurationService.fetchConfigurationHandler = { _, _ in expectedConfiguration }
 
-        let result = try await repository.fetchConfiguration(proxyInfo: ProxyInfo())
+        let result = try await repository.fetchConfiguration(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         #expect(expectedConfiguration == result)
         #expect(mockConfigurationService.fetchConfigurationCallCount == 1)
@@ -49,9 +49,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchPublicKey_success() async throws {
         let expectedPublicKey = "MockPublicKey"
 
-        mockConfigurationService.fetchPublicKeyHandler = { _ in expectedPublicKey }
+        mockConfigurationService.fetchPublicKeyHandler = { _, _ in expectedPublicKey }
 
-        let result = try await repository.fetchPublicKey(proxyInfo: ProxyInfo())
+        let result = try await repository.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         #expect(expectedPublicKey == result)
         #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
@@ -61,9 +61,9 @@ struct CentralConfigurationRepositoryTests {
     func fetchSignature_success() async throws {
         let expectedSignature = "MockSignature"
 
-        mockConfigurationService.fetchSignatureHandler = { _ in expectedSignature }
+        mockConfigurationService.fetchSignatureHandler = { _, _ in expectedSignature }
 
-        let result = try await repository.fetchSignature(proxyInfo: ProxyInfo())
+        let result = try await repository.fetchSignature(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         #expect(expectedSignature == result)
         #expect(mockConfigurationService.fetchSignatureCallCount == 1)
@@ -73,9 +73,11 @@ struct CentralConfigurationRepositoryTests {
     func fetchConfiguration_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 1, userInfo: nil)
 
-        mockConfigurationService.fetchConfigurationHandler = { _ in throw expectedError }
+        mockConfigurationService.fetchConfigurationHandler = { _, _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchConfiguration(proxyInfo: ProxyInfo()) }
+        await #expect(throws: (any Error).self) {
+            try await repository.fetchConfiguration(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
+        }
         #expect(mockConfigurationService.fetchConfigurationCallCount == 1)
     }
 
@@ -83,9 +85,11 @@ struct CentralConfigurationRepositoryTests {
     func fetchPublicKey_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 2, userInfo: nil)
 
-        mockConfigurationService.fetchPublicKeyHandler = { _ in throw expectedError }
+        mockConfigurationService.fetchPublicKeyHandler = { _, _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchPublicKey(proxyInfo: ProxyInfo()) }
+        await #expect(throws: (any Error).self) {
+            try await repository.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
+        }
         #expect(mockConfigurationService.fetchPublicKeyCallCount == 1)
     }
 
@@ -93,9 +97,11 @@ struct CentralConfigurationRepositoryTests {
     func fetchSignature_throwsErrorWhenFetchingFails() async throws {
         let expectedError = NSError(domain: "Test", code: 3, userInfo: nil)
 
-        mockConfigurationService.fetchSignatureHandler = { _ in throw expectedError }
+        mockConfigurationService.fetchSignatureHandler = { _, _ in throw expectedError }
 
-        await #expect(throws: (any Error).self) { try await repository.fetchSignature(proxyInfo: ProxyInfo()) }
+        await #expect(throws: (any Error).self) {
+            try await repository.fetchSignature(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
+        }
         #expect(mockConfigurationService.fetchSignatureCallCount == 1)
     }
 }

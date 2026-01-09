@@ -36,10 +36,6 @@ let package = Package(
             name: "CommonsLibMocks",
             dependencies: ["CommonsLib"],
             path: "Tests/Mocks/Generated"
-        ),
-        .testTarget(
-            name: "CommonsLibTests",
-            dependencies: ["CommonsLib"],
         )
     ]
 )

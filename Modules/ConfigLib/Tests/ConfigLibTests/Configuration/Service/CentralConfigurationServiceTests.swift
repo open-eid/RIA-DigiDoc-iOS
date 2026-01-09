@@ -61,7 +61,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let service = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/config",
                 updateInterval: 3600,
@@ -71,7 +70,11 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let result = try await service.fetchConfiguration(proxyInfo: ProxyInfo())
+        let result = try await service.fetchConfiguration(
+            proxyInfo: ProxyInfo(),
+            userAgent: "CentralConfigurationServiceTests"
+        )
+
         #expect(result == "{\"configKey\": \"configValue\"}")
     }
 
@@ -95,7 +98,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let errorService = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/error/",
                 updateInterval: 3600,
@@ -106,7 +108,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Error.self) {
-            try await errorService.fetchConfiguration(proxyInfo: ProxyInfo())
+            try await errorService.fetchConfiguration(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         }
     }
 
@@ -131,7 +133,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let service = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/config",
                 updateInterval: 3600,
@@ -141,7 +142,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let fetchedPublicKey = try await service.fetchPublicKey(proxyInfo: ProxyInfo())
+        let fetchedPublicKey = try await service.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         #expect(fetchedPublicKey == String(data: mockData, encoding: .utf8))
     }
 
@@ -165,7 +166,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let errorService = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/error/",
                 updateInterval: 3600,
@@ -176,7 +176,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Error.self) {
-            try await errorService.fetchPublicKey(proxyInfo: ProxyInfo())
+            try await errorService.fetchPublicKey(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         }
     }
 
@@ -201,7 +201,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let service = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/config",
                 updateInterval: 3600,
@@ -211,7 +210,7 @@ struct CentralConfigurationServiceTests {
             session: session
         )
 
-        let fetchedSignature = try await service.fetchSignature(proxyInfo: ProxyInfo())
+        let fetchedSignature = try await service.fetchSignature(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         #expect(fetchedSignature == String(data: mockData, encoding: .utf8))
     }
 
@@ -235,7 +234,6 @@ struct CentralConfigurationServiceTests {
         }
 
         let errorService = CentralConfigurationService(
-            userAgent: "TestUserAgent",
             configurationProperty: ConfigurationProperty(
                 centralConfigurationServiceUrl: "https://someUrl.abc/error/",
                 updateInterval: 3600,
@@ -246,7 +244,7 @@ struct CentralConfigurationServiceTests {
         )
 
         await #expect(throws: Error.self) {
-            try await errorService.fetchSignature(proxyInfo: ProxyInfo())
+            try await errorService.fetchSignature(proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
         }
     }
 }

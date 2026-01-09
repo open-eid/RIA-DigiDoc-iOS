@@ -18,31 +18,9 @@
  */
 
 import Foundation
-import CommonsLib
 
-/// @mockable
-public protocol ConfigurationLoaderProtocol: Sendable {
-    func initConfiguration(
-        cacheDir: URL,
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws
-
-    func loadConfigurationProperty() async throws -> ConfigurationProperty
-
-    func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws
-
-    func loadDefaultConfiguration(cacheDir: URL?) async throws
-
-    func loadCentralConfiguration(
-        cacheDir: URL?,
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws
-
-    func shouldCheckForUpdates() async throws -> Bool
-
-    func getConfiguration() async -> ConfigurationProvider?
-
-    func getConfigurationUpdates(replayLatest: Bool) async -> AsyncThrowingStream<ConfigurationProvider?, Error>
+public enum UserAgentDiagnostics: Sendable {
+    case none
+    case devices
+    case nfc
 }

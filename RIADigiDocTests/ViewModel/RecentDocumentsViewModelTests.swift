@@ -57,14 +57,6 @@ class RecentDocumentsViewModelTests {
             return [file1, file2, invalidFile]
         }
 
-//        mockFileManager.attributesOfItemHandler = { path in
-//            if path == file1.resolvedPath || path == file2.resolvedPath {
-//                return [.modificationDate: Date()]
-//            }
-//
-//            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError, userInfo: nil)
-//        }
-
         mockFileManager.fileExistsAtPathHandler = { _, _ in true }
 
         mockFileInspector.lastOpenedHandler = { _ in Date() }

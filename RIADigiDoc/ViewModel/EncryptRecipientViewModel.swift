@@ -22,6 +22,7 @@ import FactoryKit
 import CommonsLib
 import CryptoSwift
 import CryptoObjCWrapper
+import UtilsLib
 
 @Observable
 @MainActor
