@@ -217,4 +217,3 @@ final class SignatureVerifierTests {
         #expect(!result)
     }
 }
-

@@ -38,16 +38,16 @@ struct TestECKeyGenerator {
     static func generateKeyPair(curve: TestECCurve = .p521) -> (publicKeyPEM: String, privateKey: Any)? {
         switch curve {
         case .p256:
-            let sk = P256.Signing.PrivateKey()
-            return (publicKeyPEM(from: sk.publicKey.derRepresentation), sk)
+            let key = P256.Signing.PrivateKey()
+            return (publicKeyPEM(from: key.publicKey.derRepresentation), key)
 
         case .p384:
-            let sk = P384.Signing.PrivateKey()
-            return (publicKeyPEM(from: sk.publicKey.derRepresentation), sk)
+            let key = P384.Signing.PrivateKey()
+            return (publicKeyPEM(from: key.publicKey.derRepresentation), key)
 
         case .p521:
-            let sk = P521.Signing.PrivateKey()
-            return (publicKeyPEM(from: sk.publicKey.derRepresentation), sk)
+            let key = P521.Signing.PrivateKey()
+            return (publicKeyPEM(from: key.publicKey.derRepresentation), key)
         }
     }
 
@@ -56,16 +56,16 @@ struct TestECKeyGenerator {
         let message = Data(data.utf8)
 
         do {
-            if let sk = privateKey as? P256.Signing.PrivateKey {
-                let sig = try sk.signature(for: message)
+            if let key = privateKey as? P256.Signing.PrivateKey {
+                let sig = try key.signature(for: message)
                 return sig.derRepresentation.base64EncodedString()
             }
-            if let sk = privateKey as? P384.Signing.PrivateKey {
-                let sig = try sk.signature(for: message)
+            if let key = privateKey as? P384.Signing.PrivateKey {
+                let sig = try key.signature(for: message)
                 return sig.derRepresentation.base64EncodedString()
             }
-            if let sk = privateKey as? P521.Signing.PrivateKey {
-                let sig = try sk.signature(for: message)
+            if let key = privateKey as? P521.Signing.PrivateKey {
+                let sig = try key.signature(for: message)
                 return sig.derRepresentation.base64EncodedString()
             }
             return nil

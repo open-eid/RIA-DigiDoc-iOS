@@ -28,9 +28,9 @@ struct ConfigurationSignatureVerifierTests {
     init() async throws {
         configurationSignatureVerifier = ConfigurationSignatureVerifier()
     }
-    
+
     // MARK: - Tests
-    
+
     @Test
     func generateKeysAndSign_success() async throws {
         guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {

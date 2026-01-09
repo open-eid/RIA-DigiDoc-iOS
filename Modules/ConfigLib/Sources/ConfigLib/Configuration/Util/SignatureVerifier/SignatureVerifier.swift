@@ -56,7 +56,9 @@ struct SignatureVerifier {
             ("-----BEGINECPUBLICKEY-----", "-----ENDECPUBLICKEY-----")
         ]
 
-        guard let (begin, end) = possibleHeaders.first(where: { cleaned.contains($0.0) && cleaned.contains($0.1) }) else {
+        guard let (begin, end) = possibleHeaders.first(
+            where: { cleaned.contains($0.0) && cleaned.contains($0.1) }
+        ) else {
             throw SignatureVerifierError.invalidPEM
         }
 
@@ -103,4 +105,3 @@ struct SignatureVerifier {
         }
     }
 }
-
