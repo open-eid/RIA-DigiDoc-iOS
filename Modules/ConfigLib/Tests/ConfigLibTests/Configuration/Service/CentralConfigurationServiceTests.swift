@@ -112,7 +112,7 @@ struct CentralConfigurationServiceTests {
 
     @Test
     func fetchPublicKey_success() async throws {
-        let mockUrl = URL(string: "https://someUrl.abc/config/config.pub")
+        let mockUrl = URL(string: "https://someUrl.abc/config/config.ecpub")
 
         guard let url = mockUrl else {
             throw URLError(.badURL)
@@ -147,7 +147,7 @@ struct CentralConfigurationServiceTests {
 
     @Test
     func fetchPublicKey_throwResponseValidationError() async throws {
-        let mockUrl = URL(string: "https://someUrl.abc/error/config.pub")
+        let mockUrl = URL(string: "https://someUrl.abc/error/config.ecpub")
 
         guard let url = mockUrl else {
             throw URLError(.badURL)
@@ -182,7 +182,7 @@ struct CentralConfigurationServiceTests {
 
     @Test
     func fetchSignature_success() async throws {
-        let mockUrl = URL(string: "https://someUrl.abc/config/config.rsa")
+        let mockUrl = URL(string: "https://someUrl.abc/config/config.ecc")
 
         guard let url = mockUrl else {
             throw URLError(.badURL)
@@ -217,7 +217,7 @@ struct CentralConfigurationServiceTests {
 
     @Test
     func fetchSignature_throwResponseValidationError() async throws {
-        let mockUrl = URL(string: "https://someUrl.abc/error/config.rsa")
+        let mockUrl = URL(string: "https://someUrl.abc/error/config.ecc")
 
         guard let url = mockUrl else {
             throw URLError(.badURL)

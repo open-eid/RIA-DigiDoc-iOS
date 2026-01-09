@@ -19,64 +19,89 @@
 
 import Foundation
 import Security
-import CommonCrypto
+import CryptoKit
+
+enum SignatureVerifierError: Error {
+    case invalidPEM
+    case invalidBase64
+    case unsupportedKeySize(Int)
+}
 
 struct SignatureVerifier {
 
     static func verify(signature: String, publicKeyPEM: String, signedContent: String) -> Bool {
-        guard let publicKey = parsePublicKey(fromPEM: publicKeyPEM) else {
+        do {
+            let pubKeyDER = try parsePublicKeyDER(fromPEM: publicKeyPEM)
+            let sigDER = try decodeBase64(signature)
+
+            let messageData = Data(signedContent.utf8)
+
+            return try verifyECDSASignature(
+                signatureDER: sigDER,
+                publicKeyDER: pubKeyDER,
+                message: messageData
+            )
+        } catch {
             return false
         }
-        return verifySignature(signature: signature, publicKey: publicKey, signedContent: signedContent)
     }
 
-    private static func parsePublicKey(fromPEM pem: String) -> SecKey? {
-        let der = removeAllWhitespace(data: pem
-            .replacing("-----BEGIN RSA PUBLIC KEY-----", with: "")
-            .replacing("-----END RSA PUBLIC KEY-----", with: "")
-            .replacing("\n", with: ""))
-        guard let pKey = Data(base64Encoded: der) else {
-            return nil
-        }
+    // MARK: - PEM / Base64 helpers
 
-        let sizeInBits = pKey.count * 8
-        let options: [CFString: Any] = [
-            kSecAttrKeyType: kSecAttrKeyTypeRSA,
-            kSecAttrKeyClass: kSecAttrKeyClassPublic,
-            kSecAttrKeySizeInBits: NSNumber(value: sizeInBits),
-            kSecReturnPersistentRef: true
+    private static func parsePublicKeyDER(fromPEM pem: String) throws -> Data {
+        let cleaned = removeAllWhitespace(data: pem)
+
+        let possibleHeaders = [
+            ("-----BEGINPUBLICKEY-----", "-----ENDPUBLICKEY-----"),
+            ("-----BEGINECPUBLICKEY-----", "-----ENDECPUBLICKEY-----")
         ]
 
-        var error: Unmanaged<CFError>?
-        guard let publicKey = SecKeyCreateWithData(pKey as CFData, options as CFDictionary, &error) else {
-            return nil
+        guard let (begin, end) = possibleHeaders.first(
+            where: { cleaned.contains($0.0) && cleaned.contains($0.1) }
+        ) else {
+            throw SignatureVerifierError.invalidPEM
         }
 
-        return publicKey
+        let base64Payload = cleaned
+            .replacing(begin, with: "")
+            .replacing(end, with: "")
+
+        return try decodeBase64(base64Payload)
     }
 
-    private static func verifySignature(signature: String, publicKey: SecKey, signedContent: String) -> Bool {
-        guard let messageData = signedContent.data(using: .utf8) else {
-            return false
+    private static func decodeBase64(_ value: String) throws -> Data {
+        let cleaned = removeAllWhitespace(data: value)
+        guard let data = Data(base64Encoded: cleaned) else {
+            throw SignatureVerifierError.invalidBase64
         }
-
-        guard let signatureData = Data(base64Encoded: removeAllWhitespace(data: signature)) else {
-            return false
-        }
-
-        let algorithm: SecKeyAlgorithm = .rsaSignatureMessagePKCS1v15SHA512
-
-        guard SecKeyIsAlgorithmSupported(publicKey, .verify, algorithm) else {
-            return false
-        }
-
-        var error: Unmanaged<CFError>?
-        let result = SecKeyVerifySignature(publicKey, algorithm, messageData as CFData, signatureData as CFData, &error)
-
-        return result
+        return data
     }
 
     private static func removeAllWhitespace(data: String) -> String {
-        return data.filter { !" \n\t\r".contains($0) }
+        data.filter { !" \n\t\r".contains($0) }
+    }
+
+    // MARK: - ECDSA verify (curve chosen by DER length heuristic)
+
+    private static func verifyECDSASignature(signatureDER: Data, publicKeyDER: Data, message: Data) throws -> Bool {
+        switch publicKeyDER.count {
+        case 80...100:
+            let key = try P256.Signing.PublicKey(derRepresentation: publicKeyDER)
+            let sig = try P256.Signing.ECDSASignature(derRepresentation: signatureDER)
+            return key.isValidSignature(sig, for: message)
+
+        case 110...130:
+            let key = try P384.Signing.PublicKey(derRepresentation: publicKeyDER)
+            let sig = try P384.Signing.ECDSASignature(derRepresentation: signatureDER)
+            return key.isValidSignature(sig, for: message)
+
+        case 150...170:
+            let key = try P521.Signing.PublicKey(derRepresentation: publicKeyDER)
+            let sig = try P521.Signing.ECDSASignature(derRepresentation: signatureDER)
+            return key.isValidSignature(sig, for: message)
+
+        default:
+            throw SignatureVerifierError.unsupportedKeySize(publicKeyDER.count)
+        }
     }
 }

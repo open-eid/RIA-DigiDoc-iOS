@@ -19,6 +19,7 @@
 
 import Foundation
 import Testing
+import CryptoKit
 @testable import ConfigLib
 
 struct ConfigurationSignatureVerifierTests {
@@ -28,16 +29,18 @@ struct ConfigurationSignatureVerifierTests {
         configurationSignatureVerifier = ConfigurationSignatureVerifier()
     }
 
+    // MARK: - Tests
+
     @Test
     func generateKeysAndSign_success() async throws {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "This is the content that was signed."
-        guard let signature = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
-            Issue.record("Failed to sign content")
+        guard let signature = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey) else {
+            Issue.record("Failed to sign content with EC key")
             return
         }
 
@@ -52,13 +55,14 @@ struct ConfigurationSignatureVerifierTests {
 
     @Test
     func verify_throwSignatureValidationFailedErroWithInvalidSignature() {
-        guard let (publicKeyPEM, privateKey) = TestRSAKeyGenerator.generateKeyPair() else {
-            Issue.record("Failed to generate key pair")
+        guard let (publicKeyPEM, privateKey) = TestECKeyGenerator.generateKeyPair(curve: .p521) else {
+            Issue.record("Failed to generate EC key pair")
             return
         }
 
         let signedContent = "Valid content to sign."
-        _ = TestRSAKeyGenerator.sign(data: signedContent, privateKey: privateKey)
+        _ = TestECKeyGenerator.sign(data: signedContent, privateKey: privateKey)
+
         let invalidSignature = "InvalidBase64Signature=="
 
         #expect(throws: ConfigurationSignatureVerificationError.signatureValidationFailed) {

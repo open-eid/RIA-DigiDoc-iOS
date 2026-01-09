@@ -109,13 +109,13 @@ public struct Constants {
 
     public struct Configuration {
         public static let CachedConfigJson = "active-config.json"
-        public static let CachedConfigPub = "active-config.pub"
-        public static let CachedConfigRsa = "active-config.rsa"
+        public static let CachedConfigEcPub = "active-config.ecpub"
+        public static let CachedConfigEcc = "active-config.ecc"
         public static let CacheConfigFolder = "config"
 
         public static let DefaultConfigJson = "\(CacheConfigFolder)/default-config.json"
-        public static let DefaultConfigPub = "\(CacheConfigFolder)/default-config.pub"
-        public static let DefaultConfigRsa = "\(CacheConfigFolder)/default-config.rsa"
+        public static let DefaultConfigEcPub = "\(CacheConfigFolder)/default-config.ecpub"
+        public static let DefaultConfigEcc = "\(CacheConfigFolder)/default-config.ecc"
         public static let DefaultConfigurationPropertiesFileName =
             "\(CacheConfigFolder)/configuration"
 

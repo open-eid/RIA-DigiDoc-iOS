@@ -56,7 +56,7 @@ actor ConfigurationCache: ConfigurationCacheProtocol {
         }
 
         try await cacheFile(
-            fileName: CommonsLib.Constants.Configuration.CachedConfigPub,
+            fileName: CommonsLib.Constants.Configuration.CachedConfigEcPub,
             data: publicKeyBytes,
             configDir: configDir
         )
@@ -66,7 +66,7 @@ actor ConfigurationCache: ConfigurationCacheProtocol {
         }
 
         try await cacheFile(
-            fileName: CommonsLib.Constants.Configuration.CachedConfigRsa,
+            fileName: CommonsLib.Constants.Configuration.CachedConfigEcc,
             data: signatureBytes,
             configDir: configDir
         )

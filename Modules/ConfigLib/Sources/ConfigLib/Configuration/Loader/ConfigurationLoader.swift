@@ -117,10 +117,10 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
             path: CommonsLib.Constants.Configuration.CachedConfigJson
         )
         let publicKeyFile = configDir.appending(
-            path: CommonsLib.Constants.Configuration.CachedConfigPub
+            path: CommonsLib.Constants.Configuration.CachedConfigEcPub
         )
         let signatureFile = configDir.appending(
-            path: CommonsLib.Constants.Configuration.CachedConfigRsa
+            path: CommonsLib.Constants.Configuration.CachedConfigEcc
         )
 
         let configFilesExist =
@@ -205,7 +205,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         guard
             let publicKeyURL = bundle.url(
-                forResource: CommonsLib.Constants.Configuration.DefaultConfigPub,
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigEcPub,
                 withExtension: nil
             ),
             let publicKey = try? String(contentsOf: publicKeyURL)
@@ -215,7 +215,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
 
         guard
             let signatureURL = bundle.url(
-                forResource: CommonsLib.Constants.Configuration.DefaultConfigRsa,
+                forResource: CommonsLib.Constants.Configuration.DefaultConfigEcc,
                 withExtension: nil
             ),
             let signatureBytes = try? Data(contentsOf: signatureURL)
@@ -271,7 +271,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
         let cachedSignature = try await configurationCache.getCachedFile(
-            fileName: CommonsLib.Constants.Configuration.CachedConfigRsa,
+            fileName: CommonsLib.Constants.Configuration.CachedConfigEcc,
             configDir: configDir
         )
 
