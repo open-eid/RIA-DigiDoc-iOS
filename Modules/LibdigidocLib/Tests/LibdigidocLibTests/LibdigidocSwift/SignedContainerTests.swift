@@ -166,7 +166,7 @@ final class SignedContainerTests {
     func renameContainer_success() async throws {
         let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let newFileName = "renamed.asice"
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(
             subfolder: "SignedContainerTests"
         )
         let uniqueFileURL = tempDirectoryURL.appending(path: "renamed_unique.asice")
@@ -249,7 +249,7 @@ final class SignedContainerTests {
     func renameContainer_returnURLWithDefaultNameWhenEmptyNewFileName() async throws {
         let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let emptyNewName = ""
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(
             subfolder: "SignedContainerTests"
         )
         let defaultFileName = CommonsLib.Constants.Container.DefaultName

@@ -75,8 +75,8 @@ struct URLExtensionsTests {
     }
 
     @Test
-    func isPDF_success() async {
-        let tempFileURL = TestFileUtil.getTemporaryDirectory(
+    func isPDF_success() async throws {
+        let tempFileURL = try TestFileUtil.getTemporaryDirectory(
             subfolder: "URLExtensionsTests"
         ).appending(path: "testFile.pdf")
 
@@ -161,7 +161,7 @@ struct URLExtensionsTests {
     @Test
     func md5Hash_success() {
         do {
-            let tempFileURL = TestFileUtil.createSampleFile()
+            let tempFileURL = try TestFileUtil.createSampleFile()
 
             let expectedMD5Hash = Insecure.MD5.hash(data: try Data(contentsOf: tempFileURL))
                 .hexString(separator: "")
@@ -178,8 +178,8 @@ struct URLExtensionsTests {
     }
 
     @Test
-    func md5Hash_returnEmptyStringIfFileDoesNotExist() {
-        let nonexistentFileURL = TestFileUtil.getTemporaryDirectory(
+    func md5Hash_returnEmptyStringIfFileDoesNotExist() throws {
+        let nonexistentFileURL = try TestFileUtil.getTemporaryDirectory(
             subfolder: "URLExtensionsTests"
         ).appending(path: "nonexistentFile.txt")
 

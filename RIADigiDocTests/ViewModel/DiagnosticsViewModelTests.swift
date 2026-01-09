@@ -270,7 +270,7 @@ final class DiagnosticsViewModelTests {
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
         try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
 
         mockFileManager.urlHandler = { _, _, _, _ in tempDirectoryURL }

@@ -183,7 +183,7 @@ final class ValidationSettingsViewModelTests {
 
     @Test
     func importSiVaCert_success() async throws {
-        let certURL = TestCertificateUtil.createSampleCertFile()
+        let certURL = try TestCertificateUtil.createSampleCertFile()
         defer {
             try? FileManager.default.removeItem(at: certURL)
         }

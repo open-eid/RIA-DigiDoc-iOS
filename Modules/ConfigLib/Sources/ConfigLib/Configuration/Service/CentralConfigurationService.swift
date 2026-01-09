@@ -60,32 +60,6 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
         }
     }
 
-    public func fetchPublicKey(
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws -> String {
-        let session = self.session ?? constructHttpClient(
-            defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
-            proxyInfo: proxyInfo,
-            userAgent: userAgent
-        )
-
-        let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.ecpub"
-
-        do {
-            let response: String = try await session.request(url)
-                .validate()
-                .serializingString()
-                .value
-
-            return response
-        } catch {
-            CentralConfigurationService.logger()
-                .error("Unable to fetch central configuration public key: \(error)")
-            throw URLError(.resourceUnavailable)
-        }
-    }
-
     public func fetchSignature(
         proxyInfo: ProxyInfo,
         userAgent: String

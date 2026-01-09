@@ -37,7 +37,7 @@ struct MimeTypeResolverTests {
 
     @Test
     func mimeType_successUsingCacheToSetAndGet() async throws {
-        let fileUrl = TestFileUtil.createSampleFile(name: "image", withExtension: "png")
+        let fileUrl = try TestFileUtil.createSampleFile(name: "image", withExtension: "png")
         let expectedMimeType = "image/png"
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in

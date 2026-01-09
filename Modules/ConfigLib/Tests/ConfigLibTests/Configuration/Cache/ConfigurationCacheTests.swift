@@ -52,12 +52,10 @@ struct ConfigurationCacheTests {
             "ConfigurationCacheTests-\(UUID().uuidString)"
         )
         let confFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let pubFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
         let sigFile = configDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try await configurationCache.cacheConfigurationFiles(
             confData: validConfData,
-            publicKey: validPublicKey,
             signature: validSignature,
             configDir: configDir
         )
@@ -67,18 +65,12 @@ struct ConfigurationCacheTests {
             configDir: configDir
         )
 
-        let cachedPublicKey = try await configurationCache.getCachedFile(
-            fileName: CommonsLib.Constants.Configuration.CachedConfigEcPub,
-            configDir: configDir
-        )
-
         let cachedSignature = try await configurationCache.getCachedFile(
             fileName: CommonsLib.Constants.Configuration.CachedConfigEcc,
             configDir: configDir
         )
 
         #expect(cachedConfiguration == confFile)
-        #expect(cachedPublicKey == pubFile)
         #expect(cachedSignature == sigFile)
     }
 
@@ -96,7 +88,6 @@ struct ConfigurationCacheTests {
         ) {
             try await configurationCache.cacheConfigurationFiles(
                 confData: validConfData,
-                publicKey: validPublicKey,
                 signature: validSignature,
                 configDir: nonExistentDirectory
             )

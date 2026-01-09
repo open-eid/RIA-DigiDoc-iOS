@@ -40,8 +40,8 @@ struct ContainerWrapperTests {
     private var mockFileURL = URL(fileURLWithPath: "/tmp/path/test.txt")
 
     private let dataFileURLs = [
-        TestFileUtil.createSampleFile(),
-        TestFileUtil.createSampleFile()
+        try? TestFileUtil.createSampleFile(),
+        try? TestFileUtil.createSampleFile()
     ]
     private let mockSignature: SignatureWrapper
 
@@ -91,7 +91,7 @@ struct ContainerWrapperTests {
 
     @Test
     func getDataFiles_success() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -120,7 +120,7 @@ struct ContainerWrapperTests {
 
     @Test
     func getMimetype_success() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -148,7 +148,7 @@ struct ContainerWrapperTests {
 
     @Test
     func addDataFiles_success() async throws {
-        let testFile = TestFileUtil.createSampleFile()
+        let testFile = try TestFileUtil.createSampleFile()
         let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: [testFile], isSivaConfirmed: true)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
@@ -164,7 +164,8 @@ struct ContainerWrapperTests {
             try? FileManager.default.removeItem(at: containerFile)
         }
 
-        try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)
+        let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }
+        try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFilesUrls)
 
         let dataFiles = await containerWrapper.getDataFiles()
 
@@ -173,7 +174,7 @@ struct ContainerWrapperTests {
 
     @Test
     func addDataFiles_throwErrorWithDuplicateFiles() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -190,7 +191,8 @@ struct ContainerWrapperTests {
         let expectedErrorMessage = "Multiple documents already exist"
 
         do {
-            try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFileURLs)
+            let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }
+            try await containerWrapper.addDataFiles(containerFile: containerFile, dataFiles: dataFilesUrls)
         } catch let error as DigiDocError {
             switch error {
             case .addingFilesToContainerFailed(let errorDetail):
@@ -208,8 +210,9 @@ struct ContainerWrapperTests {
 
     @Test
     func open_success() async throws {
+        let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }
         let signedContainer = try await SignedContainer.openOrCreate(
-            dataFiles: [dataFileURLs.first ?? URL(fileURLWithPath: "")], isSivaConfirmed: true
+            dataFiles: [dataFilesUrls.first ?? URL(fileURLWithPath: "")], isSivaConfirmed: true
         )
 
         let container = try await containerWrapper.open(containerFile: signedContainer.getRawContainerFile() ??
@@ -239,7 +242,7 @@ struct ContainerWrapperTests {
 
     @Test
     func addDataFiles_throwAddingFilesToContainerFailedError() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -274,7 +277,7 @@ struct ContainerWrapperTests {
 
     @Test
     func saveDataFile_success() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -303,7 +306,7 @@ struct ContainerWrapperTests {
 
     @Test
     func saveDataFile_throwErrorWhenInvalidDataFile() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -338,7 +341,7 @@ struct ContainerWrapperTests {
             return
         }
 
-        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
             subfolder: "ContainerWrapperTests"
         )
 
@@ -368,7 +371,7 @@ struct ContainerWrapperTests {
 
     @Test
     func removeSignature_throwErrorWhenSignatureDoesNotExist() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -397,7 +400,7 @@ struct ContainerWrapperTests {
             return
         }
 
-        let tempDirectory = TestFileUtil.getTemporaryDirectory(
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
             subfolder: "ContainerWrapperTests"
         )
 
@@ -427,7 +430,7 @@ struct ContainerWrapperTests {
 
     @Test
     func removeDataFile_throwErrorWhenDataFileDoesNotExist() async throws {
-        let sampleContainer = try await SignedContainer.openOrCreate(dataFiles: dataFileURLs, isSivaConfirmed: true)
+        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
 
         guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
 
@@ -446,5 +449,11 @@ struct ContainerWrapperTests {
             Issue.record("Unexpected error: \(error)")
             return
         }
+    }
+
+    @discardableResult
+    private func createSampleContainer(dataFileURLs: [URL?]) async throws -> SignedContainerProtocol {
+        let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }
+        return try await SignedContainer.openOrCreate(dataFiles: dataFilesUrls, isSivaConfirmed: true)
     }
 }

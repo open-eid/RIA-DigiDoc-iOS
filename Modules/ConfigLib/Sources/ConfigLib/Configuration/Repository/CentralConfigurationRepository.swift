@@ -38,16 +38,6 @@ public struct CentralConfigurationRepository: CentralConfigurationRepositoryProt
         )
     }
 
-    public func fetchPublicKey(
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws -> String {
-        return try await centralConfigurationService.fetchPublicKey(
-            proxyInfo: proxyInfo,
-            userAgent: userAgent
-        )
-    }
-
     public func fetchSignature(
         proxyInfo: ProxyInfo,
         userAgent: String

@@ -44,7 +44,7 @@ public class TestCertificateUtil {
 
     public static func createSampleCertFile(
         subfolder: String = "TestFileUtil"
-    ) -> URL {
+    ) throws -> URL {
         let testCertContent = """
             -----BEGIN CERTIFICATE-----
             MIIGGzCCBQOgAwIBAgIQDmRuJmtGcd4j6HiqQzw0hzANBgkqhkiG9w0BAQsFADBZ
@@ -56,7 +56,7 @@ public class TestCertificateUtil {
             yaKSeng9fe8ZVZdjOwmCa9ZdgjQYMZbDezMt+oRp2Q==
             -----END CERTIFICATE-----
             """
-        let sampleFileURL = TestFileUtil.createSampleFile(
+        let sampleFileURL = try TestFileUtil.createSampleFile(
             name: "cert-\(UUID().uuidString)",
             withExtension: "cer",
             contents: testCertContent,
