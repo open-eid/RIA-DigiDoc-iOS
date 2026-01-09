@@ -40,6 +40,7 @@ let package = Package(
                 "CommonsLib",
                 "ConfigLib",
                 "IdCardLib",
+                "UtilsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
             path: "Sources/CryptoObjCWrapper",

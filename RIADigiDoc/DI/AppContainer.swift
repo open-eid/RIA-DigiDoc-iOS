@@ -37,7 +37,8 @@ extension Container {
                 advancedSettingsRepository: self.advancedSettingsRepository(),
                 keychainStore: self.keychainStore(),
                 proxyUtil: self.proxyUtil(),
-                cryptoSetup: self.cryptoSetup()
+                cryptoSetup: self.cryptoSetup(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
         .shared
@@ -250,7 +251,8 @@ extension Container {
                 configurationRepository: self.configurationRepository(),
                 tslUtil: self.tslUtil(),
                 dataStore: self.dataStore(),
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
     }
@@ -317,7 +319,9 @@ extension Container {
     var proxySettingsViewModel: Factory<ProxySettingsViewModel> {
         self { @MainActor in
             ProxySettingsViewModel(
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                userAgentUtil: self.userAgentUtil(),
+                dataStore: self.dataStore()
             )
         }
     }
@@ -392,7 +396,8 @@ extension Container {
                 mobileIdSignService: self.mobileIdSignService(),
                 certificateUtil: self.certificateUtil(),
                 dataStore: self.dataStore(),
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
     }
@@ -406,7 +411,8 @@ extension Container {
                 certificateUtil: self.certificateUtil(),
                 notificationUtil: self.notificationUtil(),
                 dataStore: self.dataStore(),
-                proxyUtil: self.proxyUtil()
+                proxyUtil: self.proxyUtil(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
     }

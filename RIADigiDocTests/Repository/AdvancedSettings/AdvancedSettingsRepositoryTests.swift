@@ -22,6 +22,7 @@ import CommonsLibMocks
 import CommonsTestShared
 import Foundation
 import Testing
+import UtilsLib
 
 struct AdvancedSettingsRepositoryTests {
     private let mockFileManager: FileManagerProtocolMock

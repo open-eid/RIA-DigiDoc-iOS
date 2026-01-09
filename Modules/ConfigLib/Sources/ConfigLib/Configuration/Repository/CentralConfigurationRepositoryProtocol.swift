@@ -22,7 +22,18 @@ import Foundation
 
 /// @mockable
 public protocol CentralConfigurationRepositoryProtocol: Sendable {
-    func fetchConfiguration(proxyInfo: ProxyInfo) async throws -> String
-    func fetchPublicKey(proxyInfo: ProxyInfo) async throws -> String
-    func fetchSignature(proxyInfo: ProxyInfo) async throws -> String
+    func fetchConfiguration(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String
+
+    func fetchPublicKey(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String
+
+    func fetchSignature(
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> String
 }

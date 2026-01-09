@@ -40,11 +40,13 @@ public struct DigiDocConf: DigiDocConfProtocol, Loggable {
         sivaOption: ServicesSettingsOption? = nil,
         sivaUrl: URL? = nil,
         sivaCert: Data? = nil,
-        proxyInfo: ProxyInfo? = nil
+        proxyInfo: ProxyInfo? = nil,
+        userAgent: String
     ) async throws {
         try await sharedInitializer.initializeDigiDoc(
             configuration: configuration,
-            isLoggingEnabled: isLoggingEnabled
+            isLoggingEnabled: isLoggingEnabled,
+            userAgent: userAgent
         )
 
         if let tsaOption {
@@ -187,7 +189,11 @@ public actor DigiDocInitializer: Loggable {
         self.fileManager = fileManager
     }
 
-    func initializeDigiDoc(configuration: ConfigurationProvider? = nil, isLoggingEnabled: Bool) async throws {
+    func initializeDigiDoc(
+        configuration: ConfigurationProvider? = nil,
+        isLoggingEnabled: Bool,
+        userAgent: String
+    ) async throws {
 
         guard !isInitialized else {
             throw DigiDocError.alreadyInitialized
@@ -202,11 +208,15 @@ public actor DigiDocInitializer: Loggable {
                     logFile: overrideLogFile(),
                     tslCache: overrideTSLCache(),
                     configurationProvider: customConf
-                )
+                ),
+                userAgent: userAgent
             )
         } else {
             digidocConf.logLevel = overrideLogLevel(logLevel: logLevel)
-            try await initDigiDoc(conf: digidocConf)
+            try await initDigiDoc(
+                conf: digidocConf,
+                userAgent: userAgent
+            )
         }
         isInitialized = true
     }
@@ -298,10 +308,11 @@ public actor DigiDocInitializer: Loggable {
 
     private func initDigiDoc(
         conf digiDocConf: DigiDocConfig,
-        digidocConfWrapper: DigiDocConfWrapper = DigiDocConfWrapper()
+        digidocConfWrapper: DigiDocConfWrapper = DigiDocConfWrapper(),
+        userAgent: String
     ) async throws {
         do {
-            let isInitialized = try await digidocConfWrapper.initWithConf(digiDocConf)
+            let isInitialized = try await digidocConfWrapper.initWithConf(digiDocConf, userAgent: userAgent)
 
             guard isInitialized, DigiDocConfWrapper.sharedInstance() != nil else {
                 throw DigiDocError.initializationFailed(

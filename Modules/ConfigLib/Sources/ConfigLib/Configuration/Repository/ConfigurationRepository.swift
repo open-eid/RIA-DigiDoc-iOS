@@ -47,24 +47,38 @@ public actor ConfigurationRepository: ConfigurationRepositoryProtocol {
 
     public func getCentralConfiguration(
         cacheDir: URL?,
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> ConfigurationProvider? {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir, proxyInfo: proxyInfo)
+        try await configurationLoader
+            .loadCentralConfiguration(
+                cacheDir: configDir,
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
+            )
+
         return await getConfiguration()
     }
 
     public func getCentralConfigurationUpdates(
         cacheDir: URL?,
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> AsyncThrowingStream<
         ConfigurationProvider?,
         Error
     >? {
         let configDir = try cacheDir ?? Directories.getConfigDirectory(fileManager: fileManager)
 
-        try await configurationLoader.loadCentralConfiguration(cacheDir: configDir, proxyInfo: proxyInfo)
+        try await configurationLoader
+            .loadCentralConfiguration(
+                cacheDir: configDir,
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
+            )
+
         return await getConfigurationUpdates()
     }
 

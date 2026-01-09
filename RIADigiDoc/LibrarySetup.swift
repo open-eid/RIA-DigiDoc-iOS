@@ -36,6 +36,7 @@ actor LibrarySetup: Loggable {
     private let keychainStore: KeychainStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
     private let cryptoSetup: CryptoSetupProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
 
     init(
         configurationLoader: ConfigurationLoaderProtocol,
@@ -46,7 +47,8 @@ actor LibrarySetup: Loggable {
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
         keychainStore: KeychainStoreProtocol,
         proxyUtil: ProxyUtilProtocol,
-        cryptoSetup: CryptoSetupProtocol
+        cryptoSetup: CryptoSetupProtocol,
+        userAgentUtil: UserAgentUtilProtocol
     ) {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
@@ -57,6 +59,7 @@ actor LibrarySetup: Loggable {
         self.keychainStore = keychainStore
         self.proxyUtil = proxyUtil
         self.cryptoSetup = cryptoSetup
+        self.userAgentUtil = userAgentUtil
     }
 
     func setupLibraries() async {
@@ -65,6 +68,8 @@ actor LibrarySetup: Loggable {
 
         do {
             let proxyInfo = await proxyUtil.getProxyInfo()
+            let appLanguage = await dataStore.getSelectedLanguage()
+            let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
 
             try DigiDocConf.observeConfigurationUpdates(
                 configurationRepository: configurationRepository
@@ -85,7 +90,8 @@ actor LibrarySetup: Loggable {
             do {
                 try await configurationLoader.initConfiguration(
                     cacheDir: configDirectory,
-                    proxyInfo: proxyInfo
+                    proxyInfo: proxyInfo,
+                    userAgent: userAgent
                 )
             } catch {
                 LibrarySetup.logger().error("Unable to initialize configuration: \(error)")
@@ -100,7 +106,8 @@ actor LibrarySetup: Loggable {
                 sivaOption: getSiVaOption(),
                 sivaUrl: getSiVaUrl(),
                 sivaCert: getSiVaCert(),
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
             LibrarySetup.logger().info("Libdigidocpp initialized successfully")
 

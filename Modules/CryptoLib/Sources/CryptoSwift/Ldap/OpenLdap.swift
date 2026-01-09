@@ -23,6 +23,7 @@ import CommonsLib
 import LDAP
 import ASN1Decoder
 import Foundation
+import UtilsLib
 
 final public class OpenLdap: OpenLdapProtocol, Loggable {
     private let ldapConfiguration: LdapConfigurationProtocol

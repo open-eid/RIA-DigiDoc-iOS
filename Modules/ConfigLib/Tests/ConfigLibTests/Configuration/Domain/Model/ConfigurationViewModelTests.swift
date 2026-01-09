@@ -44,11 +44,11 @@ struct ConfigurationViewModelTests {
     @Test
     func fetchConfiguration_successUpdatingConfigurationWhenNoLastUpdateTime() async throws {
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return mockAsyncStream(configProvider: mockConfigProvider)
         }
 
-        await viewModel.fetchConfiguration(lastUpdate: 0, proxyInfo: ProxyInfo())
+        await viewModel.fetchConfiguration(lastUpdate: 0, proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         let configuration = await viewModel.configuration
 
@@ -59,11 +59,11 @@ struct ConfigurationViewModelTests {
     func fetchConfiguration_successUpdatingConfigurationWhenBeforeLastUpdateTime() async throws {
         let configProvider = try TestConfigurationProvider.mockConfigurationProvider(configurationUpdateDate: nil)
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return mockAsyncStream(configProvider: configProvider)
         }
 
-        await viewModel.fetchConfiguration(lastUpdate: -1, proxyInfo: ProxyInfo())
+        await viewModel.fetchConfiguration(lastUpdate: -1, proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         let configuration = await viewModel.configuration
 
@@ -77,13 +77,13 @@ struct ConfigurationViewModelTests {
             return nil
         }
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return nil
         }
 
         let currentConf = await viewModel.getConfiguration()
 
-        await viewModel.fetchConfiguration(lastUpdate: 0, proxyInfo: ProxyInfo())
+        await viewModel.fetchConfiguration(lastUpdate: 0, proxyInfo: ProxyInfo(), userAgent: "TestUserAgent")
 
         let unchangedConf = await viewModel.getConfiguration()
 
@@ -95,11 +95,16 @@ struct ConfigurationViewModelTests {
     @Test
     func fetchConfiguration_doesNotUpdateConfigurationWhenLastUpdateIsNewer() async throws {
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return mockAsyncStream(configProvider: mockConfigProvider)
         }
 
-        await viewModel.fetchConfiguration(lastUpdate: Date().timeIntervalSince1970, proxyInfo: ProxyInfo())
+        await viewModel
+            .fetchConfiguration(
+                lastUpdate: Date().timeIntervalSince1970,
+                proxyInfo: ProxyInfo(),
+                userAgent: "TestUserAgent"
+            )
 
         await #expect(viewModel.configuration == nil)
     }
@@ -107,7 +112,7 @@ struct ConfigurationViewModelTests {
     @Test
     func getConfiguration_noUpdatesReturnedWhenConfigurationUpdateNil() async throws {
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return nil
         }
 
@@ -135,7 +140,7 @@ struct ConfigurationViewModelTests {
             continuation.finish(throwing: ConfigurationLoaderError.configurationNotFound)
         }
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return asyncStream
         }
 
@@ -152,7 +157,7 @@ struct ConfigurationViewModelTests {
             continuation.finish()
         }
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return asyncStream
         }
 
@@ -167,7 +172,7 @@ struct ConfigurationViewModelTests {
             continuation.finish()
         }
 
-        mockRepository.getCentralConfigurationUpdatesHandler = { _, _ in
+        mockRepository.getCentralConfigurationUpdatesHandler = { _, _, _ in
             return asyncStream
         }
 

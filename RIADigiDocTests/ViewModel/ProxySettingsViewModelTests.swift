@@ -22,19 +22,28 @@ import CommonsLib
 import CommonsTestShared
 import Foundation
 import Testing
+import UtilsLibMocks
 
 @MainActor
 final class ProxySettingsViewModelTests {
-    private let viewModel: ProxySettingsViewModel!
+    private let mockProxyUtil: ProxyUtilProtocolMock
+    private let mockUserAgentUtil: UserAgentUtilProtocolMock
+    private let mockDataStore: DataStoreProtocolMock
 
-    private let mockProxyUtil: ProxyUtilProtocolMock!
+    private let viewModel: ProxySettingsViewModel
 
     init() {
         mockProxyUtil = ProxyUtilProtocolMock()
+        mockUserAgentUtil = UserAgentUtilProtocolMock()
+        mockDataStore = DataStoreProtocolMock()
 
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
-        viewModel = ProxySettingsViewModel(proxyUtil: mockProxyUtil)
+        viewModel = ProxySettingsViewModel(
+            proxyUtil: mockProxyUtil,
+            userAgentUtil: mockUserAgentUtil,
+            dataStore: mockDataStore
+        )
     }
 
     @Test

@@ -22,6 +22,7 @@ import UIKit
 import SwiftUI
 import UniformTypeIdentifiers
 import FactoryKit
+import UtilsLib
 
 class ShareViewController: UIViewController, Sendable, Loggable {
     let viewModel = Container.shared.shareViewModel()

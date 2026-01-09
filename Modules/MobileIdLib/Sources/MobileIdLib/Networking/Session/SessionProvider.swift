@@ -20,6 +20,7 @@
 import Foundation
 import Alamofire
 import CommonsLib
+import UtilsLib
 
 actor SessionProvider: SessionProviderProtocol, Loggable {
     private var session: Session?
@@ -28,7 +29,8 @@ actor SessionProvider: SessionProviderProtocol, Loggable {
     func ensureSession(
         url: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> Session {
         if currentProxy == proxyInfo {
             if let existing = session { return existing }
@@ -46,7 +48,8 @@ actor SessionProvider: SessionProviderProtocol, Loggable {
         let newSession = SessionProvider.createAlamofireSession(
             host: host,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
         session = newSession
         return newSession
@@ -55,7 +58,8 @@ actor SessionProvider: SessionProviderProtocol, Loggable {
     private static func createAlamofireSession(
         host: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) -> Session {
         let evaluators = [host: PinnedCertificatesTrustEvaluator(certificates: trustedCertificates)]
         let config = URLSessionConfiguration.default
@@ -63,6 +67,13 @@ actor SessionProvider: SessionProviderProtocol, Loggable {
         config.timeoutIntervalForResource = TimeInterval(Constants.Signing.Timeout)
         config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         config.urlCache = nil
+
+        var headers = config.httpAdditionalHeaders ?? [:]
+        headers["User-Agent"] = userAgent
+        headers["Content-Type"] = "application/json; charset=utf-8"
+        headers["Cache-Control"] = "no-cache"
+        headers["Pragma"] = "no-cache"
+        config.httpAdditionalHeaders = headers
 
         return Session.withProxy(
             proxyInfo: proxyInfo,

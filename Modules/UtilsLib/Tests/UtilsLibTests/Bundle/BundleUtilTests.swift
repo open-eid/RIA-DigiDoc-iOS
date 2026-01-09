@@ -20,9 +20,9 @@
 import Foundation
 import Testing
 
-@testable import CommonsLib
+@testable import UtilsLib
 
-final class BundleUtilTests {
+struct BundleUtilTests {
 
     @Test
     func getBundleIdentifier_success() {

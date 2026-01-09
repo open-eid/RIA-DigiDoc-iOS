@@ -26,6 +26,7 @@ import MobileIdLibMocks
 import CommonsLib
 import LibdigidocLibSwift
 import LibdigidocLibSwiftMocks
+import UtilsLibMocks
 
 @MainActor
 struct MobileIdViewModelTests {
@@ -43,6 +44,7 @@ struct MobileIdViewModelTests {
     private let mockCertificatUtil: CertificateUtilProtocolMock
     private let mockDataStore: DataStoreProtocolMock
     private let mockProxyUtil: ProxyUtilProtocolMock
+    private let mockUserAgentUtil: UserAgentUtilProtocolMock
 
     private let viewModel: MobileIdViewModel
 
@@ -52,6 +54,7 @@ struct MobileIdViewModelTests {
         self.mockCertificatUtil = CertificateUtilProtocolMock()
         self.mockDataStore = DataStoreProtocolMock()
         self.mockProxyUtil = ProxyUtilProtocolMock()
+        self.mockUserAgentUtil = UserAgentUtilProtocolMock()
 
         mockConfigurationRepository.getConfigurationHandler = {
             do {
@@ -74,7 +77,8 @@ struct MobileIdViewModelTests {
             mobileIdSignService: mockMobileIdSignService,
             certificateUtil: mockCertificatUtil,
             dataStore: mockDataStore,
-            proxyUtil: mockProxyUtil
+            proxyUtil: mockProxyUtil,
+            userAgentUtil: mockUserAgentUtil
         )
     }
 
@@ -173,14 +177,14 @@ struct MobileIdViewModelTests {
     func sign_returnSignedContainerSuccessfully() async {
         mockDataStore.getSelectedLanguageHandler = { "et" }
 
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -232,7 +236,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setGeneralErrorWhenCertificateRequestThrows() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.generalError
         }
 
@@ -251,7 +255,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setGeneralErrorWhenCertificateBase64Invalid() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse(cert: "!!!")
         }
 
@@ -269,7 +273,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_returnNilWhenPrepareSignatureFails() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
@@ -293,7 +297,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_returnNilWhenVerificationCodeNil() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
@@ -313,16 +317,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_returnNilWhenMissingSessionId() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature(sessionId: nil)
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -341,16 +345,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_returnNilWhenSessionWithoutSignature() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession(signature: nil)
         }
 
@@ -368,16 +372,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setTechnicalErrorWhenAddSignatureFails() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -402,7 +406,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setNotClientMessageWhenNotMidClientErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.notMidClient
         }
 
@@ -421,7 +425,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setExpiredTransactionMessageWhenTimeoutErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.timeout
         }
 
@@ -440,7 +444,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setUserCancelledMessageWhenUserCancelledErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.userCancelled
         }
 
@@ -459,7 +463,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setAlertMessageWhenTooManyRequestsErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.tooManyRequests
         }
 
@@ -480,7 +484,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setAlertMessageWhenInvalidAccessRightsErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.invalidAccessRights
         }
 
@@ -500,7 +504,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_doesNotSetErrorMessageWhenExplicitlyCancelledErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.explicitlyCancelled
         }
 
@@ -519,16 +523,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setSSLMessageWhenSslHandshakeFailureErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -553,16 +557,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setAlertWhenOcspErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -589,16 +593,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setRevokedMessageWhenRevokedCertificateErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -623,16 +627,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setProxyMessageWhenProxyAuthenticationErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -657,16 +661,16 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setTechnicalErrorWhenUnknownDigiDocErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             await mockMobileIdCertificateResponse()
         }
 
         mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
-        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
             await mockSuccessSignature()
         }
 
-        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _ in
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
             await mockSuccessSession()
         }
 
@@ -691,7 +695,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_doesNotSetErrorMessageWhenCancellationErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw CancellationError()
         }
 
@@ -711,7 +715,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setGeneralErrorWhenNonMobileIdErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw NSError(domain: "TestError", code: 1)
         }
 
@@ -730,7 +734,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setIncorrectParametersMessageWhenIncorrectParametersThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.incorrectParameters
         }
 
@@ -749,7 +753,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setFailedTransactionMessageWhenSignatureHashMismatch() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.signatureHashMismatch
         }
 
@@ -768,7 +772,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setCoverageMessageWhenPhoneAbsentErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.phoneAbsent
         }
 
@@ -787,7 +791,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setRequestSendingErrorMessageWhenDeliveryErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.deliveryError
         }
 
@@ -806,7 +810,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setSimErrorMessageWhenSimErrorThrown() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.simError
         }
 
@@ -825,7 +829,7 @@ struct MobileIdViewModelTests {
 
     @Test
     func sign_setNoInternetMessageWhenNoInternetConnection() async {
-        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _ in
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.noInternetConnection
         }
 

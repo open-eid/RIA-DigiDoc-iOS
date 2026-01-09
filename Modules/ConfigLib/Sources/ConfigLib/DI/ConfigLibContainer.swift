@@ -42,7 +42,6 @@ extension Container {
 
     public var centralConfigurationService: Factory<CentralConfigurationServiceProtocol> {
         self { CentralConfigurationService(
-            userAgent: "",
             configurationProperty: self.configurationProperty(),
             session: nil
         ) }

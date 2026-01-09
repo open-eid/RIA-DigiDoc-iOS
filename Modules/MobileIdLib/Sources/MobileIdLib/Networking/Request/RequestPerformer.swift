@@ -20,6 +20,7 @@
 import Foundation
 import Alamofire
 import CommonsLib
+import UtilsLib
 
 struct RequestPerformer: RequestPerfomerProtocol, Loggable {
     private let sessionProvider: SessionProviderProtocol
@@ -38,7 +39,8 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
         method: HTTPMethod,
         parameters: P? = nil,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> T {
         let encoder: ParameterEncoder = method == .get ?
         URLEncodedFormParameterEncoder.default :
@@ -48,7 +50,8 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
             let session = try await sessionProvider.ensureSession(
                 url: url,
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
             let headers = RequestPerformer.defaultHeaders()
 

@@ -49,19 +49,22 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     private let certificateUtil: CertificateUtilProtocol
     private let dataStore: DataStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
 
     init(
         configurationRepository: ConfigurationRepositoryProtocol,
         mobileIdSignService: MobileIdSignServiceProtocol,
         certificateUtil: CertificateUtilProtocol,
         dataStore: DataStoreProtocol,
-        proxyUtil: ProxyUtilProtocol
+        proxyUtil: ProxyUtilProtocol,
+        userAgentUtil: UserAgentUtilProtocol
     ) {
         self.configurationRepository = configurationRepository
         self.mobileIdSignService = mobileIdSignService
         self.certificateUtil = certificateUtil
         self.dataStore = dataStore
         self.proxyUtil = proxyUtil
+        self.userAgentUtil = userAgentUtil
     }
 
     func isSigningEnabled(
@@ -131,6 +134,12 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
         let proxyInfo = await proxyUtil.getProxyInfo()
 
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting language")
+        let appLanguage = await dataStore.getSelectedLanguage()
+
+        MobileIdViewModel.logger().debug("Mobile-ID: Getting User-Agent")
+        let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
+
         let containerFile: URL
         do {
             containerFile = try await getContainerFile(signedContainer: signedContainer)
@@ -147,7 +156,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 phoneNumber: phoneNumber,
                 personalCode: personalCode,
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
         } catch {
             MobileIdViewModel.logger().debug("Mobile-ID: Unable to request certificate or get cert from response")
@@ -161,7 +171,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 cert: cert,
                 containerFile: containerFile,
                 roleData: roleData,
-                signedContainer: signedContainer
+                signedContainer: signedContainer,
+                userAgent: userAgent
             )
         } catch {
             MobileIdViewModel.logger().debug("Mobile-ID: Unable to prepare signature for signing")
@@ -180,9 +191,6 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
         controlCode = verificationCode
 
-        MobileIdViewModel.logger().debug("Mobile-ID: Getting language")
-        let language = await dataStore.getSelectedLanguage()
-
         let sessionId: String
         do {
             sessionId = try await requestSignature(
@@ -190,9 +198,10 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 phoneNumber: phoneNumber,
                 personalCode: personalCode,
                 hash: hash,
-                language: language,
+                language: appLanguage,
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
         } catch {
             MobileIdViewModel.logger().debug("Mobile-ID: Unable to request signature")
@@ -206,7 +215,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 midUrl: midUrl,
                 sessionId: sessionId,
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
         } catch {
             MobileIdViewModel.logger().debug(
@@ -238,12 +248,14 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         await dataStore.getIsRoleAndAddressEnabled()
     }
 
+    // swiftlint:disable:next function_parameter_count
     private func requestCertificate(
         midUrl: URL,
         phoneNumber: String,
         personalCode: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> Data {
         MobileIdViewModel.logger().debug("Mobile-ID: Getting certificate")
         let certResponse = try await mobileIdSignService
@@ -254,7 +266,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 phoneNumber: phoneNumber,
                 nationalIdentityNumber: personalCode,
                 trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
 
         guard let certData = Data(
@@ -276,7 +289,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         hash: Data,
         language: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> String {
         MobileIdViewModel.logger().debug("Mobile-ID: Getting signature")
         let signatureResponse = try await mobileIdSignService.getSignatureRequest(
@@ -291,7 +305,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             displayText: NSLocalizedString("Sign document", comment: ""),
             displayTextFormat: Constants.MobileId.DisplayTextFormat,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         MobileIdViewModel.logger().debug("Mobile-ID: Getting sessionID")
@@ -308,7 +323,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         midUrl: URL,
         sessionId: String,
         trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> Data {
         MobileIdViewModel.logger().debug("Mobile-ID: Getting session request")
         let sessionResponse = try await mobileIdSignService.getSessionRequest(
@@ -316,7 +332,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             sessionId: sessionId,
             pollingTimeout: Constants.Signing.DefaultTimeout,
             trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         guard let signatureData = sessionResponse.signature?.value else {
@@ -330,7 +347,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         cert: Data,
         containerFile: URL,
         roleData: RoleData,
-        signedContainer: SignedContainerProtocol
+        signedContainer: SignedContainerProtocol,
+        userAgent: String
     ) async throws -> Data {
         MobileIdViewModel.logger().debug(
             "Mobile-ID: Preparing signature. Calculating hash"
@@ -340,7 +358,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             cert: cert,
             containerPath: containerFile,
             roleData: roleData,
-            userAgent: ""
+            userAgent: userAgent
         )
     }
 

@@ -37,7 +37,8 @@ struct SessionProviderTests {
         let session = try await provider.ensureSession(
             url: "https://url.test",
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "SessionProviderTestsUserAgent"
         )
 
         #expect(
@@ -64,13 +65,15 @@ struct SessionProviderTests {
         let firstSessionCall = try await provider.ensureSession(
             url: "https://url.test",
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "SessionProviderTestsUserAgent"
         )
 
         let secondSessionCall = try await provider.ensureSession(
             url: "https://url.test",
             trustedCertificates: [],
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "SessionProviderTestsUserAgent"
         )
 
         #expect(firstSessionCall === secondSessionCall)
@@ -82,7 +85,8 @@ struct SessionProviderTests {
             try await provider.ensureSession(
                 url: "invalid-url",
                 trustedCertificates: [],
-                proxyInfo: ProxyInfo()
+                proxyInfo: ProxyInfo(),
+                userAgent: "SessionProviderTestsUserAgent"
             )
         }
     }

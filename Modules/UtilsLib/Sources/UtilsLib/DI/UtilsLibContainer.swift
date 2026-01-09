@@ -54,4 +54,8 @@ extension Container {
     public var notificationUtil: Factory<NotificationUtilProtocol> {
         self { @MainActor in NotificationUtil() }
     }
+
+    public var userAgentUtil: Factory<UserAgentUtilProtocol> {
+        self { UserAgentUtil() }
+    }
 }

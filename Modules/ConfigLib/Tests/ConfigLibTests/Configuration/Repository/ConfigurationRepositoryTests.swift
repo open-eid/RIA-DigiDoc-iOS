@@ -84,10 +84,14 @@ struct ConfigurationRepositoryTests {
         let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _, _ in }
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
 
-        let configuration = try await repository.getCentralConfiguration(cacheDir: mockCacheDir, proxyInfo: ProxyInfo())
+        let configuration = try await repository.getCentralConfiguration(
+            cacheDir: mockCacheDir,
+            proxyInfo: ProxyInfo(),
+            userAgent: "TestUserAgent"
+        )
 
         #expect(expectedConfiguration.tslUrl == configuration?.tslUrl)
         #expect(mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir == mockCacheDir)
@@ -98,10 +102,14 @@ struct ConfigurationRepositoryTests {
     func getCentralConfiguration_returnConfigurationThatUsesDefaultConfiguration() async throws {
         let expectedConfiguration = try TestConfigurationProvider.mockConfigurationProvider()
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _, _ in }
         mockConfigurationLoader.getConfigurationHandler = { expectedConfiguration }
 
-        let configuration = try await repository.getCentralConfiguration(cacheDir: nil, proxyInfo: ProxyInfo())
+        let configuration = try await repository.getCentralConfiguration(
+            cacheDir: nil,
+            proxyInfo: ProxyInfo(),
+            userAgent: "TestUserAgent"
+        )
 
         let isCorrectDirectory = try mockConfigurationLoader.loadCentralConfigurationArgValues.first?.cacheDir ==
         Directories.getConfigDirectory(fileManager: mockFileManager)
@@ -120,12 +128,13 @@ struct ConfigurationRepositoryTests {
             continuation.finish()
         }
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _, _ in }
         mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
         let resultStream = try await repository.getCentralConfigurationUpdates(
             cacheDir: mockCacheDir,
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "TestUserAgent"
         )
 
         #expect(resultStream != nil)
@@ -154,10 +163,14 @@ struct ConfigurationRepositoryTests {
             continuation.finish()
         }
 
-        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _ in }
+        mockConfigurationLoader.loadCentralConfigurationHandler = { _, _, _ in }
         mockConfigurationLoader.getConfigurationUpdatesHandler = { _ in stream }
 
-        let resultStream = try await repository.getCentralConfigurationUpdates(cacheDir: nil, proxyInfo: ProxyInfo())
+        let resultStream = try await repository.getCentralConfigurationUpdates(
+            cacheDir: nil,
+            proxyInfo: ProxyInfo(),
+            userAgent: "TestUserAgent"
+        )
 
         #expect(resultStream != nil)
 

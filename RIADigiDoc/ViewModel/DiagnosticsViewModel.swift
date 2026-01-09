@@ -45,6 +45,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     private let tslUtil: TSLUtilProtocol
     private let dataStore: DataStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -55,7 +56,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         configurationRepository: ConfigurationRepositoryProtocol,
         tslUtil: TSLUtilProtocol,
         dataStore: DataStoreProtocol,
-        proxyUtil: ProxyUtilProtocol
+        proxyUtil: ProxyUtilProtocol,
+        userAgentUtil: UserAgentUtilProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
@@ -64,6 +66,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         self.tslUtil = tslUtil
         self.dataStore = dataStore
         self.proxyUtil = proxyUtil
+        self.userAgentUtil = userAgentUtil
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -297,9 +300,12 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
                 CommonsLib.Constants.Configuration.CacheConfigFolder
             )
             let proxyInfo = await proxyUtil.getProxyInfo()
+            let appLanguage = await dataStore.getSelectedLanguage()
+            let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
             try await configurationLoader.loadCentralConfiguration(
                 cacheDir: configDirectory,
-                proxyInfo: proxyInfo
+                proxyInfo: proxyInfo,
+                userAgent: userAgent
             )
             return true
         } catch {

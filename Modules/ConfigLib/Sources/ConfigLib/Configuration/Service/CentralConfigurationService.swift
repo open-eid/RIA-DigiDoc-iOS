@@ -20,28 +20,28 @@
 import Foundation
 import Alamofire
 import CommonsLib
+import UtilsLib
 
 public actor CentralConfigurationService: CentralConfigurationServiceProtocol, Loggable {
-    private let userAgent: String
     private let configurationProperty: ConfigurationProperty
     private let session: Session?
 
     public init(
-        userAgent: String,
         configurationProperty: ConfigurationProperty,
         session: Session? = nil
     ) {
-        self.userAgent = userAgent
         self.configurationProperty = configurationProperty
         self.session = session
     }
 
     public func fetchConfiguration(
         proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> String {
         let session = self.session ?? constructHttpClient(
             defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.json"
@@ -61,11 +61,13 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
     }
 
     public func fetchPublicKey(
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> String {
         let session = self.session ?? constructHttpClient(
             defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.ecpub"
@@ -85,11 +87,13 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
     }
 
     public func fetchSignature(
-        proxyInfo: ProxyInfo
+        proxyInfo: ProxyInfo,
+        userAgent: String
     ) async throws -> String {
         let session = self.session ?? constructHttpClient(
             defaultTimeout: CommonsLib.Constants.Configuration.DefaultTimeout,
-            proxyInfo: proxyInfo
+            proxyInfo: proxyInfo,
+            userAgent: userAgent
         )
 
         let url = "\(await configurationProperty.centralConfigurationServiceUrl)/config.ecc"
@@ -115,43 +119,37 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
         defaultTimeout: TimeInterval,
         proxyInfo: ProxyInfo,
         customConfiguration: URLSessionConfiguration? = nil,
+        userAgent: String
     ) -> Session {
-        let interceptor = constructAlamofireRequestInterceptor()
+        let retryInterceptor = constructAlamofireRetryRequestInterceptor()
 
         let configuration = customConfiguration ?? {
-            let config = URLSessionConfiguration.default
+            let config = URLSessionConfiguration.af.default
             config.timeoutIntervalForRequest = defaultTimeout
             config.timeoutIntervalForResource = defaultTimeout
+
+            var headers = config.httpAdditionalHeaders ?? [:]
+            headers["User-Agent"] = userAgent
+            headers["Content-Type"] = "application/json; charset=utf-8"
+            headers["Cache-Control"] = "no-cache"
+            headers["Pragma"] = "no-cache"
+            config.httpAdditionalHeaders = headers
             return config
         }()
 
         return Session.withProxy(
             proxyInfo: proxyInfo,
             configuration: configuration,
-            interceptor: interceptor
+            interceptor: retryInterceptor
         )
     }
 
-    private func constructAlamofireRequestInterceptor() -> RequestInterceptor {
-        return CustomRequestInterceptor(userAgent: userAgent)
+    private func constructAlamofireRetryRequestInterceptor() -> RequestInterceptor {
+        return RetryRequestInterceptor()
     }
 }
 
-struct CustomRequestInterceptor: RequestInterceptor {
-
-    private let userAgent: String
-
-    init(userAgent: String) {
-        self.userAgent = userAgent
-    }
-
-    // swiftlint:disable:next unused_parameter
-    func adapt(_ request: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        var modifiedRequest = request
-        modifiedRequest.setValue(userAgent, forHTTPHeaderField: "User-Agent")
-
-        completion(.success(modifiedRequest))
-    }
+struct RetryRequestInterceptor: RequestInterceptor {
 
     // swiftlint:disable:next blanket_disable_command
     // swiftlint:disable unused_parameter

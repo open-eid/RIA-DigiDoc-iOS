@@ -43,17 +43,25 @@ final class DigiDocConfTests {
 
         try await mockConfigurationLoader.initConfiguration(
             cacheDir: URL(fileURLWithPath: "/mock/path"),
-            proxyInfo: ProxyInfo()
+            proxyInfo: ProxyInfo(),
+            userAgent: "TestUserAgent"
         )
     }
 
     @Test
     func initDigiDoc_successAndReInitialization() async {
         do {
-            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
+            try await DigiDocConf.initDigiDoc(
+                configuration: configurationProvider,
+                userAgent: "TestUserAgent"
+            )
+
             #expect(true)
 
-            try await DigiDocConf.initDigiDoc(configuration: configurationProvider)
+            try await DigiDocConf.initDigiDoc(
+                configuration: configurationProvider,
+                userAgent: "TestUserAgent"
+            )
 
             Issue.record("Expected DigiDocError.alreadyInitialized to be thrown")
             return

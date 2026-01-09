@@ -18,31 +18,27 @@
  */
 
 import Foundation
-import CommonsLib
+import Testing
 
-/// @mockable
-public protocol ConfigurationLoaderProtocol: Sendable {
-    func initConfiguration(
-        cacheDir: URL,
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws
+@testable import UtilsLib
 
-    func loadConfigurationProperty() async throws -> ConfigurationProperty
+struct SystemUtilTests {
 
-    func loadCachedConfiguration(afterCentralCheck: Bool, cacheDir: URL?) async throws
+    @Test
+    func getOSVersion_success() {
+        let osVersion = SystemUtil.getOSVersion()
 
-    func loadDefaultConfiguration(cacheDir: URL?) async throws
+        #expect(!osVersion.isEmpty)
 
-    func loadCentralConfiguration(
-        cacheDir: URL?,
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws
+        // Accepts number.number.number i.e "18.6.0"
+        if let regex = try? NSRegularExpression(pattern: #"^\d+\.\d+\.\d+$"#) {
+            let range = NSRange(
+                osVersion.startIndex..<osVersion.endIndex,
+                in: osVersion
+            )
+            let match = regex.firstMatch(in: osVersion, options: [], range: range)
 
-    func shouldCheckForUpdates() async throws -> Bool
-
-    func getConfiguration() async -> ConfigurationProvider?
-
-    func getConfigurationUpdates(replayLatest: Bool) async -> AsyncThrowingStream<ConfigurationProvider?, Error>
+            #expect(match != nil)
+        }
+    }
 }
