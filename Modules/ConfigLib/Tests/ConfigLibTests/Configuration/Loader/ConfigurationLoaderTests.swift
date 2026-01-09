@@ -102,8 +102,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -111,8 +111,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -168,8 +168,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -177,8 +177,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -233,8 +233,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -242,8 +242,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -292,8 +292,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -301,8 +301,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -422,8 +422,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -431,8 +431,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -488,8 +488,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -497,8 +497,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -540,8 +540,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -549,8 +549,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -601,8 +601,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -610,8 +610,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -669,8 +669,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -678,8 +678,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
@@ -723,8 +723,8 @@ struct ConfigurationLoaderTests {
         try FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
 
         let confFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigJson)
-        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigPub)
-        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigRsa)
+        let publicKeyFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcPub)
+        let signatureFile = cacheDir.appending(path: CommonsLib.Constants.Configuration.CachedConfigEcc)
 
         try configurationResponse.write(to: confFile, atomically: true, encoding: .utf8)
         try "publicKey".write(to: publicKeyFile, atomically: true, encoding: .utf8)
@@ -732,8 +732,8 @@ struct ConfigurationLoaderTests {
 
         let fileMap: [String: URL] = [
             CommonsLib.Constants.Configuration.DefaultConfigJson: confFile,
-            CommonsLib.Constants.Configuration.DefaultConfigPub: publicKeyFile,
-            CommonsLib.Constants.Configuration.DefaultConfigRsa: signatureFile
+            CommonsLib.Constants.Configuration.DefaultConfigEcPub: publicKeyFile,
+            CommonsLib.Constants.Configuration.DefaultConfigEcc: signatureFile
         ]
 
         mockBundle.urlHandler = { name, _ in
