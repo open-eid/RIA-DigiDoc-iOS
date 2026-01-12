@@ -78,7 +78,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
-        SigningViewModel.logger().debug("Loading container data")
+        SigningViewModel.logger().info("Loading container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
@@ -101,7 +101,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
-        SigningViewModel.logger().debug("Container data loaded")
+        SigningViewModel.logger().info("Container data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
@@ -185,7 +185,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         do {
             let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
-            SigningViewModel.logger().debug("Added data files to container")
+            SigningViewModel.logger().info("Added data files to container")
             successMessage = ToastMessage(
                 key: files.count == 1 ? "File successfully added" : "Files successfully added",
                 args: []

@@ -41,6 +41,7 @@ final class DiagnosticsViewModelTests {
     private let mockDataStore: DataStoreProtocolMock
     private let mockProxyUtil: ProxyUtilProtocolMock
     private let mockUserAgentUtil: UserAgentUtilProtocolMock
+    private let mockFileUtil: FileUtilProtocolMock
 
     let mockConfigProvider: ConfigurationProvider?
 
@@ -53,6 +54,7 @@ final class DiagnosticsViewModelTests {
         mockDataStore = DataStoreProtocolMock()
         mockProxyUtil = ProxyUtilProtocolMock()
         mockUserAgentUtil = UserAgentUtilProtocolMock()
+        mockFileUtil = FileUtilProtocolMock()
 
         mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
         TestConfigurationSetup.configureMocks(
@@ -70,7 +72,8 @@ final class DiagnosticsViewModelTests {
             tslUtil: mockTSLUtil,
             dataStore: mockDataStore,
             proxyUtil: mockProxyUtil,
-            userAgentUtil: mockUserAgentUtil
+            userAgentUtil: mockUserAgentUtil,
+            fileUtil: mockFileUtil
         )
     }
 
@@ -257,10 +260,10 @@ final class DiagnosticsViewModelTests {
         #expect(rpUuid == uuid)
     }
 
-    // MARK: - Create Log File Tests
+    // MARK: - Create Diagnostics File Tests
 
     @Test
-    func createLogFile_success() async throws {
+    func createDiagnosticsFile_success() async throws {
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
@@ -275,7 +278,7 @@ final class DiagnosticsViewModelTests {
             try? FileManager.default.removeItem(at: tempDirectoryURL)
         }
 
-        if let logFileUrl = await viewModel.createLogFile(
+        if let logFileUrl = await viewModel.createDiagnosticsFile(
             languageSettings: mockLanguageSettings,
             directory: tempDirectoryURL
         ) {
@@ -284,34 +287,24 @@ final class DiagnosticsViewModelTests {
     }
 
     @Test
-    func createLogFile_returnsNilWhenDirectoryDoesNotExist() async throws {
+    func createDiagnosticsFile_returnsNilWhenDirectoryDoesNotExist() async throws {
         mockFileManager.fileExistsHandler = { _ in false }
 
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
-        let logFileUrl = await self.viewModel.createLogFile(
+        let logFileUrl = await self.viewModel.createDiagnosticsFile(
             languageSettings: mockLanguageSettings,
         )
         #expect(logFileUrl == nil)
     }
 
-    // MARK: - Remove Log Files Directory Tests
+    // MARK: - onDiagnosticsFileSavingComplete Tests
 
     @Test
-    func removeLogFilesDirectory_success() async throws {
-        viewModel.removeLogFilesDirectory()
-        #expect(mockFileManager.removeItemCallCount == 1)
-    }
-
-    @Test
-    func removeLogFilesDirectory_doesNotThrowWhenFails() async throws {
-        mockFileManager.removeItemHandler = { _ in
-            throw NSError(domain: "TestError", code: 1, userInfo: nil)
-        }
-        #expect(throws: Never.self) {
-            self.viewModel.removeLogFilesDirectory()
-        }
+    func onDiagnosticsFileSavingComplete_success() async throws {
+        viewModel.onDiagnosticsFileSavingComplete()
+        #expect(mockFileUtil.removeCacheLogsDirectoryCallCount == 1)
     }
 
     // MARK: - Update Configuration Tests

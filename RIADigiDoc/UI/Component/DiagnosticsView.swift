@@ -23,20 +23,33 @@ import UtilsLib
 
 struct DiagnosticsView: View {
     @AppTheme private var theme
+    @AppTypography private var typography
 
     @Environment(LanguageSettings.self) private var languageSettings
-
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) var openURL
 
     private let fileUtil: FileUtilProtocol
 
-    @State private var enableOneTimeLogGeneration = false  // TODO: implement one time log generation logic
+    private enum ExportType {
+        case diagnosticsFile
+        case logFile
+    }
 
-    @State private var tempDiagnosticsFileURL: URL?
-    @State private var isShowingFileSaver = false
+    @State private var activeExportType: ExportType?
+    @State private var tempFileURL: URL?
+    @State private var isShowingFileSaver: Bool = false
     @State private var isFileSaved: Bool = false
 
     @State private var viewModel: DiagnosticsViewModel
+
+    private var restartText: String {
+        if viewModel.enableOneTimeLogGeneration {
+            return languageSettings.localized("Main diagnostics restart message")
+        } else {
+            return languageSettings.localized("Main diagnostics restart message deactivate")
+        }
+    }
 
     init(
         fileUtil: FileUtilProtocol = Container.shared.fileUtil(),
@@ -67,21 +80,42 @@ struct DiagnosticsView: View {
                                 },
                                 onSaveDiagnosticsClick: {
                                     Task {
-                                        tempDiagnosticsFileURL = await viewModel.createLogFile(
+                                        tempFileURL = await viewModel.createDiagnosticsFile(
                                             languageSettings: languageSettings
                                         )
-
-                                        if fileUtil.fileExists(fileLocation: tempDiagnosticsFileURL) {
-                                            isShowingFileSaver = true
-                                        }
+                                        triggerFileSaver(type: .diagnosticsFile)
                                     }
                                 }
                             )
 
                             ToggleSection(
-                                isOn: $enableOneTimeLogGeneration,
+                                isOn: $viewModel.enableOneTimeLogGeneration,
                                 label: languageSettings.localized("Main diagnostics logging switch")
                             )
+
+                            if viewModel.showSaveLogButton {
+                                PrimaryOutlinedButton(
+                                    text: languageSettings.localized("Main diagnostics save log"),
+                                    assetImageName: "ic_m3_download_48pt_wght400",
+                                    action: {
+                                        Task {
+                                            tempFileURL = await viewModel.createLogFile()
+                                            triggerFileSaver(type: .logFile)
+                                        }
+                                    }
+                                )
+                            }
+
+                            if viewModel.showRestartText {
+                                HStack {
+                                    Text(restartText)
+                                        .font(typography.bodyLarge)
+                                        .foregroundStyle(theme.error)
+                                        .padding(.top, Dimensions.Padding.ZeroPadding)
+                                        .padding(.bottom, Dimensions.Padding.MSPadding)
+                                    Spacer()
+                                }
+                            }
 
                             DiagnosticsSections(
                                 versionSectionContent: viewModel.versionSectionContent,
@@ -98,14 +132,22 @@ struct DiagnosticsView: View {
                     .background(
                         FileSaverHandler(
                             isPresented: $isShowingFileSaver,
-                            fileURL: tempDiagnosticsFileURL,
+                            fileURL: tempFileURL,
                             languageSettings: languageSettings,
                             onComplete: {
-                                viewModel.removeLogFilesDirectory()
+                                handleFileSaverCompletion()
                             },
                             isFileSaved: $isFileSaved
                         )
                     )
+                    .alert(
+                        languageSettings.localized("Main diagnostics restart message"),
+                        isPresented: $viewModel.showRestartActivateAlert
+                    ) {alertContent}
+                    .alert(
+                        languageSettings.localized("Main diagnostics restart message deactivate"),
+                        isPresented: $viewModel.showRestartDeactivateAlert
+                    ) {alertContent}
                     .task {
                         await viewModel
                             .getConfigurationData(
@@ -117,6 +159,11 @@ struct DiagnosticsView: View {
                             Task { await viewModel.getConfigurationData(configuration: newConfig) }
                         }
                     })
+                    .onChange(of: viewModel.enableOneTimeLogGeneration) { _, newValue in
+                        Task {
+                            await viewModel.onEnableOneTimeLogGenerationChange(newValue)
+                        }
+                    }
                     .onDisappear {
                         Task {
                             await viewModel.removeObservers()
@@ -126,6 +173,40 @@ struct DiagnosticsView: View {
             }
         )
     }
+
+    @ViewBuilder
+    private var alertContent: some View {
+        Button(languageSettings.localized("OK")) {}
+        Button(languageSettings.localized("Read more here")) {
+            if let url = URL(
+                string: languageSettings.localized("main diagnostics restart message url")
+            ) {
+                openURL(url)
+            }
+        }
+    }
+
+    private func triggerFileSaver(type: ExportType) {
+        self.activeExportType = type
+        if fileUtil.fileExists(fileLocation: tempFileURL) {
+            isShowingFileSaver = true
+        }
+    }
+
+    private func handleFileSaverCompletion() {
+        guard let type = activeExportType else { return }
+
+        switch type {
+        case .diagnosticsFile:
+            viewModel.onDiagnosticsFileSavingComplete()
+        case .logFile:
+            Task {
+                await viewModel.onLogFileSavingComplete()
+            }
+        }
+
+        activeExportType = nil
+    }
 }
 
 // MARK: - Preview
@@ -133,4 +214,5 @@ struct DiagnosticsView: View {
     DiagnosticsView()
         .environment(Container.shared.languageSettings())
         .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

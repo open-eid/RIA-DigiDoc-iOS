@@ -48,4 +48,8 @@ public protocol FileUtilProtocol: Sendable {
     func removeSharedFiles(url: URL?) throws
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL?)
+
+    func removeCacheLogsDirectory()
+
+    func removeLibraryLogsDirectory(directory: URL?)
 }

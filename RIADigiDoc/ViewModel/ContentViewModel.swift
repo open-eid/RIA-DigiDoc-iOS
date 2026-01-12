@@ -38,7 +38,7 @@ class ContentViewModel: ContentViewModelProtocol, Loggable {
 
     func getSharedFiles() async -> [URL] {
         do {
-            ContentViewModel.logger().debug("Checking for shared files...")
+            ContentViewModel.logger().info("Checking for shared files...")
             let sharedFolderURL = try await Directories.getSharedFolder(fileManager: fileManager)
                 .validURL(fileUtil: fileUtil)
 
@@ -48,9 +48,9 @@ class ContentViewModel: ContentViewModelProtocol, Loggable {
                 options: .skipsHiddenFiles)
 
             if contents.isEmpty {
-                ContentViewModel.logger().debug("Shared files folder is empty")
+                ContentViewModel.logger().info("Shared files folder is empty")
             } else {
-                ContentViewModel.logger().debug("Found \(contents.count) shared files")
+                ContentViewModel.logger().info("Found \(contents.count) shared files")
             }
 
             return contents

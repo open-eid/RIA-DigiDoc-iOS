@@ -60,17 +60,17 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
 
     func handleFiles() async {
         do {
-            CryptoFileOpeningViewModel.logger().debug("Handling chosen files from file system or from external sources")
+            CryptoFileOpeningViewModel.logger().info("Handling chosen files from file system or from external sources")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            CryptoFileOpeningViewModel.logger().debug("Found \(validFiles.count) valid file(s)")
+            CryptoFileOpeningViewModel.logger().info("Found \(validFiles.count) valid file(s)")
 
             if validFiles.isEmpty {
-                CryptoFileOpeningViewModel.logger().debug("No valid files found")
+                CryptoFileOpeningViewModel.logger().info("No valid files found")
                 throw FileOpeningError.noDataFiles
             }
 

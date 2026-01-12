@@ -62,7 +62,7 @@ class DataFilesViewModel: DataFilesViewModelProtocol, Loggable {
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)
-            DataFilesViewModel.logger().debug("Saved Files directory removed")
+            DataFilesViewModel.logger().info("Saved Files directory removed")
         } catch {
             DataFilesViewModel.logger().error("Unable to delete saved files directory: \(error.localizedDescription)")
         }

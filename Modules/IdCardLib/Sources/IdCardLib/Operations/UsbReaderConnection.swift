@@ -39,7 +39,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
             return
         }
 
-        UsbReaderConnection.logger().debug("ID-CARD: Starting reader discovery")
+        UsbReaderConnection.logger().info("ID-CARD: Starting reader discovery")
         await updateStatus(status)
 
         let result = SCardEstablishContext(DWORD(SCARD_SCOPE_SYSTEM), nil, nil, &handle)
@@ -50,18 +50,18 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
             return
         }
 
-        UsbReaderConnection.logger().debug("ID-CARD: Started reader discovery: \(self.handle)")
+        UsbReaderConnection.logger().info("ID-CARD: Started reader discovery: \(self.handle)")
     }
 
     public func stopDiscoveringReaders(with status: UsbReaderStatus = .sInitial) async {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Stopping reader discovery")
+        UsbReaderConnection.logger().info("ID-CARD: Stopping reader discovery")
         self.status = status
         FtDidEnterBackground(1)
         SCardCancel(handle)
         SCardReleaseContext(handle)
-        UsbReaderConnection.logger().debug("ID-CARD: Stopped reader discovery with status: \(self.handle)")
+        UsbReaderConnection.logger().info("ID-CARD: Stopped reader discovery with status: \(self.handle)")
         handle = 0
     }
 
@@ -96,7 +96,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     // MARK: ID-Card Actions
 
     public func getPublicData() async throws -> CardInfo {
-        UsbReaderConnection.logger().debug("ID-CARD: Getting ID-card public data")
+        UsbReaderConnection.logger().info("ID-CARD: Getting ID-card public data")
 
         guard let handler = cardHandler else {
             UsbReaderConnection.logger().error("ID-CARD: Unable to get card handler to get public data")
@@ -109,7 +109,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func readAuthenticationCertificate() async throws -> Data {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Reading authentication certificate with reader")
+        UsbReaderConnection.logger().info("ID-CARD: Reading authentication certificate with reader")
 
         guard let handler = cardHandler else {
             UsbReaderConnection
@@ -131,7 +131,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func readSignatureCertificate() async throws -> Data {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Reading signature certificate with reader")
+        UsbReaderConnection.logger().info("ID-CARD: Reading signature certificate with reader")
 
         guard let handler = cardHandler else {
             UsbReaderConnection
@@ -153,7 +153,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8 {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Reading try counter with reader for \(codeType.name)")
+        UsbReaderConnection.logger().info("ID-CARD: Reading try counter with reader for \(codeType.name)")
 
         guard let handler = cardHandler else {
             UsbReaderConnection
@@ -175,7 +175,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func isPUKChangeable() async throws -> Bool {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Checking if PUK is changeable with reader")
+        UsbReaderConnection.logger().info("ID-CARD: Checking if PUK is changeable with reader")
 
         guard let handler = cardHandler else {
             UsbReaderConnection.logger().error("ID-CARD: Unable to check if PUK is changeable with reader")
@@ -188,7 +188,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func changeCode(_ codeType: CodeType, to newCode: Data, verifyCode: Data) async throws {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Changing code for \(codeType.name)")
+        UsbReaderConnection.logger().info("ID-CARD: Changing code for \(codeType.name)")
 
         guard let handler = cardHandler else {
             UsbReaderConnection.logger().error("ID-CARD: Unable to get card handler to change \(codeType.name)")
@@ -209,7 +209,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
     public func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws {
         await ensureHandler()
 
-        UsbReaderConnection.logger().debug("ID-CARD: Unblocking code for \(codeType.name)")
+        UsbReaderConnection.logger().info("ID-CARD: Unblocking code for \(codeType.name)")
 
         guard let handler = cardHandler else {
             UsbReaderConnection.logger().error("ID-CARD: Unable to get card handler to unblock \(codeType.name)")
@@ -255,14 +255,14 @@ private final class UsbReaderInterfaceHandler: NSObject, ReaderInterfaceDelegate
     }
 
     func readerInterfaceDidChange(_ attached: Bool, bluetoothID _: String?) {
-        UsbReaderInterfaceHandler.logger().debug("ID-CARD: Reader attached: \(attached)")
+        UsbReaderInterfaceHandler.logger().info("ID-CARD: Reader attached: \(attached)")
         Task {
             await usbReaderConnection.updateStatus(attached ? .sReaderConnected : .sReaderNotConnected)
         }
     }
 
     func cardInterfaceDidDetach(_ attached: Bool) {
-        UsbReaderInterfaceHandler.logger().debug("ID-CARD: Card (interface) attached: \(attached)")
+        UsbReaderInterfaceHandler.logger().info("ID-CARD: Card (interface) attached: \(attached)")
         Task {
             do {
                 let contextHandle = await usbReaderConnection.getHandle()
@@ -289,7 +289,7 @@ private final class UsbReaderInterfaceHandler: NSObject, ReaderInterfaceDelegate
                 if let handler {
                     await usbReaderConnection.setCardHandler(handler)
 
-                    UsbReaderInterfaceHandler.logger().debug("ID-CARD: Card connected")
+                    UsbReaderInterfaceHandler.logger().info("ID-CARD: Card connected")
 
                     await usbReaderConnection.updateStatus(.sCardConnected)
                 }
@@ -303,6 +303,6 @@ private final class UsbReaderInterfaceHandler: NSObject, ReaderInterfaceDelegate
     func didGetBattery(_: Int) {}
 
     func findPeripheralReader(_ readerName: String) {
-        UsbReaderInterfaceHandler.logger().debug("ID-CARD: Reader name: \(readerName)")
+        UsbReaderInterfaceHandler.logger().info("ID-CARD: Reader name: \(readerName)")
     }
 }

@@ -478,12 +478,28 @@ public actor DataStore: DataStoreProtocol {
 
     // MARK: - Logging
 
-    public func getIsLoggingEnabled() async -> Bool {
-        userDefaults().bool(forKey: Keys.isLoggingEnabled)
+    public func getEnableLoggingNextSession() async -> Bool {
+        userDefaults().bool(forKey: Keys.enableLoggingNextSession)
     }
 
-    public func setIsLoggingEnabled(_ isEnabled: Bool) async {
-        userDefaults().set(isEnabled, forKey: Keys.isLoggingEnabled)
+    public func setEnableLoggingNextSession(_ isEnabled: Bool) async {
+        userDefaults().set(isEnabled, forKey: Keys.enableLoggingNextSession)
+    }
+
+    public func getEnableLoggingThisSession() async -> Bool {
+        userDefaults().bool(forKey: Keys.enableLoggingThisSession)
+    }
+
+    public func setEnableLoggingThisSession(_ isEnabled: Bool) async {
+        userDefaults().set(isEnabled, forKey: Keys.enableLoggingThisSession)
+    }
+
+    public func getIsLogFileSaved() async -> Bool {
+        userDefaults().bool(forKey: Keys.isLogFileSaved)
+    }
+
+    public func setIsLogFileSaved(_ isSaved: Bool) async {
+        userDefaults().set(isSaved, forKey: Keys.isLogFileSaved)
     }
 
     // MARK: - Constants
@@ -550,6 +566,8 @@ public actor DataStore: DataStoreProtocol {
         static let roleZipCode = "roleZipCode"
         static let nfcCanNumber = "nfcCanNumber"
         static let nfcRememberMe = "nfcRememberMe"
-        static let isLoggingEnabled = "isLoggingEnabled"
+        static let enableLoggingNextSession = "enableLoggingNextSession"
+        static let enableLoggingThisSession = "enableLoggingThisSession"
+        static let isLogFileSaved = "isLogFileSaved"
     }
 }

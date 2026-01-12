@@ -61,17 +61,17 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
     func handleFiles() async {
         do {
-            FileOpeningViewModel.logger().debug("Handling chosen files from file system or from external sources")
+            FileOpeningViewModel.logger().info("Handling chosen files from file system or from external sources")
             let validFiles = try await fileOpeningRepository.getValidFiles(
                 sharedContainerViewModel.getFileOpeningResult() ?? .failure(FileOpeningError.noDataFiles)
             )
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            FileOpeningViewModel.logger().debug("Found \(validFiles.count) valid file(s)")
+            FileOpeningViewModel.logger().info("Found \(validFiles.count) valid file(s)")
 
             if validFiles.isEmpty {
-                FileOpeningViewModel.logger().debug("No valid files found")
+                FileOpeningViewModel.logger().info("No valid files found")
                 throw FileOpeningError.noDataFiles
             }
 
@@ -118,7 +118,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
                 let container = try await fileOpeningRepository
                     .openOrCreateContainer(urls: files, isSivaConfirmed: false)
                 sharedContainerViewModel.setSignedContainer(container)
-                FileOpeningViewModel.logger().debug("Asics signed container set successfully")
+                FileOpeningViewModel.logger().info("Asics signed container set successfully")
                 handleLoadingSuccess(isSivaConfirmed: false)
             } catch {
                 FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(error)")

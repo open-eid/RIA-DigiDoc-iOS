@@ -47,7 +47,7 @@ class CardReaderiR301: CardReader, @unchecked Sendable, Loggable {
             return Int(modelNameLength)
         }
 
-        CardReaderiR301.logger().debug("ID-CARD: Checking if card reader is supported: \(modelName)")
+        CardReaderiR301.logger().info("ID-CARD: Checking if card reader is supported: \(modelName)")
         guard modelName.hasPrefix("iR301") else {
             CardReaderiR301.logger().error("ID-CARD: Unsupported reader: \(modelName)")
             return nil
@@ -94,7 +94,7 @@ class CardReaderiR301: CardReader, @unchecked Sendable, Loggable {
             }
             initializedCount = Int(atrSize)
         }
-        CardReaderiR301.logger().debug("SCardStatus status: \(dwStatus) ATR: \(self.atr.hex))")
+        CardReaderiR301.logger().info("SCardStatus status: \(dwStatus) ATR: \(self.atr.hex))")
 
         guard dwStatus == SCARD_PRESENT else {
             CardReaderiR301.logger().error("ID-CARD: Did not successfully power on card")
@@ -103,7 +103,7 @@ class CardReaderiR301: CardReader, @unchecked Sendable, Loggable {
     }
 
     func transmit(_ apdu: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
-        CardReaderiR301.logger().debug("ID-CARD Transmitting: \(apdu.hex)")
+        CardReaderiR301.logger().info("ID-CARD Transmitting: \(apdu.hex)")
         var responseSize: DWORD = 512
         var response = try Bytes(unsafeUninitializedCapacity: Int(responseSize)) { buffer, initializedCount in
             guard SCardTransmit(
@@ -126,7 +126,7 @@ class CardReaderiR301: CardReader, @unchecked Sendable, Loggable {
                 "ID-CARD: Response size must be at least 2. Response size: \(response.count)")
             throw IdCardInternalError.readerProcessFailed
         }
-        CardReaderiR301.logger().debug("ID-CARD Response: \(response.hex)")
+        CardReaderiR301.logger().info("ID-CARD Response: \(response.hex)")
         let swVal = UInt16(response[response.count - 2], response[response.count - 1])
         response.removeLast(2)
         return (response, swVal)

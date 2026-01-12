@@ -25,6 +25,11 @@ import CommonsLib
 @MainActor
 public protocol DiagnosticsViewModelProtocol: Sendable {
     // MARK: Published properties
+    var enableOneTimeLogGeneration: Bool { get }
+    var showSaveLogButton: Bool { get }
+    var showRestartActivateAlert: Bool { get }
+    var showRestartDeactivateAlert: Bool { get }
+
     var versionSectionContent: String { get }
     var osSectionContent: (key: String, content: String) { get }
     var libdigidocVersion: String { get }
@@ -38,8 +43,13 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
 
     // MARK: Actions
     func updateConfiguration() async -> Bool
-    func createLogFile(languageSettings: LanguageSettingsProtocol, directory: URL?) async -> URL?
-    func removeLogFilesDirectory()
+    func createDiagnosticsFile(languageSettings: LanguageSettingsProtocol, directory: URL?) async -> URL?
+    func onDiagnosticsFileSavingComplete()
+    func onEnableOneTimeLogGenerationChange(_ isEnabled: Bool) async
+    func createLogFile(directory: URL?) async -> URL?
+    func onLogFileSavingComplete() async
 
     func removeObservers() async
+    func getRpUuid() async -> String
+    func observeConfigurationUpdates() async
 }

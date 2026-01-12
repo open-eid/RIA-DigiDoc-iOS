@@ -28,19 +28,9 @@ public struct Directories {
     ) throws -> URL {
         var tempDirectory = fileManager.temporaryDirectory
             .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
-        if !subfolder.isEmpty {
-            tempDirectory = tempDirectory.appending(path: subfolder, directoryHint: .isDirectory)
-        }
 
-        if !fileManager.fileExists(atPath: tempDirectory.resolvedPath) {
-            try fileManager
-                .createDirectory(
-                    at: tempDirectory,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-        }
-
+        tempDirectory = appendSubfolder(baseFolder: tempDirectory, subfolder: subfolder)
+        try createDirectoryIfNeeded(at: tempDirectory, fileManager: fileManager)
         return tempDirectory
     }
 
@@ -56,16 +46,7 @@ public struct Directories {
         }
 
         let sharedContainerSubfolder = sharedContainerURL.appending(path: subfolder)
-
-        if !fileManager.fileExists(atPath: sharedContainerSubfolder.resolvedPath) {
-            try fileManager
-                .createDirectory(
-                    at: sharedContainerSubfolder,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-        }
-
+        try createDirectoryIfNeeded(at: sharedContainerSubfolder, fileManager: fileManager)
         return sharedContainerSubfolder
     }
 
@@ -81,53 +62,28 @@ public struct Directories {
             .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
 
         for subfolder in subfolders {
-            cacheDirectory = cacheDirectory.appending(path: subfolder, directoryHint: .isDirectory)
+            cacheDirectory = appendSubfolder(baseFolder: cacheDirectory, subfolder: subfolder)
         }
 
-        if !fileManager.fileExists(atPath: cacheDirectory.resolvedPath) {
-            try fileManager
-                .createDirectory(
-                    at: cacheDirectory,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-        }
-
+        try createDirectoryIfNeeded(at: cacheDirectory, fileManager: fileManager)
         return cacheDirectory
     }
 
-    public static func getLibraryDirectory(
-        fileManager: FileManagerProtocol
-    ) -> URL? {
-        if let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first {
-            return libraryDirectory
-        }
-        return nil
+    public static func getLibraryDirectory(fileManager: FileManagerProtocol) -> URL? {
+        return fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first
     }
 
-    public static func getDocumentsDirectory(
-        fileManager: FileManagerProtocol
-    ) -> URL? {
-        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
-            return documentsDirectory
-        }
-        return nil
+    public static func getDocumentsDirectory(fileManager: FileManagerProtocol) -> URL? {
+        return fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
     }
 
-    public static func getApplicationDirectory(
-        fileManager: FileManagerProtocol
-    ) -> URL? {
-        if let applicationDirectory = fileManager.urls(for: .applicationDirectory, in: .userDomainMask).first {
-            return applicationDirectory
-        }
-        return nil
+    public static func getApplicationDirectory(fileManager: FileManagerProtocol) -> URL? {
+        return fileManager.urls(for: .applicationDirectory, in: .userDomainMask).first
     }
 
     public static func getConfigDirectory(from directory: URL? = nil, fileManager: FileManagerProtocol) throws -> URL {
         let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
-        return baseDirectory.appending(path:
-            Constants.Configuration.CacheConfigFolder, directoryHint: .isDirectory
-        )
+        return appendSubfolder(baseFolder: baseDirectory, subfolder: Constants.Configuration.CacheConfigFolder)
     }
 
     public static func getTslCacheDirectory(fileManager: FileManagerProtocol) -> URL? {
@@ -138,34 +94,29 @@ public struct Directories {
         from directory: URL?,
         fileManager: FileManagerProtocol
     ) throws -> URL? {
-        let libdigidocppLogFile = "libdigidocpp.log"
+        let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
+        let logsDirectory = baseDirectory.appending(path: "logs")
+        try createDirectoryIfNeeded(at: logsDirectory, fileManager: fileManager)
+        return logsDirectory.appending(path: Constants.File.LibDigidocLog)
+    }
 
-        if let mainDirectory = directory {
-            let primaryLogsDirectory = mainDirectory.appending(path: "logs")
-
-            if !fileManager.fileExists(atPath: primaryLogsDirectory.resolvedPath) {
-                try fileManager.createDirectory(
-                    at: primaryLogsDirectory,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-                return primaryLogsDirectory.appending(path: libdigidocppLogFile)
-            } else {
-                return primaryLogsDirectory.appending(path: libdigidocppLogFile)
-            }
+    private static func appendSubfolder(baseFolder: URL, subfolder: String = "") -> URL {
+        if !subfolder.isEmpty {
+            return baseFolder.appending(path: subfolder, directoryHint: .isDirectory)
         }
+        return baseFolder
+    }
 
-        let cacheDirectory = try getCacheDirectory(fileManager: fileManager)
-        let fallbackLogsDirectory = cacheDirectory.appending(path: "logs")
-
-        if !fileManager.fileExists(atPath: fallbackLogsDirectory.resolvedPath) {
+    private static func createDirectoryIfNeeded(
+        at url: URL,
+        fileManager: FileManagerProtocol
+    ) throws {
+        if !fileManager.fileExists(atPath: url.resolvedPath) {
             try fileManager.createDirectory(
-                at: fallbackLogsDirectory,
+                at: url,
                 withIntermediateDirectories: true,
                 attributes: nil
             )
         }
-
-        return fallbackLogsDirectory.appending(path: libdigidocppLogFile)
     }
 }

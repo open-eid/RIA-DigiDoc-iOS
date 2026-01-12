@@ -62,7 +62,7 @@ public struct ContainerUtil: ContainerUtilProtocol, Loggable {
         do {
             try fileManager
                 .createDirectory(at: signedContainersDirectory, withIntermediateDirectories: true, attributes: [:])
-            ContainerUtil.logger().debug(
+            ContainerUtil.logger().info(
                 "Directories created or already exist for \(signedContainersDirectory.resolvedPath)"
             )
         } catch {
@@ -118,7 +118,7 @@ public struct ContainerUtil: ContainerUtilProtocol, Loggable {
                         attributes: [:]
                     )
                     if let base = directory {
-                        ContainerUtil.logger().debug("Directories created or already exist for \(base.resolvedPath)")
+                        ContainerUtil.logger().info("Directories created or already exist for \(base.resolvedPath)")
                     }
                 } catch {
                     ContainerUtil.logger().error("Failed to create directory: \(error.localizedDescription)")

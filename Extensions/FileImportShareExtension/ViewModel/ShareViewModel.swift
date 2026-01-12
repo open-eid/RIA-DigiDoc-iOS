@@ -42,7 +42,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
     @discardableResult
     func importFiles(_ items: [ImportedFileItem]) async -> Bool {
-        ShareViewModel.logger().debug("Importing files...")
+        ShareViewModel.logger().info("Importing files...")
         guard !items.isEmpty else {
             await MainActor.run { [weak self] in
                 self?.status = .failed
@@ -57,7 +57,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
             )
 
             if isImported {
-                ShareViewModel.logger().debug("Files imported successfully")
+                ShareViewModel.logger().info("Files imported successfully")
             } else {
                 ShareViewModel.logger().error("Could not import files")
             }
@@ -178,7 +178,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
     }
 
     func downloadFileFromUrl(_ itemUrl: URL) async -> Bool {
-        ShareViewModel.logger().debug("Downloading file from \(itemUrl.absoluteString)")
+        ShareViewModel.logger().info("Downloading file from \(itemUrl.absoluteString)")
 
         do {
             let destinationURL = try Directories.getTempDirectory(
@@ -198,7 +198,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
                 for await progress in request.downloadProgress() {
                     let fileName = itemUrl.lastPathComponent
                     let downloadProgress = progress.fractionCompleted * 100
-                    ShareViewModel.logger().debug(
+                    ShareViewModel.logger().info(
                         "\(String(format: "Download progress for file '%@': %.2f%%", fileName, downloadProgress))"
                     )
                 }
