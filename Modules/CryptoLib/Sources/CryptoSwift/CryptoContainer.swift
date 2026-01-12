@@ -200,7 +200,7 @@ extension CryptoContainer {
         dataFiles: [URL],
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
     ) async throws -> CryptoContainerProtocol {
-        logger().debug("Opening or creating crypto container. Found \(dataFiles.count) datafile(s)")
+        logger().info("Opening or creating crypto container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
             logger().error("Unable to create or open crypto container. First datafile is nil")
             throw CryptoError.containerCreationFailed(
@@ -245,10 +245,10 @@ extension CryptoContainer {
         }
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
-            CryptoContainer.logger().debug("Opening existing crypto container")
+            CryptoContainer.logger().info("Opening existing crypto container")
             return try await open(containerFile: containerFile)
         } else {
-            CryptoContainer.logger().debug("Creating a new crypto container")
+            CryptoContainer.logger().info("Creating a new crypto container")
             return try await create(
                 containerFile: containerFile,
                 dataFiles: dataFiles,

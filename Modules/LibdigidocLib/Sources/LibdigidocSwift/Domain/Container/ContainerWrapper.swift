@@ -84,7 +84,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 saveDataFile: dataFile.fileId,
                 to: tempSavedFileLocation.resolvedPath
             )
-            ContainerWrapper.logger().debug("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
+            ContainerWrapper.logger().info("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
             return tempSavedFileLocation
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot save data file", code: 2)
@@ -108,7 +108,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
-        ContainerWrapper.logger().debug("Opening container file '\(containerFile.lastPathComponent)'")
+        ContainerWrapper.logger().info("Opening container file '\(containerFile.lastPathComponent)'")
 
         do {
             let container = try DigiDocContainerWrapper.open(

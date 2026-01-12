@@ -183,11 +183,7 @@ public:
     }
 
     std::string logFile() const final {
-        return logFileLocation(currentConf.logFile);
-    }
-
-    std::string logFileLocation(NSString *logsFolderPath) const {
-        return [logsFolderPath stringByAppendingPathComponent:@"libdigidocpp.log"].UTF8String;
+        return currentConf.logFile.UTF8String;
     }
 
     std::vector<digidoc::X509Cert> toX509Certs(NSArray<NSData*> *certBundle, NSURL *cert = nil) const {

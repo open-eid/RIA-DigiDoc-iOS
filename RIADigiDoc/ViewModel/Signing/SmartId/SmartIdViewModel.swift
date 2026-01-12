@@ -119,7 +119,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         roleData: RoleData,
         signedContainer: SignedContainerProtocol
     ) async -> SignedContainerProtocol? {
-        SmartIdViewModel.logger().debug("Smart-ID: Signing with Smart-ID")
+        SmartIdViewModel.logger().info("Smart-ID: Signing with Smart-ID")
 
         let currentConfiguration = await configurationRepository.getConfiguration()
 
@@ -142,17 +142,17 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
         let proxyInfo = await proxyUtil.getProxyInfo()
 
-        SmartIdViewModel.logger().debug("Smart-ID: Getting language")
+        SmartIdViewModel.logger().info("Smart-ID: Getting language")
         let appLanguage = await dataStore.getSelectedLanguage()
 
-        SmartIdViewModel.logger().debug("Smart-ID: Getting User-Agent")
+        SmartIdViewModel.logger().info("Smart-ID: Getting User-Agent")
         let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
 
         let containerFile: URL
         do {
             containerFile = try await getContainerFile(signedContainer: signedContainer)
         } catch {
-            SmartIdViewModel.logger().debug("Smart-ID: Unable to get container file from container")
+            SmartIdViewModel.logger().info("Smart-ID: Unable to get container file from container")
             handleSigningError(error)
             return nil
         }
@@ -171,7 +171,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
                 userAgent: userAgent
             )
         } catch {
-            SmartIdViewModel.logger().debug("Smart-ID: Unable to request certificate or get response")
+            SmartIdViewModel.logger().info("Smart-ID: Unable to request certificate or get response")
             handleSigningError(error)
             return nil
         }
@@ -194,7 +194,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
                 userAgent: userAgent
             )
         } catch {
-            SmartIdViewModel.logger().debug("Smart-ID: Unable to prepare signature for signing")
+            SmartIdViewModel.logger().info("Smart-ID: Unable to prepare signature for signing")
             handleSigningError(error)
             return nil
         }
@@ -235,7 +235,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             )
         } catch {
             endBackgroundTask()
-            SmartIdViewModel.logger().debug("Smart-ID: Unable to request signature or get cert from response")
+            SmartIdViewModel.logger().info("Smart-ID: Unable to request signature or get cert from response")
             handleSigningError(error)
             notificationUtil.removeNotification(id: notificationIdentifier)
             return nil
@@ -251,7 +251,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
                 containerFile: containerFile
             )
 
-            SmartIdViewModel.logger().debug("Signature added successfully (Smart-ID)")
+            SmartIdViewModel.logger().info("Signature added successfully (Smart-ID)")
             smartIdMessageKey = "Signature added"
             notificationUtil.removeNotification(id: notificationIdentifier)
             return updatedContainer
@@ -296,7 +296,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws -> SmartIdSessionResponse {
-        SmartIdViewModel.logger().debug("Smart-ID: Getting certificate")
+        SmartIdViewModel.logger().info("Smart-ID: Getting certificate")
         let certResponse = try await smartIdSignService
             .getCertificateRequest(
                 url: "\(sidUrl)\(SmartIdViewModel.certificateEndpoint)",
@@ -313,7 +313,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             throw SmartIdError.missingSessionId
         }
 
-        SmartIdViewModel.logger().debug("Smart-ID: Requesting session from certificate response")
+        SmartIdViewModel.logger().info("Smart-ID: Requesting session from certificate response")
 
         return try await requestSession(
             sidUrl: "\(sidUrl)\(SmartIdViewModel.sessionEndpoint)",
@@ -338,7 +338,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws -> Data {
-        SmartIdViewModel.logger().debug("Smart-ID: Getting signature")
+        SmartIdViewModel.logger().info("Smart-ID: Getting signature")
 
         let certResponse = try await smartIdSignService
             .getSignatureRequest(
@@ -359,7 +359,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             throw SmartIdError.missingSessionId
         }
 
-        SmartIdViewModel.logger().debug("Smart-ID: Requesting session from signature response")
+        SmartIdViewModel.logger().info("Smart-ID: Requesting session from signature response")
 
         let sessionResponse = try await requestSession(
             sidUrl: "\(sidUrl)\(SmartIdViewModel.sessionEndpoint)",
@@ -399,7 +399,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws -> SmartIdSessionResponse {
-        SmartIdViewModel.logger().debug("Smart-ID: Getting session")
+        SmartIdViewModel.logger().info("Smart-ID: Getting session")
         return try await smartIdSignService.getSessionRequest(
             url: sidUrl,
             sessionId: sessionId,
@@ -415,7 +415,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     }
 
     private func getTrustedCertificates(certificates: [Data]) -> [SecCertificate] {
-        SmartIdViewModel.logger().debug("Smart-ID: Getting trusted certificates list")
+        SmartIdViewModel.logger().info("Smart-ID: Getting trusted certificates list")
         return certificates.compactMap { certificateUtil.certificate(from: $0) }
     }
 
@@ -438,7 +438,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         signedContainer: SignedContainerProtocol,
         userAgent: String
     ) async throws -> Data {
-        SmartIdViewModel.logger().debug(
+        SmartIdViewModel.logger().info(
             "Smart-ID: Preparing signature. Calculating hash"
         )
 
@@ -451,7 +451,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     }
 
     private func getVerificationCode(hash: Data) async -> String {
-        SmartIdViewModel.logger().debug(
+        SmartIdViewModel.logger().info(
             "Smart-ID: Calculating verification code (control code)"
         )
         return await smartIdSignService.getVerificationCode(digest: sha256(data: hash))
@@ -483,7 +483,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
         case .explicitlyCancelled:
             // Do not throw an error if user cancelled signing with back button
-            SmartIdViewModel.logger().debug("Smart-ID signing manually cancelled")
+            SmartIdViewModel.logger().info("Smart-ID signing manually cancelled")
             smartIdMessageKey = nil
 
         case .noInternetConnection, .noResponse:

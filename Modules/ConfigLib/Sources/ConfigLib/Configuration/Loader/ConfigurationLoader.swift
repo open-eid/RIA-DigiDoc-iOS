@@ -62,7 +62,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws {
-        ConfigurationLoader.logger().debug("Initializing configuration")
+        ConfigurationLoader.logger().info("Initializing configuration")
 
         if !fileManager.fileExists(atPath: cacheDir.resolvedPath) {
             try fileManager.createDirectory(
@@ -74,7 +74,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         try await loadConfigurationProperty()
 
         if try await shouldCheckForUpdates() {
-            ConfigurationLoader.logger().debug("Checking for configuration updates...")
+            ConfigurationLoader.logger().info("Checking for configuration updates...")
             try await loadCentralConfiguration(
                 cacheDir: cacheDir,
                 proxyInfo: proxyInfo,
@@ -82,7 +82,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
             )
         }
 
-        ConfigurationLoader.logger().debug("Finished initializing configuration")
+        ConfigurationLoader.logger().info("Finished initializing configuration")
 
         finishConfigurationUpdate()
     }
@@ -132,7 +132,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
             fileManager.fileExists(atPath: signatureFile.resolvedPath)
 
         if configFilesExist {
-            ConfigurationLoader.logger().debug("Initializing cached configuration")
+            ConfigurationLoader.logger().info("Initializing cached configuration")
 
             let confFileContents = try String(contentsOf: confFile, encoding: .utf8)
             let publicKeyContents = try String(contentsOf: publicKeyFile, encoding: .utf8)
@@ -149,7 +149,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 from: Data(contentsOf: confFile)
             )
 
-            ConfigurationLoader.logger().debug(
+            ConfigurationLoader.logger().info(
                 "Using cached configuration version \(configurationProvider.metaInf.serial)"
             )
 
@@ -187,7 +187,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 updateConfiguration(configurationProvider)
             }
         } else {
-            ConfigurationLoader.logger().debug(
+            ConfigurationLoader.logger().info(
                 "Cached configuration not found. Initializing default configuration")
             try await loadDefaultConfiguration(cacheDir: configDir)
         }
@@ -247,7 +247,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
             ConfigurationProvider.self, from: Data(contentsOf: confDataURL)
         )
 
-        ConfigurationLoader.logger().debug(
+        ConfigurationLoader.logger().info(
             "Initializing default configuration version \(configurationProvider.metaInf.serial)"
         )
 
@@ -291,7 +291,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         ).trimmingCharacters(in: .whitespaces)
 
         if !centralSignature.isEmpty && currentSignature != centralSignature.data(using: .utf8) {
-            ConfigurationLoader.logger().debug("Found new configuration")
+            ConfigurationLoader.logger().info("Found new configuration")
 
             let centralConfig = try await centralConfigurationRepository.fetchConfiguration(
                 proxyInfo: proxyInfo,
@@ -306,7 +306,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
             let centralConfigurationProvider = try JSONDecoder().decode(
                 ConfigurationProvider.self, from: Data(centralConfig.utf8)
             )
-            ConfigurationLoader.logger().debug(
+            ConfigurationLoader.logger().info(
                 "Initializing configuration version \(centralConfigurationProvider.metaInf.serial)"
             )
 
@@ -350,7 +350,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)
             }
         } else {
-            ConfigurationLoader.logger().debug(
+            ConfigurationLoader.logger().info(
                 "New configuration not found. Using cached configuration"
             )
             try await loadCachedConfiguration(afterCentralCheck: true, cacheDir: configDir)

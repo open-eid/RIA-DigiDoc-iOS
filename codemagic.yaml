@@ -167,7 +167,11 @@ workflows:
             REPO_RIA_CONF_FLAGS="DEFAULT_CENTRAL_CONFIGURATION_URL='' DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=4 DEFAULT_CENTRAL_CONFIGURATION_TSL_URL=''"
           fi
           
-          ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS"
+          # Enable logging flag
+          LOGGING_FLAGS="OTHER_SWIFT_FLAGS=\"\$(inherited) -DENABLE_LOGGING\""
+          
+          # Add logging flag to conf flags
+          ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS $LOGGING_FLAGS"
 
           xcode-project build-ipa \
             --clean \

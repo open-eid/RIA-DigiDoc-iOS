@@ -309,7 +309,7 @@ extension SignedContainer {
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
         isSivaConfirmed: Bool
     ) async throws -> SignedContainerProtocol {
-        logger().debug("Opening or creating container. Found \(dataFiles.count) datafile(s)")
+        logger().info("Opening or creating container. Found \(dataFiles.count) datafile(s)")
         guard let firstFile = dataFiles.first else {
             logger().error("Unable to create or open container. First datafile is nil")
             throw DigiDocError.containerCreationFailed(
@@ -349,11 +349,11 @@ extension SignedContainer {
         }
 
         if dataFiles.count == 1 && isFirstDataFileContainer {
-            SignedContainer.logger().debug("Opening existing container")
+            SignedContainer.logger().info("Opening existing container")
             return try await open(file: containerFile, isSivaConfirmed: isSivaConfirmed)
         }
 
-        SignedContainer.logger().debug("Creating a new container")
+        SignedContainer.logger().info("Creating a new container")
         return try await create(containerFile: containerFile, dataFiles: dataFiles)
     }
 
@@ -433,20 +433,20 @@ extension SignedContainer {
             containerUtil: Container.shared.containerUtil()
         )
 
-        SignedContainer.logger().debug("Container created. Removing \(dataFiles.count) saved data files")
+        SignedContainer.logger().info("Container created. Removing \(dataFiles.count) saved data files")
         for (index, dataFile) in dataFiles.enumerated() {
             let containerName = await signedContainer.getContainerName()
             if await dataFile.isContainer() && containerName == dataFile.lastPathComponent {
                 continue
             }
 
-            SignedContainer.logger().debug(
+            SignedContainer.logger().info(
                 "Removing data file (\(index + 1) / \(dataFiles.count)): \(dataFile.lastPathComponent)"
             )
             if fileManager.fileExists(atPath: dataFile.resolvedPath) &&
                 fileManager.isDeletableFile(atPath: dataFile.resolvedPath) {
                 try fileManager.removeItem(at: dataFile)
-                SignedContainer.logger().debug("Data file: '\(dataFile.lastPathComponent)' removed")
+                SignedContainer.logger().info("Data file: '\(dataFile.lastPathComponent)' removed")
             }
         }
 

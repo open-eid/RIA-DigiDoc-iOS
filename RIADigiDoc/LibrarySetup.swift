@@ -30,6 +30,7 @@ actor LibrarySetup: Loggable {
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let fileManager: FileManagerProtocol
+    private let fileUtil: FileUtilProtocol
     private let tslUtil: TSLUtilProtocol
     private let dataStore: DataStoreProtocol
     private let advancedSettingsRepository: AdvancedSettingsRepositoryProtocol
@@ -42,6 +43,7 @@ actor LibrarySetup: Loggable {
         configurationLoader: ConfigurationLoaderProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
         fileManager: FileManagerProtocol,
+        fileUtil: FileUtilProtocol,
         tslUtil: TSLUtilProtocol,
         dataStore: DataStoreProtocol,
         advancedSettingsRepository: AdvancedSettingsRepositoryProtocol,
@@ -53,6 +55,7 @@ actor LibrarySetup: Loggable {
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
         self.fileManager = fileManager
+        self.fileUtil = fileUtil
         self.tslUtil = tslUtil
         self.dataStore = dataStore
         self.advancedSettingsRepository = advancedSettingsRepository
@@ -63,8 +66,7 @@ actor LibrarySetup: Loggable {
     }
 
     func setupLibraries() async {
-        let isLoggingEnabled = await dataStore.getIsLoggingEnabled()
-        await initializeLogging(isLoggingEnabled: isLoggingEnabled)
+        let isLoggingEnabled = await initializeLogging()
 
         do {
             let proxyInfo = await proxyUtil.getProxyInfo()
@@ -97,7 +99,7 @@ actor LibrarySetup: Loggable {
                 LibrarySetup.logger().error("Unable to initialize configuration: \(error)")
             }
 
-            LibrarySetup.logger().debug("Initializing Libdigidocpp")
+            LibrarySetup.logger().info("Initializing Libdigidocpp")
             try await DigiDocConf.initDigiDoc(
                 isLoggingEnabled: isLoggingEnabled,
                 tsaOption: getTSAOption(),
@@ -175,8 +177,24 @@ actor LibrarySetup: Loggable {
         )
     }
 
-    private func initializeLogging(isLoggingEnabled: Bool) async {
+    private func initializeLogging() async -> Bool {
+        #if DEBUG || ENABLE_LOGGING
+            let isLoggingEnabled = true
+            await dataStore.setEnableLoggingNextSession(true)
+        #else
+            let isLoggingEnabled = await dataStore.getEnableLoggingNextSession()
+            if !isLoggingEnabled {
+                fileUtil.removeCacheLogsDirectory()
+                fileUtil.removeLibraryLogsDirectory(directory: nil)
+            }
+            await dataStore.setEnableLoggingNextSession(false)
+        #endif
+
         Container.shared.isLoggingEnabled.register { isLoggingEnabled }
+        await dataStore.setEnableLoggingThisSession(isLoggingEnabled)
+        await dataStore.setIsLogFileSaved(false)
+
+        return isLoggingEnabled
     }
 
     private func getTSAOption() async -> ServicesSettingsOption {

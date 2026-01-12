@@ -29,14 +29,14 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol, Loggabl
     }
 
     public func requestAuthorization() async -> Bool {
-        NotificationUtil.logger().debug("Requesting authorization to send notifications")
+        NotificationUtil.logger().info("Requesting authorization to send notifications")
         let center = UNUserNotificationCenter.current()
         do {
             let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
-            NotificationUtil.logger().debug("Notification sending authorized: \(granted)")
+            NotificationUtil.logger().info("Notification sending authorized: \(granted)")
             return granted
         } catch {
-            NotificationUtil.logger().debug("Unable to request authorization to send notifications. \(error)")
+            NotificationUtil.logger().info("Unable to request authorization to send notifications. \(error)")
             return false
         }
     }
@@ -45,7 +45,7 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol, Loggabl
         title: String,
         body: String
     ) async throws -> String {
-        NotificationUtil.logger().debug("Sending notification (\(title))")
+        NotificationUtil.logger().info("Sending notification (\(title))")
 
         let notificationId = UUID().uuidString
         let content = UNMutableNotificationContent()
@@ -57,17 +57,17 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol, Loggabl
 
         try await UNUserNotificationCenter.current().add(request)
 
-        NotificationUtil.logger().debug("Notification sent. ID: \(notificationId)")
+        NotificationUtil.logger().info("Notification sent. ID: \(notificationId)")
 
         return notificationId
     }
 
     public func removeNotification(id: String) {
-        NotificationUtil.logger().debug("Removing notification (\(id))")
+        NotificationUtil.logger().info("Removing notification (\(id))")
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id])
         center.removeDeliveredNotifications(withIdentifiers: [id])
-        NotificationUtil.logger().debug("Removed notification \(id)")
+        NotificationUtil.logger().info("Removed notification \(id)")
     }
 }
 

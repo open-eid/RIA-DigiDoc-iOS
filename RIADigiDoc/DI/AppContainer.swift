@@ -32,6 +32,7 @@ extension Container {
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),
                 fileManager: self.fileManager(),
+                fileUtil: self.fileUtil(),
                 tslUtil: self.tslUtil(),
                 dataStore: self.dataStore(),
                 advancedSettingsRepository: self.advancedSettingsRepository(),
@@ -253,7 +254,8 @@ extension Container {
                 tslUtil: self.tslUtil(),
                 dataStore: self.dataStore(),
                 proxyUtil: self.proxyUtil(),
-                userAgentUtil: self.userAgentUtil()
+                userAgentUtil: self.userAgentUtil(),
+                fileUtil: self.fileUtil()
             )
         }
     }

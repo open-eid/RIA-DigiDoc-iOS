@@ -92,14 +92,14 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             if fileManager.fileExists(atPath: ldapCertFilePath) {
                 filePath = ldapCertFilePath
             } else {
-                OpenLdap.logger().debug("File ldapCerts.pem does not exist at directory path: \(ldapCertFilePath)")
+                OpenLdap.logger().info("File ldapCerts.pem does not exist at directory path: \(ldapCertFilePath)")
                 filePath = nil
             }
         }
 
         let searchType = SearchType(from: identityCode)
         if case .personalCode = searchType {
-            OpenLdap.logger().debug("Searching with personal code from LDAP")
+            OpenLdap.logger().info("Searching with personal code from LDAP")
             var result = [Addressee]()
             var tooManyResults = false
             for url in await self.ldapConfiguration.getLdapPersonURLS() {
@@ -117,7 +117,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             return (result, tooManyResults)
         } else {
             if let ldapCorpURL = await self.ldapConfiguration.getLdapCorpURL() {
-                OpenLdap.logger().debug("Searching with corporation keyword from LDAP")
+                OpenLdap.logger().info("Searching with corporation keyword from LDAP")
                 let (addresses, found) = OpenLdap.search(
                     searchType: searchType,
                     url: ldapCorpURL,
@@ -146,7 +146,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             var ldapConnectionReset = 0
             let result = ldap_set_option(nil, LDAP_OPT_X_TLS_NEWCTX, &ldapConnectionReset)
             guard result == LDAP_SUCCESS else {
-                OpenLdap.logger().debug(
+                OpenLdap.logger().info(
                     "ldap_set_option(LDAP_OPT_X_TLS_NEWCTX) failed: \(String(cString: ldap_err2string(result)))"
                 )
                 return ([], 0)
@@ -168,14 +168,14 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             if let ldap = ldap { ldap_destroy(ldap) }
         }
         guard ldapReturnCode == LDAP_SUCCESS else {
-            OpenLdap.logger().debug("Failed to initialize LDAP: \(String(cString: ldap_err2string(ldapReturnCode)))")
+            OpenLdap.logger().info("Failed to initialize LDAP: \(String(cString: ldap_err2string(ldapReturnCode)))")
             return ([], 0)
         }
 
         var ldapVersion = LDAP_VERSION3
         ldapReturnCode = ldap_set_option(ldap, LDAP_OPT_PROTOCOL_VERSION, &ldapVersion)
         guard ldapReturnCode == LDAP_SUCCESS else {
-            OpenLdap.logger().debug(
+            OpenLdap.logger().info(
                 "ldap_set_option(PROTOCOL_VERSION) failed: \(String(cString: ldap_err2string(ldapReturnCode)))"
             )
             return ([], 0)
@@ -187,7 +187,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         } else {
             distinguishedName.remove(at: distinguishedName.startIndex)
         }
-        OpenLdap.logger().debug("Searching from LDAP. Url: \(url) \(distinguishedName) \(searchType.filter)")
+        OpenLdap.logger().info("Searching from LDAP. Url: \(url) \(distinguishedName) \(searchType.filter)")
         var msgId: Int32 = 0
         var attr = Array("userCertificate;binary".utf8CString)
         ldapReturnCode = attr.withUnsafeMutableBufferPointer { attr in
@@ -210,7 +210,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         }
 
         guard ldapReturnCode == LDAP_SUCCESS else {
-            OpenLdap.logger().debug("ldap_search_ext failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
+            OpenLdap.logger().info("ldap_search_ext failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
             return ([], 0)
         }
 
@@ -232,7 +232,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             case Int32(LDAP_SUCCESS):
                 break
             default:
-                OpenLdap.logger().debug("ldap_result failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
+                OpenLdap.logger().info("ldap_result failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
                 return (addressees: result, totalAddressees: totalAddressees)
             }
         }
@@ -279,7 +279,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
                 }
 
                 if let namePointer = ldap_get_dn(ldap, currentMessage) {
-                    OpenLdap.logger().debug("Result (\(result.count)) \(String(cString: namePointer))")
+                    OpenLdap.logger().info("Result (\(result.count)) \(String(cString: namePointer))")
                     ldap_memfree(namePointer)
                 }
             }

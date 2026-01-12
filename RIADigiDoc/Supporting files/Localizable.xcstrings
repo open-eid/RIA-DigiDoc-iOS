@@ -3029,13 +3029,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable one-time log generation"
+            "value" : "Create a log file on the next startup"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiveeri ühekordne logifaili genereerimine"
+            "value" : "Loo järgmisel käivitusel logifail"
           }
         }
       }
@@ -3090,6 +3090,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Logimise aktiveerimiseks taaskäivita RIA DigiDoc."
+          }
+        }
+      }
+    },
+    "Main diagnostics restart message deactivate" : {
+      "comment" : "Main diagnostics restart message deactivate logging",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart RIA DigiDoc to deactivate logging."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logimise deaktiveerimiseks taaskäivita RIA DigiDoc."
           }
         }
       }

@@ -38,7 +38,7 @@ public struct PersonalCodeValidator: Loggable {
 
         guard !personalCode.isEmpty,
               personalCode.count == Constants.Validation.MaximumLatvianPersonalCodeLength else {
-            PersonalCodeValidator.logger().debug("Personal code is NOT Latvian")
+            PersonalCodeValidator.logger().info("Personal code is NOT Latvian")
             return false
         }
 

@@ -143,7 +143,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     }
 
     private func getPublicData() async throws -> CardInfo {
-        IdCardViewModel.logger().debug(
+        IdCardViewModel.logger().info(
             "ID-CARD: Getting public data from ID-card with reader"
         )
 
@@ -151,7 +151,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     }
 
     private func readAuthenticationCertificateNotValidDate() async throws -> String? {
-        IdCardViewModel.logger().debug(
+        IdCardViewModel.logger().info(
             "Reading authentication certificate from ID-card with reader"
         )
 
@@ -162,7 +162,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     }
 
     private func readSignatureCertificateNotValidDate() async throws -> String? {
-        IdCardViewModel.logger().debug(
+        IdCardViewModel.logger().info(
             "ID-CARD: Reading signature certificate from ID-card with reader"
         )
 
@@ -173,7 +173,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     }
 
     private func readCodeTryCounterRecord() async throws -> RetryCount {
-        IdCardViewModel.logger().debug(
+        IdCardViewModel.logger().info(
             "ID-CARD: Reading retry counter record from ID-card with reader"
         )
 
@@ -188,7 +188,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     }
 
     private func isPukChangeable() async throws -> Bool {
-        IdCardViewModel.logger().debug(
+        IdCardViewModel.logger().info(
             "ID-CARD: Reading if PUK is changeable for this ID-card with reader"
         )
 

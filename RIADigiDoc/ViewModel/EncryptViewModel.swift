@@ -84,7 +84,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     }
 
     func loadContainerData(cryptoContainer: CryptoContainerProtocol?) async {
-        EncryptViewModel.logger().debug("Loading container data")
+        EncryptViewModel.logger().info("Loading container data")
         let openedContainer = (cryptoContainer ?? sharedContainerViewModel.currentContainer())
             as? any CryptoContainerProtocol
         guard let openedContainer else {
@@ -100,7 +100,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         self.containerMimetype = await openedContainer.getContainerMimetype()
         self.containerURL = await openedContainer.getRawContainerFile()
 
-        EncryptViewModel.logger().debug("Container data loaded")
+        EncryptViewModel.logger().info("Container data loaded")
     }
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
@@ -157,7 +157,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         }
 
         await cryptoContainer?.addDataFiles(files)
-        EncryptViewModel.logger().debug("Added data files to container")
+        EncryptViewModel.logger().info("Added data files to container")
         errorMessage = ToastMessage(
             key: files.count == 1 ? "File successfully added" : "Files successfully added",
             args: []

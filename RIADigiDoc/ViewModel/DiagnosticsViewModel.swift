@@ -17,16 +17,23 @@
  *
  */
 
-import SwiftUI
 import CommonsLib
 import ConfigLib
 import LibdigidocLibSwift
+import OSLog
 import UtilsLib
 
 @Observable
 @MainActor
 class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     var configuration: ConfigurationProvider?
+
+    var enableOneTimeLogGeneration = false
+    var showSaveLogButton = false
+    var showRestartActivateAlert = false
+    var showRestartDeactivateAlert = false
+
+    var showRestartText = false
 
     // MARK: - section content
     var versionSectionContent: String = ""
@@ -46,6 +53,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     private let dataStore: DataStoreProtocol
     private let proxyUtil: ProxyUtilProtocol
     private let userAgentUtil: UserAgentUtilProtocol
+    private let fileUtil: FileUtilProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -57,7 +65,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         tslUtil: TSLUtilProtocol,
         dataStore: DataStoreProtocol,
         proxyUtil: ProxyUtilProtocol,
-        userAgentUtil: UserAgentUtilProtocol
+        userAgentUtil: UserAgentUtilProtocol,
+        fileUtil: FileUtilProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
@@ -67,6 +76,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         self.dataStore = dataStore
         self.proxyUtil = proxyUtil
         self.userAgentUtil = userAgentUtil
+        self.fileUtil = fileUtil
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -74,6 +84,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
 
         Task {
             await loadLibdigidocVersion()
+            await loadLoggingVariables()
         }
     }
 
@@ -81,7 +92,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         configurationObservationTask?.cancel()
     }
 
-    // MARK: - Fetching content
+    // MARK: - Fetching content - public
 
     func getConfigurationData(
         configuration: ConfigurationProvider?,
@@ -94,6 +105,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         loadTslSectionContent(schemaDirectory: tslSchemaDirectory)
         loadCentralConfigurationContent(configuration: configuration)
     }
+
+    // MARK: - Fetching content - private
 
     func getRpUuid() async -> String {
         await dataStore.getRelyingPartyUUID()
@@ -216,42 +229,23 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         return "\(dateTime.date) \(dateTime.time)"
     }
 
-    // MARK: - Create Log File
+    // MARK: - Create Diagnostics File - public
 
-    func createLogFile(languageSettings: LanguageSettingsProtocol, directory: URL? = nil) async -> URL? {
+    func createDiagnosticsFile(languageSettings: LanguageSettingsProtocol, directory: URL? = nil) async -> URL? {
         let diagnosticsText = buildDiagnosticsText(languageSettings: languageSettings)
-        do {
-
-            let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
-                subfolders: [CommonsLib.Constants.Folder.Logs],
-                fileManager: fileManager
-            )
-            let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
-            let fileURL = savedFilesDirectory.appending(path: diagnosticsFileName)
-
-            try diagnosticsText.write(to: fileURL, atomically: true, encoding: .utf8)
-
-            return fileURL
-        } catch {
-            DiagnosticsViewModel.logger().error(
-                "Failed to write diagnostics file: \(error.localizedDescription)")
-        }
-        return nil
+        let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
+        return writeToTempFile(
+            content: diagnosticsText,
+            fileName: diagnosticsFileName,
+            directory: directory
+        )
     }
 
-    func removeLogFilesDirectory() {
-        do {
-            let directory = try Directories.getCacheDirectory(
-                subfolders: [CommonsLib.Constants.Folder.Logs],
-                fileManager: fileManager
-            )
-            try fileManager.removeItem(at: directory)
-            DiagnosticsViewModel.logger().debug("Saved Files directory removed")
-        } catch {
-            DiagnosticsViewModel.logger().error(
-                "Unable to delete saved files directory: \(error.localizedDescription)")
-        }
+    func onDiagnosticsFileSavingComplete() {
+        fileUtil.removeCacheLogsDirectory()
     }
+
+    // MARK: - Create Diagnostics File - private
 
     private func buildDiagnosticsText(languageSettings: LanguageSettingsProtocol) -> String {
         var lines: [String] = []
@@ -290,7 +284,15 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         return lines.joined(separator: "\n")
     }
 
-    // MARK: - Update configuration
+    private func getTempFileURL(fileName: String, directory: URL? = nil) throws -> URL {
+        let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
+            subfolders: [CommonsLib.Constants.Folder.Logs],
+            fileManager: fileManager
+        )
+        return savedFilesDirectory.appending(path: fileName)
+    }
+
+    // MARK: - Update configuration - public
 
     func updateConfiguration() async -> Bool {
         do {
@@ -312,6 +314,174 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
             DiagnosticsViewModel.logger().error("Unable to update configuration: \(error)")
             return false
         }
+    }
+
+    // MARK: - Creating Log - public
+
+    public func onEnableOneTimeLogGenerationChange(_ isEnabled: Bool) async {
+        let dataStoreValue = await dataStore.getEnableLoggingNextSession()
+        if isEnabled == dataStoreValue {
+            return
+        }
+
+        if isEnabled {
+            self.showRestartActivateAlert = true
+        }
+        await dataStore.setEnableLoggingNextSession(isEnabled)
+
+        showRestartText = isEnabled
+
+        if !isEnabled {
+            showSaveLogButton = false
+            removeAllLogFiles()
+            await dataStore.setEnableLoggingThisSession(false)
+        }
+    }
+
+    public func createLogFile(directory: URL? = nil) async -> URL? {
+        let appLogEntries = await readAppLogEntries()
+        let libdigidocLogEntries = await readLibDigidocLogEntries()
+        let mergedLines = mergeLogEntries(appLogEntries, libdigidocLogEntries)
+        let logFileName = "ria_digidoc_\(self.versionSectionContent).log"
+        return writeToTempFile(
+            content: mergedLines,
+            fileName: logFileName,
+            directory: directory
+        )
+    }
+
+    public func onLogFileSavingComplete() async {
+        removeAllLogFiles()
+
+        await dataStore.setEnableLoggingNextSession(false)
+        await dataStore.setIsLogFileSaved(true)
+        self.showRestartText = true
+        self.enableOneTimeLogGeneration = false
+        self.showSaveLogButton = false
+        self.showRestartDeactivateAlert = true
+    }
+
+    // MARK: - Creating Log - private
+
+    private func loadLoggingVariables() async {
+        enableOneTimeLogGeneration = await dataStore.getEnableLoggingNextSession()
+        let enableLoggingThisSession = await dataStore.getEnableLoggingThisSession()
+        let isLogFileSaved = await dataStore.getIsLogFileSaved()
+        showSaveLogButton = enableLoggingThisSession && !isLogFileSaved
+
+        if (enableOneTimeLogGeneration && !showSaveLogButton) ||
+            (enableLoggingThisSession && isLogFileSaved) {
+            showRestartText = true
+        }
+    }
+
+    private func writeToTempFile(content: String, fileName: String, directory: URL?) -> URL? {
+        do {
+            let fileURL = try getTempFileURL(fileName: fileName, directory: directory)
+            try content.write(to: fileURL, atomically: true, encoding: .utf8)
+            return fileURL
+        } catch {
+            DiagnosticsViewModel.logger().error("Unable to write \"\(fileName)\" file: \(error)")
+        }
+        return nil
+    }
+
+    private func removeAllLogFiles() {
+        fileUtil.removeCacheLogsDirectory()
+        fileUtil.removeLibraryLogsDirectory(directory: nil)
+    }
+
+    private func entriesToLines(_ entries: AnySequence<OSLogEntry>) -> [String] {
+        var lines = [String]()
+        for entry in entries {
+            if let log = entry as? OSLogEntryLog {
+                lines.append("""
+                      \(entry.date) \
+                      [\(log.subsystem):\(log.category)] - \
+                      \(entry.composedMessage)
+                      """)
+            } else {
+                lines.append("\(entry.date): \(entry.composedMessage)\n")
+            }
+        }
+        return lines
+    }
+
+    private func readAppLogEntries() async -> [String]? {
+        return await withCheckedContinuation { continuation in
+            Task.detached(priority: .userInitiated) {
+                do {
+                    let store = try OSLogStore(scope: .currentProcessIdentifier)
+                    let oneDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+                    guard let yesterday = oneDayAgo else {
+                        continuation.resume(returning: nil)
+                        return
+                    }
+
+                    let position = store.position(date: yesterday)
+                    let bundleIdentifier = BundleUtil.getBundleIdentifier()
+                    let predicate = NSPredicate(
+                        format: "subsystem BEGINSWITH %@",
+                        bundleIdentifier
+                    )
+                    let entries = try store.getEntries(at: position, matching: predicate)
+                    let lines = await self.entriesToLines(entries)
+                    continuation.resume(returning: lines)
+                } catch {
+                    DiagnosticsViewModel.logger().error("Unable to get app log entries: \(error)")
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    private func readLibDigidocLogEntries() async -> [String]? {
+        if let libdigidocLogURL = await getLibDigidocLogURL() {
+            return getLines(from: libdigidocLogURL)
+        }
+        return nil
+    }
+
+    private func getLibDigidocLogURL() async -> URL? {
+        do {
+            return try Directories.getLibdigidocLogFile(
+                from: Directories.getLibraryDirectory(fileManager: fileManager),
+                fileManager: fileManager
+            )
+        } catch {
+            DiagnosticsViewModel.logger().error("Unable to get libdigidoc log URL: \(error)")
+        }
+        return nil
+    }
+
+    private func getLines(from url: URL?) -> [String] {
+        guard let url = url, fileManager.fileExists(atPath: url.path) else { return [] }
+        do {
+            let content = try String(contentsOf: url, encoding: .utf8)
+            return content.components(separatedBy: .newlines).filter { !$0.isEmpty }
+        } catch {
+            return []
+        }
+    }
+
+    private func mergeLogEntries(_ appLogEntries: [String]?, _ libDigidocLogEntries: [String]?) -> String {
+        var allEntries: [String] = []
+
+        allEntries.append("===== File: \(Constants.File.LibDigidocLog) =====")
+        allEntries.append("")
+        if let libDigidocLogEntries = libDigidocLogEntries {
+            allEntries.append(contentsOf: libDigidocLogEntries)
+        }
+
+        allEntries.append("")
+        allEntries.append("")
+        allEntries.append("===== File: ria_digidoc.log =====")
+        allEntries.append("")
+        if let appLogEntries = appLogEntries {
+            allEntries.append(contentsOf: appLogEntries)
+        }
+
+        return allEntries.joined(separator: "\n")
     }
 
     // MARK: - Observer
