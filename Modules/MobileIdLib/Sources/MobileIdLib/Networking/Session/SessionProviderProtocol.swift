@@ -18,19 +18,14 @@
  */
 
 import Foundation
+import Alamofire
+import CommonsLib
 
-public struct MobileIdSignatureResponse: Sendable, Decodable, CustomStringConvertible {
-    public let sessionID: String?
-
-    public var description: String {
-        return """
-        MobileIdSignatureResponse(
-            sessionId: \(sessionID ?? "-")
-        )
-        """
-    }
-
-    public init(sessionID: String?) {
-        self.sessionID = sessionID
-    }
+/// @mockable
+public protocol SessionProviderProtocol: Sendable {
+    func ensureSession(
+        url: String,
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo
+    ) async throws -> Session
 }

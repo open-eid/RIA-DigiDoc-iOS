@@ -35,6 +35,18 @@ public struct MobileIdCertificateResponse: Sendable, Decodable, CustomStringConv
         )
         """
     }
+
+    public init(
+        result: MobileIdCertificateResult?,
+        cert: String?,
+        time: String?,
+        traceId: String?
+    ) {
+        self.result = result
+        self.cert = cert
+        self.time = time
+        self.traceId = traceId
+    }
 }
 
 public enum MobileIdCertificateResult: String, Sendable, Decodable {
