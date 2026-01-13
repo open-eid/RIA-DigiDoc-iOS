@@ -261,4 +261,54 @@ struct DirectoriesTests {
         #expect(logFilePath != nil)
         #expect("libdigidocpp.log" == logFilePath?.lastPathComponent)
     }
+
+    @Test
+    func getDocumentsDirectory_success() async throws {
+        let mockDirectory = URL(fileURLWithPath: "mock/documents/directory")
+
+        mockFileManager.urlsHandler = { _, _ in
+            return [URL(fileURLWithPath: "mock/documents/directory")]
+        }
+
+        let directory = Directories.getDocumentsDirectory(fileManager: mockFileManager)
+
+        #expect(mockDirectory == directory)
+    }
+
+    @Test
+    func getDocumentsDirectory_returnNilWhenDocumentsFolderDoesNotExist() async throws {
+
+        mockFileManager.urlsHandler = { _, _ in
+            return []
+        }
+
+        let directory = Directories.getDocumentsDirectory(fileManager: mockFileManager)
+
+        #expect(directory == nil)
+    }
+
+    @Test
+    func getApplicationDirectory_success() async throws {
+        let mockDirectory = URL(fileURLWithPath: "mock/application/directory")
+
+        mockFileManager.urlsHandler = { _, _ in
+            return [URL(fileURLWithPath: "mock/application/directory")]
+        }
+
+        let directory = Directories.getApplicationDirectory(fileManager: mockFileManager)
+
+        #expect(mockDirectory == directory)
+    }
+
+    @Test
+    func getApplicationDirectory_returnNilWhenDocumentsFolderDoesNotExist() async throws {
+
+        mockFileManager.urlsHandler = { _, _ in
+            return []
+        }
+
+        let directory = Directories.getApplicationDirectory(fileManager: mockFileManager)
+
+        #expect(directory == nil)
+    }
 }

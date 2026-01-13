@@ -19,7 +19,7 @@
 
 import Foundation
 
-public struct RoleData: Sendable {
+public struct RoleData: Sendable, Equatable {
     public var roles: [String]
     public var city: String
     public var state: String

@@ -21,7 +21,28 @@ import Foundation
 import FactoryKit
 
 extension Container {
+    var sessionProvider: Factory<SessionProviderProtocol> {
+        self { SessionProvider() }
+    }
+
+    var responseHandler: Factory<ResponseHandlerProtocol> {
+        self { ResponseHandler() }
+    }
+
+    var requestPerfomer: Factory<RequestPerfomerProtocol> {
+        self {
+            RequestPerformer(
+                sessionProvider: self.sessionProvider(),
+                responseHandler: self.responseHandler()
+            )
+        }
+    }
+
     public var mobileIdSignService: Factory<MobileIdSignServiceProtocol> {
-        self { MobileIdSignService() }
+        self {
+            MobileIdSignService(
+                requestPerfomer: self.requestPerfomer()
+            )
+        }
     }
 }

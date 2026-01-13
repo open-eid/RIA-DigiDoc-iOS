@@ -747,4 +747,114 @@ final class SignedContainerTests {
             }
         }
     }
+
+    @Test
+    func prepareSignature_success() async throws {
+        let expectedData = Data([0x01, 0x02])
+        let cert = Data([0xAA])
+        let containerPath = URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        let roleData = RoleData(
+            roles: ["TestRole"],
+            city: "TestCity",
+            state: "TestState",
+            country: "TestCountry",
+            zipCode: "TestZipCode123"
+        )
+        let userAgent = "TestUserAgent"
+
+        mockContainerWrapper.prepareSignatureHandler =
+        { receivedCert, receivedPath, receivedRoleData, receivedAgent in
+
+            #expect(receivedCert == cert)
+            #expect(receivedPath == containerPath)
+            #expect(receivedRoleData == roleData)
+            #expect(receivedAgent == userAgent)
+
+            return expectedData
+        }
+
+        let result = try await signedContainer.prepareSignature(
+            cert: cert,
+            containerPath: containerPath,
+            roleData: roleData,
+            userAgent: userAgent
+        )
+
+        #expect(result == expectedData)
+    }
+
+    @Test
+    func prepareSignature_throwErrorWhenSignaturePreparingDoesNotSucceed() async {
+        mockContainerWrapper.prepareSignatureHandler = { _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        do {
+            _ = try await signedContainer
+                .prepareSignature(
+                    cert: Data(),
+                    containerPath: URL(fileURLWithPath: "/mock/path/mockContainer.asice"),
+                    roleData: RoleData(
+                        roles: ["TestRole"],
+                        city: "TestCity",
+                        state: "TestState",
+                        country: "TestCountry",
+                        zipCode: "TestZipCode123"
+                    ),
+                    userAgent: "TestUserAgent"
+                )
+            Issue.record("Expected error to be thrown")
+            return
+        } catch {
+            #expect(true)
+        }
+    }
+
+    @Test
+    func addSignature_success() async throws {
+        let signature = Data([0x01, 0x02])
+        let containerFile = URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        let returnedMockContainerWrapper = ContainerWrapperProtocolMock()
+
+        mockContainerWrapper.addSignatureHandler = { receivedSignature, receivedURL in
+            #expect(receivedSignature == signature)
+            #expect(receivedURL == containerFile)
+            return returnedMockContainerWrapper
+        }
+
+        mockContainerWrapper.getSignaturesHandler = {
+            return [MockSignatureWrapper.mockSignatureWrapper(
+                signatureId: "1"
+            )]
+        }
+
+        let result = try await signedContainer.addSignature(
+            signature: signature,
+            containerFile: containerFile
+        )
+
+        let resultSignatures = await result.getSignatures()
+        let returnedMockContainerWrapperSignatures = await returnedMockContainerWrapper.getSignatures()
+
+        await #expect(result.getRawContainerFile() == containerFile)
+        #expect(resultSignatures == returnedMockContainerWrapperSignatures)
+    }
+
+    @Test
+    func addSignature_propagatesErrorsFromContainer() async {
+        mockContainerWrapper.addSignatureHandler = { _, _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        do {
+            _ = try await signedContainer.addSignature(
+                signature: Data(),
+                containerFile: URL(fileURLWithPath: "/tmp/container.asice")
+            )
+            Issue.record("Expected error to be thrown")
+            return
+        } catch {
+            #expect(true)
+        }
+    }
 }

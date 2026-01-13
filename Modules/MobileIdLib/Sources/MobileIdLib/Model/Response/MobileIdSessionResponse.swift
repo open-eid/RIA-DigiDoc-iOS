@@ -39,6 +39,22 @@ public struct MobileIdSessionResponse: Sendable, Decodable, CustomStringConverti
         )
         """
     }
+
+    public init(
+        state: SessionResponseState?,
+        result: SessionResultCode?,
+        signature: MobileIdSessionSignatureResponse?,
+        cert: String?,
+        time: String?,
+        traceId: String?
+    ) {
+        self.state = state
+        self.result = result
+        self.signature = signature
+        self.cert = cert
+        self.time = time
+        self.traceId = traceId
+    }
 }
 
 public struct MobileIdSessionSignatureResponse: Sendable, Decodable {
@@ -51,6 +67,11 @@ public struct MobileIdSessionSignatureResponse: Sendable, Decodable {
             value: \(value?.base64EncodedString() ?? ""),
             algorithm: \(algorithm ?? "")
         """
+    }
+
+    public init(value: Data?, algorithm: String?) {
+        self.value = value
+        self.algorithm = algorithm
     }
 }
 

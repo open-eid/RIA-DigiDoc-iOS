@@ -44,6 +44,7 @@ let package = Package(
             name: "MobileIdLibTests",
             dependencies: [
                 "MobileIdLib",
+                "MobileIdLibMocks",
                 "CommonsLib",
                 "UtilsLib",
                 .product(name: "CommonsLibMocks", package: "commonslib"),

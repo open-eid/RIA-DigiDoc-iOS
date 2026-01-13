@@ -26,7 +26,7 @@ final class DataStoreTests {
     private let testSuiteName: String
 
     init() {
-        testSuiteName = "TestDataStore-\(UUID().uuidString)"
+        testSuiteName = "DataStoreTests-\(UUID().uuidString)"
         dataStore = DataStore(suiteName: testSuiteName)
     }
 
@@ -362,5 +362,63 @@ final class DataStoreTests {
         #expect(roleData.city == "Test city")
         #expect(roleData.state == "Test state")
         #expect(roleData.country == "Test country")
+    }
+
+    // MARK: - Selected signing method tests
+
+    @Test
+    func getSelectedSigningMethod_returnDefaultValuesWhenNoValuesSaved() async {
+
+        let result = await dataStore.getSelectedSigningMethod()
+
+        #expect(result == .idCardViaNFC)
+    }
+
+    @Test
+    func getSelectedSigningMethod_returnSavedSelectedMethodWhenValidSavedValueExists() async {
+        let actionMethod: ActionMethod = .mobileId
+
+        await dataStore.setSelectedSigningMethod(actionMethod)
+
+        let result = await dataStore.getSelectedSigningMethod()
+
+        #expect(result == actionMethod)
+    }
+
+    @Test
+    func setSelectedSigningMethod_success() async {
+        await dataStore.setSelectedSigningMethod(.mobileId)
+
+        let selectedSigningMethod = await dataStore.getSelectedSigningMethod()
+
+        #expect(selectedSigningMethod == .mobileId)
+    }
+
+    // MARK: - MobileID signing tests
+
+    @Test
+    func getMobileIdInputData_returnDefaultValuesWhenNoValuesSaved() async {
+        let result = await dataStore.getMobileIdInputData()
+
+        #expect(result.phoneNumber == Constants.MobileId.DefaultCountryCode)
+        #expect(result.personalCode == "")
+        #expect(result.rememberMe == true)
+    }
+
+    @Test
+    func setMobileIdInputData_success() async {
+        let input = MobileIdInputData(
+            phoneNumber: "37251234567",
+            personalCode: "60001019906",
+            rememberMe: true
+        )
+
+        await dataStore.setMobileIdInputData(input)
+
+        let inputData = await dataStore.getMobileIdInputData()
+
+        #expect(inputData.phoneNumber == input.phoneNumber)
+        #expect(inputData.personalCode == input.personalCode)
+        #expect(inputData.rememberMe == input.rememberMe)
     }
 }
