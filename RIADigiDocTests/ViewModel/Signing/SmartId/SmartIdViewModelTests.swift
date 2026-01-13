@@ -162,7 +162,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -184,7 +189,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -215,7 +225,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -243,7 +258,12 @@ struct SmartIdViewModelTests {
             country: .lithuania,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -279,7 +299,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "38501010001",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -329,7 +354,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "38501010001",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result != nil)
@@ -382,7 +412,12 @@ struct SmartIdViewModelTests {
             country: .latvia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result != nil)
@@ -418,7 +453,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -460,7 +500,12 @@ struct SmartIdViewModelTests {
             country: .latvia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -511,7 +556,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -553,7 +603,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -595,7 +650,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -637,7 +697,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: container
+            signedContainer: container,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -661,7 +726,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -684,7 +754,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -715,7 +790,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -738,7 +818,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -769,7 +854,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -792,7 +882,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -820,7 +915,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -860,7 +960,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -885,7 +990,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -910,7 +1020,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -934,7 +1049,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer()
+            signedContainer: mockContainer(),
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -981,7 +1101,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer
+            signedContainer: mockContainer,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -1027,7 +1152,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer
+            signedContainer: mockContainer,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)
@@ -1093,7 +1223,12 @@ struct SmartIdViewModelTests {
             country: .estonia,
             personalCode: "60001019906",
             roleData: roleData,
-            signedContainer: mockContainer
+            signedContainer: mockContainer,
+            liveActivityTexts: SmartIdLiveActivityTexts(
+                initialMessage: "Initial message",
+                controlCodeTitle: "Control code",
+                compactTitle: "Code"
+            )
         )
 
         #expect(result == nil)

@@ -63,6 +63,7 @@ public final class NotificationUtil: NSObject, NotificationUtilProtocol, Loggabl
     }
 
     public func removeNotification(id: String) {
+        guard !id.isEmpty else { return }
         NotificationUtil.logger().info("Removing notification (\(id))")
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [id])

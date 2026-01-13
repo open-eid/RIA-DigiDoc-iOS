@@ -626,6 +626,24 @@
         }
       }
     },
+    "Code" : {
+      "comment" : "Smart-ID live activity Dynamic Island compact text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kood"
+          }
+        }
+      }
+    },
     "ConcatKDF reference method" : {
       "comment" : "Recipient detail",
       "extractionState" : "manual",
@@ -4550,6 +4568,24 @@
         }
       }
     },
+    "Mobile-ID signing info message" : {
+      "comment" : "Displayed under control code when signing with Mobile-ID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make sure the control code matches the one on phone screen and enter mobile-ID PIN2 code."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veendu kontrollkoodi õigsuses ja sisesta telefonil mobiil-ID PIN2-kood."
+          }
+        }
+      }
+    },
     "More options" : {
       "comment" : "More options button name",
       "localizations" : {
@@ -7189,6 +7225,24 @@
         }
       }
     },
+    "Smart-ID control code signing info message" : {
+      "comment" : "Displayed under control code when signing with Smart-ID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make sure control code matches with one in phone screen and enter Smart-ID PIN2 code."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veendu kontrollkoodi õigsuses ja sisesta nutiseadmes Smart-ID PIN2-kood."
+          }
+        }
+      }
+    },
     "Smart-ID notification title" : {
       "comment" : "Smart-ID signing notification title in Notification Center",
       "extractionState" : "manual",
@@ -7239,6 +7293,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sessiooni ei leitud"
+          }
+        }
+      }
+    },
+    "Smart-ID signing info message" : {
+      "comment" : "Displayed under control code when signing with Smart-ID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm device for signing in Smart-ID application."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamiseks kinnita seade Smart-ID rakenduses."
           }
         }
       }
