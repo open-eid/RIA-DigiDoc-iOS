@@ -48,6 +48,9 @@
 		DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD042E82B1AB00906874 /* Alamofire */; };
 		DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F12B2CF020C200185A7F /* CommonsLib */; };
 		DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFB1F1302CF0217C00185A7F /* CommonsLib */; };
+		DFB663A02F16917E00804545 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFB6639F2F16917D00804545 /* WidgetKit.framework */; };
+		DFB663A22F16917E00804545 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFB663A12F16917E00804545 /* SwiftUI.framework */; };
+		DFB663AF2F16918100804545 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +61,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = DF4E43C02D0BA38600967997;
 			remoteInfo = FileImportShareExtension;
+		};
+		DFB663AD2F16918100804545 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFDB14732CC97B0E00153876 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DFB6639D2F16917D00804545;
+			remoteInfo = WidgetExtensionExtension;
 		};
 		DFCE022F2D148B4D00216362 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -89,6 +99,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				DFB663AF2F16918100804545 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */,
 				DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -125,6 +136,9 @@
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MobileIdLib; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
+		DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DFB6639F2F16917D00804545 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		DFB663A12F16917E00804545 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileImportShareExtensionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFCF22F82E83512D0015AE6B /* CommonsTestShared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CommonsTestShared; sourceTree = "<group>"; };
 		DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RIADigiDoc.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +178,7 @@
 				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
 				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
+				Domain/Model/Signing/SmartId/SmartIdLiveActivityTexts.swift,
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
@@ -295,6 +310,7 @@
 				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
 				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
+				Domain/Model/Signing/SmartId/SmartIdLiveActivityTexts.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
@@ -346,6 +362,7 @@
 				Domain/Model/Signing/SigningMethod.swift,
 				Domain/Model/Signing/SmartId/SmartIdCountry.swift,
 				Domain/Model/Signing/SmartId/SmartIdInputData.swift,
+				Domain/Model/Signing/SmartId/SmartIdLiveActivityTexts.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
@@ -355,6 +372,27 @@
 				ViewModel/Protocols/ProxySettingsViewModelProtocol.swift,
 			);
 			target = DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */;
+		};
+		DFA5D36B2F19077D00FA3836 /* Exceptions for "WidgetExtension" folder in "RIADigiDocTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WidgetExtensionAttributes.swift,
+			);
+			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
+		};
+		DFB663B32F16918100804545 /* Exceptions for "WidgetExtension" folder in "WidgetExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DFB6639D2F16917D00804545 /* WidgetExtensionExtension */;
+		};
+		DFB663B72F16939700804545 /* Exceptions for "WidgetExtension" folder in "RIADigiDoc" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WidgetExtensionAttributes.swift,
+			);
+			target = DFDB147A2CC97B0E00153876 /* RIADigiDoc */;
 		};
 		DFDBADEC2DE7BDBC00C8A9A5 /* Exceptions for "RIADigiDocTests" folder in "RIADigiDocTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -374,6 +412,16 @@
 			);
 			name = FileImportShareExtension;
 			path = Extensions/FileImportShareExtension;
+			sourceTree = "<group>";
+		};
+		DFB663A32F16917E00804545 /* WidgetExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DFB663B72F16939700804545 /* Exceptions for "WidgetExtension" folder in "RIADigiDoc" target */,
+				DFA5D36B2F19077D00FA3836 /* Exceptions for "WidgetExtension" folder in "RIADigiDocTests" target */,
+				DFB663B32F16918100804545 /* Exceptions for "WidgetExtension" folder in "WidgetExtensionExtension" target */,
+			);
+			path = WidgetExtension;
 			sourceTree = "<group>";
 		};
 		DFCE022C2D148B4D00216362 /* FileImportShareExtensionTests */ = {
@@ -418,6 +466,15 @@
 				DF9AFE992E0358C20062C64D /* FactoryKit in Frameworks */,
 				1A4A775E2EF19823001747D8 /* ConfigLib in Frameworks */,
 				DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFB6639B2F16917D00804545 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DFB663A22F16917E00804545 /* SwiftUI.framework in Frameworks */,
+				DFB663A02F16917E00804545 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,6 +594,8 @@
 			isa = PBXGroup;
 			children = (
 				DFA3EE432D14962C001D951B /* FileImportShareExtension */,
+				DFB6639F2F16917D00804545 /* WidgetKit.framework */,
+				DFB663A12F16917E00804545 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -551,6 +610,7 @@
 				DFA16AFE2CD18BD00099D34F /* Modules */,
 				DF4E43C22D0BA38600967997 /* FileImportShareExtension */,
 				DFCE022C2D148B4D00216362 /* FileImportShareExtensionTests */,
+				DFB663A32F16917E00804545 /* WidgetExtension */,
 				DFD24C382CD1B718004C1D2E /* Frameworks */,
 				DFDB147C2CC97B0E00153876 /* Products */,
 			);
@@ -564,6 +624,7 @@
 				DFDB14962CC97B1000153876 /* RIADigiDocUITests.xctest */,
 				DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */,
 				DFCE022B2D148B4D00216362 /* FileImportShareExtensionTests.xctest */,
+				DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -596,6 +657,28 @@
 			);
 			productName = FileImportShareExtension;
 			productReference = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		DFB6639D2F16917D00804545 /* WidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DFB663B22F16918100804545 /* Build configuration list for PBXNativeTarget "WidgetExtensionExtension" */;
+			buildPhases = (
+				DFB6639A2F16917D00804545 /* Sources */,
+				DFB6639B2F16917D00804545 /* Frameworks */,
+				DFB6639C2F16917D00804545 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DFB663A32F16917E00804545 /* WidgetExtension */,
+			);
+			name = WidgetExtensionExtension;
+			packageProductDependencies = (
+			);
+			productName = WidgetExtensionExtension;
+			productReference = DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */ = {
@@ -645,6 +728,7 @@
 			);
 			dependencies = (
 				DF4E43CA2D0BA38600967997 /* PBXTargetDependency */,
+				DFB663AE2F16918100804545 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				DFDB147D2CC97B0E00153876 /* RIADigiDoc */,
@@ -737,12 +821,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = "Riigi Infosüsteemi Amet";
 				TargetAttributes = {
 					DF4E43C02D0BA38600967997 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					DFB6639D2F16917D00804545 = {
+						CreatedOnToolsVersion = 26.2;
 					};
 					DFCE022A2D148B4D00216362 = {
 						CreatedOnToolsVersion = 16.2;
@@ -797,12 +884,20 @@
 				DFDB14952CC97B1000153876 /* RIADigiDocUITests */,
 				DF4E43C02D0BA38600967997 /* FileImportShareExtension */,
 				DFCE022A2D148B4D00216362 /* FileImportShareExtensionTests */,
+				DFB6639D2F16917D00804545 /* WidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DF4E43BF2D0BA38600967997 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DFB6639C2F16917D00804545 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -894,6 +989,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DFB6639A2F16917D00804545 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DFCE02272D148B4D00216362 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -929,6 +1031,11 @@
 			isa = PBXTargetDependency;
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 			targetProxy = DF4E43C92D0BA38600967997 /* PBXContainerItemProxy */;
+		};
+		DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DFB6639D2F16917D00804545 /* WidgetExtensionExtension */;
+			targetProxy = DFB663AD2F16918100804545 /* PBXContainerItemProxy */;
 		};
 		DFCE02302D148B4D00216362 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1006,6 +1113,69 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_INTEROP_MODE = objc;
 				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DFB663B02F16918100804545 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ET847QJV9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Riigi Infosüsteemi Amet. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DFB663B12F16918100804545 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ET847QJV9F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Riigi Infosüsteemi Amet. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1424,6 +1594,15 @@
 			buildConfigurations = (
 				DF4E43CD2D0BA38600967997 /* Debug */,
 				DF4E43CE2D0BA38600967997 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DFB663B22F16918100804545 /* Build configuration list for PBXNativeTarget "WidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DFB663B02F16918100804545 /* Debug */,
+				DFB663B12F16918100804545 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -29,6 +29,7 @@ struct ControlCodeView: View {
     var icon: String
 
     @Binding var controlCode: String
+    @Binding var infoMessage: String
 
     var body: some View {
         VStack(alignment: .center) {
@@ -51,10 +52,16 @@ struct ControlCodeView: View {
                     .foregroundStyle(theme.onSurface)
                     .scaleEffect(x: Dimensions.Scaling.WideScaling, y: Dimensions.Scaling.DefaultScaling)
                     .accessibilityIdentifier("controlCode")
+
+                Text(verbatim: languageSettings.localized(infoMessage))
+                    .font(typography.bodyLarge)
+                    .foregroundStyle(theme.onSurface)
+                    .accessibilityIdentifier("infoMessage")
             }
         }
         .onDisappear {
             controlCode = "- - - -"
+            infoMessage = ""
         }
     }
 }
@@ -62,7 +69,8 @@ struct ControlCodeView: View {
 #Preview {
     ControlCodeView(
         icon: "mobile_id_logo",
-        controlCode: .constant("1234")
+        controlCode: .constant("1234"),
+        infoMessage: .constant("Mobile-ID info message")
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

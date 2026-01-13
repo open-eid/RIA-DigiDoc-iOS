@@ -38,6 +38,10 @@ struct MobileIdView: View {
 
     @State private var task: Task<Void, Never>?
 
+    private var infoMessage: String {
+        languageSettings.localized(viewModel.infoMessage)
+    }
+
     let signedContainer: SignedContainerProtocol
     let onSuccess: (SignedContainerProtocol) -> Void
 
@@ -77,7 +81,8 @@ struct MobileIdView: View {
                 if isSigning {
                     ControlCodeView(
                         icon: "mobile_id_logo",
-                        controlCode: $viewModel.controlCode
+                        controlCode: $viewModel.controlCode,
+                        infoMessage: $viewModel.infoMessage
                     )
                 } else {
                     MobileIdInputView(

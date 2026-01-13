@@ -39,6 +39,14 @@ struct SmartIdView: View {
 
     @State private var task: Task<Void, Never>?
 
+    private var liveActivityTexts: SmartIdLiveActivityTexts {
+        SmartIdLiveActivityTexts(
+            initialMessage: languageSettings.localized("Smart-ID signing info message"),
+            controlCodeTitle: languageSettings.localized("Smart-ID notification title"),
+            compactTitle: languageSettings.localized("Code")
+        )
+    }
+
     private let signedContainer: SignedContainerProtocol
     private let onSuccess: (SignedContainerProtocol) -> Void
 
@@ -78,7 +86,8 @@ struct SmartIdView: View {
                 if isSigning {
                     ControlCodeView(
                         icon: "smart_id_logo",
-                        controlCode: $viewModel.controlCode
+                        controlCode: $viewModel.controlCode,
+                        infoMessage: $viewModel.infoMessage
                     )
                     .onChange(of: scenePhase) { _, newPhase in
                         switch newPhase {
@@ -192,7 +201,8 @@ struct SmartIdView: View {
                     country: "",
                     zipCode: ""
                 ),
-                signedContainer: signedContainer
+                signedContainer: signedContainer,
+                liveActivityTexts: liveActivityTexts
             )
             guard let container = updatedContainer else {
                 cancelSigning()

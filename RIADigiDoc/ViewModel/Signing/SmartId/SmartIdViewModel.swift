@@ -25,10 +25,14 @@ import UtilsLib
 import ConfigLib
 import CommonsLib
 import CryptoKit
+import ActivityKit
 
 @Observable
 @MainActor
 class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
+
+    private var activity: Activity<WidgetExtensionAttributes>?
+
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     private static let certificateEndpoint = "/certificatechoice/etsi"
@@ -36,6 +40,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     private static let sessionEndpoint = "/session"
 
     var controlCode: String = "- - - -"
+    var infoMessage: String = "Smart-ID signing info message"
 
     var personalCodeErrorKey: String?
 
@@ -117,7 +122,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         country: SmartIdCountry,
         personalCode: String,
         roleData: RoleData,
-        signedContainer: SignedContainerProtocol
+        signedContainer: SignedContainerProtocol,
+        liveActivityTexts: SmartIdLiveActivityTexts
     ) async -> SignedContainerProtocol? {
         SmartIdViewModel.logger().info("Smart-ID: Signing with Smart-ID")
 
@@ -157,7 +163,16 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             return nil
         }
 
-        let isNotificationPermissionGranted = await notificationUtil.requestAuthorization()
+        var isNotificationPermissionGranted = false
+        do {
+            try startLiveActivity(withTexts: liveActivityTexts)
+        } catch {
+            SmartIdViewModel.logger().error(
+                "Smart-ID: Unable to start live activity for verification code (control code). \(error)"
+            )
+
+            isNotificationPermissionGranted = await notificationUtil.requestAuthorization()
+        }
 
         let response: SmartIdSessionResponse
         do {
@@ -200,6 +215,9 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         }
 
         controlCode = await getVerificationCode(hash: hash)
+        infoMessage = "Smart-ID control code signing info message"
+
+        await updateLiveActivity(withTexts: liveActivityTexts)
 
         var notificationIdentifier: String = ""
         do {
@@ -238,10 +256,13 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().info("Smart-ID: Unable to request signature or get cert from response")
             handleSigningError(error)
             notificationUtil.removeNotification(id: notificationIdentifier)
+            await endLiveActivity()
             return nil
         }
 
         endBackgroundTask()
+
+        await endLiveActivity()
 
         do {
             try Task.checkCancellation()
@@ -254,11 +275,13 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().info("Signature added successfully (Smart-ID)")
             smartIdMessageKey = "Signature added"
             notificationUtil.removeNotification(id: notificationIdentifier)
+            await endLiveActivity()
             return updatedContainer
         } catch {
             SmartIdViewModel.logger().error("Unable to sign container with Smart-ID: \(error)")
             handleSignatureAddingError(error)
             notificationUtil.removeNotification(id: notificationIdentifier)
+            await endLiveActivity()
             return nil
         }
     }
@@ -606,5 +629,84 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         default:
             smartIdMessageKey = "General error"
         }
+    }
+
+    private func startLiveActivity(withTexts texts: SmartIdLiveActivityTexts) throws {
+        if UIAccessibility.isVoiceOverRunning {
+            SmartIdViewModel.logger().info("Smart-ID: VoiceOver active - using local notification instead")
+            throw ActivityAuthorizationError.unsupported
+        }
+
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            SmartIdViewModel.logger().info("Smart-ID: Live Activities not enabled - using local notification instead")
+            throw ActivityAuthorizationError.denied
+        }
+
+        if let existingActivity = Activity<WidgetExtensionAttributes>.activities.first {
+            self.activity = existingActivity
+            return
+        }
+
+        let attributes = WidgetExtensionAttributes()
+        let initialState = WidgetExtensionAttributes.ContentState(
+            title: texts.initialMessage,
+            compactTitle: texts.compactTitle,
+            controlCode: ""
+        )
+
+        activity = try Activity.request(
+            attributes: attributes,
+            content: ActivityContent(
+                state: initialState,
+                staleDate: Date.now.addingTimeInterval(100000),
+                relevanceScore: 100.0
+            ),
+            pushType: nil
+        )
+
+        SmartIdViewModel.logger().info("Smart-ID: Live activity started for control code")
+    }
+
+    private func updateLiveActivity(withTexts texts: SmartIdLiveActivityTexts) async {
+        guard let activity = self.activity else {
+            SmartIdViewModel.logger().error("Smart-ID: No active Live Activity to update")
+            return
+        }
+
+        let newState = WidgetExtensionAttributes.ContentState(
+            title: texts.controlCodeTitle,
+            compactTitle: texts.compactTitle,
+            controlCode: controlCode
+        )
+        let newContent = ActivityContent(
+            state: newState,
+            staleDate: nil
+        )
+
+        await activity.update(newContent)
+
+        SmartIdViewModel.logger().info("Smart-ID: Live Activity updated")
+    }
+
+    func endLiveActivity() async {
+        guard let activity else { return }
+
+        let state = WidgetExtensionAttributes.ContentState(
+            title: "",
+            compactTitle: "",
+            controlCode: ""
+        )
+
+        let content = ActivityContent(
+            state: state,
+            staleDate: nil
+        )
+
+        await activity.end(
+            content,
+            dismissalPolicy: .immediate
+        )
+
+        self.activity = nil
     }
 }

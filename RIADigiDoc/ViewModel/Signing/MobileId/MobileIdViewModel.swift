@@ -34,6 +34,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     private static let signatureSessionEndpoint = "\(signatureEndpoint)/session"
 
     var controlCode: String = "- - - -"
+    var infoMessage: String = "Mobile-ID signing info message"
 
     var countryCodeAndPhoneErrorKey: String?
     var personalCodeErrorKey: String?
