@@ -39,6 +39,8 @@ struct ActionMethodSelectionView: View {
 
     var actionMethodTitle: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Choose a method of decryption")
         case .signing:
             languageSettings.localized("Choose a signing method")
         case .myeid:
@@ -48,6 +50,8 @@ struct ActionMethodSelectionView: View {
 
     private var selectedActionMethodLabel: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Decryption method")
         case .signing:
             languageSettings.localized("Signing method")
         case .myeid:
@@ -57,6 +61,8 @@ struct ActionMethodSelectionView: View {
 
     var saveButtonAccessibilityLabel: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Decryption method changed")
         case .signing:
             languageSettings.localized("Signing method changed")
         case .myeid:
@@ -125,6 +131,8 @@ struct ActionMethodSelectionView: View {
         .onAppear {
             Task {
                 switch actionType {
+                case .decrypt:
+                    selectedMethod = await viewModel.getSelectedDecryptMethod()
                 case .signing:
                     selectedMethod = await viewModel.getSelectedSigningMethod()
                 case .myeid:
@@ -148,6 +156,8 @@ struct ActionMethodSelectionView: View {
     func setActionMethod(_ selectedMethod: ActionMethod) {
         Task {
             switch actionType {
+            case .decrypt:
+                await viewModel.setSelectedDecryptMethod(selectedMethod)
             case .signing:
                 await viewModel.setSelectedSigningMethod(selectedMethod)
             case .myeid:

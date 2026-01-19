@@ -448,6 +448,24 @@
         }
       }
     },
+    "Choose a method of decryption" : {
+      "comment" : "Title for decrypt method choosing view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a method of decryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali dekrüpteerimise meetod"
+          }
+        }
+      }
+    },
     "Choose a signing method" : {
       "comment" : "Title for signing method choosing view",
       "extractionState" : "manual",
@@ -626,6 +644,24 @@
         }
       }
     },
+    "Container decryption" : {
+      "comment" : "DecryptView title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container decryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku dekrüpteerimine"
+          }
+        }
+      }
+    },
     "Container encryption" : {
       "comment" : "EncryptView title",
       "extractionState" : "manual",
@@ -783,6 +819,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku allkirjastamine"
+          }
+        }
+      }
+    },
+    "Container successfully decrypted" : {
+      "comment" : "Container decrypted success text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container successfully decrypted!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbrik edukalt dekrüpteeritud!"
           }
         }
       }
@@ -1016,6 +1070,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dekrüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Decryption method" : {
+      "comment" : "Title for signing method in container decrypt view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption method"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimise meetod"
+          }
+        }
+      }
+    },
+    "Decryption method changed" : {
+      "comment" : "Decryption method selection button accessibility label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption method changed"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimise meetod muudetud"
           }
         }
       }

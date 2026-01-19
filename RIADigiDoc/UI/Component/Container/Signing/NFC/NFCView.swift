@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import CryptoSwift
 import LibdigidocLibSwift
 import CommonsLib
 
@@ -65,20 +66,27 @@ struct NFCView: View {
     }
 
     let signedContainer: SignedContainerProtocol?
+    let cryptoContainer: CryptoContainerProtocol?
+
     let onSuccess: (SignedContainerProtocol) -> Void
+    let onSuccessDecrypt: (CryptoContainerProtocol) -> Void
 
     init(
         actionType: ActionType,
         actionMethods: [ActionMethod],
-        signedContainer: SignedContainerProtocol?,
-        onSuccess: @escaping (SignedContainerProtocol) -> Void
+        cryptoContainer: CryptoContainerProtocol? = nil,
+        signedContainer: SignedContainerProtocol? = nil,
+        onSuccess: @escaping (SignedContainerProtocol) -> Void = { _ in },
+        onSuccessDecrypt: @escaping (CryptoContainerProtocol) -> Void = { _ in }
     ) {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
         _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
         self.actionType = actionType
         self.actionMethods = actionMethods
+        self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
         self.onSuccess = onSuccess
+        self.onSuccessDecrypt = onSuccessDecrypt
     }
 
     var body: some View {
@@ -97,6 +105,11 @@ struct NFCView: View {
             },
             onSubmit: {
                 switch actionType {
+                case .decrypt:
+                    saveInputData()
+
+                    // TODO: Implement decrypt action
+                    isInProgress = true
                 case .signing:
                     saveInputData()
 

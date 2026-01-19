@@ -346,6 +346,20 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(info.username, forKey: Keys.proxyInfoUsername)
     }
 
+    // MARK: - Decrypt Selection Methods
+
+    public func getSelectedDecryptMethod() async -> ActionMethod {
+        if let rawValue = userDefaults().string(forKey: Keys.selectedDecryptMethod) {
+            return ActionMethod(rawValue: rawValue) ??
+            DefaultValues.selectedDecryptMethod
+        }
+        return DefaultValues.selectedDecryptMethod
+    }
+
+    public func setSelectedDecryptMethod(_ method: ActionMethod) async {
+        userDefaults().set(method.rawValue, forKey: Keys.selectedDecryptMethod)
+    }
+
     // MARK: - Signing Selection Methods
 
     public func getSelectedSigningMethod() async -> ActionMethod {
@@ -483,6 +497,7 @@ public actor DataStore: DataStoreProtocol {
         static let proxyOption: ProxySettingsOption = .disabled
         static let selectedSigningMethod: ActionMethod = .idCardViaNFC
         static let selectedMyEidMethod: ActionMethod = .idCardViaNFC
+        static let selectedDecryptMethod: ActionMethod = .idCardViaNFC
         static let mobileIdPhoneNumber = Constants.MobileId.DefaultCountryCode
         static let mobileIdPersonalCode = ""
         static let smartIdCountry = SmartIdCountry.estonia
@@ -520,6 +535,7 @@ public actor DataStore: DataStoreProtocol {
         static let relyingPartyOption = "relyingPartyOption"
         static let selectedSigningMethod = "selectedSigningMethod"
         static let selectedMyEidMethod = "selectedMyEidMethod"
+        static let selectedDecryptMethod = "selectedDecryptMethod"
         static let mobileIdPhoneNumber = "mobileIdPhoneNumber"
         static let mobileIdPersonalCode = "mobileIdPersonalCode"
         static let mobileIdRememberMe = "mobileIdRememberMe"

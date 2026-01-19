@@ -197,6 +197,8 @@
 				ViewModel/AdvancedSettingsViewModel.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/ContentViewModel.swift,
+				ViewModel/Crypto/DecryptRootViewModel.swift,
+				ViewModel/Crypto/DecryptRootViewModelProtocol.swift,
 				ViewModel/CryptoFileOpeningViewModel.swift,
 				ViewModel/CryptoHomeViewModel.swift,
 				ViewModel/DataFilesViewModel.swift,

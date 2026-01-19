@@ -39,6 +39,8 @@ struct ActionInputScreen<Content: View>: View {
 
     private var headerTitle: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Container decryption")
         case .signing:
             languageSettings.localized("Container signing")
         case .myeid:
@@ -48,6 +50,8 @@ struct ActionInputScreen<Content: View>: View {
 
     private var selectedActionMethodLabel: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Decryption method")
         case .signing:
             languageSettings.localized("Signing method")
         case .myeid:
@@ -61,6 +65,8 @@ struct ActionInputScreen<Content: View>: View {
 
     private var buttonTitle: String {
         switch actionType {
+        case .decrypt:
+            languageSettings.localized("Decrypt")
         case .signing:
             languageSettings.localized("Sign")
         case .myeid:

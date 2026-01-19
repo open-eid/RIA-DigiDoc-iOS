@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import CryptoSwift
 import LibdigidocLibSwift
 
 struct IdCardView: View {
@@ -32,18 +33,25 @@ struct IdCardView: View {
     @State private var idCardActionMessage: String = "ID card connect card reader"
 
     let signedContainer: SignedContainerProtocol?
+    let cryptoContainer: CryptoContainerProtocol?
+
     let onSuccess: (SignedContainerProtocol) -> Void
+    let onSuccessDecrypt: (CryptoContainerProtocol) -> Void
 
     init(
         actionType: ActionType,
         actionMethods: [ActionMethod],
-        signedContainer: SignedContainerProtocol?,
-        onSuccess: @escaping (SignedContainerProtocol) -> Void
+        signedContainer: SignedContainerProtocol? = nil,
+        cryptoContainer: CryptoContainerProtocol? = nil,
+        onSuccess: @escaping (SignedContainerProtocol) -> Void = { _ in },
+        onSuccessDecrypt: @escaping (CryptoContainerProtocol) -> Void = { _ in }
     ) {
         self.actionType = actionType
         self.actionMethods = actionMethods
         self.signedContainer = signedContainer
+        self.cryptoContainer = cryptoContainer
         self.onSuccess = onSuccess
+        self.onSuccessDecrypt = onSuccessDecrypt
     }
 
     var body: some View {
@@ -63,6 +71,9 @@ struct IdCardView: View {
             },
             onSubmit: {
                 switch actionType {
+                case .decrypt:
+                    // TODO: Implement signing action
+                    isInProgress = true
                 case .signing:
                     // TODO: Implement signing action
                     isInProgress = true
