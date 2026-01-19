@@ -56,7 +56,6 @@ struct DecryptRootView: View {
                         onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setCryptoContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
                         }
                     )
                 }
@@ -72,16 +71,13 @@ struct DecryptRootView: View {
                         onSuccess: { container in
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setSignedContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
                         }
                     )
                 }
             case .mobileId:
-                let container = cryptoContainer as? CryptoContainerProtocol
-                // do nothing
+                EmptyView()
             case .smartId:
-                let container = cryptoContainer as? CryptoContainerProtocol
-                // do nothing
+                EmptyView()
             }
         }
         .onAppear {

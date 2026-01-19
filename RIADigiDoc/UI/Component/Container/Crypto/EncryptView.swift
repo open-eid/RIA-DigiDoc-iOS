@@ -201,7 +201,7 @@ struct EncryptView: View {
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
                                     isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
                                     isEncryptButtonShown: viewModel.isEncryptButtonShown,
-                                    showLeftActionButton: viewModel.isSignButtonShown,
+                                    showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
                                         viewModel.isDecryptButtonShown,
                                     leftActionButtonName: signLabel,
@@ -209,7 +209,7 @@ struct EncryptView: View {
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                     rightActionButtonAccessibilityLabel: encryptDecryptAccessibilityLabel.lowercased(),
                                     onLeftActionButtonClick: {
-                                        // TODO: Implement signing functionality
+                                        // Do nothing
                                     },
                                     onRightActionButtonClick: {
                                         if viewModel.isEncryptButtonShown {
