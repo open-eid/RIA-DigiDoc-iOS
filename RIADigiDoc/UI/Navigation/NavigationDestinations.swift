@@ -62,6 +62,9 @@ struct NavigationDestinations: ViewModifier {
         case .containerNotificationsView(let notifications):
             ContainerNotificationsView(notifications: notifications)
 
+        case .decryptRootView:
+            DecryptRootView()
+
         case .signingRootView:
             SigningRootView()
 

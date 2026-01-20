@@ -19,8 +19,8 @@
 
 import Foundation
 
-public enum ActionType {
-    case signing
-    case myeid
-    case decrypt
+/// @mockable
+@MainActor
+public protocol DecryptRootViewModelProtocol: Sendable {
+    func getSelectedDecryptMethod() async -> ActionMethod
 }

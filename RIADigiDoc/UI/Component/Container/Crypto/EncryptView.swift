@@ -49,6 +49,7 @@ struct EncryptView: View {
     @State private var isFileSaved: Bool = false
 
     @State private var isWithEncryption: Bool = false
+    @State private var isWithDecryption: Bool = false
     @State private var encryptionButtonEnabled = true
 
     @State private var showRenameModal = false
@@ -162,12 +163,14 @@ struct EncryptView: View {
 
     init(
         isWithEncryption: Bool = false,
+        isWithDecryption: Bool = false,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
         _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
         self.isWithEncryption = isWithEncryption
+        self.isWithDecryption = isWithDecryption
         self.nameUtil = nameUtil
         self.recipientUtil = recipientUtil
         self.fileUtil = fileUtil
@@ -198,7 +201,7 @@ struct EncryptView: View {
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
                                     isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
                                     isEncryptButtonShown: viewModel.isEncryptButtonShown,
-                                    showLeftActionButton: viewModel.isSignButtonShown,
+                                    showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
                                         viewModel.isDecryptButtonShown,
                                     leftActionButtonName: signLabel,
@@ -206,7 +209,7 @@ struct EncryptView: View {
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                     rightActionButtonAccessibilityLabel: encryptDecryptAccessibilityLabel.lowercased(),
                                     onLeftActionButtonClick: {
-                                        // TODO: Implement signing functionality
+                                        // Do nothing
                                     },
                                     onRightActionButtonClick: {
                                         if viewModel.isEncryptButtonShown {
@@ -225,7 +228,9 @@ struct EncryptView: View {
                                                 }
                                             }
                                         } else if viewModel.isDecryptButtonShown {
-                                            // TODO: Implement decrypt functionality
+                                            isWithEncryption = false
+                                            isWithDecryption = false
+                                            pathManager.navigate(to: .decryptRootView)
                                         }
                                     },
                                     onSaveContainerButtonClick: {
@@ -415,6 +420,13 @@ struct EncryptView: View {
                                 ))
 
                                 encryptionButtonEnabled = true
+                            } else if isWithDecryption {
+                                await updateAsyncLabels()
+                                await viewModel.updateAsyncProperties()
+
+                                Toast.show(languageSettings.localized(
+                                    "Container successfully decrypted"
+                                ))
                             } else {
                                 await viewModel.loadContainerData(
                                     cryptoContainer: viewModel.cryptoContainer

@@ -82,6 +82,10 @@ public protocol DataStoreProtocol: Sendable {
     func getProxyInfo() async -> ProxyInfo
     func setProxyInfo(_ info: ProxyInfo) async
 
+    // MARK: - Decrypt Selection Methods
+    func getSelectedDecryptMethod() async -> ActionMethod
+    func setSelectedDecryptMethod(_ method: ActionMethod) async
+
     // MARK: - Signing Selection Methods
     func getSelectedSigningMethod() async -> ActionMethod
     func setSelectedSigningMethod(_ method: ActionMethod) async

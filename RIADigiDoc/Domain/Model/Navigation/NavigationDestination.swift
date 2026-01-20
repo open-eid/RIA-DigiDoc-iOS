@@ -43,6 +43,7 @@ public enum NavigationDestination: Hashable {
     case containerNotificationsView(
         notifications: [ContainerNotificationType]
     )
+    case decryptRootView
     case signingRootView
     case signingMethodSelectionView(
         actionType: ActionType,

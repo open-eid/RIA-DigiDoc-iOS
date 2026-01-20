@@ -421,6 +421,15 @@ extension Container {
     }
 
     @MainActor
+    var decryptRootViewModel: Factory<DecryptRootViewModel> {
+        self { @MainActor in
+            DecryptRootViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
+    @MainActor
     var signingRootViewModel: Factory<SigningRootViewModel> {
         self { @MainActor in
             SigningRootViewModel(
