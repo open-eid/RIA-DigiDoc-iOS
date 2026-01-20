@@ -228,6 +228,8 @@ struct EncryptView: View {
                                                 }
                                             }
                                         } else if viewModel.isDecryptButtonShown {
+                                            isWithEncryption = false
+                                            isWithDecryption = false
                                             pathManager.navigate(to: .decryptRootView)
                                         }
                                     },

@@ -72,7 +72,7 @@ struct IdCardView: View {
             onSubmit: {
                 switch actionType {
                 case .decrypt:
-                    // TODO: Implement signing action
+                    // TODO: Implement decrypt action
                     isInProgress = true
                 case .signing:
                     // TODO: Implement signing action
