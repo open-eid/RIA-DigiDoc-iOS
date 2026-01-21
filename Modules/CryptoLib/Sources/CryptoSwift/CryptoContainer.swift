@@ -191,6 +191,11 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
 extension CryptoContainer {
 
     @MainActor
+    public static func enableLogging(bool: Bool = true) {
+        Encrypt.enableLogging(bool)
+    }
+    
+    @MainActor
     public static func openOrCreate(
         dataFiles: [URL],
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
@@ -258,13 +263,16 @@ extension CryptoContainer {
     public static func decrypt(
         containerFile: URL,
         recipients: [Addressee],
+        cert: Data,
         cardCommands: CardCommands,
         pin: SecureData,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
+        
         let decryptedData =
             try await Decrypt.decryptFile(
-                containerFile.absoluteString,
+                containerFile.resolvedPath,
+                withCert: cert,
                 withToken: SmartToken(card: cardCommands, pin1: pin)
             )
         var cryptoDataFiles: [CryptoDataFile] = []

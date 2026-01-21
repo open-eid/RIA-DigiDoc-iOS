@@ -25,8 +25,60 @@
 
 #include <cdoc/CDocWriter.h>
 #include <cdoc/Recipient.h>
-
+#include <cdoc/ILogger.h>
 @implementation Encrypt
+
+static inline NSString *NSStringFromStringView(std::string_view sv) {
+    return [[NSString alloc] initWithBytes:sv.data()
+                                    length:sv.size()
+                                  encoding:NSUTF8StringEncoding] ?: @"";
+}
+
+static inline NSString *NSStringFromLogLevel(libcdoc::ILogger::LogLevel level) {
+    switch (level) {
+        case libcdoc::ILogger::LEVEL_FATAL:   return @"FATAL";
+        case libcdoc::ILogger::LEVEL_ERROR:   return @"ERROR";
+        case libcdoc::ILogger::LEVEL_WARNING: return @"WARN";
+        case libcdoc::ILogger::LEVEL_INFO:    return @"INFO";
+        case libcdoc::ILogger::LEVEL_DEBUG:   return @"DEBUG";
+        case libcdoc::ILogger::LEVEL_TRACE:   return @"TRACE";
+    }
+    return @"UNKNOWN";
+}
+
+class ObjCLogger final : public libcdoc::ILogger {
+public:
+    void LogMessage(libcdoc::ILogger::LogLevel level,
+                    std::string_view file,
+                    int line,
+                    std::string_view message) override
+    {
+        NSString *nsFile = NSStringFromStringView(file);
+        NSString *nsMsg  = NSStringFromStringView(message);
+        NSString *nsLvl  = NSStringFromLogLevel(level);
+
+        NSLog(@"CryptoContainer: %@:%d %@ %@",
+              nsFile.length ? nsFile : @"<unknown>",
+              line,
+              nsLvl,
+              nsMsg);
+    }
+};
+
++ (void)enableLogging:(bool)enabled {
+    static ObjCLogger gLogger;
+
+    if (!enabled) {
+        return;
+    }
+
+    // Install only once, even if enableLogging:YES is called many times
+    static std::once_flag once;
+    std::call_once(once, [] {
+        libcdoc::ILogger::setLogger(&gLogger);
+        gLogger.SetMinLogLevel(libcdoc::ILogger::LEVEL_TRACE);
+    });
+}
 
 + (void)encryptFile:(NSString *)fullPath withDataFiles:(NSArray<CryptoDataFile*> *)dataFiles withAddressees:(NSArray<Addressee*> *)addressees
          completion:(void (^)(NSError*))completion {
@@ -137,4 +189,6 @@
 }
 
 @end
+
+
 

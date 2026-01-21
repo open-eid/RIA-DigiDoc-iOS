@@ -64,7 +64,8 @@ public class OperationDecrypt: NSObject {
             "Please place your ID card against the smart device",
             "Hold your ID card against your smart device until the data is read",
             "Reading data please wait",
-            "Signing in progress please wait"
+            "Reading certificate please wait",
+            "Decrypting in progress please wait",
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
@@ -85,9 +86,12 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
                 updateAlertMessage(step: 2)
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: CAN)
                 updateAlertMessage(step: 3)
+                let cert = try await cardCommands.readAuthenticationCertificate()
+                updateAlertMessage(step: 4)
                 let decryptedContainer = try await CryptoContainer.decrypt(
                     containerFile: containerFile,
                     recipients: recipients,
+                    cert: cert,
                     cardCommands: cardCommands,
                     pin: PIN,
                 )
