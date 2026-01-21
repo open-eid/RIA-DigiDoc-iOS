@@ -110,10 +110,10 @@ struct NavigationDestinations: ViewModifier {
         case .myEidRootView:
             MyEidRootView()
 
-        case .myEidDataView:
-            MyEidDataView()
-        case .myEidPinView(let pinAction, let codeType):
-            MyEidPinChangeView(pinAction: pinAction, codeType: codeType)
+        case .myEidView(let idCardData):
+            MyEidView(idCardData: idCardData)
+        case .myEidPinView(let pinAction, let codeType, let personalCode):
+            MyEidPinChangeView(pinAction: pinAction, codeType: codeType, personalCode: personalCode)
         }
     }
 }

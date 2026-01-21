@@ -22,6 +22,7 @@ import FactoryKit
 import CryptoSwift
 import LibdigidocLibSwift
 import CommonsLib
+import IdCardLib
 
 struct NFCView: View {
     @Environment(\.dismiss) private var dismiss
@@ -123,7 +124,21 @@ struct NFCView: View {
                     // TODO: Replace with real loading
                     Task {
                         try? await Task.sleep(for: .seconds(1))
-                        pathManager.replaceLast(to: .myEidDataView)
+                        pathManager.replaceLast(
+                            to: .myEidView(
+                                idCardData: IdCardData(
+                                    publicData: CardInfo(),
+                                    authCertNotValidDate: nil,
+                                    signCertNotValidDate: nil,
+                                    retryCount: RetryCount(
+                                        pin1: 3,
+                                        pin2: 3,
+                                        puk: 3
+                                    ),
+                                    isPUKChangeable: true
+                                )
+                            )
+                        )
                     }
                 }
             },

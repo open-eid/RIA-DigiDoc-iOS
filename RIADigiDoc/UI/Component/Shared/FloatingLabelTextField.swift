@@ -160,7 +160,7 @@ struct FloatingLabelTextField: View {
             alignment: .leading
         ) {
             mainContainer
-            if isError {
+            if isError && !errorText.isEmpty {
                 Text(errorText)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)

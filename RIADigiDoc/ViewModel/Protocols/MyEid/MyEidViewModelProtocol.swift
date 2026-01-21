@@ -17,21 +17,15 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
+import IdCardLib
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
-        }
-    }
+/// @mockable
+@MainActor
+public protocol MyEidViewModelProtocol: Sendable {
+    func parseDateOfBirth(personalCode: String) -> String
+    func parseExpiryDate(expiryDate: String) -> String
+    func getDocumentExpirationStatus(expiryDate: String) -> MyEidDocumentStatus
+    func getIsPinBlocked(for codeType: CodeType) -> Bool
+    func stopDiscoveringReaders() async
 }

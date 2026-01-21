@@ -17,21 +17,10 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
-        }
-    }
+/// @mockable
+@MainActor
+public protocol SharedIdCardViewModelProtocol: Sendable {
+    func startStatusStreaming() async
 }

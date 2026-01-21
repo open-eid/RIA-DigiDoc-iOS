@@ -32,9 +32,20 @@ struct MyEidPinChangeView: View {
     @State private var viewModel: MyEidPinChangeViewModel
     @State private var pinAction: MyEidPinCodeAction
     @State private var codeType: CodeType
+    private var personalCode: String
+
+    private var inputErrorMessage: String {
+        languageSettings.localized(
+            viewModel.inputErrorMessage ?? "",
+            viewModel.inputErrorMessageExtraArguments
+        )
+    }
 
     private var errorMessage: String {
-        languageSettings.localized(viewModel.errorMessage ?? "", viewModel.errorMessageExtraArguments)
+        languageSettings.localized(
+            viewModel.errorMessage ?? "",
+            viewModel.errorMessageExtraArguments
+        )
     }
 
     private var leftIcon: String {
@@ -80,7 +91,7 @@ struct MyEidPinChangeView: View {
     private var flowDescription: String {
         let pinLengthRequirement = languageSettings.localized(
             "PIN length requirement",
-            [codeType.name, String(pinMinimumLength), String(Constants.Validation.PinMaximumLength)]
+            [codeType.name, String(codeType.minimumLength), String(Constants.Validation.PinMaximumLength)]
         )
 
         let newPinDifferenceRequirement = languageSettings.localized(
@@ -118,17 +129,6 @@ struct MyEidPinChangeView: View {
         }
     }
 
-    private var pinMinimumLength: Int {
-        switch codeType {
-        case .pin1:
-            return Constants.Validation.Pin1MinimumLength
-        case .pin2:
-            return Constants.Validation.Pin2MinimumLength
-        case .puk:
-            return Constants.Validation.PukMinimumLength
-        }
-    }
-
     private var buttonTitle: String {
         switch viewModel.step {
         case .confirm:
@@ -138,13 +138,33 @@ struct MyEidPinChangeView: View {
         }
     }
 
+    private var isInputError: Bool {
+        viewModel.handleConfirmStepError()
+
+        let pin = Array(viewModel.input.utf8)
+
+        if !pin.isEmpty && viewModel
+            .isPINLengthValid(pin: pin) && viewModel.step == .new {
+            viewModel.verifyNewCode()
+        }
+
+        return !inputErrorMessage.isEmpty ||
+        !viewModel.isPINLengthValid(pin: pin)
+    }
+
     init(
         pinAction: MyEidPinCodeAction,
-        codeType: CodeType
+        codeType: CodeType,
+        personalCode: String
     ) {
-        self._viewModel = State(wrappedValue: Container.shared.myEidPinChangeViewModel((pinAction, codeType)))
+        self._viewModel = State(
+            wrappedValue: Container.shared.myEidPinChangeViewModel(
+                (pinAction, codeType, personalCode)
+            )
+        )
         self.pinAction = pinAction
         self.codeType = codeType
+        self.personalCode = personalCode
     }
 
     var body: some View {
@@ -193,12 +213,12 @@ struct MyEidPinChangeView: View {
                                 placeholder: flowCodeType,
                                 text: $viewModel.input,
                                 isSecure: true,
-                                isError: !errorMessage.isEmpty,
-                                errorText: errorMessage,
+                                isError: isInputError,
+                                errorText: inputErrorMessage,
                                 keyboardType: .numberPad,
                                 onDone: {
                                     if viewModel.step == .confirm || (
-                                        viewModel.input.isEmpty || !errorMessage.isEmpty
+                                        viewModel.input.isEmpty || !inputErrorMessage.isEmpty
                                     ) { return }
 
                                     Task { await viewModel.submit() }
@@ -207,14 +227,14 @@ struct MyEidPinChangeView: View {
 
                             Text(verbatim: flowDescription)
                                 .font(typography.bodySmall)
-                                .foregroundStyle(!errorMessage.isEmpty ? theme.error : theme.onSurface)
+                                .foregroundStyle(isInputError ? theme.error : theme.onSurface)
                                 .padding(.vertical, Dimensions.Padding.MSPadding)
                         }
                     }
 
                     PrimaryButton(
                         text: buttonTitle,
-                        isButtonEnabled: !viewModel.input.isEmpty && errorMessage.isEmpty,
+                        isButtonEnabled: !viewModel.input.isEmpty && !isInputError,
                         action: {
                             Task { await viewModel.submit() }
                         }
@@ -231,6 +251,20 @@ struct MyEidPinChangeView: View {
                             Toast.show(languageSettings.localized("PIN unblocked", [codeType.name]))
                         }
 
+                        dismiss()
+                    }
+                }
+                .onChange(of: errorMessage, { _, newValue in
+                    guard !newValue.isEmpty else { return }
+                    Toast.show(newValue)
+                    if viewModel.isBlocked {
+                        viewModel.resetErrors()
+                        dismiss()
+                    }
+                    viewModel.resetErrors()
+                })
+                .onChange(of: viewModel.usbReaderStatus) { _, newValue in
+                    if newValue != .sCardConnected {
                         dismiss()
                     }
                 }

@@ -71,9 +71,13 @@ public enum NavigationDestination: Hashable {
     case proxySettingsView
 
     case myEidRootView
-    case myEidDataView
+    case myEidView(
+        idCardData: IdCardData
+    )
+
     case myEidPinView(
         pinAction: MyEidPinCodeAction,
-        codeType: CodeType
+        codeType: CodeType,
+        personalCode: String
     )
 }
