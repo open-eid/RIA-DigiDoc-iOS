@@ -17,21 +17,22 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
-        }
-    }
+@MainActor
+protocol MyEidPinChangeViewModelProtocol: Sendable {
+    var step: MyEidPinCodeStep { get }
+    var input: String { get set }
+    var inputErrorMessage: String? { get }
+    var inputErrorMessageExtraArguments: [String] { get }
+    var errorMessage: String? { get }
+    var errorMessageExtraArguments: [String] { get }
+    var isBlocked: Bool { get }
+
+    func submit() async
+    func resetErrors()
+
+    func verifyNewCode()
+    func verifyRepeatedCode() -> Bool
+    func isPINLengthValid(pin: [UInt8]) -> Bool
 }

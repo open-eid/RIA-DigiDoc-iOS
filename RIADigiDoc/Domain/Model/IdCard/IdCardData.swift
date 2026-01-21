@@ -17,21 +17,13 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
+import IdCardLib
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
-        }
-    }
+public struct IdCardData: Sendable, Hashable {
+    public let publicData: CardInfo
+    public let authCertNotValidDate: String?
+    public let signCertNotValidDate: String?
+    public let retryCount: RetryCount
+    public let isPUKChangeable: Bool
 }

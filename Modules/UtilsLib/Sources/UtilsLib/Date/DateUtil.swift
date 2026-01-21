@@ -56,6 +56,19 @@ public class DateUtil {
         )
     }
 
+    public static func stringToDate(
+        _ dateString: String,
+        isUTC: Bool,
+        dateOutputFormat: String = "dd.MM.yyyy"
+    ) -> Date? {
+        let formatter = outputDateFormatter(
+            format: dateOutputFormat,
+            isUTC: isUTC
+        )
+
+        return formatter.date(from: dateString)
+    }
+
     private static func outputDateFormatter(
         format: String,
         isUTC: Bool = false

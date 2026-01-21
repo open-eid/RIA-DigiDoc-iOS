@@ -20,7 +20,7 @@
 import iR301
 import UtilsLib
 
-class CardReaderiR301: CardReader, Loggable {
+class CardReaderiR301: CardReader, Sendable, Loggable {
     let atr: Bytes
     private var cardHandle: SCARDHANDLE = 0
     private var pioSendPci = SCARD_IO_REQUEST(dwProtocol: UInt32(SCARD_PROTOCOL_UNDEFINED),

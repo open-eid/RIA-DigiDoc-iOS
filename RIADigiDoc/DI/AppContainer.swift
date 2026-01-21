@@ -418,6 +418,51 @@ extension Container {
     }
 
     @MainActor
+    var idCardViewModel: Factory<IdCardViewModel> {
+        self { @MainActor in
+            IdCardViewModel(
+                idCardRepository: self.idCardRepository(),
+                sharedMyEidSession: self.sharedMyEidSession(),
+                certificateUtil: self.certificateUtil()
+            )
+        }
+    }
+
+    @MainActor
+    var idCardService: Factory<IdCardServiceProtocol> {
+        self { @MainActor in
+            IdCardService(usbReaderConnection: self.usbReaderConnection())
+        }
+    }
+
+    @MainActor
+    var idCardRepository: Factory<IdCardRepositoryProtocol> {
+        self { @MainActor in
+            IdCardRepository(idCardService: self.idCardService())
+        }
+        .shared
+    }
+
+    @MainActor
+    var sharedMyEidSession: Factory<SharedMyEidSessionProtocol> {
+        self { @MainActor in
+            SharedMyEidSession(idCardRepository: self.idCardRepository())
+        }
+        .shared
+    }
+
+    @MainActor
+    var myEidViewModel: Factory<MyEidViewModel> {
+        self { @MainActor in
+            MyEidViewModel(
+                idCardRepository: self.idCardRepository(),
+                sharedMyEidSession: self.sharedMyEidSession()
+            )
+        }
+        .shared
+    }
+
+    @MainActor
     var actionMethodSelectionViewModel: Factory<ActionMethodSelectionViewModel> {
         self { @MainActor in
             ActionMethodSelectionViewModel(
@@ -478,11 +523,15 @@ extension Container {
     }
 
     @MainActor
-    var myEidPinChangeViewModel: ParameterFactory<(MyEidPinCodeAction, CodeType), MyEidPinChangeViewModel> {
-        self { @MainActor (pinAction: MyEidPinCodeAction, codeType: CodeType) -> MyEidPinChangeViewModel in
+    var myEidPinChangeViewModel: ParameterFactory<(MyEidPinCodeAction, CodeType, String), MyEidPinChangeViewModel> {
+        self { @MainActor (pinAction: MyEidPinCodeAction, codeType: CodeType, personalCode: String
+        ) -> MyEidPinChangeViewModel in
             MyEidPinChangeViewModel(
                 pinAction: pinAction,
-                codeType: codeType
+                codeType: codeType,
+                personalCode: personalCode,
+                idCardRepository: self.idCardRepository(),
+                sharedMyEidSession: self.sharedMyEidSession()
             )
         }
     }

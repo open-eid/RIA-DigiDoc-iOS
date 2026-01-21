@@ -21,16 +21,20 @@ import SwiftUI
 import FactoryKit
 import CryptoSwift
 import LibdigidocLibSwift
+import IdCardLib
 
 struct IdCardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
+    @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
     @State private var isInProgress: Bool = false
 
     @State private var idCardActionMessage: String = "ID card connect card reader"
+
+    @State private var viewModel: IdCardViewModel
 
     let signedContainer: SignedContainerProtocol?
     let cryptoContainer: CryptoContainerProtocol?
@@ -46,6 +50,7 @@ struct IdCardView: View {
         onSuccess: @escaping (SignedContainerProtocol) -> Void = { _ in },
         onSuccessDecrypt: @escaping (CryptoContainerProtocol) -> Void = { _ in }
     ) {
+        _viewModel = State(wrappedValue: Container.shared.idCardViewModel())
         self.actionType = actionType
         self.actionMethods = actionMethods
         self.signedContainer = signedContainer
@@ -63,13 +68,39 @@ struct IdCardView: View {
             isInProgress: $isInProgress,
             showSubmitButton: false,
             onBackClick: {
+                Task {
+                    await viewModel.stopDiscoveringReaders()
+                }
+
                 guard isInProgress else {
                     dismiss()
                     return
                 }
                 isInProgress = false
             },
-            onSubmit: {
+            onSubmit: {},
+            content: {
+                IdCardActionView(
+                    icon: "ic_m3_smart_card_reader_48pt_wght400",
+                    message: $idCardActionMessage
+                )
+            }
+        )
+        .task {
+            await viewModel.startDiscoveringReaders()
+        }
+        .onChange(of: viewModel.usbReaderStatus) { _, newValue in
+            idCardActionMessage = getStatusText(newValue)
+
+            let notInProgressStates: [UsbReaderStatus] = [
+                .sInitial,
+                .sReaderNotConnected,
+                .sReaderProcessFailed
+            ]
+
+            isInProgress = !notInProgressStates.contains(newValue)
+
+            Task {
                 switch actionType {
                 case .decrypt:
                     // TODO: Implement decrypt action
@@ -78,17 +109,47 @@ struct IdCardView: View {
                     // TODO: Implement signing action
                     isInProgress = true
                 case .myeid:
-                    // TODO: Implement My eID personal data loading action
-                    isInProgress = true
+                    if newValue == .sCardConnected {
+                        let idCardData = await viewModel.getIdCardData()
+
+                        guard let cardData = idCardData else {
+                            await viewModel.stopDiscoveringReaders()
+
+                            await MainActor.run {
+                                Toast.show(viewModel.errorMessage ?? "")
+                                viewModel.resetErrors()
+                                dismiss()
+                            }
+                            return
+                        }
+
+                        await MainActor.run {
+                            isInProgress = true
+                            pathManager.replaceLast(
+                                to: .myEidView(
+                                    idCardData: cardData
+                                )
+                            )
+                        }
+                    }
                 }
-            },
-            content: {
-                IdCardActionView(
-                    icon: "ic_m3_smart_card_reader_48pt_wght400",
-                    message: $idCardActionMessage
-                )
             }
-        )
+        }
+    }
+
+    private func getStatusText(_ status: UsbReaderStatus) -> String {
+        switch status {
+        case .sInitial, .sReaderNotConnected:
+            return languageSettings.localized("ID card connect card reader")
+        case .sReaderConnected:
+            return languageSettings.localized("ID card reader connected")
+        case .sCardConnected:
+            return languageSettings.localized("ID card detected")
+        case .sReaderProcessFailed:
+            return languageSettings.localized("ID card reader process failed")
+        default:
+            return languageSettings.localized("ID card connect card reader")
+        }
     }
 }
 

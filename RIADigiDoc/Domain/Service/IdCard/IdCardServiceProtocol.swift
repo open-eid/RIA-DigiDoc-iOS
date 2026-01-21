@@ -17,21 +17,19 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
+import IdCardLib
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
-        }
-    }
+/// @mockable
+public protocol IdCardServiceProtocol: Sendable {
+    func startDiscoveringReaders() async
+    func stopDiscoveringReaders() async
+    func statusStream() async -> AsyncStream<UsbReaderStatus>
+    func getPublicData() async throws -> CardInfo
+    func readAuthenticationCertificate() async throws -> Data
+    func readSignatureCertificate() async throws -> Data
+    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8
+    func isPUKChangeable() async throws -> Bool
+    func changeCode(_ codeType: CodeType, to newCode: Data, verifyCode: Data) async throws
+    func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws
 }

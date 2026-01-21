@@ -17,21 +17,23 @@
  *
  */
 
-public enum MyEidDocumentStatus: Sendable {
-    case valid
-    case expired
-    case unknown
-}
+import Foundation
+import IdCardLib
 
-extension MyEidDocumentStatus {
-    var localizationKey: String {
-        switch self {
-        case .valid:
-            return "My eid status valid"
-        case .expired:
-            return "My eid status expired"
-        case .unknown:
-            return "My eid status unknown"
+@Observable
+@MainActor
+class SharedIdCardViewModel: SharedIdCardViewModelProtocol {
+    private let usbReaderConnection: UsbReaderConnectionProtocol
+
+    var usbReaderStatus: UsbReaderStatus = .sInitial
+
+    init(usbReaderConnection: UsbReaderConnectionProtocol) {
+        self.usbReaderConnection = usbReaderConnection
+    }
+
+    public func startStatusStreaming() async {
+        for await status in await usbReaderConnection.statusStream() {
+            self.usbReaderStatus = status
         }
     }
 }

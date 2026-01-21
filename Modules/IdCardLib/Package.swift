@@ -11,6 +11,7 @@ let package = Package(
         )
     ],
     dependencies: [
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 21, 0)),
         .package(url: "https://github.com/leif-ibsen/Digest.git", exact: .init(1, 13, 0)),
         .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
@@ -39,6 +40,8 @@ let package = Package(
                 "SwiftECC",
                 "iR301",
                 "UtilsLib"
+                "CommonsLib",
+                .product(name: "FactoryKit", package: "Factory")
             ],
             path: "Sources/IdCardLib",
             swiftSettings: [

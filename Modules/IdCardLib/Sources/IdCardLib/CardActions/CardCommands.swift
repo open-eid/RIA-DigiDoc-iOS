@@ -18,8 +18,9 @@
  */
 
 import Foundation
+import CommonsLib
 
-public enum CodeType: UInt {
+public enum CodeType: UInt, Sendable {
     case puk = 0
     case pin1 = 1
     case pin2 = 2
@@ -29,6 +30,28 @@ public enum CodeType: UInt {
         case .puk: return "PUK"
         case .pin1: return "PIN1"
         case .pin2: return "PIN2"
+        }
+    }
+
+    public var minimumLength: Int {
+        switch self {
+        case .pin1:
+            return Constants.Validation.Pin1MinimumLength
+        case .pin2:
+            return Constants.Validation.Pin2MinimumLength
+        case .puk:
+            return Constants.Validation.PukMinimumLength
+        }
+    }
+
+    public var validLength: ClosedRange<Int> {
+        return switch self {
+        case .pin1:
+            minimumLength...Constants.Validation.PinMaximumLength
+        case .pin2:
+            minimumLength...Constants.Validation.PinMaximumLength
+        case .puk:
+            minimumLength...Constants.Validation.PinMaximumLength
         }
     }
 }

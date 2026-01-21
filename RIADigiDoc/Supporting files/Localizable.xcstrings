@@ -538,6 +538,24 @@
         }
       }
     },
+    "Citizenship" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Citizenship"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodakondsus"
+          }
+        }
+      }
+    },
     "City title" : {
       "comment" : "Role detail",
       "extractionState" : "manual",
@@ -1034,6 +1052,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Andmed loetud"
+          }
+        }
+      }
+    },
+    "Date of birth" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date of birth"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sünniaeg"
           }
         }
       }
@@ -1649,6 +1685,24 @@
         }
       }
     },
+    "Given names" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Given names"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eesnimi"
+          }
+        }
+      }
+    },
     "Hash value of signature" : {
       "comment" : "Signature detail",
       "extractionState" : "manual",
@@ -1739,6 +1793,24 @@
         }
       }
     },
+    "Id card number" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card number"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaardi number"
+          }
+        }
+      }
+    },
     "ID card reader connected" : {
       "comment" : "ID-card view reader detected message",
       "extractionState" : "manual",
@@ -1753,6 +1825,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kaardilugeja leitud. Sisesta ID-kaart lugejasse."
+          }
+        }
+      }
+    },
+    "ID card reader process failed" : {
+      "comment" : "ID-card view reader process failed message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to read data. Please reconnect the card reader and try again."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andmete lugemine ebaõnnestus. Palun taasühenda kaardilugeja ja proovi uuesti."
           }
         }
       }
@@ -4854,7 +4944,7 @@
       }
     },
     "Personal code" : {
-      "comment" : "Used in Mobile-ID and Smart-ID textfield views",
+      "comment" : "Used in Mobile-ID and Smart-ID textfield views, My eID public data",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -5015,6 +5105,42 @@
         }
       }
     },
+    "PIN part of date of birth" : {
+      "comment" : "My eID PIN input error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New %1$@ code can't be your date of birth"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus %1$@-kood ei saa olla sinu sünnikuupäev"
+          }
+        }
+      }
+    },
+    "PIN part of personal code" : {
+      "comment" : "My eID PIN input error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New %1$@ code can't be part of your personal code"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus %1$@-kood ei saa olla osa sinu isikukoodist"
+          }
+        }
+      }
+    },
     "PIN repeat error" : {
       "comment" : "My eID repeat new PIN or PUK codes mismatch error message",
       "extractionState" : "manual",
@@ -5029,6 +5155,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uued %1$@-koodid peavad olema samad"
+          }
+        }
+      }
+    },
+    "PIN too easy" : {
+      "comment" : "My eID PIN input error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New %1$@ code can't be so easy"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uus %1$@-kood ei saa olla nii lihtne"
           }
         }
       }
@@ -5051,44 +5195,38 @@
         }
       }
     },
-    "PIN verification error" : {
-      "comment" : "My eID PIN or PUK wrong code error message",
+    "PIN verification error multiple" : {
+      "comment" : "My eID PIN or PUK wrong code with multiple tries left error message",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Wrong %1$@ code. You can try 1 more time."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Wrong %1$@ code. You can try %2$d more times."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong %1$@ code. You can try %2$@ more times."
           }
         },
         "et" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Vale %1$@-kood. Saad veel proovida 1 kord."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Vale %1$@-kood. Saad veel proovida %2$d korda."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vale %1$@-kood. Saad veel proovida %2$@ korda."
+          }
+        }
+      }
+    },
+    "PIN verification error one" : {
+      "comment" : "My eID PIN or PUK wrong code with one try left error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong %1$@ code. You can try 1 more time."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vale %1$@-kood. Saad veel proovida 1 kord."
           }
         }
       }
@@ -6978,6 +7116,24 @@
         }
       }
     },
+    "Surname" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surname"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perekonnanimi"
+          }
+        }
+      }
+    },
     "Tab" : {
       "comment" : "Tab view",
       "extractionState" : "manual",
@@ -7310,6 +7466,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "(kehtiv kuni %@)"
+          }
+        }
+      }
+    },
+    "Valid to date" : {
+      "comment" : "My eID public data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valid to"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehtiv kuni"
           }
         }
       }

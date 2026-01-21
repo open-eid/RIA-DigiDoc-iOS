@@ -68,6 +68,7 @@ class Thales: CardCommandsInternal {
             case 2: personalData.givenName = record
             case 4: personalData.citizenship = !record.isEmpty ? record : "-"
             case 6: personalData.personalCode = record
+            case 7: personalData.documentNumber = record
             case 8: personalData.dateOfExpiry = record.replacing(" ", with: ".")
             default: break
             }

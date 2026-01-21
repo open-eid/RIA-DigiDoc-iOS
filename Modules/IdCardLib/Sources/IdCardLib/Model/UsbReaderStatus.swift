@@ -19,12 +19,11 @@
 
 import Foundation
 
-@MainActor
-protocol MyEidPinChangeViewModelProtocol: Sendable {
-    var step: MyEidPinCodeStep { get }
-    var input: String { get set }
-    var errorMessage: String? { get }
-    var errorMessageExtraArguments: [String] { get }
-
-    func submit() async
+public enum UsbReaderStatus: Sendable, Equatable {
+    case sInitial
+    case sReaderNotConnected
+    case sReaderRestarted
+    case sReaderConnected
+    case sCardConnected
+    case sReaderProcessFailed
 }
