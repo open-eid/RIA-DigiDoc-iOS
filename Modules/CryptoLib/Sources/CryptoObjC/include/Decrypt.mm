@@ -105,7 +105,6 @@
 + (void)decryptFile:(NSString *)fullPath withCert:(NSData *)certData withToken:(id<AbstractSmartToken>)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> *, NSError *))completion {
     auto cert = [certData toVector];
-    auto certCopy = cert; // copy for getLockForCert
     if(cert.empty()) {
         return completion(nil, [NSError cryptoError:@"Failed to get certData"]);
     }
@@ -128,7 +127,6 @@
             return sign(dst, algorithm, digest, 0);
         }
     };
-    //TokenBackend token(smartToken, std::move(cert));
     TokenBackend token(smartToken, std::move(cert));
     Settings conf;
     std::unique_ptr<libcdoc::CDocReader> reader(libcdoc::CDocReader::createReader(fullPath.UTF8String, &conf, &token, &token));
@@ -137,7 +135,7 @@
         return completion(nil, [NSError cryptoError:@"Failed to create CDocReader"]);
     }
     
-    auto idx = reader->getLockForCert(certCopy);
+    auto idx = reader->getLockForCert(token.cert);
     
     if(idx < 0) {
         return completion(nil, [NSError cryptoError:@"Failed to find lock for cert"]);
