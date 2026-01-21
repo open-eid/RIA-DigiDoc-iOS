@@ -20,6 +20,7 @@
 import SwiftUI
 import FactoryKit
 import CryptoSwift
+import IdCardLib
 import CommonsLib
 
 struct DecryptRootView: View {
@@ -52,6 +53,7 @@ struct DecryptRootView: View {
                             .idCardViaNFC,
                             .idCardViaUSB
                         ],
+                        pinType: CodeType.pin1,
                         cryptoContainer: container,
                         onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()

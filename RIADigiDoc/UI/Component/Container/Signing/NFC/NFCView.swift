@@ -20,6 +20,7 @@
 import SwiftUI
 import FactoryKit
 import CryptoSwift
+import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
 import IdCardLib
@@ -32,6 +33,8 @@ struct NFCView: View {
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
     @State private var canNumber = ""
+    @State private var pinNumber = ""
+    @State private var pinType: CodeType? = nil
     @State private var rememberMe: Bool = true
     @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
@@ -41,6 +44,8 @@ struct NFCView: View {
     @State private var viewModel: NFCViewModel
     @State private var sharedNfcViewModel: SharedNFCViewModel
 
+    @State private var taskDecrypt: Task<Void, Never>?
+    
     private var isNFCSupported: Bool {
         sharedNfcViewModel.isNFCSupported()
     }
@@ -55,6 +60,16 @@ struct NFCView: View {
         )
     }
 
+    private var pinNumberError: Binding<String?> {
+        Binding(
+            get: { languageSettings.localized(
+                viewModel.pinNumberErrorKey ?? "",
+                viewModel.pinNumberErrorExtraArguments
+            ) },
+            set: { _ in }
+        )
+    }
+    
     private var displayedMessage: Binding<String> {
         Binding(
             get: {
@@ -75,6 +90,7 @@ struct NFCView: View {
     init(
         actionType: ActionType,
         actionMethods: [ActionMethod],
+        pinType: CodeType? = nil,
         cryptoContainer: CryptoContainerProtocol? = nil,
         signedContainer: SignedContainerProtocol? = nil,
         onSuccess: @escaping (SignedContainerProtocol) -> Void = { _ in },
@@ -83,6 +99,7 @@ struct NFCView: View {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
         _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
         self.actionType = actionType
+        self.pinType = pinType
         self.actionMethods = actionMethods
         self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
@@ -98,6 +115,7 @@ struct NFCView: View {
             isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
             onBackClick: {
+                cancelDecrypt()
                 guard isInProgress else {
                     dismiss()
                     return
@@ -108,8 +126,9 @@ struct NFCView: View {
                 switch actionType {
                 case .decrypt:
                     saveInputData()
-
-                    // TODO: Implement decrypt action
+                    Task {
+                        decrypt()
+                    }
                     isInProgress = true
                 case .signing:
                     saveInputData()
@@ -155,9 +174,12 @@ struct NFCView: View {
                         rememberMe: $rememberMe,
                         isActionEnabled: $isActionEnabled,
                         canNumberError: canNumberError,
+                        pin: $pinNumber,
+                        pinError: pinNumberError,
+                        pinType: pinType,
                         onInputChange: {
                             isActionEnabled = viewModel
-                                .isActionEnabled(canNumber: canNumber)
+                                .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
                         }
                     )
                 }
@@ -181,6 +203,45 @@ struct NFCView: View {
             )
         }
     }
+    
+    private func decrypt() {
+        taskDecrypt = Task {
+            guard let container = cryptoContainer else { return }
+
+            let (inputCANNumber) = rememberMe ? (canNumber) : ("")
+
+            await viewModel.saveInputData(
+                canNumber:  inputCANNumber,
+                rememberMe: rememberMe
+            )
+                        
+            isInProgress = true
+            nfcActionMessage = "Hold near ID card"
+            
+            let decryptedContainer = await viewModel.decrypt(
+                CAN: canNumber,
+                pin1: pinNumber,
+                cryptoContainer: container
+            )
+            
+            guard let container = decryptedContainer else {
+                cancelDecrypt()
+                isInProgress = false
+                return
+            }
+
+            cancelDecrypt()
+            isInProgress = false
+
+            onSuccessDecrypt(container)
+            dismiss()
+        }
+    }
+    
+    private func cancelDecrypt() {
+        taskDecrypt?.cancel()
+        taskDecrypt = nil
+    }
 }
 
 #Preview {
@@ -192,6 +253,7 @@ struct NFCView: View {
             .mobileId,
             .smartId
         ],
+        pinType: CodeType.pin2,
         signedContainer: SignedContainer(
             fileManager: Container.shared.fileManager(),
             containerUtil: Container.shared.containerUtil()

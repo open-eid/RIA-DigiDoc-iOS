@@ -263,10 +263,10 @@ extension CryptoContainer {
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
         let decryptedData =
-        try await Decrypt.decryptFile(
-            containerFile.absoluteString,
-            withToken: SmartToken(card: cardCommands, pin1: pin)
-        )
+            try await Decrypt.decryptFile(
+                containerFile.absoluteString,
+                withToken: SmartToken(card: cardCommands, pin1: pin)
+            )
         var cryptoDataFiles: [CryptoDataFile] = []
         var urlDataFiles: [URL] = []
         cryptoDataFiles.removeAll()

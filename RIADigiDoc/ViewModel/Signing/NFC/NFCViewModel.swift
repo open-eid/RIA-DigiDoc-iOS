@@ -18,6 +18,9 @@
  */
 
 import Foundation
+import CryptoObjCWrapper
+import CryptoSwift
+import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
@@ -29,6 +32,12 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var canNumberErrorKey: String?
     var canNumberErrorExtraArguments: [String] = []
 
+    var pinNumberErrorKey: String?
+    var pinNumberErrorExtraArguments: [String] = []
+    
+    var nfcErrorKey: String?
+    var nfcErrorExtraArguments: [String] = []
+    
     private let dataStore: DataStoreProtocol
 
     init(
@@ -37,9 +46,12 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         self.dataStore = dataStore
     }
 
-    func isActionEnabled(canNumber: String) -> Bool {
+    func isActionEnabled(canNumber: String, pinNumber: String, pinType: CodeType?) -> Bool {
         checkCANNumberValidity(canNumber: canNumber)
-        return (!canNumber.isEmpty && canNumberErrorKey?.isEmpty == true)
+        checkPINNumberValidity(pinNumber: pinNumber, pinType: pinType)
+        let result = (!canNumber.isEmpty && canNumberErrorKey?.isEmpty == true)
+            && (!pinNumber.isEmpty && pinNumberErrorKey?.isEmpty == true)
+        return result
     }
 
     func saveInputData(canNumber: String, rememberMe: Bool) async {
@@ -59,12 +71,59 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     func resetErrors() {
         canNumberErrorKey = nil
         canNumberErrorExtraArguments = []
+        pinNumberErrorKey = nil
+        pinNumberErrorExtraArguments = []
+        nfcErrorKey = nil
+        nfcErrorExtraArguments = []
     }
 
     func loadPersonalData() {
         // TODO: Implement with My eID
     }
 
+    func decrypt(CAN: String, pin1: String, cryptoContainer: CryptoContainerProtocol?) async
+    -> CryptoContainerProtocol? {
+        do {
+            let containerFile = await cryptoContainer?.getRawContainerFile() ?? URL(fileURLWithPath: "")
+            let recipients = await cryptoContainer?.getRecipients() ?? []
+            let pinSecureData = SecureData(Array(pin1.utf8))
+            let container = try await OperationDecrypt().processDecrypt(
+                CAN: CAN,
+                PIN1: pinSecureData,
+                containerFile: containerFile,
+                recipients: recipients
+            )
+            return container
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                NFCViewModel.logger().error("NFC: ID Card General error.")
+                nfcErrorKey = "General error"
+                
+                return nil
+            }
+            
+            let error  = exception.getIdCardError()
+            handleIdCardError(error)
+            
+            return nil
+        }
+    }
+    
+    private func handleIdCardError(_ error:  IdCardError) {
+        NFCViewModel.logger().error("NFC: ID Card error: \(error)")
+
+        switch error {
+        case .wrongCAN:
+            nfcErrorKey = "Wrong CAN"
+        case .wrongPIN:
+            nfcErrorKey = "Wrong PIN"
+        case .sessionError:
+            nfcErrorKey = "Session error"
+        default:
+            nfcErrorKey = "General error"
+        }
+    }
+    
     func sign() async -> SignedContainerProtocol? {
         // TODO: Implement with NFC signing
         return nil
@@ -86,5 +145,28 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return
         }
         canNumberErrorKey = ""
+    }
+    
+    private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
+        let minLen = if pinType == .pin1 {
+            Constants.Validation.Pin1MinimumLength
+        } else if pinType == .pin2 {
+            Constants.Validation.Pin2MinimumLength
+        } else {
+            Constants.Validation.PukMinimumLength
+        }
+        
+        let maxLen = Constants.Validation.PinMaximumLength
+        
+        guard pinNumber.isEmpty || (
+            pinNumber.count >= minLen &&
+            pinNumber.count <= maxLen &&
+            pinNumber.allSatisfy { $0.isNumber }
+        ) else {
+            pinNumberErrorKey = "PIN length requirement"
+            pinNumberErrorExtraArguments = [pinType?.name ?? "", String(minLen), String(maxLen)]
+            return
+        }
+        pinNumberErrorKey = ""
     }
 }

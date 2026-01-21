@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import IdCardLib
 
 struct NFCInputView: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -31,6 +32,10 @@ struct NFCInputView: View {
     @Binding var isActionEnabled: Bool
     @Binding var canNumberError: String?
 
+    @Binding var pin: String
+    @Binding var pinError: String?
+    var pinType: CodeType?
+    
     let onInputChange: () -> Void
 
     private var canNumberTitle: String {
@@ -50,12 +55,18 @@ struct NFCInputView: View {
         rememberMe: Binding<Bool>,
         isActionEnabled: Binding<Bool>,
         canNumberError: Binding<String?>,
+        pin: Binding<String>,
+        pinError: Binding<String?>,
+        pinType: CodeType?,
         onInputChange: @escaping () -> Void
     ) {
         self._canNumber = canNumber
         self._rememberMe = rememberMe
         self._isActionEnabled = isActionEnabled
         self._canNumberError = canNumberError
+        self._pin = pin
+        self._pinError = pinError
+        self.pinType = pinType
         self.onInputChange = onInputChange
     }
 
@@ -83,6 +94,23 @@ struct NFCInputView: View {
             }
             .padding(.vertical, Dimensions.Padding.ZeroPadding)
 
+            
+            VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                Text(verbatim: languageSettings.localized(pinType?.name ?? ""))
+                    .font(typography.labelMedium)
+                    .foregroundStyle(theme.onSurface)
+
+                SecureField("", text: $pin)
+                    .font(typography.bodyLarge)
+                    .keyboardType(.numberPad)
+                    .textContentType(.password)
+                    .onChange(of: pin) { _, _ in
+                        onInputChange()
+                    }
+                    .padding(Dimensions.Padding.MPadding)
+                    .background(theme.surfaceContainerHighest)
+            }
+            
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
                 ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
                     .padding(.trailing, Dimensions.Padding.XSPadding)
@@ -108,7 +136,10 @@ struct NFCInputView: View {
         rememberMe: .constant(true),
         isActionEnabled: .constant(true),
         canNumberError: .constant(nil),
-        onInputChange: {}
+        pin: .constant("123"),
+        pinError: .constant(nil),
+        pinType: CodeType.pin2,
+        onInputChange: {},
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())
