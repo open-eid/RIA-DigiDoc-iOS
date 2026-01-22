@@ -27,30 +27,25 @@ final class ToastController {
     var message: String?
     var isVisible = false
 
-    private var dismissTask: Task<Void, Never>?
+    private let showAnimation = Animation.interpolatingSpring(stiffness: 300, damping: 25)
 
-    func show(message: String, duration: TimeInterval) {
-        guard !isVisible else { return }
-        self.message = message
+    private let hideAnimation = Animation.easeInOut(duration: 0.3)
 
-        withAnimation(.interpolatingSpring(stiffness: 300, damping: 25)) {
+    func present(_ toast: ToastItem) async {
+        message = toast.message
+
+        withAnimation(showAnimation) {
             isVisible = true
         }
 
-        dismissTask?.cancel()
-        dismissTask = Task {
-            try? await Task.sleep(for: .seconds(duration))
+        try? await Task.sleep(for: .seconds(toast.duration))
 
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    self.isVisible = false
-                }
-
-                Task {
-                    try? await Task.sleep(for: .seconds(0.3))
-                    self.message = nil
-                }
-            }
+        withAnimation(hideAnimation) {
+            isVisible = false
         }
+
+        try? await Task.sleep(for: .seconds(0.3))
+
+        message = nil
     }
 }

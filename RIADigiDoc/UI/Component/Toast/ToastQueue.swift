@@ -17,15 +17,33 @@
  *
  */
 
-import SwiftUI
+import Foundation
 
-struct Toast {
-    static func show(_ message: String, duration: TimeInterval = 5.0) {
+actor ToastQueue {
+    static let shared = ToastQueue()
+
+    private var queue: [ToastItem] = []
+    private var isPresenting = false
+
+    func enqueue(message: String, duration: TimeInterval) {
+        queue.append(ToastItem(message: message, duration: duration))
+        processQueueIfNeeded()
+    }
+
+    private func processQueueIfNeeded() {
+        guard !isPresenting, let next = queue.first else { return }
+
+        isPresenting = true
+        queue.removeFirst()
+
         Task {
-            await ToastQueue.shared.enqueue(
-                message: message,
-                duration: duration
-            )
+            await ToastController.shared.present(next)
+            toastDidFinish()
         }
+    }
+
+    private func toastDidFinish() {
+        isPresenting = false
+        processQueueIfNeeded()
     }
 }

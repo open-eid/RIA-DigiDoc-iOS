@@ -25,8 +25,15 @@ public struct MimeTypeDecoder: MimeTypeDecoderProtocol {
         await withCheckedContinuation { continuation in
             let parser = XMLParser(data: xmlData)
             let handler = XMLParserHandler(continuation: continuation)
+
             parser.delegate = handler
-            parser.parse()
-        } ? .ddoc : .none
+
+            let success = parser.parse()
+
+            if !success {
+                handler.finishIfNeeded()
+            }
+        }
     }
+
 }

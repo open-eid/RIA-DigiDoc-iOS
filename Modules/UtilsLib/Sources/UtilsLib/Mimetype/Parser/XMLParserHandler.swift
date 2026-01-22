@@ -19,11 +19,13 @@
 
 import Foundation
 
-class XMLParserHandler: NSObject, XMLParserDelegate {
-    private var continuation: CheckedContinuation<Bool, Never>?
+final class XMLParserHandler: NSObject, XMLParserDelegate {
+
+    private let continuation: CheckedContinuation<ContainerType, Never>
+    private var didResume = false
     private var foundElement = false
 
-    init(continuation: CheckedContinuation<Bool, Never>) {
+    init(continuation: CheckedContinuation<ContainerType, Never>) {
         self.continuation = continuation
     }
 
@@ -36,23 +38,27 @@ class XMLParserHandler: NSObject, XMLParserDelegate {
     ) {
         if elementName == "SignedDoc", attributeDict["format"] == "DIGIDOC-XML" {
             foundElement = true
-            continuation?.resume(returning: true)
-            continuation = nil
             parser.abortParsing()
         }
     }
 
-    func parserDidEndDocument(_: XMLParser) {
-        if continuation != nil {
-            continuation?.resume(returning: foundElement)
-            continuation = nil
-        }
+    // swiftlint:disable:next unused_parameter
+    func parserDidEndDocument(_ parser: XMLParser) {
+        resume(foundElement ? .ddoc : .none)
     }
 
-    func parser(_: XMLParser, parseErrorOccurred _: Error) {
-        if continuation != nil {
-            continuation?.resume(returning: foundElement)
-            continuation = nil
-        }
+    // swiftlint:disable:next unused_parameter
+    func parser(_ parser: XMLParser, parseErrorOccurred error: Error) {
+        resume(foundElement ? .ddoc : .none)
+    }
+
+    func finishIfNeeded() {
+        resume(foundElement ? .ddoc : .none)
+    }
+
+    private func resume(_ value: ContainerType) {
+        guard !didResume else { return }
+        didResume = true
+        continuation.resume(returning: value)
     }
 }

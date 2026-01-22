@@ -34,54 +34,54 @@ struct XMLParserHandlerTests {
         """
         let data = Data(xml.utf8)
 
-        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<ContainerType, Never>) in
             let handler = XMLParserHandler(continuation: continuation)
             let parser = XMLParser(data: data)
             parser.delegate = handler
             parser.parse()
         }
 
-        #expect(result == true)
+        #expect(result == .ddoc)
     }
 
     @Test
-    func xmlParserHandler_parser_returnFalseWithWrongSignedDocFormat() async {
+    func xmlParserHandler_parser_returnNoneResultWithWrongSignedDocFormat() async {
         let xml = """
         <?xml version="1.0"?>
         <SignedDoc format="WRONG-FORMAT"></SignedDoc>
         """
         let data = Data(xml.utf8)
 
-        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<ContainerType, Never>) in
             let handler = XMLParserHandler(continuation: continuation)
             let parser = XMLParser(data: data)
             parser.delegate = handler
             parser.parse()
         }
 
-        #expect(result == false)
+        #expect(result == .none)
     }
 
     @Test
-    func xmlParserHandler_parser_returnFalseWithNoSignedDocTag() async {
+    func xmlParserHandler_parser_returnNoneResultWithNoSignedDocTag() async {
         let xml = """
         <?xml version="1.0"?>
         <OtherTag></OtherTag>
         """
         let data = Data(xml.utf8)
 
-        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<ContainerType, Never>) in
             let handler = XMLParserHandler(continuation: continuation)
             let parser = XMLParser(data: data)
             parser.delegate = handler
             parser.parse()
         }
 
-        #expect(result == false)
+        #expect(result == .none)
     }
 
     @Test
-    func xmlParserHandler_parser_returnsFalseWhenXMLIsMalformed() async {
+    func xmlParserHandler_parser_returnsNoneResultWhenXMLIsMalformed() async {
         let xml = """
         <?xml version="1.0"?>
         <SignedDoc format="DIGIDOC-XML"
@@ -89,13 +89,13 @@ struct XMLParserHandlerTests {
 
         let data = Data(xml.utf8)
 
-        let result = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        let result = await withCheckedContinuation { (continuation: CheckedContinuation<ContainerType, Never>) in
             let handler = XMLParserHandler(continuation: continuation)
             let parser = XMLParser(data: data)
             parser.delegate = handler
             parser.parse()
         }
 
-        #expect(result == false)
+        #expect(result == .none)
     }
 }

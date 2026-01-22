@@ -33,7 +33,7 @@ final class DigiDocErrorTests {
 
         #expect(errorDetail.message == retrievedDetail.message)
         #expect(errorDetail.code == retrievedDetail.code)
-        #expect(retrievedDetail.userInfo == ["key": "value"])
+        #expect(retrievedDetail.userInfo as? [String : String] == ["key": "value"])
     }
 
     @Test
@@ -44,7 +44,7 @@ final class DigiDocErrorTests {
 
         #expect(retrievedDetail.message == "Libdigidocpp is already initialized")
         #expect(retrievedDetail.code == 0)
-        #expect(retrievedDetail.userInfo == [:])
+        #expect(retrievedDetail.userInfo.isEmpty)
     }
 
     @Test

@@ -19,8 +19,8 @@
 
 struct DataFileBottomSheetActions {
     static func actions(
-        showOpenFileButton: Bool = false,
-        showSaveFileButton: Bool = false,
+        showOpenFileButton: Bool = true,
+        showSaveFileButton: Bool = true,
         showRemoveFileButton: Bool = false,
         onOpenFileButtonClick: @escaping () -> Void,
         onSaveFileButtonClick: @escaping () -> Void,

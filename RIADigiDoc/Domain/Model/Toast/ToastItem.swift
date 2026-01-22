@@ -19,7 +19,7 @@
 
 import Foundation
 
-struct ErrorMessage: Sendable, Equatable {
-    let key: String
-    let args: [String]
+struct ToastItem: Sendable {
+    let message: String
+    let duration: TimeInterval
 }

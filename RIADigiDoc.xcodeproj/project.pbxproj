@@ -143,7 +143,6 @@
 				Domain/Model/EncryptionServerInfo.swift,
 				Domain/Model/EncryptionServerOption.swift,
 				Domain/Model/EncryptionServerOptionId.swift,
-				Domain/Model/Error/ErrorMessage.swift,
 				Domain/Model/Error/FileOpeningErrors.swift,
 				"Domain/Model/Error/My eID/MyEidCodeChangeError.swift",
 				Domain/Model/FileItem.swift,

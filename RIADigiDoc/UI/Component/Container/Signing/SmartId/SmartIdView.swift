@@ -128,6 +128,14 @@ struct SmartIdView: View {
                 }
             }
         }
+        .onChange(of: viewModel.smartIdMessageKey, { _, newValue in
+            if let messageKey = newValue, !messageKey.isEmpty {
+                let extraArguments = viewModel.smartIdAlertMessageExtraArguments
+                Toast.show(
+                    languageSettings.localized(messageKey, extraArguments)
+                )
+            }
+        })
         .fullScreenCover(isPresented: $showRoleView) {
             RoleView(
                 onComplete: { roles, city, state, country, zipCode in
@@ -189,18 +197,11 @@ struct SmartIdView: View {
             guard let container = updatedContainer else {
                 cancelSigning()
                 isSigning = false
-                if let messageKey = viewModel.smartIdMessageKey,
-                   !messageKey.isEmpty {
-                    let extraArguments = viewModel.smartIdAlertMessageExtraArguments
-                    Toast.show(
-                        languageSettings.localized(messageKey, extraArguments)
-                    )
-                }
-
                 return
             }
 
             cancelSigning()
+            isSigning = false
 
             onSuccess(container)
             dismiss()

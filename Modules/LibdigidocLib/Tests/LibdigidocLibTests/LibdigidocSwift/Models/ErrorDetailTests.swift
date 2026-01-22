@@ -43,7 +43,7 @@ final class ErrorDetailsTests {
 
         #expect(message == errorDetail.message)
         #expect(code == errorDetail.code)
-        #expect(userInfo == errorDetail.userInfo)
+        #expect(userInfo == errorDetail.userInfo as? [String: String])
     }
 
     @Test
@@ -58,7 +58,12 @@ final class ErrorDetailsTests {
 
         #expect(nsError.localizedDescription == errorDetail.message)
         #expect(nsError.code == errorDetail.code)
-        #expect(errorDetail.userInfo == ["key": "value", NSLocalizedDescriptionKey: "Test NSError message"])
+        #expect(
+            errorDetail.userInfo as? [String : String] == [
+                "key": "value",
+                NSLocalizedDescriptionKey: "Test NSError message"
+            ]
+        )
     }
 
     @Test
@@ -74,7 +79,7 @@ final class ErrorDetailsTests {
 
         #expect(nsError.localizedDescription == errorDetail.message)
         #expect(nsError.code == errorDetail.code)
-        #expect(errorDetail.userInfo == [
+        #expect(errorDetail.userInfo as? [String : String] == [
             "key": "value",
             NSLocalizedDescriptionKey: "Test NSError message",
             "extraKey": "extraValue"
