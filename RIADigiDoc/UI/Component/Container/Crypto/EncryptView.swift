@@ -135,14 +135,6 @@ struct EncryptView: View {
         languageSettings.localized("Back")
     }
 
-    private var signLabel: String {
-        languageSettings.localized("Sign")
-    }
-
-    private var signAccessibilityLabel: String {
-        languageSettings.localized("Sign container")
-    }
-
     private var encryptLabel: String {
         languageSettings.localized("Encrypt")
     }
@@ -204,9 +196,9 @@ struct EncryptView: View {
                                     showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
                                         viewModel.isDecryptButtonShown,
-                                    leftActionButtonName: signLabel,
+                                    leftActionButtonName: "",
                                     rightActionButtonName: encryptDecryptLabel,
-                                    leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
+                                    leftActionButtonAccessibilityLabel: "",
                                     rightActionButtonAccessibilityLabel: encryptDecryptAccessibilityLabel.lowercased(),
                                     onLeftActionButtonClick: {
                                         // Do nothing
