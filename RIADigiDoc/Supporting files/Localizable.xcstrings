@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "Add file" : {
       "comment" : "Home screen bottom sheet action",
       "extractionState" : "manual",
@@ -4552,6 +4549,24 @@
         }
       }
     },
+    "Multiple documents added" : {
+      "comment" : "When trying to add multiple data files that are added, but not some other files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ files added successfully"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ faili edukalt lisatud"
+          }
+        }
+      }
+    },
     "Multiple documents already exist" : {
       "comment" : "When trying to add multiple data files that already exist in the container",
       "extractionState" : "manual",
@@ -5860,7 +5875,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eemalda konteiner"
+            "value" : "Eemalda ümbrik"
           }
         }
       }
@@ -6972,6 +6987,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SIM-kaardi viga"
+          }
+        }
+      }
+    },
+    "Single document added" : {
+      "comment" : "When trying to add multiple data files, one is added, but not other files",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 file added successfully"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 fail edukalt lisatud"
           }
         }
       }

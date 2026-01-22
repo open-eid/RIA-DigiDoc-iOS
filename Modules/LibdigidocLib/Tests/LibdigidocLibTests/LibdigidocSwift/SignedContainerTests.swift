@@ -153,7 +153,7 @@ final class SignedContainerTests {
                     notExistingContainerUrl
                         .deletingPathExtension()
                         .appendingPathExtension(Constants.Extension.Asice).lastPathComponent == errorDetail
-                        .userInfo["fileName"]
+                        .userInfo["fileName"] as? String
                 )
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")

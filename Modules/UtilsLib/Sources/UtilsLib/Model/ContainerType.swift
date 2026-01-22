@@ -19,7 +19,7 @@
 
 import Foundation
 
-public enum ContainerType {
+public enum ContainerType: Sendable {
     case none
     case asice
     case cdoc

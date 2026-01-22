@@ -39,7 +39,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     var isShowingFileSaver = false
     var showRecipientRemoveButton = false
     var isLastDataFileRemoved = false
-    private(set) var errorMessage: ErrorMessage?
+    private(set) var errorMessage: ToastMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
@@ -158,7 +158,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
         await cryptoContainer?.addDataFiles(files)
         EncryptViewModel.logger().debug("Added data files to container")
-        errorMessage = ErrorMessage(
+        errorMessage = ToastMessage(
             key: files.count == 1 ? "File successfully added" : "Files successfully added",
             args: []
         )
@@ -193,12 +193,12 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             switch cryptoError {
             case .addingFilesToContainerFailed(let detail):
                 let fileName = detail.userInfo["fileName"] ?? ""
-                errorMessage = ErrorMessage(
+                errorMessage = ToastMessage(
                     key: detail.message,
                     args: [fileName]
                 )
             default:
-                errorMessage = ErrorMessage(
+                errorMessage = ToastMessage(
                     key: "General error",
                     args: []
                 )
@@ -207,24 +207,24 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         case let fileError as FileOpeningError:
             switch fileError {
             case .invalidFileSize:
-                errorMessage = ErrorMessage(
+                errorMessage = ToastMessage(
                     key: "Invalid file size",
                     args: []
                 )
             case .noDataFiles:
-                errorMessage = ErrorMessage(
+                errorMessage = ToastMessage(
                     key: "Could not load selected files",
                     args: []
                 )
             default:
-                errorMessage = ErrorMessage(
+                errorMessage = ToastMessage(
                     key: "General error",
                     args: []
                 )
             }
 
         default:
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "General error",
                 args: []
             )
@@ -256,19 +256,19 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         if let cryptoError = error as? CryptoError {
             switch cryptoError {
             case .containerCreationFailed(let detail):
-                errorMessage = ErrorMessage(key: detail.message, args: [])
+                errorMessage = ToastMessage(key: detail.message, args: [])
             default:
-                errorMessage = ErrorMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "General error", args: [])
             }
             return
         }
 
         if let nsError = error as NSError? {
-            errorMessage = ErrorMessage(key: nsError.localizedDescription, args: [])
+            errorMessage = ToastMessage(key: nsError.localizedDescription, args: [])
             return
         }
 
-        errorMessage = ErrorMessage(key: "General error", args: [])
+        errorMessage = ToastMessage(key: "General error", args: [])
     }
 
     @discardableResult
@@ -281,15 +281,15 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                 switch cryptoError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = ErrorMessage(
+                    errorMessage = ToastMessage(
                         key: "Failed to rename file",
                         args: [errorDetail.userInfo["fileName"] ?? ""]
                     )
                 default:
-                    errorMessage = ErrorMessage(key: "General error", args: [])
+                    errorMessage = ToastMessage(key: "General error", args: [])
                 }
             } else {
-                errorMessage = ErrorMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "General error", args: [])
             }
             return nil
         }
@@ -332,13 +332,13 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                     // TODO: Open signed container files
                 } catch {
                     EncryptViewModel.logger().error("Failed to open nested container: \(error)")
-                    errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to open file", args: [dataFile.lastPathComponent])
+            errorMessage = ToastMessage(key: "Failed to open file", args: [dataFile.lastPathComponent])
         }
     }
 
@@ -351,7 +351,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             isShowingFileSaver = true
 
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to save file", args: [dataFile.lastPathComponent])
+            errorMessage = ToastMessage(key: "Failed to save file", args: [dataFile.lastPathComponent])
             isShowingFileSaver = false
         }
     }
@@ -363,7 +363,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+            errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
             return false
         }
     }
@@ -509,7 +509,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             EncryptViewModel.logger().error(
                 "Unable to remove signature from container. CryptoContainer or containerURL is nil"
             )
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove recipient from container",
                 args: []
             )
@@ -521,7 +521,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             await loadContainerData(cryptoContainer: container)
         } catch {
             EncryptViewModel.logger().error("Unable to remove signature from container. \(error)")
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove signature from container",
                 args: []
             )
@@ -534,7 +534,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             EncryptViewModel.logger().error(
                 "Unable to remove file from container. CryptoContainer or containerURL is nil"
             )
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.lastPathComponent]
             )
@@ -552,7 +552,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             return
         } catch {
             EncryptViewModel.logger().error("Unable to remove file from container. \(error)")
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.lastPathComponent]
             )

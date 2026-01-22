@@ -972,7 +972,7 @@ struct SigningViewModelTests: Loggable {
 
         let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
+        #expect(errorMessage == ToastMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -990,7 +990,7 @@ struct SigningViewModelTests: Loggable {
 
         let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
+        #expect(errorMessage == ToastMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -1012,7 +1012,7 @@ struct SigningViewModelTests: Loggable {
 
         let errorMessage = viewModel.errorMessage
 
-        #expect(errorMessage == ErrorMessage(key: "Failed to remove signature from container", args: []))
+        #expect(errorMessage == ToastMessage(key: "Failed to remove signature from container", args: []))
     }
 
     @Test
@@ -1057,7 +1057,7 @@ struct SigningViewModelTests: Loggable {
         let errorMessage = viewModel.errorMessage
 
         #expect(
-            errorMessage == ErrorMessage(
+            errorMessage == ToastMessage(
                 key: "Failed to remove file from container",
                 args: [mockDataFile.fileName]
             )
@@ -1081,7 +1081,7 @@ struct SigningViewModelTests: Loggable {
         let errorMessage = viewModel.errorMessage
 
         #expect(
-            errorMessage == ErrorMessage(
+            errorMessage == ToastMessage(
                 key: "Failed to remove file from container",
                 args: [mockDataFile.fileName]
             )
@@ -1113,7 +1113,7 @@ struct SigningViewModelTests: Loggable {
         let errorMessage = viewModel.errorMessage
 
         #expect(
-            errorMessage == ErrorMessage(
+            errorMessage == ToastMessage(
                 key: "Failed to remove file from container",
                 args: [mockDataFile.fileName]
             )
@@ -1153,7 +1153,7 @@ struct SigningViewModelTests: Loggable {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "File successfully added", args: []))
+        #expect(viewModel.successMessage == ToastMessage(key: "File successfully added", args: []))
         await #expect(updatedMockSignedContainer.getDataFiles().count == 2)
     }
 
@@ -1192,7 +1192,7 @@ struct SigningViewModelTests: Loggable {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Files successfully added", args: []))
+        #expect(viewModel.successMessage == ToastMessage(key: "Files successfully added", args: []))
         await #expect(updatedMockSignedContainer.getDataFiles().count == 3)
     }
 
@@ -1217,7 +1217,7 @@ struct SigningViewModelTests: Loggable {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Invalid file size", args: []))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Invalid file size", args: []))
         #expect(mockSignedContainer.addDataFilesCallCount == 0)
     }
 
@@ -1237,7 +1237,7 @@ struct SigningViewModelTests: Loggable {
 
         await viewModel.addDataFiles([], to: containerFile)
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Could not load selected files", args: []))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Could not load selected files", args: []))
         #expect(mockSignedContainer.addDataFilesCallCount == 0)
     }
 
@@ -1272,7 +1272,7 @@ struct SigningViewModelTests: Loggable {
             to: containerFile
         )
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Document already exists", args: [mockFileName]))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Document already exists", args: [mockFileName]))
         await #expect(mockSignedContainer.getDataFiles().count == 2)
     }
 
@@ -1329,9 +1329,7 @@ struct SigningViewModelTests: Loggable {
             testFile, testFile2, testFile3
         ], to: containerFile)
 
-        print(signedContainer)
-
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Multiple documents already exist", args: ["2"]))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Could not add files", args: ["2"]))
         #expect(viewModel.dataFiles.count == 3)
     }
 
@@ -1386,7 +1384,7 @@ struct SigningViewModelTests: Loggable {
             testFile, testFile2
         ], to: containerFile)
 
-        #expect(viewModel.errorMessage == ErrorMessage(key: "Multiple documents already exist", args: ["2"]))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Multiple documents already exist", args: ["2"]))
         #expect(viewModel.dataFiles.count == 2)
     }
 }

@@ -19,12 +19,11 @@
 
 import Foundation
 
-struct ToastMessage: Identifiable {
-    let id = UUID()
-    let key: String?
-    let args: [CVarArg]
+struct ToastMessage: Sendable, Equatable {
+    let key: String
+    let args: [String]
 
-    init(key: String?, args: [CVarArg] = []) {
+    init(key: String, args: [String] = []) {
         self.key = key
         self.args = args
     }

@@ -419,6 +419,14 @@ struct SigningView: View {
             Toast.show(
                 languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
             )
+            viewModel.resetErrorMessage()
+        }
+        .onChange(of: viewModel.successMessage) { _, message in
+            guard let message else { return }
+            Toast.show(
+                languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+            )
+            viewModel.resetSuccessMessage()
         }
     }
 

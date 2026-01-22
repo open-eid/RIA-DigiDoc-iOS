@@ -43,7 +43,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isXadesContainer = false
     var isLastDataFileRemoved = false
     private(set) var containerNotifications: [ContainerNotificationType] = []
-    private(set) var errorMessage: ErrorMessage?
+    private(set) var errorMessage: ToastMessage?
+    private(set) var successMessage: ToastMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
@@ -185,7 +186,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         do {
             let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
             SigningViewModel.logger().debug("Added data files to container")
-            errorMessage = ErrorMessage(
+            successMessage = ToastMessage(
                 key: files.count == 1 ? "File successfully added" : "Files successfully added",
                 args: []
             )
@@ -234,59 +235,74 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         case let digiDocError as DigiDocError:
             switch digiDocError {
             case .addingFilesToContainerFailed(let detail):
-                let fileName = detail.userInfo["fileName"] ?? ""
-                errorMessage = ErrorMessage(key: detail.message, args: [fileName])
+                let fileName = detail.userInfo["fileName"] as? String ?? ""
+                errorMessage = ToastMessage(key: detail.message, args: [fileName])
             default:
-                errorMessage = ErrorMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "General error", args: [])
             }
 
         case let fileError as FileOpeningError:
             switch fileError {
             case .invalidFileSize:
-                errorMessage = ErrorMessage(key: "Invalid file size", args: [])
+                errorMessage = ToastMessage(key: "Invalid file size", args: [])
             case .noDataFiles:
-                errorMessage = ErrorMessage(key: "Could not load selected files", args: [])
+                errorMessage = ToastMessage(key: "Could not load selected files", args: [])
             default:
-                errorMessage = ErrorMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "General error", args: [])
             }
 
         default:
-            errorMessage = ErrorMessage(key: "General error", args: [])
+            errorMessage = ToastMessage(key: "General error", args: [])
         }
     }
 
     private func handleAddFilesError(_ error: Error, container: URL) async {
         SigningViewModel.logger().error("Unable to add data files to container: \(error.localizedDescription)")
 
-        var totalFilesCount = 0
+        var totalFileCount = 0
         var failedFileCount = 0
         var duplicateFileCount = 0
 
         guard let digiDocError = error as? DigiDocError else {
-            errorMessage = ErrorMessage(key: "General error", args: [])
+            errorMessage = ToastMessage(key: "General error", args: [])
             return
         }
 
         switch digiDocError {
         case .addingFilesToContainerFailed(let errorDetail):
-            totalFilesCount = Int(errorDetail.userInfo["totalFileCount"] ?? "0") ?? 0
-            failedFileCount = Int(errorDetail.userInfo["failedFileCount"] ?? "0") ?? 0
-            duplicateFileCount = Int(errorDetail.userInfo["duplicateFileCount"] ?? "0") ?? 0
+            totalFileCount = Int(errorDetail.userInfo["totalFileCount"] as? Int ?? 0)
+            failedFileCount = Int(errorDetail.userInfo["failedFileCount"] as? Int ?? 0)
+            duplicateFileCount = Int(errorDetail.userInfo["duplicateFileCount"] as? Int ?? 0)
 
             if duplicateFileCount > 1 {
-                errorMessage = ErrorMessage(key: errorDetail.message, args: [String(duplicateFileCount)])
+                errorMessage = ToastMessage(key: "Multiple documents already exist", args: [String(duplicateFileCount)])
+            } else if duplicateFileCount == 1 {
+                if let fileName = errorDetail.userInfo["fileName"] as? String {
+                    errorMessage = ToastMessage(key: "Document already exists", args: [fileName])
+                } else {
+                    errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
+                }
             } else {
-                errorMessage = ErrorMessage(key: errorDetail.message, args: [String(failedFileCount)])
+                errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
             }
 
         default:
-            errorMessage = ErrorMessage(key: "General error", args: [])
+            errorMessage = ToastMessage(key: "General error", args: [])
         }
 
         // Update container when at least one file has been added to container
-        if totalFilesCount > failedFileCount {
-            await refreshContainer(with: container)
-        }
+        guard totalFileCount > failedFileCount else { return }
+
+        await refreshContainer(with: container)
+
+        let successfulFilesCount = totalFileCount - failedFileCount
+
+        successMessage = successfulFilesCount == 1 ?
+        ToastMessage(key: "Single document added") :
+        ToastMessage(
+            key: "Multiple documents added",
+            args: [String(successfulFilesCount)]
+        )
     }
 
     private func refreshContainer(with container: URL) async {
@@ -297,7 +313,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             )
             await loadContainerData(signedContainer: updatedContainer)
         } catch {
-            errorMessage = ErrorMessage(key: "General error", args: [])
+            errorMessage = ToastMessage(key: "General error", args: [])
         }
     }
 
@@ -315,15 +331,15 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                 switch digiDocError {
                 case .containerRenamingFailed(let errorDetail),
                         .containerSavingFailed(let errorDetail):
-                    errorMessage = ErrorMessage(
+                    errorMessage = ToastMessage(
                         key: "Failed to rename file",
-                        args: [errorDetail.userInfo["fileName"] ?? ""]
+                        args: [errorDetail.userInfo["fileName"] as? String ?? ""]
                     )
                 default:
-                    errorMessage = ErrorMessage(key: "General error", args: [])
+                    errorMessage = ToastMessage(key: "General error", args: [])
                 }
             } else {
-                errorMessage = ErrorMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "General error", args: [])
             }
             return nil
         }
@@ -365,7 +381,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
                     SigningViewModel.logger().error("Failed to open nested container: \(error)")
-                    errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
+                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
                     if error.localizedDescription.contains("Online validation disabled") {
                         SigningViewModel.logger().error(
                             "Unable to open container '\([dataFile.fileName])'. Sending to SiVa not allowed."
@@ -373,14 +389,14 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                         errorMessage = nil
                     } else {
                         SigningViewModel.logger().error("Failed to open nested container: \(error)")
-                        errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
+                        errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
                     }
                 }
             } else {
                 previewFile = fileURL
             }
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to open file", args: [dataFile.fileName])
+            errorMessage = ToastMessage(key: "Failed to open file", args: [dataFile.fileName])
         }
     }
 
@@ -393,7 +409,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             isShowingFileSaver = true
 
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to save file", args: [dataFile.fileName])
+            errorMessage = ToastMessage(key: "Failed to save file", args: [dataFile.fileName])
             isShowingFileSaver = false
         }
     }
@@ -405,7 +421,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ErrorMessage(key: "Failed to open container", args: [dataFile.fileName])
+            errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
             return false
         }
     }
@@ -469,7 +485,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             SigningViewModel.logger().error(
                 "Unable to remove signature from container. SignedContainer or containerURL is nil"
             )
-            errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
+            errorMessage = ToastMessage(key: "Failed to remove signature from container", args: [])
             return
         }
 
@@ -478,7 +494,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             await loadContainerData(signedContainer: container)
         } catch {
             SigningViewModel.logger().error("Unable to remove signature from container. \(error)")
-            errorMessage = ErrorMessage(key: "Failed to remove signature from container", args: [])
+            errorMessage = ToastMessage(key: "Failed to remove signature from container", args: [])
             return
         }
     }
@@ -488,7 +504,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             SigningViewModel.logger().error(
                 "Unable to remove file from container. SignedContainer or containerURL is nil"
             )
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.fileName]
             )
@@ -499,7 +515,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             SigningViewModel.logger().error(
                 "Unable to remove file from container. File not found in container"
             )
-            errorMessage = ErrorMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
+            errorMessage = ToastMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
             return
         }
 
@@ -515,12 +531,20 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             return
         } catch {
             SigningViewModel.logger().error("Unable to remove file from container. \(error)")
-            errorMessage = ErrorMessage(
+            errorMessage = ToastMessage(
                 key: "Failed to remove file from container",
                 args: [dataFile.fileName]
             )
             return
         }
+    }
+
+    func resetErrorMessage() {
+        errorMessage = nil
+    }
+
+    func resetSuccessMessage() {
+        successMessage = nil
     }
 
     private func openNestedContainer(fileURL: URL, isSivaConfirmed: Bool) async throws {

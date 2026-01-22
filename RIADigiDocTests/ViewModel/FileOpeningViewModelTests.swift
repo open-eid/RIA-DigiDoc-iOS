@@ -187,17 +187,17 @@ struct FileOpeningViewModelTests {
 
     @Test
     func handleSivaConfirmation_successWithNonSivaContainer() async throws {
-        let container = SignedContainerProtocolMock()
-        container.getContainerMimetypeHandler = { Constants.MimeType.Pdf }
+        let mockContainer = SignedContainerProtocolMock()
+        mockContainer.getContainerMimetypeHandler = { Constants.MimeType.Pdf }
 
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, isSivaConfirmed in
             #expect(isSivaConfirmed)
-            return container
+            return mockContainer
         }
 
         await viewModel.handleSivaConfirmation()
 
-        let rawContainerFile = await container.getRawContainerFile()
+        let rawContainerFile = await mockContainer.getRawContainerFile()
 
         #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
         if let count = mockSharedContainerViewModel.setAddedFilesCountArgValues.first {
@@ -431,13 +431,14 @@ struct FileOpeningViewModelTests {
 
     @Test
     func showFileAddedMessage_returnFalseWhenContainerIsSigned() async {
-        let container = SignedContainerProtocolMock()
-        container.getSignaturesHandler = {[
+        let mockContainer = SignedContainerProtocolMock()
+        mockContainer.getSignaturesHandler = {[
             MockSignatureWrapper.mockSignatureWrapper(signatureId: "1"),
             MockSignatureWrapper.mockSignatureWrapper(signatureId: "2")
         ]}
 
-        mockSharedContainerViewModel.currentContainerHandler = { container }
+        mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
+        mockContainer.isExistingContainerHandler = { true }
 
         let showFileAddedMessage = await viewModel.showFileAddedMessage()
 
@@ -447,9 +448,10 @@ struct FileOpeningViewModelTests {
 
     @Test
     func showFileAddedMessage_returnTrueWhenContainerIsNotSigned() async {
-        let container = SignedContainerProtocolMock()
-        container.getSignaturesHandler = { [] }
-        mockSharedContainerViewModel.currentContainerHandler = { container }
+        let mockContainer = SignedContainerProtocolMock()
+        mockContainer.getSignaturesHandler = { [] }
+        mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
+        mockContainer.isExistingContainerHandler = { false }
 
         let showFileAddedMessage = await viewModel.showFileAddedMessage()
 

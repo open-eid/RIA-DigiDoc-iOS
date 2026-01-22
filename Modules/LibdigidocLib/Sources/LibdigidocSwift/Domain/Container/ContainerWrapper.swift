@@ -158,13 +158,16 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
             let duplicatePrefix = "Document with same file name"
 
             let duplicateCount = errors.filter { $0.localizedDescription.hasPrefix(duplicatePrefix) }.count
-            let totalCount = errors.count
+
+            let failedCount = nsError.userInfo["failedFileCount"] as? Int ?? 0
+            let totalCount = nsError.userInfo["totalFileCount"] as? Int ?? dataFilesPaths.count
 
             if duplicateCount == totalCount && totalCount > 1 {
                 throw DigiDocError.addingFilesToContainerFailed(
                     ErrorDetail(message: "Multiple documents already exist", code: 4, userInfo: [
-                        "totalFileCount": String(totalCount),
-                        "duplicateFileCount": String(duplicateCount)
+                        "totalFileCount": totalCount,
+                        "failedFileCount": failedCount,
+                        "duplicateFileCount": duplicateCount
                     ])
                 )
             } else {
@@ -175,7 +178,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
                 throw DigiDocError.addingFilesToContainerFailed(
                     ErrorDetail(
-                        nsError: nsError
+                        nsError: nsError,
+                        extraInfo: ["duplicateFileCount": duplicateCount]
                     )
                 )
             }
