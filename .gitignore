@@ -8,6 +8,8 @@ timeline.xctimeline
 playground.xcworkspace
 
 .build/
+build-cdoc/
+build-cdoc-debug/
 
 # Swift Package Manager
 Packages/
