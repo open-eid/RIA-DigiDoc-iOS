@@ -19,7 +19,7 @@
 
 import Foundation
 
-public struct SmartIdInputData: Sendable {
+public struct SmartIdInputData: Sendable, Equatable {
     let country: SmartIdCountry
     let personalCode: String
     let rememberMe: Bool

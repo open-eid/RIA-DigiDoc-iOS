@@ -18,11 +18,14 @@
  */
 
 import Foundation
+import Alamofire
 
-public enum SmartIdCountry: String, Sendable, Equatable, Identifiable, CaseIterable {
-    case estonia = "Estonia"
-    case latvia = "Latvia"
-    case lithuania = "Lithuania"
-
-    public var id: String { rawValue }
+/// @mockable
+public protocol ResponseHandlerProtocol: Sendable {
+    func handleSessionResponse(_ responseValue: Any) throws
+    func handleSessionResult(_ response: SmartIdSessionStatusResponseCode) throws
+    func handleCancellationError(_ error: Error) throws
+    func handleNetworkError(_ error: AFError, statusCode: Int?) throws
+    func handleURLError(_ error: URLError) throws
+    func handleStatusCodeError(_ statusCode: Int?) throws
 }

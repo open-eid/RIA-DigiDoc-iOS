@@ -72,6 +72,22 @@ struct MobileIdViewModelTests {
             SecCertificateCreateWithData(nil, Data() as CFData)
         }
 
+        mockConfigurationRepository.getConfigurationHandler = {
+            do {
+                return try await MobileIdViewModelTests.defaultConfiguration()
+            } catch {
+                Issue.record("Unable to get configuration. \(error)")
+                return nil
+            }
+        }
+        mockDataStore.getRelyingPartyUUIDHandler = { Constants.Signing.RelyingPartyUUID }
+        mockDataStore.getSelectedLanguageHandler = { "en" }
+        mockDataStore.getIsRoleAndAddressEnabledHandler = { true }
+
+        mockCertificatUtil.certificateHandler = { _ in
+            SecCertificateCreateWithData(nil, Data() as CFData)
+        }
+
         viewModel = MobileIdViewModel(
             configurationRepository: mockConfigurationRepository,
             mobileIdSignService: mockMobileIdSignService,

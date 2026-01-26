@@ -53,14 +53,12 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
                 proxyInfo: proxyInfo,
                 userAgent: userAgent
             )
-            let headers = RequestPerformer.defaultHeaders()
 
             let response = await session.request(
                 url,
                 method: method,
                 parameters: parameters,
-                encoder: encoder,
-                headers: headers
+                encoder: encoder
             )
                 .validate()
                 .serializingDecodable(T.self)
@@ -82,13 +80,5 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
 
             throw mobileIdError
         }
-    }
-
-    private static func defaultHeaders() -> HTTPHeaders {
-        [
-            .contentType("application/json; charset=utf-8"),
-            .init(name: "Cache-Control", value: "no-cache"),
-            .init(name: "Pragma", value: "no-cache")
-        ]
     }
 }

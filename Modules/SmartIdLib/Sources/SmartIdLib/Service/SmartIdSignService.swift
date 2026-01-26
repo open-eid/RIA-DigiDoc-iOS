@@ -24,8 +24,16 @@ import UtilsLib
 import UIKit
 
 public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
+
+    private let requestPerformer: RequestPerfomerProtocol
     private var session: Session?
     private var currentProxy: ProxyInfo?
+
+    init(
+        requestPerfomer: RequestPerfomerProtocol
+    ) {
+        self.requestPerformer = requestPerfomer
+    }
 
     // swiftlint:disable:next function_parameter_count
     public func getCertificateRequest(
@@ -45,7 +53,7 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
 
         let semanticsIdentifier = "PNO\(country)-\(nationalIdentityNumber)"
 
-        return try await performRequest(
+        return try await requestPerformer.performRequest(
             url: "\(url)/\(semanticsIdentifier)",
             method: .post,
             parameters: request,
@@ -80,7 +88,7 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
             )]
         )
 
-        return try await performRequest(
+        return try await requestPerformer.performRequest(
             url: "\(url)/\(documentNumber)",
             method: .post,
             parameters: request,
@@ -102,7 +110,7 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         let pollingTimeoutMs = pollingTimeout * 1000
 
         while true {
-            let sessionResponse: SmartIdSessionResponse? = try await performRequest(
+            let sessionResponse: SmartIdSessionResponse? = try await requestPerformer.performRequest(
                 url: "\(url)/\(sessionId)",
                 method: .get,
                 parameters: ["timeoutMs": pollingTimeoutMs],
@@ -123,212 +131,5 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
     public func getVerificationCode(digest: Data) async -> String {
         let code = UInt16(digest[digest.count - 2]) << 8 | UInt16(digest[digest.count - 1])
         return String(format: "%04d", (code % 10000))
-    }
-
-    func performRequest<T: Decodable & Sendable, P: Encodable & Sendable>(
-        url: String,
-        method: HTTPMethod,
-        parameters: P? = nil,
-        trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            Task {
-                do {
-                    let encoder: ParameterEncoder = method == .get ?
-                    URLEncodedFormParameterEncoder.default :
-                    JSONParameterEncoder.default
-
-                    let session = try await ensureSession(
-                        url: url,
-                        trustedCertificates: trustedCertificates,
-                        proxyInfo: proxyInfo,
-                        userAgent: userAgent
-                    )
-
-                    let response = await session.request(
-                        url,
-                        method: method,
-                        parameters: parameters,
-                        encoder: encoder
-                    )
-                        .validate()
-                        .serializingDecodable(T.self)
-                        .response
-
-                    switch response.result {
-                    case .success(let value):
-                        if let response = value as? SmartIdSessionResponse, let result = response.result?.endResult {
-                            do {
-                                try handleSessionResult(result)
-                            } catch {
-                                continuation.resume(throwing: error)
-                                return
-                            }
-                        }
-                        continuation.resume(returning: value)
-                        return
-                    case .failure(let afError):
-                        continuation.resume(with: Result {
-                            try handleCancellationError(afError)
-                            try handleNetworkError(afError, statusCode: response.response?.statusCode)
-
-                            throw SmartIdError.generalError
-                        })
-                        return
-                    }
-
-                } catch {
-                    Task { @MainActor in
-                        continuation.resume(throwing: SmartIdError.timeout)
-                        return
-                    }
-
-                    continuation.resume(with: Result {
-                        try handleCancellationError(error)
-                        guard let smartIdError = error as? SmartIdError else {
-                            throw SmartIdError.generalError
-                        }
-                        throw smartIdError
-                    })
-                    return
-                }
-            }
-        }
-    }
-
-    private func ensureSession(
-        url: String,
-        trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo,
-        userAgent: String,
-    ) async throws -> Session {
-        if currentProxy == proxyInfo {
-            if let existing = session { return existing }
-        }
-
-        currentProxy = proxyInfo
-
-        guard let host = URL(string: url)?.host else {
-            SmartIdSignService.logger().error(
-                "Unable to parse host from URL: \(url)"
-            )
-            throw URLError(.badURL)
-        }
-
-        let newSession = SmartIdSignService.createAlamofireSession(
-            host: host,
-            trustedCertificates: trustedCertificates,
-            proxyInfo: proxyInfo,
-            userAgent: userAgent
-        )
-
-        session = newSession
-        return newSession
-    }
-
-    private static func createAlamofireSession(
-        host: String,
-        trustedCertificates: [SecCertificate],
-        proxyInfo: ProxyInfo,
-        userAgent: String
-    ) -> Session {
-        let evaluators = [host: PinnedCertificatesTrustEvaluator(certificates: trustedCertificates)]
-
-        let config = URLSessionConfiguration.af.default
-        config.timeoutIntervalForRequest = TimeInterval(Constants.Signing.Timeout)
-        config.timeoutIntervalForResource = TimeInterval(Constants.Signing.Timeout)
-        config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        config.urlCache = nil
-
-        var headers = config.httpAdditionalHeaders ?? [:]
-        headers["User-Agent"] = userAgent
-        headers["Content-Type"] = "application/json; charset=utf-8"
-        headers["Cache-Control"] = "no-cache"
-        headers["Pragma"] = "no-cache"
-        config.httpAdditionalHeaders = headers
-
-        return Session.withProxy(
-            proxyInfo: proxyInfo,
-            configuration: config,
-            serverTrustManager: ServerTrustManager(evaluators: evaluators)
-        )
-    }
-
-    private func handleSessionResponse(_ responseValue: Any) throws {
-        if let sessionResponse = responseValue as? SmartIdSessionResponse {
-            guard sessionResponse.state == .complete else { return }
-
-            guard let endResult = sessionResponse.result?.endResult else { return }
-
-            try handleSessionResult(endResult)
-        }
-    }
-
-    private func handleSessionResult(_ response: SmartIdSessionStatusResponseCode) throws {
-        switch response {
-        case .timeout: throw SmartIdError.timeout
-        case .userRefused,
-                .userRefusedDisplayTextAndPin,
-                .userRefusedVcChoice,
-                .userRefusedConfirmationMessage,
-                .userRefusedConfirmationMessageWithVcChoice,
-                .userRefusedCertChoice:
-            throw SmartIdError.userRefused
-        case .wrongVc: throw SmartIdError.wrongVC
-        case .documentUnusable: throw SmartIdError.documentUnusable
-        case .requiredInteractionNotSupportedByApp: throw SmartIdError.oldApi
-        default: break
-        }
-    }
-
-    private func handleCancellationError(_ error: Error) throws {
-        if let afError = error as? AFError {
-            switch afError {
-            case .explicitlyCancelled:
-                throw SmartIdError.explicitlyCancelled
-            default:
-                return
-            }
-        }
-    }
-
-    private func handleNetworkError(_ error: AFError, statusCode: Int?) throws {
-        if let underlyingError = error.underlyingError as? URLError {
-            try handleURLError(underlyingError)
-        } else {
-            try handleStatusCodeError(statusCode)
-        }
-    }
-
-    private func handleURLError(_ error: URLError) throws {
-        switch error.code {
-        case .notConnectedToInternet, .networkConnectionLost:
-            throw SmartIdError.noInternetConnection
-        case .timedOut:
-            throw SmartIdError.timeout
-        default:
-            throw SmartIdError.noInternetConnection
-        }
-    }
-
-    private func handleStatusCodeError(_ statusCode: Int?) throws {
-        switch statusCode ?? -1 {
-        case 400:
-            throw SmartIdError.incorrectParameters
-        case 401:
-            throw SmartIdError.invalidAccessRights
-        case 409:
-            throw SmartIdError.exceededUnsuccessfulRequests
-        case 429:
-            throw SmartIdError.tooManyRequests
-        case 480:
-            throw SmartIdError.oldApi
-        case 580:
-            throw SmartIdError.underMaintenance
-        default:
-            throw SmartIdError.technicalError
-        }
     }
 }

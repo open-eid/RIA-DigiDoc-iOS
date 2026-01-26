@@ -14,23 +14,16 @@
   "testTargets" : [
     {
       "target" : {
+        "containerPath" : "container:Modules\/SmartIdLib",
+        "identifier" : "SmartIdLibTests",
+        "name" : "SmartIdLibTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:Modules\/ConfigLib",
         "identifier" : "ConfigLibTests",
         "name" : "ConfigLibTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:Modules\/LibdigidocLib",
-        "identifier" : "LibdigidocLibTests",
-        "name" : "LibdigidocLibTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:Modules\/UtilsLib",
-        "identifier" : "UtilsLibTests",
-        "name" : "UtilsLibTests"
       }
     },
     {
@@ -42,6 +35,13 @@
     },
     {
       "target" : {
+        "containerPath" : "container:Modules\/LibdigidocLib",
+        "identifier" : "LibdigidocLibTests",
+        "name" : "LibdigidocLibTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:RIADigiDoc.xcodeproj",
         "identifier" : "DFDB148B2CC97B1000153876",
         "name" : "RIADigiDocTests"
@@ -49,16 +49,16 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Modules\/CommonsLib",
-        "identifier" : "CommonsLibTests",
-        "name" : "CommonsLibTests"
+        "containerPath" : "container:RIADigiDoc.xcodeproj",
+        "identifier" : "DFCE022A2D148B4D00216362",
+        "name" : "FileImportShareExtensionTests"
       }
     },
     {
       "target" : {
-        "containerPath" : "container:RIADigiDoc.xcodeproj",
-        "identifier" : "DFCE022A2D148B4D00216362",
-        "name" : "FileImportShareExtensionTests"
+        "containerPath" : "container:Modules\/UtilsLib",
+        "identifier" : "UtilsLibTests",
+        "name" : "UtilsLibTests"
       }
     }
   ],
