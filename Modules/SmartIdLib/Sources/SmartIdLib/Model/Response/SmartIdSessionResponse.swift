@@ -35,6 +35,18 @@ public struct SmartIdSessionResponse: Sendable, Decodable, CustomStringConvertib
         )
         """
     }
+
+    public init(
+        state: SessionResponseState,
+        result: SessionResult?,
+        signature: SmartIdSessionSignatureResponse?,
+        cert: SmartIdSessionCertResponse?
+    ) {
+        self.state = state
+        self.result = result
+        self.signature = signature
+        self.cert = cert
+    }
 }
 
 public struct SmartIdSessionSignatureResponse: Sendable, Decodable, CustomStringConvertible {
@@ -48,6 +60,11 @@ public struct SmartIdSessionSignatureResponse: Sendable, Decodable, CustomString
             algorithm: \(algorithm)
         )
         """
+    }
+
+    public init(value: Data, algorithm: String) {
+        self.value = value
+        self.algorithm = algorithm
     }
 }
 
@@ -68,6 +85,14 @@ public struct SessionResult: Sendable, Decodable, CustomStringConvertible {
         )
         """
     }
+
+    public init(
+        endResult: SmartIdSessionStatusResponseCode,
+        documentNumber: String?
+    ) {
+        self.endResult = endResult
+        self.documentNumber = documentNumber
+    }
 }
 
 public enum SessionCertificateLevel: String, Sendable, Decodable {
@@ -87,6 +112,14 @@ public struct SmartIdSessionCertResponse: Sendable, Decodable, CustomStringConve
             certificateLevel: \(certificateLevel.debugDescription)
         )
         """
+    }
+
+    public init(
+        value: Data?,
+        certificateLevel: SessionCertificateLevel?
+    ) {
+        self.value = value
+        self.certificateLevel = certificateLevel
     }
 }
 

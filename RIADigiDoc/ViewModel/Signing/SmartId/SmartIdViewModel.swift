@@ -113,7 +113,6 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         smartIdAlertMessageUrl = nil
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func sign(
         country: SmartIdCountry,
         personalCode: String,
@@ -200,16 +199,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             return nil
         }
 
-        let verificationCode: String
-        do {
-            verificationCode = try await getVerificationCode(hash: hash)
-        } catch {
-            SmartIdViewModel.logger().debug("Smart-ID: Unable to get verification code (control code)")
-            handleSigningError(error)
-            return nil
-        }
-
-        controlCode = verificationCode
+        controlCode = await getVerificationCode(hash: hash)
 
         var notificationIdentifier: String = ""
         do {
@@ -460,7 +450,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         )
     }
 
-    private func getVerificationCode(hash: Data) async throws -> String {
+    private func getVerificationCode(hash: Data) async -> String {
         SmartIdViewModel.logger().debug(
             "Smart-ID: Calculating verification code (control code)"
         )

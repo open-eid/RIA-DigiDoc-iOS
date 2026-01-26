@@ -19,7 +19,7 @@
 
 import Foundation
 
-public struct SmartIdSessionIdResponse: Sendable, Decodable, CustomStringConvertible {
+public struct SmartIdSessionIdResponse: Sendable, Equatable, Decodable, CustomStringConvertible {
     public let sessionID: String?
 
     public var description: String {
@@ -28,5 +28,9 @@ public struct SmartIdSessionIdResponse: Sendable, Decodable, CustomStringConvert
             sessionId: \(sessionID ?? "-")
         )
         """
+    }
+
+    public init(sessionID: String?) {
+        self.sessionID = sessionID
     }
 }

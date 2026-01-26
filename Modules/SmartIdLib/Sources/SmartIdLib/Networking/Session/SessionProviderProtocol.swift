@@ -18,11 +18,15 @@
  */
 
 import Foundation
+import Alamofire
+import CommonsLib
 
-public enum SmartIdCountry: String, Sendable, Equatable, Identifiable, CaseIterable {
-    case estonia = "Estonia"
-    case latvia = "Latvia"
-    case lithuania = "Lithuania"
-
-    public var id: String { rawValue }
+/// @mockable
+public protocol SessionProviderProtocol: Sendable {
+    func ensureSession(
+        url: String,
+        trustedCertificates: [SecCertificate],
+        proxyInfo: ProxyInfo,
+        userAgent: String
+    ) async throws -> Session
 }

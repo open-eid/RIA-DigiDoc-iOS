@@ -421,4 +421,32 @@ final class DataStoreTests {
         #expect(inputData.personalCode == input.personalCode)
         #expect(inputData.rememberMe == input.rememberMe)
     }
+
+    // MARK: - SmartID signing tests
+
+    @Test
+    func getSmartIdInputData_returnDefaultValuesWhenNoValuesSaved() async {
+        let result = await dataStore.getSmartIdInputData()
+
+        #expect(result.country == .estonia)
+        #expect(result.personalCode == "")
+        #expect(result.rememberMe == true)
+    }
+
+    @Test
+    func setSmartIdInputData_success() async {
+        let input = SmartIdInputData(
+            country: .estonia,
+            personalCode: "60001019906",
+            rememberMe: true
+        )
+
+        await dataStore.setSmartIdInputData(input)
+
+        let inputData = await dataStore.getSmartIdInputData()
+
+        #expect(inputData.country == input.country)
+        #expect(inputData.personalCode == input.personalCode)
+        #expect(inputData.rememberMe == input.rememberMe)
+    }
 }

@@ -17,7 +17,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
         .package(url: "https://github.com/apple/swift-certificates.git", exact: .init(1, 7, 0)),
         .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
-        .package(path: "../UtilsLib")
+        .package(path: "../UtilsLib"),
+        .package(path: "../CommonsLib")
     ],
     targets: [
         .target(
@@ -39,7 +40,7 @@ let package = Package(
                 "Digest",
                 "SwiftECC",
                 "iR301",
-                "UtilsLib"
+                "UtilsLib",
                 "CommonsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
