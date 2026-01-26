@@ -421,7 +421,7 @@ struct EncryptView: View {
                                 ))
                             } else {
                                 await viewModel.loadContainerData(
-                                    cryptoContainer: viewModel.cryptoContainer
+                                    cryptoContainer: nil
                                 )
 
                                 await updateAsyncLabels()

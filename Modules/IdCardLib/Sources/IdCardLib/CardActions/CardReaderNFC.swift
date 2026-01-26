@@ -24,7 +24,7 @@ import CryptoTokenKit
 internal import SwiftECC
 import BigInt
 
-class CardReaderNFC: CardReader, Loggable {
+class CardReaderNFC: @unchecked CardReader, Loggable {
     // swiftlint:disable identifier_name
     enum PasswordType: UInt8 {
         case id_PasswordType_MRZ = 1 // 0.4.0.127.0.7.2.2.12.1

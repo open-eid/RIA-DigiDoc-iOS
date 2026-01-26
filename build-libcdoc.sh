@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ---- Config ----
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILD_ROOT="${PROJECT_ROOT}/build-cdoc-debug"
+BUILD_ROOT="${PROJECT_ROOT}/build-cdoc"
 
 SOURCE_DIR="${PROJECT_ROOT}/../Downloads/libcdoc"
 GIT_URL="https://github.com/open-eid/libcdoc.git"

@@ -174,7 +174,7 @@ struct NFCView: View {
                         rememberMe: $rememberMe,
                         isActionEnabled: $isActionEnabled,
                         canNumberError: canNumberError,
-                        pin: $pinNumber,
+                        pinNumber: $pinNumber,
                         pinError: pinNumberError,
                         pinType: pinType,
                         onInputChange: {

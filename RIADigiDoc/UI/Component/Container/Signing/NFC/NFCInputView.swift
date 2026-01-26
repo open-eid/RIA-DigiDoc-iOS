@@ -32,7 +32,7 @@ struct NFCInputView: View {
     @Binding var isActionEnabled: Bool
     @Binding var canNumberError: String?
 
-    @Binding var pin: String
+    @Binding var pinNumber: String
     @Binding var pinError: String?
     var pinType: CodeType?
     
@@ -40,6 +40,10 @@ struct NFCInputView: View {
 
     private var canNumberTitle: String {
         languageSettings.localized("CAN number")
+    }
+    
+    private var pinNumberTitle: String {
+        languageSettings.localized("PIN code", [pinType?.name ?? ""])
     }
 
     private var canNumberLocationLabel: String {
@@ -55,7 +59,7 @@ struct NFCInputView: View {
         rememberMe: Binding<Bool>,
         isActionEnabled: Binding<Bool>,
         canNumberError: Binding<String?>,
-        pin: Binding<String>,
+        pinNumber: Binding<String>,
         pinError: Binding<String?>,
         pinType: CodeType?,
         onInputChange: @escaping () -> Void
@@ -64,7 +68,7 @@ struct NFCInputView: View {
         self._rememberMe = rememberMe
         self._isActionEnabled = isActionEnabled
         self._canNumberError = canNumberError
-        self._pin = pin
+        self._pinNumber = pinNumber
         self._pinError = pinError
         self.pinType = pinType
         self.onInputChange = onInputChange
@@ -96,19 +100,18 @@ struct NFCInputView: View {
 
             
             VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                Text(verbatim: languageSettings.localized(pinType?.name ?? ""))
-                    .font(typography.labelMedium)
-                    .foregroundStyle(theme.onSurface)
-
-                SecureField("", text: $pin)
-                    .font(typography.bodyLarge)
-                    .keyboardType(.numberPad)
-                    .textContentType(.password)
-                    .onChange(of: pin) { _, _ in
-                        onInputChange()
-                    }
-                    .padding(Dimensions.Padding.MPadding)
-                    .background(theme.surfaceContainerHighest)
+                FloatingLabelTextField(
+                    title: pinNumberTitle,
+                    placeholder: pinNumberTitle,
+                    text: $pinNumber,
+                    isSecure: true,
+                    isError: !(pinError?.isEmpty ?? true),
+                    errorText: pinError ?? "",
+                    keyboardType: .numberPad
+                )
+                .onChange(of: pinNumber) {
+                    onInputChange()
+                }
             }
             
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
@@ -136,7 +139,7 @@ struct NFCInputView: View {
         rememberMe: .constant(true),
         isActionEnabled: .constant(true),
         canNumberError: .constant(nil),
-        pin: .constant("123"),
+        pinNumber: .constant("123"),
         pinError: .constant(nil),
         pinType: CodeType.pin2,
         onInputChange: {},

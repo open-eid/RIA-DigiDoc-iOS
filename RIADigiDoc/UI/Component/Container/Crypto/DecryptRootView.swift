@@ -25,7 +25,7 @@ import CommonsLib
 
 struct DecryptRootView: View {
     @Environment(\.dismiss) private var dismiss
-
+    @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var chosenMethod: ActionMethod = .idCardViaNFC
@@ -58,6 +58,10 @@ struct DecryptRootView: View {
                         onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setCryptoContainer(container)
+                            
+                            Toast.show(languageSettings.localized(
+                                "Container successfully decrypted"
+                            ))
                         }
                     )
                 }

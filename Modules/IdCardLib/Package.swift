@@ -18,7 +18,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-certificates.git", exact: .init(1, 7, 0)),
         .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
         .package(path: "../UtilsLib"),
-        .package(path: "../CommonsLib")
+        .package(path: "../CommonsLib"),
     ],
     targets: [
         .target(

@@ -39,33 +39,32 @@ NSError* SmartCardTokenWrapper::lastError() const
     return token->error;
 }
 
-libcdoc::result_t SmartCardTokenWrapper::deriveECDH1(std::vector<uint8_t>& dst, const std::vector<uint8_t> &public_key, unsigned int idx)
+libcdoc::result_t SmartCardTokenWrapper::deriveECDH1(
+    std::vector<uint8_t>& dst,
+    const std::vector<uint8_t>& public_key,
+    unsigned int idx)
 {
     __block NSData  *resultData = nil;
     __block NSError *blockError = nil;
+    __block BOOL finished = NO;
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     NSData *pub = [NSData dataFromVectorNoCopy:public_key];
 
-    auto invoke = ^{
-        [token->smartTokenClass derive:pub
-                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
-            resultData = data;
-            blockError = error;
-            dispatch_semaphore_signal(sema);
-        }];
-    };
+    [token->smartTokenClass derive:pub
+                 completionHandler:^(NSData * _Nullable data,
+                                     NSError * _Nullable error)
+    {
+        resultData = data;
+        blockError = error;
+        finished = YES;
+    }];
 
-    if ([NSThread isMainThread]) {
-        /// Avoid deadlock: perform async then wait.
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
-    } else {
-        /// Already off main thread; call directly.
-        invoke();
+    // Pump the run loop until completion fires
+    // FIXME: Review and fix NFC lib, to use normal completion sync like semaphore.
+    while (!finished) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                 beforeDate:[NSDate distantFuture]];
     }
-
-    /// Wait for completion (consider a timeout if appropriate)
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
     if (resultData) {
         dst = [resultData toVector];
@@ -81,29 +80,25 @@ libcdoc::result_t SmartCardTokenWrapper::decryptRSA(std::vector<uint8_t>& dst, c
 {
     __block NSData  *resultData = nil;
     __block NSError *blockError = nil;
+    __block BOOL finished = NO;
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     NSData *pub = [NSData dataFromVectorNoCopy:data];
 
-    auto invoke = ^{
-        [token->smartTokenClass decrypt:pub
-                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
-            resultData = data;
-            blockError = error;
-            dispatch_semaphore_signal(sema);
-        }];
-    };
+    [token->smartTokenClass decrypt:pub
+                 completionHandler:^(NSData * _Nullable data,
+                                     NSError * _Nullable error)
+    {
+        resultData = data;
+        blockError = error;
+        finished = YES;
+    }];
 
-    if ([NSThread isMainThread]) {
-        /// Avoid deadlock: perform async then wait.
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
-    } else {
-        /// Already off main thread; call directly.
-        invoke();
+    // Pump the run loop until completion fires
+    // FIXME: Review and fix NFC lib, to use normal completion sync like semaphore.
+    while (!finished) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                 beforeDate:[NSDate distantFuture]];
     }
-
-    /// Wait for completion (consider a timeout if appropriate)
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
     if (resultData) {
         dst = [resultData toVector];
@@ -119,29 +114,25 @@ libcdoc::result_t SmartCardTokenWrapper::sign(std::vector<uint8_t> &dst, HashAlg
 {
     __block NSData  *resultData = nil;
     __block NSError *blockError = nil;
+    __block BOOL finished = NO;
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     NSData *pub = [NSData dataFromVectorNoCopy:digest];
 
-    auto invoke = ^{
-        [token->smartTokenClass authenticate:pub
-                     completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
-            resultData = data;
-            blockError = error;
-            dispatch_semaphore_signal(sema);
-        }];
-    };
+    [token->smartTokenClass authenticate:pub
+                 completionHandler:^(NSData * _Nullable data,
+                                     NSError * _Nullable error)
+    {
+        resultData = data;
+        blockError = error;
+        finished = YES;
+    }];
 
-    if ([NSThread isMainThread]) {
-        /// Avoid deadlock: perform async then wait.
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), invoke);
-    } else {
-        /// Already off main thread; call directly.
-        invoke();
+    // Pump the run loop until completion fires
+    // FIXME: Review and fix NFC lib, to use normal completion sync like semaphore.
+    while (!finished) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                 beforeDate:[NSDate distantFuture]];
     }
-
-    /// Wait for completion (consider a timeout if appropriate)
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
     if (resultData) {
         dst = [resultData toVector];

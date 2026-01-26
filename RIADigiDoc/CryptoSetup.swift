@@ -20,6 +20,7 @@
 import Foundation
 import CryptoObjCWrapper
 import CryptoSwift
+import CommonsLib
 import ConfigLib
 
 actor CryptoSetup: CryptoSetupProtocol {
@@ -97,12 +98,17 @@ actor CryptoSetup: CryptoSetupProtocol {
     }
 
     public func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?) async {
+        var defaultUseCdoc2Encryption = Constants.CryptoDefaultValues.encryptionUseCdoc2
         if let useCdoc2Encryption = configurationProvider?.cdoc2Default {
-            await CDoc2Setting.setEncryptionEnabled(await dataStore.getUseCdoc2Encryption(useCdoc2Encryption))
+            defaultUseCdoc2Encryption = useCdoc2Encryption
         }
+        await CDoc2Setting.setEncryptionEnabled(await dataStore.getUseCdoc2Encryption(defaultUseCdoc2Encryption))
+        
+        var defaultUseCdoc2Online = Constants.CryptoDefaultValues.encryptionUseKeyTransfer
         if let useCdoc2Online = configurationProvider?.cdoc2UseKeyserver {
-            await CDoc2Setting.setOnlineEncryptionEnabled(await dataStore.getEncryptionUseKeyTransfer(useCdoc2Online))
+            defaultUseCdoc2Online = useCdoc2Online
         }
+        await CDoc2Setting.setOnlineEncryptionEnabled(await dataStore.getEncryptionUseKeyTransfer(defaultUseCdoc2Online))
 
         if let cdoc2UUID = configurationProvider?.cdoc2DefaultKeyserver {
             let serverInfo = await dataStore.getEncryptionServerInfo(cdoc2UUID)
