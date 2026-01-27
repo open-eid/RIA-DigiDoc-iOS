@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Move to project folder root
+cd "$(dirname "$0")/.."
+
 # ---- Config ----
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_ROOT="${PROJECT_ROOT}/build-cdoc"
