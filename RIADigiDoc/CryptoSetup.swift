@@ -102,13 +102,17 @@ actor CryptoSetup: CryptoSetupProtocol {
         if let useCdoc2Encryption = configurationProvider?.cdoc2Default {
             defaultUseCdoc2Encryption = useCdoc2Encryption
         }
-        await CDoc2Setting.setEncryptionEnabled(await dataStore.getUseCdoc2Encryption(defaultUseCdoc2Encryption))
-        
+        await CDoc2Setting.setEncryptionEnabled(
+            await dataStore.getUseCdoc2Encryption(defaultUseCdoc2Encryption)
+        )
+
         var defaultUseCdoc2Online = Constants.CryptoDefaultValues.encryptionUseKeyTransfer
         if let useCdoc2Online = configurationProvider?.cdoc2UseKeyserver {
             defaultUseCdoc2Online = useCdoc2Online
         }
-        await CDoc2Setting.setOnlineEncryptionEnabled(await dataStore.getEncryptionUseKeyTransfer(defaultUseCdoc2Online))
+        await CDoc2Setting.setOnlineEncryptionEnabled(
+            await dataStore.getEncryptionUseKeyTransfer(defaultUseCdoc2Online)
+        )
 
         if let cdoc2UUID = configurationProvider?.cdoc2DefaultKeyserver {
             let serverInfo = await dataStore.getEncryptionServerInfo(cdoc2UUID)

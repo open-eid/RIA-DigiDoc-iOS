@@ -194,7 +194,7 @@ extension CryptoContainer {
     public static func enableLogging(bool: Bool = true) {
         Encrypt.enableLogging(bool)
     }
-    
+
     @MainActor
     public static func openOrCreate(
         dataFiles: [URL],
@@ -268,7 +268,7 @@ extension CryptoContainer {
         pin: SecureData,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
-        
+
         let decryptedData =
             try await Decrypt.decryptFile(
                 containerFile.resolvedPath,
@@ -281,7 +281,7 @@ extension CryptoContainer {
         for dataFile in decryptedData {
 
             let sanitizedName = dataFile.key.sanitized()
-            
+
             let destinationPath = try Directories.getCacheDirectory(
                 subfolder: Constants.Folder.SignedContainerFolder,
                 fileManager: fileManager

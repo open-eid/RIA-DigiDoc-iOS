@@ -35,13 +35,13 @@ struct NFCInputView: View {
     @Binding var pinNumber: String
     @Binding var pinError: String?
     var pinType: CodeType?
-    
+
     let onInputChange: () -> Void
 
     private var canNumberTitle: String {
         languageSettings.localized("CAN number")
     }
-    
+
     private var pinNumberTitle: String {
         languageSettings.localized("PIN code", [pinType?.name ?? ""])
     }
@@ -98,7 +98,6 @@ struct NFCInputView: View {
             }
             .padding(.vertical, Dimensions.Padding.ZeroPadding)
 
-            
             VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                 FloatingLabelTextField(
                     title: pinNumberTitle,
@@ -113,7 +112,7 @@ struct NFCInputView: View {
                     onInputChange()
                 }
             }
-            
+
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
                 ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
                     .padding(.trailing, Dimensions.Padding.XSPadding)

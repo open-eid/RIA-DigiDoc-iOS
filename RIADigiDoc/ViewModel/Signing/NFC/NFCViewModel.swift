@@ -34,10 +34,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
     var pinNumberErrorKey: String?
     var pinNumberErrorExtraArguments: [String] = []
-    
+
     var nfcErrorKey: String?
     var nfcErrorExtraArguments: [String] = []
-    
+
     private let dataStore: DataStoreProtocol
 
     init(
@@ -98,18 +98,18 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             guard let exception = error as? IdCardInternalError else {
                 NFCViewModel.logger().error("NFC: ID Card General error.")
                 nfcErrorKey = "General error"
-                
+
                 return nil
             }
-            
+
             let error  = exception.getIdCardError()
             handleIdCardError(error)
-            
+
             return nil
         }
     }
-    
-    private func handleIdCardError(_ error:  IdCardError) {
+
+    private func handleIdCardError(_ error: IdCardError) {
         NFCViewModel.logger().error("NFC: ID Card error: \(error)")
 
         switch error {
@@ -123,7 +123,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             nfcErrorKey = "General error"
         }
     }
-    
+
     func sign() async -> SignedContainerProtocol? {
         // TODO: Implement with NFC signing
         return nil
@@ -146,7 +146,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         }
         canNumberErrorKey = ""
     }
-    
+
     private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
         let minLen = if pinType == .pin1 {
             Constants.Validation.Pin1MinimumLength
@@ -155,9 +155,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         } else {
             Constants.Validation.PukMinimumLength
         }
-        
+
         let maxLen = Constants.Validation.PinMaximumLength
-        
+
         guard pinNumber.isEmpty || (
             pinNumber.count >= minLen &&
             pinNumber.count <= maxLen &&

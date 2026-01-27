@@ -58,7 +58,7 @@ struct DecryptRootView: View {
                         onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setCryptoContainer(container)
-                            
+
                             Toast.show(languageSettings.localized(
                                 "Container successfully decrypted"
                             ))

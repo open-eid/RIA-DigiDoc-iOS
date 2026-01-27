@@ -23,8 +23,6 @@ import CryptoSwift
 import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
-import IdCardLib
-
 struct NFCView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
@@ -34,7 +32,7 @@ struct NFCView: View {
     @State private var actionMethods: [ActionMethod]
     @State private var canNumber = ""
     @State private var pinNumber = ""
-    @State private var pinType: CodeType? = nil
+    @State private var pinType: CodeType?
     @State private var rememberMe: Bool = true
     @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
@@ -45,7 +43,7 @@ struct NFCView: View {
     @State private var sharedNfcViewModel: SharedNFCViewModel
 
     @State private var taskDecrypt: Task<Void, Never>?
-    
+
     private var isNFCSupported: Bool {
         sharedNfcViewModel.isNFCSupported()
     }
@@ -69,7 +67,7 @@ struct NFCView: View {
             set: { _ in }
         )
     }
-    
+
     private var displayedMessage: Binding<String> {
         Binding(
             get: {
@@ -203,7 +201,7 @@ struct NFCView: View {
             )
         }
     }
-    
+
     private func decrypt() {
         taskDecrypt = Task {
             guard let container = cryptoContainer else { return }
@@ -211,19 +209,19 @@ struct NFCView: View {
             let (inputCANNumber) = rememberMe ? (canNumber) : ("")
 
             await viewModel.saveInputData(
-                canNumber:  inputCANNumber,
+                canNumber: inputCANNumber,
                 rememberMe: rememberMe
             )
-                        
+
             isInProgress = true
             nfcActionMessage = "Hold near ID card"
-            
+
             let decryptedContainer = await viewModel.decrypt(
                 CAN: canNumber,
                 pin1: pinNumber,
                 cryptoContainer: container
             )
-            
+
             guard let container = decryptedContainer else {
                 cancelDecrypt()
                 isInProgress = false
@@ -237,7 +235,7 @@ struct NFCView: View {
             dismiss()
         }
     }
-    
+
     private func cancelDecrypt() {
         taskDecrypt?.cancel()
         taskDecrypt = nil

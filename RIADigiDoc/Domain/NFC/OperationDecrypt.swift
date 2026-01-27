@@ -39,7 +39,12 @@ public class OperationDecrypt: NSObject {
     private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
     private var connection = NFCConnection()
 
-    public func processDecrypt(CAN: String, PIN1: SecureData, containerFile: URL, recipients: [Addressee]) async throws -> CryptoContainerProtocol {
+    public func processDecrypt(
+        CAN: String,
+        PIN1: SecureData,
+        containerFile: URL,
+        recipients: [Addressee]
+    ) async throws -> CryptoContainerProtocol {
 
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -65,7 +70,7 @@ public class OperationDecrypt: NSObject {
             "Hold your ID card against your smart device until the data is read",
             "Reading data please wait",
             "Reading certificate please wait",
-            "Decrypting in progress please wait",
+            "Decrypting in progress please wait"
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]

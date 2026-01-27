@@ -112,7 +112,7 @@ actor LibrarySetup: Loggable {
             LibrarySetup.logger().info("Libdigidocpp initialized successfully")
 
             await CryptoContainer.enableLogging(bool: isLoggingEnabled)
-            
+
             let configurationProvider = await configurationRepository.getConfiguration()
 
             await cryptoSetup.setLdapConfig(configurationProvider)

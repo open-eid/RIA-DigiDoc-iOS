@@ -48,7 +48,7 @@ public protocol NFCViewModelProtocol: Sendable {
         pin1: String,
         cryptoContainer: CryptoContainerProtocol?
     ) async -> CryptoContainerProtocol?
-    
+
     func loadPersonalData()
 
     func isRoleDataEnabled() async -> Bool
