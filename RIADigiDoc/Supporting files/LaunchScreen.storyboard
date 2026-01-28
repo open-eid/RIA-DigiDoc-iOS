@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Roboto_Condensed-Medium.ttf">
+            <string>RobotoCondensed-Medium</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--View Controller-->
         <scene sceneID="EHf-IW-A2E">
@@ -16,18 +21,30 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AppLogo" translatesAutoresizingMaskIntoConstraints="NO" id="hPn-7G-dZF">
-                                <rect key="frame" x="116.66666666666669" y="255.33333333333334" width="160" height="341.33333333333326"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="160" id="FwR-bb-zvK"/>
-                                </constraints>
-                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="cDc-rZ-eCa">
+                                <rect key="frame" x="124.66666666666669" y="337.66666666666669" width="144" height="177.00000000000006"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="image_eesti_shield" translatesAutoresizingMaskIntoConstraints="NO" id="hPn-7G-dZF">
+                                        <rect key="frame" x="0.0" y="0.0" width="144" height="144"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="144" id="Q19-JD-VbR"/>
+                                            <constraint firstAttribute="height" constant="144" id="a0A-yg-cMi"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RIA DIGIDOC" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wIm-vW-aRj">
+                                        <rect key="frame" x="1.3333333333333286" y="144" width="141.33333333333337" height="33"/>
+                                        <fontDescription key="fontDescription" name="RobotoCondensed-Medium" family="Roboto Condensed" pointSize="28"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" red="0.065298415720000003" green="0.18868720529999999" blue="0.39347493649999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="hPn-7G-dZF" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="9cK-uk-ATq"/>
-                            <constraint firstItem="hPn-7G-dZF" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="FW5-15-q8O"/>
+                            <constraint firstItem="cDc-rZ-eCa" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="HlS-ts-us0"/>
+                            <constraint firstItem="cDc-rZ-eCa" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="vO4-jF-0bZ"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -37,6 +54,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="AppLogo" width="341.33334350585938" height="341.33334350585938"/>
+        <image name="image_eesti_shield" width="512" height="512"/>
     </resources>
 </document>

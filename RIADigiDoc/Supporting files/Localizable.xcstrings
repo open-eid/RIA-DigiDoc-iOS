@@ -1974,13 +1974,31 @@
       }
     },
     "Information system authority" : {
-      "comment" : "RIA name. Used in initial language screen",
+      "comment" : "RIA name",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estonian Information System Authority"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riigi Infosüsteemi Amet"
+          }
+        }
+      }
+    },
+    "Init footer RIA" : {
+      "comment" : "Init footer smallcaps RIA text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riigi Infosüsteemi Amet"
           }
         },
         "et" : {
@@ -1998,13 +2016,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In English"
+            "value" : "English"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In English"
+            "value" : "English"
           }
         }
       }
@@ -2016,13 +2034,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eesti keel"
+            "value" : "Eesti"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eesti keel"
+            "value" : "Eesti"
           }
         }
       }
@@ -2262,23 +2280,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laen"
-          }
-        }
-      }
-    },
-    "Logo" : {
-      "comment" : "Accessibility label for launch screen logo",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Logo"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Logo"
           }
         }
       }
@@ -5983,24 +5984,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Päringu saatmise viga"
-          }
-        }
-      }
-    },
-    "RIA small caps" : {
-      "comment" : "RIA small caps",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rɪɪɢɪ Iɴꜰᴏꜱüꜱᴛᴇᴇᴍɪ Aᴍᴇᴛ"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rɪɪɢɪ Iɴꜰᴏꜱüꜱᴛᴇᴇᴍɪ Aᴍᴇᴛ"
           }
         }
       }
