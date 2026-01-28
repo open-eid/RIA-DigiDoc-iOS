@@ -66,6 +66,7 @@ enum Dimensions {
 
     enum Scaling {
         static let DefaultScaling: CGFloat = 1.0
+        static let SmallScaling: CGFloat = 1.1
         static let WideScaling: CGFloat = 1.2
     }
 

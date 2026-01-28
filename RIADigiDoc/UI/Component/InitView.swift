@@ -34,6 +34,9 @@ struct InitView: View {
     private var appName: String {
         languageSettings.localized("App name")
     }
+    private var footerRIA: String {
+        languageSettings.localized("Init footer RIA")
+    }
 
     init() {
         _viewModel = State(wrappedValue: Container.shared.initViewModel())
@@ -80,20 +83,45 @@ struct InitView: View {
                         .padding(.vertical, Dimensions.Padding.MPadding)
 
                         Spacer()
-
-                        Text(languageSettings.localized("RIA small caps"))
-                            .font(typography.titleMedium)
-                            .foregroundStyle(Color.white)
-                            .padding(.bottom, Dimensions.Padding.MPadding)
-                            .accessibilityLabel(
-                                Text(verbatim: languageSettings.localized("Information system authority"))
-                            )
+                        smallCapsTextView(
+                            footerRIA,
+                            accessibilityLabel: footerRIA
+                        )
                     }
                     .frame(minHeight: geometry.size.height)
                     .frame(minWidth: geometry.size.width)
                 }
             }
         }
+    }
+
+    func smallCapsTextView(_ text: String, accessibilityLabel: String) -> some View {
+        var attr = AttributedString(text)
+        var isStartOfWord = true
+
+        for index in attr.characters.indices {
+            let char = attr.characters[index]
+
+            let nextIndex = attr.characters.index(after: index)
+            let range = index..<nextIndex
+
+            if char.isWhitespace {
+                isStartOfWord = true
+                continue
+            }
+
+            if isStartOfWord {
+                attr[range].font = typography.titleMedium
+                isStartOfWord = false
+            } else {
+                attr[range].font = typography.titleMedium.smallCaps()
+            }
+        }
+
+        return Text(attr)
+            .foregroundColor(.white)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(accessibilityLabel)
     }
 }
 
