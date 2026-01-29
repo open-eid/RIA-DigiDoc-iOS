@@ -85,7 +85,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         CAN: String,
         pin1: String,
         cryptoContainer: CryptoContainerProtocol?,
-        languageSettings: LanguageSettings
+        strings: NFCSessionStrings
     ) async
     -> CryptoContainerProtocol? {
         do {
@@ -93,11 +93,12 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             let recipients = await cryptoContainer?.getRecipients() ?? []
             let pinSecureData = SecureData(Array(pin1.utf8))
 
-            let container = try await OperationDecrypt(languageSettings: languageSettings).processDecrypt(
+            let container = try await OperationDecrypt().processDecrypt(
                 CAN: CAN,
                 PIN1: pinSecureData,
                 containerFile: containerFile,
-                recipients: recipients
+                recipients: recipients,
+                strings: strings
             )
             return container
         } catch {

@@ -27,7 +27,6 @@ import CryptoKit
 import IdCardLib
 import CryptoObjCWrapper
 import CryptoSwift
-import SwiftUI
 
 @MainActor
 public class OperationDecrypt: NSObject {
@@ -39,22 +38,16 @@ public class OperationDecrypt: NSObject {
     private var PIN: SecureData = SecureData([0x00])
     private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
     private var connection = NFCConnection()
-
-    private var nfcErrorKey: String?
-    private var nfcErrorExtraArguments: [String] = []
-
-    private let languageSettings: LanguageSettings
-
-    public init(languageSettings: LanguageSettings) {
-        self.languageSettings = languageSettings
-        super.init()
-    }
+    
+    private var nfcError: String? = ""
+    private var strings: NFCSessionStrings? = nil
 
     public func processDecrypt(
         CAN: String,
         PIN1: SecureData,
         containerFile: URL,
-        recipients: [Addressee]
+        recipients: [Addressee],
+        strings: NFCSessionStrings,
     ) async throws -> CryptoContainerProtocol {
 
         return try await withCheckedThrowingContinuation { continuation in
@@ -68,7 +61,8 @@ public class OperationDecrypt: NSObject {
             self.PIN = PIN1
             self.containerFile = containerFile
             self.recipients = recipients
-
+            self.strings = strings
+            
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
             session?.begin()
@@ -77,44 +71,46 @@ public class OperationDecrypt: NSObject {
 
     private func updateAlertMessage(step: Int) {
         let stepMessages = [
-            "Please place your ID card against the smart device",
-            "Hold your ID card against your smart device until the data is read",
-            "Reading data please wait",
-            "Reading certificate",
-            "Decrypting in progress please wait"
+            strings?.initialMessage ?? "",
+            strings?.step1Message ?? "",
+            strings?.step2Message ?? "",
+            strings?.step3Message ?? "",
+            strings?.step4Message ?? ""
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
         let progressBar = ProgressBar(currentStep: step)
-        var message = languageSettings.localized(stepMessage)
+        var message = stepMessage
         message += "\n\n\(progressBar.generate())"
         session?.alertMessage = message
     }
 
-    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
-        NFCViewModel.logger().error("NFC: ID Card error: \(error)")
-
+    private func success() {
+        session?.alertMessage = strings?.successMessage ?? ""
+        session?.invalidate()
+    }
+    
+    private func failure(_ idCardError: IdCardError) {
+        handleIdCardError(idCardError)
+        session?.invalidate(errorMessage: nfcError ?? "")
+    }
+    
+    private func handleIdCardError(_ error: IdCardError) {
         switch error {
         case .wrongCAN:
-            nfcErrorKey = "Wrong CAN"
-            nfcErrorExtraArguments = []
+            nfcError = strings?.canErrorMessage ?? ""
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
-                nfcErrorKey = "PIN verification error multiple"
-                nfcErrorExtraArguments = [pinType.name, String(triesLeft)]
+                nfcError = strings?.pin1WrongMultipleErrorMessage ?? ""
             } else if triesLeft == 1 {
-                nfcErrorKey = "PIN verification error one"
-                nfcErrorExtraArguments = [pinType.name]
+                nfcError = strings?.pin1WrongErrorMessage ?? ""
             } else {
-                nfcErrorKey = "PIN blocked"
-                nfcErrorExtraArguments = [pinType.name]
+                nfcError = strings?.pin1BlockedErrorMessage ?? ""
             }
         case .sessionError:
-            nfcErrorKey = "NFC session error"
-            nfcErrorExtraArguments = []
+            nfcError = strings?.sessionErrorMessage ?? ""
         default:
-            nfcErrorKey = "NFC technical error"
-            nfcErrorExtraArguments = []
+            nfcError = strings?.technicalErrorMessage ?? ""
         }
     }
 }
@@ -139,27 +135,16 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
                     pin: PIN,
                 )
                 continuation?.resume(with: .success(decryptedContainer))
-                session.alertMessage = languageSettings.localized("Data read")
-                session.invalidate()
+                success()
             } catch {
                 guard let exception = error as? IdCardInternalError else {
-                    nfcErrorKey = "NFC technical error"
-                    nfcErrorExtraArguments = []
-                    session.invalidate(errorMessage: languageSettings.localized(
-                        nfcErrorKey ?? "",
-                        nfcErrorExtraArguments
-                    ))
+                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
                     continuation?.resume(throwing: error)
                     return
                 }
 
                 let idCardError  = exception.getIdCardError()
-                handleIdCardError(idCardError, pinType: CodeType.pin1)
-
-                session.invalidate(errorMessage: languageSettings.localized(
-                    nfcErrorKey ?? "",
-                    nfcErrorExtraArguments
-                ))
+                failure(idCardError)
                 continuation?.resume(throwing: error)
             }
         }

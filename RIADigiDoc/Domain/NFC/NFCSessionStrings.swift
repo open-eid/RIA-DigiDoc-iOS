@@ -17,40 +17,17 @@
  *
  */
 
-import Foundation
-import CryptoSwift
-import IdCardLib
-import LibdigidocLibSwift
-import CommonsLib
-
-/// @mockable
-@MainActor
-public protocol NFCViewModelProtocol: Sendable {
-    func isActionEnabled(
-        canNumber: String,
-        pinNumber: String,
-        pinType: CodeType?
-    ) -> Bool
-
-    func saveInputData(
-        canNumber: String,
-        rememberMe: Bool
-    ) async
-
-    func getInputData() async -> NFCInputData
-
-    func resetErrors()
-
-    func sign() async -> SignedContainerProtocol?
-
-    func decrypt(
-        CAN: String,
-        pin1: String,
-        cryptoContainer: CryptoContainerProtocol?,
-        strings: NFCSessionStrings
-    ) async -> CryptoContainerProtocol?
-
-    func loadPersonalData()
-
-    func isRoleDataEnabled() async -> Bool
+public struct NFCSessionStrings {
+    let initialMessage: String
+    let step1Message: String
+    let step2Message: String
+    let step3Message: String
+    let step4Message: String
+    let successMessage: String
+    let canErrorMessage: String
+    let pin1WrongMultipleErrorMessage: String
+    let pin1WrongErrorMessage: String
+    let pin1BlockedErrorMessage: String
+    let technicalErrorMessage: String
+    let sessionErrorMessage: String
 }
