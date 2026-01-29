@@ -226,22 +226,29 @@ struct NFCView: View {
 
             isInProgress = true
             nfcActionMessage = "NFC hold card"
-            
+
             let strings = NFCSessionStrings(
                 initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
-                step1Message: languageSettings.localized("Hold your ID card against your smart device until the data is read"),
+                step1Message:
+                    languageSettings.localized(
+                        "Hold your ID card against your smart device until the data is read"
+                    ),
                 step2Message: languageSettings.localized("Reading data please wait"),
                 step3Message: languageSettings.localized("Reading certificate"),
                 step4Message: languageSettings.localized("Decrypting in progress please wait"),
                 successMessage: languageSettings.localized("Data read"),
                 canErrorMessage: languageSettings.localized("Wrong CAN"),
-                pin1WrongMultipleErrorMessage: languageSettings.localized("PIN verification error multiple", [CodeType.pin1.name, "2"]),
+                pin1WrongMultipleErrorMessage:
+                    languageSettings.localized(
+                        "PIN verification error multiple",
+                        [CodeType.pin1.name, "2"]
+                    ),
                 pin1WrongErrorMessage: languageSettings.localized("PIN verification error one", [CodeType.pin1.name]),
                 pin1BlockedErrorMessage: languageSettings.localized("PIN blocked", [CodeType.pin1.name]),
                 technicalErrorMessage: languageSettings.localized("NFC session error"),
                 sessionErrorMessage: languageSettings.localized("NFC technical error")
             )
-            
+
             let decryptedContainer = await viewModel.decrypt(
                 CAN: canNumber,
                 pin1: pinNumber,

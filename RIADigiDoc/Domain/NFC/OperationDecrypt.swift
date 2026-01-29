@@ -38,9 +38,9 @@ public class OperationDecrypt: NSObject {
     private var PIN: SecureData = SecureData([0x00])
     private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
     private var connection = NFCConnection()
-    
+
     private var nfcError: String? = ""
-    private var strings: NFCSessionStrings? = nil
+    private var strings: NFCSessionStrings?
 
     public func processDecrypt(
         CAN: String,
@@ -62,7 +62,7 @@ public class OperationDecrypt: NSObject {
             self.containerFile = containerFile
             self.recipients = recipients
             self.strings = strings
-            
+
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
             session?.begin()
@@ -89,12 +89,12 @@ public class OperationDecrypt: NSObject {
         session?.alertMessage = strings?.successMessage ?? ""
         session?.invalidate()
     }
-    
+
     private func failure(_ idCardError: IdCardError) {
         handleIdCardError(idCardError)
         session?.invalidate(errorMessage: nfcError ?? "")
     }
-    
+
     private func handleIdCardError(_ error: IdCardError) {
         switch error {
         case .wrongCAN:
