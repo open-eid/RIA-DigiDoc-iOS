@@ -27,17 +27,28 @@ import CryptoKit
 import IdCardLib
 import CryptoObjCWrapper
 import CryptoSwift
+import SwiftUI
 
 @MainActor
 public class OperationDecrypt: NSObject {
+
     private var session: NFCTagReaderSession?
     private var containerFile: URL = URL(fileURLWithPath: "")
     private var recipients: [Addressee] = []
     private var CAN: String = ""
     private var PIN: SecureData = SecureData([0x00])
-    private let nfcMessage: String = "Please place your ID card against the smart device"
     private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
     private var connection = NFCConnection()
+
+    private var nfcErrorKey: String?
+    private var nfcErrorExtraArguments: [String] = []
+
+    private let languageSettings: LanguageSettings
+
+    public init(languageSettings: LanguageSettings) {
+        self.languageSettings = languageSettings
+        super.init()
+    }
 
     public func processDecrypt(
         CAN: String,
@@ -75,9 +86,36 @@ public class OperationDecrypt: NSObject {
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
         let progressBar = ProgressBar(currentStep: step)
-        var message = stepMessage
+        var message = languageSettings.localized(stepMessage)
         message += "\n\n\(progressBar.generate())"
         session?.alertMessage = message
+    }
+
+    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
+        NFCViewModel.logger().error("NFC: ID Card error: \(error)")
+
+        switch error {
+        case .wrongCAN:
+            nfcErrorKey = "Wrong CAN"
+            nfcErrorExtraArguments = []
+        case .wrongPIN(let triesLeft):
+            if triesLeft > 1 {
+                nfcErrorKey = "PIN verification error multiple"
+                nfcErrorExtraArguments = [pinType.name, String(triesLeft)]
+            } else if triesLeft == 1 {
+                nfcErrorKey = "PIN verification error one"
+                nfcErrorExtraArguments = [pinType.name]
+            } else {
+                nfcErrorKey = "PIN blocked"
+                nfcErrorExtraArguments = [pinType.name]
+            }
+        case .sessionError:
+            nfcErrorKey = "NFC session error"
+            nfcErrorExtraArguments = []
+        default:
+            nfcErrorKey = "NFC technical error"
+            nfcErrorExtraArguments = []
+        }
     }
 }
 
@@ -101,10 +139,27 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
                     pin: PIN,
                 )
                 continuation?.resume(with: .success(decryptedContainer))
-                session.alertMessage = "Data read"
+                session.alertMessage = languageSettings.localized("Data read")
                 session.invalidate()
             } catch {
-                session.invalidate(errorMessage: "Failed to read data")
+                guard let exception = error as? IdCardInternalError else {
+                    nfcErrorKey = "NFC technical error"
+                    nfcErrorExtraArguments = []
+                    session.invalidate(errorMessage: languageSettings.localized(
+                        nfcErrorKey ?? "",
+                        nfcErrorExtraArguments
+                    ))
+                    continuation?.resume(throwing: error)
+                    return
+                }
+
+                let idCardError  = exception.getIdCardError()
+                handleIdCardError(idCardError, pinType: CodeType.pin1)
+
+                session.invalidate(errorMessage: languageSettings.localized(
+                    nfcErrorKey ?? "",
+                    nfcErrorExtraArguments
+                ))
                 continuation?.resume(throwing: error)
             }
         }

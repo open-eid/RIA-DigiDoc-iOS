@@ -46,7 +46,8 @@ public protocol NFCViewModelProtocol: Sendable {
     func decrypt(
         CAN: String,
         pin1: String,
-        cryptoContainer: CryptoContainerProtocol?
+        cryptoContainer: CryptoContainerProtocol?,
+        languageSettings: LanguageSettings
     ) async -> CryptoContainerProtocol?
 
     func loadPersonalData()

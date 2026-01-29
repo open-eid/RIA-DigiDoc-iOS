@@ -81,13 +81,19 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         // TODO: Implement with My eID
     }
 
-    func decrypt(CAN: String, pin1: String, cryptoContainer: CryptoContainerProtocol?) async
+    func decrypt(
+        CAN: String,
+        pin1: String,
+        cryptoContainer: CryptoContainerProtocol?,
+        languageSettings: LanguageSettings
+    ) async
     -> CryptoContainerProtocol? {
         do {
             let containerFile = await cryptoContainer?.getRawContainerFile() ?? URL(fileURLWithPath: "")
             let recipients = await cryptoContainer?.getRecipients() ?? []
             let pinSecureData = SecureData(Array(pin1.utf8))
-            let container = try await OperationDecrypt().processDecrypt(
+
+            let container = try await OperationDecrypt(languageSettings: languageSettings).processDecrypt(
                 CAN: CAN,
                 PIN1: pinSecureData,
                 containerFile: containerFile,
@@ -103,24 +109,36 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             }
 
             let error  = exception.getIdCardError()
-            handleIdCardError(error)
+            handleIdCardError(error, pinType: CodeType.pin1)
 
             return nil
         }
     }
 
-    private func handleIdCardError(_ error: IdCardError) {
+    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
         NFCViewModel.logger().error("NFC: ID Card error: \(error)")
 
         switch error {
         case .wrongCAN:
             nfcErrorKey = "Wrong CAN"
-        case .wrongPIN:
-            nfcErrorKey = "Wrong PIN"
+            nfcErrorExtraArguments = []
+        case .wrongPIN(let triesLeft):
+            if triesLeft > 1 {
+                nfcErrorKey = "PIN verification error multiple"
+                nfcErrorExtraArguments = [pinType.name, String(triesLeft)]
+            } else if triesLeft == 1 {
+                nfcErrorKey = "PIN verification error one"
+                nfcErrorExtraArguments = [pinType.name]
+            } else {
+                nfcErrorKey = "PIN blocked"
+                nfcErrorExtraArguments = [pinType.name]
+            }
         case .sessionError:
-            nfcErrorKey = "Session error"
+            nfcErrorKey = "NFC session error"
+            nfcErrorExtraArguments = []
         default:
-            nfcErrorKey = "General error"
+            nfcErrorKey = "NFC technical error"
+            nfcErrorExtraArguments = []
         }
     }
 

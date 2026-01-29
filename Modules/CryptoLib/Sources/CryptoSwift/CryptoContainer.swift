@@ -191,7 +191,7 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
 extension CryptoContainer {
 
     @MainActor
-    public static func enableLogging(bool: Bool = true) {
+    public static func enableLogging(_ bool: Bool) {
         Encrypt.enableLogging(bool)
     }
 

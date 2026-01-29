@@ -48,6 +48,13 @@ struct NFCView: View {
         sharedNfcViewModel.isNFCSupported()
     }
 
+    private var nfcErrorMessage: String {
+        languageSettings.localized(
+            viewModel.nfcErrorKey ?? "",
+            viewModel.nfcErrorExtraArguments
+        )
+    }
+
     private var canNumberError: Binding<String?> {
         Binding(
             get: { languageSettings.localized(
@@ -190,6 +197,10 @@ struct NFCView: View {
                 rememberMe = inputData.rememberMe
             }
         }
+        .onChange(of: viewModel.nfcErrorKey) { _, newKey in
+            guard newKey != nil else { return }
+            Toast.show(nfcErrorMessage)
+        }
     }
 
     func saveInputData() {
@@ -219,7 +230,8 @@ struct NFCView: View {
             let decryptedContainer = await viewModel.decrypt(
                 CAN: canNumber,
                 pin1: pinNumber,
-                cryptoContainer: container
+                cryptoContainer: container,
+                languageSettings: languageSettings
             )
 
             guard let container = decryptedContainer else {
@@ -237,6 +249,7 @@ struct NFCView: View {
     }
 
     private func cancelDecrypt() {
+        pinNumber.isEmpty ? () : (pinNumber.removeAll())
         taskDecrypt?.cancel()
         taskDecrypt = nil
     }

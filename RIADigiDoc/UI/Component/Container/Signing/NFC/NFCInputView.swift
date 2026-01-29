@@ -96,7 +96,7 @@ struct NFCInputView: View {
                         .padding(.vertical, Dimensions.Padding.XXSPadding)
                 }
             }
-            .padding(.vertical, Dimensions.Padding.ZeroPadding)
+            .padding(.vertical, Dimensions.Padding.MPadding)
 
             VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                 FloatingLabelTextField(
