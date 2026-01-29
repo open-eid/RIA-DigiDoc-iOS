@@ -80,7 +80,7 @@ public class OperationDecrypt: NSObject {
             "Please place your ID card against the smart device",
             "Hold your ID card against your smart device until the data is read",
             "Reading data please wait",
-            "Reading certificate please wait",
+            "Reading certificate",
             "Decrypting in progress please wait"
         ]
 

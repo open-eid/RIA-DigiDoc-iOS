@@ -5612,20 +5612,20 @@
         }
       }
     },
-    "Reading certificate please wait" : {
+    "Reading certificate" : {
       "comment" : "NFC alert message, step 3",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reading certificate, please wait."
+            "value" : "Reading certificate."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sertifikaadi lugemine käib, palun oodake."
+            "value" : "Sertifikaadi lugemine."
           }
         }
       }
