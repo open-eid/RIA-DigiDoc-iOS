@@ -356,7 +356,6 @@ struct EncryptView: View {
                                 rightButtonAction: {
                                     if viewModel.isContainerWithoutRecipients {
                                         pathManager.replaceLast(to: .encryptRecipientView)
-                                        // pathManager.navigate(to: .encryptRecipientView)
                                     } else {
                                         if encryptionButtonEnabled {
                                             encryptionButtonEnabled = false
