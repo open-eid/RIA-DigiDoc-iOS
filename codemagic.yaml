@@ -147,10 +147,7 @@ workflows:
         script: |
           sh scripts/GenerateMocks.sh
           
-          xcode-project run-tests \
-            --project RIADigiDoc.xcodeproj \
-            --scheme AllTests \
-            --device "iPhone 17"
+          sh scripts/run-ci-tests.sh
         when:
           condition: ${{ inputs.enableTests_input }}
       - name: Increment build number
@@ -281,12 +278,9 @@ workflows:
         script: xcode-project use-profiles
       - name: Run tests
         script: |
-            sh scripts/GenerateMocks.sh
+          sh scripts/GenerateMocks.sh
 
-            xcode-project run-tests \
-                --project RIADigiDoc.xcodeproj \
-                --scheme AllTests \
-                --device "iPhone 17"
+          sh scripts/run-ci-tests.sh
       - *get_app_version
       - name: Increment build number
         script: |
