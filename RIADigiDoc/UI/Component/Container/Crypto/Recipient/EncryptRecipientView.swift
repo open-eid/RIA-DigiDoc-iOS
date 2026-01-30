@@ -66,7 +66,9 @@ struct EncryptRecipientView: View {
         TopBarContainer(
             isTopBarHidden: isSearchExpanded,
             title: nil,
-            onLeftClick: { dismiss() },
+            onLeftClick: {
+                pathManager.replaceLast(to: .encryptView(isWithEncryption: false))
+            },
             showRightIcons: true,
             content: {
                 ZStack {

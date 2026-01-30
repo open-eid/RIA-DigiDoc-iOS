@@ -245,8 +245,8 @@ struct NFCView: View {
                     ),
                 pin1WrongErrorMessage: languageSettings.localized("PIN verification error one", [CodeType.pin1.name]),
                 pin1BlockedErrorMessage: languageSettings.localized("PIN blocked", [CodeType.pin1.name]),
-                technicalErrorMessage: languageSettings.localized("NFC session error"),
-                sessionErrorMessage: languageSettings.localized("NFC technical error")
+                technicalErrorMessage: languageSettings.localized("NFC technical error"),
+                sessionErrorMessage: languageSettings.localized("NFC session error")
             )
 
             let decryptedContainer = await viewModel.decrypt(

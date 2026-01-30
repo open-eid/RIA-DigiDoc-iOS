@@ -138,7 +138,7 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
                 success()
             } catch {
                 guard let exception = error as? IdCardInternalError else {
-                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
+                    session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
                     continuation?.resume(throwing: error)
                     return
                 }

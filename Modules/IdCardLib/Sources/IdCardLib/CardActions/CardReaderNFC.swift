@@ -64,18 +64,18 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
     }
     typealias TLV = TKBERTLVRecord
 
-    let tag: NFCISO7816Tag
+    let tag: SendableISO7816Tag
     var ksEnc: Bytes
     var ksMac: Bytes
     var SSC: Bytes = AES.Zero
 
     init(_ tag: NFCISO7816Tag, CAN: String) async throws {
-        self.tag = tag
+        self.tag = SendableISO7816Tag(tag: tag)
 
         CardReaderNFC.logger().debug("Select CardAccess")
-        _ = try await tag.sendCommand(cls: 0x00, ins: 0xA4, p1Byte: 0x02, p2Byte: 0x0C, data: Data([0x01, 0x1C]))
+        _ = try await self.tag.sendCommand(cls: 0x00, ins: 0xA4, p1Byte: 0x02, p2Byte: 0x0C, data: Data([0x01, 0x1C]))
         CardReaderNFC.logger().debug("Read CardAccess")
-        let data = try await tag.sendCommand(cls: 0x00, ins: 0xB0, p1Byte: 0x00, p2Byte: 0x00, leByte: 256)
+        let data = try await self.tag.sendCommand(cls: 0x00, ins: 0xB0, p1Byte: 0x00, p2Byte: 0x00, leByte: 256)
 
         guard let (mappingType, parameterId) = TLV.sequenceOfRecords(from: data)?
             .flatMap({ cardAccess in TLV.sequenceOfRecords(from: cardAccess.value) ?? [] })
@@ -94,21 +94,21 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         }
         let domain = parameterId.domain
 
-        _ = try await tag.sendCommand(cls: 0x00, ins: 0x22, p1Byte: 0xc1, p2Byte: 0xa4, records: [
+        _ = try await self.tag.sendCommand(cls: 0x00, ins: 0x22, p1Byte: 0xc1, p2Byte: 0xa4, records: [
             TLV(tag: 0x80, value: mappingType.data),
             TLV(tag: 0x83, bytes: [PasswordType.id_PasswordType_CAN.rawValue]),
             TLV(tag: 0x84, bytes: [parameterId.rawValue])
         ])
 
         // Step1 - General Authentication
-        let nonceEnc = try await tag.sendPaceCommand(records: [], tagExpected: 0x80)
+        let nonceEnc = try await self.tag.sendPaceCommand(records: [], tagExpected: 0x80)
         CardReaderNFC.logger().debug("Challenge \(nonceEnc.value.toHex)")
         let nonce = try CardReaderNFC.decryptNonce(CAN: CAN, encryptedNonce: nonceEnc.value)
         CardReaderNFC.logger().debug("Nonce \(nonce.toHex)")
 
         // Step2
         let (terminalPubKey, terminalPrivKey) = domain.makeKeyPair()
-        let mappingKey = try await tag.sendPaceCommand(
+        let mappingKey = try await self.tag.sendPaceCommand(
             records: [try TLV(
                 tag: 0x81,
                 publicKey: terminalPubKey
@@ -146,7 +146,7 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
             cofactor: domain.cofactor
         )
         let (terminalEphemeralPubKey, terminalEphemeralPrivKey) = mappedDomain.makeKeyPair()
-        let ephemeralKey = try await tag.sendPaceCommand(
+        let ephemeralKey = try await self.tag.sendPaceCommand(
             records: [try TLV(
                 tag: 0x83,
                 publicKey: terminalEphemeralPubKey
@@ -172,7 +172,7 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
             TLV(tag: 0x06, value: mappingType.data),
             TLV(tag: 0x86, bytes: try ephemeralCardPubKey.x963Representation())
         ])
-        let macValue = try await tag.sendPaceCommand(
+        let macValue = try await self.tag.sendPaceCommand(
             records: [TLV(
                 tag: 0x85,
                 bytes: (

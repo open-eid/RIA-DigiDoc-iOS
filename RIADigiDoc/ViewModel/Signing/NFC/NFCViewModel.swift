@@ -104,8 +104,8 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         } catch {
             guard let exception = error as? IdCardInternalError else {
                 NFCViewModel.logger().error("NFC: ID Card General error.")
-                nfcErrorKey = "General error"
-
+                nfcErrorKey = "NFC session error"
+                nfcErrorExtraArguments = []
                 return nil
             }
 
