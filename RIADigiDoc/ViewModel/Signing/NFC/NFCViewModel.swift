@@ -120,6 +120,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         NFCViewModel.logger().error("NFC: ID Card error: \(error)")
 
         switch error {
+        case .cancelledByUser:
+            nfcErrorKey = nil
+            nfcErrorExtraArguments = []
         case .wrongCAN:
             nfcErrorKey = "Wrong CAN"
             nfcErrorExtraArguments = []

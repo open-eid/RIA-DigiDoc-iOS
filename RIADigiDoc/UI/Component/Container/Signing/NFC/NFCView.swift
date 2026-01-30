@@ -272,6 +272,8 @@ struct NFCView: View {
 
     private func cancelDecrypt() {
         pinNumber.isEmpty ? () : (pinNumber.removeAll())
+        isActionEnabled = viewModel
+            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
         taskDecrypt?.cancel()
         taskDecrypt = nil
     }

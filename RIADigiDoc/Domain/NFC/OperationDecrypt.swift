@@ -32,6 +32,7 @@ import CryptoSwift
 public class OperationDecrypt: NSObject {
 
     private var session: NFCTagReaderSession?
+    private var isFinished = false
     private var containerFile: URL = URL(fileURLWithPath: "")
     private var recipients: [Addressee] = []
     private var CAN: String = ""
@@ -137,6 +138,8 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
                 continuation?.resume(with: .success(decryptedContainer))
                 success()
             } catch {
+                guard !isFinished else { return }
+                isFinished = true
                 guard let exception = error as? IdCardInternalError else {
                     session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
                     continuation?.resume(throwing: error)
@@ -154,6 +157,18 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
 
     public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
         self.session = nil
+        guard !isFinished else { return }
+        isFinished = true
+        if let nfcError = error as? NFCReaderError {
+            switch nfcError.code {
+            case .readerSessionInvalidationErrorUserCanceled:
+                continuation?.resume(throwing: IdCardInternalError.cancelledByUser)
+                return
+
+            default:
+                break
+            }
+        }
         continuation?.resume(throwing: error)
     }
 }

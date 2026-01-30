@@ -21,7 +21,8 @@ public enum IdCardError: Error {
     case wrongCAN,
          wrongPIN(triesLeft: Int),
          invalidNewPIN,
-         sessionError
+         sessionError,
+         cancelledByUser
 }
 
 public enum IdCardInternalError: Error {
@@ -75,7 +76,6 @@ public enum IdCardInternalError: Error {
                 .connectionFailed,
                 .multipleTagsDetected,
                 .couldNotVerifyChipsMAC,
-                .cancelledByUser,
                 .sessionInvalidated,
                 .readerProcessFailed,
                 .failedToRemovePadding,
@@ -89,6 +89,8 @@ public enum IdCardInternalError: Error {
             return .wrongPIN(triesLeft: value)
         case .invalidNewPin:
             return .invalidNewPIN
+        case .cancelledByUser:
+            return .cancelledByUser
         }
     }
 }
