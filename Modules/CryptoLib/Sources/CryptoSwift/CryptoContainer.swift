@@ -191,6 +191,11 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
 extension CryptoContainer {
 
     @MainActor
+    public static func enableLogging(_ bool: Bool) {
+        Encrypt.enableLogging(bool)
+    }
+
+    @MainActor
     public static func openOrCreate(
         dataFiles: [URL],
         containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
@@ -258,29 +263,37 @@ extension CryptoContainer {
     public static func decrypt(
         containerFile: URL,
         recipients: [Addressee],
+        cert: Data,
         cardCommands: CardCommands,
         pin: SecureData,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
+
         let decryptedData =
-        try await Decrypt.decryptFile(
-            containerFile.absoluteString,
-            withToken: SmartToken(card: cardCommands, pin1: pin)
-        )
+            try await Decrypt.decryptFile(
+                containerFile.resolvedPath,
+                withCert: cert,
+                withToken: SmartToken(card: cardCommands, pin1: pin)
+            )
         var cryptoDataFiles: [CryptoDataFile] = []
         var urlDataFiles: [URL] = []
         cryptoDataFiles.removeAll()
         for dataFile in decryptedData {
 
-            let destinationPath = try Directories
-                .getTempDirectory(subfolder: Constants.Folder.Temp, fileManager: fileManager)
-            let fileUrl = destinationPath.appending(path: dataFile.key)
+            let sanitizedName = dataFile.key.sanitized()
+
+            let destinationPath = try Directories.getCacheDirectory(
+                subfolder: Constants.Folder.SignedContainerFolder,
+                fileManager: fileManager
+            ).appending(path: Constants.Folder.Temp, directoryHint: .isDirectory)
+
+            let fileUrl = destinationPath.appending(path: sanitizedName)
 
             cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.resolvedPath))
             urlDataFiles.append(fileUrl)
             let isCreated =
             fileManager.createFile(
-                atPath: destinationPath.resolvedPath, contents: dataFile.value, attributes: nil
+                atPath: fileUrl.resolvedPath, contents: dataFile.value, attributes: nil
             )
 
             if !isCreated {

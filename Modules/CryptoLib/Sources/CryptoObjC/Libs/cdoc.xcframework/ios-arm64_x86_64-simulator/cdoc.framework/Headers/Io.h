@@ -48,17 +48,17 @@ struct CDOC_EXPORT DataConsumer {
 	 * @param size the number of bytes to write
 	 * @return size or error code
 	 */
-    virtual result_t write(const uint8_t *src, size_t size) = 0;
+    virtual result_t write(const uint8_t *src, size_t size) noexcept = 0;
 	/**
      * @brief informs DataConsumer that the writing is finished
 	 * @return error code or OK
 	 */
-    virtual result_t close() = 0;
+    virtual result_t close() noexcept = 0;
 	/**
 	 * @brief checks whether DataSource is in error state
      * @return true if error state
 	 */
-	virtual bool isError() = 0;
+    virtual bool isError() noexcept = 0;
 	/**
      * @brief get textual description of the last error
 	 *
@@ -74,7 +74,7 @@ struct CDOC_EXPORT DataConsumer {
      * @param src a vector
      * @return vector size or error code
      */
-    result_t write(const std::vector<uint8_t>& src) {
+    result_t write(const std::vector<uint8_t>& src) noexcept {
 		return write(src.data(), src.size());
 	}
     /**
@@ -82,7 +82,7 @@ struct CDOC_EXPORT DataConsumer {
      * @param src a string
      * @return string length or error code
      */
-    result_t write(const std::string& src) {
+    result_t write(const std::string& src) noexcept {
 		return write((const uint8_t *) src.data(), src.size());
 	}
     /**
@@ -93,7 +93,7 @@ struct CDOC_EXPORT DataConsumer {
      * @param src the input DataSource
      * @return the number of bytes copied or error
      */
-    result_t writeAll(DataSource& src);
+    result_t writeAll(DataSource& src) noexcept;
 
 	DataConsumer (const DataConsumer&) = delete;
 	DataConsumer& operator= (const DataConsumer&) = delete;
@@ -128,17 +128,17 @@ struct CDOC_EXPORT DataSource {
 	 * @param size the number of bytes to read
      * @return the number of bytes read or error code
 	 */
-    virtual result_t read(uint8_t *dst, size_t size) { return NOT_IMPLEMENTED; }
+    virtual result_t read(uint8_t *dst, size_t size) noexcept { return NOT_IMPLEMENTED; }
     /**
      * @brief check whether DataConsumer is in error state
      * @return true if error state
      */
-    virtual bool isError() { return true; }
+    virtual bool isError() noexcept { return true; }
     /**
      * @brief check whether DataConsumer is reached to the end of data
      * @return true if end of stream
      */
-    virtual bool isEof() { return true; }
+    virtual bool isEof() noexcept { return true; }
     /**
      * @brief get textual description of the last error
      *
@@ -169,7 +169,7 @@ struct CDOC_EXPORT DataSource {
      * @param dst the destination DataConsumer
      * @return error code or OK
      */
-    result_t readAll(DataConsumer& dst) {
+    result_t readAll(DataConsumer& dst) noexcept {
 		return dst.writeAll(*this);
 	}
 
@@ -214,14 +214,14 @@ struct CDOC_EXPORT ChainedConsumer : public DataConsumer {
 	~ChainedConsumer() {
 		if (_owned) delete _dst;
 	}
-    result_t write(const uint8_t *src, size_t size) override {
+    result_t write(const uint8_t *src, size_t size) noexcept override {
 		return _dst->write(src, size);
 	}
-    result_t close() override {
+    result_t close() noexcept override {
 		if (_owned) return _dst->close();
         return OK;
 	}
-	bool isError() override {
+    bool isError() noexcept override {
 		return _dst->isError();
 	}
 protected:
@@ -234,13 +234,13 @@ struct CDOC_EXPORT ChainedSource : public DataSource {
 	~ChainedSource() {
 		if (_owned) delete _src;
 	}
-    result_t read(uint8_t *dst, size_t size) {
+    result_t read(uint8_t *dst, size_t size) noexcept override {
 		return _src->read(dst, size);
 	}
-	bool isError() {
+    bool isError() noexcept override {
 		return _src->isError();
 	}
-	bool isEof() {
+    bool isEof() noexcept override {
 		return _src->isEof();
 	}
 protected:
@@ -264,13 +264,15 @@ struct CDOC_EXPORT IStreamSource : public DataSource {
         return bool(_ifs->bad()) ? INPUT_STREAM_ERROR : OK;
 	}
 
-    result_t read(uint8_t *dst, size_t size) {
+    result_t read(uint8_t *dst, size_t size) noexcept override try {
 		_ifs->read((char *) dst, size);
 		return (_ifs->bad()) ? INPUT_STREAM_ERROR : _ifs->gcount();
+    } catch(...) {
+        return INPUT_STREAM_ERROR;
 	}
 
-	bool isError() { return _ifs->bad(); }
-	bool isEof() { return _ifs->eof(); }
+    bool isError() noexcept override { return _ifs->bad(); }
+    bool isEof() noexcept override { return _ifs->eof(); }
 protected:
 	std::istream *_ifs;
 	bool _owned;
@@ -285,17 +287,17 @@ struct CDOC_EXPORT OStreamConsumer : public DataConsumer {
 		if (_owned) delete _ofs;
 	}
 
-    result_t write(const uint8_t *src, size_t size) {
+    result_t write(const uint8_t *src, size_t size) noexcept override {
 		_ofs->write((const char *) src, size);
 		return (_ofs->bad()) ? OUTPUT_STREAM_ERROR : size;
 	}
 
-    result_t close() {
+    result_t close() noexcept override {
 		_ofs->flush();
         return (_ofs->bad()) ? OUTPUT_STREAM_ERROR : OK;
 	}
 
-	bool isError() { return _ofs->bad(); }
+    bool isError() noexcept override { return _ofs->bad(); }
 protected:
 	std::ostream *_ofs;
 	bool _owned;
@@ -310,15 +312,15 @@ struct CDOC_EXPORT VectorSource : public DataSource {
         return OK;
 	}
 
-    result_t read(uint8_t *dst, size_t size) override {
+    result_t read(uint8_t *dst, size_t size) noexcept override {
 		size = std::min<size_t>(size, _data.size() - _ptr);
 		std::copy_n(_data.cbegin() + _ptr, size, dst);
 		_ptr += size;
 		return size;
 	}
 
-    bool isError() override { return false; }
-    bool isEof() override { return _ptr >= _data.size(); }
+    bool isError() noexcept override { return false; }
+    bool isEof() noexcept override { return _ptr >= _data.size(); }
 protected:
 	const std::vector<uint8_t>& _data;
 	size_t _ptr;
@@ -326,12 +328,14 @@ protected:
 
 struct CDOC_EXPORT VectorConsumer : public DataConsumer {
 	VectorConsumer(std::vector<uint8_t>& data) : _data(data) {}
-    result_t write(const uint8_t *src, size_t size) override final {
+    result_t write(const uint8_t *src, size_t size) noexcept final try {
 		_data.insert(_data.end(), src, src + size);
 		return size;
+    } catch(...) {
+        return OUTPUT_STREAM_ERROR;
 	}
-    result_t close() override final { return OK; }
-	virtual bool isError() override final { return false; }
+    result_t close() noexcept final { return OK; }
+    virtual bool isError() noexcept final { return false; }
 protected:
     std::vector<uint8_t>& _data;
 };
@@ -340,15 +344,17 @@ struct CDOC_EXPORT FileListConsumer : public MultiDataConsumer {
     FileListConsumer(const std::string& base_path) {
 		base = base_path;
 	}
-    result_t write(const uint8_t *src, size_t size) override final {
+    result_t write(const uint8_t *src, size_t size) noexcept final try {
 		ofs.write((const char *) src, size);
 		return (ofs.bad()) ? OUTPUT_STREAM_ERROR : size;
+    } catch(...) {
+        return OUTPUT_STREAM_ERROR;
 	}
-    result_t close() override final {
+    result_t close() noexcept final {
 		ofs.close();
         return (ofs.bad()) ? OUTPUT_STREAM_ERROR : OK;
 	}
-	bool isError() override final {
+    bool isError() noexcept final {
 		return ofs.bad();
 	}
     result_t open(const std::string& name, int64_t size) override final {
@@ -378,11 +384,11 @@ protected:
 
 struct CDOC_EXPORT FileListSource : public MultiDataSource {
 	FileListSource(const std::string& base, const std::vector<std::string>& files);
-    result_t read(uint8_t *dst, size_t size) override final;
-	bool isError() override final;
-	bool isEof() override final;
-    result_t getNumComponents() override final;
-    result_t next(std::string& name, int64_t& size) override final;
+    result_t read(uint8_t *dst, size_t size) noexcept final;
+    bool isError() noexcept final;
+    bool isEof() noexcept final;
+    result_t getNumComponents() final;
+    result_t next(std::string& name, int64_t& size) final;
 protected:
 	std::filesystem::path _base;
 	const std::vector<std::string>& _files;

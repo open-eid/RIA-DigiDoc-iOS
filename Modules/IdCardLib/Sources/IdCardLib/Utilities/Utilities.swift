@@ -27,7 +27,7 @@ public let rsaAlgorithmName = "RSA"
 public let ecAlgorithmName = "EC"
 public let unknownAlgorithmName = "Unknown"
 
-func convertBytesToX509Certificate(_ data: Data) throws -> SecCertificate {
+public func convertBytesToX509Certificate(_ data: Data) throws -> SecCertificate {
     guard let certificate = SecCertificateCreateWithData(nil, data as CFData) else {
         throw CertificateConversionError.creationFailed
     }
@@ -35,6 +35,6 @@ func convertBytesToX509Certificate(_ data: Data) throws -> SecCertificate {
     return certificate
 }
 
-enum CertificateConversionError: Error {
+public enum CertificateConversionError: Error {
     case creationFailed
 }

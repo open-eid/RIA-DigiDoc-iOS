@@ -21,7 +21,6 @@ import Foundation
 import IdCardLib
 import CryptoObjCWrapper
 
-@MainActor
 public class SmartToken: AbstractSmartToken {
     let pin1: SecureData
     let card: CardCommands

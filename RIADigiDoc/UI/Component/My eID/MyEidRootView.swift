@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
 

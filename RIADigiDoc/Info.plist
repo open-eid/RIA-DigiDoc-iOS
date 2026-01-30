@@ -223,6 +223,12 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>This app uses NFC to scan ID-cards</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth card reader is used to read data from ID card</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth card reader is used to read data from ID card</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto_Condensed-Bold.ttf</string>
@@ -970,6 +976,11 @@
 	<array>
 		<string>com.ftsafe.bR301</string>
 		<string>com.ftsafe.iR301</string>
+	</array>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A000000077010800070000FE00000100</string>
+		<string>A0000000181002030000000000000001</string>
 	</array>
 </dict>
 </plist>

@@ -178,7 +178,7 @@ struct EncryptView: View {
                 onLeftClick: {
                     Task {
                         if await viewModel.handleBackButton() {
-                            pathManager.popToRoot()
+                            dismiss()
                         }
                     }
                 },
@@ -355,7 +355,7 @@ struct EncryptView: View {
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
                                     if viewModel.isContainerWithoutRecipients {
-                                        pathManager.navigate(to: .encryptRecipientView)
+                                        pathManager.replaceLast(to: .encryptRecipientView)
                                     } else {
                                         if encryptionButtonEnabled {
                                             encryptionButtonEnabled = false
@@ -421,7 +421,7 @@ struct EncryptView: View {
                                 ))
                             } else {
                                 await viewModel.loadContainerData(
-                                    cryptoContainer: viewModel.cryptoContainer
+                                    cryptoContainer: nil
                                 )
 
                                 await updateAsyncLabels()

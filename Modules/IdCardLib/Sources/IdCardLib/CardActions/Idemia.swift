@@ -44,7 +44,7 @@ extension CodeType {
     }
 }
 
-class Idemia: CardCommandsInternal {
+final class Idemia: CardCommandsInternal {
     let canChangePUK: Bool = true
     let reader: CardReader
     let fillChar: UInt8 = 0xFF

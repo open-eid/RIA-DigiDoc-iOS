@@ -20,7 +20,7 @@
 import Foundation
 
 typealias Bytes = [UInt8]
-@MainActor
+
 protocol CardReader: Sendable {
     /**
      * Sends an APDU (Application Protocol Data Unit) command to the smart card and retrieves the response.

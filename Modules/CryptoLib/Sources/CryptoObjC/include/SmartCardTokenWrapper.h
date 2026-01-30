@@ -20,8 +20,6 @@
 
 #if __cplusplus
 
-//@import CryptoObjCWrapper;
-
 #import <cdoc/CryptoBackend.h>
 #import <Foundation/Foundation.h>
 #include <memory>

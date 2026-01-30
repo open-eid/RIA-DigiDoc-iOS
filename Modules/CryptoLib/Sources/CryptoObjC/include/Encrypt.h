@@ -28,15 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Encrypt: NSObject
 
++ (void)enableLogging:(bool)enabled;
 + (void)encryptFile:(NSString *)fullPath withDataFiles:(NSArray *)dataFiles
      withAddressees:(NSArray *)addressees completion:(void (^)(NSError * _Nullable))completion;
 + (void)encryptFile:(NSString *)fullPath withDataFiles:(NSArray *)dataFiles
           withLabel:(NSString*)label withPassword:(NSString *)password completion:(void (^)(NSError * _Nullable))completion;
-
-//+ (void)encryptFile:(NSString *)fullPath withDataFiles:(NSArray<CryptoDataFile*> *)dataFiles
-//     withAddressees:(NSArray<Addressee*> *)addressees completion:(void (^)(NSError * _Nullable))completion;
-//+ (void)encryptFile:(NSString *)fullPath withDataFiles:(NSArray<CryptoDataFile*> *)dataFiles
-//          withLabel:(NSString*)label withPassword:(NSString *)password completion:(void (^)(NSError * _Nullable))completion;
 
 @end
 

@@ -18,6 +18,8 @@
  */
 
 import Foundation
+import CryptoSwift
+import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
 
@@ -26,6 +28,8 @@ import CommonsLib
 public protocol NFCViewModelProtocol: Sendable {
     func isActionEnabled(
         canNumber: String,
+        pinNumber: String,
+        pinType: CodeType?
     ) -> Bool
 
     func saveInputData(
@@ -38,6 +42,13 @@ public protocol NFCViewModelProtocol: Sendable {
     func resetErrors()
 
     func sign() async -> SignedContainerProtocol?
+
+    func decrypt(
+        CAN: String,
+        pin1: String,
+        cryptoContainer: CryptoContainerProtocol?,
+        strings: NFCSessionStrings
+    ) async -> CryptoContainerProtocol?
 
     func loadPersonalData()
 

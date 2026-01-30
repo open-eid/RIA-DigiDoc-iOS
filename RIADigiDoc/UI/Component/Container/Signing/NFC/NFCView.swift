@@ -20,10 +20,9 @@
 import SwiftUI
 import FactoryKit
 import CryptoSwift
+import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
-import IdCardLib
-
 struct NFCView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
@@ -32,6 +31,8 @@ struct NFCView: View {
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
     @State private var canNumber = ""
+    @State private var pinNumber = ""
+    @State private var pinType: CodeType?
     @State private var rememberMe: Bool = true
     @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
@@ -41,8 +42,17 @@ struct NFCView: View {
     @State private var viewModel: NFCViewModel
     @State private var sharedNfcViewModel: SharedNFCViewModel
 
+    @State private var taskDecrypt: Task<Void, Never>?
+
     private var isNFCSupported: Bool {
         sharedNfcViewModel.isNFCSupported()
+    }
+
+    private var nfcErrorMessage: String {
+        languageSettings.localized(
+            viewModel.nfcErrorKey ?? "",
+            viewModel.nfcErrorExtraArguments
+        )
     }
 
     private var canNumberError: Binding<String?> {
@@ -50,6 +60,16 @@ struct NFCView: View {
             get: { languageSettings.localized(
                 viewModel.canNumberErrorKey ?? "",
                 viewModel.canNumberErrorExtraArguments
+            ) },
+            set: { _ in }
+        )
+    }
+
+    private var pinNumberError: Binding<String?> {
+        Binding(
+            get: { languageSettings.localized(
+                viewModel.pinNumberErrorKey ?? "",
+                viewModel.pinNumberErrorExtraArguments
             ) },
             set: { _ in }
         )
@@ -75,6 +95,7 @@ struct NFCView: View {
     init(
         actionType: ActionType,
         actionMethods: [ActionMethod],
+        pinType: CodeType? = nil,
         cryptoContainer: CryptoContainerProtocol? = nil,
         signedContainer: SignedContainerProtocol? = nil,
         onSuccess: @escaping (SignedContainerProtocol) -> Void = { _ in },
@@ -83,6 +104,7 @@ struct NFCView: View {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
         _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
         self.actionType = actionType
+        self.pinType = pinType
         self.actionMethods = actionMethods
         self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
@@ -98,6 +120,7 @@ struct NFCView: View {
             isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
             onBackClick: {
+                cancelDecrypt()
                 guard isInProgress else {
                     dismiss()
                     return
@@ -108,8 +131,9 @@ struct NFCView: View {
                 switch actionType {
                 case .decrypt:
                     saveInputData()
-
-                    // TODO: Implement decrypt action
+                    Task {
+                        decrypt()
+                    }
                     isInProgress = true
                 case .signing:
                     saveInputData()
@@ -155,9 +179,12 @@ struct NFCView: View {
                         rememberMe: $rememberMe,
                         isActionEnabled: $isActionEnabled,
                         canNumberError: canNumberError,
+                        pinNumber: $pinNumber,
+                        pinError: pinNumberError,
+                        pinType: pinType,
                         onInputChange: {
                             isActionEnabled = viewModel
-                                .isActionEnabled(canNumber: canNumber)
+                                .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
                         }
                     )
                 }
@@ -170,6 +197,10 @@ struct NFCView: View {
                 rememberMe = inputData.rememberMe
             }
         }
+        .onChange(of: viewModel.nfcErrorKey) { _, newKey in
+            guard newKey != nil else { return }
+            Toast.show(nfcErrorMessage)
+        }
     }
 
     func saveInputData() {
@@ -180,6 +211,71 @@ struct NFCView: View {
                 rememberMe: rememberMe
             )
         }
+    }
+
+    private func decrypt() {
+        taskDecrypt = Task {
+            guard let container = cryptoContainer else { return }
+
+            let (inputCANNumber) = rememberMe ? (canNumber) : ("")
+
+            await viewModel.saveInputData(
+                canNumber: inputCANNumber,
+                rememberMe: rememberMe
+            )
+
+            isInProgress = true
+            nfcActionMessage = "NFC hold card"
+
+            let strings = NFCSessionStrings(
+                initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
+                step1Message:
+                    languageSettings.localized(
+                        "Hold your ID card against your smart device until the data is read"
+                    ),
+                step2Message: languageSettings.localized("Reading data please wait"),
+                step3Message: languageSettings.localized("Reading certificate"),
+                step4Message: languageSettings.localized("Decrypting in progress please wait"),
+                successMessage: languageSettings.localized("Data read"),
+                canErrorMessage: languageSettings.localized("Wrong CAN"),
+                pin1WrongMultipleErrorMessage:
+                    languageSettings.localized(
+                        "PIN verification error multiple",
+                        [CodeType.pin1.name, "2"]
+                    ),
+                pin1WrongErrorMessage: languageSettings.localized("PIN verification error one", [CodeType.pin1.name]),
+                pin1BlockedErrorMessage: languageSettings.localized("PIN blocked", [CodeType.pin1.name]),
+                technicalErrorMessage: languageSettings.localized("NFC technical error"),
+                sessionErrorMessage: languageSettings.localized("NFC session error")
+            )
+
+            let decryptedContainer = await viewModel.decrypt(
+                CAN: canNumber,
+                pin1: pinNumber,
+                cryptoContainer: container,
+                strings: strings
+            )
+
+            guard let container = decryptedContainer else {
+                cancelDecrypt()
+                isInProgress = false
+                return
+            }
+
+            cancelDecrypt()
+            isInProgress = false
+
+            onSuccessDecrypt(container)
+            dismiss()
+        }
+    }
+
+    private func cancelDecrypt() {
+        pinNumber.isEmpty ? () : (pinNumber.removeAll())
+        isActionEnabled = viewModel
+            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
+        taskDecrypt?.cancel()
+        taskDecrypt = nil
     }
 }
 
@@ -192,6 +288,7 @@ struct NFCView: View {
             .mobileId,
             .smartId
         ],
+        pinType: CodeType.pin2,
         signedContainer: SignedContainer(
             fileManager: Container.shared.fileManager(),
             containerUtil: Container.shared.containerUtil()

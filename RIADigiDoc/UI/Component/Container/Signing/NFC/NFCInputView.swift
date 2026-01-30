@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import IdCardLib
 
 struct NFCInputView: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -31,10 +32,18 @@ struct NFCInputView: View {
     @Binding var isActionEnabled: Bool
     @Binding var canNumberError: String?
 
+    @Binding var pinNumber: String
+    @Binding var pinError: String?
+    var pinType: CodeType?
+
     let onInputChange: () -> Void
 
     private var canNumberTitle: String {
         languageSettings.localized("CAN number")
+    }
+
+    private var pinNumberTitle: String {
+        languageSettings.localized("PIN code", [pinType?.name ?? ""])
     }
 
     private var canNumberLocationLabel: String {
@@ -50,12 +59,18 @@ struct NFCInputView: View {
         rememberMe: Binding<Bool>,
         isActionEnabled: Binding<Bool>,
         canNumberError: Binding<String?>,
+        pinNumber: Binding<String>,
+        pinError: Binding<String?>,
+        pinType: CodeType?,
         onInputChange: @escaping () -> Void
     ) {
         self._canNumber = canNumber
         self._rememberMe = rememberMe
         self._isActionEnabled = isActionEnabled
         self._canNumberError = canNumberError
+        self._pinNumber = pinNumber
+        self._pinError = pinError
+        self.pinType = pinType
         self.onInputChange = onInputChange
     }
 
@@ -81,7 +96,22 @@ struct NFCInputView: View {
                         .padding(.vertical, Dimensions.Padding.XXSPadding)
                 }
             }
-            .padding(.vertical, Dimensions.Padding.ZeroPadding)
+            .padding(.vertical, Dimensions.Padding.MPadding)
+
+            VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                FloatingLabelTextField(
+                    title: pinNumberTitle,
+                    placeholder: pinNumberTitle,
+                    text: $pinNumber,
+                    isSecure: true,
+                    isError: !(pinError?.isEmpty ?? true),
+                    errorText: pinError ?? "",
+                    keyboardType: .numberPad
+                )
+                .onChange(of: pinNumber) {
+                    onInputChange()
+                }
+            }
 
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
                 ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
@@ -108,7 +138,10 @@ struct NFCInputView: View {
         rememberMe: .constant(true),
         isActionEnabled: .constant(true),
         canNumberError: .constant(nil),
-        onInputChange: {}
+        pinNumber: .constant("123"),
+        pinError: .constant(nil),
+        pinType: CodeType.pin2,
+        onInputChange: {},
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

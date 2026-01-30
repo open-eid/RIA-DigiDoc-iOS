@@ -18,7 +18,7 @@
  */
 
 import CryptoTokenKit
-@MainActor
+
 protocol CardCommandsInternal: CardCommands {
     /**
      * The smart card reader used to communicate with the card.
@@ -89,7 +89,7 @@ extension CardCommandsInternal {
         }
     }
 
-    private func pinTemplate(_ pin: SecureData?, fillChar: UInt8 = 0xFF) -> Data {
+    private func pinTemplate(_ pin: SecureData?) -> Data {
         guard let pin = pin else { return Data() }
 
         var out = Data()

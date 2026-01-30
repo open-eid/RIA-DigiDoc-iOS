@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Add file" : {
       "comment" : "Home screen bottom sheet action",
       "extractionState" : "manual",
@@ -1106,6 +1109,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dekrüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Decrypting in progress please wait" : {
+      "comment" : "NFC decrypt alert message step 4",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrypting in progress, please wait."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimine käib, palun oodake."
           }
         }
       }
@@ -4711,6 +4732,42 @@
         }
       }
     },
+    "NFC session error" : {
+      "comment" : "NFC connection lost error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC connection lost"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontaktivaba ühendust ei saa luua"
+          }
+        }
+      }
+    },
+    "NFC technical error" : {
+      "comment" : "NFC technical error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Technical error. Please try again"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midagi läks valesti. Palun proovi uuesti"
+          }
+        }
+      }
+    },
     "No Internet connection" : {
       "comment" : "Error shown whne app is unable to conenct to the Internet to do requests",
       "extractionState" : "manual",
@@ -5552,6 +5609,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loe täpsemalt siit"
+          }
+        }
+      }
+    },
+    "Reading certificate" : {
+      "comment" : "NFC alert message, step 3",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading certificate."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaadi lugemine."
           }
         }
       }
@@ -7467,6 +7542,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kehtiv kuni"
+          }
+        }
+      }
+    },
+    "Wrong CAN" : {
+      "comment" : "NFC decrypt wrong CAN message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong CAN number"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vale CAN number"
           }
         }
       }

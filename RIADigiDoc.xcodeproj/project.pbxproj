@@ -163,6 +163,8 @@
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
+				Domain/NFC/NFCSessionStrings.swift,
+				Domain/NFC/OperationDecrypt.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
