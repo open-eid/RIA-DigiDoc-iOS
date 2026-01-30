@@ -152,7 +152,8 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
 
     public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
         self.session = nil
+        continuation?.resume(throwing: error)
     }
 }
