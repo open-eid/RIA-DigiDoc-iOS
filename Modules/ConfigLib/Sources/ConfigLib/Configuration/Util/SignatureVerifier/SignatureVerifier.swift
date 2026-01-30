@@ -49,24 +49,25 @@ struct SignatureVerifier {
     // MARK: - PEM / Base64 helpers
 
     private static func parsePublicKeyDER(fromPEM pem: String) throws -> Data {
-        let cleaned = removeAllWhitespace(data: pem)
-
         let possibleHeaders = [
-            ("-----BEGINPUBLICKEY-----", "-----ENDPUBLICKEY-----"),
-            ("-----BEGINECPUBLICKEY-----", "-----ENDECPUBLICKEY-----")
+            ("-----BEGIN PUBLIC KEY-----", "-----END PUBLIC KEY-----"),
+            ("-----BEGIN EC PUBLIC KEY-----", "-----END EC PUBLIC KEY-----")
         ]
 
         guard let (begin, end) = possibleHeaders.first(
-            where: { cleaned.contains($0.0) && cleaned.contains($0.1) }
+            where: { (begin, end) in
+                pem.contains(begin) && pem.contains(end)
+            }
         ) else {
             throw SignatureVerifierError.invalidPEM
         }
 
-        let base64Payload = cleaned
+        let payload = pem
             .replacing(begin, with: "")
             .replacing(end, with: "")
 
-        return try decodeBase64(base64Payload)
+        let cleaned = removeAllWhitespace(data: payload)
+        return try decodeBase64(cleaned)
     }
 
     private static func decodeBase64(_ value: String) throws -> Data {
@@ -78,7 +79,7 @@ struct SignatureVerifier {
     }
 
     private static func removeAllWhitespace(data: String) -> String {
-        data.filter { !" \n\t\r".contains($0) }
+        data.filter { !$0.isWhitespace && !$0.isNewline }
     }
 
     // MARK: - ECDSA verify (curve chosen by DER length heuristic)
