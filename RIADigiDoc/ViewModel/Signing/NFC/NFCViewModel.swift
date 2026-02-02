@@ -24,11 +24,12 @@ import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
+import CoreNFC
+import X509
 
 @Observable
 @MainActor
 class NFCViewModel: NFCViewModelProtocol, Loggable {
-
     var canNumberErrorKey: String?
     var canNumberErrorExtraArguments: [String] = []
 
@@ -38,12 +39,26 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcErrorKey: String?
     var nfcErrorExtraArguments: [String] = []
 
+    var showNfcAlertMessage: Bool = false
+    var nfcAlertMessageKey: String?
+    var nfcAlertMessageExtraArguments: [String] = []
+    var nfcAlertMessageUrl: String?
+
     private let dataStore: DataStoreProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
 
     init(
-        dataStore: DataStoreProtocol
+        dataStore: DataStoreProtocol,
+        userAgentUtil: UserAgentUtilProtocol
     ) {
         self.dataStore = dataStore
+        self.userAgentUtil = userAgentUtil
+    }
+
+    func isNFCSupported() -> Bool {
+        if NFCTagReaderSession.readingAvailable { return true }
+        NFCViewModel.logger().error("NFC: NFC not available on this device")
+        return false
     }
 
     func isActionEnabled(canNumber: String, pinNumber: String, pinType: CodeType?) -> Bool {
@@ -88,30 +103,42 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         strings: NFCSessionStrings
     ) async
     -> CryptoContainerProtocol? {
-        do {
-            let containerFile = await cryptoContainer?.getRawContainerFile() ?? URL(fileURLWithPath: "")
-            let recipients = await cryptoContainer?.getRecipients() ?? []
-            let pinSecureData = SecureData(Array(pin1.utf8))
+        NFCViewModel.logger().info("NFC: Starting NFC decryption")
+        let containerFile = await cryptoContainer?.getRawContainerFile() ?? URL(fileURLWithPath: "")
+        let recipients = await cryptoContainer?.getRecipients() ?? []
+        let pinSecureData = SecureData(Array(pin1.utf8))
 
+        do {
+            NFCViewModel.logger().info("NFC: Starting decryption operation")
             let container = try await OperationDecrypt().processDecrypt(
-                CAN: CAN,
-                PIN1: pinSecureData,
+                canNumber: CAN,
+                pin1Number: pinSecureData,
                 containerFile: containerFile,
                 recipients: recipients,
                 strings: strings
             )
+            NFCViewModel.logger().info("NFC: Decryption completed successfully")
             return container
         } catch {
-            guard let exception = error as? IdCardInternalError else {
-                NFCViewModel.logger().error("NFC: ID Card General error.")
-                nfcErrorKey = "NFC session error"
-                nfcErrorExtraArguments = []
+            NFCViewModel.logger().error("NFC: Decryption operation failed")
+
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: CodeType.pin1)
                 return nil
             }
 
-            let error  = exception.getIdCardError()
-            handleIdCardError(error, pinType: CodeType.pin1)
+            if let decryptError = error as? DecryptError {
+                NFCViewModel.logger().error("NFC: ReadCertAndDecryptError: \(decryptError.localizedDescription)")
+                handleDecryptError(error: decryptError)
+                return nil
+            }
 
+            NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+            NFCViewModel.logger().error("NFC: Error details: \(error)")
+            nfcErrorKey = "NFC session error"
+            nfcErrorExtraArguments = []
             return nil
         }
     }
@@ -146,9 +173,63 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         }
     }
 
-    func sign() async -> SignedContainerProtocol? {
-        // TODO: Implement with NFC signing
-        return nil
+    private func handleReadCertAndSignError(error: ReadCertAndSignError) {
+        switch error {
+        case .cancelled:
+            nfcErrorKey = nil
+        case .signedContainerNil, .roleDataNil, .containerPathNil, .userAgentEmpty:
+            NFCViewModel.logger().error("NFC: Configuration error")
+            nfcErrorKey = "NFC session error"
+        case .unknown(let underlying):
+            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDigiDocError(error: DigiDocError) {
+        switch error {
+        case .signatureAddingFailed(let underlying):
+            handleDigiDocSignError(errorDetail: underlying)
+        default:
+            NFCViewModel.logger().error("NFC: Unknown DigiDoc error - \(error)")
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDigiDocSignError(errorDetail: ErrorDetail) {
+        NFCViewModel.logger().error("NFC: DigiDoc signature adding error - \(errorDetail.description)")
+        switch errorDetail.code {
+        case 5, 6:
+            nfcErrorKey = "Certificate status revoked"
+        case 7:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "OCSP response not in valid time slot"
+            nfcAlertMessageUrl = "OCSP response not in valid time slot url"
+        case 18:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "Too many requests"
+            nfcAlertMessageUrl = "Too many requests url"
+            nfcAlertMessageExtraArguments = ["NFC"]
+        case 20:
+            nfcErrorKey = "No Internet connection"
+        case 101, 102:
+            nfcErrorKey = "SSL handshake failed"
+        default:
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDecryptError(error: DecryptError) {
+        switch error {
+        case .cancelled:
+            nfcErrorKey = nil
+        case .containerFileInvalid, .recipientsEmpty:
+            NFCViewModel.logger().error("NFC: Configuration error")
+            nfcErrorKey = "NFC session error"
+        case .unknown(let underlying):
+            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
+            nfcErrorKey = "General error"
+        }
     }
 
     func isRoleDataEnabled() async -> Bool {
@@ -167,6 +248,73 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return
         }
         canNumberErrorKey = ""
+    }
+
+    func sign(
+        canNumber: String,
+        pin2: String,
+        roleData: RoleData,
+        signedContainer: SignedContainerProtocol,
+        strings: NFCSessionStrings
+    ) async -> SignedContainerProtocol? {
+        NFCViewModel.logger().info("NFC: Starting NFC signing")
+        let pin2Data = pin2.data(using: .utf8)
+        guard let pin2Data else {
+            NFCViewModel.logger().error("NFC: Failed to convert PIN2 to Data")
+            return nil
+        }
+
+        guard let containerFile = await signedContainer.getRawContainerFile() else {
+            NFCViewModel.logger().error("NFC: Failed to get container file path")
+            return nil
+        }
+
+        NFCViewModel.logger().info("NFC: Getting language")
+        let appLanguage = await dataStore.getSelectedLanguage()
+
+        NFCViewModel.logger().info("NFC: Getting User-Agent")
+        let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
+
+        do {
+            NFCViewModel.logger().info("NFC: Starting signing operation")
+            let result = try await OperationReadCertAndSign().startOperation(
+                canNumber: canNumber,
+                pin2Number: SecureData(pin2Data),
+                signedContainer: signedContainer,
+                containerPath: containerFile,
+                roleData: roleData,
+                userAgent: userAgent,
+                strings: strings
+            )
+            NFCViewModel.logger().info("NFC: Signature added successfully")
+            return result
+        } catch {
+            NFCViewModel.logger().error("NFC: Signing operation failed")
+
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: .pin2)
+                return nil
+            }
+
+            if let readCertSignError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+                handleReadCertAndSignError(error: readCertSignError)
+                return nil
+            }
+
+            if let digiDocError = error as? DigiDocError {
+                NFCViewModel.logger().error("NFC: DigiDocError: \(digiDocError.localizedDescription)")
+                handleDigiDocError(error: digiDocError)
+                return nil
+            }
+
+            NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+            NFCViewModel.logger().error("NFC: Error details: \(error)")
+            nfcErrorKey = "General error"
+            return nil
+        }
     }
 
     private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {

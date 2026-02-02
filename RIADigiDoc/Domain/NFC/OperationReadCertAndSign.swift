@@ -20,37 +20,42 @@
 import Foundation
 import CoreNFC
 import CommonCrypto
+import CommonsLib
 import CryptoTokenKit
 internal import SwiftECC
 import BigInt
-import CryptoKit
+import Security
 import IdCardLib
-import CryptoObjCWrapper
-import CryptoSwift
+import LibdigidocLibSwift
 import UtilsLib
 
 @MainActor
-public class OperationDecrypt: NSObject, Loggable {
-
+public class OperationReadCertAndSign: NSObject, Loggable {
     private var session: NFCTagReaderSession?
     private var isFinished = false
-    private var containerFile: URL?
-    private var recipients: [Addressee] = []
     private var canNumber: String = ""
-    private var pin1Number: SecureData = SecureData([0x00])
-    private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
-    private var connection = NFCConnection()
-
+    private var pin2Number: SecureData = SecureData([0x00])
+    private var signedContainer: SignedContainerProtocol?
+    private var containerPath: URL?
+    private var roleData: RoleData?
+    private var userAgent: String = ""
     private var nfcError: String? = ""
     private var strings: NFCSessionStrings?
 
-    public func processDecrypt(
+    private let connection = NFCConnection()
+
+    private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
+
+    // swiftlint:disable:next function_parameter_count
+    public func startOperation(
         canNumber: String,
-        pin1Number: SecureData,
-        containerFile: URL,
-        recipients: [Addressee],
-        strings: NFCSessionStrings,
-    ) async throws -> CryptoContainerProtocol {
+        pin2Number: SecureData,
+        signedContainer: SignedContainerProtocol,
+        containerPath: URL,
+        roleData: RoleData,
+        userAgent: String,
+        strings: NFCSessionStrings
+    ) async throws -> SignedContainerProtocol {
 
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -59,10 +64,13 @@ public class OperationDecrypt: NSObject, Loggable {
                 continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
                 return
             }
+
             self.canNumber = canNumber
-            self.pin1Number = pin1Number
-            self.containerFile = containerFile
-            self.recipients = recipients
+            self.pin2Number = pin2Number
+            self.signedContainer = signedContainer
+            self.containerPath = containerPath
+            self.roleData = roleData
+            self.userAgent = userAgent
             self.strings = strings
 
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
@@ -83,7 +91,7 @@ public class OperationDecrypt: NSObject, Loggable {
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
         let progressBar = ProgressBar(currentStep: step)
         var message = stepMessage
-        OperationDecrypt.logger().info("NFC: Updating alert message to: \(message)")
+        OperationReadCertAndSign.logger().info("NFC: Updating alert message to: \(message)")
         message += "\n\n\(progressBar.generate())"
         session?.alertMessage = message
     }
@@ -113,60 +121,73 @@ public class OperationDecrypt: NSObject, Loggable {
     }
 }
 
-extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
+extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-
         Task { @MainActor in
             defer {
                 self.session = nil
             }
 
-            guard let containerFile else {
-                let error = DecryptError.containerFileInvalid
-                OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "Failed to read container file")
+            guard let signedContainer else {
+                let error = ReadCertAndSignError.signedContainerNil
+                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                session.invalidate(errorMessage: "Failed to read container data")
+                continuation?.resume(throwing: error)
+                return
+            }
+            guard let roleData else {
+                let error = ReadCertAndSignError.roleDataNil
+                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                session.invalidate(errorMessage: "Failed to read role data")
+                continuation?.resume(throwing: error)
+                return
+            }
+            guard let containerPath else {
+                let error = ReadCertAndSignError.containerPathNil
+                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                session.invalidate(errorMessage: "Failed to read container path")
+                continuation?.resume(throwing: error)
+                return
+            }
+            if userAgent.isEmpty {
+                let error = ReadCertAndSignError.userAgentEmpty
+                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                session.invalidate(errorMessage: "Failed to initialize user agent")
                 continuation?.resume(throwing: error)
                 return
             }
 
-            if containerFile.path.isEmpty {
-                let error = DecryptError.containerFileInvalid
-                OperationDecrypt.logger().error("NFC: Container file path is empty")
-                session.invalidate(errorMessage: "Failed to read container file")
-                continuation?.resume(throwing: error)
-                return
-            }
-
-            if recipients.isEmpty {
-                let error = DecryptError.recipientsEmpty
-                OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "No recipients found")
-                continuation?.resume(throwing: error)
-                return
-            }
-
-            OperationDecrypt.logger().info("NFC: Checks complete starting decryption")
+            OperationReadCertAndSign.logger().info("NFC: Checks complete starting signing")
 
             do {
                 updateAlertMessage(step: 1)
                 let tag = try await connection.setup(session, tags: tags)
+
                 updateAlertMessage(step: 2)
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
+
                 updateAlertMessage(step: 3)
-                let cert = try await cardCommands.readAuthenticationCertificate()
-                updateAlertMessage(step: 4)
-                let decryptedContainer = try await CryptoContainer.decrypt(
-                    containerFile: containerFile,
-                    recipients: recipients,
+                let cert = try await cardCommands.readSignatureCertificate()
+                let hashToSign = try await signedContainer.prepareSignature(
                     cert: cert,
-                    cardCommands: cardCommands,
-                    pin: pin1Number,
+                    containerPath: containerPath,
+                    roleData: roleData,
+                    userAgent: userAgent
                 )
-                continuation?.resume(with: .success(decryptedContainer))
+
+                let signatureValue = try await cardCommands.calculateSignature(for: hashToSign, withPin2: pin2Number)
+
+                updateAlertMessage(step: 4)
+                let result = try await signedContainer.addSignature(
+                    signature: signatureValue,
+                    containerFile: containerPath
+                )
+
+                continuation?.resume(with: .success(result))
                 success()
             } catch {
                 guard !isFinished else {
-                    OperationDecrypt.logger()
+                    OperationReadCertAndSign.logger()
                         .info("NFC: Operation already finished, ignoring error: \(error.localizedDescription)")
                     return
                 }
@@ -174,24 +195,31 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     let idCardError = idCardInternalError.getIdCardError()
-                    OperationDecrypt.logger().error("NFC: IdCardError detected: \(idCardError)")
+                    OperationReadCertAndSign.logger().error("NFC: IdCardError detected: \(idCardError)")
                     handleIdCardError(idCardError)
                     session.invalidate(errorMessage: nfcError ?? "")
                     continuation?.resume(throwing: error)
                     return
                 }
 
-                if let decryptError = error as? DecryptError {
-                    OperationDecrypt.logger()
-                        .error("NFC: ReadCertAndDecryptError: \(decryptError.localizedDescription)")
+                if let readCertSignError = error as? ReadCertAndSignError {
+                    OperationReadCertAndSign.logger()
+                        .error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
                     continuation?.resume(throwing: error)
                     return
                 }
 
-                OperationDecrypt.logger().error("NFC: Unknown error type: \(type(of: error))")
-                OperationDecrypt.logger().error("NFC: Error details: \(error.localizedDescription)")
-                let wrappedError = DecryptError.unknown(error)
+                if let digiDocError = error as? DigiDocError {
+                    OperationReadCertAndSign.logger().error("NFC: DigidocError: \(digiDocError.localizedDescription)")
+                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
+                    continuation?.resume(throwing: error)
+                    return
+                }
+
+                OperationReadCertAndSign.logger().error("NFC: Unknown error type: \(type(of: error))")
+                OperationReadCertAndSign.logger().error("NFC: Error details: \(error.localizedDescription)")
+                let wrappedError = ReadCertAndSignError.unknown(error)
                 session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
                 continuation?.resume(throwing: wrappedError)
             }
@@ -216,4 +244,5 @@ extension OperationDecrypt: @MainActor NFCTagReaderSessionDelegate {
         }
         continuation?.resume(throwing: error)
     }
+
 }
