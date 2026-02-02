@@ -26,7 +26,8 @@ public protocol UsbReaderConnectionProtocol: Actor {
     func stopDiscoveringReaders(with status: UsbReaderStatus) async
     func updateStatus(_ status: UsbReaderStatus) async
     func getHandle() async -> SCARDCONTEXT
-    func setCardHandler(_ handler: CardCommands?) async
+    func getCardHandler() throws -> CardCommands
+    func setCardHandler(_ handler: CardCommands?)
     func statusStream() -> AsyncStream<UsbReaderStatus>
     func getPublicData() async throws -> CardInfo
     func readAuthenticationCertificate() async throws -> Data

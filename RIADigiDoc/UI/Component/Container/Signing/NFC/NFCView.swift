@@ -134,7 +134,6 @@ struct NFCView: View {
                     Task {
                         decrypt()
                     }
-                    isInProgress = true
                 case .signing:
                     saveInputData()
 

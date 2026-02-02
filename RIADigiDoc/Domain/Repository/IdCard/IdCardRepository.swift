@@ -41,6 +41,10 @@ actor IdCardRepository: IdCardRepositoryProtocol {
         await idCardService.statusStream()
     }
 
+    func getCardHandler() async throws -> CardCommands {
+        try await idCardService.getCardHandler()
+    }
+
     func getPublicData() async throws -> CardInfo {
         try await idCardService.getPublicData()
     }

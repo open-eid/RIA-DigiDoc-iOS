@@ -73,10 +73,15 @@ struct DecryptRootView: View {
                             .idCardViaNFC,
                             .idCardViaUSB
                         ],
+                        pinType: CodeType.pin1,
                         cryptoContainer: container,
                         onSuccess: { container in
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setSignedContainer(container)
+
+                            Toast.show(languageSettings.localized(
+                                "Container successfully decrypted"
+                            ))
                         }
                     )
                 }

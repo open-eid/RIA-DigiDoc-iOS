@@ -74,6 +74,7 @@ struct SigningRootView: View {
                             .mobileId,
                             .smartId
                         ],
+                        pinType: CodeType.pin2,
                         signedContainer: container,
                         onSuccess: { container in
                             sharedContainerViewModel.removeLastContainer()
