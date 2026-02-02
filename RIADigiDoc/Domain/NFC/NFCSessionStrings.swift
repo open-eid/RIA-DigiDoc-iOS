@@ -25,9 +25,9 @@ public struct NFCSessionStrings: Sendable {
     let step4Message: String
     let successMessage: String
     let canErrorMessage: String
-    let pin1WrongMultipleErrorMessage: String
-    let pin1WrongErrorMessage: String
-    let pin1BlockedErrorMessage: String
+    let pinWrongMultipleErrorMessage: String
+    let pinWrongErrorMessage: String
+    let pinBlockedErrorMessage: String
     let technicalErrorMessage: String
     let sessionErrorMessage: String
 }

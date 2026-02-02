@@ -506,7 +506,8 @@ extension Container {
     var nfcViewModel: Factory<NFCViewModel> {
         self { @MainActor in
             NFCViewModel(
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
     }
@@ -518,12 +519,6 @@ extension Container {
                 dataStore: self.dataStore()
             )
         }
-    }
-
-    @MainActor
-    var sharedNfcViewModel: Factory<SharedNFCViewModel> {
-        self { @MainActor in SharedNFCViewModel() }
-            .shared
     }
 
     @MainActor

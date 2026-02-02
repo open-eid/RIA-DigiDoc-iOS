@@ -18,9 +18,25 @@
  */
 
 import Foundation
-import LibdigidocLibSwift
 
-/// @mockable
-@MainActor
-public protocol SharedNFCViewModelProtocol: Sendable {
+public enum DecryptError: Error {
+    case containerFileInvalid
+    case recipientsEmpty
+    case cancelled
+    case unknown(Error)
+}
+
+extension DecryptError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .containerFileInvalid:
+            return "Container file is invalid"
+        case .recipientsEmpty:
+            return "No recipients found in container"
+        case .cancelled:
+            return "Operation cancelled by user"
+        case .unknown(let error):
+            return "Unknown error: \(error.localizedDescription)"
+        }
+    }
 }

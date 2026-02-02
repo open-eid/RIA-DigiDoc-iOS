@@ -25,6 +25,7 @@ import LibdigidocLibSwift
 import CommonsLib
 struct NFCView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
@@ -36,16 +37,18 @@ struct NFCView: View {
     @State private var rememberMe: Bool = true
     @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
+    @State private var showRoleView: Bool = false
+    @State private var roleData: RoleData?
 
     @State private var nfcActionMessage: String = "NFC hold card"
 
     @State private var viewModel: NFCViewModel
-    @State private var sharedNfcViewModel: SharedNFCViewModel
 
+    @State private var taskSign: Task<Void, Never>?
     @State private var taskDecrypt: Task<Void, Never>?
 
     private var isNFCSupported: Bool {
-        sharedNfcViewModel.isNFCSupported()
+        viewModel.isNFCSupported()
     }
 
     private var nfcErrorMessage: String {
@@ -102,7 +105,6 @@ struct NFCView: View {
         onSuccessDecrypt: @escaping (CryptoContainerProtocol) -> Void = { _ in }
     ) {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
-        _sharedNfcViewModel = State(wrappedValue: Container.shared.sharedNfcViewModel())
         self.actionType = actionType
         self.pinType = pinType
         self.actionMethods = actionMethods
@@ -121,6 +123,7 @@ struct NFCView: View {
             isInProgress: $isInProgress,
             onBackClick: {
                 cancelDecrypt()
+                cancelSigning()
                 guard isInProgress else {
                     dismiss()
                     return
@@ -136,9 +139,18 @@ struct NFCView: View {
                     }
                 case .signing:
                     saveInputData()
-
-                    // TODO: Implement signing action
                     isInProgress = true
+                    if !isNFCSupported {
+                        return
+                    }
+                    Task {
+                        let isRoleDataEnabled = await viewModel.isRoleDataEnabled()
+                        if isRoleDataEnabled {
+                            showRoleView = true
+                        } else {
+                            sign()
+                        }
+                    }
                 case .myeid:
                     saveInputData()
                     // TODO: Implement My eID personal data loading action
@@ -189,6 +201,46 @@ struct NFCView: View {
                 }
             }
         )
+        .alert(
+            languageSettings.localized(
+                viewModel.nfcAlertMessageKey ?? "",
+                viewModel.nfcAlertMessageExtraArguments
+            ),
+            isPresented: $viewModel.showNfcAlertMessage
+        ) {
+            Button(languageSettings.localized("OK")) {
+                viewModel.resetErrors()
+            }
+
+            if let messageUrl = viewModel.nfcAlertMessageUrl, !messageUrl.isEmpty {
+                Button(languageSettings.localized("Additional information")) {
+                    if let url = URL(string: languageSettings.localized(messageUrl)),
+                       UIApplication.shared.canOpenURL(url) {
+                        openURL(url)
+                    }
+                    viewModel.resetErrors()
+                    isInProgress = false
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showRoleView) {
+            RoleView(
+                onComplete: { roles, city, state, country, zipCode in
+                    showRoleView = false
+                    sign(
+                        roleData: RoleData(
+                            roles: roles
+                                .split(separator: ",")
+                                .map { $0.trimmingCharacters(in: .whitespaces) },
+                            city: city,
+                            state: state,
+                            country: country,
+                            zipCode: zipCode
+                        )
+                    )
+                }
+            )
+        }
         .onAppear {
             Task {
                 let inputData = await viewModel.getInputData()
@@ -199,6 +251,9 @@ struct NFCView: View {
         .onChange(of: viewModel.nfcErrorKey) { _, newKey in
             guard newKey != nil else { return }
             Toast.show(nfcErrorMessage)
+        }
+        .onDisappear {
+            cancelSigning()
         }
     }
 
@@ -226,6 +281,7 @@ struct NFCView: View {
             isInProgress = true
             nfcActionMessage = "NFC hold card"
 
+            let pinName = CodeType.pin1.name
             let strings = NFCSessionStrings(
                 initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
                 step1Message:
@@ -237,13 +293,13 @@ struct NFCView: View {
                 step4Message: languageSettings.localized("Decrypting in progress"),
                 successMessage: languageSettings.localized("Data read"),
                 canErrorMessage: languageSettings.localized("Wrong CAN"),
-                pin1WrongMultipleErrorMessage:
+                pinWrongMultipleErrorMessage:
                     languageSettings.localized(
                         "PIN verification error multiple",
-                        [CodeType.pin1.name, "2"]
+                        [pinName, "2"]
                     ),
-                pin1WrongErrorMessage: languageSettings.localized("PIN verification error one", [CodeType.pin1.name]),
-                pin1BlockedErrorMessage: languageSettings.localized("PIN blocked", [CodeType.pin1.name]),
+                pinWrongErrorMessage: languageSettings.localized("PIN verification error one", [pinName]),
+                pinBlockedErrorMessage: languageSettings.localized("PIN blocked", [pinName]),
                 technicalErrorMessage: languageSettings.localized("NFC technical error"),
                 sessionErrorMessage: languageSettings.localized("NFC session error")
             )
@@ -275,6 +331,74 @@ struct NFCView: View {
             .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
         taskDecrypt?.cancel()
         taskDecrypt = nil
+    }
+
+    private func cancelSigning() {
+        pinNumber.isEmpty ? () : (pinNumber.removeAll())
+        isActionEnabled = viewModel
+            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
+        taskSign?.cancel()
+        taskSign = nil
+    }
+
+    private func sign(roleData: RoleData? = nil) {
+        taskSign = Task {
+            guard let container = signedContainer else { return }
+
+            await viewModel.saveInputData(
+                canNumber: rememberMe ? canNumber : "",
+                rememberMe: rememberMe
+            )
+
+            isInProgress = true
+            nfcActionMessage = "NFC hold card"
+
+            let pinName = CodeType.pin2.name
+            let strings = NFCSessionStrings(
+                initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
+                step1Message:
+                    languageSettings.localized(
+                        "Hold your ID card against your smart device until the data is read"
+                    ),
+                step2Message: languageSettings.localized("Reading data please wait"),
+                step3Message: languageSettings.localized("Reading certificate"),
+                step4Message: languageSettings.localized("Signing in progress please wait"),
+                successMessage: languageSettings.localized("Signature added"),
+                canErrorMessage: languageSettings.localized("Wrong CAN"),
+                pinWrongMultipleErrorMessage:
+                    languageSettings.localized(
+                        "PIN verification error multiple",
+                        [pinName, "2"]
+                    ),
+                pinWrongErrorMessage: languageSettings.localized("PIN verification error one", [pinName]),
+                pinBlockedErrorMessage: languageSettings.localized("PIN blocked", [pinName]),
+                technicalErrorMessage: languageSettings.localized("NFC technical error"),
+                sessionErrorMessage: languageSettings.localized("NFC session error")
+            )
+
+            let updatedContainer = await viewModel.sign(
+                canNumber: canNumber,
+                pin2: pinNumber,
+                roleData: roleData ?? RoleData(
+                    roles: [],
+                    city: "",
+                    state: "",
+                    country: "",
+                    zipCode: ""
+                ),
+                signedContainer: container,
+                strings: strings
+            )
+            cancelSigning()
+            isInProgress = false
+
+            guard let container = updatedContainer else {
+                return
+            }
+
+            onSuccess(container)
+            dismiss()
+        }
     }
 }
 

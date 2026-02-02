@@ -41,14 +41,20 @@ public protocol NFCViewModelProtocol: Sendable {
 
     func resetErrors()
 
-    func sign() async -> SignedContainerProtocol?
-
     func decrypt(
         CAN: String,
         pin1: String,
         cryptoContainer: CryptoContainerProtocol?,
         strings: NFCSessionStrings
     ) async -> CryptoContainerProtocol?
+
+    func sign(
+        canNumber: String,
+        pin2: String,
+        roleData: RoleData,
+        signedContainer: SignedContainerProtocol,
+        strings: NFCSessionStrings
+    ) async -> SignedContainerProtocol?
 
     func loadPersonalData()
 
