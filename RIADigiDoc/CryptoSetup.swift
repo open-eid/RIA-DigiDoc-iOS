@@ -108,7 +108,7 @@ actor CryptoSetup: CryptoSetupProtocol {
         await CDoc2Setting.setEncryptionEnabled(
             await dataStore.getUseCdoc2Encryption(defaultUseCdoc2Encryption)
         )
-        
+
         var defaultUseCdoc2Online = Constants.CryptoDefaultValues.encryptionUseKeyTransfer
         if let useCdoc2Online = configurationProvider?.cdoc2UseKeyserver {
             defaultUseCdoc2Online = useCdoc2Online
@@ -116,7 +116,7 @@ actor CryptoSetup: CryptoSetupProtocol {
         await CDoc2Setting.setOnlineEncryptionEnabled(
             await dataStore.getEncryptionUseKeyTransfer(defaultUseCdoc2Online)
         )
-        
+
         if let cdoc2UUID = configurationProvider?.cdoc2DefaultKeyserver {
             let serverInfo = await dataStore.getEncryptionServerInfo(cdoc2UUID)
             await CDoc2Setting.setUUID(serverInfo.uuid)
@@ -126,14 +126,14 @@ actor CryptoSetup: CryptoSetupProtocol {
         if let cdoc2Conf = configurationProvider?.cdoc2Conf {
             await CDoc2Setting.setCDoc2Conf(cdoc2Conf)
         }
-        
+
         let proxyInfo = await proxyUtil.getProxyInfo()
         await CDoc2Setting.setProxyInfo(proxyInfo)
-        
+
         if let certBundle = configurationProvider?.certBundle {
             await CDoc2Setting.setCertBundle(certBundle)
         }
-        
+
         if let certData {
             await CDoc2Setting.setCert(certData)
         }
