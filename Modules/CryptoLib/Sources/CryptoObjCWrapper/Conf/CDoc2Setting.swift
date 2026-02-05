@@ -30,9 +30,11 @@ public final class CDoc2Setting: NSObject, Sendable, Loggable {
     @objc @MainActor static public var getFetchURL: String = Constants.CryptoDefaultValues.encryptionServerInfoFetchURL
     @objc @MainActor static public var getPostURL: String = Constants.CryptoDefaultValues.encryptionServerInfoPostURL
 
+    @MainActor static public var proxyInfo: ProxyInfo?
+
     @MainActor static public var cdoc2Conf: [String: ConfigurationProvider.CDOC2Conf] = [:]
 
-    @MainActor @objc static public var getCert: Data = Data()
+    @MainActor @objc static public var cert: Data = Data()
 
     @MainActor @objc public static var cdoc2Certs = [Data]()
 
@@ -66,10 +68,20 @@ public final class CDoc2Setting: NSObject, Sendable, Loggable {
        Self.cdoc2Conf = val
     }
 
-    @objc public static let kProxyHost = "kProxyHost"
-    @objc public static let kProxyPort = "kProxyPort"
-    @objc public static let kProxyUsername = "kProxyUsername"
-    @objc public static let kProxyPassword = "kProxyPassword"
+    @MainActor
+    public static func setProxyInfo(_ val: ProxyInfo) {
+        Self.proxyInfo = val
+    }
+
+    @MainActor
+    public static func setCertBundle(_ val: [Data]) {
+        Self.cdoc2Certs = val
+    }
+
+    @MainActor
+    public static func setCert(_ val: Data) {
+        Self.cert = val
+    }
 
     @objc @MainActor public static func getEncryptionServerInfoFetchURL(domain: String) -> String? {
         let conf = cdoc2Conf[domain]
@@ -87,47 +99,17 @@ public final class CDoc2Setting: NSObject, Sendable, Loggable {
         return self.getPostURL
     }
 
-    @objc public static func proxyCredentials() -> [String: Any]? {
-        guard let result = findProxy(withData: true),
-              let host = result[kSecAttrServer as String] as? String,
-              let port = result[kSecAttrPort as String] as? Int,
-              let username = result[kSecAttrAccount as String] as? String,
-              let passwordData = result[kSecValueData as String] as? Data,
-              let password = String(data: passwordData, encoding: .utf8) else {
-            return nil
-        }
+    @objc public static let kProxyHost = "kProxyHost"
+    @objc public static let kProxyPort = "kProxyPort"
+    @objc public static let kProxyUsername = "kProxyUsername"
+    @objc public static let kProxyPassword = "kProxyPassword"
+
+    @objc @MainActor public static func proxyCredentials() -> [String: Any]? {
         return [
-            "kProxyHost": host,
-            "kProxyPort": port,
-            "kProxyUsername": username,
-            "kProxyPassword": password
+            kProxyHost: proxyInfo?.host ?? "",
+            kProxyPort: proxyInfo?.port ?? 80,
+            kProxyUsername: proxyInfo?.username ?? "",
+            kProxyPassword: proxyInfo?.password ?? ""
         ]
     }
-
-        private static func findProxy(withData data: Bool = false) -> [String: Any]? {
-            let returnData: CFBoolean = data ? kCFBooleanTrue : kCFBooleanFalse
-
-            let query: [CFString: Any] = [
-                kSecClass: kSecClassInternetPassword,
-                kSecAttrLabel: "proxy" as CFString,
-                kSecReturnAttributes: kCFBooleanTrue as CFBoolean,
-                kSecReturnData: returnData,
-                kSecMatchLimit: kSecMatchLimitOne
-            ]
-
-            var item: CFTypeRef?
-            let status = SecItemCopyMatching(query as CFDictionary, &item)
-
-            switch status {
-            case errSecSuccess:
-                return item as? [String: Any]
-            case errSecItemNotFound:
-                return nil
-            default:
-                let message = SecCopyErrorMessageString(status, nil) as String? ?? "Unknown error"
-                logger().error("Keychain lookup failed (\(status)): \(message)")
-                return nil
-            }
-        }
-
 }

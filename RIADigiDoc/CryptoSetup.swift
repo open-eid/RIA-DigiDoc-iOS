@@ -25,13 +25,16 @@ import ConfigLib
 
 actor CryptoSetup: CryptoSetupProtocol {
     private let dataStore: DataStoreProtocol
+    private let proxyUtil: ProxyUtilProtocol
     private let ldapConfiguration: LdapConfigurationProtocol
 
     init(
         dataStore: DataStoreProtocol,
+        proxyUtil: ProxyUtilProtocol,
         ldapConfiguration: LdapConfigurationProtocol
     ) {
         self.dataStore = dataStore
+        self.proxyUtil = proxyUtil
         self.ldapConfiguration = ldapConfiguration
     }
 
@@ -97,7 +100,7 @@ actor CryptoSetup: CryptoSetupProtocol {
         }
     }
 
-    public func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?) async {
+    public func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?, _ certData: Data? = nil) async {
         var defaultUseCdoc2Encryption = Constants.CryptoDefaultValues.encryptionUseCdoc2
         if let useCdoc2Encryption = configurationProvider?.cdoc2Default {
             defaultUseCdoc2Encryption = useCdoc2Encryption
@@ -122,6 +125,17 @@ actor CryptoSetup: CryptoSetupProtocol {
         }
         if let cdoc2Conf = configurationProvider?.cdoc2Conf {
             await CDoc2Setting.setCDoc2Conf(cdoc2Conf)
+        }
+
+        let proxyInfo = await proxyUtil.getProxyInfo()
+        await CDoc2Setting.setProxyInfo(proxyInfo)
+
+        if let certBundle = configurationProvider?.certBundle {
+            await CDoc2Setting.setCertBundle(certBundle)
+        }
+
+        if let certData {
+            await CDoc2Setting.setCert(certData)
         }
     }
 

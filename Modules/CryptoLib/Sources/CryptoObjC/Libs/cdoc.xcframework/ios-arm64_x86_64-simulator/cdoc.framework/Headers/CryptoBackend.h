@@ -36,8 +36,8 @@ struct Lock;
  * - decryptRSA for RSA keys
  * - getSecret for symmetric keys.
  *
- * ECC and symmetric keys have also frontend methods; implementing these allows the program to perform certain cryptographic procedures in controlled
- * environment and (in case of symmetric keys) avoid exposing secret keys/passwords.
+ * ECC and symmetric keys have also frontend methods; implementing these allows the program to perform certain cryptographic procedures in secure
+ * environment and (in case of symmetric keys) avoid exposing secret keys/passwords to library code.
  */
 struct CDOC_EXPORT CryptoBackend {
 	static constexpr int INVALID_PARAMS = -201;

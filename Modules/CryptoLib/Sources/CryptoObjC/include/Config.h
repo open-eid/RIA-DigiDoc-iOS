@@ -57,7 +57,7 @@ struct Network: public libcdoc::NetworkBackend {
         for (NSData *cert in CDoc2Setting.cdoc2Certs) {
             dst.push_back([cert toVector]);
         }
-        if (auto cert = [CDoc2Setting.getCert toVector]; !cert.empty()) {
+        if (auto cert = [CDoc2Setting.cert toVector]; !cert.empty()) {
             dst.push_back(std::move(cert));
         }
         return libcdoc::OK;
@@ -65,12 +65,15 @@ struct Network: public libcdoc::NetworkBackend {
 
     libcdoc::result_t getProxyCredentials(ProxyCredentials &cred) const final {
         if (NSDictionary<NSString *, id> *data = [CDoc2Setting proxyCredentials]) {
-            cred = {
-                .host = [(NSString*)data[CDoc2Setting.kProxyHost] toString],
-                .port = [data[CDoc2Setting.kProxyPort] unsignedShortValue],
-                .username = [(NSString*)data[CDoc2Setting.kProxyUsername] toString],
-                .password = [(NSString*)data[CDoc2Setting.kProxyPassword] toString]
-            };
+            NSString * proxyHost = (NSString*)data[CDoc2Setting.kProxyHost];
+            if (proxyHost.length > 0) {
+                cred = {
+                    .host = [(NSString*)data[CDoc2Setting.kProxyHost] toString],
+                    .port = [data[CDoc2Setting.kProxyPort] unsignedShortValue],
+                    .username = [(NSString*)data[CDoc2Setting.kProxyUsername] toString],
+                    .password = [(NSString*)data[CDoc2Setting.kProxyPassword] toString]
+                };
+            }
         }
         return libcdoc::OK;
     }

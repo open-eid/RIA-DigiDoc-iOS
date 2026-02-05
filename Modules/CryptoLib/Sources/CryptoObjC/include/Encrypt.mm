@@ -57,7 +57,18 @@ public:
         NSString *nsMsg  = NSStringFromStringView(message);
         NSString *nsLvl  = NSStringFromLogLevel(level);
 
-        NSLog(@"CryptoContainer: %@:%d %@ %@",
+        static NSDateFormatter *formatter;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            formatter = [[NSDateFormatter alloc] init];
+            formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
+        });
+
+        NSString *timeString = [formatter stringFromDate:[NSDate date]];
+
+        NSLog(@"[%@] CryptoContainer: %@:%d %@ %@",
+              timeString,
               nsFile.length ? nsFile : @"<unknown>",
               line,
               nsLvl,

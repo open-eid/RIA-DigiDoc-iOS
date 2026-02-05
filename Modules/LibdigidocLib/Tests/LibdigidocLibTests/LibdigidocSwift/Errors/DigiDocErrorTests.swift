@@ -33,7 +33,7 @@ final class DigiDocErrorTests {
 
         #expect(errorDetail.message == retrievedDetail.message)
         #expect(errorDetail.code == retrievedDetail.code)
-        #expect(retrievedDetail.userInfo as? [String : String] == ["key": "value"])
+        #expect(retrievedDetail.userInfo as? [String: String] == ["key": "value"])
     }
 
     @Test
