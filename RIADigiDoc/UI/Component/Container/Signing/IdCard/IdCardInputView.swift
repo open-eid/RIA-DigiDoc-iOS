@@ -20,6 +20,7 @@
 import SwiftUI
 import FactoryKit
 import IdCardLib
+import CommonsLib
 
 struct IdCardInputView: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -27,60 +28,101 @@ struct IdCardInputView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @Binding var isActionEnabled: Bool
+    private var pinError: String?
 
+    @Binding var isActionEnabled: Bool
+    let personIdentifier: String
     @Binding var pinNumber: String
-    @Binding var pinError: String?
-    var pinType: CodeType?
+    var actionType: ActionType
+    var pinType: CodeType
 
     let onInputChange: () -> Void
 
     private var pinNumberTitle: String {
-        languageSettings.localized("PIN code", [pinType?.name ?? ""])
+        languageSettings.localized("PIN code", [pinType.name])
+    }
+
+    private var actionMessage: String {
+        let messageKey = actionType == .decrypt
+            ? "Ready to decrypt message"
+            : "Ready to sign message"
+
+        return languageSettings.localized(messageKey)
+    }
+
+    private var pinLengthRequirementMessage: String {
+        languageSettings.localized(
+            "PIN length requirement",
+            [pinType.name, String(pinType.minimumLength), String(Constants.Validation.PinMaximumLength)]
+        )
+    }
+
+    private var isPinError: Bool {
+        let hasPinErrorText = !(pinError?.isEmpty ?? true)
+
+        let pinLength = pinNumber.count
+        let isPinLengthInvalid =
+            pinLength < pinType.minimumLength ||
+            pinLength > Constants.Validation.PinMaximumLength
+
+        return hasPinErrorText || isPinLengthInvalid
     }
 
     init(
+        personIdentifier: String,
         isActionEnabled: Binding<Bool>,
         pinNumber: Binding<String>,
-        pinError: Binding<String?>,
-        pinType: CodeType?,
+        actionType: ActionType,
+        pinType: CodeType,
         onInputChange: @escaping () -> Void
     ) {
+        self.personIdentifier = personIdentifier
         self._isActionEnabled = isActionEnabled
         self._pinNumber = pinNumber
-        self._pinError = pinError
+        self.actionType = actionType
         self.pinType = pinType
         self.onInputChange = onInputChange
-    }
+   }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
-                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                    FloatingLabelTextField(
-                        title: pinNumberTitle,
-                        placeholder: pinNumberTitle,
-                        text: $pinNumber,
-                        isSecure: true,
-                        isError: !(pinError?.isEmpty ?? true),
-                        errorText: pinError ?? "",
-                        keyboardType: .numberPad
-                    )
-                    .onChange(of: pinNumber) {
-                        onInputChange()
-                    }
-                }
+        VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
+            Text(verbatim: actionMessage)
+                .font(typography.labelLarge)
+                .foregroundStyle(theme.onSurfaceVariant)
+
+            Text(verbatim: personIdentifier)
+                .font(typography.bodyLarge)
+                .foregroundStyle(theme.onSurface)
+
+            FloatingLabelTextField(
+                title: pinNumberTitle,
+                placeholder: pinNumberTitle,
+                text: $pinNumber,
+                isSecure: true,
+                isError: isPinError,
+                errorText: pinError ?? "",
+                keyboardType: .numberPad,
+                identifier: "idCardPinNumberField"
+            )
+            .onChange(of: pinNumber) {
+                onInputChange()
             }
-            .padding(.vertical, Dimensions.Padding.MPadding)
+
+            if isPinError {
+                Text(verbatim: pinLengthRequirementMessage)
+                    .font(typography.bodySmall)
+                    .foregroundStyle(theme.error)
+            }
         }
     }
 }
 
 #Preview {
     IdCardInputView(
+        personIdentifier: "Test User, 12345678901",
         isActionEnabled: .constant(true),
         pinNumber: .constant("123"),
-        pinError: .constant(nil),
+        actionType: .signing,
         pinType: CodeType.pin2,
         onInputChange: {},
     )

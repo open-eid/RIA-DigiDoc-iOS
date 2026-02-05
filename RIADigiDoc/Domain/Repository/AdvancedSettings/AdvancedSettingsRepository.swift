@@ -59,7 +59,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol, Loggable {
         certificateBaseName: String
     ) throws -> URL? {
         let certCacheDirectory = try Directories.getCacheDirectory(
-            subfolder: certificateFolder,
+            subfolders: [certificateFolder],
             fileManager: fileManager
         )
         guard fileManager.fileExists(atPath: certCacheDirectory.resolvedPath) else { return nil }
@@ -93,7 +93,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol, Loggable {
     ) async -> Data? {
         do {
             let certCacheDirectory = try Directories.getCacheDirectory(
-                subfolder: certificateFolder,
+                subfolders: [certificateFolder],
                 fileManager: fileManager
             )
 
@@ -134,7 +134,7 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol, Loggable {
     public func removeAllCertFiles(certificateFolders: [String]) async throws {
         for certificateFolder in certificateFolders {
             let certCacheDirectory = try Directories.getCacheDirectory(
-                subfolder: certificateFolder,
+                subfolders: [certificateFolder],
                 fileManager: fileManager
             )
             try removeAllCertFiles(certCacheDirectory: certCacheDirectory)

@@ -17,7 +17,7 @@
  *
  */
 
-public struct NFCSessionStrings {
+public struct NFCSessionStrings: Sendable {
     let initialMessage: String
     let step1Message: String
     let step2Message: String

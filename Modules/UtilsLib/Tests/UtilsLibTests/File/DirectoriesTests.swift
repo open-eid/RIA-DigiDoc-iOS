@@ -149,7 +149,10 @@ struct DirectoriesTests {
         mockFileManager.urlHandler = { _, _, _, _ in cacheDirectory }
         mockFileManager.fileExistsHandler = { _ in true }
 
-        let directory = try Directories.getCacheDirectory(subfolder: subfolder, fileManager: mockFileManager)
+        let directory = try Directories.getCacheDirectory(
+            subfolders: [subfolder],
+            fileManager: mockFileManager
+        )
 
         #expect(expectedDir == directory)
         #expect(mockFileManager.createDirectoryCallCount == 0)
@@ -166,7 +169,10 @@ struct DirectoriesTests {
         mockFileManager.urlHandler = { _, _, _, _ in cacheDirectory }
         mockFileManager.fileExistsHandler = { _ in false }
 
-        let directory = try Directories.getCacheDirectory(subfolder: subfolder, fileManager: mockFileManager)
+        let directory = try Directories.getCacheDirectory(
+            subfolders: [subfolder],
+            fileManager: mockFileManager
+        )
 
         #expect(expectedDir == directory)
         #expect(mockFileManager.createDirectoryCallCount == 1)
@@ -203,7 +209,7 @@ struct DirectoriesTests {
         }
 
         let result = try Directories.getCacheDirectory(
-            subfolder: "existingFolder",
+            subfolders: ["existingFolder"],
             fileManager: mockFileManager
         )
 

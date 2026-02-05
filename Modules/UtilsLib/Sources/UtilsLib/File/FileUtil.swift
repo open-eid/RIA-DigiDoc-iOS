@@ -285,7 +285,7 @@ public struct FileUtil: FileUtilProtocol, Loggable {
         FileUtil.logger().debug("Removing saved files directory")
         do {
             let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                subfolders: [CommonsLib.Constants.Folder.SavedFiles],
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)

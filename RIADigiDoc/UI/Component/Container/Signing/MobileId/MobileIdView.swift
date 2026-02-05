@@ -52,7 +52,7 @@ struct MobileIdView: View {
 
     var body: some View {
         ActionInputScreen(
-            selectedActionMethod: ActionMethod.mobileId.rawValue,
+            selectedActionMethod: .mobileId,
             isActionEnabled: $isSigningEnabled,
             isInProgress: $isSigning,
             onBackClick: {

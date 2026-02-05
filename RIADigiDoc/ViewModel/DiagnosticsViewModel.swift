@@ -223,7 +223,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         do {
 
             let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.Logs,
+                subfolders: [CommonsLib.Constants.Folder.Logs],
                 fileManager: fileManager
             )
             let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
@@ -242,7 +242,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     func removeLogFilesDirectory() {
         do {
             let directory = try Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.Logs,
+                subfolders: [CommonsLib.Constants.Folder.Logs],
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)

@@ -30,9 +30,11 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     private let idCardRepository: IdCardRepositoryProtocol
     private let sharedMyEidSession: SharedMyEidSessionProtocol
     private let certificateUtil: CertificateUtilProtocol
+    private let nameUtil: NameUtilProtocol
 
     var errorMessage: String?
     var errorExtraArguments: [String] = []
+    var shouldDismissForError = false
 
     var pinNumberErrorKey: String?
     var pinNumberErrorExtraArguments: [String] = []
@@ -44,11 +46,13 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     init(
         idCardRepository: IdCardRepositoryProtocol,
         sharedMyEidSession: SharedMyEidSessionProtocol,
-        certificateUtil: CertificateUtilProtocol
+        certificateUtil: CertificateUtilProtocol,
+        nameUtil: NameUtilProtocol
     ) {
         self.idCardRepository = idCardRepository
         self.sharedMyEidSession = sharedMyEidSession
         self.certificateUtil = certificateUtil
+        self.nameUtil = nameUtil
     }
 
     func startDiscoveringReaders() async {
@@ -130,6 +134,12 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
 
     func resetErrors() {
         errorMessage = nil
+        errorExtraArguments = []
+        shouldDismissForError = false
+    }
+
+    func formatPersonalIdentifier(givenName: String, surname: String, personalCode: String) -> String {
+        return "\(nameUtil.formatName("\(givenName) \(surname)")), \(personalCode)"
     }
 
     private func getPublicData() async throws -> CardInfo {
@@ -201,6 +211,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         case .cancelledByUser:
             errorMessage = nil
             errorExtraArguments = []
+            shouldDismissForError = true
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
                 errorMessage = "PIN verification error multiple"
@@ -211,13 +222,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             } else {
                 errorMessage = "PIN blocked"
                 errorExtraArguments = [pinType.name]
+                shouldDismissForError = true
             }
         case .sessionError:
             errorMessage = "General error"
             errorExtraArguments = []
+            shouldDismissForError = true
         default:
             errorMessage = "General error"
             errorExtraArguments = []
+            shouldDismissForError = true
         }
     }
 

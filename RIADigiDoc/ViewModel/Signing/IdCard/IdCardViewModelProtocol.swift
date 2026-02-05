@@ -33,4 +33,5 @@ public protocol IdCardViewModelProtocol: Sendable {
     ) async -> CryptoContainerProtocol?
     func getIdCardData() async -> IdCardData?
     func resetErrors()
+    func formatPersonalIdentifier(givenName: String, surname: String, personalCode: String) -> String
 }

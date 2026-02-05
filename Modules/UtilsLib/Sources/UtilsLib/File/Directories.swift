@@ -70,7 +70,7 @@ public struct Directories {
     }
 
     public static func getCacheDirectory(
-        subfolder: String = "",
+        subfolders: [String] = [],
         fileManager: FileManagerProtocol
     ) throws -> URL {
         var cacheDirectory = try fileManager.url(
@@ -80,7 +80,7 @@ public struct Directories {
             create: false)
             .appending(path: BundleUtil.getBundleIdentifier(), directoryHint: .isDirectory)
 
-        if !subfolder.isEmpty {
+        for subfolder in subfolders {
             cacheDirectory = cacheDirectory.appending(path: subfolder, directoryHint: .isDirectory)
         }
 

@@ -424,7 +424,8 @@ extension Container {
             IdCardViewModel(
                 idCardRepository: self.idCardRepository(),
                 sharedMyEidSession: self.sharedMyEidSession(),
-                certificateUtil: self.certificateUtil()
+                certificateUtil: self.certificateUtil(),
+                nameUtil: self.nameUtil()
             )
         }
     }

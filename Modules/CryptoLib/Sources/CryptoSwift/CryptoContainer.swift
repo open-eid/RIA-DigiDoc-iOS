@@ -166,7 +166,7 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
     public func saveDataFile(dataFile: URL, to directory: URL?) async throws -> URL {
         let sanitizedName = dataFile.lastPathComponent.sanitized()
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
-            subfolder: CommonsLib.Constants.Folder.SavedFiles,
+            subfolders: [CommonsLib.Constants.Folder.SavedFiles],
             fileManager: fileManager
         )
         let file = savedFilesDirectory.appending(path: sanitizedName)
@@ -283,16 +283,15 @@ extension CryptoContainer {
             let sanitizedName = dataFile.key.sanitized()
 
             let destinationPath = try Directories.getCacheDirectory(
-                subfolder: Constants.Folder.SignedContainerFolder,
+                subfolders: [Constants.Folder.CryptoContainerFolder, Constants.Folder.Temp],
                 fileManager: fileManager
-            ).appending(path: Constants.Folder.Temp, directoryHint: .isDirectory)
+            )
 
-            let fileUrl = destinationPath.appending(path: sanitizedName)
+            let fileUrl = destinationPath.appending(path: sanitizedName, directoryHint: .notDirectory)
 
             cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.resolvedPath))
             urlDataFiles.append(fileUrl)
-            let isCreated =
-            fileManager.createFile(
+            let isCreated = fileManager.createFile(
                 atPath: fileUrl.resolvedPath, contents: dataFile.value, attributes: nil
             )
 

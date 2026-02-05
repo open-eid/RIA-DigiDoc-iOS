@@ -53,7 +53,7 @@ struct SmartIdView: View {
 
     var body: some View {
         ActionInputScreen(
-            selectedActionMethod: ActionMethod.smartId.rawValue,
+            selectedActionMethod: .smartId,
             isActionEnabled: $isSigningEnabled,
             isInProgress: $isSigning,
             onBackClick: {

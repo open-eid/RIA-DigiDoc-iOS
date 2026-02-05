@@ -58,8 +58,8 @@ public class OperationSignHash: NSObject {
         let stepMessages = [
             "Please place your ID card against the smart device",
             "Hold your ID card against your smart device until the data is read",
-            "Reading data please wait",
-            "Signing in progress please wait"
+            "Reading data",
+            "Signing in progress"
         ]
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
