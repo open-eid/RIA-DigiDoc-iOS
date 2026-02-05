@@ -117,7 +117,7 @@ actor LibrarySetup: Loggable {
 
             await cryptoSetup.setLdapConfig(configurationProvider)
             await cryptoSetup.setCdoc2Config(configurationProvider)
-            await cryptoSetup.setCdoc2Settings(configurationProvider)
+            await cryptoSetup.setCdoc2Settings(configurationProvider, nil)
 
             try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {

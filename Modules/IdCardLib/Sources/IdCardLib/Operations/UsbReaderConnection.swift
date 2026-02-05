@@ -174,7 +174,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
             throw IdCardInternalError.readerProcessFailed
         }
 
-        return await handler.canChangePUK
+        return handler.canChangePUK
     }
 
     public func changeCode(_ codeType: CodeType, to newCode: Data, verifyCode: Data) async throws {
@@ -259,17 +259,17 @@ private final class UsbReaderInterfaceHandler: NSObject, ReaderInterfaceDelegate
             do {
                 let contextHandle = await usbReaderConnection.getHandle()
 
-                guard attached, let reader = try await CardReaderiR301(contextHandle: contextHandle) else {
+                guard attached, let reader = try CardReaderiR301(contextHandle: contextHandle) else {
                     return await usbReaderConnection.updateStatus(.sReaderConnected)
                 }
 
                 let handler: CardCommands?
 
                 do {
-                    if let idemia = await Idemia(reader: reader, atr: reader.atr) {
+                    if let idemia = Idemia(reader: reader, atr: reader.atr) {
                         handler = idemia
                     } else {
-                        handler = try await Thales(reader: reader, atr: reader.atr)
+                        handler = try Thales(reader: reader, atr: reader.atr)
                     }
                 } catch {
                     UsbReaderInterfaceHandler.logger().error("ID-CARD: Unable to connect card. \(error)")

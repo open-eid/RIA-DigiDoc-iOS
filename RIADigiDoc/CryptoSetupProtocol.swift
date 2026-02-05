@@ -24,5 +24,5 @@ import ConfigLib
 public protocol CryptoSetupProtocol: Sendable {
     func setLdapConfig(_ configurationProvider: ConfigurationProvider?) async
     func setCdoc2Config(_ configurationProvider: ConfigurationProvider?) async
-    func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?) async
+    func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?, _ certData: Data?) async
 }

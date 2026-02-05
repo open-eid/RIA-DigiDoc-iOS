@@ -57,10 +57,16 @@ enum {
     NOT_SUPPORTED = -101,
     /**
      * @brief Conflicting or invalid arguments for a method
+     * 
+     * This does not set CDocReader/CDocWriter into error state - so invoking subsequent methods
+     * with correct arguments will succeed
      */
     WRONG_ARGUMENTS = -102,
     /**
      * @brief Components of multi-method workflow are called in wrong order
+     * 
+     * This does not set CDocReader/CDocWriter into error state - so invoking subsequent methods
+     * in correct order will succeed
      */
     WORKFLOW_ERROR = -103,
     /**
@@ -85,6 +91,9 @@ enum {
     INPUT_STREAM_ERROR = -108,
     /**
      * @brief The supplied decryption key is wrong
+     * 
+     * This does not set CDocReader/CDocWriter into error state - so invoking subsequent methods
+     * with correct key will succeed
      */
     WRONG_KEY = -109,
     /**

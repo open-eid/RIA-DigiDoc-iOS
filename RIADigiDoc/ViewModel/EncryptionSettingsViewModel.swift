@@ -19,6 +19,7 @@
 
 import CommonsLib
 import ConfigLib
+import CryptoObjCWrapper
 import Foundation
 import UtilsLib
 
@@ -174,7 +175,7 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Loggable
             serverInfo.postURL = serverInfo.postURL.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         await dataStore.setEncryptionServerInfo(serverInfo)
-        await cryptoSetup.setCdoc2Settings(configuration)
+        await cryptoSetup.setCdoc2Settings(configuration, certData)
     }
 
     // MARK: - Cert Info Getters

@@ -412,6 +412,7 @@ struct EncryptView: View {
                                 ))
 
                                 encryptionButtonEnabled = true
+                                isWithEncryption = false
                             } else if isWithDecryption {
                                 await updateAsyncLabels()
                                 await viewModel.updateAsyncProperties()
@@ -419,6 +420,7 @@ struct EncryptView: View {
                                 Toast.show(languageSettings.localized(
                                     "Container successfully decrypted"
                                 ))
+                                isWithDecryption = false
                             } else {
                                 await viewModel.loadContainerData(
                                     cryptoContainer: nil

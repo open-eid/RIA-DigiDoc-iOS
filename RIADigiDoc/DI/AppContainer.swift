@@ -49,6 +49,7 @@ extension Container {
         self { @MainActor in
             CryptoSetup(
                 dataStore: self.dataStore(),
+                proxyUtil: self.proxyUtil(),
                 ldapConfiguration: self.ldapConfiguration()
             )
         }
