@@ -28,11 +28,9 @@ struct IdCardInputView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    private var pinError: String?
-
-    @Binding var isActionEnabled: Bool
     let personIdentifier: String
     @Binding var pinNumber: String
+    @Binding var pinError: String
     var actionType: ActionType
     var pinType: CodeType
 
@@ -50,35 +48,21 @@ struct IdCardInputView: View {
         return languageSettings.localized(messageKey)
     }
 
-    private var pinLengthRequirementMessage: String {
-        languageSettings.localized(
-            "PIN length requirement",
-            [pinType.name, String(pinType.minimumLength), String(Constants.Validation.PinMaximumLength)]
-        )
-    }
-
     private var isPinError: Bool {
-        let hasPinErrorText = !(pinError?.isEmpty ?? true)
-
-        let pinLength = pinNumber.count
-        let isPinLengthInvalid =
-            pinLength < pinType.minimumLength ||
-            pinLength > Constants.Validation.PinMaximumLength
-
-        return hasPinErrorText || isPinLengthInvalid
+        !pinError.isEmpty
     }
 
     init(
         personIdentifier: String,
-        isActionEnabled: Binding<Bool>,
         pinNumber: Binding<String>,
+        pinError: Binding<String>,
         actionType: ActionType,
         pinType: CodeType,
         onInputChange: @escaping () -> Void
     ) {
         self.personIdentifier = personIdentifier
-        self._isActionEnabled = isActionEnabled
         self._pinNumber = pinNumber
+        self._pinError = pinError
         self.actionType = actionType
         self.pinType = pinType
         self.onInputChange = onInputChange
@@ -100,7 +84,6 @@ struct IdCardInputView: View {
                 text: $pinNumber,
                 isSecure: true,
                 isError: isPinError,
-                errorText: pinError ?? "",
                 keyboardType: .numberPad,
                 identifier: "idCardPinNumberField"
             )
@@ -109,7 +92,7 @@ struct IdCardInputView: View {
             }
 
             if isPinError {
-                Text(verbatim: pinLengthRequirementMessage)
+                Text(verbatim: pinError)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
             }
@@ -120,8 +103,8 @@ struct IdCardInputView: View {
 #Preview {
     IdCardInputView(
         personIdentifier: "Test User, 12345678901",
-        isActionEnabled: .constant(true),
         pinNumber: .constant("123"),
+        pinError: .constant("PIN length requirement"),
         actionType: .signing,
         pinType: CodeType.pin2,
         onInputChange: {},

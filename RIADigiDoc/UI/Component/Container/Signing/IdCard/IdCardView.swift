@@ -55,6 +55,16 @@ struct IdCardView: View {
         )
     }
 
+    private var pinNumberError: Binding<String> {
+        Binding(
+            get: { languageSettings.localized(
+                viewModel.pinNumberErrorKey ?? "",
+                viewModel.pinNumberErrorExtraArguments
+            ) },
+            set: { _ in }
+        )
+    }
+
     private var personIdentifier: String {
         let publicData = idCardData?.publicData
         guard let personData = publicData else { return "" }
@@ -175,8 +185,8 @@ struct IdCardView: View {
                 } else if isInProgress && isShowingPinView {
                     IdCardInputView(
                         personIdentifier: personIdentifier,
-                        isActionEnabled: $isActionEnabled,
                         pinNumber: $pinNumber,
+                        pinError: pinNumberError,
                         actionType: actionType,
                         pinType: pinCodeType,
                         onInputChange: {
