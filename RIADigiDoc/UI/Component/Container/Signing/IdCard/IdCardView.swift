@@ -134,6 +134,8 @@ struct IdCardView: View {
                                 cryptoContainer: container,
                             )
 
+                            pinNumber = ""
+
                             let shouldDismiss = viewModel.shouldDismissForError
 
                             guard let container = decryptedContainer else {

@@ -5677,7 +5677,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ID-kaart on valmis allkirjastamiseks"
+            "value" : "ID-kaart on valmis dekrüpteerimiseks"
           }
         }
       }
@@ -5695,7 +5695,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ID-kaart on valmis dekrüpteerimiseks"
+            "value" : "ID-kaart on valmis allkirjastamiseks"
           }
         }
       }
