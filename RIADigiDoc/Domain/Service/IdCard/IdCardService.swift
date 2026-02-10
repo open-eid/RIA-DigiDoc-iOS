@@ -43,6 +43,10 @@ actor IdCardService: IdCardServiceProtocol {
         return try await usbReaderConnection.getPublicData()
     }
 
+    public func getCardHandler() async throws -> CardCommands {
+        return try await usbReaderConnection.getCardHandler()
+    }
+
     func readAuthenticationCertificate() async throws -> Data {
         return try await usbReaderConnection.readAuthenticationCertificate()
     }

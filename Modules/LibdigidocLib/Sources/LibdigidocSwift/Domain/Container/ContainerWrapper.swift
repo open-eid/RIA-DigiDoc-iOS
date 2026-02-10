@@ -67,7 +67,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     @MainActor
     public func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
-            subfolder: CommonsLib.Constants.Folder.SavedFiles,
+            subfolders: [CommonsLib.Constants.Folder.SavedFiles],
             fileManager: fileManager
         )
 

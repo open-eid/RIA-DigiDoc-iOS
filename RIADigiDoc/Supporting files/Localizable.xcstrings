@@ -145,20 +145,20 @@
         }
       }
     },
-    "Authentication in progress please wait" : {
+    "Authentication in progress" : {
       "comment" : "OperationAuthenticateWithWebEID alert message 4",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authentication in progress, please wait."
+            "value" : "Authentication in progress. Please wait."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autentimine käib, palun oodake."
+            "value" : "Autentimine käib. Palun oodake."
           }
         }
       }
@@ -1110,20 +1110,20 @@
         }
       }
     },
-    "Decrypting in progress please wait" : {
+    "Decrypting in progress" : {
       "comment" : "NFC decrypt alert message step 4",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decrypting in progress, please wait."
+            "value" : "Decrypting in progress. Please wait."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dekrüpteerimine käib, palun oodake."
+            "value" : "Dekrüpteerimine käib. Palun oodake."
           }
         }
       }
@@ -5646,20 +5646,56 @@
         }
       }
     },
-    "Reading data please wait" : {
+    "Reading data" : {
       "comment" : "NFC alert message, step 3",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reading data, please wait."
+            "value" : "Reading data. Please wait."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Andmete lugemine käib, palun oodake."
+            "value" : "Andmete lugemine käib. Palun oodake."
+          }
+        }
+      }
+    },
+    "Ready to decrypt message" : {
+      "comment" : "ID-card input view message when ready to enter PIN code for ID-card reader action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready to decrypt with ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart on valmis dekrüpteerimiseks"
+          }
+        }
+      }
+    },
+    "Ready to sign message" : {
+      "comment" : "ID-card input view message when ready to enter PIN code for ID-card reader action",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready to sign with ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart on valmis allkirjastamiseks"
           }
         }
       }
@@ -6901,20 +6937,20 @@
         }
       }
     },
-    "Signing in progress please wait" : {
+    "Signing in progress" : {
       "comment" : "NFC alert message step 4",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signing in progress, please wait."
+            "value" : "Signing in progress. Please wait."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signeerimine käib, palun oodake."
+            "value" : "Signeerimine käib. Palun oodake."
           }
         }
       }

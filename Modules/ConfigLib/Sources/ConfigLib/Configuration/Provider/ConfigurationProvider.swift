@@ -20,6 +20,23 @@
 import Foundation
 import UtilsLib
 
+extension Dictionary where Key == String, Value == ConfigurationProvider.CDOC2Conf {
+    public func asNSDictionary() -> [String: Any] {
+        var result: [String: Any] = [:]
+        result.reserveCapacity(self.count)
+
+        for (uuid, conf) in self {
+            result[uuid] = [
+                "NAME": conf.name,
+                "POST": conf.postURL.absoluteString,
+                "FETCH": conf.fetchURL.absoluteString
+            ]
+        }
+
+        return result
+    }
+}
+
 public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public struct MetaInf: Codable, Sendable, Equatable {
         public let url: String
@@ -59,6 +76,18 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
             self.name = name
             self.postURL = postURL
             self.fetchURL = fetchURL
+        }
+
+        public func asDictionary(uuid: String) -> [String: Any] {
+            guard
+                let data = try? JSONEncoder().encode(self),
+                let confDict = try? JSONSerialization.jsonObject(with: data),
+                let dict = confDict as? [String: Any]
+            else {
+                return [:]
+            }
+
+            return [uuid: dict]
         }
     }
 

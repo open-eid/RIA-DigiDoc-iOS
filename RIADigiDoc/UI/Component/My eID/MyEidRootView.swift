@@ -46,7 +46,6 @@ struct MyEidRootView: View {
                         .idCardViaNFC,
                         .idCardViaUSB
                     ],
-                    signedContainer: nil,
                     onSuccess: { _ in }
                 )
             case .idCardViaUSB:
@@ -56,7 +55,6 @@ struct MyEidRootView: View {
                         .idCardViaNFC,
                         .idCardViaUSB
                     ],
-                    signedContainer: nil,
                     onSuccess: { _ in }
                 )
             default:

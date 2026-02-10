@@ -55,7 +55,7 @@ public struct ContainerUtil: ContainerUtilProtocol, Loggable {
 
     public func getSignatureContainersDir() throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolder: Constants.Folder.SignedContainerFolder,
+            subfolders: [Constants.Folder.SignedContainerFolder],
             fileManager: fileManager
         )
 

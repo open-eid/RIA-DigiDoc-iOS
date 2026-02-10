@@ -28,6 +28,38 @@
 #include <cdoc/ILogger.h>
 @implementation Encrypt
 
++ (void)setCerts:(nullable NSArray<NSData *> *)certs {
+    Network::setCerts(certs);
+}
+
++ (void)setCert:(nullable NSData *)cert {
+    Network::setCert(cert);
+}
+
++ (void)setCdoc2Config:(nonnull NSDictionary<NSString *,id> *)config {
+    Settings::setCdoc2Config(config);
+}
+
++ (void)setFetchURL:(nonnull NSString *)url {
+    Settings::setFetchURL(url);
+}
+
++ (void)setPostURL:(nonnull NSString *)url {
+    Settings::setPostURL(url);
+}
+
++ (void)setUUID:(nonnull NSString *)uuid {
+    Settings::setUUID(uuid);
+}
+
++ (void)setIsOnlineEncryptionEnabled:(bool)enabled {
+    Settings::setIsOnlineEncryptionEnabled(enabled);
+}
+
++ (void)setProxy:(nonnull NSString *)host port:(NSInteger)port username:(nonnull NSString *)username password:(nonnull NSString *)password {
+    Network::setProxy(host, port, username, password);
+}
+
 static inline NSString *NSStringFromStringView(std::string_view sv) {
     return [[NSString alloc] initWithBytes:sv.data()
                                     length:sv.size()
@@ -103,8 +135,8 @@ public:
     }
   
     
-    if (version == 2 && CDoc2Setting.isOnlineEncryptionEnabled) {
-        NSString *server_id = CDoc2Setting.getUUID;
+    if (version == 2 && Settings::isOnlineEncryptionEnabled()) {
+        NSString *server_id = Settings::getUUID();
         for (Addressee *addressee in addressees) {
             if (writer->addRecipient(libcdoc::Recipient::makeServer({}, [addressee.data toVector], [server_id toString])) != 0) {
                 return completion([NSError cryptoError:@"Failed to add recipient"]);

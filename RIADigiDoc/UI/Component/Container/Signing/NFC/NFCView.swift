@@ -116,7 +116,7 @@ struct NFCView: View {
         ActionInputScreen(
             actionType: actionType,
             actionMethods: actionMethods,
-            selectedActionMethod: ActionMethod.idCardViaNFC.rawValue,
+            selectedActionMethod: .idCardViaNFC,
             isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
             onBackClick: {
@@ -134,7 +134,6 @@ struct NFCView: View {
                     Task {
                         decrypt()
                     }
-                    isInProgress = true
                 case .signing:
                     saveInputData()
 
@@ -233,9 +232,9 @@ struct NFCView: View {
                     languageSettings.localized(
                         "Hold your ID card against your smart device until the data is read"
                     ),
-                step2Message: languageSettings.localized("Reading data please wait"),
+                step2Message: languageSettings.localized("Reading data"),
                 step3Message: languageSettings.localized("Reading certificate"),
-                step4Message: languageSettings.localized("Decrypting in progress please wait"),
+                step4Message: languageSettings.localized("Decrypting in progress"),
                 successMessage: languageSettings.localized("Data read"),
                 canErrorMessage: languageSettings.localized("Wrong CAN"),
                 pin1WrongMultipleErrorMessage:

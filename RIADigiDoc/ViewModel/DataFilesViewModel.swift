@@ -58,7 +58,7 @@ class DataFilesViewModel: DataFilesViewModelProtocol, Loggable {
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
         do {
             let directory = try savedFilesDirectory ?? Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                subfolders: [CommonsLib.Constants.Folder.SavedFiles],
                 fileManager: fileManager
             )
             try fileManager.removeItem(at: directory)

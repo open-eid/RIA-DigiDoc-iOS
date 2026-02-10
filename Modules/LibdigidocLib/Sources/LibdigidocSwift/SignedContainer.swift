@@ -361,7 +361,7 @@ extension SignedContainer {
         let fileManager = Container.shared.fileManager()
 
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolder: Constants.Folder.SignedContainerFolder,
+            subfolders: [Constants.Folder.SignedContainerFolder],
             fileManager: fileManager
         )
 

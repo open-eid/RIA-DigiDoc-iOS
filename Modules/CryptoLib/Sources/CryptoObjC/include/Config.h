@@ -26,7 +26,42 @@
 #include <cdoc/NetworkBackend.h>
 
 struct Settings : public libcdoc::Configuration {
+private:
+    inline static NSDictionary<NSString *, id> * _Nullable _cdoc2Config = nil;
+    inline static NSString * _Nullable _fetchURL = nil;
+    inline static NSString * _Nullable _postURL = nil;
+    inline static NSString * _Nullable _uuid = nil;
+    inline static bool _isOnlineEncryptionEnabled = false;
 
+public:
+    static void setCdoc2Config(NSDictionary<NSString *, id> * _Nonnull config) {
+        _cdoc2Config = config;
+    }
+    
+    static void setFetchURL(NSString * _Nonnull url) {
+        _fetchURL = url;
+    }
+    
+    static void setPostURL(NSString * _Nonnull url) {
+        _postURL = url;
+    }
+    
+    static void setUUID(NSString * _Nonnull uuid) {
+        _uuid = uuid;
+    }
+
+    static NSString * _Nullable getUUID() {
+        return _uuid;
+    }
+    
+    static void setIsOnlineEncryptionEnabled(bool isOnlineEncryptionEnabled) {
+        _isOnlineEncryptionEnabled = isOnlineEncryptionEnabled;
+    }
+
+    static bool isOnlineEncryptionEnabled() {
+        return _isOnlineEncryptionEnabled;
+    }
+    
     std::string getValue(std::string_view domain,
                          std::string_view param) const final {
 
@@ -36,15 +71,35 @@ struct Settings : public libcdoc::Configuration {
                                     encoding:NSUTF8StringEncoding];
 
         if (param == KEYSERVER_FETCH_URL) {
-            NSString *url =
-                [CDoc2Setting getEncryptionServerInfoFetchURLWithDomain:nsDomain];
-            return url ? std::string(url.toString) : std::string{};
+
+            NSDictionary *uuidDict = _cdoc2Config[nsDomain];
+
+            if (![uuidDict isKindOfClass:[NSDictionary class]]) {
+                return std::string([_fetchURL UTF8String]);
+            }
+
+            NSString *fetch = uuidDict[@"FETCH"];
+            if (![fetch isKindOfClass:[NSString class]]) {
+                return std::string([_fetchURL UTF8String]);
+            }
+
+            return std::string([fetch UTF8String]);
         }
 
         if (param == KEYSERVER_SEND_URL) {
-            NSString *url =
-                [CDoc2Setting getEncryptionServerInfoPostURLWithDomain:nsDomain];
-            return url ? std::string(url.toString) : std::string{};
+
+            NSDictionary *uuidDict = _cdoc2Config[nsDomain];
+
+            if (![uuidDict isKindOfClass:[NSDictionary class]]) {
+                return std::string([_postURL UTF8String]);
+            }
+
+            NSString *post = uuidDict[@"POST"];
+            if (![post isKindOfClass:[NSString class]]) {
+                return std::string([_postURL UTF8String]);
+            }
+
+            return std::string([post UTF8String]);
         }
 
         return {};
@@ -52,28 +107,52 @@ struct Settings : public libcdoc::Configuration {
 };
 
 struct Network: public libcdoc::NetworkBackend {
+private:
+    inline static NSArray<NSData *> * _Nullable _certs = nil;
+    inline static NSData * _Nullable _cert = nil;
+    inline static NSString * _Nonnull _host = @"";
+    inline static NSInteger _port = 80;
+    inline static NSString * _Nonnull _username = @"";
+    inline static NSString * _Nonnull _password = @"";
+
+public:
+    static void setCert(NSData * _Nullable cert) {
+        _cert = cert;
+    }
+    
+    static void setCerts(NSArray<NSData *> * _Nullable certs) {
+        _certs = certs;
+    }
+    
+    static void setProxy(NSString * _Nonnull host,
+                         NSInteger port,
+                         NSString * _Nonnull username,
+                         NSString * _Nonnull password) {
+        _host = host;
+        _port = port;
+        _username = username;
+        _password = password;
+    }
+
     libcdoc::result_t getPeerTLSCertificates(std::vector<std::vector<uint8_t>> &dst, const std::string& url) final {
         libcdoc::NetworkBackend::getPeerTLSCertificates(dst);
-        for (NSData *cert in CDoc2Setting.cdoc2Certs) {
+        for (NSData *cert in _certs) {
             dst.push_back([cert toVector]);
         }
-        if (auto cert = [CDoc2Setting.cert toVector]; !cert.empty()) {
+        if (auto cert = [_cert toVector]; !cert.empty()) {
             dst.push_back(std::move(cert));
         }
         return libcdoc::OK;
     }
 
     libcdoc::result_t getProxyCredentials(ProxyCredentials &cred) const final {
-        if (NSDictionary<NSString *, id> *data = [CDoc2Setting proxyCredentials]) {
-            NSString * proxyHost = (NSString*)data[CDoc2Setting.kProxyHost];
-            if (proxyHost.length > 0) {
-                cred = {
-                    .host = [(NSString*)data[CDoc2Setting.kProxyHost] toString],
-                    .port = [data[CDoc2Setting.kProxyPort] unsignedShortValue],
-                    .username = [(NSString*)data[CDoc2Setting.kProxyUsername] toString],
-                    .password = [(NSString*)data[CDoc2Setting.kProxyPassword] toString]
-                };
-            }
+        if (_host.length > 0) {
+            cred = {
+                .host = std::string([_host UTF8String]),
+                .port = (uint16_t)_port,
+                .username = std::string([_username UTF8String]),
+                .password = std::string([_password UTF8String])
+            };
         }
         return libcdoc::OK;
     }

@@ -1329,7 +1329,7 @@ struct SigningViewModelTests: Loggable {
             testFile, testFile2, testFile3
         ], to: containerFile)
 
-        #expect(viewModel.errorMessage == ToastMessage(key: "Could not add files", args: ["2"]))
+        #expect(viewModel.errorMessage == ToastMessage(key: "Multiple documents already exist", args: ["2"]))
         #expect(viewModel.dataFiles.count == 3)
     }
 

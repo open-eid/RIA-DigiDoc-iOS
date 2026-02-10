@@ -25,6 +25,7 @@ public protocol IdCardServiceProtocol: Sendable {
     func startDiscoveringReaders() async
     func stopDiscoveringReaders() async
     func statusStream() async -> AsyncStream<UsbReaderStatus>
+    func getCardHandler() async throws -> CardCommands
     func getPublicData() async throws -> CardInfo
     func readAuthenticationCertificate() async throws -> Data
     func readSignatureCertificate() async throws -> Data

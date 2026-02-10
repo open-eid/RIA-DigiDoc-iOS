@@ -30,17 +30,55 @@ struct IdCardView: View {
 
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
+    @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
-
+    @State private var isShowingPinView: Bool = false
+    @State private var isShowingLoadingView: Bool = false
+    @State private var pinNumber = ""
     @State private var idCardActionMessage: String = "ID card connect card reader"
 
     @State private var viewModel: IdCardViewModel
+
+    @State private var usbReaderStatus: UsbReaderStatus = .sInitial
+    @State private var idCardData: IdCardData?
 
     let signedContainer: SignedContainerProtocol?
     let cryptoContainer: CryptoContainerProtocol?
 
     let onSuccess: (SignedContainerProtocol) -> Void
     let onSuccessDecrypt: (CryptoContainerProtocol) -> Void
+
+    private var errorMessage: String {
+        languageSettings.localized(
+            viewModel.errorMessage ?? "",
+            viewModel.errorExtraArguments
+        )
+    }
+
+    private var pinNumberError: Binding<String> {
+        Binding(
+            get: { languageSettings.localized(
+                viewModel.pinNumberErrorKey ?? "",
+                viewModel.pinNumberErrorExtraArguments
+            ) },
+            set: { _ in }
+        )
+    }
+
+    private var personIdentifier: String {
+        let publicData = idCardData?.publicData
+        guard let personData = publicData else { return "" }
+        return viewModel
+            .formatPersonalIdentifier(
+                givenName: personData.givenName,
+                surname: personData.surname,
+                personalCode: personData.personalCode
+            )
+    }
+
+    private var pinCodeType: CodeType {
+        actionType == .signing ? .pin2 : .pin1
+    }
 
     init(
         actionType: ActionType,
@@ -63,10 +101,10 @@ struct IdCardView: View {
         ActionInputScreen(
             actionType: actionType,
             actionMethods: actionMethods,
-            selectedActionMethod: ActionMethod.idCardViaUSB.rawValue,
-            isActionEnabled: .constant(true),
+            selectedActionMethod: .idCardViaUSB,
+            isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
-            showSubmitButton: false,
+            showSubmitButton: isShowingPinView,
             onBackClick: {
                 Task {
                     await viewModel.stopDiscoveringReaders()
@@ -77,19 +115,99 @@ struct IdCardView: View {
                     return
                 }
                 isInProgress = false
+                isShowingPinView = false
+                isShowingLoadingView = false
             },
-            onSubmit: {},
+            onSubmit: {
+                switch actionType {
+                case .decrypt:
+                    isInProgress = true
+                    isShowingPinView = false
+                    isShowingLoadingView = true
+
+                    guard let container = cryptoContainer else { return }
+
+                    if usbReaderStatus == .sCardConnected {
+                        Task {
+                            let decryptedContainer = await viewModel.decrypt(
+                                pin1: pinNumber,
+                                cryptoContainer: container,
+                            )
+
+                            pinNumber = ""
+
+                            let shouldDismiss = viewModel.shouldDismissForError
+
+                            guard let container = decryptedContainer else {
+                                if shouldDismiss {
+                                    cancelDecrypt()
+                                    await viewModel.stopDiscoveringReaders()
+                                }
+
+                                await MainActor.run {
+                                    Toast.show(errorMessage)
+                                    viewModel.resetErrors()
+                                    if shouldDismiss {
+                                        dismiss()
+                                    }
+
+                                    isInProgress = !viewModel.shouldDismissForError
+                                    isShowingPinView = !viewModel.shouldDismissForError
+                                    isShowingLoadingView = false
+                                    return
+                                }
+
+                                return
+                            }
+
+                            await viewModel.stopDiscoveringReaders()
+                            cancelDecrypt()
+                            isInProgress = false
+                            isShowingPinView = false
+                            isShowingLoadingView = false
+
+                            onSuccessDecrypt(container)
+                            dismiss()
+                        }
+                    }
+                case .signing:
+                    // TODO: Implement signing action
+                    isInProgress = true
+                case .myeid:
+                    // Do nothing
+                    isInProgress = true
+                }
+            },
             content: {
-                IdCardActionView(
-                    icon: "ic_m3_smart_card_reader_48pt_wght400",
-                    message: $idCardActionMessage
-                )
+                if !isShowingPinView && !isShowingLoadingView {
+                    IdCardActionView(
+                        icon: "ic_m3_smart_card_reader_48pt_wght400",
+                        message: $idCardActionMessage
+                    )
+                } else if isInProgress && isShowingPinView {
+                    IdCardInputView(
+                        personIdentifier: personIdentifier,
+                        pinNumber: $pinNumber,
+                        pinError: pinNumberError,
+                        actionType: actionType,
+                        pinType: pinCodeType,
+                        onInputChange: {
+                            isActionEnabled = viewModel
+                                .isActionEnabled(pinNumber: pinNumber, pinType: pinCodeType)
+                        }
+                    )
+                } else if isInProgress && isShowingLoadingView {
+                    IdCardLoadingView(
+                        actionType: actionType
+                    )
+                }
             }
         )
         .task {
             await viewModel.startDiscoveringReaders()
         }
         .onChange(of: viewModel.usbReaderStatus) { _, newValue in
+            usbReaderStatus = newValue
             idCardActionMessage = getStatusText(newValue)
 
             let notInProgressStates: [UsbReaderStatus] = [
@@ -103,37 +221,61 @@ struct IdCardView: View {
             Task {
                 switch actionType {
                 case .decrypt:
-                    // TODO: Implement decrypt action
-                    isInProgress = true
+                    guard newValue == .sCardConnected else {
+                        await MainActor.run {
+                            isShowingPinView = false
+                            isShowingLoadingView = false
+                        }
+                        return
+                    }
+
+                    idCardData = await viewModel.getIdCardData()
+                    guard idCardData != nil else {
+                        await handleCardError()
+                        return
+                    }
+
+                    await MainActor.run {
+                        isShowingLoadingView = false
+                        isShowingPinView = true
+                    }
+
                 case .signing:
                     // TODO: Implement signing action
                     isInProgress = true
+
                 case .myeid:
-                    if newValue == .sCardConnected {
-                        let idCardData = await viewModel.getIdCardData()
+                    guard newValue == .sCardConnected else { return }
 
-                        guard let cardData = idCardData else {
-                            await viewModel.stopDiscoveringReaders()
+                    let cardData = await viewModel.getIdCardData()
+                    guard let cardData else {
+                        await handleCardError()
+                        return
+                    }
 
-                            await MainActor.run {
-                                Toast.show(viewModel.errorMessage ?? "")
-                                viewModel.resetErrors()
-                                dismiss()
-                            }
-                            return
-                        }
-
-                        await MainActor.run {
-                            isInProgress = true
-                            pathManager.replaceLast(
-                                to: .myEidView(
-                                    idCardData: cardData
-                                )
-                            )
-                        }
+                    await MainActor.run {
+                        isInProgress = true
+                        pathManager.replaceLast(
+                            to: .myEidView(idCardData: cardData)
+                        )
                     }
                 }
             }
+        }
+        .onDisappear {
+            pinNumber.removeAll()
+            Task {
+                await viewModel.stopDiscoveringReaders()
+            }
+        }
+    }
+
+    private func handleCardError() async {
+        await viewModel.stopDiscoveringReaders()
+        await MainActor.run {
+            Toast.show(errorMessage)
+            viewModel.resetErrors()
+            dismiss()
         }
     }
 
@@ -150,6 +292,12 @@ struct IdCardView: View {
         default:
             return languageSettings.localized("ID card connect card reader")
         }
+    }
+
+    private func cancelDecrypt() {
+        pinNumber.isEmpty ? () : (pinNumber.removeAll())
+        isActionEnabled = viewModel
+            .isActionEnabled(pinNumber: pinNumber, pinType: pinCodeType)
     }
 }
 

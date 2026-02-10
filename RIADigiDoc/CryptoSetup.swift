@@ -22,6 +22,7 @@ import CryptoObjCWrapper
 import CryptoSwift
 import CommonsLib
 import ConfigLib
+import CryptoObjC
 
 actor CryptoSetup: CryptoSetupProtocol {
     private let dataStore: DataStoreProtocol
@@ -113,29 +114,45 @@ actor CryptoSetup: CryptoSetupProtocol {
         if let useCdoc2Online = configurationProvider?.cdoc2UseKeyserver {
             defaultUseCdoc2Online = useCdoc2Online
         }
-        await CDoc2Setting.setOnlineEncryptionEnabled(
+        Encrypt.setIsOnlineEncryptionEnabled(
             await dataStore.getEncryptionUseKeyTransfer(defaultUseCdoc2Online)
         )
 
         if let cdoc2UUID = configurationProvider?.cdoc2DefaultKeyserver {
             let serverInfo = await dataStore.getEncryptionServerInfo(cdoc2UUID)
-            await CDoc2Setting.setUUID(serverInfo.uuid)
-            await CDoc2Setting.setFetchURL(serverInfo.fetchURL)
-            await CDoc2Setting.setPostURL(serverInfo.postURL)
+            Encrypt.setUUID(serverInfo.uuid)
+            Encrypt.setFetchURL(serverInfo.fetchURL)
+            Encrypt.setPostURL(serverInfo.postURL)
         }
         if let cdoc2Conf = configurationProvider?.cdoc2Conf {
-            await CDoc2Setting.setCDoc2Conf(cdoc2Conf)
+            Encrypt.setCdoc2Config(cdoc2Conf.asNSDictionary())
+            Decrypt.setCdoc2Config(cdoc2Conf.asNSDictionary())
         }
 
         let proxyInfo = await proxyUtil.getProxyInfo()
-        await CDoc2Setting.setProxyInfo(proxyInfo)
+
+        Encrypt.setProxy(
+            proxyInfo.host,
+            port: proxyInfo.port,
+            username: proxyInfo.username,
+            password: proxyInfo.password
+        )
+
+        Decrypt.setProxy(
+            proxyInfo.host,
+            port: proxyInfo.port,
+            username: proxyInfo.username,
+            password: proxyInfo.password
+        )
 
         if let certBundle = configurationProvider?.certBundle {
-            await CDoc2Setting.setCertBundle(certBundle)
+            Encrypt.setCerts(certBundle)
+            Decrypt.setCerts(certBundle)
         }
 
         if let certData {
-            await CDoc2Setting.setCert(certData)
+            Encrypt.setCert(certData)
+            Decrypt.setCert(certData)
         }
     }
 

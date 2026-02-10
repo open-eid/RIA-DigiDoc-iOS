@@ -74,6 +74,14 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
         return handle
     }
 
+    public func getCardHandler() throws -> CardCommands {
+        guard let cardCommands = self.cardHandler else {
+            throw IdCardInternalError.connectionFailed
+        }
+
+        return cardCommands
+    }
+
     public func setCardHandler(_ handler: CardCommands?) {
         self.cardHandler = handler
     }

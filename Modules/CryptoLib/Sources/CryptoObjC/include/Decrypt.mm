@@ -59,6 +59,30 @@
 
 @implementation Decrypt
 
++ (void)setCerts:(nullable NSArray<NSData *> *)certs {
+    Network::setCerts(certs);
+}
+
++ (void)setCert:(nullable NSData *)cert {
+    Network::setCert(cert);
+}
+
++ (void)setCdoc2Config:(nonnull NSDictionary<NSString *,id> *)config {
+    Settings::setCdoc2Config(config);
+}
+
++ (void)setFetchURL:(nonnull NSString *)url {
+    Settings::setFetchURL(url);
+}
+
++ (void)setPostURL:(nonnull NSString *)url {
+    Settings::setPostURL(url);
+}
+
++ (void)setProxy:(nonnull NSString *)host port:(NSInteger)port username:(nonnull NSString *)username password:(nonnull NSString *)password {
+    Network::setProxy(host, port, username, password);
+}
+
 + (CdocInfo*)cdocInfo:(NSString *)fullPath error:(NSError**)error {
     CdocInfo* cdocInfo = nil;
     
@@ -104,48 +128,50 @@
 
 + (void)decryptFile:(NSString *)fullPath withCert:(NSData *)certData withToken:(id<AbstractSmartToken>)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> *, NSError *))completion {
-    auto cert = [certData toVector];
-    if(cert.empty()) {
-        return completion(nil, [NSError cryptoError:@"Failed to get certData"]);
-    }
-
-    struct TokenBackend: public SmartCardTokenWrapper, public Network
-    {
-        std::vector<uint8_t> cert;
-
-        TokenBackend(id<AbstractSmartToken> smartToken, std::vector<uint8_t> &&_cert)
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        auto cert = [certData toVector];
+        if(cert.empty()) {
+            return completion(nil, [NSError cryptoError:@"Failed to get certData"]);
+        }
+        
+        struct TokenBackend: public SmartCardTokenWrapper, public Network
+        {
+            std::vector<uint8_t> cert;
+            
+            TokenBackend(id<AbstractSmartToken> smartToken, std::vector<uint8_t> &&_cert)
             : SmartCardTokenWrapper(smartToken)
             , cert(std::move(_cert))
-        {}
-
-        libcdoc::result_t getClientTLSCertificate(std::vector<uint8_t> &dst) final {
-            dst = cert;
-            return dst.empty() ? libcdoc::IO_ERROR : libcdoc::OK;
+            {}
+            
+            libcdoc::result_t getClientTLSCertificate(std::vector<uint8_t> &dst) final {
+                dst = cert;
+                return dst.empty() ? libcdoc::IO_ERROR : libcdoc::OK;
+            }
+            
+            libcdoc::result_t signTLS(std::vector<uint8_t> &dst, libcdoc::CryptoBackend::HashAlgorithm algorithm, const std::vector<uint8_t> &digest) final {
+                return sign(dst, algorithm, digest, 0);
+            }
+        };
+        TokenBackend token(smartToken, std::move(cert));
+        Settings conf;
+        std::unique_ptr<libcdoc::CDocReader> reader(libcdoc::CDocReader::createReader(fullPath.UTF8String, &conf, &token, &token));
+        
+        if (!reader) {
+            return completion(nil, [NSError cryptoError:@"Failed to create CDocReader"]);
         }
-
-        libcdoc::result_t signTLS(std::vector<uint8_t> &dst, libcdoc::CryptoBackend::HashAlgorithm algorithm, const std::vector<uint8_t> &digest) final {
-            return sign(dst, algorithm, digest, 0);
+        
+        auto idx = reader->getLockForCert(token.cert);
+        
+        if(idx < 0) {
+            return completion(nil, [NSError cryptoError:@"Failed to find lock for cert"]);
         }
-    };
-    TokenBackend token(smartToken, std::move(cert));
-    Settings conf;
-    std::unique_ptr<libcdoc::CDocReader> reader(libcdoc::CDocReader::createReader(fullPath.UTF8String, &conf, &token, &token));
-
-    if (!reader) {
-        return completion(nil, [NSError cryptoError:@"Failed to create CDocReader"]);
-    }
-    
-    auto idx = reader->getLockForCert(token.cert);
-    
-    if(idx < 0) {
-        return completion(nil, [NSError cryptoError:@"Failed to find lock for cert"]);
-    }
-    std::vector<uint8_t> fmk;
-    if(reader->getFMK(fmk, unsigned(idx)) != 0 || fmk.empty()) {
-        return completion(nil, token.lastError() ?: [NSError cryptoError:@"Failed to get FMK"]);
-    }
-    NSError *error = nil;
-    completion([self decryptReader:*reader withFMK:fmk error:&error], error);
+        std::vector<uint8_t> fmk;
+        if(reader->getFMK(fmk, unsigned(idx)) != 0 || fmk.empty()) {
+            return completion(nil, token.lastError() ?: [NSError cryptoError:@"Failed to get FMK"]);
+        }
+        NSError *error = nil;
+        completion([self decryptReader:*reader withFMK:fmk error:&error], error);
+    });
 }
 
 + (NSDictionary<NSString*,NSData*> *)decryptFile:(NSString *)fullPath withPassword:(NSString*)password error:(NSError**)error {

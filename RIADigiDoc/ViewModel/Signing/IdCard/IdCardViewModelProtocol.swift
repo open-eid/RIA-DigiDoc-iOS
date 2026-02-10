@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import CryptoSwift
 import IdCardLib
 
 /// @mockable
@@ -25,6 +26,12 @@ import IdCardLib
 public protocol IdCardViewModelProtocol: Sendable {
     func startDiscoveringReaders() async
     func stopDiscoveringReaders() async
+    func isActionEnabled(pinNumber: String, pinType: CodeType?) -> Bool
+    func decrypt(
+        pin1: String,
+        cryptoContainer: CryptoContainerProtocol?
+    ) async -> CryptoContainerProtocol?
     func getIdCardData() async -> IdCardData?
     func resetErrors()
+    func formatPersonalIdentifier(givenName: String, surname: String, personalCode: String) -> String
 }

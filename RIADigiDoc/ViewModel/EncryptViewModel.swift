@@ -111,7 +111,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
         do {
             let savedFilesDirectory = try Directories.getCacheDirectory(
-                subfolder: CommonsLib.Constants.Folder.SavedFiles,
+                subfolders: [CommonsLib.Constants.Folder.SavedFiles],
                 fileManager: fileManager
             )
 

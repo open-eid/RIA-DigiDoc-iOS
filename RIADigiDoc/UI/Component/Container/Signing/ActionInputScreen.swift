@@ -26,7 +26,7 @@ struct ActionInputScreen<Content: View>: View {
 
     @Environment(LanguageSettings.self) private var languageSettings
 
-    private let selectedActionMethod: String
+    private let selectedActionMethod: ActionMethod
 
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
@@ -60,7 +60,7 @@ struct ActionInputScreen<Content: View>: View {
     }
 
     private var selectedSigningMethodText: String {
-        languageSettings.localized(selectedActionMethod)
+        languageSettings.localized(selectedActionMethod.rawValue)
     }
 
     private var buttonTitle: String {
@@ -82,7 +82,7 @@ struct ActionInputScreen<Content: View>: View {
             .mobileId,
             .smartId
         ],
-        selectedActionMethod: String,
+        selectedActionMethod: ActionMethod,
         isActionEnabled: Binding<Bool>,
         isInProgress: Binding<Bool>,
         showSubmitButton: Bool = true,
@@ -157,7 +157,10 @@ struct ActionInputScreen<Content: View>: View {
 
                         content
 
-                        if !isInProgress && showSubmitButton {
+                        // ID-card via USB shows the button later in the process
+                        if (!isInProgress ||
+                            selectedActionMethod == .idCardViaUSB
+                        ) && showSubmitButton {
                             PrimaryButton(
                                 text: buttonTitle,
                                 isButtonEnabled: isActionEnabled,
@@ -176,7 +179,7 @@ struct ActionInputScreen<Content: View>: View {
 #Preview {
     ActionInputScreen(
         actionType: .signing,
-        selectedActionMethod: "ID-card via NFC",
+        selectedActionMethod: .idCardViaNFC,
         isActionEnabled: .constant(true),
         isInProgress: .constant(false),
         onBackClick: {},

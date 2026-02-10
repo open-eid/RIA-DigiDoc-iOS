@@ -74,9 +74,13 @@ struct DecryptRootView: View {
                             .idCardViaUSB
                         ],
                         cryptoContainer: container,
-                        onSuccess: { container in
+                        onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setSignedContainer(container)
+                            sharedContainerViewModel.setCryptoContainer(container)
+
+                            Toast.show(languageSettings.localized(
+                                "Container successfully decrypted"
+                            ))
                         }
                     )
                 }
