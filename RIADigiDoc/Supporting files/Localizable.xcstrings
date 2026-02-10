@@ -1002,6 +1002,96 @@
         }
       }
     },
+    "Crash report always send" : {
+      "comment" : "Crash report dialog always send reports button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always send"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saada alati"
+          }
+        }
+      }
+    },
+    "Crash report dont send" : {
+      "comment" : "Crash report dialog don’t send report button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don’t send"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ära saada"
+          }
+        }
+      }
+    },
+    "Crash report message" : {
+      "comment" : "Crash report dialog message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Application crashed. Please send us crash report, so we can fix the problem."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rakenduses juhtus viga. Palun saada meile vearaport, et saaksime selle vea parandada."
+          }
+        }
+      }
+    },
+    "Crash report send" : {
+      "comment" : "Crash report dialog send report button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saada"
+          }
+        }
+      }
+    },
+    "Crash report title" : {
+      "comment" : "Crash report dialog title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send crash report?"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kas saata vearaport?"
+          }
+        }
+      }
+    },
     "Crypto files encrypted" : {
       "comment" : "Crypto container files names locked",
       "extractionState" : "manual",

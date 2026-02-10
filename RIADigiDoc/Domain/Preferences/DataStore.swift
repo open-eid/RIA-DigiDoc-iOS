@@ -502,6 +502,15 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(isSaved, forKey: Keys.isLogFileSaved)
     }
 
+    // MARK: - Crashlytics
+    public func getIsCrashlyticsAlwaysEnabled() async -> Bool {
+        userDefaults().bool(forKey: Keys.isCrashlyticsAlwaysEnabled)
+    }
+
+    public func setIsCrashlyticsAlwaysEnabled(_ isAlwaysEnabled: Bool) async {
+        userDefaults().set(isAlwaysEnabled, forKey: Keys.isCrashlyticsAlwaysEnabled)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -569,5 +578,6 @@ public actor DataStore: DataStoreProtocol {
         static let enableLoggingNextSession = "enableLoggingNextSession"
         static let enableLoggingThisSession = "enableLoggingThisSession"
         static let isLogFileSaved = "isLogFileSaved"
+        static let isCrashlyticsAlwaysEnabled = "isCrashlyticsAlwaysEnabled"
     }
 }

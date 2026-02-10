@@ -6,7 +6,7 @@ scripts:
   - &get_google_services_plist
     name: "Get Google Services configuration"
     script: |
-      echo $GOOGLE_SERVICES_PLIST | base64 --decode > $CM_BUILD_DIR/RIADigiDoc/GoogleService-Info.plist
+      echo $GOOGLE_SERVICES_PLIST | base64 --decode > "$CM_BUILD_DIR/RIADigiDoc/Supporting files/GoogleService-Info.plist"
 
 workflows:
   debug:

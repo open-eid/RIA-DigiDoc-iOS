@@ -19,6 +19,8 @@
 
 import Foundation
 import FactoryKit
+import Firebase
+import FirebaseCrashlytics
 import LibdigidocLibSwift
 import CryptoObjCWrapper
 import CryptoSwift
@@ -67,6 +69,9 @@ actor LibrarySetup: Loggable {
 
     func setupLibraries() async {
         let isLoggingEnabled = await initializeLogging()
+
+        FirebaseApp.configure()
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
 
         do {
             let proxyInfo = await proxyUtil.getProxyInfo()

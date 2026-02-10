@@ -118,4 +118,8 @@ public protocol DataStoreProtocol: Sendable {
     func setEnableLoggingThisSession(_ isEnabled: Bool) async
     func getIsLogFileSaved() async -> Bool
     func setIsLogFileSaved(_ isSaved: Bool) async
+
+    // MARK: - Crashlytics
+    func getIsCrashlyticsAlwaysEnabled() async -> Bool
+    func setIsCrashlyticsAlwaysEnabled(_ isEnabled: Bool) async
 }

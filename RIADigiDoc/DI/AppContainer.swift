@@ -534,4 +534,14 @@ extension Container {
             )
         }
     }
+
+    @MainActor
+    var crashReportManager: Factory<CrashReportManager> {
+        self { @MainActor in
+            CrashReportManager(
+                dataStore: self.dataStore()
+            )
+        }
+        .singleton
+    }
 }
