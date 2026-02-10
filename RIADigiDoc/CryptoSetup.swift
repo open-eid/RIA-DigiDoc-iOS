@@ -22,6 +22,7 @@ import CryptoObjCWrapper
 import CryptoSwift
 import CommonsLib
 import ConfigLib
+import CryptoObjC
 
 actor CryptoSetup: CryptoSetupProtocol {
     private let dataStore: DataStoreProtocol
@@ -69,6 +70,8 @@ actor CryptoSetup: CryptoSetupProtocol {
            let cdoc2Conf = configurationProvider?.cdoc2Conf {
 
             let conf = cdoc2Conf[cdoc2UUID]
+            Encrypt.setCdoc2Config(conf?.asDictionary(uuid: cdoc2UUID) ?? [:])
+            Decrypt.setCdoc2Config(conf?.asDictionary(uuid: cdoc2UUID) ?? [:])
             if let cdoc2ConfFetchUrl = conf?.fetchURL,
                let cdoc2ConfPostUrl = conf?.postURL,
                let cdoc2ConfName = conf?.name {
@@ -129,6 +132,19 @@ actor CryptoSetup: CryptoSetupProtocol {
 
         let proxyInfo = await proxyUtil.getProxyInfo()
         await CDoc2Setting.setProxyInfo(proxyInfo)
+        Encrypt.setProxy(
+            proxyInfo.host,
+            port: proxyInfo.port,
+            username: proxyInfo.username,
+            password: proxyInfo.password
+        )
+
+        Decrypt.setProxy(
+            proxyInfo.host,
+            port: proxyInfo.port,
+            username: proxyInfo.username,
+            password: proxyInfo.password
+        )
 
         if let certBundle = configurationProvider?.certBundle {
             await CDoc2Setting.setCertBundle(certBundle)

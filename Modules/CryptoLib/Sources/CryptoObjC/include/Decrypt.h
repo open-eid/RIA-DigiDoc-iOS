@@ -26,6 +26,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Decrypt : NSObject
++ (void)setCdoc2Config:(NSDictionary<NSString *, id> *)config;
++ (void)setProxy:(NSString *)host port:(NSInteger)port username:(NSString *)username password:(NSString *)password;
 + (nullable id)cdocInfo:(NSString *)fullPath error:(NSError **)error;
 + (void)decryptFile:(NSString *)fullPath withCert:(NSData *)certData withToken:(id)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> * _Nullable, NSError * _Nullable))completion;

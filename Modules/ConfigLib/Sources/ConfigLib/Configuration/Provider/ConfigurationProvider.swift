@@ -60,6 +60,18 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
             self.postURL = postURL
             self.fetchURL = fetchURL
         }
+
+        public func asDictionary(uuid: String) -> [String: Any] {
+            guard
+                let data = try? JSONEncoder().encode(self),
+                let confDict = try? JSONSerialization.jsonObject(with: data),
+                let dict = confDict as? [String: Any]
+            else {
+                return [:]
+            }
+
+            return [uuid: dict]
+        }
     }
 
     public let metaInf: MetaInf

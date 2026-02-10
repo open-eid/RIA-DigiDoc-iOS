@@ -59,6 +59,14 @@
 
 @implementation Decrypt
 
++ (void)setCdoc2Config:(nonnull NSDictionary<NSString *,id> *)config {
+    Settings::setCdoc2Config(config);
+}
+
++ (void)setProxy:(nonnull NSString *)host port:(NSInteger)port username:(nonnull NSString *)username password:(nonnull NSString *)password {
+    Network::setProxy(host, port, username, password);
+}
+
 + (CdocInfo*)cdocInfo:(NSString *)fullPath error:(NSError**)error {
     CdocInfo* cdocInfo = nil;
     

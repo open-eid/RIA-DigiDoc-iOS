@@ -28,6 +28,14 @@
 #include <cdoc/ILogger.h>
 @implementation Encrypt
 
++ (void)setCdoc2Config:(nonnull NSDictionary<NSString *,id> *)config {
+    Settings::setCdoc2Config(config);
+}
+
++ (void)setProxy:(nonnull NSString *)host port:(NSInteger)port username:(nonnull NSString *)username password:(nonnull NSString *)password {
+    Network::setProxy(host, port, username, password);
+}
+
 static inline NSString *NSStringFromStringView(std::string_view sv) {
     return [[NSString alloc] initWithBytes:sv.data()
                                     length:sv.size()
