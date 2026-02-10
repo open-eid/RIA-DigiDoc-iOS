@@ -12,6 +12,8 @@
 		1A4A77602EF1983F001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775F2EF1983F001747D8 /* ConfigLib */; };
 		1A4A77622EF1983F001747D8 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A77612EF1983F001747D8 /* ConfigLibMocks */; };
 		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
+		DF1D595A2F3BF88000855E2E /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D59592F3BF88000855E2E /* FirebaseCore */; };
+		DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */; };
 		DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
@@ -198,6 +200,8 @@
 				Util/File/FileInspectorProtocol.swift,
 				Util/Language/LanguageSettings.swift,
 				Util/Language/LanguageSettingsProtocol.swift,
+				Util/Manager/CrashReport/CrashReportManager.swift,
+				Util/Manager/CrashReport/CrashReportManagerProtocol.swift,
 				Util/Proxy/ProxyUtil.swift,
 				Util/Proxy/ProxyUtilProtocol.swift,
 				Util/Recipient/RecipientUtil.swift,
@@ -445,7 +449,9 @@
 				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
 				1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */,
 				DFA23CBD2EB6DC64000403E4 /* MobileIdLib in Frameworks */,
+				DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */,
 				DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */,
+				DF1D595A2F3BF88000855E2E /* FirebaseCore in Frameworks */,
 				DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -633,6 +639,7 @@
 				DFED7A602CC9A42A00D8BCA9 /* SwiftLint */,
 				DFD24C3B2CD1B718004C1D2E /* Embed Frameworks */,
 				DF4E43CC2D0BA38600967997 /* Embed Foundation Extensions */,
+				DF1D59572F3BF3F800855E2E /* Setup Firebase Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -655,6 +662,8 @@
 				1A5026EC2E8BFCF400C184D7 /* IdCardLib */,
 				DFA23CBC2EB6DC64000403E4 /* MobileIdLib */,
 				DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */,
+				DF1D59592F3BF88000855E2E /* FirebaseCore */,
+				DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -770,6 +779,7 @@
 				1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */,
 				1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */,
 				1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */,
+				DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -830,6 +840,30 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		DF1D59572F3BF3F800855E2E /* Setup Firebase Crashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Setup Firebase Crashlytics";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
 		DFED7A602CC9A42A00D8BCA9 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1170,6 +1204,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_APP_SANDBOX = YES;
@@ -1200,6 +1235,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1226,6 +1262,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"RIADigiDoc/Preview Content\"";
 				DEVELOPMENT_TEAM = ET847QJV9F;
 				ENABLE_APP_SANDBOX = YES;
@@ -1256,6 +1293,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = ee.ria.digidoc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1462,6 +1500,14 @@
 				minimumVersion = 1.10.0;
 			};
 		};
+		DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = exactVersion;
+				version = 12.9.0;
+			};
+		};
 		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-certificates.git";
@@ -1520,6 +1566,16 @@
 		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonsTestShared;
+		};
+		DF1D59592F3BF88000855E2E /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 		DF3E4A7E2CE269C900137235 /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;

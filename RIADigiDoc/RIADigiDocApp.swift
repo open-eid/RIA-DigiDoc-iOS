@@ -28,6 +28,7 @@ import CommonsLib
 struct RIADigiDocApp: App {
     @State private var languageSettings: LanguageSettings
     @State private var themeSettings: ThemeSettings
+    @State private var crashReportManager: CrashReportManager
 
     @State private var isSetupComplete = false
     @State private var isJailbroken: Bool = false
@@ -45,6 +46,7 @@ struct RIADigiDocApp: App {
     init() {
         _languageSettings = State(wrappedValue: Container.shared.languageSettings())
         _themeSettings = State(wrappedValue: Container.shared.themeSettings())
+        _crashReportManager = State(wrappedValue: Container.shared.crashReportManager())
 
         self.configurationProperty = Container.shared.configurationProperty()
         self.configurationLoader = Container.shared.configurationLoader()
@@ -87,6 +89,27 @@ struct RIADigiDocApp: App {
                         ContentView()
                             .environment(pathManager)
                             .appNavigation(pathManager: pathManager)
+                            .task {
+                                await crashReportManager.evaluateCrashReporting()
+                            }
+                            .alert(
+                                languageSettings.localized("Crash report title"),
+                                isPresented: $crashReportManager.showCrashDialog
+                            ) {
+                                Button(languageSettings.localized("Crash report send")) {
+                                    crashReportManager.sendReport()
+                                }
+                                Button(languageSettings.localized("Crash report always send")) {
+                                    Task {
+                                        await crashReportManager.alwaysSendReport()
+                                    }
+                                }
+                                Button(languageSettings.localized("Crash report dont send"), role: .cancel) {
+                                    crashReportManager.doNotSendReport()
+                                }
+                            } message: {
+                                Text(verbatim: languageSettings.localized("Crash report message"))
+                            }
                     } else {
                         InitView()
                             .environment(pathManager)
