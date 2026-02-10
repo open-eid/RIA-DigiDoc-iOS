@@ -37,7 +37,6 @@ extension Dictionary where Key == String, Value == ConfigurationProvider.CDOC2Co
     }
 }
 
-
 public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public struct MetaInf: Codable, Sendable, Equatable {
         public let url: String

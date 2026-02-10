@@ -139,7 +139,7 @@ struct IdCardView: View {
                             let shouldDismiss = viewModel.shouldDismissForError
 
                             guard let container = decryptedContainer else {
-                                if shouldDismiss{
+                                if shouldDismiss {
                                     cancelDecrypt()
                                     await viewModel.stopDiscoveringReaders()
                                 }

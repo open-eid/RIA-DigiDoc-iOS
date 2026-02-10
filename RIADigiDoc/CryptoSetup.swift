@@ -130,7 +130,7 @@ actor CryptoSetup: CryptoSetupProtocol {
         }
 
         let proxyInfo = await proxyUtil.getProxyInfo()
-        
+
         Encrypt.setProxy(
             proxyInfo.host,
             port: proxyInfo.port,
