@@ -62,6 +62,10 @@ class MyEidViewModel: MyEidViewModelProtocol, Loggable {
             .date
     }
 
+    public func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool) {
+        sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: isBlocked)
+    }
+
     public func getIsPinBlocked(for codeType: CodeType) -> Bool {
         return sharedMyEidSession.getIsPinBlocked(for: codeType)
     }

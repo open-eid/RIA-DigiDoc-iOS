@@ -143,13 +143,15 @@ struct MyEidPinChangeView: View {
 
         let pin = Array(viewModel.input.utf8)
 
-        if !pin.isEmpty && viewModel
-            .isPINLengthValid(pin: pin) && viewModel.step == .new {
-            viewModel.verifyNewCode()
+        let currentCodeType = (pinAction == .unblock && viewModel.step == .current) ? .puk : codeType
+
+        if !pin.isEmpty && viewModel.isPINLengthValid(for: currentCodeType, pin: pin) &&
+            viewModel.step == .new {
+                viewModel.verifyNewCode()
         }
 
         return !inputErrorMessage.isEmpty ||
-        !viewModel.isPINLengthValid(pin: pin)
+        !viewModel.isPINLengthValid(for: currentCodeType, pin: pin)
     }
 
     init(

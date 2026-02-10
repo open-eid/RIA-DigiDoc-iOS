@@ -143,7 +143,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         resetInputError()
     }
 
-    func isPINLengthValid(pin: [UInt8]) -> Bool {
+    func isPINLengthValid(for codeType: CodeType, pin: [UInt8]) -> Bool {
         guard codeType.validLength.contains(pin.count) else {
             return false
         }
@@ -268,7 +268,9 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
             sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: true)
         case .wrongPIN(let remaining):
             errorMessage = remaining > 1 ? "PIN verification error multiple" : "PIN verification error one"
-            errorMessageExtraArguments = [codeType.name, String(remaining)]
+            errorMessageExtraArguments = [
+                pinAction == .change ? codeType.name : CodeType.puk.name, String(remaining)
+            ]
             resetToCurrentPinEntryStep()
         default:
             resetInputError()

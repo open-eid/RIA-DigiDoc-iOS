@@ -62,7 +62,6 @@ struct PrimaryOutlinedButton: View {
                     .padding(Dimensions.Padding.XSPadding)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, Dimensions.Padding.XSPadding)
             .background(
                 Capsule()
                     .fill(isButtonEnabled ? theme.surface : Color.gray)

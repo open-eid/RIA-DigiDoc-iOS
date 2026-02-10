@@ -82,9 +82,9 @@ public struct ErrorDetail: Sendable {
            let errors = causes["errors"] as? [NSError],
            let firstError = errors.first,
            let subCauses = firstError.userInfo["causes"] as? [String: Any],
-           let ex = subCauses["exceptions"] as? [Any], !ex.isEmpty {
+           let exceptions = subCauses["exceptions"] as? [Any], !exceptions.isEmpty {
 
-            dict["exceptions"] = ex.map { "\($0)" }
+            dict["exceptions"] = exceptions.map { "\($0)" }
         }
 
         return dict

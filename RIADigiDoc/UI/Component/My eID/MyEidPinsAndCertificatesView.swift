@@ -34,8 +34,29 @@ struct MyEidPinsAndCertificatesView: View {
     var signCertValidTo: String
     var isPUKChangeable: Bool
 
+    private var pukBlockedMessage: String {
+        languageSettings.localized(
+            isPUKChangeable ? "PUK blocked" : "PUK blocked Thales"
+        )
+    }
+
     private var pukBlockedUrl: String {
-        languageSettings.localized("PUK blocked URL")
+        languageSettings.localized(
+            isPUKChangeable ? "PUK blocked URL" : "PUK blocked Thales URL"
+        )
+    }
+
+    private var pinBlockedMessage: String {
+        let pinBlockedText = languageSettings.localized(
+            "PIN blocked",
+            [CodeType.pin1.name]
+        )
+
+        if isPukBlocked {
+            return pinBlockedText
+        }
+
+        return "\(pinBlockedText) \(languageSettings.localized("PIN blocked unblock message", []))"
     }
 
     init(
@@ -79,12 +100,10 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin1BlockedState)
 
             if isPin1Blocked {
-                Text(verbatim: languageSettings.localized(
-                    "PIN blocked", [CodeType.pin1.name])
-                )
-                .font(typography.bodySmall)
-                .foregroundStyle(theme.error)
-                .padding(.vertical, Dimensions.Padding.XSPadding)
+                Text(verbatim: pinBlockedMessage)
+                    .font(typography.bodySmall)
+                    .foregroundStyle(theme.error)
+                    .padding(.vertical, Dimensions.Padding.XSPadding)
             }
         }
         .padding(.vertical, Dimensions.Padding.SPadding)
@@ -98,7 +117,7 @@ struct MyEidPinsAndCertificatesView: View {
                         [signCertValidTo]
                     )
                 ),
-                forgotPinText: isPin1Blocked ?
+                forgotPinText: isPin2Blocked ?
                 languageSettings.localized("Unblock PIN", [CodeType.pin2.name]) :
                     languageSettings.localized("Forgot PIN", [CodeType.pin2.name]),
                 changePinText: languageSettings
@@ -115,12 +134,10 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin2BlockedState)
 
             if isPin2Blocked {
-                Text(verbatim: languageSettings.localized(
-                    "PIN blocked", [CodeType.pin2.name])
-                )
-                .font(typography.bodySmall)
-                .foregroundStyle(theme.error)
-                .padding(.vertical, Dimensions.Padding.XSPadding)
+                Text(verbatim: pinBlockedMessage)
+                    .font(typography.bodySmall)
+                    .foregroundStyle(theme.error)
+                    .padding(.vertical, Dimensions.Padding.XSPadding)
             }
         }
         .padding(.bottom, Dimensions.Padding.SPadding)
@@ -139,7 +156,7 @@ struct MyEidPinsAndCertificatesView: View {
 
             if isPukBlocked {
                 VStack(alignment: .leading) {
-                    Text(verbatim: languageSettings.localized("PUK blocked"))
+                    Text(verbatim: pukBlockedMessage)
                         .font(typography.bodySmall)
                         .foregroundStyle(theme.error)
                         .padding(.vertical, Dimensions.Padding.XSPadding)

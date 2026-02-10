@@ -17,23 +17,15 @@
  *
  */
 
-import Foundation
-import IdCardLib
+import SwiftUI
 
-@MainActor
-protocol MyEidPinChangeViewModelProtocol: Sendable {
-    var step: MyEidPinCodeStep { get }
-    var input: String { get set }
-    var inputErrorMessage: String? { get }
-    var inputErrorMessageExtraArguments: [String] { get }
-    var errorMessage: String? { get }
-    var errorMessageExtraArguments: [String] { get }
-    var isBlocked: Bool { get }
-
-    func submit() async
-    func resetErrors()
-
-    func verifyNewCode()
-    func verifyRepeatedCode() -> Bool
-    func isPINLengthValid(for codeType: CodeType, pin: [UInt8]) -> Bool
+extension UIKeyboardType {
+    var needsDoneButton: Bool {
+        switch self {
+        case .numberPad, .decimalPad, .phonePad, .asciiCapableNumberPad:
+            return true
+        default:
+            return false
+        }
+    }
 }

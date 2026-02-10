@@ -183,11 +183,20 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         case .containerCreationFailed(let errorDetail),
                 .containerOpeningFailed(let errorDetail),
                 .containerSavingFailed(let errorDetail):
-            return ToastMessage(key: "Failed to open container", args: [errorDetail.userInfo["fileName"] as? String ?? ""])
+            return ToastMessage(
+                key: "Failed to open container",
+                args: [errorDetail.userInfo["fileName"] as? String ?? ""]
+            )
         case .addingFilesToContainerFailed(let errorDetail):
-            return ToastMessage(key: "Failed to open file", args: [errorDetail.userInfo["fileName"] as? String ?? ""])
+            return ToastMessage(
+                key: "Failed to open file",
+                args: [errorDetail.userInfo["fileName"] as? String ?? ""]
+            )
         case .containerDataFileSavingFailed(let errorDetail):
-            return ToastMessage(key: "Failed to save file", args: [errorDetail.userInfo["fileName"] as? String ?? ""])
+            return ToastMessage(
+                key: "Failed to save file",
+                args: [errorDetail.userInfo["fileName"] as? String ?? ""]
+            )
         case .alreadyInitialized:
             return ToastMessage(key: "Libdigidocpp is already initialized")
         default:
