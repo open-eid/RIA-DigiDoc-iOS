@@ -5088,6 +5088,24 @@
         }
       }
     },
+    "PIN blocked unblock message" : {
+      "comment" : "My eID PIN unblock instructions error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock to use the PIN again."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tühista blokeering, et PIN-i taas kasutada."
+          }
+        }
+      }
+    },
     "PIN change failed" : {
       "comment" : "OperationUnblockPin error",
       "extractionState" : "manual",
@@ -5462,6 +5480,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PUK on blokeeritud, kuna PUK-koodi on sisestatud 3 korda valesti. PUK-koodi ei saa ise lahti blokeerida.\n\nKuigi PUK-kood on blokeeritud, saab kõiki eID võimalusi kasutada, välja arvatud PUK-koodi vajavaid.\n\nUue PUK-koodi saamiseks külasta klienditeeninduspunkti, kust saad uue koodiümbriku uute koodidega."
+          }
+        }
+      }
+    },
+    "PUK blocked Thales" : {
+      "comment" : "My eID PUK blocked Thales message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK has been blocked because PUK code has been entered incorrectly 3 times. You can not unblock the PUK code yourself.\n\nAs long as the PUK code is blocked, all eID options can be used, except transactions that need PUK code.\n\nA new document must be requested to receive the new PUK code."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PUK on blokeeritud, kuna PUK-koodi on sisestatud 3 korda valesti. PUK-koodi ei saa ise lahti blokeerida.\n\nKuigi PUK-kood on blokeeritud, saab kõiki eID võimalusi kasutada, välja arvatud PUK-koodi vajavaid.\n\nUue PUK-koodi saamiseks tuleb taotleda uus dokument."
+          }
+        }
+      }
+    },
+    "PUK blocked Thales URL" : {
+      "comment" : "My eID PUK blocked Thales URL",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/changing-id-card-pin-codes-and-puk-code/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/id-kaardi-pin-ja-puk-koodide-muutmine/"
           }
         }
       }

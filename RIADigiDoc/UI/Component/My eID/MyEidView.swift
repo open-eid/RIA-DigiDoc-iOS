@@ -82,9 +82,9 @@ struct MyEidView: View {
         _viewModel = State(wrappedValue: Container.shared.myEidViewModel())
         self.idCardData = idCardData
 
-        self._isPin1Blocked = State(initialValue: idCardData.retryCount.pin1 == 0)
-        self._isPin2Blocked = State(initialValue: idCardData.retryCount.pin2 == 0)
-        self._isPukBlocked = State(initialValue: idCardData.retryCount.puk == 0)
+        viewModel.setIsPinBlocked(.pin1, isBlocked: idCardData.retryCount.pin1 == 0)
+        viewModel.setIsPinBlocked(.pin2, isBlocked: idCardData.retryCount.pin2 == 0)
+        viewModel.setIsPinBlocked(.puk, isBlocked: idCardData.retryCount.puk == 0)
     }
 
     var body: some View {
@@ -204,7 +204,7 @@ struct MyEidView: View {
             if viewModel.usbReaderStatus != .sCardConnected {
                 await viewModel.stopDiscoveringReaders()
                 await MainActor.run {
-                    dismiss()
+                    pathManager.replaceLast(to: .myEidRootView)
                 }
             }
         }

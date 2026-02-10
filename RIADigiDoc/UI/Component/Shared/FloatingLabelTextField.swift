@@ -21,6 +21,7 @@ import SwiftUI
 import FactoryKit
 
 struct FloatingLabelTextField: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.sizeCategory) private var sizeCategory
     @AppTheme private var theme
     @AppTypography private var typography
@@ -285,14 +286,16 @@ struct FloatingLabelTextField: View {
                                     )
                                 }
 
-                                Button(
-                                    action: {
-                                        fieldIsFocused = false
-                                        isAccessibilityFocused = true
-                                        onDone()
-                                    },
-                                    label: { Text(verbatim: languageSettings.localized("Done")) }
-                                )
+                                if keyboardType.needsDoneButton {
+                                    Button(
+                                        action: {
+                                            fieldIsFocused = false
+                                            isAccessibilityFocused = true
+                                            onDone()
+                                        },
+                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                    )
+                                }
                             }
                         }
                     }
@@ -326,14 +329,16 @@ struct FloatingLabelTextField: View {
                                     )
                                 }
 
-                                Button(
-                                    action: {
-                                        fieldIsFocused = false
-                                        isAccessibilityFocused = true
-                                        onDone()
-                                    },
-                                    label: { Text(verbatim: languageSettings.localized("Done")) }
-                                )
+                                if keyboardType.needsDoneButton {
+                                    Button(
+                                        action: {
+                                            fieldIsFocused = false
+                                            isAccessibilityFocused = true
+                                            onDone()
+                                        },
+                                        label: { Text(verbatim: languageSettings.localized("Done")) }
+                                    )
+                                }
                             }
                         }
                     }

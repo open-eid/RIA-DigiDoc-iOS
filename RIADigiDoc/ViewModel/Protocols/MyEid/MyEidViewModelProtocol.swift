@@ -26,6 +26,7 @@ public protocol MyEidViewModelProtocol: Sendable {
     func parseDateOfBirth(personalCode: String) -> String
     func parseExpiryDate(expiryDate: String) -> String
     func getDocumentExpirationStatus(expiryDate: String) -> MyEidDocumentStatus
+    func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
     func getIsPinBlocked(for codeType: CodeType) -> Bool
     func stopDiscoveringReaders() async
 }

@@ -265,7 +265,9 @@ struct IdCardView: View {
         .onDisappear {
             pinNumber.removeAll()
             Task {
-                await viewModel.stopDiscoveringReaders()
+                await MainActor.run {
+                    viewModel.resetErrors()
+                }
             }
         }
     }
