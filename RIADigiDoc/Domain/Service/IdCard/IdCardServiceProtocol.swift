@@ -33,4 +33,5 @@ public protocol IdCardServiceProtocol: Sendable {
     func isPUKChangeable() async throws -> Bool
     func changeCode(_ codeType: CodeType, to newCode: Data, verifyCode: Data) async throws
     func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws
+    func calculateSignature(for dataToSign: Data, pin2: SecureData) async throws -> Data
 }

@@ -66,6 +66,7 @@ struct RIADigiDocApp: App {
             }
 
             await librarySetup.setupLibraries()
+            await crashReportManager.evaluateCrashReporting()
             fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nil)
             isInitialLanguageSelected = await dataStore.getIsInitialLanguageSelected()
             await MainActor.run {
@@ -89,15 +90,14 @@ struct RIADigiDocApp: App {
                         ContentView()
                             .environment(pathManager)
                             .appNavigation(pathManager: pathManager)
-                            .task {
-                                await crashReportManager.evaluateCrashReporting()
-                            }
                             .alert(
                                 languageSettings.localized("Crash report title"),
                                 isPresented: $crashReportManager.showCrashDialog
                             ) {
                                 Button(languageSettings.localized("Crash report send")) {
-                                    crashReportManager.sendReport()
+                                    Task {
+                                        await crashReportManager.sendReport()
+                                    }
                                 }
                                 Button(languageSettings.localized("Crash report always send")) {
                                     Task {
@@ -105,7 +105,9 @@ struct RIADigiDocApp: App {
                                     }
                                 }
                                 Button(languageSettings.localized("Crash report dont send"), role: .cancel) {
-                                    crashReportManager.doNotSendReport()
+                                    Task {
+                                        await crashReportManager.doNotSendReport()
+                                    }
                                 }
                             } message: {
                                 Text(verbatim: languageSettings.localized("Crash report message"))

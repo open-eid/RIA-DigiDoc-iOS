@@ -70,4 +70,8 @@ actor IdCardService: IdCardServiceProtocol {
     func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws {
         try await usbReaderConnection.unblockCode(codeType, puk: puk, newCode: newCode)
     }
+
+    func calculateSignature(for dataToSign: Data, pin2: SecureData) async throws -> Data {
+        try await usbReaderConnection.calculateSignature(for: dataToSign, pin2: pin2)
+    }
 }

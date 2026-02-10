@@ -22,8 +22,10 @@ import FactoryKit
 import CryptoSwift
 import LibdigidocLibSwift
 import IdCardLib
+import CommonsLib
 
 struct IdCardView: View {
+    @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
@@ -34,6 +36,7 @@ struct IdCardView: View {
     @State private var isInProgress: Bool = false
     @State private var isShowingPinView: Bool = false
     @State private var isShowingLoadingView: Bool = false
+    @State private var showRoleView: Bool = false
     @State private var pinNumber = ""
     @State private var idCardActionMessage: String = "ID card connect card reader"
 
@@ -42,11 +45,22 @@ struct IdCardView: View {
     @State private var usbReaderStatus: UsbReaderStatus = .sInitial
     @State private var idCardData: IdCardData?
 
+    @State private var task: Task<Void, Never>?
+
     let signedContainer: SignedContainerProtocol?
     let cryptoContainer: CryptoContainerProtocol?
 
     let onSuccess: (SignedContainerProtocol) -> Void
     let onSuccessDecrypt: (CryptoContainerProtocol) -> Void
+
+    var localizedArguments: [String] {
+        var localized: [String] = []
+        for arg in viewModel.idCardAlertMessageExtraArguments {
+            localized.append(languageSettings.localized(arg))
+        }
+
+        return localized
+    }
 
     private var errorMessage: String {
         languageSettings.localized(
@@ -131,7 +145,7 @@ struct IdCardView: View {
                         Task {
                             let decryptedContainer = await viewModel.decrypt(
                                 pin1: pinNumber,
-                                cryptoContainer: container,
+                                cryptoContainer: container
                             )
 
                             pinNumber = ""
@@ -140,7 +154,7 @@ struct IdCardView: View {
 
                             guard let container = decryptedContainer else {
                                 if shouldDismiss {
-                                    cancelDecrypt()
+                                    cancelIdCardAction()
                                     await viewModel.stopDiscoveringReaders()
                                 }
 
@@ -161,7 +175,7 @@ struct IdCardView: View {
                             }
 
                             await viewModel.stopDiscoveringReaders()
-                            cancelDecrypt()
+                            cancelIdCardAction()
                             isInProgress = false
                             isShowingPinView = false
                             isShowingLoadingView = false
@@ -171,8 +185,20 @@ struct IdCardView: View {
                         }
                     }
                 case .signing:
-                    // TODO: Implement signing action
                     isInProgress = true
+                    isShowingPinView = false
+                    isShowingLoadingView = true
+
+                    if usbReaderStatus == .sCardConnected {
+                        Task {
+                            let isRoleDataEnabled = await viewModel.isRoleDataEnabled()
+                            if isRoleDataEnabled {
+                                showRoleView = true
+                            } else {
+                                sign()
+                            }
+                        }
+                    }
                 case .myeid:
                     // Do nothing
                     isInProgress = true
@@ -206,6 +232,49 @@ struct IdCardView: View {
         .task {
             await viewModel.startDiscoveringReaders()
         }
+        .fullScreenCover(isPresented: $showRoleView) {
+            RoleView(
+                onComplete: { roles, city, state, country, zipCode in
+                    showRoleView = false
+                    sign(
+                        roleData: RoleData(
+                            roles: roles
+                                .split(separator: ",")
+                                .map { $0.trimmingCharacters(in: .whitespaces) },
+                            city: city,
+                            state: state,
+                            country: country,
+                            zipCode: zipCode
+                        )
+                    )
+                }
+            )
+        }
+        .alert(
+            languageSettings.localized(
+                viewModel.idCardAlertMessageKey ?? "",
+                localizedArguments
+            ),
+            isPresented: $viewModel.showIdCardAlertMessage
+        ) {
+            Button(languageSettings.localized("OK")) {
+                viewModel.resetErrors()
+                viewModel.resetAlertErrors()
+                dismiss()
+            }
+
+            if let messageUrl = viewModel.idCardAlertMessageUrl, !messageUrl.isEmpty {
+                Button(languageSettings.localized("Additional information")) {
+                    if let url = URL(string: languageSettings.localized(messageUrl)),
+                       UIApplication.shared.canOpenURL(url) {
+                        openURL(url)
+                    }
+                    viewModel.resetErrors()
+                    viewModel.resetAlertErrors()
+                    dismiss()
+                }
+            }
+        }
         .onChange(of: viewModel.usbReaderStatus) { _, newValue in
             usbReaderStatus = newValue
             idCardActionMessage = getStatusText(newValue)
@@ -217,6 +286,8 @@ struct IdCardView: View {
             ]
 
             isInProgress = !notInProgressStates.contains(newValue)
+
+            pinNumber = ""
 
             Task {
                 switch actionType {
@@ -241,8 +312,24 @@ struct IdCardView: View {
                     }
 
                 case .signing:
-                    // TODO: Implement signing action
-                    isInProgress = true
+                    guard newValue == .sCardConnected else {
+                        await MainActor.run {
+                            isShowingPinView = false
+                            isShowingLoadingView = false
+                        }
+                        return
+                    }
+
+                    idCardData = await viewModel.getIdCardData()
+                    guard idCardData != nil else {
+                        await handleCardError()
+                        return
+                    }
+
+                    await MainActor.run {
+                        isShowingLoadingView = false
+                        isShowingPinView = true
+                    }
 
                 case .myeid:
                     guard newValue == .sCardConnected else { return }
@@ -267,11 +354,7 @@ struct IdCardView: View {
         }
         .onDisappear {
             pinNumber.removeAll()
-            Task {
-                await MainActor.run {
-                    viewModel.resetErrors()
-                }
-            }
+            cancelIdCardAction()
         }
     }
 
@@ -299,10 +382,86 @@ struct IdCardView: View {
         }
     }
 
-    private func cancelDecrypt() {
+    private func cancelIdCardAction() {
         pinNumber.isEmpty ? () : (pinNumber.removeAll())
         isActionEnabled = viewModel
             .isActionEnabled(pinNumber: pinNumber, pinType: pinCodeType)
+        resetIdCardAction()
+    }
+
+    private func resetIdCardAction() {
+        task?.cancel()
+        task = nil
+        viewModel.resetErrors()
+    }
+
+    private func sign(roleData: RoleData? = nil) {
+        resetIdCardAction()
+
+        guard let container = signedContainer else {
+            Toast.show(
+                languageSettings.localized("General error")
+            )
+            return
+        }
+
+        task = Task {
+            let updatedContainer = await viewModel.sign(
+                pin2: pinNumber,
+                signedContainer: container,
+                roleData: roleData ?? RoleData(
+                    roles: [],
+                    city: "",
+                    state: "",
+                    country: "",
+                    zipCode: ""
+                )
+            )
+
+            pinNumber = ""
+
+            let shouldDismiss = viewModel.shouldDismissForError
+
+            guard let container = updatedContainer else {
+                if shouldDismiss {
+                    cancelIdCardAction()
+                    await viewModel.stopDiscoveringReaders()
+                }
+
+                await MainActor.run {
+                    Toast.show(errorMessage)
+                    viewModel.resetErrors()
+                    if shouldDismiss {
+                        dismiss()
+                    }
+
+                    if viewModel.showIdCardAlertMessage {
+                        idCardActionMessage = "ID card connect card reader"
+                        isInProgress = false
+                        isShowingPinView = false
+                        isShowingLoadingView = false
+                    } else {
+                        isInProgress = !viewModel.shouldDismissForError
+                        isShowingPinView = !viewModel.shouldDismissForError
+                        isShowingLoadingView = false
+                    }
+                    return
+                }
+
+                return
+            }
+
+            await viewModel.stopDiscoveringReaders()
+            cancelIdCardAction()
+            isInProgress = false
+            isShowingPinView = false
+            isShowingLoadingView = false
+
+            Toast.show(languageSettings.localized("Signature added"))
+
+            onSuccess(container)
+            dismiss()
+        }
     }
 }
 

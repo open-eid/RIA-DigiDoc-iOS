@@ -36,40 +36,47 @@ final class CrashReportManager: CrashReportManagerProtocol, Loggable {
     }
 
     func evaluateCrashReporting() async {
-        if await dataStore.getIsCrashlyticsAlwaysEnabled() {
-            checkForUnsentReports(send: true)
+        let isAlwaysEnabled = await dataStore.getIsCrashlyticsAlwaysEnabled()
+        let hasUnsentReports = await Crashlytics.crashlytics().checkForUnsentReports()
+
+        guard hasUnsentReports else {
+            showCrashDialog = false
+            return
+        }
+
+        if isAlwaysEnabled {
+            await checkForUnsentReports(send: true)
         } else {
             showCrashDialog = true
         }
     }
 
-    func sendReport() {
+    func sendReport() async {
         CrashReportManager.logger().info("Sending crash report")
-        checkForUnsentReports(send: true)
+        await checkForUnsentReports(send: true)
         showCrashDialog = false
     }
 
     func alwaysSendReport() async {
         CrashReportManager.logger().info("(Always) sending crash report")
         await dataStore.setIsCrashlyticsAlwaysEnabled(true)
-        checkForUnsentReports(send: true)
+        await checkForUnsentReports(send: true)
         showCrashDialog = false
     }
 
-    func doNotSendReport() {
+    func doNotSendReport() async {
         CrashReportManager.logger().info("Not sending crash report")
-        checkForUnsentReports(send: false)
+        await checkForUnsentReports(send: false)
         showCrashDialog = false
     }
 
-    private func checkForUnsentReports(send: Bool) {
-        Crashlytics.crashlytics().checkForUnsentReports { hasUnsentReports in
-            CrashReportManager.logger().info("Has unsent crash reports: \(hasUnsentReports)")
-            if send && hasUnsentReports {
-                Crashlytics.crashlytics().sendUnsentReports()
-            } else {
-                Crashlytics.crashlytics().deleteUnsentReports()
-            }
+    private func checkForUnsentReports(send: Bool) async {
+        let hasUnsentReports = await Crashlytics.crashlytics().checkForUnsentReports()
+        CrashReportManager.logger().info("Has unsent crash reports: \(hasUnsentReports)")
+        if send && hasUnsentReports {
+            Crashlytics.crashlytics().sendUnsentReports()
+        } else {
+            Crashlytics.crashlytics().deleteUnsentReports()
         }
     }
 }

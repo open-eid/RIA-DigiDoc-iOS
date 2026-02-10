@@ -21,6 +21,8 @@ import SwiftUI
 
 struct Toast {
     static func show(_ message: String, duration: TimeInterval = 5.0) {
+        if message.isEmpty { return }
+
         Task {
             await ToastQueue.shared.enqueue(
                 message: message,
