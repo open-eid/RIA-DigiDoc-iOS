@@ -23,7 +23,7 @@ import Foundation
 @MainActor
 protocol CrashReportManagerProtocol: Sendable {
     func evaluateCrashReporting() async
-    func sendReport()
+    func sendReport() async
     func alwaysSendReport() async
-    func doNotSendReport()
+    func doNotSendReport() async
 }

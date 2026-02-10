@@ -1536,7 +1536,7 @@
         },
         "et" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ümbriku krüpteerimine ebaõnnestus"
           }
         }
@@ -2023,6 +2023,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hoidke ID-kaarti vastu nutiseadet kuni andmeid loetakse."
+          }
+        }
+      }
+    },
+    "ID card conditional speech" : {
+      "comment" : "ID-card error messages where it’s used in sentences",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card's"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaardi"
           }
         }
       }

@@ -227,6 +227,24 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
         }
     }
 
+    public func calculateSignature(for dataToSign: Data, pin2: SecureData) async throws -> Data {
+        await ensureHandler()
+
+        guard let handler = cardHandler else {
+            UsbReaderConnection.logger().error("ID-CARD: Unable to calculate signature to sign with ID-card reader")
+            throw IdCardInternalError.readerProcessFailed
+        }
+
+        do {
+            return try await handler.calculateSignature(for: dataToSign, withPin2: pin2)
+        } catch {
+            guard let exception = error as? IdCardInternalError else {
+                throw IdCardError.sessionError
+            }
+            throw exception.getIdCardError()
+        }
+    }
+
     // MARK: Handler
 
     private func ensureHandler() async {

@@ -72,4 +72,8 @@ actor IdCardRepository: IdCardRepositoryProtocol {
     func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws {
         try await idCardService.unblockCode(codeType, puk: puk, newCode: newCode)
     }
+
+    func calculateSignature(for dataToSign: Data, pin2: SecureData) async throws -> Data {
+        try await idCardService.calculateSignature(for: dataToSign, pin2: pin2)
+    }
 }

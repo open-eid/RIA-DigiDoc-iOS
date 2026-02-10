@@ -23,6 +23,7 @@ import IdCardLib
 import CommonsLib
 import X509
 import UtilsLib
+import LibdigidocLibSwift
 
 @Observable
 @MainActor
@@ -31,10 +32,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     private let sharedMyEidSession: SharedMyEidSessionProtocol
     private let certificateUtil: CertificateUtilProtocol
     private let nameUtil: NameUtilProtocol
+    private let dataStore: DataStoreProtocol
+    private let userAgentUtil: UserAgentUtilProtocol
 
     var errorMessage: String?
     var errorExtraArguments: [String] = []
     var shouldDismissForError = false
+    var showIdCardAlertMessage = false
+    var idCardAlertMessageKey: String?
+    var idCardAlertMessageUrl: String?
+    var idCardAlertMessageExtraArguments: [String] = []
 
     var pinNumberErrorKey: String?
     var pinNumberErrorExtraArguments: [String] = []
@@ -47,12 +54,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         idCardRepository: IdCardRepositoryProtocol,
         sharedMyEidSession: SharedMyEidSessionProtocol,
         certificateUtil: CertificateUtilProtocol,
-        nameUtil: NameUtilProtocol
+        nameUtil: NameUtilProtocol,
+        dataStore: DataStoreProtocol,
+        userAgentUtil: UserAgentUtilProtocol
     ) {
         self.idCardRepository = idCardRepository
         self.sharedMyEidSession = sharedMyEidSession
         self.certificateUtil = certificateUtil
         self.nameUtil = nameUtil
+        self.dataStore = dataStore
+        self.userAgentUtil = userAgentUtil
     }
 
     func startDiscoveringReaders() async {
@@ -92,6 +103,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
 
             return container
         } catch {
+            IdCardViewModel.logger().error("ID-CARD: Unable to decrypt container with ID-card reader. \(error)")
             guard let exception = error as? IdCardInternalError else {
                 IdCardViewModel.logger().error("ID-CARD: ID Card General error.")
                 errorMessage = "General error"
@@ -102,6 +114,58 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let error  = exception.getIdCardError()
             handleIdCardError(error, pinType: CodeType.pin1)
 
+            return nil
+        }
+    }
+
+    func sign(
+        pin2: String,
+        signedContainer: SignedContainerProtocol,
+        roleData: RoleData
+    ) async -> SignedContainerProtocol? {
+        do {
+            let containerFile = await signedContainer.getRawContainerFile() ?? URL(fileURLWithPath: "")
+            let pinSecureData = SecureData(Array(pin2.utf8))
+            let signatureCertificate = try await idCardRepository.readSignatureCertificate()
+
+            IdCardViewModel.logger().info("ID-CARD: Getting language")
+            let appLanguage = await dataStore.getSelectedLanguage()
+
+            IdCardViewModel.logger().info("ID-CARD: Getting User-Agent")
+            let userAgent = userAgentUtil.userAgent(diagnostics: .devices, language: appLanguage)
+
+            let dataToSign: Data
+            do {
+                dataToSign = try await prepareSignature(
+                    cert: signatureCertificate,
+                    containerFile: containerFile,
+                    roleData: roleData,
+                    signedContainer: signedContainer,
+                    userAgent: userAgent
+                )
+            } catch {
+                IdCardViewModel.logger().error(
+                    "ID-CARD: Unable to prepare signature for signing with ID-card reader. \(error)"
+                )
+                handleError(error, codeType: .pin2)
+                return nil
+            }
+
+            let signatureData = try await idCardRepository.calculateSignature(
+                for: dataToSign,
+                pin2: pinSecureData
+            )
+
+            return try await signedContainer.addSignature(
+                signature: signatureData,
+                containerFile: containerFile
+            )
+        } catch {
+            IdCardViewModel.logger().error(
+                "ID-CARD: Unable to read ID-card data to sign with ID-Card reader. \(error)"
+            )
+
+            handleError(error, codeType: .pin2)
             return nil
         }
     }
@@ -138,8 +202,19 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         shouldDismissForError = false
     }
 
+    func resetAlertErrors() {
+        showIdCardAlertMessage = false
+        idCardAlertMessageKey = nil
+        idCardAlertMessageUrl = nil
+        idCardAlertMessageExtraArguments = []
+    }
+
     func formatPersonalIdentifier(givenName: String, surname: String, personalCode: String) -> String {
         return "\(nameUtil.formatName("\(givenName) \(surname)")), \(personalCode)"
+    }
+
+    func isRoleDataEnabled() async -> Bool {
+        await dataStore.getIsRoleAndAddressEnabled()
     }
 
     private func getPublicData() async throws -> CardInfo {
@@ -256,5 +331,98 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             return
         }
         pinNumberErrorKey = ""
+    }
+
+    private func prepareSignature(
+        cert: Data,
+        containerFile: URL,
+        roleData: RoleData,
+        signedContainer: SignedContainerProtocol,
+        userAgent: String
+    ) async throws -> Data {
+        IdCardViewModel.logger().info(
+            "ID-CARD: Preparing signature. Calculating hash"
+        )
+
+        return try await signedContainer.prepareSignature(
+            cert: cert,
+            containerPath: containerFile,
+            roleData: roleData,
+            userAgent: userAgent
+        )
+    }
+
+    private func handleError(_ error: Error, codeType: CodeType) {
+        switch error {
+        case let idCardError as IdCardError:
+            handleIdCardError(idCardError, pinType: codeType)
+
+        case let digidocError as DigiDocError:
+            handleSignatureAddingError(digidocError)
+
+        default:
+            errorMessage = "General error"
+            errorExtraArguments = []
+        }
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
+    private func handleSignatureAddingError(_ error: Error) {
+        IdCardViewModel.logger().error("Unable to sign container with ID-card: \(error)")
+
+        if let cancellationError = error as? CancellationError {
+            IdCardViewModel.logger().error("ID-card signing manually cancelled: \(cancellationError)")
+            return
+        }
+
+        guard let digidocError = error as? DigiDocError else {
+            errorMessage = "General error"
+            return
+        }
+
+        switch digidocError {
+        case .signatureAddingFailed(let errorDetail):
+            let message = errorDetail.message
+
+            let sslError = "Failed to create ssl connection with host"
+            let tooManyRequestsError = "Too Many Requests"
+            let ocspError = "OCSP response not in valid time slot"
+            let revokedCertError = "Certificate status: revoked"
+            let connectError = "CONNECT: 403"
+            let failedToConnectError = "Failed to connect"
+            let proxyError = "Failed to authenticate with proxy"
+
+            switch true {
+            case message.contains(sslError):
+                errorMessage = "SSL handshake failed"
+
+            case message.contains(tooManyRequestsError):
+                showIdCardAlertMessage = true
+                idCardAlertMessageKey = "Too many requests"
+                idCardAlertMessageUrl = "Too many requests url"
+                idCardAlertMessageExtraArguments = ["ID card conditional speech"]
+
+            case message.contains(ocspError):
+                showIdCardAlertMessage = true
+                idCardAlertMessageKey = "OCSP response not in valid time slot"
+                idCardAlertMessageUrl = "OCSP response not in valid time slot url"
+
+            case message.contains(revokedCertError):
+                errorMessage = "Certificate status revoked"
+
+            case message.contains(connectError), message.contains(failedToConnectError):
+                errorMessage = "No Internet connection"
+
+            case message.contains(proxyError):
+                errorMessage = "Invalid proxy settings"
+
+            default:
+                errorMessage = "Signing technical error"
+                idCardAlertMessageExtraArguments = ["ID card conditional speech"]
+            }
+
+        default:
+            errorMessage = "General error"
+        }
     }
 }

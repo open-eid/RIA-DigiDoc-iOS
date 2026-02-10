@@ -419,7 +419,9 @@ extension Container {
                 idCardRepository: self.idCardRepository(),
                 sharedMyEidSession: self.sharedMyEidSession(),
                 certificateUtil: self.certificateUtil(),
-                nameUtil: self.nameUtil()
+                nameUtil: self.nameUtil(),
+                dataStore: self.dataStore(),
+                userAgentUtil: self.userAgentUtil()
             )
         }
     }
