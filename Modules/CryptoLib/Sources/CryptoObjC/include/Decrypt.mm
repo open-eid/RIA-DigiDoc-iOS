@@ -59,8 +59,24 @@
 
 @implementation Decrypt
 
++ (void)setCerts:(nullable NSArray<NSData *> *)certs {
+    Network::setCerts(certs);
+}
+
++ (void)setCert:(nullable NSData *)cert {
+    Network::setCert(cert);
+}
+
 + (void)setCdoc2Config:(nonnull NSDictionary<NSString *,id> *)config {
     Settings::setCdoc2Config(config);
+}
+
++ (void)setFetchURL:(nonnull NSString *)url {
+    Settings::setFetchURL(url);
+}
+
++ (void)setPostURL:(nonnull NSString *)url {
+    Settings::setPostURL(url);
 }
 
 + (void)setProxy:(nonnull NSString *)host port:(NSInteger)port username:(nonnull NSString *)username password:(nonnull NSString *)password {

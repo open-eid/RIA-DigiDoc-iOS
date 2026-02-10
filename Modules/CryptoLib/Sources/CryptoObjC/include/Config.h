@@ -28,12 +28,40 @@
 struct Settings : public libcdoc::Configuration {
 private:
     inline static NSDictionary<NSString *, id> * _Nullable _cdoc2Config = nil;
+    inline static NSString * _Nullable _fetchURL = nil;
+    inline static NSString * _Nullable _postURL = nil;
+    inline static NSString * _Nullable _uuid = nil;
+    inline static bool _isOnlineEncryptionEnabled = false;
 
 public:
     static void setCdoc2Config(NSDictionary<NSString *, id> * _Nonnull config) {
         _cdoc2Config = config;
     }
+    
+    static void setFetchURL(NSString * _Nonnull url) {
+        _fetchURL = url;
+    }
+    
+    static void setPostURL(NSString * _Nonnull url) {
+        _postURL = url;
+    }
+    
+    static void setUUID(NSString * _Nonnull uuid) {
+        _uuid = uuid;
+    }
 
+    static NSString * _Nullable getUUID() {
+        return _uuid;
+    }
+    
+    static void setIsOnlineEncryptionEnabled(bool isOnlineEncryptionEnabled) {
+        _isOnlineEncryptionEnabled = isOnlineEncryptionEnabled;
+    }
+
+    static bool isOnlineEncryptionEnabled() {
+        return _isOnlineEncryptionEnabled;
+    }
+    
     std::string getValue(std::string_view domain,
                          std::string_view param) const final {
 
@@ -47,15 +75,15 @@ public:
             NSDictionary *uuidDict = _cdoc2Config[nsDomain];
 
             if (![uuidDict isKindOfClass:[NSDictionary class]]) {
-                return std::string();
+                return std::string([_fetchURL UTF8String]);
             }
 
-            NSString *post = uuidDict[@"FETCH"];
-            if (![post isKindOfClass:[NSString class]]) {
-                return std::string();
+            NSString *fetch = uuidDict[@"FETCH"];
+            if (![fetch isKindOfClass:[NSString class]]) {
+                return std::string([_fetchURL UTF8String]);
             }
 
-            return std::string([post UTF8String]);
+            return std::string([fetch UTF8String]);
         }
 
         if (param == KEYSERVER_SEND_URL) {
@@ -63,15 +91,15 @@ public:
             NSDictionary *uuidDict = _cdoc2Config[nsDomain];
 
             if (![uuidDict isKindOfClass:[NSDictionary class]]) {
-                return std::string();
+                return std::string([_postURL UTF8String]);
             }
 
-            NSString *fetch = uuidDict[@"POST"];
-            if (![fetch isKindOfClass:[NSString class]]) {
-                return std::string();
+            NSString *post = uuidDict[@"POST"];
+            if (![post isKindOfClass:[NSString class]]) {
+                return std::string([_postURL UTF8String]);
             }
 
-            return std::string([fetch UTF8String]);
+            return std::string([post UTF8String]);
         }
 
         return {};
@@ -81,12 +109,21 @@ public:
 struct Network: public libcdoc::NetworkBackend {
 private:
     inline static NSArray<NSData *> * _Nullable _certs = nil;
+    inline static NSData * _Nullable _cert = nil;
     inline static NSString * _Nonnull _host = @"";
     inline static NSInteger _port = 80;
     inline static NSString * _Nonnull _username = @"";
     inline static NSString * _Nonnull _password = @"";
 
 public:
+    static void setCert(NSData * _Nullable cert) {
+        _cert = cert;
+    }
+    
+    static void setCerts(NSArray<NSData *> * _Nullable certs) {
+        _certs = certs;
+    }
+    
     static void setProxy(NSString * _Nonnull host,
                          NSInteger port,
                          NSString * _Nonnull username,
@@ -99,10 +136,10 @@ public:
 
     libcdoc::result_t getPeerTLSCertificates(std::vector<std::vector<uint8_t>> &dst, const std::string& url) final {
         libcdoc::NetworkBackend::getPeerTLSCertificates(dst);
-        for (NSData *cert in CDoc2Setting.cdoc2Certs) {
+        for (NSData *cert in _certs) {
             dst.push_back([cert toVector]);
         }
-        if (auto cert = [CDoc2Setting.cert toVector]; !cert.empty()) {
+        if (auto cert = [_cert toVector]; !cert.empty()) {
             dst.push_back(std::move(cert));
         }
         return libcdoc::OK;

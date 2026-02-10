@@ -17,7 +17,6 @@
  *
  */
 
-//@import CryptoObjCWrapper;
 #import <Foundation/Foundation.h>
 
 @protocol AbstractSmartToken;
@@ -27,6 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Decrypt : NSObject
 + (void)setCdoc2Config:(NSDictionary<NSString *, id> *)config;
++ (void)setFetchURL:(NSString *)url;
++ (void)setPostURL:(NSString *)url;
++ (void)setCerts:(NSArray<NSData *> * _Nullable)certs;
++ (void)setCert:(NSData * _Nullable)cert;
 + (void)setProxy:(NSString *)host port:(NSInteger)port username:(NSString *)username password:(NSString *)password;
 + (nullable id)cdocInfo:(NSString *)fullPath error:(NSError **)error;
 + (void)decryptFile:(NSString *)fullPath withCert:(NSData *)certData withToken:(id)smartToken

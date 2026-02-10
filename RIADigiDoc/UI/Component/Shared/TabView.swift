@@ -36,40 +36,55 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
         )
     }
 
+    private let tabMinHeight: CGFloat = 56
+
     var body: some View {
-        VStack {
-            HStack {
+        VStack(spacing: 0) {
+
+            HStack(spacing: 0) {
                 ForEach(titles.indices, id: \.self) { index in
-                    Button(action: {
-                        withAnimation {
+                    let title = titles[index]
+                    let isSelected = selectedIndex.wrappedValue == index
+                    let selectedText = isSelected
+                        ? languageSettings.localized("Selected")
+                        : languageSettings.localized("Unselected")
+
+                    Button {
+                        withAnimation(.easeInOut) {
                             selectedIndex.wrappedValue = index
                         }
-                    }, label: {
-                        VStack {
-                            let title = titles[index]
-                            let isSelected = selectedIndex.wrappedValue == index
-                            let selectedText = isSelected ?
-                            languageSettings.localized("Selected") :
-                            languageSettings.localized("Unselected")
-
-                            Text(title)
-                                .font(typography.labelLarge)
-                                .foregroundStyle(isSelected ? theme.primary : theme.onSurface)
-                                .accessibilityLabel(Text(verbatim:
-                                    "\(title), " +
-                                    "\(languageSettings.localized("Tab")) \(index + 1) / \(titles.count), " +
-                                    "\(selectedText)"
-                                ))
+                    } label: {
+                        Text(title)
+                            .font(typography.labelLarge)
+                            .foregroundStyle(isSelected ? theme.primary : theme.onSurface)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.9)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .padding(.horizontal, 8)
+                            .accessibilityLabel(Text(verbatim:
+                                "\(title), " +
+                                "\(languageSettings.localized("Tab")) \(index + 1) / \(titles.count), " +
+                                "\(selectedText)"
+                            ))
+                    }
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, minHeight: tabMinHeight)
+                    .overlay(alignment: .bottom) {
+                        Rectangle()
+                            .fill(theme.outlineVariant)
+                            .frame(height: Dimensions.Height.SBorder)
+                    }
+                    .overlay(alignment: .bottom) {
+                        if isSelected {
                             Rectangle()
-                                .fill(selectedIndex.wrappedValue == index ? theme.primary : theme.outlineVariant)
+                                .fill(theme.primary)
                                 .frame(height: Dimensions.Height.SBorder)
                         }
-                        .frame(maxWidth: .infinity)
-                    })
+                    }
                 }
             }
             .padding(.top, Dimensions.Padding.LPadding)
-
             content()
         }
     }
