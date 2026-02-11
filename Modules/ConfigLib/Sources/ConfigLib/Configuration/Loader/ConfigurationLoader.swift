@@ -201,7 +201,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 forResource: CommonsLib.Constants.Configuration.DefaultConfigJson,
                 withExtension: nil
             ),
-            let confData = try? String(contentsOf: confDataURL)
+            let confData = try? String(contentsOf: confDataURL, encoding: .utf8)
         else {
             throw ConfigurationLoaderError.configurationNotFound
         }
@@ -211,7 +211,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 forResource: CommonsLib.Constants.Configuration.DefaultConfigEcPub,
                 withExtension: nil
             ),
-            let publicKey = try? String(contentsOf: publicKeyURL)
+            let publicKey = try? String(contentsOf: publicKeyURL, encoding: .utf8)
         else {
             throw ConfigurationLoaderError.publicKeyNotFound
         }

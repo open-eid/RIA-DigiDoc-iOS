@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "LibdigidocLib",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v18)],
     products: [
         .library(
             name: "LibdigidocLib",

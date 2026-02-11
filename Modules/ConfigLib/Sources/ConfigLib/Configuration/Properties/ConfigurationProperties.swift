@@ -93,7 +93,10 @@ public actor ConfigurationProperties: ConfigurationPropertiesProtocol {
     }
 
     private func loadProperties(from propertiesFile: URL) -> [String: String]? {
-        guard let fileContents = try? String(contentsOfFile: propertiesFile.resolvedPath) else {
+        guard let fileContents = try? String(
+            contentsOfFile: propertiesFile.resolvedPath,
+            encoding: .utf8
+        ) else {
             return nil
         }
 
