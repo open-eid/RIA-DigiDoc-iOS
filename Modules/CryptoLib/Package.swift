@@ -8,7 +8,7 @@ let packageRoot = #filePath
 
 let package = Package(
     name: "CryptoLib",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v18)],
     products: [
         .library(
             name: "CryptoLib",

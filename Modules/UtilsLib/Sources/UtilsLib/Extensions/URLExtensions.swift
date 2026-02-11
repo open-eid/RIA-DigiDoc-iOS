@@ -68,7 +68,7 @@ extension URL {
                 from: self,
                 fileNameToFind: "mimetype"
             ) {
-                let mimetypeContent = try String(contentsOf: mimetypeFile)
+                let mimetypeContent = try String(contentsOf: mimetypeFile, encoding: .utf8)
                 return mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
