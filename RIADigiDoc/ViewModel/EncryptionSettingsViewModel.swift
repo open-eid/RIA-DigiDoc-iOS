@@ -175,7 +175,8 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Loggable
             serverInfo.postURL = serverInfo.postURL.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         await dataStore.setEncryptionServerInfo(serverInfo)
-        await cryptoSetup.setCdoc2Settings(configuration, certData)
+        await cryptoSetup.setCdoc2Settings(configuration)
+        await cryptoSetup.setCdoc2CustomCert(certData)
     }
 
     // MARK: - Cert Info Getters

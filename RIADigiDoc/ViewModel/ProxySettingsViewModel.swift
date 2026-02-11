@@ -33,15 +33,18 @@ class ProxySettingsViewModel: ProxySettingsViewModelProtocol, Loggable {
     private let proxyUtil: ProxyUtilProtocol
     private let userAgentUtil: UserAgentUtilProtocol
     private let dataStore: DataStoreProtocol
+    private let cryptoSetup: CryptoSetupProtocol
 
     init(
         proxyUtil: ProxyUtilProtocol,
         userAgentUtil: UserAgentUtilProtocol,
-        dataStore: DataStoreProtocol
+        dataStore: DataStoreProtocol,
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.proxyUtil = proxyUtil
         self.userAgentUtil = userAgentUtil
         self.dataStore = dataStore
+        self.cryptoSetup = cryptoSetup
 
         Task {
             await loadSettings()
@@ -69,6 +72,7 @@ class ProxySettingsViewModel: ProxySettingsViewModelProtocol, Loggable {
 
     public func saveSettings() async {
         await proxyUtil.saveSetting(proxyInfo: proxyInfo)
+        await cryptoSetup.setCdoc2ProxyInfo(proxyInfo)
     }
 
     // MARK: - Check connection

@@ -63,6 +63,31 @@ import Foundation
         )
     }
 
+    @objc public init(
+        cnVal: String,
+        serialNumber: String?,
+        certType: CertType,
+        validTo: Date?,
+        data: Data,
+        concatKDFAlgorithmURI: String = ""
+    ) {
+        let split = cnVal.split(separator: ",").map { String($0) }
+        if split.count > 1 {
+            surname = split[0]
+            givenName = split[1]
+            identifier = split[2]
+        } else {
+            surname = nil
+            givenName = nil
+            identifier = cnVal
+        }
+        self.serialNumber = serialNumber
+        self.certType = certType
+        self.validTo = validTo
+        self.data = data
+        self.concatKDFAlgorithmURI = concatKDFAlgorithmURI
+    }
+
     public init(cert: Data, x509: X509Certificate?) {
         data = cert
         let cnVal = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""

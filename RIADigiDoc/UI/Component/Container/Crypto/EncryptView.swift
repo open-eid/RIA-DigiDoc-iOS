@@ -364,11 +364,8 @@ struct EncryptView: View {
                                                 await updateAsyncLabels()
                                                 await viewModel.updateAsyncProperties()
 
-                                                Toast.show(languageSettings.localized(
-                                                    "Container successfully encrypted"
-                                                ))
-
                                                 encryptionButtonEnabled = true
+                                                isWithEncryption = false
                                             }
                                         }
                                     }
@@ -406,10 +403,6 @@ struct EncryptView: View {
                                 await viewModel.encryptContainer()
                                 await updateAsyncLabels()
                                 await viewModel.updateAsyncProperties()
-
-                                Toast.show(languageSettings.localized(
-                                    "Container successfully encrypted"
-                                ))
 
                                 encryptionButtonEnabled = true
                                 isWithEncryption = false
@@ -479,11 +472,18 @@ struct EncryptView: View {
         .animation(.easeInOut, value: showRenameModal)
         .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
-            Toast.show(String(
-                format: languageSettings.localized(error.key),
-                error.args.joined(separator: ", "))
+            Toast.show(
+                languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
             )
+            viewModel.resetErrorMessage()
             encryptionButtonEnabled = true
+        }
+        .onChange(of: viewModel.successMessage) { _, message in
+            guard let message else { return }
+            Toast.show(
+                languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+            )
+            viewModel.resetSuccessMessage()
         }
     }
 

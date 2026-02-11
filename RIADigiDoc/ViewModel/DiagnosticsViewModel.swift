@@ -54,6 +54,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     private let proxyUtil: ProxyUtilProtocol
     private let userAgentUtil: UserAgentUtilProtocol
     private let fileUtil: FileUtilProtocol
+    private let cryptoSetup: CryptoSetupProtocol
 
     private var configurationObservationTask: Task<Void, Never>?
 
@@ -66,7 +67,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         dataStore: DataStoreProtocol,
         proxyUtil: ProxyUtilProtocol,
         userAgentUtil: UserAgentUtilProtocol,
-        fileUtil: FileUtilProtocol
+        fileUtil: FileUtilProtocol,
+        cryptoSetup: CryptoSetupProtocol
     ) {
         self.containerWrapper = containerWrapper
         self.fileManager = fileManager
@@ -77,6 +79,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         self.proxyUtil = proxyUtil
         self.userAgentUtil = userAgentUtil
         self.fileUtil = fileUtil
+        self.cryptoSetup = cryptoSetup
 
         configurationObservationTask = Task {
             await observeConfigurationUpdates()
@@ -501,6 +504,8 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
                 await MainActor.run {
                     configuration = config
                 }
+                await cryptoSetup.setCdoc2Config(config)
+                await cryptoSetup.setCdoc2Settings(config)
             }
         } catch {
             DiagnosticsViewModel.logger().error("Unable to get configuration from stream")
