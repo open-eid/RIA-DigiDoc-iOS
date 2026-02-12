@@ -170,15 +170,20 @@ struct DiagnosticsView: View {
 
     private func onCheckUpdateClick() {
         Task {
-            let status = await viewModel.updateConfiguration()
-            if !status {
-                let message = languageSettings.localized("No Internet connection")
-                if voiceOverEnabled {
-                    var saveButtonAccessibilityAnnouncement = AttributedString(message)
-                    saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
-                    AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
-                }
-                Toast.show(message)
+            let isUpdated = await viewModel.updateConfiguration()
+
+            let messageKey = isUpdated ?
+            "Configuration update successful" :
+            "Configuration update unsuccessful"
+
+            let updateMessage = languageSettings.localized(messageKey)
+
+            Toast.show(updateMessage)
+
+            if voiceOverEnabled {
+                var saveButtonAccessibilityAnnouncement = AttributedString(updateMessage)
+                saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
+                AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
             }
         }
     }
