@@ -716,6 +716,42 @@
         }
       }
     },
+    "Configuration update successful" : {
+      "comment" : "In Diagnostics view when configuration check and update were successful",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoc configuration update was successful"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RIA DigiDoci konfiguratsiooni värskendamine õnnestus"
+          }
+        }
+      }
+    },
+    "Configuration update unsuccessful" : {
+      "comment" : "In Diagnostics view when configuration check or update was unsuccessful",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please check your internet connection and network settings"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Palun kontrolli internetiühendust ja võrgu sätteid"
+          }
+        }
+      }
+    },
     "Confirm container removal" : {
       "comment" : "Recent documents remove container accessibility confirm button",
       "extractionState" : "manual",
@@ -3539,7 +3575,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "RIA DigiDoc äpi kohta"
+            "value" : "RIA DigiDoci äpi kohta"
           }
         }
       }

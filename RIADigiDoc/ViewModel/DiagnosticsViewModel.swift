@@ -312,7 +312,11 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
                 proxyInfo: proxyInfo,
                 userAgent: userAgent
             )
+            DiagnosticsViewModel.logger().info("Configuration updated successfully")
             return true
+        } catch let error as URLError where error.code == .resourceUnavailable {
+            DiagnosticsViewModel.logger().error("Unable to update configuration. No Internet connection. \(error)")
+            return false
         } catch {
             DiagnosticsViewModel.logger().error("Unable to update configuration: \(error)")
             return false
