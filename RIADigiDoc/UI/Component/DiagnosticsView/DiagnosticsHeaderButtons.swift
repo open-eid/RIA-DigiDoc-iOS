@@ -33,12 +33,16 @@ struct DiagnosticsHeaderButtons: View {
                     "Main diagnostics configuration check for update button"),
                 assetImageName: nil,
                 action: onCheckUpdateClick,
+                focusedField: nil,
+                currentFocus: .constant(nil)
             )
             PrimaryOutlinedButton(
                 text: languageSettings.localized(
                     "Main diagnostics configuration save diagnostics button"),
                 assetImageName: "ic_m3_download_48pt_wght400",
                 action: onSaveDiagnosticsClick,
+                focusedField: nil,
+                currentFocus: .constant(nil)
             )
         }
     }

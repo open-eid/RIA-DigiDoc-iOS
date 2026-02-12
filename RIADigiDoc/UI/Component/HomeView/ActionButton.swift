@@ -24,15 +24,34 @@ struct ActionButton: View {
     @AppTheme private var theme
 
     let title: String
+    let titleAccessibility: String
     let description: String
     let assetImageName: String
     let action: () -> Void
+
+    init(
+        title: String,
+        titleAccessibility: String = "",
+        description: String,
+        assetImageName: String,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.titleAccessibility = titleAccessibility
+        self.description = description
+        self.assetImageName = assetImageName
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: Dimensions.Padding.SPadding) {
                 AssetIconComponent(assetName: assetImageName)
-                TextComponent(title: title, description: description)
+                TextComponent(
+                    title: title,
+                    titleAccessibility: titleAccessibility,
+                    description: description
+                )
                 Spacer()
             }
             .padding(Dimensions.Padding.SPadding)
@@ -48,6 +67,7 @@ struct ActionButton: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(titleAccessibility.isEmpty ? title : titleAccessibility)
     }
 }
 
@@ -76,6 +96,7 @@ private struct TextComponent: View {
     @AppTypography private var typography
 
     let title: String
+    let titleAccessibility: String
     let description: String
 
     var body: some View {
@@ -83,6 +104,7 @@ private struct TextComponent: View {
             Text(title)
                 .font(typography.titleMedium)
                 .foregroundStyle(theme.onSurface)
+                .accessibilityLabel(titleAccessibility.isEmpty ? title : titleAccessibility)
 
             Text(description)
                 .font(typography.bodyMedium)

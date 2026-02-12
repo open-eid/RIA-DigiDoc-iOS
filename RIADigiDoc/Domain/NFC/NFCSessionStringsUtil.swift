@@ -98,7 +98,7 @@ public struct NFCSessionStringsUtil {
             ocspTimeslotErrorMessage: ocspTimeslotErrorMessage ?? localize("OCSP response not in valid time slot", []),
             certificateRevokedErrorMessage: certificateRevokedErrorMessage ?? localize(
                 "Certificate status revoked", []),
-            tooManyRequestsErrorMessage: tooManyRequestsErrorMessage ?? localize("Too many requests", []),
+            tooManyRequestsErrorMessage: tooManyRequestsErrorMessage ?? localize("Too many requests", ["NFC"]),
             networkErrorMessage: networkErrorMessage ?? localize("No Internet connection", []),
             sslErrorMessage: sslErrorMessage ?? localize("SSL handshake failed", []),
         )

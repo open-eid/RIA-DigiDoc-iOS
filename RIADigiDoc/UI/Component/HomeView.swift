@@ -215,6 +215,7 @@ struct HomeView: View {
 
                         ActionButton(
                             title: languageSettings.localized("Main home my eid title"),
+                            titleAccessibility: languageSettings.localized("My eid title accessibility"),
                             description: languageSettings.localized("Main home my eid description"),
                             assetImageName: "ic_m3_co_present_48pt_wght400",
                             action: {

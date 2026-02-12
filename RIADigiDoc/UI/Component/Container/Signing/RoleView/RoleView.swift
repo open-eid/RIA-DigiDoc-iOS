@@ -140,7 +140,9 @@ struct RoleView: View {
                                     )
                                     onComplete(roles, city, state, country, zipCode)
                                 }
-                            }
+                            },
+                            focusedField: nil,
+                            currentFocus: .constant(nil)
                         )
                         .padding(.vertical, Dimensions.Padding.MPadding)
                     }

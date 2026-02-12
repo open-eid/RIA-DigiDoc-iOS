@@ -164,7 +164,9 @@ struct ActionInputScreen<Content: View>: View {
                             PrimaryButton(
                                 text: buttonTitle,
                                 isButtonEnabled: isActionEnabled,
-                                action: onSubmit
+                                action: onSubmit,
+                                focusedField: nil,
+                                currentFocus: .constant(nil)
                             )
                             .padding(.vertical, Dimensions.Padding.MPadding)
                         }

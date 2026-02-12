@@ -27,6 +27,7 @@ struct TextModal: View {
     var title: String
     var message: String
     var isConfirmButtonVisible: Bool = true
+    var messageAccessibility: String = ""
     var confirmButtonTitle: String = "OK"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -46,10 +47,12 @@ struct TextModal: View {
             onConfirm: onConfirm,
             onCancel: onCancel
         ) {
-            Text(message)
+            Text(verbatim: message)
                 .font(typography.bodyMedium)
                 .multilineTextAlignment(.leading)
                 .foregroundStyle(theme.onSurfaceVariant)
+                .accessibilityLabel(messageAccessibility.isEmpty ? message : messageAccessibility)
         }
+        .accessibilityAddTraits([.isModal])
     }
 }

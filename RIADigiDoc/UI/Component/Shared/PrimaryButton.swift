@@ -26,31 +26,71 @@ struct PrimaryButton: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    let text: String
-    let isButtonEnabled: Bool
-    let action: () -> Void
+    private let text: String
+    private let isButtonEnabled: Bool
+    private let action: () -> Void
+
+    @Binding private var currentFocus: AccessibilityField?
+    @State private var focusedField: AccessibilityField?
+    @AccessibilityFocusState private var isFocused: Bool
+    @AccessibilityFocusState private var accessibilityField: AccessibilityField?
 
     init(
         text: String,
         isButtonEnabled: Bool,
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
+        focusedField: AccessibilityField?,
+        currentFocus: Binding<AccessibilityField?>,
     ) {
         self.text = text
         self.isButtonEnabled = isButtonEnabled
         self.action = action
+        self.focusedField = focusedField
+        self._currentFocus = currentFocus
     }
 
     var body: some View {
-        Button(action: action) {
-            Text(verbatim: text)
-                .font(typography.labelLarge)
-                .foregroundStyle(isButtonEnabled ? theme.onPrimary : theme.surfaceContainerHighest)
-                .padding(Dimensions.Padding.MSPadding)
-                .frame(maxWidth: .infinity)
-                .background(isButtonEnabled ? theme.primary : Color.gray)
-                .cornerRadius(Dimensions.Corner.MCornerRadius)
+        let button = Button(
+            action: action,
+            label: {
+                Text(verbatim: text)
+                    .foregroundStyle(isButtonEnabled ? theme.onPrimary : theme.surfaceContainerHighest)
+                    .font(typography.labelLarge)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(Dimensions.Padding.XSPadding)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        Capsule()
+                            .fill(isButtonEnabled ? theme.primary : Color.gray)
+                    )
+            })
+            .disabled(!isButtonEnabled)
+            .accessibilityFocused($isFocused)
+            .onAppear {
+                Task {
+                    await MainActor.run {
+                        let shouldFocus = (focusedField != nil && currentFocus == focusedField)
+
+                        isFocused = shouldFocus
+
+                        if shouldFocus {
+                            accessibilityField = focusedField
+                        }
+                    }
+                }
+            }
+
+        if let field = self.accessibilityField {
+            button.accessibilityFocusRestore(
+                focusedField: $accessibilityField,
+                field: field,
+                when: true
+            )
+        } else {
+            button
         }
-        .disabled(!isButtonEnabled)
     }
 }
 
@@ -60,13 +100,17 @@ struct PrimaryButton: View {
         PrimaryButton(
             text: "Button",
             isButtonEnabled: true,
-            action: {}
+            action: {},
+            focusedField: nil,
+            currentFocus: .constant(nil)
         )
 
         PrimaryButton(
             text: "Button",
             isButtonEnabled: false,
-            action: {}
+            action: {},
+            focusedField: nil,
+            currentFocus: .constant(nil)
         )
     }
     .padding(Dimensions.Padding.SPadding)

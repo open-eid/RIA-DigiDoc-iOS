@@ -73,7 +73,8 @@ struct MyEidDataView: View {
         MyEidDetailView(
             myEidDataItem: MyEidDataItem(
                 title: languageSettings.localized("Personal code"),
-                value: personalCode
+                value: personalCode,
+                spellOutCharacters: true
             )
         )
         MyEidDetailView(
@@ -85,7 +86,8 @@ struct MyEidDataView: View {
         MyEidDetailView(
             myEidDataItem: MyEidDataItem(
                 title: languageSettings.localized("Id card number"),
-                value: idCardNumber
+                value: idCardNumber,
+                spellOutCharacters: true
             )
         )
         MyEidDetailView(

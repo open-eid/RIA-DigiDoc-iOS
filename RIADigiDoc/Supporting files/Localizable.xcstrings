@@ -5017,6 +5017,24 @@
         }
       }
     },
+    "My eid title accessibility" : {
+      "comment" : "Accessibility version for My eID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My e I D"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minu e I D"
+          }
+        }
+      }
+    },
     "New PIN difference requirement" : {
       "comment" : "My eID new PIN or PUK difference description",
       "extractionState" : "manual",

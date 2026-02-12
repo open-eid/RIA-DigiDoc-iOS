@@ -35,6 +35,10 @@ struct MyEidPinsAndCertificatesView: View {
     var signCertValidTo: String
     var isPUKChangeable: Bool
 
+    @AccessibilityFocusState private var accessibilityFocus: AccessibilityField?
+    @State private var lastFocused: AccessibilityField?
+    @AccessibilityFocusState private var isPukFocused: Bool
+
     private var pin2LockedMessage: String {
         languageSettings.localized(
             "PIN2 locked"
@@ -119,11 +123,16 @@ struct MyEidPinsAndCertificatesView: View {
                 isPinBlocked: isPin1Blocked,
                 isPukBlocked: isPukBlocked,
                 onForgotPinClick: {
+                    lastFocused = .myEid(.unblockPin1Button)
                     pinChangeVariant = .pin1Unblock
                 },
                 onChangePinClick: {
+                    lastFocused = .myEid(.changePin1Button)
                     pinChangeVariant = .pin1Change
-                }
+                },
+                forgotPinAccessibilityField: .myEid(.unblockPin1Button),
+                changePinAccessibilityField: .myEid(.changePin1Button),
+                lastFocused: $lastFocused
             )
             .opacity(opacityForPin1BlockedState)
 
@@ -153,11 +162,16 @@ struct MyEidPinsAndCertificatesView: View {
                 isPinBlocked: isPin2Blocked,
                 isPukBlocked: isPukBlocked,
                 onForgotPinClick: {
+                    lastFocused = .myEid(.unblockPin2Button)
                     pinChangeVariant = .pin2Unblock
                 },
                 onChangePinClick: {
+                    lastFocused = .myEid(.changePin2Button)
                     pinChangeVariant = .pin2Change
-                }
+                },
+                forgotPinAccessibilityField: .myEid(.unblockPin2Button),
+                changePinAccessibilityField: .myEid(.changePin2Button),
+                lastFocused: $lastFocused
             )
             .opacity(opacityForPin2BlockedState)
 
@@ -186,15 +200,23 @@ struct MyEidPinsAndCertificatesView: View {
             MyEidCertificateCardView(
                 title: pukCodeTitle,
                 subtitle: pukCodeInfo,
-                isPukBlocked: isPukBlocked
+                isPukBlocked: isPukBlocked,
+                forgotPinAccessibilityField: .myEid(.changePukButton),
+                changePinAccessibilityField: .myEid(.changePukButton),
+                lastFocused: $lastFocused
             )
             .opacity(opacityForPukBlockedState)
             .onTapGesture {
                 if isPUKChangeable {
+                    lastFocused = .myEid(.changePukButton)
                     pinChangeVariant = .pukChange
                 }
             }
             .accessibilityAddTraits([.isButton])
+            .accessibilityFocused($isPukFocused)
+            .task {
+                isPukFocused = lastFocused == .myEid(.changePukButton)
+            }
 
             if isPukBlocked {
                 Text(verbatim: pukBlockedMessage)

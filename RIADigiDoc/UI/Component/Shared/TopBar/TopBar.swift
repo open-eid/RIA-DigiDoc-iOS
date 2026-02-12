@@ -30,6 +30,7 @@ struct TopBarContainer<Content: View>: View {
 
     var isTopBarHidden = false
     var title: String?
+    var titleAccessibility: String?
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
     var leftIconAccessibility: String = "Back"
@@ -87,6 +88,7 @@ struct TopBarContainer<Content: View>: View {
             if !isTopBarHidden {
                 TopBar(
                     title: title,
+                    titleAccessibility: titleAccessibility,
                     leftIcon: leftIcon,
                     leftIconAccessibility: leftIconAccessibility,
                     leftIconAccessibilityInput: leftIconAccessibilityInput,
@@ -169,6 +171,7 @@ struct TopBar: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
     var title: String?
+    var titleAccessibility: String?
 
     var leftIcon: String
     var leftIconAccessibility: String
@@ -219,6 +222,7 @@ struct TopBar: View {
                     .foregroundStyle(theme.onSurface)
                     .font(typography.titleLarge)
                     .padding(.leading, Dimensions.Padding.XSPadding)
+                    .accessibilityLabel(titleAccessibility ?? title)
                     .accessibilityAddTraits(.isHeader)
             }
 

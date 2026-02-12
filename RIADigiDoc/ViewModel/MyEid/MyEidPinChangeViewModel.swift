@@ -142,7 +142,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
     }
 
     func handleConfirmStepError() {
-        if step == .confirm && !verifyRepeatedCode() {
+        if step == .confirm && !verifyRepeatedCode() && !isSuccess {
             inputErrorMessage = "PIN repeat error"
             inputErrorMessageExtraArguments = [codeType.name]
         } else {
