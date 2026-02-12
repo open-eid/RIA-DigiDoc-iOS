@@ -94,7 +94,9 @@ struct DiagnosticsView: View {
                                             tempFileURL = await viewModel.createLogFile()
                                             triggerFileSaver(type: .logFile)
                                         }
-                                    }
+                                    },
+                                    focusedField: nil,
+                                    currentFocus: .constant(nil)
                                 )
                             }
 

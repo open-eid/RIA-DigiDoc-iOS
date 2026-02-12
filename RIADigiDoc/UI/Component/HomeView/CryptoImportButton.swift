@@ -21,6 +21,7 @@ import SwiftUI
 
 struct CryptoImportButton: View {
     let title: String
+    let titleAccessibility: String
     let description: String
     let assetImageName: String
     @Binding var isFileOpeningLoading: Bool
@@ -34,6 +35,7 @@ struct CryptoImportButton: View {
 
     init(
         title: String,
+        titleAccessibility: String = "",
         description: String,
         assetImageName: String,
         isFileOpeningLoading: Binding<Bool>,
@@ -44,6 +46,7 @@ struct CryptoImportButton: View {
         fileOpeningMethod: FileOpeningMethod
     ) {
         self.title = title
+        self.titleAccessibility = titleAccessibility
         self.description = description
         self.assetImageName = assetImageName
         self._isFileOpeningLoading = isFileOpeningLoading
@@ -57,6 +60,7 @@ struct CryptoImportButton: View {
     var body: some View {
         ActionButton(
             title: title,
+            titleAccessibility: titleAccessibility,
             description: description,
             assetImageName: assetImageName
         ) {

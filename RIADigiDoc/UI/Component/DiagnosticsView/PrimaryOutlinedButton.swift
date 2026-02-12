@@ -24,53 +24,88 @@ struct PrimaryOutlinedButton: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
-    let text: String
-    let assetImageName: String?
-    let isButtonEnabled: Bool
-    let action: () -> Void
+    private let text: String
+    private let assetImageName: String?
+    private let isButtonEnabled: Bool
+    private let action: () -> Void
+
+    @Binding private var currentFocus: AccessibilityField?
+    @State private var focusedField: AccessibilityField?
+    @AccessibilityFocusState private var isFocused: Bool
+    @AccessibilityFocusState private var accessibilityField: AccessibilityField?
 
     init(
         text: String,
         assetImageName: String?,
         isButtonEnabled: Bool = true,
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
+        focusedField: AccessibilityField?,
+        currentFocus: Binding<AccessibilityField?>,
     ) {
         self.text = text
         self.assetImageName = assetImageName
         self.isButtonEnabled = isButtonEnabled
         self.action = action
+        self.focusedField = focusedField
+        self._currentFocus = currentFocus
     }
 
     var body: some View {
-        Button(action: action) {
-            HStack {
-                if let image = assetImageName {
-                    Image(image)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundStyle(theme.primary)
-                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                        .accessibilityHidden(true)
+        let button = Button(
+            action: action,
+            label: {
+                HStack {
+                    if let image = assetImageName {
+                        Image(image)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(theme.primary)
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .accessibilityHidden(true)
+                    }
+                    Text(verbatim: text)
+                        .foregroundStyle(isButtonEnabled ? theme.primary : theme.surfaceContainerHighest)
+                        .font(typography.labelLarge)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(Dimensions.Padding.XSPadding)
                 }
-                Text(verbatim: text)
-                    .foregroundStyle(isButtonEnabled ? theme.primary : theme.surfaceContainerHighest)
-                    .font(typography.labelLarge)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(nil)
-                    .frame(minHeight: Dimensions.Icon.IconSizeXXS)
-                    .padding(Dimensions.Padding.XSPadding)
+                .frame(maxWidth: .infinity)
+                .background(
+                    Capsule()
+                        .fill(isButtonEnabled ? theme.surface : Color.gray)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
+                )
+            })
+            .disabled(!isButtonEnabled)
+            .accessibilityFocused($isFocused)
+            .onAppear {
+                Task {
+                    await MainActor.run {
+                        let shouldFocus = (focusedField != nil && currentFocus == focusedField)
+
+                        isFocused = shouldFocus
+
+                        if shouldFocus {
+                            accessibilityField = focusedField
+                        }
+                    }
+                }
             }
-            .frame(maxWidth: .infinity)
-            .background(
-                Capsule()
-                    .fill(isButtonEnabled ? theme.surface : Color.gray)
+
+        if let field = self.accessibilityField {
+            button.accessibilityFocusRestore(
+                focusedField: $accessibilityField,
+                field: field,
+                when: true
             )
-            .overlay(
-                Capsule()
-                    .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
-            )
+        } else {
+            button
         }
-        .disabled(!isButtonEnabled)
     }
 }
 
@@ -80,12 +115,16 @@ struct PrimaryOutlinedButton: View {
         PrimaryOutlinedButton(
             text: "button without icon",
             assetImageName: nil,
-            action: {}
+            action: {},
+            focusedField: nil,
+            currentFocus: .constant(nil)
         )
         PrimaryOutlinedButton(
             text: "button with icon",
             assetImageName: "ic_m3_download_48pt_wght400",
-            action: {}
+            action: {},
+            focusedField: nil,
+            currentFocus: .constant(nil)
         )
     }
     .environment(Container.shared.languageSettings())

@@ -120,7 +120,9 @@ struct ActionMethodSelectionView: View {
                             isButtonEnabled: true,
                             action: {
                                 shouldSetMethod = true
-                            }
+                            },
+                            focusedField: nil,
+                            currentFocus: .constant(nil)
                         )
                         .padding(.vertical, Dimensions.Padding.MPadding)
                     }
@@ -142,12 +144,7 @@ struct ActionMethodSelectionView: View {
         }
         .onChange(of: shouldSetMethod) { _, newValue in
             if newValue {
-                if voiceOverEnabled {
-                    var saveButtonAccessibilityAnnouncement = AttributedString(saveButtonAccessibilityLabel)
-                    saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
-                    AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
-                }
-
+                AccessibilityUtil.announceMessage(saveButtonAccessibilityLabel)
                 setActionMethod(selectedMethod)
             }
         }

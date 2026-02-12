@@ -23,6 +23,7 @@ struct ConfirmModalView: View {
     var title: String
     var message: String
     var isConfirmButtonVisible: Bool = true
+    var messageAccessibility: String = ""
     var confirmButtonTitle: String = "Remove"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -36,11 +37,13 @@ struct ConfirmModalView: View {
             Color.black
                 .opacity(Dimensions.Shadow.LOpacity)
                 .ignoresSafeArea()
+                .accessibilityHidden(true)
 
             TextModal(
                 title: title,
                 message: message,
                 isConfirmButtonVisible: isConfirmButtonVisible,
+                messageAccessibility: messageAccessibility,
                 confirmButtonTitle: confirmButtonTitle,
                 cancelButtonTitle: cancelButtonTitle,
                 confirmButtonAccessibility: confirmButtonAccessibility,
@@ -48,6 +51,8 @@ struct ConfirmModalView: View {
                 onConfirm: onConfirm,
                 onCancel: onCancel
             )
+            .accessibilityAddTraits(.isModal)
+            .accessibilityElement(children: .contain)
         }
     }
 }

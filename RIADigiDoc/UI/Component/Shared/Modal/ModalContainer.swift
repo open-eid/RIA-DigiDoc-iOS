@@ -37,6 +37,28 @@ struct ModalContainer<Content: View>: View {
     var onCancel: () -> Void
     @ViewBuilder var content: Content
 
+    private var header: some View {
+        Text(verbatim: title)
+            .foregroundStyle(theme.onSurface)
+            .font(typography.headlineSmall)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.leading, Dimensions.Padding.MSPadding)
+            .padding(.trailing, Dimensions.Padding.LPadding)
+            .padding(.bottom, Dimensions.Padding.MSPadding)
+            .minimumScaleFactor(0.5)
+            .accessibilityHeading(.h1)
+            .accessibilityAddTraits([.isHeader])
+            .accessibilityFocused($isFocused)
+    }
+
+    private var containerContent: some View {
+        VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+            header
+            content
+                .padding(.horizontal, Dimensions.Padding.MSPadding)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
             HStack(alignment: .center) {
@@ -51,20 +73,19 @@ struct ModalContainer<Content: View>: View {
                 }
             }
 
-            Text(verbatim: title)
-                .foregroundStyle(theme.onSurface)
-                .font(typography.headlineSmall)
-                .padding(.leading, Dimensions.Padding.MSPadding)
-                .padding(.trailing, Dimensions.Padding.LPadding)
-                .accessibilityFocused($isFocused)
+            ViewThatFits(in: .vertical) {
+                containerContent
 
-            content
-                .padding(.horizontal, Dimensions.Padding.MSPadding)
+                ScrollView(.vertical) {
+                    containerContent
+                }
+            }
 
             HStack(spacing: Dimensions.Padding.MPadding) {
                 Button(languageSettings.localized(cancelButtonTitle)) { onCancel() }
                     .font(typography.labelLarge)
                     .foregroundStyle(theme.primary)
+                    .minimumScaleFactor(0.5)
                     .accessibilityLabel(
                         cancelButtonAccessibility ??
                         languageSettings.localized(cancelButtonTitle).lowercased()
@@ -73,6 +94,7 @@ struct ModalContainer<Content: View>: View {
                     Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
                         .font(typography.labelLarge)
                         .foregroundStyle(theme.primary)
+                        .minimumScaleFactor(0.5)
                         .accessibilityLabel(
                             confirmButtonAccessibility ??
                             languageSettings.localized(confirmButtonTitle).lowercased()
@@ -89,6 +111,7 @@ struct ModalContainer<Content: View>: View {
                 .fill(theme.surfaceContainerHighest)
         )
         .padding(.horizontal, Dimensions.Padding.XLPadding)
+        .accessibilityAddTraits([.isModal])
         .onAppear {
             Task {
                 await MainActor.run {

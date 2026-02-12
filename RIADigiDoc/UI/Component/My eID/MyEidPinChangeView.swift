@@ -23,8 +23,12 @@ import IdCardLib
 import CommonsLib
 
 struct MyEidPinChangeView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
+
+    @AccessibilityFocusState private var flowTitleFocused: Bool
+    @AccessibilityFocusState private var stepTitleFocused: Bool
 
     @AppTheme private var theme
     @AppTypography private var typography
@@ -197,6 +201,11 @@ struct MyEidPinChangeView: View {
                                 .foregroundStyle(theme.onSurface)
                                 .padding(.top, Dimensions.Padding.MSPadding)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .accessibilityHeading(.h1)
+                                .accessibilityAddTraits([.isHeader])
+                                .accessibilityFocused($flowTitleFocused)
+                                .accessibilitySortPriority(3)
+                                .accessibilityRespondsToUserInteraction(true)
 
                             VStack(alignment: .center, spacing: Dimensions.Padding.XSPadding) {
                                 Image("ic_m3_vpn_key_48pt_wght400")
@@ -212,32 +221,44 @@ struct MyEidPinChangeView: View {
                                 Text(verbatim: stepTitle)
                                     .font(typography.titleLarge)
                                     .foregroundStyle(theme.onSurface)
+                                    .accessibilityHeading(.h2)
+                                    .accessibilityAddTraits([.isHeader])
+                                    .accessibilityFocused($stepTitleFocused)
+                                    .accessibilitySortPriority(2)
                             }
                             .padding(.top, Dimensions.Padding.XSPadding)
                             .padding(.bottom, Dimensions.Padding.LPadding)
                             .frame(maxWidth: .infinity)
 
-                            FloatingLabelTextField(
-                                title: flowCodeType,
-                                placeholder: flowCodeType,
-                                text: $viewModel.input,
-                                isSecure: true,
-                                isError: isInputError,
-                                errorText: inputErrorMessage,
-                                keyboardType: .numberPad,
-                                onDone: {
-                                    if viewModel.step == .confirm || (
-                                        viewModel.input.isEmpty || !inputErrorMessage.isEmpty
-                                    ) { return }
+                            VStack {
+                                FloatingLabelTextField(
+                                    title: flowCodeType,
+                                    placeholder: flowCodeType,
+                                    text: $viewModel.input,
+                                    isSecure: true,
+                                    isError: isInputError,
+                                    errorText: inputErrorMessage,
+                                    keyboardType: .numberPad,
+                                    identifier: "pinInput",
+                                    sortPriority: 0,
+                                    spellOutCharacters: true,
+                                    onDone: {
+                                        if voiceOverEnabled || (viewModel.step == .confirm || (
+                                            viewModel.input.isEmpty || !inputErrorMessage.isEmpty
+                                        )) { return }
 
-                                    Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
-                                }
-                            )
+                                        Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
+                                    }
+                                )
 
-                            Text(verbatim: flowDescription)
-                                .font(typography.bodySmall)
-                                .foregroundStyle(isInputError ? theme.error : theme.onSurface)
-                                .padding(.vertical, Dimensions.Padding.MSPadding)
+                                Text(verbatim: flowDescription)
+                                    .font(typography.bodySmall)
+                                    .foregroundStyle(isInputError ? theme.error : theme.onSurface)
+                                    .padding(.vertical, Dimensions.Padding.MSPadding)
+                                    .multilineTextAlignment(.leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .accessibilitySortPriority(1)
+                            }
                         }
                     }
 
@@ -246,19 +267,31 @@ struct MyEidPinChangeView: View {
                         isButtonEnabled: !viewModel.input.isEmpty && !isInputError,
                         action: {
                             Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
-                        }
+                        },
+                        focusedField: nil,
+                        currentFocus: .constant(nil)
                     )
                 }
                 .padding(Dimensions.Padding.SPadding)
                 .frame(maxHeight: .infinity)
+                .onAppear {
+                    DispatchQueue.main.async {
+                        flowTitleFocused = true
+                    }
+                }
                 .onChange(of: viewModel.isSuccess) { _, newValue in
                     if newValue {
-                        switch pinAction {
-                        case .change:
-                            Toast.show(languageSettings.localized("PIN changed", [codeType.name]))
-                        case .unblock:
-                            Toast.show(languageSettings.localized("PIN unblocked", [codeType.name]))
-                        }
+                        let message: String = {
+                            switch pinAction {
+                            case .change:
+                                return languageSettings.localized("PIN changed", [codeType.name])
+                            case .unblock:
+                                return languageSettings.localized("PIN unblocked", [codeType.name])
+                            }
+                        }()
+
+                        Toast.show(message)
+                        AccessibilityUtil.announceMessage(message)
 
                         dismiss()
                     }
@@ -266,6 +299,7 @@ struct MyEidPinChangeView: View {
                 .onChange(of: errorMessage, { _, newValue in
                     guard !newValue.isEmpty else { return }
                     Toast.show(newValue)
+                    AccessibilityUtil.announceMessage(newValue)
                     if viewModel.isBlocked {
                         viewModel.resetErrors()
                         dismiss()
@@ -277,7 +311,43 @@ struct MyEidPinChangeView: View {
                         dismiss()
                     }
                 }
+                .onChange(of: viewModel.step) { _, _ in
+                    DispatchQueue.main.async {
+                        stepTitleFocused = true
+                    }
+                }
             }
         )
     }
+
+//    @ViewBuilder
+//    private var inputGroup: some View {
+//        VStack {
+//            FloatingLabelTextField(
+//                title: flowCodeType,
+//                placeholder: flowCodeType,
+//                text: $viewModel.input,
+//                isSecure: true,
+//                isError: isInputError,
+//                errorText: inputErrorMessage,
+//                keyboardType: .numberPad,
+//                identifier: "pinInput",
+//                sortPriority: 0,
+//                spellOutCharacters: true,
+//                onDone: {
+//                    if voiceOverEnabled || (viewModel.step == .confirm || (
+//                        viewModel.input.isEmpty || !inputErrorMessage.isEmpty
+//                    )) { return }
+//
+//                    Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
+//                }
+//            )
+//
+//            Text(verbatim: flowDescription)
+//                .font(typography.bodySmall)
+//                .foregroundStyle(isInputError ? theme.error : theme.onSurface)
+//                .padding(.vertical, Dimensions.Padding.MSPadding)
+//                .accessibilitySortPriority(1)
+//        }
+//    }
 }

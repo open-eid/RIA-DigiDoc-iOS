@@ -24,11 +24,18 @@ struct MyEidDataItem {
     let title: String
     let value: String
     let status: MyEidDocumentStatus?
+    let spellOutCharacters: Bool
 
-    init(title: String, value: String, status: MyEidDocumentStatus? = nil) {
+    init(
+        title: String,
+        value: String,
+        status: MyEidDocumentStatus? = nil,
+        spellOutCharacters: Bool = false
+    ) {
         self.title = title
         self.value = value
         self.status = status
+        self.spellOutCharacters = spellOutCharacters
     }
 }
 
@@ -59,9 +66,12 @@ struct MyEidDetailView: View {
                         Text(verbatim: myEidDataItem.title)
                             .font(typography.labelSmall)
                             .foregroundStyle(theme.onSurfaceVariant)
+                            .accessibilityLabel(myEidDataItem.title.lowercased())
                         Text(verbatim: myEidDataItem.value)
                             .foregroundStyle(theme.onSurface)
                             .font(typography.bodyLarge)
+                            .accessibilityLabel(myEidDataItem.value.lowercased())
+                            .speechSpellsOutCharacters(myEidDataItem.spellOutCharacters)
                     }
 
                     Spacer()

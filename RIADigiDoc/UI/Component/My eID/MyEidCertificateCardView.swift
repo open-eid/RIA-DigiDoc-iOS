@@ -33,6 +33,10 @@ struct MyEidCertificateCardView: View {
     let showForgotPin: Bool
     let onForgotPinClick: (() -> Void)?
     let onChangePinClick: (() -> Void)?
+    @Binding var lastFocused: AccessibilityField?
+
+    let forgotPinAccessibilityField: AccessibilityField
+    let changePinAccessibilityField: AccessibilityField
 
     init(
         title: String,
@@ -43,7 +47,10 @@ struct MyEidCertificateCardView: View {
         isPukBlocked: Bool = false,
         showForgotPin: Bool = true,
         onForgotPinClick: (() -> Void)? = nil,
-        onChangePinClick: (() -> Void)? = nil
+        onChangePinClick: (() -> Void)? = nil,
+        forgotPinAccessibilityField: AccessibilityField,
+        changePinAccessibilityField: AccessibilityField,
+        lastFocused: Binding<AccessibilityField?>
     ) {
         self.title = title
         self.subtitle = subtitle
@@ -54,6 +61,9 @@ struct MyEidCertificateCardView: View {
         self.showForgotPin = showForgotPin
         self.onForgotPinClick = onForgotPinClick
         self.onChangePinClick = onChangePinClick
+        self.forgotPinAccessibilityField = forgotPinAccessibilityField
+        self.changePinAccessibilityField = changePinAccessibilityField
+        self._lastFocused = lastFocused
     }
 
     var body: some View {
@@ -87,6 +97,7 @@ struct MyEidCertificateCardView: View {
                         .font(typography.bodyMedium)
                         .foregroundColor(theme.onSurface)
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
             }
@@ -97,14 +108,20 @@ struct MyEidCertificateCardView: View {
                         text: forgotPinText,
                         assetImageName: nil,
                         isButtonEnabled: !isPukBlocked,
-                        action: onForgotPinClick ?? {}
+                        action: onForgotPinClick ?? {},
+                        focusedField: forgotPinAccessibilityField,
+                        currentFocus: $lastFocused
                     )
+                    .accessibilityLabel(forgotPinText.lowercased())
 
                     PrimaryButton(
                         text: changePinText,
                         isButtonEnabled: !isPinBlocked,
-                        action: onChangePinClick ?? {}
+                        action: onChangePinClick ?? {},
+                        focusedField: changePinAccessibilityField,
+                        currentFocus: $lastFocused
                     )
+                    .accessibilityLabel(changePinText.lowercased())
                 }
             }
         }
@@ -130,7 +147,10 @@ struct MyEidCertificateCardView: View {
             subtitle: "Certificate is valid until 1. January 2999",
             forgotPinText: "Forgot PIN1?",
             changePinText: "Change PIN1",
-            onForgotPinClick: {}
+            onForgotPinClick: {},
+            forgotPinAccessibilityField: .myEid(.unblockPin1Button),
+            changePinAccessibilityField: .myEid(.changePin1Button),
+            lastFocused: .constant(.myEid(.changePin1Button))
         )
     }
     .environment(Container.shared.languageSettings())

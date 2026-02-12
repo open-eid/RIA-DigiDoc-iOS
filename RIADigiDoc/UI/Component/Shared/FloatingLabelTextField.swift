@@ -45,6 +45,8 @@ struct FloatingLabelTextField: View {
     let keyboardType: UIKeyboardType
     let showDashButton: Bool
     let identifier: String
+    let sortPriority: Double
+    let spellOutCharacters: Bool
     let onDone: (() -> Void)
 
     init(
@@ -61,6 +63,8 @@ struct FloatingLabelTextField: View {
         keyboardType: UIKeyboardType = .default,
         showDashButton: Bool = false,
         identifier: String = "",
+        sortPriority: Double = 0,
+        spellOutCharacters: Bool = false,
         onDone: @escaping (() -> Void) = {}
     ) {
         self.title = title
@@ -76,6 +80,8 @@ struct FloatingLabelTextField: View {
         self.keyboardType = keyboardType
         self.showDashButton = showDashButton
         self.identifier = identifier
+        self.sortPriority = sortPriority
+        self.spellOutCharacters = spellOutCharacters
         self.onDone = onDone
     }
 
@@ -148,10 +154,19 @@ struct FloatingLabelTextField: View {
     }
 
     private var textFieldAccessibility: String {
-        let components = [title, text, errorText]
-            .filter { !$0.isEmpty }
+        let visibleText: String? =
+        (isSecure && !isPasswordVisible) ? nil :
+        spellOutCharacters ? text.map(String.init)
+            .joined(separator: " ") : text
 
-        return components.joined(separator: " ")
+        return [
+            title,
+            visibleText,
+            errorText
+        ]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
     }
 
     // MARK: - Body
@@ -162,10 +177,12 @@ struct FloatingLabelTextField: View {
         ) {
             mainContainer
             if isError && !errorText.isEmpty {
-                Text(errorText)
+                Text(verbatim: errorText)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XXSPadding)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityHidden(true)
             }
         }
@@ -229,6 +246,15 @@ struct FloatingLabelTextField: View {
 
     @ViewBuilder
     private var inputContainer: some View {
+        if voiceOverEnabled {
+            containerContent
+                .accessibilityElement(children: .contain)
+        } else {
+            containerContent
+        }
+    }
+
+    private var containerContent: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             inputField
                 .accessibilityLabel(Text(verbatim: textFieldAccessibility))
@@ -268,6 +294,11 @@ struct FloatingLabelTextField: View {
                 .disabled(isDisabled)
                 .keyboardType(keyboardType)
                 .submitLabel(submitLabel)
+                .textContentType(.none)
+                .autocorrectionDisabled(true)
+                .textInputAutocapitalization(.never)
+                .privacySensitive()
+                .speechSpellsOutCharacters(spellOutCharacters && isPasswordVisible)
                 .accessibilityFocused($isAccessibilityFocused)
                 .onSubmit {
                     isFocused = false
@@ -300,6 +331,7 @@ struct FloatingLabelTextField: View {
                     }
                 }
                 .accessibilityValue(Text(verbatim: ""))
+                .accessibilitySortPriority(sortPriority)
             } else {
                 TextField(
                     placeholder,
@@ -311,6 +343,10 @@ struct FloatingLabelTextField: View {
                 .disabled(isDisabled)
                 .keyboardType(keyboardType)
                 .submitLabel(submitLabel)
+                .textContentType(.none)
+                .autocorrectionDisabled(true)
+                .textInputAutocapitalization(.never)
+                .speechSpellsOutCharacters(spellOutCharacters && !isSecure && isPasswordVisible)
                 .accessibilityFocused($isAccessibilityFocused)
                 .onSubmit {
                     fieldIsFocused = false
@@ -343,6 +379,7 @@ struct FloatingLabelTextField: View {
                     }
                 }
                 .accessibilityValue(Text(verbatim: ""))
+                .accessibilitySortPriority(sortPriority)
             }
         }
         .font(typography.bodyLarge)
@@ -355,6 +392,9 @@ struct FloatingLabelTextField: View {
                 }
             }
         }
+        .onChange(of: errorText, { _, newValue in
+            AccessibilityUtil.announceMessage(newValue)
+        })
         .frame(height: Dimensions.Icon.IconSizeXXS)
         .accessibilityValue(Text(verbatim: ""))
     }

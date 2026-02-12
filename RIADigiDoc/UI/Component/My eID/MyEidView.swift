@@ -29,6 +29,8 @@ struct MyEidView: View {
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
+    @AccessibilityFocusState private var isTabFocused: Bool
+
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -98,6 +100,7 @@ struct MyEidView: View {
         ZStack {
             TopBarContainer(
                 title: languageSettings.localized("Main home my eid title"),
+                titleAccessibility: languageSettings.localized("My eid title accessibility"),
                 onLeftClick: {
                     Task {
                         await viewModel.stopDiscoveringReaders()
@@ -138,6 +141,12 @@ struct MyEidView: View {
                                         signCertValidTo: idCardData.signCertNotValidDate ?? "",
                                         isPUKChangeable: idCardData.isPUKChangeable
                                     )
+                                }
+                            }
+                            .accessibilityFocused($isTabFocused)
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    isTabFocused = true
                                 }
                             }
                         }
@@ -210,6 +219,7 @@ struct MyEidView: View {
                         pinChangeVariant = nil
                     }
                 )
+                .accessibilityAddTraits(.isModal)
             }
         }
         .task(id: viewModel.usbReaderStatus) {
@@ -247,11 +257,13 @@ struct MyEidView: View {
             title: languageSettings.localized("PIN guideline title", [config.codeType.name]),
             message: config.guidelines,
             isConfirmButtonVisible: isConfirmButtonVisible,
+            messageAccessibility: config.guidelines.replacing("•", with: ""),
             confirmButtonTitle: config.confirmTitle,
             cancelButtonTitle: languageSettings.localized("Close"),
             onConfirm: onConfirm,
             onCancel: onCancel
         )
+        .accessibilityAddTraits(.isModal)
     }
 
     private func configuration(
@@ -323,4 +335,7 @@ struct MyEidView: View {
         ),
         actionMethod: .idCardViaNFC
     )
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
+    .environment(NavigationPathManager())
 }

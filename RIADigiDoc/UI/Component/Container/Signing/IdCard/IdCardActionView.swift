@@ -23,6 +23,8 @@ import FactoryKit
 struct IdCardActionView: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
+    @AccessibilityFocusState private var isIdCardActionMessageFocused: Bool
+
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -48,8 +50,20 @@ struct IdCardActionView: View {
                 .padding(.horizontal, Dimensions.Padding.LPadding)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, alignment: .center)
+                .accessibilityFocused($isIdCardActionMessageFocused)
+                .accessibilityAddTraits([.updatesFrequently])
+                .onChange(of: message) { _, newValue in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        AccessibilityUtil.announceMessage(newValue)
+                    }
+                }
         }
         .padding(.vertical, Dimensions.Padding.LPadding)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isIdCardActionMessageFocused = true
+            }
+        }
     }
 }
 

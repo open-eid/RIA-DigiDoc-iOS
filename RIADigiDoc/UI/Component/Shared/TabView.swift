@@ -39,9 +39,8 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
     private let tabMinHeight: CGFloat = 56
 
     var body: some View {
-        VStack(spacing: 0) {
-
-            HStack(spacing: 0) {
+        VStack(spacing: Dimensions.Padding.ZeroPadding) {
+            HStack(spacing: Dimensions.Padding.ZeroPadding) {
                 ForEach(titles.indices, id: \.self) { index in
                     let title = titles[index]
                     let isSelected = selectedIndex.wrappedValue == index
@@ -54,19 +53,22 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
                             selectedIndex.wrappedValue = index
                         }
                     } label: {
-                        Text(title)
+                        Text(verbatim: title)
                             .font(typography.labelLarge)
                             .foregroundStyle(isSelected ? theme.primary : theme.onSurface)
                             .multilineTextAlignment(.center)
-                            .lineLimit(2)
+                            .lineLimit(nil)
                             .minimumScaleFactor(0.9)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, Dimensions.Padding.XSPadding)
                             .accessibilityLabel(Text(verbatim:
                                 "\(title), " +
                                 "\(languageSettings.localized("Tab")) \(index + 1) / \(titles.count), " +
                                 "\(selectedText)"
                             ))
+                            .accessibilityInputLabels(
+                                [Text(verbatim: "Tab \(index + 1)")]
+                            )
                     }
                     .buttonStyle(.plain)
                     .frame(maxWidth: .infinity, minHeight: tabMinHeight)
@@ -82,6 +84,7 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
                                 .frame(height: Dimensions.Height.SBorder)
                         }
                     }
+                    .accessibilityLabel(titles[index].lowercased())
                 }
             }
             .padding(.top, Dimensions.Padding.LPadding)
