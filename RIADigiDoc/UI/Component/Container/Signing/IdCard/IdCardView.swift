@@ -256,7 +256,10 @@ struct IdCardView: View {
                     await MainActor.run {
                         isInProgress = true
                         pathManager.replaceLast(
-                            to: .myEidView(idCardData: cardData)
+                            to: .myEidView(
+                                idCardData: cardData,
+                                actionMethod: .idCardViaUSB
+                            )
                         )
                     }
                 }

@@ -19,4 +19,5 @@
 
 public enum KeychainKey: String, CaseIterable, Sendable {
     case proxyPassword = "proxy_password"
+    case nfcCANKey = "nfc_can_key"
 }

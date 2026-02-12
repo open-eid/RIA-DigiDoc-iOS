@@ -154,14 +154,21 @@ struct MyEidPinChangeView: View {
         !viewModel.isPINLengthValid(for: currentCodeType, pin: pin)
     }
 
+    private var nfcStringsUtil: NFCSessionStringsUtil {
+        NFCSessionStringsUtil { key, args in
+            languageSettings.localized(key, args)
+        }
+    }
+
     init(
         pinAction: MyEidPinCodeAction,
         codeType: CodeType,
-        personalCode: String
+        personalCode: String,
+        actionMethod: ActionMethod
     ) {
         self._viewModel = State(
             wrappedValue: Container.shared.myEidPinChangeViewModel(
-                (pinAction, codeType, personalCode)
+                (pinAction, codeType, personalCode, actionMethod)
             )
         )
         self.pinAction = pinAction
@@ -223,7 +230,7 @@ struct MyEidPinChangeView: View {
                                         viewModel.input.isEmpty || !inputErrorMessage.isEmpty
                                     ) { return }
 
-                                    Task { await viewModel.submit() }
+                                    Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
                                 }
                             )
 
@@ -238,7 +245,7 @@ struct MyEidPinChangeView: View {
                         text: buttonTitle,
                         isButtonEnabled: !viewModel.input.isEmpty && !isInputError,
                         action: {
-                            Task { await viewModel.submit() }
+                            Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
                         }
                     )
                 }

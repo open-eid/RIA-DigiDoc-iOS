@@ -29,7 +29,8 @@ public protocol NFCViewModelProtocol: Sendable {
     func isActionEnabled(
         canNumber: String,
         pinNumber: String,
-        pinType: CodeType?
+        pinType: CodeType?,
+        actionType: ActionType?
     ) -> Bool
 
     func saveInputData(
@@ -56,7 +57,10 @@ public protocol NFCViewModelProtocol: Sendable {
         strings: NFCSessionStrings
     ) async -> SignedContainerProtocol?
 
-    func loadPersonalData()
+    func readCardData(
+        CAN: String,
+        strings: NFCSessionStrings
+    ) async -> IdCardData?
 
     func isRoleDataEnabled() async -> Bool
 }

@@ -44,6 +44,7 @@ struct MyEidView: View {
     @State private var viewModel: MyEidViewModel
 
     private let idCardData: IdCardData
+    private let actionMethod: ActionMethod
 
     private var myDataTitle: String {
         languageSettings.localized("My data")
@@ -77,10 +78,12 @@ struct MyEidView: View {
     }
 
     init(
-        idCardData: IdCardData
+        idCardData: IdCardData,
+        actionMethod: ActionMethod
     ) {
         _viewModel = State(wrappedValue: Container.shared.myEidViewModel())
         self.idCardData = idCardData
+        self.actionMethod = actionMethod
 
         viewModel.setIsPinBlocked(.pin1, isBlocked: idCardData.retryCount.pin1 == 0)
         viewModel.setIsPinBlocked(.pin2, isBlocked: idCardData.retryCount.pin2 == 0)
@@ -149,7 +152,8 @@ struct MyEidView: View {
                                 to: .myEidPinView(
                                     pinAction: .change,
                                     codeType: .pin1,
-                                    personalCode: idCardData.publicData.personalCode
+                                    personalCode: idCardData.publicData.personalCode,
+                                    actionMethod: actionMethod
                                 )
                             )
 
@@ -159,7 +163,8 @@ struct MyEidView: View {
                                     to: .myEidPinView(
                                         pinAction: .unblock,
                                         codeType: .pin1,
-                                        personalCode: idCardData.publicData.personalCode
+                                        personalCode: idCardData.publicData.personalCode,
+                                        actionMethod: actionMethod
                                     )
                                 )
 
@@ -168,7 +173,8 @@ struct MyEidView: View {
                                 to: .myEidPinView(
                                     pinAction: .change,
                                     codeType: .pin2,
-                                    personalCode: idCardData.publicData.personalCode
+                                    personalCode: idCardData.publicData.personalCode,
+                                    actionMethod: actionMethod
                                 )
                             )
 
@@ -178,7 +184,8 @@ struct MyEidView: View {
                                     to: .myEidPinView(
                                         pinAction: .unblock,
                                         codeType: .pin2,
-                                        personalCode: idCardData.publicData.personalCode
+                                        personalCode: idCardData.publicData.personalCode,
+                                        actionMethod: actionMethod
                                     )
                                 )
 
@@ -187,7 +194,8 @@ struct MyEidView: View {
                                 to: .myEidPinView(
                                     pinAction: .change,
                                     codeType: .puk,
-                                    personalCode: idCardData.publicData.personalCode
+                                    personalCode: idCardData.publicData.personalCode,
+                                    actionMethod: actionMethod
                                 )
                             )
                         }
@@ -201,7 +209,8 @@ struct MyEidView: View {
             }
         }
         .task(id: viewModel.usbReaderStatus) {
-            if viewModel.usbReaderStatus != .sCardConnected {
+            if actionMethod == .idCardViaUSB &&
+                viewModel.usbReaderStatus != .sCardConnected {
                 await viewModel.stopDiscoveringReaders()
                 await MainActor.run {
                     pathManager.replaceLast(to: .myEidRootView)
@@ -297,6 +306,7 @@ struct MyEidView: View {
                 puk: 3
             ),
             isPUKChangeable: true
-        )
+        ),
+        actionMethod: .idCardViaNFC
     )
 }

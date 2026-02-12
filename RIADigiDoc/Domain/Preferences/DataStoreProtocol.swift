@@ -108,8 +108,8 @@ public protocol DataStoreProtocol: Sendable {
     func setRoleData(_ roleData: RoleData) async
 
     // MARK: - NFC Input Methods
-    func getNFCInputData() async -> NFCInputData
-    func setNFCInputData(_ inputData: NFCInputData) async
+    func getNFCRememberMe() async -> Bool
+    func setNFCRememberMe(_ value: Bool) async
 
     // MARK: - Logging
     func getEnableLoggingNextSession() async -> Bool

@@ -46,6 +46,7 @@ struct NFCView: View {
 
     @State private var taskSign: Task<Void, Never>?
     @State private var taskDecrypt: Task<Void, Never>?
+    @State private var taskMyeid: Task<Void, Never>?
 
     private var isNFCSupported: Bool {
         viewModel.isNFCSupported()
@@ -89,6 +90,12 @@ struct NFCView: View {
         )
     }
 
+    private var nfcStringsUtil: NFCSessionStringsUtil {
+        NFCSessionStringsUtil { key, args in
+            languageSettings.localized(key, args)
+        }
+    }
+
     let signedContainer: SignedContainerProtocol?
     let cryptoContainer: CryptoContainerProtocol?
 
@@ -124,6 +131,7 @@ struct NFCView: View {
             onBackClick: {
                 cancelDecrypt()
                 cancelSigning()
+                cancelMyeid()
                 guard isInProgress else {
                     dismiss()
                     return
@@ -153,28 +161,9 @@ struct NFCView: View {
                     }
                 case .myeid:
                     saveInputData()
-                    // TODO: Implement My eID personal data loading action
                     isInProgress = true
 
-                    // TODO: Replace with real loading
-                    Task {
-                        try? await Task.sleep(for: .seconds(1))
-                        pathManager.replaceLast(
-                            to: .myEidView(
-                                idCardData: IdCardData(
-                                    publicData: CardInfo(),
-                                    authCertNotValidDate: nil,
-                                    signCertNotValidDate: nil,
-                                    retryCount: RetryCount(
-                                        pin1: 3,
-                                        pin2: 3,
-                                        puk: 3
-                                    ),
-                                    isPUKChangeable: true
-                                )
-                            )
-                        )
-                    }
+                    loadMyEid()
                 }
             },
             content: {
@@ -195,8 +184,14 @@ struct NFCView: View {
                         pinType: pinType,
                         onInputChange: {
                             isActionEnabled = viewModel
-                                .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
-                        }
+                                .isActionEnabled(
+                                    canNumber: canNumber,
+                                    pinNumber: pinNumber,
+                                    pinType: pinType,
+                                    actionType: actionType
+                                )
+                        },
+                        showPinField: actionType != .myeid
                     )
                 }
             }
@@ -281,28 +276,7 @@ struct NFCView: View {
             isInProgress = true
             nfcActionMessage = "NFC hold card"
 
-            let pinName = CodeType.pin1.name
-            let strings = NFCSessionStrings(
-                initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
-                step1Message:
-                    languageSettings.localized(
-                        "Hold your ID card against your smart device until the data is read"
-                    ),
-                step2Message: languageSettings.localized("Reading data"),
-                step3Message: languageSettings.localized("Reading certificate"),
-                step4Message: languageSettings.localized("Decrypting in progress"),
-                successMessage: languageSettings.localized("Data read"),
-                canErrorMessage: languageSettings.localized("Wrong CAN"),
-                pinWrongMultipleErrorMessage:
-                    languageSettings.localized(
-                        "PIN verification error multiple",
-                        [pinName, "2"]
-                    ),
-                pinWrongErrorMessage: languageSettings.localized("PIN verification error one", [pinName]),
-                pinBlockedErrorMessage: languageSettings.localized("PIN blocked", [pinName]),
-                technicalErrorMessage: languageSettings.localized("NFC technical error"),
-                sessionErrorMessage: languageSettings.localized("NFC session error")
-            )
+            let strings = nfcStringsUtil.makeForDecrypt(pinName: CodeType.pin1.name)
 
             let decryptedContainer = await viewModel.decrypt(
                 CAN: canNumber,
@@ -341,6 +315,11 @@ struct NFCView: View {
         taskSign = nil
     }
 
+    private func cancelMyeid() {
+        taskMyeid?.cancel()
+        taskMyeid = nil
+    }
+
     private func sign(roleData: RoleData? = nil) {
         taskSign = Task {
             guard let container = signedContainer else { return }
@@ -353,28 +332,7 @@ struct NFCView: View {
             isInProgress = true
             nfcActionMessage = "NFC hold card"
 
-            let pinName = CodeType.pin2.name
-            let strings = NFCSessionStrings(
-                initialMessage: languageSettings.localized("Please place your ID card against the smart device"),
-                step1Message:
-                    languageSettings.localized(
-                        "Hold your ID card against your smart device until the data is read"
-                    ),
-                step2Message: languageSettings.localized("Reading data please wait"),
-                step3Message: languageSettings.localized("Reading certificate"),
-                step4Message: languageSettings.localized("Signing in progress please wait"),
-                successMessage: languageSettings.localized("Signature added"),
-                canErrorMessage: languageSettings.localized("Wrong CAN"),
-                pinWrongMultipleErrorMessage:
-                    languageSettings.localized(
-                        "PIN verification error multiple",
-                        [pinName, "2"]
-                    ),
-                pinWrongErrorMessage: languageSettings.localized("PIN verification error one", [pinName]),
-                pinBlockedErrorMessage: languageSettings.localized("PIN blocked", [pinName]),
-                technicalErrorMessage: languageSettings.localized("NFC technical error"),
-                sessionErrorMessage: languageSettings.localized("NFC session error")
-            )
+            let strings = nfcStringsUtil.makeForSigning(pinName: CodeType.pin2.name)
 
             let updatedContainer = await viewModel.sign(
                 canNumber: canNumber,
@@ -398,6 +356,40 @@ struct NFCView: View {
 
             onSuccess(container)
             dismiss()
+        }
+    }
+
+    private func loadMyEid() {
+        taskMyeid = Task {
+            await viewModel.saveInputData(
+                canNumber: rememberMe ? canNumber : "",
+                rememberMe: rememberMe
+            )
+
+            isInProgress = true
+            nfcActionMessage = "NFC hold card"
+
+            let strings = nfcStringsUtil.makeDefault()
+            let cardData = await viewModel.readCardData(
+                CAN: canNumber,
+                strings: strings
+            )
+
+            isInProgress = false
+            guard let cardData else {
+                cancelMyeid()
+                return
+            }
+
+            viewModel.saveMyEidCAN(canNumber)
+            await MainActor.run {
+                pathManager.replaceLast(
+                    to: .myEidView(
+                        idCardData: cardData,
+                        actionMethod: .idCardViaNFC
+                    )
+                )
+            }
         }
     }
 }

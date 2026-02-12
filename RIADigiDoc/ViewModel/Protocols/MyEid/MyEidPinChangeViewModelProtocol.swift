@@ -30,7 +30,7 @@ protocol MyEidPinChangeViewModelProtocol: Sendable {
     var errorMessageExtraArguments: [String] { get }
     var isBlocked: Bool { get }
 
-    func submit() async
+    func submit(nfcStringsUtil: NFCSessionStringsUtil) async
     func resetErrors()
 
     func verifyNewCode()

@@ -31,12 +31,13 @@ struct NFCInputView: View {
     @Binding var rememberMe: Bool
     @Binding var isActionEnabled: Bool
     @Binding var canNumberError: String?
-
     @Binding var pinNumber: String
     @Binding var pinError: String?
-    var pinType: CodeType?
 
+    var pinType: CodeType?
     let onInputChange: () -> Void
+
+    @State private var showPinField: Bool
 
     private var canNumberTitle: String {
         languageSettings.localized("CAN number")
@@ -62,7 +63,8 @@ struct NFCInputView: View {
         pinNumber: Binding<String>,
         pinError: Binding<String?>,
         pinType: CodeType?,
-        onInputChange: @escaping () -> Void
+        onInputChange: @escaping () -> Void,
+        showPinField: Bool = true,
     ) {
         self._canNumber = canNumber
         self._rememberMe = rememberMe
@@ -72,6 +74,7 @@ struct NFCInputView: View {
         self._pinError = pinError
         self.pinType = pinType
         self.onInputChange = onInputChange
+        self.showPinField = showPinField
     }
 
     var body: some View {
@@ -98,18 +101,20 @@ struct NFCInputView: View {
             }
             .padding(.vertical, Dimensions.Padding.MPadding)
 
-            VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                FloatingLabelTextField(
-                    title: pinNumberTitle,
-                    placeholder: pinNumberTitle,
-                    text: $pinNumber,
-                    isSecure: true,
-                    isError: !(pinError?.isEmpty ?? true),
-                    errorText: pinError ?? "",
-                    keyboardType: .numberPad
-                )
-                .onChange(of: pinNumber) {
-                    onInputChange()
+            if showPinField {
+                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                    FloatingLabelTextField(
+                        title: pinNumberTitle,
+                        placeholder: pinNumberTitle,
+                        text: $pinNumber,
+                        isSecure: true,
+                        isError: !(pinError?.isEmpty ?? true),
+                        errorText: pinError ?? "",
+                        keyboardType: .numberPad
+                    )
+                    .onChange(of: pinNumber) {
+                        onInputChange()
+                    }
                 }
             }
 

@@ -18,15 +18,23 @@
  */
 
 import Foundation
-import IdCardLib
 
-/// @mockable
-@MainActor
-public protocol SharedMyEidSessionProtocol: Sendable {
-    var usbReaderStatus: UsbReaderStatus { get }
-    func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
-    func getIsPinBlocked(for codeType: CodeType) -> Bool
-    func stopStatusStream()
-    func setCAN(_ can: String)
-    func getCAN() -> String
+public enum EncryptedDataError: Error, LocalizedError {
+    case unableToLocateAppSupportDirectory
+    case keyFileDoesNotExist
+    case encryptionFailed
+    case decryptionFailed
+
+    public var errorDescription: String? {
+        switch self {
+        case .unableToLocateAppSupportDirectory:
+            return "Unable to locate Application Support directory"
+        case .keyFileDoesNotExist:
+            return "Encryption key file does not exist"
+        case .encryptionFailed:
+            return "Failed to encrypt data"
+        case .decryptionFailed:
+            return "Failed to decrypt data"
+        }
+    }
 }

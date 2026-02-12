@@ -18,15 +18,22 @@
  */
 
 import Foundation
-import IdCardLib
 
-/// @mockable
-@MainActor
-public protocol SharedMyEidSessionProtocol: Sendable {
-    var usbReaderStatus: UsbReaderStatus { get }
-    func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
-    func getIsPinBlocked(for codeType: CodeType) -> Bool
-    func stopStatusStream()
-    func setCAN(_ can: String)
-    func getCAN() -> String
+public enum UnblockPINError: Error {
+    case missingRequiredParameter
+    case cancelled
+    case unknown(Error)
+}
+
+extension UnblockPINError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .missingRequiredParameter:
+            return "Missing required parameter"
+        case .cancelled:
+            return "Operation cancelled by user"
+        case .unknown(let error):
+            return "Unknown error: \(error.localizedDescription)"
+        }
+    }
 }
