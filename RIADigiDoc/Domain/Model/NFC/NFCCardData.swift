@@ -20,13 +20,10 @@
 import Foundation
 import IdCardLib
 
-/// @mockable
-@MainActor
-public protocol SharedMyEidSessionProtocol: Sendable {
-    var usbReaderStatus: UsbReaderStatus { get }
-    func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
-    func getIsPinBlocked(for codeType: CodeType) -> Bool
-    func stopStatusStream()
-    func setCAN(_ can: String)
-    func getCAN() -> String
+public struct NFCCardData: Sendable {
+    let publicData: CardInfo
+    let authenticationCertificate: Data?
+    let signatureCertificate: Data?
+    let retryCount: RetryCount
+    let isPUKChangable: Bool
 }

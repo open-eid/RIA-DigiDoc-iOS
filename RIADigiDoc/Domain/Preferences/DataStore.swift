@@ -459,21 +459,12 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(roleData.zipCode, forKey: Keys.roleZipCode)
     }
 
-    public func getNFCInputData() async -> NFCInputData {
-        let canNumber = userDefaults().string(
-            forKey: Keys.nfcCanNumber
-        ) ?? DefaultValues.nfcCanNumber
-        let rememberMe = userDefaults().object(forKey: Keys.nfcRememberMe) as? Bool ?? true
-
-        return NFCInputData(
-            canNumber: canNumber,
-            rememberMe: rememberMe
-        )
+    public func getNFCRememberMe() async -> Bool {
+        return userDefaults().object(forKey: Keys.nfcRememberMe) as? Bool ?? true
     }
 
-    public func setNFCInputData(_ inputData: NFCInputData) async {
-        userDefaults().set(inputData.canNumber, forKey: Keys.nfcCanNumber)
-        userDefaults().set(inputData.rememberMe, forKey: Keys.nfcRememberMe)
+    public func setNFCRememberMe(_ value: Bool) async {
+        userDefaults().set(value, forKey: Keys.nfcRememberMe)
     }
 
     // MARK: - Logging
@@ -532,7 +523,6 @@ public actor DataStore: DataStoreProtocol {
         static let roleState = ""
         static let roleCountry = ""
         static let roleZipCode = ""
-        static let nfcCanNumber = ""
     }
 
     private enum Keys {
@@ -573,7 +563,6 @@ public actor DataStore: DataStoreProtocol {
         static let roleState = "roleState"
         static let roleCountry = "roleCountry"
         static let roleZipCode = "roleZipCode"
-        static let nfcCanNumber = "nfcCanNumber"
         static let nfcRememberMe = "nfcRememberMe"
         static let enableLoggingNextSession = "enableLoggingNextSession"
         static let enableLoggingThisSession = "enableLoggingThisSession"

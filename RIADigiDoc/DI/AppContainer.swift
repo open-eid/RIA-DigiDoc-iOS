@@ -509,7 +509,10 @@ extension Container {
         self { @MainActor in
             NFCViewModel(
                 dataStore: self.dataStore(),
-                userAgentUtil: self.userAgentUtil()
+                userAgentUtil: self.userAgentUtil(),
+                certificateUtil: self.certificateUtil(),
+                sharedMyEidSession: self.sharedMyEidSession(),
+                keychainStore: self.keychainStore()
             )
         }
     }
@@ -523,19 +526,33 @@ extension Container {
         }
     }
 
+    // swiftlint:disable closure_parameter_position
+    // swiftlint:disable large_tuple
     @MainActor
-    var myEidPinChangeViewModel: ParameterFactory<(MyEidPinCodeAction, CodeType, String), MyEidPinChangeViewModel> {
-        self { @MainActor (pinAction: MyEidPinCodeAction, codeType: CodeType, personalCode: String
+    var myEidPinChangeViewModel: ParameterFactory<(
+        MyEidPinCodeAction,
+        CodeType,
+        String,
+        ActionMethod
+    ), MyEidPinChangeViewModel> {
+        self { @MainActor (
+            pinAction: MyEidPinCodeAction,
+            codeType: CodeType,
+            personalCode: String,
+            actionMethod: ActionMethod
         ) -> MyEidPinChangeViewModel in
             MyEidPinChangeViewModel(
                 pinAction: pinAction,
                 codeType: codeType,
                 personalCode: personalCode,
+                actionMethod: actionMethod,
                 idCardRepository: self.idCardRepository(),
                 sharedMyEidSession: self.sharedMyEidSession()
             )
         }
     }
+    // swiftlint:enable closure_parameter_position
+    // swiftlint:enable large_tuple
 
     @MainActor
     var crashReportManager: Factory<CrashReportManager> {

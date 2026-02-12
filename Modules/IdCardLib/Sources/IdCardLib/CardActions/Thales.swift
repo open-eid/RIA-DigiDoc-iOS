@@ -115,6 +115,7 @@ final class Thales: CardCommandsInternal {
         guard type != .puk else {
             throw IdCardInternalError.notSupportedCodeType
         }
+        _ = try await select(file: Thales.kAID)
         try await unblockCode(type.pinRef, puk: puk, newCode: newCode)
     }
 

@@ -30,6 +30,8 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
     private var isPin2Blocked = false
     private var isPukBlocked = false
 
+    private var canNumber = ""
+
     private let idCardRepository: IdCardRepositoryProtocol
     private var task: Task<Void, Never>?
 
@@ -70,5 +72,15 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
 
     public func stopStatusStream() {
         task?.cancel()
+    }
+
+    // MARK: - NFC methods
+
+    public func setCAN(_ can: String) {
+        self.canNumber = can
+    }
+
+    public func getCAN() -> String {
+        self.canNumber
     }
 }

@@ -19,31 +19,23 @@
 
 import Foundation
 import CoreNFC
-import CommonCrypto
-import CryptoTokenKit
-internal import SwiftECC
-import BigInt
-import CryptoKit
-import IdCardLib
-import CryptoObjCWrapper
-import CryptoSwift
 import UtilsLib
+import IdCardLib
 
 @MainActor
-public class OperationDecrypt: NFCOperationBase {
-    private var containerFile: URL?
-    private var recipients: [Addressee] = []
-    private var pin1Number: SecureData = SecureData([0x00])
-    private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
+public class OperationChangePin: NFCOperationBase {
+    private var codeType: CodeType?
+    private var currentPin: SecureData?
+    private var newPin: SecureData?
+    private var continuation: CheckedContinuation<Void, Error>?
 
-    public func processDecrypt(
+    public func startChanging(
         canNumber: String,
-        pin1Number: SecureData,
-        containerFile: URL,
-        recipients: [Addressee],
+        codeType: CodeType,
+        currentPin: SecureData,
+        newPin: SecureData,
         strings: NFCSessionStrings,
-    ) async throws -> CryptoContainerProtocol {
-
+    ) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -51,12 +43,12 @@ public class OperationDecrypt: NFCOperationBase {
                 continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
                 return
             }
-            self.canNumber = canNumber
-            self.pin1Number = pin1Number
-            self.containerFile = containerFile
-            self.recipients = recipients
-            self.strings = strings
 
+            self.canNumber = canNumber
+            self.codeType = codeType
+            self.currentPin = currentPin
+            self.newPin = newPin
+            self.strings = strings
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
             session?.begin()
@@ -71,51 +63,31 @@ public class OperationDecrypt: NFCOperationBase {
                 self.session = nil
             }
 
-            guard let containerFile else {
-                let error = DecryptError.containerFileInvalid
-                OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
+            guard let codeType = self.codeType,
+                  let currentPin = self.currentPin,
+                  let newPin = self.newPin else {
+                let error = ChangePinError.missingRequiredParameter
+                OperationChangePin.logger().error("NFC: \(error.localizedDescription)")
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to read container file")
+                                   "Missing required parameters")
                 continuation?.resume(throwing: error)
                 return
             }
-
-            if containerFile.path.isEmpty {
-                let error = DecryptError.containerFileInvalid
-                OperationDecrypt.logger().error("NFC: Container file path is empty")
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to read container file")
-                continuation?.resume(throwing: error)
-                return
-            }
-
-            if recipients.isEmpty {
-                let error = DecryptError.recipientsEmpty
-                OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "No recipients found")
-                continuation?.resume(throwing: error)
-                return
-            }
-
-            OperationDecrypt.logger().info("NFC: Checks complete starting decryption")
 
             do {
                 updateAlertMessage(step: 1)
-                let tag = try await connection.setup(session, tags: tags)
+                OperationChangePin.logger().info("NFC: Setting up NFC connection for PIN change...")
+                let tag = try await self.connection.setup(session, tags: tags)
+
                 updateAlertMessage(step: 2)
-                let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
+                let cardCommands = try await self.connection.getCardCommands(session, tag: tag, CAN: self.canNumber)
+
                 updateAlertMessage(step: 3)
-                let cert = try await cardCommands.readAuthenticationCertificate()
-                updateAlertMessage(step: 4)
-                let decryptedContainer = try await CryptoContainer.decrypt(
-                    containerFile: containerFile,
-                    recipients: recipients,
-                    cert: cert,
-                    cardCommands: cardCommands,
-                    pin: pin1Number,
-                )
-                continuation?.resume(with: .success(decryptedContainer))
+                OperationChangePin.logger().info("NFC: Changing \(codeType.name)...")
+                try await cardCommands.changeCode(codeType, to: newPin, verifyCode: currentPin)
+                OperationChangePin.logger().info("NFC: \(codeType.name) changed successfully")
+
+                self.continuation?.resume(with: .success(()))
                 success()
             } catch {
                 guard !checkIfFinished(error: error) else { return }
@@ -126,15 +98,15 @@ public class OperationDecrypt: NFCOperationBase {
                     return
                 }
 
-                if let decryptError = error as? DecryptError {
-                    OperationDecrypt.logger()
-                        .error("NFC: DecryptError: \(decryptError.localizedDescription)")
+                if let changePinError = error as? ChangePinError {
+                    OperationChangePin.logger()
+                        .error("NFC: changePinError: \(changePinError.localizedDescription)")
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
                     continuation?.resume(throwing: error)
                     return
                 }
 
-                let wrappedError = DecryptError.unknown(handleUnknownError(error, session: session))
+                let wrappedError = UnblockPINError.unknown(handleUnknownError(error, session: session))
                 continuation?.resume(throwing: wrappedError)
             }
         }

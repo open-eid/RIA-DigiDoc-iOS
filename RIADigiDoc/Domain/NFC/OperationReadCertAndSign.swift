@@ -30,19 +30,12 @@ import LibdigidocLibSwift
 import UtilsLib
 
 @MainActor
-public class OperationReadCertAndSign: NSObject, Loggable {
-    private var session: NFCTagReaderSession?
-    private var isFinished = false
-    private var canNumber: String = ""
+public class OperationReadCertAndSign: NFCOperationBase {
     private var pin2Number: SecureData = SecureData([0x00])
     private var signedContainer: SignedContainerProtocol?
     private var containerPath: URL?
     private var roleData: RoleData?
     private var userAgent: String = ""
-    private var nfcError: String? = ""
-    private var strings: NFCSessionStrings?
-
-    private let connection = NFCConnection()
 
     private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
 
@@ -79,50 +72,9 @@ public class OperationReadCertAndSign: NSObject, Loggable {
         }
     }
 
-    private func updateAlertMessage(step: Int) {
-        let stepMessages = [
-            strings?.initialMessage ?? "",
-            strings?.step1Message ?? "",
-            strings?.step2Message ?? "",
-            strings?.step3Message ?? "",
-            strings?.step4Message ?? ""
-        ]
+    // MARK: - NFCTagReaderSessionDelegate
 
-        let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
-        let progressBar = ProgressBar(currentStep: step)
-        var message = stepMessage
-        OperationReadCertAndSign.logger().info("NFC: Updating alert message to: \(message)")
-        message += "\n\n\(progressBar.generate())"
-        session?.alertMessage = message
-    }
-
-    private func success() {
-        session?.alertMessage = strings?.successMessage ?? ""
-        session?.invalidate()
-    }
-
-    private func handleIdCardError(_ error: IdCardError) {
-        switch error {
-        case .wrongCAN:
-            nfcError = strings?.canErrorMessage ?? ""
-        case .wrongPIN(let triesLeft):
-            if triesLeft > 1 {
-                nfcError = strings?.pinWrongMultipleErrorMessage ?? ""
-            } else if triesLeft == 1 {
-                nfcError = strings?.pinWrongErrorMessage ?? ""
-            } else {
-                nfcError = strings?.pinBlockedErrorMessage ?? ""
-            }
-        case .sessionError:
-            nfcError = strings?.sessionErrorMessage ?? ""
-        default:
-            nfcError = strings?.technicalErrorMessage ?? ""
-        }
-    }
-}
-
-extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
-    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+    public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
             defer {
                 self.session = nil
@@ -131,28 +83,32 @@ extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
             guard let signedContainer else {
                 let error = ReadCertAndSignError.signedContainerNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "Failed to read container data")
+                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
+                                   "Failed to read container data")
                 continuation?.resume(throwing: error)
                 return
             }
             guard let roleData else {
                 let error = ReadCertAndSignError.roleDataNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "Failed to read role data")
+                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
+                                   "Failed to read role data")
                 continuation?.resume(throwing: error)
                 return
             }
             guard let containerPath else {
                 let error = ReadCertAndSignError.containerPathNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "Failed to read container path")
+                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
+                                   "Failed to read container path")
                 continuation?.resume(throwing: error)
                 return
             }
             if userAgent.isEmpty {
                 let error = ReadCertAndSignError.userAgentEmpty
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: "Failed to initialize user agent")
+                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
+                                   "Failed to initialize user agent")
                 continuation?.resume(throwing: error)
                 return
             }
@@ -186,18 +142,10 @@ extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
                 continuation?.resume(with: .success(result))
                 success()
             } catch {
-                guard !isFinished else {
-                    OperationReadCertAndSign.logger()
-                        .info("NFC: Operation already finished, ignoring error: \(error.localizedDescription)")
-                    return
-                }
-                isFinished = true
+                guard !checkIfFinished(error: error) else { return }
 
                 if let idCardInternalError = error as? IdCardInternalError {
-                    let idCardError = idCardInternalError.getIdCardError()
-                    OperationReadCertAndSign.logger().error("NFC: IdCardError detected: \(idCardError)")
-                    handleIdCardError(idCardError)
-                    session.invalidate(errorMessage: nfcError ?? "")
+                    handleIdCardInternalError(idCardInternalError, session: session)
                     continuation?.resume(throwing: error)
                     return
                 }
@@ -217,18 +165,13 @@ extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
                     return
                 }
 
-                OperationReadCertAndSign.logger().error("NFC: Unknown error type: \(type(of: error))")
-                OperationReadCertAndSign.logger().error("NFC: Error details: \(error.localizedDescription)")
-                let wrappedError = ReadCertAndSignError.unknown(error)
-                session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
+                let wrappedError = ReadCertAndSignError.unknown(handleUnknownError(error, session: session))
                 continuation?.resume(throwing: wrappedError)
             }
         }
     }
 
-    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
-
-    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
         self.session = nil
         guard !isFinished else { return }
         isFinished = true
@@ -244,5 +187,4 @@ extension OperationReadCertAndSign: @MainActor NFCTagReaderSessionDelegate {
         }
         continuation?.resume(throwing: error)
     }
-
 }

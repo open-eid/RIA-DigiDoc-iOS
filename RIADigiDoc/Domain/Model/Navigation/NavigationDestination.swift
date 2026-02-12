@@ -72,12 +72,14 @@ public enum NavigationDestination: Hashable {
 
     case myEidRootView
     case myEidView(
-        idCardData: IdCardData
+        idCardData: IdCardData,
+        actionMethod: ActionMethod
     )
 
     case myEidPinView(
         pinAction: MyEidPinCodeAction,
         codeType: CodeType,
-        personalCode: String
+        personalCode: String,
+        actionMethod: ActionMethod
     )
 }

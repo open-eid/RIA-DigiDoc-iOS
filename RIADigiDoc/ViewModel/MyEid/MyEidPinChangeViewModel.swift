@@ -28,6 +28,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
     private(set) var pinAction: MyEidPinCodeAction
     private(set) var codeType: CodeType
     private(set) var personalCode: String
+    private(set) var actionMethod: ActionMethod
 
     private(set) var steps: [MyEidPinCodeStep] = []
     private(set) var stepIndex: Int = 0
@@ -59,12 +60,14 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         pinAction: MyEidPinCodeAction,
         codeType: CodeType,
         personalCode: String,
+        actionMethod: ActionMethod,
         idCardRepository: IdCardRepositoryProtocol,
-        sharedMyEidSession: SharedMyEidSessionProtocol
+        sharedMyEidSession: SharedMyEidSessionProtocol,
     ) {
         self.pinAction = pinAction
         self.codeType = codeType
         self.personalCode = personalCode
+        self.actionMethod = actionMethod
         self.idCardRepository = idCardRepository
         self.sharedMyEidSession = sharedMyEidSession
 
@@ -81,7 +84,9 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         }
     }
 
-    func submit() async {
+    func submit(
+        nfcStringsUtil: NFCSessionStringsUtil
+    ) async {
         resetInputError()
         resetErrorMessage()
 
@@ -102,7 +107,6 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                 clearPinCodes()
                 return
             }
-
             guard let currentPinCode = currentCode, let newPinCode = newCode else {
                 input = ""
                 clearPinCodes()
@@ -115,7 +119,8 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                 pinAction,
                 codeType: codeType,
                 current: currentPinCode,
-                new: newPinCode
+                new: newPinCode,
+                nfcStringsUtil: nfcStringsUtil
             )
         }
 
@@ -228,28 +233,56 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         _ action: MyEidPinCodeAction,
         codeType: CodeType,
         current: [UInt8],
-        new: [UInt8]
+        new: [UInt8],
+        nfcStringsUtil: NFCSessionStringsUtil
     ) async {
         do {
-            switch action {
-            case .change:
-                try await idCardRepository.changeCode(
-                    codeType,
-                    to: Data(new),
-                    verifyCode: Data(current)
-                )
-            case .unblock:
-                try await idCardRepository
-                    .unblockCode(codeType, puk: Data(current), newCode: Data(new))
-                sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
+            if actionMethod == .idCardViaUSB {
+                switch action {
+                case .change:
+                    try await idCardRepository.changeCode(
+                        codeType,
+                        to: Data(new),
+                        verifyCode: Data(current)
+                    )
+                case .unblock:
+                    try await idCardRepository
+                        .unblockCode(codeType, puk: Data(current), newCode: Data(new))
+                    sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
+                }
+            } else if actionMethod == .idCardViaNFC {
+                let canNumber = sharedMyEidSession.getCAN()
+                switch action {
+                case .change:
+                    try await OperationChangePin().startChanging(
+                        canNumber: canNumber,
+                        codeType: codeType,
+                        currentPin: SecureData(current),
+                        newPin: SecureData(new),
+                        strings: nfcStringsUtil.makeForChangePin(pinName: codeType.name)
+                    )
+                case .unblock:
+                    try await OperationUnblockPin().startReading(
+                        canNumber: canNumber,
+                        codeType: codeType,
+                        puk: SecureData(current),
+                        newPin: SecureData(new),
+                        strings: nfcStringsUtil.makeForUnblock(pinName: codeType.name)
+                    )
+                    sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
+                }
             }
             isSuccess = true
         } catch {
-            MyEidPinChangeViewModel.logger().error("Unable to change or unblock PIN. \(error)")
+            MyEidPinChangeViewModel.logger().error("Unable to change or unblock PIN.")
 
-            if let pinCodeChangeError = error as? IdCardError {
-                handleError(pinCodeChangeError)
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                MyEidPinChangeViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: codeType)
             } else {
+                MyEidPinChangeViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+                MyEidPinChangeViewModel.logger().error("NFC: Error details: \(error)")
                 errorMessage = "General error"
             }
 
@@ -259,19 +292,34 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         clearPinCodes()
     }
 
-    private func handleError(_ error: IdCardError) {
+    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
+        MyEidPinChangeViewModel.logger().error("ID Card error: \(error)")
+
         switch error {
-        case .wrongPIN(triesLeft: 0):
-            errorMessage = "PIN blocked"
-            errorMessageExtraArguments = [codeType.name]
-            isBlocked = true
-            sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: true)
-        case .wrongPIN(let remaining):
-            errorMessage = remaining > 1 ? "PIN verification error multiple" : "PIN verification error one"
-            errorMessageExtraArguments = [
-                pinAction == .change ? codeType.name : CodeType.puk.name, String(remaining)
-            ]
-            resetToCurrentPinEntryStep()
+        case .cancelledByUser:
+            errorMessage = nil
+            errorMessageExtraArguments = []
+        case .wrongCAN:
+            errorMessage = "Wrong CAN"
+            errorMessageExtraArguments = []
+        case .wrongPIN(let triesLeft):
+            if triesLeft > 1 {
+                errorMessage = "PIN verification error multiple"
+                errorMessageExtraArguments = [pinType.name, String(triesLeft)]
+                resetToCurrentPinEntryStep()
+            } else if triesLeft == 1 {
+                errorMessage = "PIN verification error one"
+                errorMessageExtraArguments = [pinType.name]
+                resetToCurrentPinEntryStep()
+            } else {
+                errorMessage = "PIN blocked"
+                errorMessageExtraArguments = [pinType.name]
+                isBlocked = true
+                sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: true)
+            }
+        case .sessionError:
+            errorMessage = "NFC session error"
+            errorMessageExtraArguments = []
         default:
             resetInputError()
             errorMessage = "General error"

@@ -234,19 +234,38 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         }
         return (tlvEnc, tlvRes, tlvMac)
     }
-
+    // swiftlint:disable cyclomatic_complexity
     func transmit(_ apduData: Bytes) async throws -> (responseData: Bytes, sw: UInt16) {
         CardReaderNFC.logger().info("Plain >: \(apduData.toHex)")
         guard let apdu = NFCISO7816APDU(data: Data(apduData)) else {
             throw IdCardInternalError.invalidAPDU
         }
         _ = SSC.increment()
-        let DO87 = try getDO87(apdu)
-        let DO97 = try getDO97(apdu)
+        let DO87: Data
+        if let data = apdu.data, !data.isEmpty {
+            let ivValue = try AES.CBC(key: ksEnc).encrypt(SSC)
+            let encData = try AES.CBC(key: ksEnc, ivVal: ivValue).encrypt(data.addPadding())
+            if apdu.instructionCode & 0x01 == 0 {
+                DO87 = TLV(tag: 0x87, bytes: [0x01] + encData).data
+            } else {
+                DO87 = TLV(tag: 0x85, bytes: encData).data
+            }
+        } else {
+            DO87 = Data()
+        }
+        let DO97: Data
+        if apdu.expectedResponseLength > 0 {
+            DO97 = TLV(
+                tag: 0x97,
+                bytes: [UInt8(apdu.expectedResponseLength == 256 ? 0 : apdu.expectedResponseLength)]
+            ).data
+        } else {
+            DO97 = Data()
+        }
         let cmdHeader: Bytes = [apdu.instructionClass | 0x0C, apdu.instructionCode, apdu.p1Parameter, apdu.p2Parameter]
-        let MValue = cmdHeader.addPadding() + DO87 + DO97
-        let NValue = SSC + MValue
-        let mac = try AES.CMAC(key: ksMac).authenticate(bytes: NValue.addPadding())
+        let mVal = cmdHeader.addPadding() + DO87 + DO97
+        let nVal = SSC + mVal
+        let mac = try AES.CMAC(key: ksMac).authenticate(bytes: nVal.addPadding())
         let DO8E = TLV(tag: 0x8E, bytes: mac).data
         let send = DO87 + DO97 + DO8E
         let response = try await tag.sendCommand(
@@ -257,15 +276,25 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
             data: send,
             leByte: 256
         )
-        let (tlvEnc, tlvRes, tlvMac) = try getTLVs(response)
+        var tlvEnc: TKTLVRecord?
+        var tlvRes: TKTLVRecord?
+        var tlvMac: TKTLVRecord?
+        for tlv in TLV.sequenceOfRecords(from: response) ?? [] {
+            switch tlv.tag {
+            case 0x85, 0x87: tlvEnc = tlv
+            case 0x99: tlvRes = tlv
+            case 0x8E: tlvMac = tlv
+            default: print("Unknown tag")
+            }
+        }
         guard let tlvRes else {
             throw IdCardInternalError.missingRESTag
         }
         guard let tlvMac else {
             throw IdCardInternalError.missingMACTag
         }
-        let KValue = SSC.increment() + (tlvEnc?.data ?? Data()) + tlvRes.data
-        if try Data(AES.CMAC(key: ksMac).authenticate(bytes: KValue.addPadding())) != tlvMac.value {
+        let kVal = SSC.increment() + (tlvEnc?.data ?? Data()) + tlvRes.data
+        if try Data(AES.CMAC(key: ksMac).authenticate(bytes: kVal.addPadding())) != tlvMac.value {
             throw IdCardInternalError.invalidMACValue
         }
         guard let tlvEnc else {
@@ -273,10 +302,13 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
             return (.init(), UInt16(tlvRes.value[0], tlvRes.value[1]))
         }
         let ivValue = try AES.CBC(key: ksEnc).encrypt(SSC)
-        let responseData = try (try AES.CBC(key: ksEnc, ivVal: ivValue).decrypt(tlvEnc.value[1...])).removePadding()
-        CardReaderNFC.logger().info("Plain <:  \(responseData.toHex) \(tlvRes.value.toHex)")
+        let responseData = try (try AES.CBC(key: ksEnc, ivVal: ivValue)
+            .decrypt(tlvEnc.tag == 0x85 ? tlvEnc.value : tlvEnc.value[1...]))
+            .removePadding()
+        CardReaderNFC.logger().debug("Plain <:  \(responseData.toHex) \(tlvRes.value.toHex)")
         return (Bytes(responseData), UInt16(tlvRes.value[0], tlvRes.value[1]))
     }
+    // swiftlint:enable cyclomatic_complexity
 
     // MARK: - Utils
 

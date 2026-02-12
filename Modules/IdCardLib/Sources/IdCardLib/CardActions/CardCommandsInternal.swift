@@ -74,7 +74,7 @@ extension CardCommandsInternal {
                     return
                 case 0x6A80:  // New pin is invalid
                     throw IdCardInternalError.invalidNewPin
-                case 0x63C0, 0x6983: // Authentication method blocked
+                case 0x63C0, 0x6983, 0x6984: // Authentication method blocked
                     throw IdCardInternalError.pinVerificationFailed
                 // For pin codes this means verification failed due to wrong pin
                 case let uInt16 where (uInt16 & 0xFFF0) == 0x63C0:
