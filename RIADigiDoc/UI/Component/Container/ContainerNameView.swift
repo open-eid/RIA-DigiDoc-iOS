@@ -39,6 +39,7 @@ struct ContainerNameView: View {
     @Binding var name: String
     let isEditContainerButtonShown: Bool
     let isSaveButtonShown: Bool
+    let isSignButtonShown: Bool
     let isEncryptButtonShown: Bool
     let showLeftActionButton: Bool
     let showRightActionButton: Bool
@@ -50,14 +51,19 @@ struct ContainerNameView: View {
     let onRightActionButtonClick: () -> Void
     let onSaveContainerButtonClick: () -> Void
     let onRenameContainerButtonClick: () -> Void
+    let onSignContainerButtonClick: () -> Void
+    let onEncryptContainerButtonClick: () -> Void
 
     private var bottomSheetActions: [BottomSheetButton] {
         ContainerNameBottomSheetActions.actions(
             isEditContainerButtonShown: isEditContainerButtonShown,
             isSaveButtonShown: isSaveButtonShown,
+            isSignButtonShown: isSignButtonShown,
             isEncryptButtonShown: isEncryptButtonShown,
             onRenameContainerButtonClick: onRenameContainerButtonClick,
-            onSaveContainerButtonClick: onSaveContainerButtonClick
+            onSaveContainerButtonClick: onSaveContainerButtonClick,
+            onSignContainerButtonClick: onSignContainerButtonClick,
+            onEncryptContainerButtonClick: onEncryptContainerButtonClick
         )
     }
 
@@ -160,6 +166,7 @@ struct ContainerNameView: View {
         name: .constant("Test.asice"),
         isEditContainerButtonShown: true,
         isSaveButtonShown: true,
+        isSignButtonShown: true,
         isEncryptButtonShown: false,
         showLeftActionButton: true,
         showRightActionButton: true,
@@ -170,7 +177,9 @@ struct ContainerNameView: View {
         onLeftActionButtonClick: {},
         onRightActionButtonClick: {},
         onSaveContainerButtonClick: {},
-        onRenameContainerButtonClick: {}
+        onRenameContainerButtonClick: {},
+        onSignContainerButtonClick: {},
+        onEncryptContainerButtonClick: {}
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

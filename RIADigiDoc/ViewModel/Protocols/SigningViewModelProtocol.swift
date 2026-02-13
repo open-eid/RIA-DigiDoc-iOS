@@ -44,4 +44,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func removeLastOpenedXattr(from url: URL)
     func resetErrorMessage()
     func resetSuccessMessage()
+    func convertToCryptoContainer() async -> Bool
 }

@@ -192,6 +192,7 @@ struct EncryptView: View {
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
                                     isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
+                                    isSignButtonShown: viewModel.isSignButtonShown,
                                     isEncryptButtonShown: viewModel.isEncryptButtonShown,
                                     showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
@@ -236,6 +237,14 @@ struct EncryptView: View {
                                     },
                                     onRenameContainerButtonClick: {
                                         showRenameModal = true
+                                    },
+                                    onSignContainerButtonClick: {
+                                        Task {
+                                            await convertToSignedContainer()
+                                        }
+                                    },
+                                    onEncryptContainerButtonClick: {
+                                        // Do nothing
                                     }
                                 )
                                 .background(
@@ -523,6 +532,16 @@ struct EncryptView: View {
         if viewModel.dataFiles.count == 1, viewModel.isLastDataFileRemoved {
             if await viewModel.handleBackButton() {
                 dismiss()
+            }
+        }
+    }
+
+    private func convertToSignedContainer() async {
+        let isConverted = await viewModel.convertToSignedContainer()
+        if isConverted {
+            Toast.show(languageSettings.localized("Converted to a signature container"))
+            await MainActor.run {
+                pathManager.replaceLast(to: .signingView)
             }
         }
     }

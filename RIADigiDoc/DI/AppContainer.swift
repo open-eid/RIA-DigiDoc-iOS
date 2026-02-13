@@ -146,7 +146,8 @@ extension Container {
                 fileUtil: self.fileUtil(),
                 fileManager: self.fileManager(),
                 fileInspector: self.fileInspector(),
-                sivaRepository: self.sivaRepository()
+                sivaRepository: self.sivaRepository(),
+                containerUtil: self.containerUtil()
             )
         }
     }

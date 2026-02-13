@@ -53,4 +53,5 @@ public protocol EncryptViewModelProtocol: Sendable {
     func removeRecipient(_ recipient: Addressee) async
     func removeDataFile(_ dataFile: URL) async
     func updateAsyncProperties() async
+    func convertToSignedContainer() async -> Bool
 }
