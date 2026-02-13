@@ -255,7 +255,8 @@ extension Container {
                 dataStore: self.dataStore(),
                 proxyUtil: self.proxyUtil(),
                 userAgentUtil: self.userAgentUtil(),
-                fileUtil: self.fileUtil()
+                fileUtil: self.fileUtil(),
+                cryptoSetup: self.cryptoSetup()
             )
         }
     }
@@ -324,7 +325,8 @@ extension Container {
             ProxySettingsViewModel(
                 proxyUtil: self.proxyUtil(),
                 userAgentUtil: self.userAgentUtil(),
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                cryptoSetup: self.cryptoSetup()
             )
         }
     }

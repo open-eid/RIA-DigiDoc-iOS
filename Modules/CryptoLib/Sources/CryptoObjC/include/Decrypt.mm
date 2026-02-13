@@ -33,24 +33,24 @@
 - (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
     std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(label);
     id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : nil;
-    id first = info.contains("first_name") ? [NSString stringWithStdString:info["first_name"]] : nil;
-    id last = info.contains("last_name") ? [NSString stringWithStdString:info["last_name"]] : nil;
+    id type = info.contains("last_name") ? [NSString stringWithStdString:info["type"]] : nil;
     id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
-    id type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
     CertType certType = CertTypeUnknownType;
-    if ([type isEqualToString:@"ID-card"]) {
+    if ([type isEqualToString:@"ID-card"] || [type isEqualToString:@"cert"]) {
         certType = CertTypeIDCardType;
     } else if ([type isEqualToString:@"Digi-ID"]) {
         certType = CertTypeDigiIDType;
     } else if ([type isEqualToString:@"Digi-ID E-RESIDENT"]) {
         certType = CertTypeEResidentType;
+    } else if (type == nil) {
+        certType = CertTypeESealType;
     }
     id validTo = nil;
     if (info.contains("server_exp")) {
         long long epochTime = [[NSString stringWithStdString:info["server_exp"]] longLongValue];
         validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
     }
-    if (self = [self initWithData:pub cnVal:cn givenName:first surname:last serialNumber:serial certType:certType validTo:validTo concatKDFAlgorithmURI:concatKDFAlgorithmURI]) {
+    if (self = [self initWithCnVal:cn serialNumber:serial certType:certType validTo:validTo data:pub  concatKDFAlgorithmURI:concatKDFAlgorithmURI]) {
     }
     return self;
 }

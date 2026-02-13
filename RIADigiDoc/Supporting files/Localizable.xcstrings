@@ -287,6 +287,42 @@
         }
       }
     },
+    "Cannot create an empty crypto container" : {
+      "comment" : "CryptoContainer empty error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot create an empty crypto container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei saa luua tühja krüptokonteinerit"
+          }
+        }
+      }
+    },
+    "Cannot create crypto container without recipients" : {
+      "comment" : "CryptoContainer no recipients error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot create crypto container without recipients"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei saa luua krüptokonteinerit ilma adressaatideta"
+          }
+        }
+      }
+    },
     "Certificate details" : {
       "comment" : "Title of Certificate Details view",
       "localizations" : {
@@ -300,6 +336,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaadi detailid"
+          }
+        }
+      }
+    },
+    "Certificate for Encryption" : {
+      "comment" : "Certificate type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate for Encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteerimissertifikaat"
           }
         }
       }
@@ -1272,6 +1326,24 @@
         }
       }
     },
+    "Digi-ID" : {
+      "comment" : "Certificate type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digi-ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digi-ID"
+          }
+        }
+      }
+    },
     "DigiDoc" : {
       "comment" : "DigiDoc title on homesview",
       "extractionState" : "manual",
@@ -1344,6 +1416,24 @@
         }
       }
     },
+    "E-Resident" : {
+      "comment" : "Certificate type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Resident"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Resident"
+          }
+        }
+      }
+    },
     "Empty file in container" : {
       "comment" : "Empty file message in container notifications",
       "extractionState" : "manual",
@@ -1394,6 +1484,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Encrypt general error" : {
+      "comment" : "CryptoContainer encrypt error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container encryption was unsuccessful"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ümbriku krüpteerimine ebaõnnestus"
           }
         }
       }
@@ -1969,6 +2077,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Andmete lugemine ebaõnnestus. Palun taasühenda kaardilugeja ja proovi uuesti."
+          }
+        }
+      }
+    },
+    "ID-card" : {
+      "comment" : "Certificate type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaart"
           }
         }
       }
@@ -7671,6 +7797,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tühista %@ blokeering"
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "comment" : "Certificate type",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tundmatu"
           }
         }
       }

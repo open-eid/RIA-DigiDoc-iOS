@@ -40,6 +40,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     var showRecipientRemoveButton = false
     var isLastDataFileRemoved = false
     private(set) var errorMessage: ToastMessage?
+    private(set) var successMessage: ToastMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileOpeningService: FileOpeningServiceProtocol
@@ -158,7 +159,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
         await cryptoContainer?.addDataFiles(files)
         EncryptViewModel.logger().info("Added data files to container")
-        errorMessage = ToastMessage(
+        successMessage = ToastMessage(
             key: files.count == 1 ? "File successfully added" : "Files successfully added",
             args: []
         )
@@ -246,6 +247,8 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             await loadContainerData(
                 cryptoContainer: encryptedContainer
             )
+
+            successMessage = ToastMessage(key: "Container successfully encrypted", args: [])
         } catch {
             EncryptViewModel.logger().error("Unable to encrypt container: \(error)")
             handleEncryptionError(error)
@@ -258,7 +261,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             case .containerCreationFailed(let detail):
                 errorMessage = ToastMessage(key: detail.message, args: [])
             default:
-                errorMessage = ToastMessage(key: "General error", args: [])
+                errorMessage = ToastMessage(key: "Encrypt general error", args: [])
             }
             return
         }
@@ -268,7 +271,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             return
         }
 
-        errorMessage = ToastMessage(key: "General error", args: [])
+        errorMessage = ToastMessage(key: "Encrypt general error", args: [])
     }
 
     @discardableResult
@@ -558,6 +561,14 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             )
             return
         }
+    }
+
+    func resetErrorMessage() {
+        errorMessage = nil
+    }
+
+    func resetSuccessMessage() {
+        successMessage = nil
     }
 
     func updateAsyncProperties() async {

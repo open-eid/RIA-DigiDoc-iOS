@@ -101,7 +101,7 @@ actor CryptoSetup: CryptoSetupProtocol {
         }
     }
 
-    public func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?, _ certData: Data? = nil) async {
+    public func setCdoc2Settings(_ configurationProvider: ConfigurationProvider?) async {
         var defaultUseCdoc2Encryption = Constants.CryptoDefaultValues.encryptionUseCdoc2
         if let useCdoc2Encryption = configurationProvider?.cdoc2Default {
             defaultUseCdoc2Encryption = useCdoc2Encryption
@@ -129,8 +129,23 @@ actor CryptoSetup: CryptoSetupProtocol {
             Decrypt.setCdoc2Config(cdoc2Conf.asNSDictionary())
         }
 
-        let proxyInfo = await proxyUtil.getProxyInfo()
+        if let certBundle = configurationProvider?.certBundle {
+            Encrypt.setCerts(certBundle)
+            Decrypt.setCerts(certBundle)
+        }
 
+        let proxyInfo = await proxyUtil.getProxyInfo()
+        await setCdoc2ProxyInfo(proxyInfo)
+    }
+
+    public func setCdoc2CustomCert(_ certData: Data? = nil) async {
+        if let certData {
+            Encrypt.setCert(certData)
+            Decrypt.setCert(certData)
+        }
+    }
+
+    public func setCdoc2ProxyInfo(_ proxyInfo: ProxyInfo) async {
         Encrypt.setProxy(
             proxyInfo.host,
             port: proxyInfo.port,
@@ -144,16 +159,5 @@ actor CryptoSetup: CryptoSetupProtocol {
             username: proxyInfo.username,
             password: proxyInfo.password
         )
-
-        if let certBundle = configurationProvider?.certBundle {
-            Encrypt.setCerts(certBundle)
-            Decrypt.setCerts(certBundle)
-        }
-
-        if let certData {
-            Encrypt.setCert(certData)
-            Decrypt.setCert(certData)
-        }
     }
-
 }

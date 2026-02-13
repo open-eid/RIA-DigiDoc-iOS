@@ -62,7 +62,7 @@ class AdvancedSettingsViewModel: AdvancedSettingsViewModelProtocol, Loggable {
 
         await cryptoSetup.setLdapConfig(configuration)
         await cryptoSetup.setCdoc2Config(configuration)
-        await cryptoSetup.setCdoc2Settings(configuration, nil)
+        await cryptoSetup.setCdoc2Settings(configuration)
     }
 
     private func removeCertificates() async {
