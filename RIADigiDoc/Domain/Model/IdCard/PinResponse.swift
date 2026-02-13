@@ -19,8 +19,11 @@
 
 import Foundation
 
-public struct RetryCount: Sendable, Hashable {
-    let pin1: UInt8
-    let pin2: UInt8
-    let puk: UInt8
+public struct PinResponse: Sendable, Hashable {
+    let pin1RetryCount: UInt8
+    let pin1Active: Bool
+    let pin2RetryCount: UInt8
+    let pin2Active: Bool
+    let pukRetryCount: UInt8
+    let pukActive: Bool
 }

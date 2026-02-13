@@ -24,6 +24,7 @@ import CryptoTokenKit
 internal import SwiftECC
 import BigInt
 
+// swiftlint:disable force_unwrapping
 class CardReaderNFC: @unchecked CardReader, Loggable {
     // swiftlint:disable identifier_name
     enum PasswordType: UInt8 {
@@ -38,6 +39,7 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
     }
     enum MappingType: String {
         case id_PACE_ECDH_GM_AES_CBC_CMAC_256 = "04007f00070202040204" // 0.4.0.127.0.7.2.2.4.2.4
+        case id_PACE_ECDH_IM_AES_CBC_CMAC_256 = "04007f00070202040404" // 0.4.0.127.0.7.2.2.4.4.4
         var data: Data {
             guard let value = Data(hex: rawValue) else { return Data() }
             return value
@@ -107,30 +109,34 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         CardReaderNFC.logger().info("Nonce \(nonce.toHex)")
 
         // Step2
-        let (terminalPubKey, terminalPrivKey) = domain.makeKeyPair()
-        let mappingKey = try await self.tag.sendPaceCommand(
-            records: [try TLV(
-                tag: 0x81,
-                publicKey: terminalPubKey
-            )],
-            tagExpected: 0x82
-        )
-        CardReaderNFC.logger().info("Mapping key \(mappingKey.value.toHex)")
-        guard let cardPubKey = try ECPublicKey(domain: domain, point: mappingKey.value)
-        else { throw IdCardInternalError.authenticationFailed }
+        let mappedPoint: Point
+        switch mappingType {
+        case .id_PACE_ECDH_IM_AES_CBC_CMAC_256:
+            let pcdNonce = try CardReaderNFC.random(count: nonce.count)
+            _ = try await self.tag.sendPaceCommand(records: [TLV(tag: 0x81, value: pcdNonce)], tagExpected: 0x82)
+            let psrn = try CardReaderNFC.pseudoRandomNumberMappingAES(sVal: nonce, tVal: pcdNonce, domain: domain)
+            mappedPoint = CardReaderNFC.pointEncodeIM(tVal: psrn, domain: domain)
 
-        // Mapping
-        let nonceS = BInt(magnitude: nonce)
-        let mappingBasePoint = ECPublicKey(privateKey: try ECPrivateKey(domain: domain, s: nonceS)) // S*G
-        // swiftlint:disable line_length
-        CardReaderNFC.logger().info("Card Key x: \(mappingBasePoint.w.x.asMagnitudeBytes().toHex, privacy: .public), y: \(mappingBasePoint.w.y.asMagnitudeBytes().toHex, privacy: .public)")
-        // swiftlint:enable line_length
-        let sharedSecretH = try domain.multiplyPoint(cardPubKey.w, terminalPrivKey.s)
-        // swiftlint:disable line_length
-        CardReaderNFC.logger().info("Shared Secret x: \(sharedSecretH.x.asMagnitudeBytes().toHex, privacy: .public), y: \(sharedSecretH.y.asMagnitudeBytes().toHex, privacy: .public)")
-        // swiftlint:enable line_length
-        let mappedPoint = try domain.addPoints(mappingBasePoint.w, sharedSecretH) // MAP G = (S*G) + H
+        case .id_PACE_ECDH_GM_AES_CBC_CMAC_256:
+            let (terminalPubKey, terminalPrivKey) = domain.makeKeyPair()
+            let mappingKey = try await self.tag.sendPaceCommand(
+                records: [try TLV(tag: 0x81, publicKey: terminalPubKey)],
+                tagExpected: 0x82)
+            CardReaderNFC.logger().info("Mapping key \(mappingKey.value.hex)")
+            let cardPubKey = try ECPublicKey(domain: domain, point: mappingKey.value)!
 
+            // Mapping
+            let nonceS = BInt(magnitude: nonce)
+            let mappingBasePoint = ECPublicKey(privateKey: try ECPrivateKey(domain: domain, s: nonceS)) // S*G
+            // swiftlint:disable line_length
+            CardReaderNFC.logger().info("Card Key x: \(mappingBasePoint.w.x.asMagnitudeBytes().hex), y: \(mappingBasePoint.w.y.asMagnitudeBytes().hex)")
+            // swiftlint:enable line_length
+            let sharedSecretH = try domain.multiplyPoint(cardPubKey.w, terminalPrivKey.s)
+            // swiftlint:disable line_length
+            CardReaderNFC.logger().info("Shared Secret x: \(sharedSecretH.x.asMagnitudeBytes().hex), y: \(sharedSecretH.y.asMagnitudeBytes().hex)")
+            // swiftlint:enable line_length
+            mappedPoint = try domain.addPoints(mappingBasePoint.w, sharedSecretH) // MAP G = (S*G) + H
+        }
         // Ephemeral data
         // swiftlint:disable line_length
         CardReaderNFC.logger().info("Mapped point x: \(mappedPoint.x.asMagnitudeBytes().toHex, privacy: .public), y: \(mappedPoint.y.asMagnitudeBytes().toHex, privacy: .public)")
@@ -199,7 +205,11 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         if let data = apdu.data, !data.isEmpty {
             let ivValue = try AES.CBC(key: ksEnc).encrypt(SSC)
             let encData = try AES.CBC(key: ksEnc, ivVal: ivValue).encrypt(data.addPadding())
-            return TLV(tag: 0x87, bytes: [0x01] + encData).data
+            if apdu.instructionCode & 0x01 == 0 {
+                return TLV(tag: 0x87, bytes: [0x01] + encData).data
+            } else {
+                return TLV(tag: 0x85, bytes: encData).data
+            }
         } else {
             return Data()
         }
@@ -226,7 +236,7 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
         var tlvMac: TKTLVRecord?
         for tlv in TLV.sequenceOfRecords(from: response) ?? [] {
             switch tlv.tag {
-            case 0x87: tlvEnc = tlv
+            case 0x85, 0x87: tlvEnc = tlv
             case 0x99: tlvRes = tlv
             case 0x8E: tlvMac = tlv
             default: CardReaderNFC.logger().info("Unknown tag")
@@ -312,6 +322,82 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
 
     // MARK: - Utils
 
+    static private func pseudoRandomNumberMappingAES(
+        sVal: any AES.DataType,
+        tVal: any AES.DataType,
+        domain: Domain
+    ) throws -> BInt {
+        let lVal = sVal.count * 8
+        let kVal = tVal.count * 8
+
+        let c0Val: Bytes
+        let c1Val: Bytes
+        switch lVal {
+        case 128:
+            c0Val = Bytes(hex: "a668892a7c41e3ca739f40b057d85904")!
+            c1Val = Bytes(hex: "a4e136ac725f738b01c1f60217c188ad")!
+        case 192, 256:
+            c0Val = Bytes(hex: "d463d65234124ef7897054986dca0a174e28df758cbaa03f240616414d5a1676")!
+            c1Val = Bytes(hex: "54bd7255f0aaf831bec3423fcf39d69b6cbf066677d0faae5aadd99df8e53517")!
+        default:
+            throw IdCardInternalError.authenticationFailed
+        }
+
+        let cipher = AES.CBC(key: tVal)
+        var key = try cipher.encrypt(sVal)
+
+        var xVal = Bytes()
+        var nVal = 0
+        while nVal * lVal < domain.p.bitWidth + 64 {
+            let cipher = AES.CBC(key: key.prefix(kVal / 8))
+            key = try cipher.encrypt(c0Val)
+            xVal += try cipher.encrypt(c1Val)
+            nVal += 1
+        }
+
+        return BInt(magnitude: xVal).mod(domain.p)
+    }
+
+    /**
+     * https://www.icao.int/Security/FAL/TRIP/Documents/TR%20-%20Supplemental%20Access%20Control%20V1.1.pdf
+     * A.2.1. Implementation for affine coordinates
+     */
+    static private func pointEncodeIM(tVal: BInt, domain: Domain) -> Point {
+        let pVal = domain.p
+        let aVal = domain.a
+        let bVal = domain.b
+
+        // 1. α = -t^2 mod p
+        let alpha = (-(tVal ** 2)).mod(pVal)
+
+        // 2. X2 = -ba^-1 (1 + (α + α^2)^-1) mod p
+        // Hint  = -b(1 + α + α^2)(a(α + α^2))^(p-2) mod p
+        let alphaPlusAlphaSqrt = alpha + alpha ** 2
+        let x2Val = ((-bVal * (1 + alphaPlusAlphaSqrt)) * (aVal * alphaPlusAlphaSqrt).expMod(pVal - 2, pVal)).mod(pVal)
+
+        // 3. X3 = α * X2 mod p
+        let x3Val = (alpha * x2Val).mod(pVal)
+
+        // 4. h2 = (X2)^3 + a * X2 + b mod p
+        let h2Val = (x2Val ** 3 + aVal * x2Val + bVal).mod(pVal)
+
+        // 5. h3 = (X3)^3 + a * X3 + b mod p
+        // Unused: let h3 = (X3 ** 3 + a * X3 + b).mod(p)
+
+        // 6. U = t^3 * h2 mod p
+        let UVal = (tVal ** 3 * h2Val).mod(pVal)
+
+        // 7. A = (h2)^(p - 1 - (p + 1) / 4) mod p
+        // Hint: modular exponentiation with exponent p-1-(p+1)/4.
+        let AVal = h2Val.expMod(pVal - BInt.ONE - (pVal + BInt.ONE) / BInt.FOUR, pVal)
+
+        // 8. A^2 * h2 mod p = 1 -> (x, y) = (X2, A h2 mod p)
+        // 9. (x, y) = (X3, A U mod p)
+        return (AVal ** 2 * h2Val).mod(pVal) == BInt.ONE ?
+            Point(x2Val, (AVal * h2Val).mod(pVal)) :
+            Point(x3Val, (AVal * UVal).mod(pVal))
+    }
+
     static private func decryptNonce<T: AES.DataType>(CAN: String, encryptedNonce: T) throws -> Bytes {
         let decryptionKey = KDF(key: Bytes(CAN.utf8), counter: 3)
         let cipher = AES.CBC(key: decryptionKey)
@@ -330,7 +416,19 @@ class CardReaderNFC: @unchecked CardReader, Loggable {
             initializedCount = Int(CC_SHA256_DIGEST_LENGTH)
         }
     }
+
+    static private func random(count: Int) throws -> Data {
+        var data = Data(count: count)
+        let result = data.withUnsafeMutableBytes { buffer in
+            SecRandomCopyBytes(kSecRandomDefault, count, buffer.baseAddress!)
+        }
+        if result != errSecSuccess {
+            throw IdCardInternalError.authenticationFailed
+        }
+        return data
+    }
 }
+// swiftlint:enable force_unwrapping
 
 // MARK: - Extensions
 

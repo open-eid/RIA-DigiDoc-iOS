@@ -175,14 +175,14 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let publicData = try await getPublicData()
             let authCertNotValidDate = try await readAuthenticationCertificateNotValidDate()
             let signCertNotValidDate = try await readSignatureCertificateNotValidDate()
-            let retryCount = try await readCodeTryCounterRecord()
+            let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
 
             return IdCardData(
                 publicData: publicData,
                 authCertNotValidDate: authCertNotValidDate,
                 signCertNotValidDate: signCertNotValidDate,
-                retryCount: retryCount,
+                pinResponse: pinResponse,
                 isPUKChangeable: isPUKChangeable
             )
         } catch {
@@ -247,18 +247,21 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         return try getNotValidDate(from: signCert)
     }
 
-    private func readCodeTryCounterRecord() async throws -> RetryCount {
+    private func readCodeTryCounterRecord() async throws -> PinResponse {
         IdCardViewModel.logger().info(
             "ID-CARD: Reading retry counter record from ID-card with reader"
         )
 
-        let pin1RetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
-        let pin2RetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
-        let pukRetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .puk)
-        return RetryCount(
-            pin1: pin1RetryCount,
-            pin2: pin2RetryCount,
-            puk: pukRetryCount
+        let pin1Response = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
+        let pin2Response = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
+        let pukResponse = try await idCardRepository.readCodeTryCounterRecord(for: .puk)
+        return PinResponse(
+            pin1RetryCount: pin1Response.retryCount,
+            pin1Active: pin1Response.pinActive,
+            pin2RetryCount: pin2Response.retryCount,
+            pin2Active: pin2Response.pinActive,
+            pukRetryCount: pukResponse.retryCount,
+            pukActive: pukResponse.pinActive,
         )
     }
 

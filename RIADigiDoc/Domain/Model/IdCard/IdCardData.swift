@@ -24,6 +24,6 @@ public struct IdCardData: Sendable, Hashable {
     public let publicData: CardInfo
     public let authCertNotValidDate: String?
     public let signCertNotValidDate: String?
-    public let retryCount: RetryCount
+    public let pinResponse: PinResponse
     public let isPUKChangeable: Bool
 }

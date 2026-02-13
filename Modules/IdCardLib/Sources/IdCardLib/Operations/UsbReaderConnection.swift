@@ -150,7 +150,7 @@ public actor UsbReaderConnection: UsbReaderConnectionProtocol, Loggable {
         }
     }
 
-    public func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8 {
+    public func readCodeTryCounterRecord(for codeType: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool) {
         await ensureHandler()
 
         UsbReaderConnection.logger().info("ID-CARD: Reading try counter with reader for \(codeType.name)")

@@ -57,7 +57,7 @@ actor IdCardRepository: IdCardRepositoryProtocol {
         return try await idCardService.readSignatureCertificate()
     }
 
-    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8 {
+    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool) {
         return try await idCardService.readCodeTryCounterRecord(for: codeType)
     }
 

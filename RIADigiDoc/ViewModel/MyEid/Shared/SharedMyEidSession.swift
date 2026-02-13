@@ -32,12 +32,38 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
 
     private var canNumber = ""
 
+    private var isPin1Locked = false
+    private var isPin2Locked = false
+    private var isPukLocked = false
+
     private let idCardRepository: IdCardRepositoryProtocol
     private var task: Task<Void, Never>?
 
     init(idCardRepository: IdCardRepositoryProtocol) {
         self.idCardRepository = idCardRepository
         startStatusStream()
+    }
+
+    public func setIsPinLocked(_ codeType: CodeType, isLocked: Bool) {
+        switch codeType {
+        case .pin1:
+            self.isPin1Locked = isLocked
+        case .pin2:
+            self.isPin2Locked = isLocked
+        case .puk:
+            self.isPukLocked = isLocked
+        }
+    }
+
+    public func getIsPinLocked(for codeType: CodeType) -> Bool {
+        switch codeType {
+        case .pin1:
+            return self.isPin1Locked
+        case .pin2:
+            return self.isPin2Locked
+        case .puk:
+            return self.isPukLocked
+        }
     }
 
     public func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool) {

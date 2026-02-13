@@ -55,7 +55,7 @@ actor IdCardService: IdCardServiceProtocol {
         return try await usbReaderConnection.readSignatureCertificate()
     }
 
-    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8 {
+    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool) {
         return try await usbReaderConnection.readCodeTryCounterRecord(for: codeType)
     }
 

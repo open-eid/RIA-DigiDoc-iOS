@@ -169,7 +169,7 @@
 				Domain/Model/Error/NFC/UnblockPINError.swift,
 				Domain/Model/FileItem.swift,
 				Domain/Model/IdCard/IdCardData.swift,
-				Domain/Model/IdCard/RetryCount.swift,
+				Domain/Model/IdCard/PinResponse.swift,
 				Domain/Model/KeychainKey.swift,
 				"Domain/Model/My eID/MyEidDocumentStatus.swift",
 				"Domain/Model/My eID/MyEidPinCodeAction.swift",

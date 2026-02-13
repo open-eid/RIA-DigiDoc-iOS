@@ -29,10 +29,23 @@ struct MyEidPinsAndCertificatesView: View {
     @Binding var isPin1Blocked: Bool
     @Binding var isPin2Blocked: Bool
     @Binding var isPukBlocked: Bool
+    @Binding var isPin2Activated: Bool
     @Binding var pinChangeVariant: PinChangeVariant?
     var authCertValidTo: String
     var signCertValidTo: String
     var isPUKChangeable: Bool
+
+    private var pin2LockedMessage: String {
+        languageSettings.localized(
+            "PIN2 locked"
+        )
+    }
+
+    private var pin2LockedUrl: String {
+        languageSettings.localized(
+            "PIN2 locked URL"
+        )
+    }
 
     private var pukBlockedMessage: String {
         languageSettings.localized(
@@ -63,6 +76,7 @@ struct MyEidPinsAndCertificatesView: View {
         isPin1Blocked: Binding<Bool>,
         isPin2Blocked: Binding<Bool>,
         isPukBlocked: Binding<Bool>,
+        isPin2Activated: Binding<Bool>,
         pinChangeVariant: Binding<PinChangeVariant?> = .constant(nil),
         authCertValidTo: String,
         signCertValidTo: String,
@@ -71,6 +85,7 @@ struct MyEidPinsAndCertificatesView: View {
         self._isPin1Blocked = isPin1Blocked
         self._isPin2Blocked = isPin2Blocked
         self._isPukBlocked = isPukBlocked
+        self._isPin2Activated = isPin2Activated
         self._pinChangeVariant = pinChangeVariant
         self.authCertValidTo = authCertValidTo
         self.signCertValidTo = signCertValidTo
@@ -138,6 +153,20 @@ struct MyEidPinsAndCertificatesView: View {
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
+            }
+
+            if !isPin2Activated {
+                VStack(alignment: .leading) {
+                    Text(verbatim: pin2LockedMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+
+                    if let pin2LockedInfoUrl = URL(string: pin2LockedUrl) {
+                        additionalInformationLink(url: pin2LockedInfoUrl)
+                            .padding(.vertical, Dimensions.Padding.XSPadding)
+                    }
+                }
             }
         }
         .padding(.bottom, Dimensions.Padding.SPadding)
