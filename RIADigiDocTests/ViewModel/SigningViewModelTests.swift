@@ -60,7 +60,8 @@ struct SigningViewModelTests: Loggable {
             fileUtil: mockFileUtil,
             fileManager: mockFileManager,
             fileInspector: mockFileInspector,
-            sivaRepository: mockSivaRepository
+            sivaRepository: mockSivaRepository,
+            containerUtil: mockContainerUtil
         )
     }
 
@@ -1386,5 +1387,90 @@ struct SigningViewModelTests: Loggable {
 
         #expect(viewModel.errorMessage == ToastMessage(key: "Multiple documents already exist", args: ["2"]))
         #expect(viewModel.dataFiles.count == 2)
+    }
+
+    @Test
+    func convertToCryptoContainer_successWithExistingContainer() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(filePath: "/mock/path/to/container.asice")
+        }
+
+        let dataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "1",
+            fileName: "container.asice",
+            fileSize: 123,
+            mediaType: CommonsLib.Constants.MimeType.Asice
+        )
+
+        let signatureWrapper = MockSignatureWrapper.mockSignatureWrapper()
+
+        mockSignedContainer.getDataFilesHandler = { [dataFileWrapper] }
+        mockSignedContainer.getSignaturesHandler = { [signatureWrapper] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isConverted = await viewModel.convertToCryptoContainer()
+
+        #expect(isConverted)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.clearContainersCallCount == 1)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(mockSharedContainerViewModel.setCryptoContainerCallCount == 1)
+        #expect(mockContainerUtil.getContainerDataFilesDirCallCount == 0)
+    }
+
+    @Test
+    func convertToCryptoContainer_successWithUnsignedContainer() async throws {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(filePath: "/mock/path/to/container.asice")
+        }
+
+        mockContainerUtil.getContainerDataFilesDirHandler = { _ in
+            URL(filePath: "/mock/path/to/container.asice/datafiles")
+        }
+
+        mockSignedContainer.saveDataFileHandler = { _, _ in
+            URL(filePath: "/mock/path/to/container.asice/datafiles/text.txt")
+        }
+
+        let dataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "1",
+            fileName: "text.txt",
+            fileSize: 123,
+            mediaType: CommonsLib.Constants.MimeType.Default
+        )
+
+        mockSignedContainer.getDataFilesHandler = { [dataFileWrapper] }
+        mockSignedContainer.getSignaturesHandler = { [] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        let isConverted = await viewModel.convertToCryptoContainer()
+
+        #expect(isConverted)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.clearContainersCallCount == 1)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
+        #expect(mockSharedContainerViewModel.setCryptoContainerCallCount == 1)
+        #expect(mockContainerUtil.getContainerDataFilesDirCallCount == 1)
+    }
+
+    @Test
+    func convertToCryptoContainer_returnFalseWhenContainerDoesntExist() async throws {
+
+        await viewModel.loadContainerData(signedContainer: nil)
+
+        let isConverted = await viewModel.convertToCryptoContainer()
+
+        #expect(!isConverted)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
+        #expect(mockSharedContainerViewModel.clearContainersCallCount == 0)
+        #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 0)
+        #expect(mockSharedContainerViewModel.setCryptoContainerCallCount == 0)
+        #expect(mockContainerUtil.getContainerDataFilesDirCallCount == 0)
     }
 }

@@ -1020,6 +1020,42 @@
         }
       }
     },
+    "Converted to a signature container" : {
+      "comment" : "Crypto container to signed container conversion message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Converted to a signature container!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teisendatud allkirjaümbrikuks!"
+          }
+        }
+      }
+    },
+    "Converted to crypto container" : {
+      "comment" : "Signed container to crypto container conversion message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Converted to crypto container!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teisendatud krüptoümbrikuks!"
+          }
+        }
+      }
+    },
     "Could not add files" : {
       "comment" : "Show number of files that could not be added to container",
       "extractionState" : "manual",

@@ -184,6 +184,7 @@ struct SigningView: View {
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
                                     isSaveButtonShown: true,
+                                    isSignButtonShown: false,
                                     isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
                                     showLeftActionButton: isContainerSigned && isSignButtonShown,
                                     showRightActionButton: isContainerSigned && !isNestedContainer,
@@ -195,7 +196,9 @@ struct SigningView: View {
                                         pathManager.navigate(to: .signingRootView)
                                     },
                                     onRightActionButtonClick: {
-                                        // TODO: Implement encrypt functionality
+                                        Task {
+                                            await convertToCryptoContainer()
+                                        }
                                     },
                                     onSaveContainerButtonClick: {
                                         tempContainerURL = viewModel.createCopyOfContainerForSaving(
@@ -212,6 +215,14 @@ struct SigningView: View {
                                     },
                                     onRenameContainerButtonClick: {
                                         showRenameModal = true
+                                    },
+                                    onSignContainerButtonClick: {
+                                        // Do nothing
+                                    },
+                                    onEncryptContainerButtonClick: {
+                                        Task {
+                                            await convertToCryptoContainer()
+                                        }
                                     }
                                 )
                                 .background(
@@ -474,6 +485,16 @@ struct SigningView: View {
         if viewModel.dataFiles.count == 1, viewModel.isLastDataFileRemoved {
             if await viewModel.handleBackButton() {
                 dismiss()
+            }
+        }
+    }
+
+    private func convertToCryptoContainer() async {
+        let isConverted = await viewModel.convertToCryptoContainer()
+        if isConverted {
+            Toast.show(languageSettings.localized("Converted to crypto container"))
+            await MainActor.run {
+                pathManager.replaceLast(to: .encryptView(isWithEncryption: false))
             }
         }
     }

@@ -23,6 +23,7 @@ import CryptoSwift
 import CryptoObjCWrapper
 import CommonsLib
 import UtilsLib
+import LibdigidocLibSwift
 
 @Observable
 @MainActor
@@ -472,7 +473,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         isNestedContainer: Bool
     ) async -> Bool {
         let isEncryptedContainer = await isEncryptedContainer(cryptoContainer: cryptoContainer)
-        return isEncryptedContainer && !isNestedContainer
+        return !isEncryptedContainer && !isNestedContainer
     }
 
     func isShareButtonShown(
@@ -606,6 +607,43 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             self.isShareButtonShown = isShareButtonShown
             self.isEditButtonShown = isEditButtonShown
             self.shouldShowDatafiles = shouldShowDatafiles
+        }
+    }
+
+    func convertToSignedContainer() async -> Bool {
+        do {
+            guard let container = cryptoContainer else {
+                throw URLError(.fileDoesNotExist)
+            }
+
+            var dataFileURLs: [URL] = []
+
+            let isDecrypted = await container.isDecrypted()
+            let isEncrypted = await container.isEncrypted()
+
+            if isDecrypted || !isEncrypted {
+                for dataFile in dataFiles {
+                    dataFileURLs.append(dataFile)
+                }
+
+                let signedContainer = try await SignedContainer.openOrCreate(
+                    dataFiles: dataFileURLs,
+                    isSivaConfirmed: true
+                )
+
+                sharedContainerViewModel.setCryptoContainer(nil)
+                sharedContainerViewModel.clearContainers()
+                sharedContainerViewModel.setAddedFilesCount(addedFiles: dataFileURLs.count)
+                sharedContainerViewModel.setSignedContainer(signedContainer)
+
+                return true
+            }
+
+            return false
+        } catch {
+            SigningViewModel.logger()
+                .error("Unable to convert SignedContainer to CryptoContainer: \(error)")
+            return false
         }
     }
 

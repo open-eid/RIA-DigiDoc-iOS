@@ -22,6 +22,7 @@ import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
+import CryptoSwift
 
 @Observable
 @MainActor
@@ -54,6 +55,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     private let fileManager: FileManagerProtocol
     private let fileInspector: FileInspectorProtocol
     private let sivaRepository: SivaRepositoryProtocol
+    private let containerUtil: ContainerUtilProtocol
 
     private(set) var signedContainer: SignedContainerProtocol?
 
@@ -65,7 +67,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         fileUtil: FileUtilProtocol,
         fileManager: FileManagerProtocol,
         fileInspector: FileInspectorProtocol,
-        sivaRepository: SivaRepositoryProtocol
+        sivaRepository: SivaRepositoryProtocol,
+        containerUtil: ContainerUtilProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileOpeningService = fileOpeningService
@@ -75,6 +78,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.fileManager = fileManager
         self.fileInspector = fileInspector
         self.sivaRepository = sivaRepository
+        self.containerUtil = containerUtil
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
@@ -545,6 +549,47 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
     func resetSuccessMessage() {
         successMessage = nil
+    }
+
+    func convertToCryptoContainer() async -> Bool {
+        do {
+            guard let container = signedContainer else {
+                throw URLError(.fileDoesNotExist)
+            }
+
+            var dataFileURLs: [URL] = []
+
+            if await container.getSignatures().isEmpty {
+                let dataFilesDir = try containerUtil
+                    .getContainerDataFilesDir(containerFile: containerURL)
+
+                for dataFile in dataFiles {
+                    let url = try await container
+                        .saveDataFile(dataFile: dataFile, to: dataFilesDir)
+                    dataFileURLs.append(url)
+                }
+            } else {
+                guard let containerURL else {
+                    throw URLError(.fileDoesNotExist)
+                }
+                dataFileURLs = [containerURL]
+            }
+
+            let cryptoContainer = try await
+                CryptoContainer.openOrCreate(dataFiles: dataFileURLs)
+
+            sharedContainerViewModel.setSignedContainer(nil)
+            sharedContainerViewModel.clearContainers()
+            sharedContainerViewModel.setAddedFilesCount(addedFiles: dataFileURLs.count)
+            sharedContainerViewModel.setCryptoContainer(cryptoContainer)
+
+            return true
+
+        } catch {
+            SigningViewModel.logger()
+                .error("Unable to convert SignedContainer to CryptoContainer: \(error)")
+            return false
+        }
     }
 
     private func openNestedContainer(fileURL: URL, isSivaConfirmed: Bool) async throws {

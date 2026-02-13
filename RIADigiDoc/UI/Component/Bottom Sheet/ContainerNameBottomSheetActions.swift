@@ -21,9 +21,12 @@ struct ContainerNameBottomSheetActions {
     static func actions(
         isEditContainerButtonShown: Bool,
         isSaveButtonShown: Bool = true,
+        isSignButtonShown: Bool,
         isEncryptButtonShown: Bool,
         onRenameContainerButtonClick: @escaping () -> Void,
         onSaveContainerButtonClick: @escaping () -> Void,
+        onSignContainerButtonClick: @escaping () -> Void,
+        onEncryptContainerButtonClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -46,9 +49,15 @@ struct ContainerNameBottomSheetActions {
                 title: "Encrypt",
                 accessibilityLabel: "Encrypt",
                 showExtraIcon: true,
-                onClick: {
-                    // TODO: Implement encrypt action
-                }
+                onClick: onEncryptContainerButtonClick
+            ),
+            BottomSheetButton(
+                showButton: isSignButtonShown,
+                icon: "ic_m3_stylus_note_48pt_wght400",
+                title: "Sign",
+                accessibilityLabel: "Sign document",
+                showExtraIcon: true,
+                onClick: onSignContainerButtonClick
             )
         ]
     }
