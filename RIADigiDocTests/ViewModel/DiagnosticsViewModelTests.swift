@@ -42,6 +42,7 @@ final class DiagnosticsViewModelTests {
     private let mockProxyUtil: ProxyUtilProtocolMock
     private let mockUserAgentUtil: UserAgentUtilProtocolMock
     private let mockFileUtil: FileUtilProtocolMock
+    private let mockCryptoSetup: CryptoSetupProtocolMock
 
     let mockConfigProvider: ConfigurationProvider?
 
@@ -55,6 +56,7 @@ final class DiagnosticsViewModelTests {
         mockProxyUtil = ProxyUtilProtocolMock()
         mockUserAgentUtil = UserAgentUtilProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
+        mockCryptoSetup = CryptoSetupProtocolMock()
 
         mockConfigProvider = try TestConfigurationProvider.mockConfigurationProvider()
         TestConfigurationSetup.configureMocks(
@@ -73,7 +75,8 @@ final class DiagnosticsViewModelTests {
             dataStore: mockDataStore,
             proxyUtil: mockProxyUtil,
             userAgentUtil: mockUserAgentUtil,
-            fileUtil: mockFileUtil
+            fileUtil: mockFileUtil,
+            cryptoSetup: mockCryptoSetup,
         )
     }
 

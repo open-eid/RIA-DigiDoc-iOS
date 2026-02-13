@@ -29,6 +29,7 @@ final class ProxySettingsViewModelTests {
     private let mockProxyUtil: ProxyUtilProtocolMock
     private let mockUserAgentUtil: UserAgentUtilProtocolMock
     private let mockDataStore: DataStoreProtocolMock
+    private let mockCryptoSetup: CryptoSetupProtocolMock
 
     private let viewModel: ProxySettingsViewModel
 
@@ -36,13 +37,15 @@ final class ProxySettingsViewModelTests {
         mockProxyUtil = ProxyUtilProtocolMock()
         mockUserAgentUtil = UserAgentUtilProtocolMock()
         mockDataStore = DataStoreProtocolMock()
+        mockCryptoSetup = CryptoSetupProtocolMock()
 
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         viewModel = ProxySettingsViewModel(
             proxyUtil: mockProxyUtil,
             userAgentUtil: mockUserAgentUtil,
-            dataStore: mockDataStore
+            dataStore: mockDataStore,
+            cryptoSetup: mockCryptoSetup,
         )
     }
 
