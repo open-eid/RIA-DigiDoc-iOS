@@ -91,7 +91,7 @@ public struct Constants {
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
         public static let LDAPCerts = "LDAPCerts"
-        public static let Logs = "logfiles"
+        public static let Logs = "logs"
         public static let SiVaCert = "sivacert"
         public static let TSACert = "tsacert"
         public static let EncryptionKeyTransferCert = "keytransfercert"

@@ -324,4 +324,45 @@ struct FileUtilTests {
 
         #expect(!mockFileManager.fileExists(atPath: nonExistentDirectory.resolvedPath))
     }
+
+    @Test
+    func removeCacheLogsDirectory_successWhenDirectoryExists() async throws {
+        fileUtil.removeCacheLogsDirectory()
+
+        #expect(mockFileManager.removeItemCallCount == 1)
+    }
+
+    @Test
+    func removeCacheLogsDirectory_doesNotThrowWhenDirectoryCreationFails() async throws {
+        mockFileManager.createDirectoryHandler = { _, _, _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        #expect(throws: Never.self) {
+            fileUtil.removeCacheLogsDirectory()
+        }
+
+        #expect(mockFileManager.removeItemCallCount == 0)
+    }
+
+    @Test
+    func removeCacheLogsDirectory_doesNotThrowErrorWhenRemovingDirectoryAndItDoesntExist() async throws {
+        mockFileManager.removeItemHandler = { _ in
+            throw NSError(domain: "TestError", code: 1)
+        }
+
+        #expect(throws: Never.self) {
+            fileUtil.removeCacheLogsDirectory()
+        }
+
+        #expect(mockFileManager.removeItemCallCount == 1)
+    }
+
+    @Test
+    func removeLibraryLogsDirectory_successWhenDirectoryExists() async throws {
+        let testDirectory = URL(fileURLWithPath: "/tmp")
+        fileUtil.removeLibraryLogsDirectory(directory: testDirectory)
+
+        #expect(mockFileManager.removeItemCallCount == 1)
+    }
 }

@@ -312,10 +312,7 @@ public struct FileUtil: FileUtilProtocol, Loggable {
             FileUtil.logger().error("Unable to locate library directory")
             return
         }
-        let directory = libraryDirectory.appendingPathComponent(
-            "logs",
-            isDirectory: true
-        )
+        let directory = libraryDirectory.appending(path: CommonsLib.Constants.Folder.Logs)
         removeDirectory(at: directory)
     }
 

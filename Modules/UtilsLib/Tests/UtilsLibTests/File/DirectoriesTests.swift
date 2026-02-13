@@ -233,7 +233,7 @@ struct DirectoriesTests {
     @Test
     func getLogsDirectory_primaryDirectoryExists() throws {
         let mockDirectory = URL(fileURLWithPath: "/path/to/primary/directory")
-        let expectedDirectory = mockDirectory.appending(path: "logs")
+        let expectedDirectory = mockDirectory.appending(path: CommonsLib.Constants.Folder.Logs)
 
         let trimmedExpectedDirectoryPath = expectedDirectory.resolvedPath.hasPrefix("/") ? String(
             expectedDirectory.resolvedPath.dropFirst()

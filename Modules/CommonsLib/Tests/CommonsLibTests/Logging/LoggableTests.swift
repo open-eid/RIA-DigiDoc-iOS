@@ -17,31 +17,16 @@
  *
  */
 
-import Foundation
-import OSLog
+import Testing
+import CommonsLib
+import CommonsLibMocks
 
-/// @mockable
-public protocol Loggable: Sendable {}
-
-public extension Loggable {
-    static func logger(file: String = #fileID) -> Logger {
-        guard LoggingSystem.configuration.isLoggingEnabled else {
-            return Logger(.disabled)
-        }
-
-        let filePath = String(file)
-        let moduleName = URL(fileURLWithPath: filePath)
-            .lastPathComponent
-            .split(separator: ".")
-            .first
-            .map(String.init) ?? "UnknownModule"
-
-        let subsystem = "\(BundleUtil.getBundleIdentifier()).\(moduleName)"
-
-        return Logger(subsystem: subsystem, category: category)
-    }
-
-    static var category: String {
-        String(describing: Self.self)
+@MainActor
+struct LoggableTests {
+    @Test
+    func logger_createsLoggerWithCorrectCategory() {
+        let expectedCategory = "LoggableMock"
+        let category = LoggableMock.category
+        #expect(category == expectedCategory)
     }
 }
