@@ -449,4 +449,45 @@ final class DataStoreTests {
         #expect(inputData.personalCode == input.personalCode)
         #expect(inputData.rememberMe == input.rememberMe)
     }
+
+    // MARK: - Logging
+
+    @Test
+    func getEnableLoggingNextSession_success() async throws {
+        #expect(!(await dataStore.getEnableLoggingNextSession()))
+    }
+
+    @Test
+    func setEnableLoggingNextSession_success() async throws {
+        await dataStore.setEnableLoggingNextSession(true)
+        #expect(await dataStore.getEnableLoggingNextSession())
+        await dataStore.setEnableLoggingNextSession(false)
+        #expect(!(await dataStore.getEnableLoggingNextSession()))
+    }
+
+    @Test
+    func getEnableLoggingThisSession_success() async throws {
+        #expect(!(await dataStore.getEnableLoggingThisSession()))
+    }
+
+    @Test
+    func setEnableLoggingThisSession_success() async throws {
+        await dataStore.setEnableLoggingThisSession(true)
+        #expect(await dataStore.getEnableLoggingThisSession())
+        await dataStore.setEnableLoggingThisSession(false)
+        #expect(!(await dataStore.getEnableLoggingThisSession()))
+    }
+
+    @Test
+    func getIsLogFileSaved_success() async throws {
+        #expect(!(await dataStore.getIsLogFileSaved()))
+    }
+
+    @Test
+    func setIsLogFileSaved_success() async throws {
+        await dataStore.setIsLogFileSaved(true)
+        #expect(await dataStore.getIsLogFileSaved())
+        await dataStore.setIsLogFileSaved(false)
+        #expect(!(await dataStore.getIsLogFileSaved()))
+    }
 }

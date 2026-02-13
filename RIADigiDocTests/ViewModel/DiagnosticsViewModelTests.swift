@@ -341,4 +341,140 @@ final class DiagnosticsViewModelTests {
             await self.viewModel.observeConfigurationUpdates()
         }
     }
+
+    // MARK: - onEnableOneTimeLogGenerationChange Tests
+
+    @Test
+    func onEnableOneTimeLogGenerationChange_falseToFalseDoesNotUpdate() async throws {
+        mockDataStore.getEnableLoggingNextSessionHandler = {
+            false
+        }
+
+        await viewModel.onEnableOneTimeLogGenerationChange(false)
+
+        #expect(mockDataStore.setEnableLoggingNextSessionCallCount == 0)
+        #expect(mockDataStore.setEnableLoggingThisSessionCallCount == 0)
+    }
+
+    @Test
+    func onEnableOneTimeLogGenerationChange_trueToTrueDoesNotUpdate() async throws {
+        mockDataStore.getEnableLoggingNextSessionHandler = {
+            true
+        }
+
+        await viewModel.onEnableOneTimeLogGenerationChange(true)
+
+        #expect(mockDataStore.setEnableLoggingNextSessionCallCount == 0)
+        #expect(mockDataStore.setEnableLoggingThisSessionCallCount == 0)
+    }
+
+    @Test
+    func onEnableOneTimeLogGenerationChange_falseToTrueSuccess() async throws {
+        mockDataStore.getEnableLoggingNextSessionHandler = {
+            false
+        }
+
+        await viewModel.onEnableOneTimeLogGenerationChange(true)
+
+        let nextSessionArgumentValue = mockDataStore.setEnableLoggingNextSessionArgValues.first
+        guard let value = nextSessionArgumentValue else {
+            Issue.record("Expected valid enable logging next session argument value")
+            return
+        }
+        #expect(value)
+
+        #expect(mockDataStore.setEnableLoggingNextSessionCallCount == 1)
+        #expect(mockDataStore.setEnableLoggingThisSessionCallCount == 0)
+        #expect(viewModel.showRestartActivateAlert)
+    }
+
+    @Test
+    func onEnableOneTimeLogGenerationChange_TrueToFalseSuccess() async throws {
+        mockDataStore.getEnableLoggingNextSessionHandler = {
+            true
+        }
+
+        await viewModel.onEnableOneTimeLogGenerationChange(false)
+
+        let nextSessionArgumentValue = mockDataStore.setEnableLoggingNextSessionArgValues.first
+        guard let value = nextSessionArgumentValue else {
+            Issue.record("Expected valid enable logging next session argument value")
+            return
+        }
+        #expect(!value)
+        let thisSessionArgumentValue = mockDataStore.setEnableLoggingThisSessionArgValues.first
+        guard let value = thisSessionArgumentValue else {
+            Issue.record("Expected valid enable logging this session argument value")
+            return
+        }
+        #expect(!value)
+
+        #expect(mockDataStore.setEnableLoggingNextSessionCallCount == 1)
+        #expect(mockDataStore.setEnableLoggingThisSessionCallCount == 1)
+        #expect(!viewModel.showRestartActivateAlert)
+        #expect(!viewModel.showSaveLogButton)
+    }
+
+    // MARK: - createLogFile Tests
+
+    @Test
+    func createLogFile_success() async throws {
+        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
+
+        mockFileManager.urlHandler = { _, _, _, _ in tempDirectoryURL }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.copyItemHandler = { _, _ in }
+
+        defer {
+            try? FileManager.default.removeItem(at: tempDirectoryURL)
+        }
+
+        if let logFileUrl = await viewModel.createLogFile(
+            directory: tempDirectoryURL
+        ) {
+            #expect(!logFileUrl.resolvedPath.isEmpty)
+        }
+
+    }
+
+    @Test
+    func createLogFile_doesNotThrowWhenFails() async throws {
+        await #expect(throws: Never.self) {
+            let result = await viewModel.createLogFile()
+
+            #expect(result == nil)
+        }
+    }
+
+    // MARK: - onLogFileSavingComplete Tests
+
+    @Test
+    func onLogFileSavingComplete_success() async throws {
+        await viewModel.onLogFileSavingComplete()
+
+        let argumentValue = mockDataStore.setEnableLoggingNextSessionArgValues.first
+
+        guard let value = argumentValue else {
+            Issue.record("Expected valid enable logging next session argument value")
+            return
+        }
+        #expect(!value)
+
+        #expect(mockFileUtil.removeCacheLogsDirectoryCallCount == 1)
+        #expect(mockFileUtil.removeLibraryLogsDirectoryCallCount == 1)
+        #expect(mockDataStore.setEnableLoggingNextSessionCallCount == 1)
+        #expect(!viewModel.enableOneTimeLogGeneration)
+        #expect(!viewModel.showSaveLogButton)
+        #expect(viewModel.showRestartDeactivateAlert)
+    }
+
+    @Test
+    func onLogFileSavingComplete_doesNotThrowWhenFails() async throws {
+        mockFileManager.removeItemHandler = { _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+        await #expect(throws: Never.self) {
+            await viewModel.onLogFileSavingComplete()
+        }
+    }
 }

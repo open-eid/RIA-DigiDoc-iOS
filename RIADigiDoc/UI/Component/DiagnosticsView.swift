@@ -135,7 +135,9 @@ struct DiagnosticsView: View {
                             fileURL: tempFileURL,
                             languageSettings: languageSettings,
                             onComplete: {
-                                handleFileSaverCompletion()
+                                Task {
+                                    await handleFileSaverCompletion()
+                                }
                             },
                             isFileSaved: $isFileSaved
                         )
@@ -193,16 +195,14 @@ struct DiagnosticsView: View {
         }
     }
 
-    private func handleFileSaverCompletion() {
+    private func handleFileSaverCompletion() async {
         guard let type = activeExportType else { return }
 
         switch type {
         case .diagnosticsFile:
             viewModel.onDiagnosticsFileSavingComplete()
         case .logFile:
-            Task {
-                await viewModel.onLogFileSavingComplete()
-            }
+            await viewModel.onLogFileSavingComplete()
         }
 
         activeExportType = nil

@@ -95,7 +95,7 @@ public struct Directories {
         fileManager: FileManagerProtocol
     ) throws -> URL? {
         let baseDirectory = try directory ?? getCacheDirectory(fileManager: fileManager)
-        let logsDirectory = baseDirectory.appending(path: "logs")
+        let logsDirectory = baseDirectory.appending(path: CommonsLib.Constants.Folder.Logs)
         try createDirectoryIfNeeded(at: logsDirectory, fileManager: fileManager)
         return logsDirectory.appending(path: Constants.File.LibDigidocLog)
     }
