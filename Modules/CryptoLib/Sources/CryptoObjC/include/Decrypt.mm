@@ -36,6 +36,11 @@
     id type = info.contains("last_name") ? [NSString stringWithStdString:info["type"]] : nil;
     id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
     CertType certType = CertTypeUnknownType;
+    NSArray<NSString *> *split = [cn componentsSeparatedByString:@","];
+    if (split.count > 1) {
+        type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
+    }
+    
     if ([type isEqualToString:@"ID-card"] || [type isEqualToString:@"cert"]) {
         certType = CertTypeIDCardType;
     } else if ([type isEqualToString:@"Digi-ID"]) {
