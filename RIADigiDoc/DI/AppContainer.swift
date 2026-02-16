@@ -505,8 +505,47 @@ extension Container {
                 userAgentUtil: self.userAgentUtil(),
                 certificateUtil: self.certificateUtil(),
                 sharedMyEidSession: self.sharedMyEidSession(),
-                keychainStore: self.keychainStore()
+                keychainStore: self.keychainStore(),
+                encryptedDataUtil: self.encryptedDataUtil(),
+                operationReadCertAndSign: self.operationReadCertAndSign(),
+                operationReadCardData: self.operationReadCardData(),
+                operationDecrypt: self.operationDecrypt()
             )
+        }
+    }
+
+    @MainActor
+    var operationReadCertAndSign: Factory<OperationReadCertAndSign> {
+        self { @MainActor in
+            OperationReadCertAndSign()
+        }
+    }
+
+    @MainActor
+    var operationReadCardData: Factory<OperationReadCardData> {
+        self { @MainActor in
+            OperationReadCardData()
+        }
+    }
+
+    @MainActor
+    var operationDecrypt: Factory<OperationDecrypt> {
+        self { @MainActor in
+            OperationDecrypt()
+        }
+    }
+
+    @MainActor
+    var operationChangePin: Factory<OperationChangePin> {
+        self { @MainActor in
+            OperationChangePin()
+        }
+    }
+
+    @MainActor
+    var operationUnblockPin: Factory<OperationUnblockPin> {
+        self { @MainActor in
+            OperationUnblockPin()
         }
     }
 
@@ -540,12 +579,23 @@ extension Container {
                 personalCode: personalCode,
                 actionMethod: actionMethod,
                 idCardRepository: self.idCardRepository(),
-                sharedMyEidSession: self.sharedMyEidSession()
+                sharedMyEidSession: self.sharedMyEidSession(),
+                operationChangePin: self.operationChangePin(),
+                operationUnblockPin: self.operationUnblockPin()
             )
         }
     }
     // swiftlint:enable closure_parameter_position
     // swiftlint:enable large_tuple
+
+    @MainActor
+    var encryptedDataUtil: Factory<EncryptedDataUtilProtocol> {
+        self { @MainActor in
+            EncryptedDataUtil(
+                fileManager: self.fileManager()
+            )
+        }
+    }
 
     @MainActor
     var crashReportManager: Factory<CrashReportManager> {

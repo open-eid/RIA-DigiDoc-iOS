@@ -30,12 +30,13 @@ import LibdigidocLibSwift
 import UtilsLib
 
 @MainActor
-public class OperationReadCertAndSign: NFCOperationBase {
+public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSignProtocol {
     private var pin2Number: SecureData = SecureData([0x00])
     private var signedContainer: SignedContainerProtocol?
     private var containerPath: URL?
     private var roleData: RoleData?
     private var userAgent: String = ""
+    private var returnData: SignedContainerProtocol?
 
     private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
 
@@ -74,7 +75,6 @@ public class OperationReadCertAndSign: NFCOperationBase {
 
     // MARK: - NFCTagReaderSessionDelegate
 
-    // swiftlint:disable:next cyclomatic_complexity
     public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
             defer {
@@ -84,33 +84,33 @@ public class OperationReadCertAndSign: NFCOperationBase {
             guard let signedContainer else {
                 let error = ReadCertAndSignError.signedContainerNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to read container data")
-                continuation?.resume(throwing: error)
                 return
             }
             guard let roleData else {
                 let error = ReadCertAndSignError.roleDataNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to read role data")
-                continuation?.resume(throwing: error)
                 return
             }
             guard let containerPath else {
                 let error = ReadCertAndSignError.containerPathNil
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to read container path")
-                continuation?.resume(throwing: error)
                 return
             }
             if userAgent.isEmpty {
                 let error = ReadCertAndSignError.userAgentEmpty
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to initialize user agent")
-                continuation?.resume(throwing: error)
                 return
             }
 
@@ -145,57 +145,64 @@ public class OperationReadCertAndSign: NFCOperationBase {
                 let signatureValue = try await cardCommands.calculateSignature(for: hashToSign, withPin2: pin2Number)
 
                 updateAlertMessage(step: 4)
-                let result = try await signedContainer.addSignature(
+                returnData = try await signedContainer.addSignature(
                     signature: signatureValue,
                     containerFile: containerPath
                 )
 
-                continuation?.resume(with: .success(result))
                 success()
             } catch {
-                guard !checkIfFinished(error: error) else { return }
-
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
-                    continuation?.resume(throwing: error)
                     return
                 }
 
                 if let readCertSignError = error as? ReadCertAndSignError {
                     OperationReadCertAndSign.logger()
                         .error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+                    operationError = readCertSignError
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    continuation?.resume(throwing: error)
                     return
                 }
 
                 if let digiDocError = error as? DigiDocError {
-                    OperationReadCertAndSign.logger().error("NFC: DigidocError: \(digiDocError.localizedDescription)")
-                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    continuation?.resume(throwing: error)
+                    handleDigiDocError(digiDocError, session: session)
                     return
                 }
 
-                let wrappedError = ReadCertAndSignError.unknown(handleUnknownError(error, session: session))
-                continuation?.resume(throwing: wrappedError)
+                handleUnknownError(error, session: session)
             }
         }
     }
 
     public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+        Self.logger().info("NFC: Reader session finished with error: \(error)")
         self.session = nil
-        guard !isFinished else { return }
-        isFinished = true
+
+        guard let continuationToResume = self.continuation else { return }
+        self.continuation = nil
+
+        if let returnData, didCompleteSuccessfully {
+            continuationToResume.resume(with: .success(returnData))
+            return
+        }
+
+        if let storedError = self.operationError {
+            continuationToResume.resume(throwing: storedError)
+            return
+        }
+
         if let nfcError = error as? NFCReaderError {
             switch nfcError.code {
             case .readerSessionInvalidationErrorUserCanceled:
-                continuation?.resume(throwing: IdCardInternalError.cancelledByUser)
+                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
                 return
 
             default:
                 break
             }
         }
-        continuation?.resume(throwing: error)
+
+        continuationToResume.resume(throwing: error)
     }
 }

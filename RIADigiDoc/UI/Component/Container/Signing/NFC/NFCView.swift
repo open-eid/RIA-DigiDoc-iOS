@@ -142,6 +142,9 @@ struct NFCView: View {
                 switch actionType {
                 case .decrypt:
                     saveInputData()
+                    if !isNFCSupported {
+                        return
+                    }
                     Task {
                         decrypt()
                     }
@@ -162,7 +165,9 @@ struct NFCView: View {
                 case .myeid:
                     saveInputData()
                     isInProgress = true
-
+                    if !isNFCSupported {
+                        return
+                    }
                     loadMyEid()
                 }
             },

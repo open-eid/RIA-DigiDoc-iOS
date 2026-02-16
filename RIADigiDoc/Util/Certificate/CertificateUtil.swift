@@ -82,4 +82,19 @@ public struct CertificateUtil: CertificateUtilProtocol, Loggable {
         }
     }
 
+    public func getNotValidDate(_ certData: Data?) throws -> String? {
+        guard let certData else { return nil }
+        let certificate = self.certificate(from: certData)
+        guard let certificate else { return nil }
+        return try getNotValidDate(from: certificate)
+    }
+
+    private func getNotValidDate(from certificate: SecCertificate) throws -> String? {
+        let certificate = try Certificate(certificate)
+        let notValidAfter = certificate.notValidAfter
+        return DateUtil.getFormattedDateTime(
+            date: notValidAfter,
+            isUTC: false
+        ).date
+    }
 }

@@ -450,6 +450,20 @@ final class DataStoreTests {
         #expect(inputData.rememberMe == input.rememberMe)
     }
 
+    // MARK: - NFC
+    @Test
+    func getNFCRememberMe_success() async throws {
+        #expect(await dataStore.getNFCRememberMe())
+    }
+
+    @Test
+    func setNFCRememberMe_success() async throws {
+        await dataStore.setNFCRememberMe(true)
+        #expect(await dataStore.getNFCRememberMe())
+        await dataStore.setNFCRememberMe(false)
+        #expect(!(await dataStore.getNFCRememberMe()))
+    }
+
     // MARK: - Logging
 
     @Test

@@ -17,27 +17,36 @@
  *
  */
 
+import CommonsLib
 import Foundation
 import CryptoKit
 import UtilsLib
 
-public actor EncryptedDataUtil: Loggable {
+public struct EncryptedDataUtil: EncryptedDataUtilProtocol, Loggable {
+
+    private let fileManager: FileManagerProtocol
+
+    public init(
+        fileManager: FileManagerProtocol
+    ) {
+        self.fileManager = fileManager
+    }
 
     // MARK: - Private Properties
 
-    private static func applicationSupportDirectory() -> URL? {
-        return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    private func applicationSupportDirectory() -> URL? {
+        return fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
     }
 
     // MARK: - Key Management
 
-    private static func storeKey(_ key: SymmetricKey, to url: URL) throws {
+    private func storeKey(_ key: SymmetricKey, to url: URL) throws {
         let keyData = key.withUnsafeBytes { Data($0) }
         try keyData.write(to: url, options: .atomic)
     }
 
     @discardableResult
-    public static func saveSymmetricKeyToAppSupport(fileName: String) throws -> URL {
+    public func saveSymmetricKeyToAppSupport(fileName: String) throws -> URL {
         guard let appSupportDirectory = applicationSupportDirectory() else {
             EncryptedDataUtil.logger().error("Unable to locate Application Support directory")
             throw EncryptedDataError.unableToLocateAppSupportDirectory
@@ -52,7 +61,7 @@ public actor EncryptedDataUtil: Loggable {
         return symmetricKeyURL
     }
 
-    public static func getSymmetricKey(fileName: String) throws -> SymmetricKey {
+    public func getSymmetricKey(fileName: String) throws -> SymmetricKey {
         guard let appSupportDirectory = applicationSupportDirectory() else {
             EncryptedDataUtil.logger().error("Unable to locate Application Support directory")
             throw EncryptedDataError.unableToLocateAppSupportDirectory
@@ -71,7 +80,7 @@ public actor EncryptedDataUtil: Loggable {
 
     // MARK: - Encryption/Decryption
 
-    public static func encryptSecret(_ secret: String, with key: SymmetricKey) -> Data? {
+    public func encryptSecret(_ secret: String, with key: SymmetricKey) -> Data? {
         guard let secretData = secret.data(using: .utf8) else {
             EncryptedDataUtil.logger().error("Unable to convert secret to data")
             return nil
@@ -86,7 +95,7 @@ public actor EncryptedDataUtil: Loggable {
         }
     }
 
-    public static func decryptSecret(_ data: Data, with symmetricKey: SymmetricKey) -> String? {
+    public func decryptSecret(_ data: Data, with symmetricKey: SymmetricKey) -> String? {
         do {
             let sealedBox = try ChaChaPoly.SealedBox(combined: data)
             let decryptedData = try ChaChaPoly.open(sealedBox, using: symmetricKey)

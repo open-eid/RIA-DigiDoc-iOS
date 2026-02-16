@@ -99,10 +99,10 @@ struct NFCInputView: View {
                         .padding(.vertical, Dimensions.Padding.XXSPadding)
                 }
             }
-            .padding(.vertical, Dimensions.Padding.MPadding)
+            .padding(.vertical, Dimensions.Padding.ZeroPadding)
 
             if showPinField {
-                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+                VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
                     FloatingLabelTextField(
                         title: pinNumberTitle,
                         placeholder: pinNumberTitle,

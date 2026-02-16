@@ -30,11 +30,12 @@ import CryptoSwift
 import UtilsLib
 
 @MainActor
-public class OperationDecrypt: NFCOperationBase {
+public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
     private var containerFile: URL?
     private var recipients: [Addressee] = []
     private var pin1Number: SecureData = SecureData([0x00])
     private var continuation: CheckedContinuation<CryptoContainerProtocol, Error>?
+    private var returnData: CryptoContainerProtocol?
 
     public func processDecrypt(
         canNumber: String,
@@ -74,27 +75,27 @@ public class OperationDecrypt: NFCOperationBase {
             guard let containerFile else {
                 let error = DecryptError.containerFileInvalid
                 OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to read container file")
-                continuation?.resume(throwing: error)
                 return
             }
 
             if containerFile.path.isEmpty {
                 let error = DecryptError.containerFileInvalid
                 OperationDecrypt.logger().error("NFC: Container file path is empty")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Failed to read container file")
-                continuation?.resume(throwing: error)
                 return
             }
 
             if recipients.isEmpty {
                 let error = DecryptError.recipientsEmpty
                 OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
+                operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "No recipients found")
-                continuation?.resume(throwing: error)
                 return
             }
 
@@ -115,52 +116,62 @@ public class OperationDecrypt: NFCOperationBase {
 
                 let cert = try await cardCommands.readAuthenticationCertificate()
                 updateAlertMessage(step: 4)
-                let decryptedContainer = try await CryptoContainer.decrypt(
+                returnData = try await CryptoContainer.decrypt(
                     containerFile: containerFile,
                     recipients: recipients,
                     cert: cert,
                     cardCommands: cardCommands,
                     pin: pin1Number,
                 )
-                continuation?.resume(with: .success(decryptedContainer))
+
                 success()
             } catch {
-                guard !checkIfFinished(error: error) else { return }
-
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
-                    continuation?.resume(throwing: error)
                     return
                 }
 
                 if let decryptError = error as? DecryptError {
                     OperationDecrypt.logger()
                         .error("NFC: DecryptError: \(decryptError.localizedDescription)")
+                    operationError = decryptError
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    continuation?.resume(throwing: error)
                     return
                 }
 
-                let wrappedError = DecryptError.unknown(handleUnknownError(error, session: session))
-                continuation?.resume(throwing: wrappedError)
+                handleUnknownError(error, session: session)
             }
         }
     }
 
     public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+        Self.logger().info("NFC: Reader session finished with error: \(error)")
         self.session = nil
-        guard !isFinished else { return }
-        isFinished = true
+
+        guard let continuationToResume = self.continuation else { return }
+        self.continuation = nil
+
+        if let returnData, didCompleteSuccessfully {
+            continuationToResume.resume(with: .success(returnData))
+            return
+        }
+
+        if let storedError = self.operationError {
+            continuationToResume.resume(throwing: storedError)
+            return
+        }
+
         if let nfcError = error as? NFCReaderError {
             switch nfcError.code {
             case .readerSessionInvalidationErrorUserCanceled:
-                continuation?.resume(throwing: IdCardInternalError.cancelledByUser)
+                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
                 return
 
             default:
                 break
             }
         }
-        continuation?.resume(throwing: error)
+
+        continuationToResume.resume(throwing: error)
     }
 }

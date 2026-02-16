@@ -460,7 +460,10 @@ public actor DataStore: DataStoreProtocol {
     }
 
     public func getNFCRememberMe() async -> Bool {
-        return userDefaults().object(forKey: Keys.nfcRememberMe) as? Bool ?? true
+        if await !keyExists(Keys.nfcRememberMe) {
+            return true
+        }
+        return userDefaults().bool(forKey: Keys.nfcRememberMe)
     }
 
     public func setNFCRememberMe(_ value: Bool) async {

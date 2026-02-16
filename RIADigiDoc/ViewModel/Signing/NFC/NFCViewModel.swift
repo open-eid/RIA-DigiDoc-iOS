@@ -51,19 +51,31 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     private let certificateUtil: CertificateUtilProtocol
     private let sharedMyEidSession: SharedMyEidSessionProtocol
     private let keychainStore: KeychainStoreProtocol
+    private let encryptedDataUtil: EncryptedDataUtilProtocol
+    private let operationReadCertAndSign: OperationReadCertAndSignProtocol
+    private let operationReadCardData: OperationReadCardDataProtocol
+    private let operationDecrypt: OperationDecryptProtocol
 
     init(
         dataStore: DataStoreProtocol,
         userAgentUtil: UserAgentUtilProtocol,
         certificateUtil: CertificateUtilProtocol,
         sharedMyEidSession: SharedMyEidSessionProtocol,
-        keychainStore: KeychainStoreProtocol
+        keychainStore: KeychainStoreProtocol,
+        encryptedDataUtil: EncryptedDataUtilProtocol,
+        operationReadCertAndSign: OperationReadCertAndSignProtocol,
+        operationReadCardData: OperationReadCardDataProtocol,
+        operationDecrypt: OperationDecryptProtocol
     ) {
         self.dataStore = dataStore
         self.userAgentUtil = userAgentUtil
         self.certificateUtil = certificateUtil
         self.sharedMyEidSession = sharedMyEidSession
         self.keychainStore = keychainStore
+        self.encryptedDataUtil = encryptedDataUtil
+        self.operationReadCertAndSign = operationReadCertAndSign
+        self.operationReadCardData = operationReadCardData
+        self.operationDecrypt = operationDecrypt
     }
 
     func isNFCSupported() -> Bool {
@@ -118,9 +130,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
     private func saveEncryptedCAN(_ can: String) async {
         do {
-            let symmetricKey = try EncryptedDataUtil.getSymmetricKey(fileName: self.nfcCANKeyFilename)
+            let symmetricKey = try encryptedDataUtil.getSymmetricKey(fileName: self.nfcCANKeyFilename)
 
-            if let encryptedCAN = EncryptedDataUtil.encryptSecret(can, with: symmetricKey) {
+            if let encryptedCAN = encryptedDataUtil.encryptSecret(can, with: symmetricKey) {
                 let saved = await keychainStore.save(
                     key: .nfcCANKey,
                     info: encryptedCAN,
@@ -137,14 +149,14 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             }
         } catch {
             do {
-                let symKeyURL = try EncryptedDataUtil.saveSymmetricKeyToAppSupport(
+                let symKeyURL = try encryptedDataUtil.saveSymmetricKeyToAppSupport(
                     fileName: self.nfcCANKeyFilename
                 )
-                let symKey = try EncryptedDataUtil.getSymmetricKey(
+                let symKey = try encryptedDataUtil.getSymmetricKey(
                     fileName: symKeyURL.lastPathComponent
                 )
 
-                if let encryptedCAN = EncryptedDataUtil.encryptSecret(can, with: symKey) {
+                if let encryptedCAN = encryptedDataUtil.encryptSecret(can, with: symKey) {
                     let saved = await keychainStore.save(
                         key: .nfcCANKey,
                         info: encryptedCAN,
@@ -172,11 +184,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 return nil
             }
 
-            let symmetricKey = try EncryptedDataUtil.getSymmetricKey(
+            let symmetricKey = try encryptedDataUtil.getSymmetricKey(
                 fileName: self.nfcCANKeyFilename
             )
 
-            if let decryptedCAN = EncryptedDataUtil.decryptSecret(encryptedCANData, with: symmetricKey) {
+            if let decryptedCAN = encryptedDataUtil.decryptSecret(encryptedCANData, with: symmetricKey) {
                 NFCViewModel.logger().info("CAN decrypted successfully")
                 return decryptedCAN
             } else {
@@ -212,7 +224,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
         do {
             NFCViewModel.logger().info("NFC: Starting decryption operation")
-            let container = try await OperationDecrypt().processDecrypt(
+            let container = try await operationDecrypt.processDecrypt(
                 canNumber: CAN,
                 pin1Number: pinSecureData,
                 containerFile: containerFile,
@@ -383,7 +395,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
         do {
             NFCViewModel.logger().info("NFC: Starting signing operation")
-            let result = try await OperationReadCertAndSign().startOperation(
+            let result = try await operationReadCertAndSign.startOperation(
                 canNumber: canNumber,
                 pin2Number: SecureData(pin2Data),
                 signedContainer: signedContainer,
@@ -455,15 +467,13 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         strings: NFCSessionStrings
     ) async -> IdCardData? {
         do {
-            let nfcCardData = try await OperationReadCardData().startReading(
+            let nfcCardData = try await operationReadCardData.startReading(
                 canNumber: CAN,
                 strings: strings
             )
 
-            let authCertNotValidDate =
-                try await getAuthenticationCertificateNotValidDate(nfcCardData.authenticationCertificate)
-            let signCertNotValidDate =
-                try await getSignatureCertificateNotValidDate(nfcCardData.signatureCertificate)
+            let authCertNotValidDate = try certificateUtil.getNotValidDate(nfcCardData.authenticationCertificate)
+            let signCertNotValidDate = try certificateUtil.getNotValidDate(nfcCardData.signatureCertificate)
             guard let authCertNotValidDate else {
                 NFCViewModel.logger().error("NFC: Failed to get authentication certificate not valid date")
                 nfcErrorKey = "General error"
@@ -497,28 +507,5 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             nfcErrorKey = "General error"
             return nil
         }
-    }
-
-    private func getAuthenticationCertificateNotValidDate(_ authCertData: Data?) async throws -> String? {
-        guard let authCertData else { return nil }
-        let authCertificate = certificateUtil.certificate(from: authCertData)
-        guard let authCert = authCertificate else { return nil }
-        return try getNotValidDate(from: authCert)
-    }
-
-    private func getSignatureCertificateNotValidDate(_ signCertData: Data?) async throws -> String? {
-        guard let signCertData else { return nil }
-        let signCertificate = certificateUtil.certificate(from: signCertData)
-        guard let signCert = signCertificate else { return nil }
-        return try getNotValidDate(from: signCert)
-    }
-
-    private func getNotValidDate(from certificate: SecCertificate) throws -> String? {
-        let certificate = try Certificate(certificate)
-        let notValidAfter = certificate.notValidAfter
-        return DateUtil.getFormattedDateTime(
-            date: notValidAfter,
-            isUTC: false
-        ).date
     }
 }

@@ -47,6 +47,8 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
 
     private let idCardRepository: IdCardRepositoryProtocol
     private let sharedMyEidSession: SharedMyEidSessionProtocol
+    private let operationChangePin: OperationChangePinProtocol
+    private let operationUnblockPin: OperationUnblockPinProtocol
 
     var usbReaderStatus: UsbReaderStatus {
         sharedMyEidSession.usbReaderStatus
@@ -63,6 +65,8 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         actionMethod: ActionMethod,
         idCardRepository: IdCardRepositoryProtocol,
         sharedMyEidSession: SharedMyEidSessionProtocol,
+        operationChangePin: OperationChangePinProtocol,
+        operationUnblockPin: OperationUnblockPinProtocol
     ) {
         self.pinAction = pinAction
         self.codeType = codeType
@@ -70,6 +74,8 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         self.actionMethod = actionMethod
         self.idCardRepository = idCardRepository
         self.sharedMyEidSession = sharedMyEidSession
+        self.operationChangePin = operationChangePin
+        self.operationUnblockPin = operationUnblockPin
 
         configure(pinAction: pinAction, codeType: codeType)
     }
@@ -254,7 +260,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                 let canNumber = sharedMyEidSession.getCAN()
                 switch action {
                 case .change:
-                    try await OperationChangePin().startChanging(
+                    try await operationChangePin.startChanging(
                         canNumber: canNumber,
                         codeType: codeType,
                         currentPin: SecureData(current),
@@ -262,7 +268,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                         strings: nfcStringsUtil.makeForChangePin(pinName: codeType.name)
                     )
                 case .unblock:
-                    try await OperationUnblockPin().startReading(
+                    try await operationUnblockPin.startReading(
                         canNumber: canNumber,
                         codeType: codeType,
                         puk: SecureData(current),

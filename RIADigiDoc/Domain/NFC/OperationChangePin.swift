@@ -23,7 +23,7 @@ import UtilsLib
 import IdCardLib
 
 @MainActor
-public class OperationChangePin: NFCOperationBase {
+public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
     private var codeType: CodeType?
     private var currentPin: SecureData?
     private var newPin: SecureData?
@@ -67,10 +67,10 @@ public class OperationChangePin: NFCOperationBase {
                   let currentPin = self.currentPin,
                   let newPin = self.newPin else {
                 let error = ChangePinError.missingRequiredParameter
+                operationError = error
                 OperationChangePin.logger().error("NFC: \(error.localizedDescription)")
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                    "Missing required parameters")
-                continuation?.resume(throwing: error)
                 return
             }
 
@@ -87,46 +87,54 @@ public class OperationChangePin: NFCOperationBase {
                 try await cardCommands.changeCode(codeType, to: newPin, verifyCode: currentPin)
                 OperationChangePin.logger().info("NFC: \(codeType.name) changed successfully")
 
-                self.continuation?.resume(with: .success(()))
                 success()
             } catch {
-                guard !checkIfFinished(error: error) else { return }
-
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
-                    continuation?.resume(throwing: error)
                     return
                 }
 
                 if let changePinError = error as? ChangePinError {
+                    operationError = changePinError
                     OperationChangePin.logger()
                         .error("NFC: changePinError: \(changePinError.localizedDescription)")
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    continuation?.resume(throwing: error)
                     return
                 }
 
-                let wrappedError = UnblockPINError.unknown(handleUnknownError(error, session: session))
-                continuation?.resume(throwing: wrappedError)
+                handleUnknownError(error, session: session)
             }
         }
     }
 
     public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+        Self.logger().info("NFC: Reader session finished with error: \(error)")
         self.session = nil
-        guard !isFinished else { return }
-        isFinished = true
+
+        guard let continuationToResume = self.continuation else { return }
+        self.continuation = nil
+
+        if didCompleteSuccessfully {
+            continuationToResume.resume(with: .success(()))
+            return
+        }
+
+        if let storedError = self.operationError {
+            continuationToResume.resume(throwing: storedError)
+            return
+        }
+
         if let nfcError = error as? NFCReaderError {
             switch nfcError.code {
             case .readerSessionInvalidationErrorUserCanceled:
-                continuation?.resume(throwing: IdCardInternalError.cancelledByUser)
+                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
                 return
 
             default:
                 break
             }
         }
-        continuation?.resume(throwing: error)
-    }
 
+        continuationToResume.resume(throwing: error)
+    }
 }
