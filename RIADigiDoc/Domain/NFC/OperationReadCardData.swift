@@ -23,8 +23,9 @@ import IdCardLib
 import UtilsLib
 
 @MainActor
-final public class OperationReadCardData: NFCOperationBase {
+final public class OperationReadCardData: NFCOperationBase, OperationReadCardDataProtocol {
     private var continuation: CheckedContinuation<NFCCardData, Error>?
+    private var returnData: NFCCardData?
 
     public func startReading(
         canNumber: String,
@@ -101,7 +102,7 @@ final public class OperationReadCardData: NFCOperationBase {
                 let canChangePUK = cardCommands.canChangePUK
                 OperationReadCardData.logger().info("NFC: can change PUK: \(canChangePUK)")
 
-                let cardData = NFCCardData(
+                returnData = NFCCardData(
                     publicData: cardInfo,
                     authenticationCertificate: authenticationCertificate,
                     signatureCertificate: signatureCertificate,
@@ -109,37 +110,46 @@ final public class OperationReadCardData: NFCOperationBase {
                     isPUKChangable: canChangePUK
                 )
 
-                continuation?.resume(with: .success(cardData))
                 success()
             } catch {
-                guard !checkIfFinished(error: error) else { return }
-
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
-                    continuation?.resume(throwing: error)
                     return
                 }
 
-                let unknownError = handleUnknownError(error, session: session)
-                continuation?.resume(throwing: unknownError)
+                handleUnknownError(error, session: session)
             }
         }
     }
 
     public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+        Self.logger().info("NFC: Reader session finished with error: \(error)")
         self.session = nil
-        guard !isFinished else { return }
-        isFinished = true
+
+        guard let continuationToResume = self.continuation else { return }
+        self.continuation = nil
+
+        if let returnData, didCompleteSuccessfully {
+            continuationToResume.resume(with: .success(returnData))
+            return
+        }
+
+        if let storedError = self.operationError {
+            continuationToResume.resume(throwing: storedError)
+            return
+        }
+
         if let nfcError = error as? NFCReaderError {
             switch nfcError.code {
             case .readerSessionInvalidationErrorUserCanceled:
-                continuation?.resume(throwing: IdCardInternalError.cancelledByUser)
+                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
                 return
 
             default:
                 break
             }
         }
-        continuation?.resume(throwing: error)
+
+        continuationToResume.resume(throwing: error)
     }
 }

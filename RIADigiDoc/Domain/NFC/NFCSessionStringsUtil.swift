@@ -33,7 +33,8 @@ public struct NFCSessionStringsUtil {
     public func makeForDecrypt(pinName: String) -> NFCSessionStrings {
         customLocalizations(
             pinName: pinName,
-            step4Message: localize("Decrypting in progress", [])
+            step4Message: localize("Decrypting in progress", []),
+            successMessage: localize("Container successfully decrypted", [])
         )
     }
 
@@ -72,7 +73,12 @@ public struct NFCSessionStringsUtil {
         pinWrongErrorMessage: String? = nil,
         pinBlockedErrorMessage: String? = nil,
         technicalErrorMessage: String? = nil,
-        sessionErrorMessage: String? = nil
+        sessionErrorMessage: String? = nil,
+        ocspTimeslotErrorMessage: String? = nil,
+        certificateRevokedErrorMessage: String? = nil,
+        tooManyRequestsErrorMessage: String? = nil,
+        networkErrorMessage: String? = nil,
+        sslErrorMessage: String? = nil
     ) -> NFCSessionStrings {
         NFCSessionStrings(
             initialMessage: initialMessage ?? localize("Please place your ID card against the smart device", []),
@@ -88,7 +94,13 @@ public struct NFCSessionStringsUtil {
             pinWrongErrorMessage: pinWrongErrorMessage ?? localize("PIN verification error one", [pinName]),
             pinBlockedErrorMessage: pinBlockedErrorMessage ?? localize("PIN blocked", [pinName]),
             technicalErrorMessage: technicalErrorMessage ?? localize("NFC technical error", []),
-            sessionErrorMessage: sessionErrorMessage ?? localize("NFC session error", [])
+            sessionErrorMessage: sessionErrorMessage ?? localize("NFC session error", []),
+            ocspTimeslotErrorMessage: ocspTimeslotErrorMessage ?? localize("OCSP response not in valid time slot", []),
+            certificateRevokedErrorMessage: certificateRevokedErrorMessage ?? localize(
+                "Certificate status revoked", []),
+            tooManyRequestsErrorMessage: tooManyRequestsErrorMessage ?? localize("Too many requests", []),
+            networkErrorMessage: networkErrorMessage ?? localize("No Internet connection", []),
+            sslErrorMessage: sslErrorMessage ?? localize("SSL handshake failed", []),
         )
     }
 }

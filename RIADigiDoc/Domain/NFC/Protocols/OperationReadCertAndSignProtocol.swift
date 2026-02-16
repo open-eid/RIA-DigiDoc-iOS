@@ -17,22 +17,22 @@
  *
  */
 
-public struct NFCSessionStrings: Sendable {
-    let initialMessage: String
-    let step1Message: String
-    let step2Message: String
-    let step3Message: String
-    let step4Message: String
-    let successMessage: String
-    let canErrorMessage: String
-    let pinWrongMultipleErrorMessage: String
-    let pinWrongErrorMessage: String
-    let pinBlockedErrorMessage: String
-    let technicalErrorMessage: String
-    let sessionErrorMessage: String
-    let ocspTimeslotErrorMessage: String
-    let certificateRevokedErrorMessage: String
-    let tooManyRequestsErrorMessage: String
-    let networkErrorMessage: String
-    let sslErrorMessage: String
+import CommonsLib
+import Foundation
+import IdCardLib
+import LibdigidocLibSwift
+
+/// @mockable
+@MainActor
+public protocol OperationReadCertAndSignProtocol {
+    // swiftlint:disable:next function_parameter_count
+    func startOperation(
+        canNumber: String,
+        pin2Number: SecureData,
+        signedContainer: SignedContainerProtocol,
+        containerPath: URL,
+        roleData: RoleData,
+        userAgent: String,
+        strings: NFCSessionStrings
+    ) async throws -> SignedContainerProtocol
 }
