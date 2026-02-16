@@ -475,7 +475,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 publicData: nfcCardData.publicData,
                 authCertNotValidDate: authCertNotValidDate,
                 signCertNotValidDate: signCertNotValidDate,
-                retryCount: nfcCardData.retryCount,
+                pinResponse: nfcCardData.pinResponse,
                 isPUKChangeable: nfcCardData.isPUKChangable
             )
         } catch {

@@ -24,6 +24,6 @@ public struct NFCCardData: Sendable {
     let publicData: CardInfo
     let authenticationCertificate: Data?
     let signatureCertificate: Data?
-    let retryCount: RetryCount
+    let pinResponse: PinResponse
     let isPUKChangable: Bool
 }
