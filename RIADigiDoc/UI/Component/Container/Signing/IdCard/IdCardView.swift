@@ -300,7 +300,7 @@ struct IdCardView: View {
                         return
                     }
 
-                    idCardData = await viewModel.getIdCardData()
+                    idCardData = await viewModel.getIdCardData(for: .pin1)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
@@ -320,7 +320,7 @@ struct IdCardView: View {
                         return
                     }
 
-                    idCardData = await viewModel.getIdCardData()
+                    idCardData = await viewModel.getIdCardData(for: .pin2)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
@@ -334,7 +334,7 @@ struct IdCardView: View {
                 case .myeid:
                     guard newValue == .sCardConnected else { return }
 
-                    let cardData = await viewModel.getIdCardData()
+                    let cardData = await viewModel.getIdCardDataMyEid()
                     guard let cardData else {
                         await handleCardError()
                         return

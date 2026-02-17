@@ -59,10 +59,23 @@ struct MyEidPinsAndCertificatesView: View {
         )
     }
 
-    private var pinBlockedMessage: String {
+    private var pin1BlockedMessage: String {
         let pinBlockedText = languageSettings.localized(
             "PIN blocked",
             [CodeType.pin1.name]
+        )
+
+        if isPukBlocked {
+            return pinBlockedText
+        }
+
+        return "\(pinBlockedText) \(languageSettings.localized("PIN blocked unblock message", []))"
+    }
+    
+    private var pin2BlockedMessage: String {
+        let pinBlockedText = languageSettings.localized(
+            "PIN blocked",
+            [CodeType.pin2.name]
         )
 
         if isPukBlocked {
@@ -115,7 +128,7 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin1BlockedState)
 
             if isPin1Blocked {
-                Text(verbatim: pinBlockedMessage)
+                Text(verbatim: pin1BlockedMessage)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
@@ -149,7 +162,7 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin2BlockedState)
 
             if isPin2Blocked {
-                Text(verbatim: pinBlockedMessage)
+                Text(verbatim: pin2BlockedMessage)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
@@ -170,9 +183,6 @@ struct MyEidPinsAndCertificatesView: View {
             }
         }
         .padding(.bottom, Dimensions.Padding.SPadding)
-        .onAppear {
-            
-        }
 
         VStack {
             MyEidCertificateCardView(

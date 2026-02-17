@@ -31,7 +31,8 @@ public protocol IdCardViewModelProtocol: Sendable {
         pin1: String,
         cryptoContainer: CryptoContainerProtocol?
     ) async -> CryptoContainerProtocol?
-    func getIdCardData() async -> IdCardData?
+    func getIdCardData(for codeType: CodeType) async -> IdCardData?
+    func getIdCardDataMyEid() async -> IdCardData?
     func resetErrors()
     func formatPersonalIdentifier(givenName: String, surname: String, personalCode: String) -> String
     func isRoleDataEnabled() async -> Bool

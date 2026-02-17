@@ -187,7 +187,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         }
     }
 
-    func getIdCardData() async -> IdCardData? {
+    func getIdCardData(for codeType: CodeType) async -> IdCardData? {
         do {
             let publicData = try await getPublicData()
             let authCertNotValidDate = try await readAuthenticationCertificateNotValidDate()
@@ -195,6 +195,46 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
 
+            if (codeType == CodeType.pin1) {
+                if pinResponse.pin1RetryCount == 0 {
+                    throw IdCardInternalError.remainingPinRetryCount(0)
+                }
+            }
+            if (codeType == CodeType.pin2) {
+                if pinResponse.pin2RetryCount == 0 {
+                    throw IdCardInternalError.remainingPinRetryCount(0)
+                }
+            }
+            
+            if !pinResponse.pin2Active {
+                throw IdCardInternalError.pinLocked
+            }
+            
+            return IdCardData(
+                publicData: publicData,
+                authCertNotValidDate: authCertNotValidDate,
+                signCertNotValidDate: signCertNotValidDate,
+                pinResponse: pinResponse,
+                isPUKChangeable: isPUKChangeable
+            )
+        } catch {
+            IdCardViewModel.logger().error(
+                "Unable to read ID-card data. \(error)"
+            )
+
+            handleError(error, codeType: codeType)
+            return nil
+        }
+    }
+    
+    func getIdCardDataMyEid() async -> IdCardData? {
+        do {
+            let publicData = try await getPublicData()
+            let authCertNotValidDate = try await readAuthenticationCertificateNotValidDate()
+            let signCertNotValidDate = try await readSignatureCertificateNotValidDate()
+            let pinResponse = try await readCodeTryCounterRecord()
+            let isPUKChangeable = try await isPukChangeable()
+            
             return IdCardData(
                 publicData: publicData,
                 authCertNotValidDate: authCertNotValidDate,
