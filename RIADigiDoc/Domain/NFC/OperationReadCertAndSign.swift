@@ -123,6 +123,7 @@ public class OperationReadCertAndSign: NFCOperationBase {
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
 
                 updateAlertMessage(step: 3)
+                
                 let (retryCount, pinActive) = try await cardCommands.readCodeTryCounterRecord(.pin2)
                 
                 if retryCount == 0 {

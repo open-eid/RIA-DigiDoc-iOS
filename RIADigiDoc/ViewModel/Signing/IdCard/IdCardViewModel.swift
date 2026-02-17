@@ -92,6 +92,13 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinSecureData = SecureData(Array(pin1.utf8))
 
             let cardCommands = try await idCardRepository.getCardHandler()
+            
+            let (retryCount, _) = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
+            
+            if retryCount == 0 {
+                throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
+            }
+            
             let authCertData = try await idCardRepository.readAuthenticationCertificate()
             let container = try await CryptoContainer.decrypt(
                 containerFile: containerFile,
@@ -126,6 +133,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         do {
             let containerFile = await signedContainer.getRawContainerFile() ?? URL(fileURLWithPath: "")
             let pinSecureData = SecureData(Array(pin2.utf8))
+            
+            let (retryCount, pinActive) = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
+            
+            if retryCount == 0 {
+                throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
+            }
+            if !pinActive {
+                throw IdCardInternalError.pinLocked
+            }
+            
             let signatureCertificate = try await idCardRepository.readSignatureCertificate()
 
             IdCardViewModel.logger().info("ID-CARD: Getting language")
@@ -290,6 +307,10 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             errorMessage = nil
             errorExtraArguments = []
             shouldDismissForError = true
+        case .pinLocked:
+            showIdCardAlertMessage = true
+            idCardAlertMessageKey = "PIN2 locked"
+            idCardAlertMessageUrl = "PIN2 locked URL"
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
                 errorMessage = "PIN verification error multiple"
