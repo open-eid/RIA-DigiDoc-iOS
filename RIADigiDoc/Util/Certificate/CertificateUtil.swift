@@ -49,7 +49,7 @@ public struct CertificateUtil: CertificateUtilProtocol, Loggable {
                             .Value(utf8String: ""))
         } catch {
             CertificateUtil.logger().error(
-                "Unable to get issuer attribute \(attribute) from certificate: \(error.localizedDescription)"
+                "Unable to get subject attribute from certificate: \(String(reflecting: error))"
             )
             return ""
         }
@@ -76,7 +76,7 @@ public struct CertificateUtil: CertificateUtilProtocol, Loggable {
             }
         } catch {
             CertificateUtil.logger().error(
-                "Unable to get not valid after from certificate: \(error.localizedDescription)"
+                "Unable to get not valid after from certificate: \(String(reflecting: error))"
             )
             return ""
         }

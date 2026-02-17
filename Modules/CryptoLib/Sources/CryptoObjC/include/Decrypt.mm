@@ -33,9 +33,14 @@
 - (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
     std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(label);
     id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : nil;
-    id type = info.contains("last_name") ? [NSString stringWithStdString:info["type"]] : nil;
+    id type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
     id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
     CertType certType = CertTypeUnknownType;
+    NSArray<NSString *> *split = [cn componentsSeparatedByString:@","];
+    if (!info.contains("last_name") && split.count == 1) {
+        type = nil;
+    }
+    
     if ([type isEqualToString:@"ID-card"] || [type isEqualToString:@"cert"]) {
         certType = CertTypeIDCardType;
     } else if ([type isEqualToString:@"Digi-ID"]) {
