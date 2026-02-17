@@ -170,6 +170,9 @@ struct MyEidPinsAndCertificatesView: View {
             }
         }
         .padding(.bottom, Dimensions.Padding.SPadding)
+        .onAppear {
+            
+        }
 
         VStack {
             MyEidCertificateCardView(
