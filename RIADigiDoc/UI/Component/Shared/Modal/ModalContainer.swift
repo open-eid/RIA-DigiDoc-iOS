@@ -28,6 +28,7 @@ struct ModalContainer<Content: View>: View {
 
     var icon: String?
     var title: String
+    var isConfirmButtonVisible: Bool = true
     var confirmButtonTitle: String = "OK"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -68,14 +69,15 @@ struct ModalContainer<Content: View>: View {
                         cancelButtonAccessibility ??
                         languageSettings.localized(cancelButtonTitle).lowercased()
                     )
-
-                Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
-                    .font(typography.labelLarge)
-                    .foregroundStyle(theme.primary)
-                    .accessibilityLabel(
-                        confirmButtonAccessibility ??
-                        languageSettings.localized(confirmButtonTitle).lowercased()
-                    )
+                if (isConfirmButtonVisible) {
+                    Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
+                        .font(typography.labelLarge)
+                        .foregroundStyle(theme.primary)
+                        .accessibilityLabel(
+                            confirmButtonAccessibility ??
+                            languageSettings.localized(confirmButtonTitle).lowercased()
+                        )
+                }
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.vertical, Dimensions.Padding.MSPadding)

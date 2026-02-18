@@ -235,12 +235,18 @@ struct MyEidView: View {
         onConfirm: @escaping () -> Void,
         onCancel: @escaping () -> Void
     ) -> some View {
-
+        
         let config = configuration(for: pinVariant)
-
+        let isConfirmButtonVisible =
+            if config.codeType == .puk {
+                idCardData.isPUKChangeable
+            } else {
+                true
+            }
         ConfirmModalView(
             title: languageSettings.localized("PIN guideline title", [config.codeType.name]),
             message: config.guidelines,
+            isConfirmButtonVisible: isConfirmButtonVisible,
             confirmButtonTitle: config.confirmTitle,
             cancelButtonTitle: languageSettings.localized("Close"),
             onConfirm: onConfirm,

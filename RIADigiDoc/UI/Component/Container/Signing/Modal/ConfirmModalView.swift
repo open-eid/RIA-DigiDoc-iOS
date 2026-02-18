@@ -22,6 +22,7 @@ import SwiftUI
 struct ConfirmModalView: View {
     var title: String
     var message: String
+    var isConfirmButtonVisible: Bool = true
     var confirmButtonTitle: String = "Remove"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -39,6 +40,7 @@ struct ConfirmModalView: View {
             TextModal(
                 title: title,
                 message: message,
+                isConfirmButtonVisible: isConfirmButtonVisible,
                 confirmButtonTitle: confirmButtonTitle,
                 cancelButtonTitle: cancelButtonTitle,
                 confirmButtonAccessibility: confirmButtonAccessibility,

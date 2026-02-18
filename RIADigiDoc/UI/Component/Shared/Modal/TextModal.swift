@@ -26,6 +26,7 @@ struct TextModal: View {
     var icon: String?
     var title: String
     var message: String
+    var isConfirmButtonVisible: Bool = true
     var confirmButtonTitle: String = "OK"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -37,6 +38,7 @@ struct TextModal: View {
         ModalContainer(
             icon: icon,
             title: title,
+            isConfirmButtonVisible: isConfirmButtonVisible,
             confirmButtonTitle: confirmButtonTitle,
             cancelButtonTitle: cancelButtonTitle,
             confirmButtonAccessibility: confirmButtonAccessibility,
