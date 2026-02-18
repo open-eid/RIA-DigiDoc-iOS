@@ -106,13 +106,13 @@ public class OperationDecrypt: NFCOperationBase {
                 updateAlertMessage(step: 2)
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
                 updateAlertMessage(step: 3)
-                
+
                 let (retryCount, _) = try await cardCommands.readCodeTryCounterRecord(.pin1)
-                
+
                 if retryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
                 }
-                
+
                 let cert = try await cardCommands.readAuthenticationCertificate()
                 updateAlertMessage(step: 4)
                 let decryptedContainer = try await CryptoContainer.decrypt(
@@ -163,5 +163,4 @@ public class OperationDecrypt: NFCOperationBase {
         }
         continuation?.resume(throwing: error)
     }
-
 }

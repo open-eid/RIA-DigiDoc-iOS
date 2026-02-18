@@ -101,10 +101,9 @@ struct MyEidView: View {
                 onLeftClick: {
                     Task {
                         await viewModel.stopDiscoveringReaders()
-                        await MainActor.run {
-                            dismiss()
-                        }
                     }
+
+                    dismiss()
                 },
                 content: {
                     ScrollView {

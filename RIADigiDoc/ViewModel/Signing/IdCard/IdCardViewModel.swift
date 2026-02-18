@@ -92,13 +92,13 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinSecureData = SecureData(Array(pin1.utf8))
 
             let cardCommands = try await idCardRepository.getCardHandler()
-            
+
             let (retryCount, _) = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
-            
+
             if retryCount == 0 {
                 throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
             }
-            
+
             let authCertData = try await idCardRepository.readAuthenticationCertificate()
             let container = try await CryptoContainer.decrypt(
                 containerFile: containerFile,
@@ -133,16 +133,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         do {
             let containerFile = await signedContainer.getRawContainerFile() ?? URL(fileURLWithPath: "")
             let pinSecureData = SecureData(Array(pin2.utf8))
-            
+
             let (retryCount, pinActive) = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
-            
+
             if retryCount == 0 {
                 throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
             }
             if !pinActive {
                 throw IdCardInternalError.pinLocked
             }
-            
+
             let signatureCertificate = try await idCardRepository.readSignatureCertificate()
 
             IdCardViewModel.logger().info("ID-CARD: Getting language")
@@ -195,21 +195,21 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
 
-            if (codeType == CodeType.pin1) {
+            if codeType == CodeType.pin1 {
                 if pinResponse.pin1RetryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(0)
                 }
             }
-            if (codeType == CodeType.pin2) {
+            if codeType == CodeType.pin2 {
                 if pinResponse.pin2RetryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(0)
                 }
             }
-            
+
             if !pinResponse.pin2Active {
                 throw IdCardInternalError.pinLocked
             }
-            
+
             return IdCardData(
                 publicData: publicData,
                 authCertNotValidDate: authCertNotValidDate,
@@ -226,7 +226,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             return nil
         }
     }
-    
+
     func getIdCardDataMyEid() async -> IdCardData? {
         do {
             let publicData = try await getPublicData()
@@ -234,7 +234,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let signCertNotValidDate = try await readSignatureCertificateNotValidDate()
             let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
-            
+
             return IdCardData(
                 publicData: publicData,
                 authCertNotValidDate: authCertNotValidDate,
@@ -359,8 +359,9 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
                 errorMessage = "PIN verification error one"
                 errorExtraArguments = [pinType.name]
             } else {
-                errorMessage = "PIN blocked"
-                errorExtraArguments = [pinType.name]
+                showIdCardAlertMessage = true
+                idCardAlertMessageKey = "PIN blocked"
+                idCardAlertMessageExtraArguments = [pinType.name]
             }
         case .sessionError:
             errorMessage = "General error"
@@ -418,6 +419,10 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     private func handleError(_ error: Error, codeType: CodeType) {
         switch error {
         case let idCardError as IdCardError:
+            handleIdCardError(idCardError, pinType: codeType)
+
+        case let idCardInternalError as IdCardInternalError:
+            let idCardError = idCardInternalError.getIdCardError()
             handleIdCardError(idCardError, pinType: codeType)
 
         case let digidocError as DigiDocError:

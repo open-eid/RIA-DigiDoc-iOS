@@ -74,6 +74,7 @@ public class OperationReadCertAndSign: NFCOperationBase {
 
     // MARK: - NFCTagReaderSessionDelegate
 
+    // swiftlint:disable:next cyclomatic_complexity
     public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
             defer {
@@ -123,16 +124,16 @@ public class OperationReadCertAndSign: NFCOperationBase {
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
 
                 updateAlertMessage(step: 3)
-                
+
                 let (retryCount, pinActive) = try await cardCommands.readCodeTryCounterRecord(.pin2)
-                
+
                 if retryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
                 }
                 if !pinActive {
                     throw IdCardInternalError.pinLocked
                 }
-                
+
                 let cert = try await cardCommands.readSignatureCertificate()
                 let hashToSign = try await signedContainer.prepareSignature(
                     cert: cert,
