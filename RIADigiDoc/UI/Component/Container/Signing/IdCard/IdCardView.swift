@@ -53,6 +53,24 @@ struct IdCardView: View {
     let onSuccess: (SignedContainerProtocol) -> Void
     let onSuccessDecrypt: (CryptoContainerProtocol) -> Void
 
+    var localizedPinBlockedMessage: String? {
+        guard let messageKey = viewModel.idCardAlertMessageKey else { return nil }
+        if messageKey == "PIN blocked" {
+            let pinBlockedMessage = languageSettings.localized(
+                messageKey,
+                viewModel.idCardAlertMessageExtraArguments
+            )
+
+            let unblockMessage = languageSettings.localized(
+                "PIN blocked unblock message"
+            )
+
+            return "\(pinBlockedMessage) \(unblockMessage)"
+        }
+
+        return messageKey
+    }
+
     var localizedArguments: [String] {
         var localized: [String] = []
         for arg in viewModel.idCardAlertMessageExtraArguments {
@@ -92,6 +110,10 @@ struct IdCardView: View {
 
     private var pinCodeType: CodeType {
         actionType == .signing ? .pin2 : .pin1
+    }
+
+    private var isIdCardAlertError: Bool {
+        viewModel.idCardAlertMessageKey?.isEmpty == false
     }
 
     init(
@@ -201,7 +223,7 @@ struct IdCardView: View {
                     }
                 case .myeid:
                     // Do nothing
-                    isInProgress = true
+                    break
                 }
             },
             content: {
@@ -252,12 +274,15 @@ struct IdCardView: View {
         }
         .alert(
             languageSettings.localized(
-                viewModel.idCardAlertMessageKey ?? "",
+                localizedPinBlockedMessage ?? "",
                 localizedArguments
             ),
             isPresented: $viewModel.showIdCardAlertMessage
         ) {
             Button(languageSettings.localized("OK")) {
+                Task {
+                    await viewModel.stopDiscoveringReaders()
+                }
                 viewModel.resetErrors()
                 viewModel.resetAlertErrors()
                 dismiss()
@@ -300,7 +325,7 @@ struct IdCardView: View {
                         return
                     }
 
-                    idCardData = await viewModel.getIdCardData()
+                    idCardData = await viewModel.getIdCardData(for: .pin1)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
@@ -320,7 +345,7 @@ struct IdCardView: View {
                         return
                     }
 
-                    idCardData = await viewModel.getIdCardData()
+                    idCardData = await viewModel.getIdCardData(for: .pin2)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
@@ -334,7 +359,7 @@ struct IdCardView: View {
                 case .myeid:
                     guard newValue == .sCardConnected else { return }
 
-                    let cardData = await viewModel.getIdCardData()
+                    let cardData = await viewModel.getIdCardDataMyEid()
                     guard let cardData else {
                         await handleCardError()
                         return
@@ -363,7 +388,12 @@ struct IdCardView: View {
         await MainActor.run {
             Toast.show(errorMessage)
             viewModel.resetErrors()
-            dismiss()
+
+            // Let ID-card alert closure handle dismiss
+            // Dismiss is run when user has pressed OK button on alert
+            if !isIdCardAlertError {
+                dismiss()
+            }
         }
     }
 

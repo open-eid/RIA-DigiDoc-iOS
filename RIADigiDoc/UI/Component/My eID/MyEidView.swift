@@ -85,9 +85,13 @@ struct MyEidView: View {
         self.idCardData = idCardData
         self.actionMethod = actionMethod
 
-        viewModel.setIsPinBlocked(.pin1, isBlocked: idCardData.retryCount.pin1 == 0)
-        viewModel.setIsPinBlocked(.pin2, isBlocked: idCardData.retryCount.pin2 == 0)
-        viewModel.setIsPinBlocked(.puk, isBlocked: idCardData.retryCount.puk == 0)
+        viewModel.setIsPinLocked(.pin1, isLocked: idCardData.pinResponse.pin1Active != true)
+        viewModel.setIsPinLocked(.pin2, isLocked: idCardData.pinResponse.pin2Active != true)
+        viewModel.setIsPinLocked(.puk, isLocked: idCardData.pinResponse.pukActive != true)
+
+        viewModel.setIsPinBlocked(.pin1, isBlocked: idCardData.pinResponse.pin1RetryCount == 0)
+        viewModel.setIsPinBlocked(.pin2, isBlocked: idCardData.pinResponse.pin2RetryCount == 0)
+        viewModel.setIsPinBlocked(.puk, isBlocked: idCardData.pinResponse.pukRetryCount == 0)
     }
 
     var body: some View {
@@ -97,10 +101,9 @@ struct MyEidView: View {
                 onLeftClick: {
                     Task {
                         await viewModel.stopDiscoveringReaders()
-                        await MainActor.run {
-                            dismiss()
-                        }
                     }
+
+                    dismiss()
                 },
                 content: {
                     ScrollView {
@@ -129,6 +132,7 @@ struct MyEidView: View {
                                         isPin1Blocked: $isPin1Blocked,
                                         isPin2Blocked: $isPin2Blocked,
                                         isPukBlocked: $isPukBlocked,
+                                        isPin2Activated: $isPin2Activated,
                                         pinChangeVariant: $pinChangeVariant,
                                         authCertValidTo: idCardData.authCertNotValidDate ?? "",
                                         signCertValidTo: idCardData.signCertNotValidDate ?? "",
@@ -218,6 +222,7 @@ struct MyEidView: View {
             }
         }
         .onAppear {
+            isPin2Activated = !viewModel.getIsPinLocked(for: .pin2)
             isPin1Blocked = viewModel.getIsPinBlocked(for: .pin1)
             isPin2Blocked = viewModel.getIsPinBlocked(for: .pin2)
             isPukBlocked = viewModel.getIsPinBlocked(for: .puk)
@@ -230,12 +235,18 @@ struct MyEidView: View {
         onConfirm: @escaping () -> Void,
         onCancel: @escaping () -> Void
     ) -> some View {
-
+        
         let config = configuration(for: pinVariant)
-
+        let isConfirmButtonVisible =
+            if config.codeType == .puk {
+                idCardData.isPUKChangeable
+            } else {
+                true
+            }
         ConfirmModalView(
             title: languageSettings.localized("PIN guideline title", [config.codeType.name]),
             message: config.guidelines,
+            isConfirmButtonVisible: isConfirmButtonVisible,
             confirmButtonTitle: config.confirmTitle,
             cancelButtonTitle: languageSettings.localized("Close"),
             onConfirm: onConfirm,
@@ -300,10 +311,13 @@ struct MyEidView: View {
             ),
             authCertNotValidDate: nil,
             signCertNotValidDate: nil,
-            retryCount: RetryCount(
-                pin1: 3,
-                pin2: 3,
-                puk: 3
+            pinResponse: PinResponse(
+                pin1RetryCount: 3,
+                pin1Active: true,
+                pin2RetryCount: 3,
+                pin2Active: true,
+                pukRetryCount: 3,
+                pukActive: true,
             ),
             isPUKChangeable: true
         ),

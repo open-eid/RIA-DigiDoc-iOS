@@ -87,16 +87,23 @@ final class Thales: CardCommandsInternal {
     }
 
     // MARK: - PIN & PUK Management
-    func readCodeTryCounterRecord(_ type: CodeType) async throws -> UInt8 {
+    func readCodeTryCounterRecord(_ type: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool) {
         _ = try await select(file: Thales.kAID)
         let data = try await reader.sendAPDU(ins: 0xCB, p1Byte: 0x00, p2Byte: 0xFF, data:
             [0xA0, 0x03, 0x83, 0x01, type.pinRef], leByte: 0)
-        if let info = TLV(from: data), info.tag == 0xA0 {
-            for record in TLV.sequenceOfRecords(from: info.value) ?? [] where record.tag == 0xdf21 {
-                return record.value[0]
+        var retryCount: UInt8 = 0
+        var pinActive = true
+        if let info = TLV(from: data), info.tag == 0xA0,
+           let records = TLV.sequenceOfRecords(from: info.value) {
+            for record in records {
+                switch record.tag {
+                case 0xdf21: retryCount = record.value[0]
+                case 0xdf2f: pinActive = record.value[0] == 0x01
+                default: break
+                }
             }
         }
-        return 0
+        return (retryCount, pinActive)
     }
 
     func changeCode(_ type: CodeType, to code: SecureData, verifyCode: SecureData) async throws {

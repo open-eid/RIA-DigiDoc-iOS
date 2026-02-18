@@ -252,6 +252,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         case .cancelledByUser:
             nfcErrorKey = nil
             nfcErrorExtraArguments = []
+        case .pinLocked:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "PIN2 locked"
+            nfcAlertMessageUrl = "PIN2 locked URL"
         case .wrongCAN:
             nfcErrorKey = "Wrong CAN"
             nfcErrorExtraArguments = []
@@ -475,7 +479,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 publicData: nfcCardData.publicData,
                 authCertNotValidDate: authCertNotValidDate,
                 signCertNotValidDate: signCertNotValidDate,
-                retryCount: nfcCardData.retryCount,
+                pinResponse: nfcCardData.pinResponse,
                 isPUKChangeable: nfcCardData.isPUKChangable
             )
         } catch {

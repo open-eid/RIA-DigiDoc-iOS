@@ -29,10 +29,23 @@ struct MyEidPinsAndCertificatesView: View {
     @Binding var isPin1Blocked: Bool
     @Binding var isPin2Blocked: Bool
     @Binding var isPukBlocked: Bool
+    @Binding var isPin2Activated: Bool
     @Binding var pinChangeVariant: PinChangeVariant?
     var authCertValidTo: String
     var signCertValidTo: String
     var isPUKChangeable: Bool
+
+    private var pin2LockedMessage: String {
+        languageSettings.localized(
+            "PIN2 locked"
+        )
+    }
+
+    private var pin2LockedUrl: String {
+        languageSettings.localized(
+            "PIN2 locked URL"
+        )
+    }
 
     private var pukBlockedMessage: String {
         languageSettings.localized(
@@ -46,10 +59,23 @@ struct MyEidPinsAndCertificatesView: View {
         )
     }
 
-    private var pinBlockedMessage: String {
+    private var pin1BlockedMessage: String {
         let pinBlockedText = languageSettings.localized(
             "PIN blocked",
             [CodeType.pin1.name]
+        )
+
+        if isPukBlocked {
+            return pinBlockedText
+        }
+
+        return "\(pinBlockedText) \(languageSettings.localized("PIN blocked unblock message", []))"
+    }
+
+    private var pin2BlockedMessage: String {
+        let pinBlockedText = languageSettings.localized(
+            "PIN blocked",
+            [CodeType.pin2.name]
         )
 
         if isPukBlocked {
@@ -63,6 +89,7 @@ struct MyEidPinsAndCertificatesView: View {
         isPin1Blocked: Binding<Bool>,
         isPin2Blocked: Binding<Bool>,
         isPukBlocked: Binding<Bool>,
+        isPin2Activated: Binding<Bool>,
         pinChangeVariant: Binding<PinChangeVariant?> = .constant(nil),
         authCertValidTo: String,
         signCertValidTo: String,
@@ -71,6 +98,7 @@ struct MyEidPinsAndCertificatesView: View {
         self._isPin1Blocked = isPin1Blocked
         self._isPin2Blocked = isPin2Blocked
         self._isPukBlocked = isPukBlocked
+        self._isPin2Activated = isPin2Activated
         self._pinChangeVariant = pinChangeVariant
         self.authCertValidTo = authCertValidTo
         self.signCertValidTo = signCertValidTo
@@ -78,7 +106,7 @@ struct MyEidPinsAndCertificatesView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             MyEidCertificateCardView(
                 title: languageSettings.localized("Authentication certificate"),
                 subtitle: AttributedString(languageSettings
@@ -100,7 +128,7 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin1BlockedState)
 
             if isPin1Blocked {
-                Text(verbatim: pinBlockedMessage)
+                Text(verbatim: pin1BlockedMessage)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
@@ -108,7 +136,7 @@ struct MyEidPinsAndCertificatesView: View {
         }
         .padding(.vertical, Dimensions.Padding.SPadding)
 
-        VStack {
+        VStack(alignment: .leading) {
             MyEidCertificateCardView(
                 title: languageSettings.localized("Signing certificate"),
                 subtitle: AttributedString(
@@ -134,15 +162,27 @@ struct MyEidPinsAndCertificatesView: View {
             .opacity(opacityForPin2BlockedState)
 
             if isPin2Blocked {
-                Text(verbatim: pinBlockedMessage)
+                Text(verbatim: pin2BlockedMessage)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
             }
+
+            if !isPin2Activated {
+                Text(verbatim: pin2LockedMessage)
+                    .font(typography.bodySmall)
+                    .foregroundStyle(theme.error)
+                    .padding(.vertical, Dimensions.Padding.XSPadding)
+
+                if let pin2LockedInfoUrl = URL(string: pin2LockedUrl) {
+                    additionalInformationLink(url: pin2LockedInfoUrl)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                }
+            }
         }
         .padding(.bottom, Dimensions.Padding.SPadding)
 
-        VStack {
+        VStack(alignment: .leading) {
             MyEidCertificateCardView(
                 title: pukCodeTitle,
                 subtitle: pukCodeInfo,
@@ -150,21 +190,21 @@ struct MyEidPinsAndCertificatesView: View {
             )
             .opacity(opacityForPukBlockedState)
             .onTapGesture {
-                pinChangeVariant = .pukChange
+                if (isPUKChangeable) {
+                    pinChangeVariant = .pukChange
+                }
             }
             .accessibilityAddTraits([.isButton])
 
             if isPukBlocked {
-                VStack(alignment: .leading) {
-                    Text(verbatim: pukBlockedMessage)
-                        .font(typography.bodySmall)
-                        .foregroundStyle(theme.error)
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                Text(verbatim: pukBlockedMessage)
+                    .font(typography.bodySmall)
+                    .foregroundStyle(theme.error)
+                    .padding(.vertical, Dimensions.Padding.XSPadding)
 
-                    if let pukBlockedInfoUrl = URL(string: pukBlockedUrl) {
-                        additionalInformationLink(url: pukBlockedInfoUrl)
-                            .padding(.vertical, Dimensions.Padding.XSPadding)
-                    }
+                if let pukBlockedInfoUrl = URL(string: pukBlockedUrl) {
+                    additionalInformationLink(url: pukBlockedInfoUrl)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
                 }
             }
         }

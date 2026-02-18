@@ -92,6 +92,13 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinSecureData = SecureData(Array(pin1.utf8))
 
             let cardCommands = try await idCardRepository.getCardHandler()
+
+            let (retryCount, _) = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
+
+            if retryCount == 0 {
+                throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
+            }
+
             let authCertData = try await idCardRepository.readAuthenticationCertificate()
             let container = try await CryptoContainer.decrypt(
                 containerFile: containerFile,
@@ -126,6 +133,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         do {
             let containerFile = await signedContainer.getRawContainerFile() ?? URL(fileURLWithPath: "")
             let pinSecureData = SecureData(Array(pin2.utf8))
+
+            let (retryCount, pinActive) = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
+
+            if retryCount == 0 {
+                throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
+            }
+            if !pinActive {
+                throw IdCardInternalError.pinLocked
+            }
+
             let signatureCertificate = try await idCardRepository.readSignatureCertificate()
 
             IdCardViewModel.logger().info("ID-CARD: Getting language")
@@ -170,19 +187,59 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         }
     }
 
-    func getIdCardData() async -> IdCardData? {
+    func getIdCardData(for codeType: CodeType) async -> IdCardData? {
         do {
             let publicData = try await getPublicData()
             let authCertNotValidDate = try await readAuthenticationCertificateNotValidDate()
             let signCertNotValidDate = try await readSignatureCertificateNotValidDate()
-            let retryCount = try await readCodeTryCounterRecord()
+            let pinResponse = try await readCodeTryCounterRecord()
+            let isPUKChangeable = try await isPukChangeable()
+
+            if codeType == CodeType.pin1 {
+                if pinResponse.pin1RetryCount == 0 {
+                    throw IdCardInternalError.remainingPinRetryCount(0)
+                }
+            }
+            if codeType == CodeType.pin2 {
+                if pinResponse.pin2RetryCount == 0 {
+                    throw IdCardInternalError.remainingPinRetryCount(0)
+                }
+            }
+
+            if !pinResponse.pin2Active {
+                throw IdCardInternalError.pinLocked
+            }
+
+            return IdCardData(
+                publicData: publicData,
+                authCertNotValidDate: authCertNotValidDate,
+                signCertNotValidDate: signCertNotValidDate,
+                pinResponse: pinResponse,
+                isPUKChangeable: isPUKChangeable
+            )
+        } catch {
+            IdCardViewModel.logger().error(
+                "Unable to read ID-card data. \(error)"
+            )
+
+            handleError(error, codeType: codeType)
+            return nil
+        }
+    }
+
+    func getIdCardDataMyEid() async -> IdCardData? {
+        do {
+            let publicData = try await getPublicData()
+            let authCertNotValidDate = try await readAuthenticationCertificateNotValidDate()
+            let signCertNotValidDate = try await readSignatureCertificateNotValidDate()
+            let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
 
             return IdCardData(
                 publicData: publicData,
                 authCertNotValidDate: authCertNotValidDate,
                 signCertNotValidDate: signCertNotValidDate,
-                retryCount: retryCount,
+                pinResponse: pinResponse,
                 isPUKChangeable: isPUKChangeable
             )
         } catch {
@@ -247,18 +304,21 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         return try getNotValidDate(from: signCert)
     }
 
-    private func readCodeTryCounterRecord() async throws -> RetryCount {
+    private func readCodeTryCounterRecord() async throws -> PinResponse {
         IdCardViewModel.logger().info(
             "ID-CARD: Reading retry counter record from ID-card with reader"
         )
 
-        let pin1RetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
-        let pin2RetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
-        let pukRetryCount = try await idCardRepository.readCodeTryCounterRecord(for: .puk)
-        return RetryCount(
-            pin1: pin1RetryCount,
-            pin2: pin2RetryCount,
-            puk: pukRetryCount
+        let pin1Response = try await idCardRepository.readCodeTryCounterRecord(for: .pin1)
+        let pin2Response = try await idCardRepository.readCodeTryCounterRecord(for: .pin2)
+        let pukResponse = try await idCardRepository.readCodeTryCounterRecord(for: .puk)
+        return PinResponse(
+            pin1RetryCount: pin1Response.retryCount,
+            pin1Active: pin1Response.pinActive,
+            pin2RetryCount: pin2Response.retryCount,
+            pin2Active: pin2Response.pinActive,
+            pukRetryCount: pukResponse.retryCount,
+            pukActive: pukResponse.pinActive,
         )
     }
 
@@ -287,6 +347,10 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             errorMessage = nil
             errorExtraArguments = []
             shouldDismissForError = true
+        case .pinLocked:
+            showIdCardAlertMessage = true
+            idCardAlertMessageKey = "PIN2 locked"
+            idCardAlertMessageUrl = "PIN2 locked URL"
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
                 errorMessage = "PIN verification error multiple"
@@ -295,9 +359,9 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
                 errorMessage = "PIN verification error one"
                 errorExtraArguments = [pinType.name]
             } else {
-                errorMessage = "PIN blocked"
-                errorExtraArguments = [pinType.name]
-                shouldDismissForError = true
+                showIdCardAlertMessage = true
+                idCardAlertMessageKey = "PIN blocked"
+                idCardAlertMessageExtraArguments = [pinType.name]
             }
         case .sessionError:
             errorMessage = "General error"
@@ -355,6 +419,10 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     private func handleError(_ error: Error, codeType: CodeType) {
         switch error {
         case let idCardError as IdCardError:
+            handleIdCardError(idCardError, pinType: codeType)
+
+        case let idCardInternalError as IdCardInternalError:
+            let idCardError = idCardInternalError.getIdCardError()
             handleIdCardError(idCardError, pinType: codeType)
 
         case let digidocError as DigiDocError:

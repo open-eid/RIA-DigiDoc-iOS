@@ -78,19 +78,23 @@ final public class OperationReadCardData: NFCOperationBase {
                 updateAlertMessage(step: 4)
                 OperationReadCardData.logger().info("Reading PIN retry counts...")
 
-                let pin1Count = try await cardCommands.readCodeTryCounterRecord(.pin1)
-                OperationReadCardData.logger().info("PIN1 retry count: \(pin1Count)")
+                let pin1Response = try await cardCommands.readCodeTryCounterRecord(.pin1)
+                OperationReadCardData.logger().info("PIN1 retry count: \(pin1Response.retryCount)")
+                OperationReadCardData.logger().info("PIN1 active: \(pin1Response.pinActive)")
+                let pin2Response = try await cardCommands.readCodeTryCounterRecord(.pin2)
+                OperationReadCardData.logger().info("PIN2 retry count: \(pin2Response.retryCount)")
+                OperationReadCardData.logger().info("PIN2 active: \(pin2Response.pinActive)")
+                let pukResponse = try await cardCommands.readCodeTryCounterRecord(.puk)
+                OperationReadCardData.logger().info("PUK retry count: \(pukResponse.retryCount)")
+                OperationReadCardData.logger().info("PUK active: \(pukResponse.pinActive)")
 
-                let pin2Count = try await cardCommands.readCodeTryCounterRecord(.pin2)
-                OperationReadCardData.logger().info("PIN2 retry count: \(pin2Count)")
-
-                let pukCount = try await cardCommands.readCodeTryCounterRecord(.puk)
-                OperationReadCardData.logger().info("PUK retry count: \(pukCount)")
-
-                let retryCount = RetryCount(
-                    pin1: pin1Count,
-                    pin2: pin2Count,
-                    puk: pukCount
+                let pinResponse = PinResponse(
+                    pin1RetryCount: pin1Response.retryCount,
+                    pin1Active: pin1Response.pinActive,
+                    pin2RetryCount: pin2Response.retryCount,
+                    pin2Active: pin2Response.pinActive,
+                    pukRetryCount: pukResponse.retryCount,
+                    pukActive: pukResponse.pinActive,
                 )
 
                 OperationReadCardData.logger().info("NFC: reading can change PUK")
@@ -101,7 +105,7 @@ final public class OperationReadCardData: NFCOperationBase {
                     publicData: cardInfo,
                     authenticationCertificate: authenticationCertificate,
                     signatureCertificate: signatureCertificate,
-                    retryCount: retryCount,
+                    pinResponse: pinResponse,
                     isPUKChangable: canChangePUK
                 )
 

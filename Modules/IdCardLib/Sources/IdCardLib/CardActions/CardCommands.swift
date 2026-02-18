@@ -93,7 +93,7 @@ public protocol CardCommands: Sendable {
      * - Throws: An error if the operation fails.
      * - Returns: The remaining attempts as an `UInt8`.
      */
-    func readCodeTryCounterRecord(_ type: CodeType) async throws -> UInt8
+    func readCodeTryCounterRecord(_ type: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool)
 
     /**
      * Changes the PIN or PUK code.

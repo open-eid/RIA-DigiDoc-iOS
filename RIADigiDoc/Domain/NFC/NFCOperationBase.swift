@@ -82,7 +82,7 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         let idCardError = error.getIdCardError()
         Self.logger().error("NFC: IdCardError detected: \(idCardError)")
         handleIdCardError(idCardError)
-        session.invalidate(errorMessage: nfcError ?? "")
+        session.invalidate(errorMessage: nfcError)
     }
 
     func handleUnknownError(

@@ -78,6 +78,19 @@ static inline NSString *NSStringFromLogLevel(libcdoc::ILogger::LogLevel level) {
     return @"UNKNOWN";
 }
 
+static inline NSString *BasenameFromPath(NSString *path) {
+    if (path == nil || path.length == 0) return @"<unknown>";
+    NSString *last = path.lastPathComponent;
+    if (last.length > 0) return last;
+
+    NSCharacterSet *seps = [NSCharacterSet characterSetWithCharactersInString:@"/\\"];
+    NSArray<NSString *> *parts = [path componentsSeparatedByCharactersInSet:seps];
+    for (NSInteger i = parts.count - 1; i >= 0; i--) {
+        if (parts[i].length > 0) return parts[i];
+    }
+    return path;
+}
+
 class ObjCLogger final : public libcdoc::ILogger {
 public:
     void LogMessage(libcdoc::ILogger::LogLevel level,
@@ -85,7 +98,8 @@ public:
                     int line,
                     std::string_view message) override
     {
-        NSString *nsFile = NSStringFromStringView(file);
+        NSString *nsFileFull = NSStringFromStringView(file);
+        NSString *nsFile = BasenameFromPath(nsFileFull);
         NSString *nsMsg  = NSStringFromStringView(message);
         NSString *nsLvl  = NSStringFromLogLevel(level);
 

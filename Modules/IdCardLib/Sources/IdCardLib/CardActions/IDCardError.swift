@@ -20,6 +20,7 @@
 public enum IdCardError: Error {
     case wrongCAN,
          wrongPIN(triesLeft: Int),
+         pinLocked,
          invalidNewPIN,
          sessionError,
          cancelledByUser
@@ -36,6 +37,7 @@ public enum IdCardInternalError: Error {
          invalidResponse(message: String),
          swError(UInt16),
          pinVerificationFailed,
+         pinLocked,
          remainingPinRetryCount(Int),
          invalidNewPin,
          notSupportedCodeType,
@@ -91,6 +93,8 @@ public enum IdCardInternalError: Error {
             return .invalidNewPIN
         case .cancelledByUser:
             return .cancelledByUser
+        case .pinLocked:
+            return .pinLocked
         }
     }
 }

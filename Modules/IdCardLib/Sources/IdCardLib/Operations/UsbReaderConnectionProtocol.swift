@@ -32,7 +32,7 @@ public protocol UsbReaderConnectionProtocol: Actor {
     func getPublicData() async throws -> CardInfo
     func readAuthenticationCertificate() async throws -> Data
     func readSignatureCertificate() async throws -> Data
-    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> UInt8
+    func readCodeTryCounterRecord(for codeType: CodeType) async throws -> (retryCount: UInt8, pinActive: Bool)
     func isPUKChangeable() async throws -> Bool
     func changeCode(_ codeType: CodeType, to newCode: Data, verifyCode: Data) async throws
     func unblockCode(_ codeType: CodeType, puk: Data, newCode: Data) async throws

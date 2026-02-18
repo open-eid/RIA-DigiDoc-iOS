@@ -278,11 +278,14 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
 
             if let idCardInternalError = error as? IdCardInternalError {
                 let idCardError = idCardInternalError.getIdCardError()
-                MyEidPinChangeViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                MyEidPinChangeViewModel.logger().error("IdCardInternalError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: codeType)
+            } else if let idCardError = error as? IdCardError {
+                MyEidPinChangeViewModel.logger().error("IdCardError: \(idCardError)")
                 handleIdCardError(idCardError, pinType: codeType)
             } else {
-                MyEidPinChangeViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
-                MyEidPinChangeViewModel.logger().error("NFC: Error details: \(error)")
+                MyEidPinChangeViewModel.logger().error("Unexpected error type: \(type(of: error))")
+                MyEidPinChangeViewModel.logger().error("Error details: \(error)")
                 errorMessage = "General error"
             }
 
@@ -318,7 +321,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                 sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: true)
             }
         case .sessionError:
-            errorMessage = "NFC session error"
+            errorMessage = "General error"
             errorMessageExtraArguments = []
         default:
             resetInputError()

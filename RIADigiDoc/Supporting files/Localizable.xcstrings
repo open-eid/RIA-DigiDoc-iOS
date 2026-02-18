@@ -5790,6 +5790,40 @@
         }
       }
     },
+    "PIN2 locked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing with the ID-card isn't possible yet. PIN2 code must be changed in order to sign. "
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selle ID-kaardiga allkirjastamine ei ole veel võimalik. Allkirjastamiseks tuleb PIN2-koodi muuta."
+          }
+        }
+      }
+    },
+    "PIN2 locked URL" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/changing-id-card-pin-codes-and-puk-code/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/id-kaardi-pin-ja-puk-koodide-muutmine/"
+          }
+        }
+      }
+    },
     "PINs and certificates" : {
       "comment" : "My eID tab title",
       "extractionState" : "manual",

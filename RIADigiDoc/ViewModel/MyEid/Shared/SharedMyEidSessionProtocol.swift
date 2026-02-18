@@ -24,6 +24,8 @@ import IdCardLib
 @MainActor
 public protocol SharedMyEidSessionProtocol: Sendable {
     var usbReaderStatus: UsbReaderStatus { get }
+    func setIsPinLocked(_ codeType: CodeType, isLocked: Bool)
+    func getIsPinLocked(for codeType: CodeType) -> Bool
     func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
     func getIsPinBlocked(for codeType: CodeType) -> Bool
     func stopStatusStream()

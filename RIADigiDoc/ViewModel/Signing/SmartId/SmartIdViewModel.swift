@@ -118,6 +118,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         smartIdAlertMessageUrl = nil
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func sign(
         country: SmartIdCountry,
         personalCode: String,
