@@ -361,7 +361,6 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             } else {
                 errorMessage = "PIN blocked"
                 errorExtraArguments = [pinType.name]
-                shouldDismissForError = true
             }
         case .sessionError:
             errorMessage = "General error"
