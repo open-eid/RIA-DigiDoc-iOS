@@ -190,7 +190,9 @@ struct MyEidPinsAndCertificatesView: View {
             )
             .opacity(opacityForPukBlockedState)
             .onTapGesture {
-                pinChangeVariant = .pukChange
+                if (isPUKChangeable) {
+                    pinChangeVariant = .pukChange
+                }
             }
             .accessibilityAddTraits([.isButton])
 
