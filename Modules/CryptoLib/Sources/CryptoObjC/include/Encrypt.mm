@@ -79,7 +79,7 @@ static inline NSString *NSStringFromLogLevel(libcdoc::ILogger::LogLevel level) {
 }
 
 static inline NSString *BasenameFromPath(NSString *path) {
-    if (path.length == 0) return @"<unknown>";
+    if (path == nil || path.length == 0) return @"<unknown>";
     NSString *last = path.lastPathComponent;
     if (last.length > 0) return last;
 
