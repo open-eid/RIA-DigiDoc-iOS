@@ -74,7 +74,7 @@ struct FileUtilTests {
             fileNameToFind: fileNameToFind
         ))
 
-        let mimetypeContent = try String(contentsOf: fileFromZip)
+        let mimetypeContent = try String(contentsOf: fileFromZip, encoding: .utf8)
         let mimetype = mimetypeContent.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 
         #expect(asiceMimetype == mimetype)
