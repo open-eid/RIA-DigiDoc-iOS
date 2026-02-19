@@ -422,7 +422,7 @@ final class DiagnosticsViewModelTests {
 
     @Test
     func createLogFile_success() async throws {
-        let tempDirectoryURL = TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
 
         mockFileManager.urlHandler = { _, _, _, _ in tempDirectoryURL }
         mockFileManager.fileExistsHandler = { _ in true }
