@@ -40,6 +40,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     var isShowingFileSaver = false
     var showRecipientRemoveButton = false
     var isLastDataFileRemoved = false
+    var navigateToNestedSignedContainerView = false
     private(set) var errorMessage: ToastMessage?
     private(set) var successMessage: ToastMessage?
 
@@ -86,7 +87,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     }
 
     func loadContainerData(cryptoContainer: CryptoContainerProtocol?) async {
-        EncryptViewModel.logger().info("Loading container data")
+        EncryptViewModel.logger().info("Loading crypto container data")
         let openedContainer = (cryptoContainer ?? sharedContainerViewModel.currentContainer())
             as? any CryptoContainerProtocol
         guard let openedContainer else {
@@ -102,18 +103,18 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         self.containerMimetype = await openedContainer.getContainerMimetype()
         self.containerURL = await openedContainer.getRawContainerFile()
 
-        EncryptViewModel.logger().info("Container data loaded")
+        EncryptViewModel.logger().info("Crypto container data loaded")
     }
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
         guard let containerLocation = containerURL else {
-            EncryptViewModel.logger().error("Unable to get container to create copy for saving")
+            EncryptViewModel.logger().error("Unable to get crypto container to create copy for saving")
             return nil
         }
 
         do {
             let savedFilesDirectory = try Directories.getCacheDirectory(
-                subfolders: [CommonsLib.Constants.Folder.SavedFiles],
+                subfolders: [Constants.Folder.SavedFiles, Constants.Folder.Temp],
                 fileManager: fileManager
             )
 
@@ -330,13 +331,31 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                 return
             }
 
-            if Constants.Extension.CryptoContainers.contains(fileURL.pathExtension) {
+            let isContainer = await fileURL.isContainer()
+            let isCryptoContainer = await fileURL.isCryptoContainer()
+
+            if isCryptoContainer {
                 do {
+                    await MainActor.run {
+                        navigateToNestedSignedContainerView = false
+                    }
                     try await openNestedContainer(fileURL: fileURL)
-                    // TODO: Open signed container files
                 } catch {
                     EncryptViewModel.logger().error("Failed to open nested container: \(error)")
                     errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+                }
+            } else if isContainer {
+                do {
+                    try await openNestedSignedContainer(fileUrl: fileURL)
+                    await MainActor.run {
+                        navigateToNestedSignedContainerView = true
+                    }
+                } catch {
+                    SigningViewModel.logger().error(
+                        "Failed to open nested signed container: \(String(reflecting: error))"
+                    )
+                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+                    return
                 }
             } else {
                 previewFile = fileURL
@@ -407,6 +426,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             sharedContainerViewModel.removeLastContainer()
             let currentContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
             sharedContainerViewModel.setCryptoContainer(currentContainer)
+            if currentContainer == nil { return true }
             await loadContainerData(cryptoContainer: currentContainer)
             return false
         } else {
@@ -648,12 +668,30 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     }
 
     private func openNestedContainer(fileURL: URL) async throws {
-        if Constants.Extension.CryptoContainers.contains(fileURL.pathExtension) {
-            let container = try await fileOpeningService
-                .openOrCreateCryptoContainer(dataFiles: [fileURL])
-            await loadContainerData(cryptoContainer: container)
-        } else {
-            // TODO: Load nested crypto containers
-        }
+        let container = try await fileOpeningService
+            .openOrCreateCryptoContainer(dataFiles: [fileURL])
+        sharedContainerViewModel.setCryptoContainer(container)
+        await loadContainerData(cryptoContainer: container)
+    }
+
+    private func openNestedSignedContainer(fileUrl: URL) async throws {
+        let container = try await ContainerWrapper(
+            fileManager: fileManager
+        ).open(
+            containerFile: fileUrl,
+            isSivaConfirmed: sivaRepository.isSivaConfirmationNeeded(
+                files: [fileUrl]
+            )
+        )
+
+        let signedContainer = SignedContainer(
+            containerFile: fileUrl,
+            isExistingContainer: true,
+            container: container,
+            fileManager: Container.shared.fileManager(),
+            containerUtil: Container.shared.containerUtil()
+        )
+
+        sharedContainerViewModel.setSignedContainer(signedContainer)
     }
 }

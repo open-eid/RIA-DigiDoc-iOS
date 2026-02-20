@@ -32,6 +32,7 @@ struct DataFilesSection: View {
     @Binding var showSivaMessage: Bool
     @Binding var isFileSaved: Bool
     @Binding var showRemoveDataFileModal: Bool
+    @Binding var navigateToNestedCryptoContainerView: Bool
 
     private var sivaMessage: String {
         languageSettings.localized("Siva message")
@@ -48,7 +49,8 @@ struct DataFilesSection: View {
         selectedDataFile: Binding<DataFileWrapper?>,
         showSivaMessage: Binding<Bool>,
         isFileSaved: Binding<Bool>,
-        showRemoveDataFileModal: Binding<Bool>
+        showRemoveDataFileModal: Binding<Bool>,
+        navigateToNestedCryptoContainerView: Binding<Bool>
     ) {
         self.viewModel = viewModel
         self.isContainerSigned = isContainerSigned
@@ -57,6 +59,7 @@ struct DataFilesSection: View {
         self._showSivaMessage = showSivaMessage
         self._isFileSaved = isFileSaved
         self._showRemoveDataFileModal = showRemoveDataFileModal
+        self._navigateToNestedCryptoContainerView = navigateToNestedCryptoContainerView
     }
 
     var body: some View {
@@ -84,6 +87,10 @@ struct DataFilesSection: View {
             } else {
                 await viewModel.handleFileOpening(dataFile: dataFile, isSivaConfirmed: true)
             }
+
+            await MainActor.run {
+                navigateToNestedCryptoContainerView = viewModel.navigateToNestedCryptoContainerView
+            }
         }
     }
 
@@ -98,7 +105,11 @@ struct DataFilesSection: View {
             isPresented: $viewModel.isShowingFileSaver,
             fileURL: viewModel.selectedDataFile,
             languageSettings: languageSettings,
-            onComplete: { viewModel.removeSavedFilesDirectory() },
+            onComplete: {
+                if !isNestedContainer {
+                    viewModel.removeSavedFilesDirectory()
+                }
+            },
             isFileSaved: $isFileSaved
         )
     }
@@ -138,7 +149,8 @@ struct DataFilesSection: View {
         selectedDataFile: .constant(nil),
         showSivaMessage: .constant(false),
         isFileSaved: .constant(false),
-        showRemoveDataFileModal: .constant(false)
+        showRemoveDataFileModal: .constant(false),
+        navigateToNestedCryptoContainerView: .constant(false)
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

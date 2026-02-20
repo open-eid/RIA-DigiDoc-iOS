@@ -57,10 +57,14 @@ class CryptoHomeViewModel: CryptoHomeViewModelProtocol, Loggable {
         sharedContainerViewModel.setFileOpeningResult(fileOpeningResult: chosenFiles)
     }
 
+    func setFileOpeningMethod(_ method: FileOpeningMethod) {
+        sharedContainerViewModel.setFileOpeningMethod(method)
+    }
+
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appending(path: Constants.Folder.CryptoContainerFolder)
+                .appending(path: Constants.Folder.ContainerFolder)
         } catch {
             CryptoHomeViewModel.logger().error("Unable to get crypto recent documents folder: \(error)")
             return nil

@@ -83,7 +83,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         from sourceURL: URL,
     ) async throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.SignedContainerFolder],
+            subfolders: [Constants.Folder.ContainerFolder],
             fileManager: fileManager
         )
 

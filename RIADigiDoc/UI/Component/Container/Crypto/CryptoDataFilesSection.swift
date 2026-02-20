@@ -34,6 +34,7 @@ struct CryptoDataFilesSection: View {
     @Binding var showSivaMessage: Bool
     @Binding var isFileSaved: Bool
     @Binding var showRemoveDataFileModal: Bool
+    @Binding var navigateToNestedSignedContainerView: Bool
 
     init(
         viewModel: EncryptViewModel,
@@ -44,7 +45,8 @@ struct CryptoDataFilesSection: View {
         selectedDataFile: Binding<URL?>,
         showSivaMessage: Binding<Bool>,
         isFileSaved: Binding<Bool>,
-        showRemoveDataFileModal: Binding<Bool>
+        showRemoveDataFileModal: Binding<Bool>,
+        navigateToNestedSignedContainerView: Binding<Bool>
     ) {
         self.viewModel = viewModel
         self.showOpenFileButton = showOpenFileButton
@@ -55,6 +57,7 @@ struct CryptoDataFilesSection: View {
         self._showSivaMessage = showSivaMessage
         self._isFileSaved = isFileSaved
         self._showRemoveDataFileModal = showRemoveDataFileModal
+        self._navigateToNestedSignedContainerView = navigateToNestedSignedContainerView
     }
 
     private var sivaMessage: String {
@@ -91,6 +94,10 @@ struct CryptoDataFilesSection: View {
             } else {
                 await viewModel.handleFileOpening(dataFile: dataFile, isSivaConfirmed: true)
             }
+
+            await MainActor.run {
+                navigateToNestedSignedContainerView = viewModel.navigateToNestedSignedContainerView
+            }
         }
     }
 
@@ -105,7 +112,11 @@ struct CryptoDataFilesSection: View {
             isPresented: $viewModel.isShowingFileSaver,
             fileURL: viewModel.selectedDataFile,
             languageSettings: languageSettings,
-            onComplete: { viewModel.removeSavedFilesDirectory() },
+            onComplete: {
+                if !isNestedContainer {
+                    viewModel.removeSavedFilesDirectory()
+                }
+            },
             isFileSaved: $isFileSaved
         )
     }
@@ -135,4 +146,21 @@ struct CryptoDataFilesSection: View {
             await viewModel.handleFileOpening(dataFile: dataFile, isSivaConfirmed: confirmed)
         }
     }
+}
+
+#Preview {
+    CryptoDataFilesSection(
+        viewModel: Container.shared.encryptViewModel(),
+        showOpenFileButton: true,
+        showSaveFileButton: true,
+        showRemoveFileButton: true,
+        isNestedContainer: false,
+        selectedDataFile: .constant(nil),
+        showSivaMessage: .constant(false),
+        isFileSaved: .constant(false),
+        showRemoveDataFileModal: .constant(false),
+        navigateToNestedSignedContainerView: .constant(false)
+    )
+    .environment(Container.shared.languageSettings())
+    .environment(Container.shared.themeSettings())
 }

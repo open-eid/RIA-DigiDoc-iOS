@@ -65,7 +65,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     }
 
     @MainActor
-    public func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
+    public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
             subfolders: [CommonsLib.Constants.Folder.SavedFiles],
             fileManager: fileManager
@@ -80,8 +80,8 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
         do {
             try await DigiDocContainerWrapper.container(
-                containerFile.resolvedPath,
-                saveDataFile: dataFile.fileId,
+                containerURL.resolvedPath,
+                saveDataFile: dataFile.fileName,
                 to: tempSavedFileLocation.resolvedPath
             )
             ContainerWrapper.logger().info(

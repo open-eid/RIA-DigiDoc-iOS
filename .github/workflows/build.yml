@@ -114,7 +114,18 @@ jobs:
           -project RIADigiDoc.xcodeproj \
           -scheme AllTests \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
-          -quiet
+          -resultBundlePath TestResults.xcresult \
+          -quiet 2>&1 | grep -E "^(✗|.*FAILED|.*error:)" || true
+    - name: Test summary
+      if: always()
+      run: |
+        SUMMARY=$(xcrun xcresulttool get test-results summary --path TestResults.xcresult)
+        echo "$SUMMARY"
+
+        FAILED=$(echo "$SUMMARY" | jq '.failedTests')
+        if [ "$FAILED" -gt 0 ]; then
+          exit 1
+        fi
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"

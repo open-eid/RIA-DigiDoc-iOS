@@ -101,7 +101,8 @@ struct CryptoFileOpeningView: View {
 #Preview {
     FileOpeningView(
         isFileOpeningLoading: .constant(true),
-        isNavigatingToNextView: .constant(false)
+        isNavigatingToSigningView: .constant(false),
+        isNavigatingToEncryptView: .constant(false)
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

@@ -85,8 +85,7 @@ public struct Constants {
     }
 
     public struct Folder {
-        public static let SignedContainerFolder = "SignedContainers"
-        public static let CryptoContainerFolder = "CryptoContainers"
+        public static let ContainerFolder = "Containers"
         public static let Temp = "tempfiles"
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"

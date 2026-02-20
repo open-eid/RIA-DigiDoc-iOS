@@ -59,10 +59,14 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
         sharedContainerViewModel.setFileOpeningResult(fileOpeningResult: chosenFiles)
     }
 
+    func setFileOpeningMethod(_ method: FileOpeningMethod) {
+        sharedContainerViewModel.setFileOpeningMethod(method)
+    }
+
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)
-                .appending(path: Constants.Folder.SignedContainerFolder)
+                .appending(path: Constants.Folder.ContainerFolder)
         } catch {
             HomeViewModel.logger().error("Unable to get signed containers recent documents folder: \(error)")
             return nil

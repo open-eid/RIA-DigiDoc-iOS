@@ -55,7 +55,26 @@ struct HomeView: View {
     @State private var sharedFilesLoadingTask: Task<Void, Never>?
     @AccessibilityFocusState private var isFilesButtonFocused: Bool
 
-    private var filesBottomSheetActions: [BottomSheetButton] {
+    private var allContainerFilesBottomSheetActions: [BottomSheetButton] {
+        HomeViewBottomSheetActions.actions(
+            onOpenFilesClick: {
+                isImporting = true
+            },
+            onRecentDocumentsClick: {
+                containerType = .none
+                recentDocumentsExtensions =
+                    Constants.Container.ContainerExtensions + Constants.Container.CryptoContainerExtensions
+                pathManager.navigate(to:
+                        .recentDocumentsView(
+                            folderURL: getRecentDocumentsFolder(containerType: containerType),
+                            extensions: recentDocumentsExtensions
+                        )
+                )
+            }
+        )
+    }
+
+    private var signedFilesBottomSheetActions: [BottomSheetButton] {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
                 isImporting = true
@@ -140,12 +159,14 @@ struct HomeView: View {
                             description: languageSettings.localized("Main home open document description"),
                             assetImageName: "ic_m3_attach_file_48pt_wght400",
                             isFileOpeningLoading: $isFileOpeningLoading,
-                            isNavigatingToNextView: $isNavigatingToSigningView,
+                            isNavigatingToSigningView: $isNavigatingToSigningView,
+                            isNavigatingToEncryptView: $isNavigatingToEncryptView,
                             showBottomSheet: $showFilesBottomSheet,
                             isImporting: $isImporting,
-                            viewModel: viewModel
+                            viewModel: viewModel,
+                            fileOpeningMethod: .all
                         )
-                        .bottomSheet(isPresented: $showFilesBottomSheet, actions: filesBottomSheetActions)
+                        .bottomSheet(isPresented: $showFilesBottomSheet, actions: allContainerFilesBottomSheetActions)
                         .accessibilityFocused($isFilesButtonFocused)
 
                         SigningImportButton(
@@ -153,12 +174,14 @@ struct HomeView: View {
                             description: languageSettings.localized("Main home signature description"),
                             assetImageName: "ic_m3_stylus_note_48pt_wght400",
                             isFileOpeningLoading: $isFileOpeningLoading,
-                            isNavigatingToNextView: $isNavigatingToSigningView,
+                            isNavigatingToSigningView: $isNavigatingToSigningView,
+                            isNavigatingToEncryptView: $isNavigatingToEncryptView,
                             showBottomSheet: $showSignatureBottomSheet,
                             isImporting: $isImporting,
-                            viewModel: viewModel
+                            viewModel: viewModel,
+                            fileOpeningMethod: .signing
                         )
-                        .bottomSheet(isPresented: $showSignatureBottomSheet, actions: filesBottomSheetActions)
+                        .bottomSheet(isPresented: $showSignatureBottomSheet, actions: signedFilesBottomSheetActions)
 
                         CryptoImportButton(
                             title: languageSettings.localized("Main home crypto title"),
@@ -168,7 +191,8 @@ struct HomeView: View {
                             isNavigatingToNextView: $isNavigatingToEncryptView,
                             showBottomSheet: $showCryptoBottomSheet,
                             isImporting: $isCryptoImporting,
-                            viewModel: cryptoViewModel
+                            viewModel: cryptoViewModel,
+                            fileOpeningMethod: .crypto
                         )
                         .bottomSheet(isPresented: $showCryptoBottomSheet, actions: cryptoFilesBottomSheetActions)
 

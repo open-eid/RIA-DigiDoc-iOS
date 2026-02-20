@@ -486,7 +486,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
 
             default:
                 errorMessage = "Signing technical error"
-                idCardAlertMessageExtraArguments = ["ID card conditional speech"]
+                errorExtraArguments = ["ID card conditional speech"]
             }
 
         default:

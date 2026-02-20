@@ -283,7 +283,7 @@ extension CryptoContainer {
             let sanitizedName = dataFile.key.sanitized()
 
             let destinationPath = try Directories.getCacheDirectory(
-                subfolders: [Constants.Folder.CryptoContainerFolder, Constants.Folder.Temp],
+                subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
                 fileManager: fileManager
             )
 
@@ -371,8 +371,35 @@ extension CryptoContainer {
             dataFiles.append(fileUrl)
         }
 
+        let fileManager = Container.shared.fileManager()
+
+        let cryptoContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
+        let isFileInTempSignedContainerDirectory = containerFile.absoluteString.hasPrefix(
+            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = containerFile.absoluteString.hasPrefix(
+            cryptoContainersDirectory.absoluteString
+        ) && !isFileInTempSignedContainerDirectory
+
+        var renamedContainerFile = containerFile
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: containerFile,
+                in: isFileInRecentDocuments ? containerFile.deletingLastPathComponent() :
+                    containerFile.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: containerFile, to: renamedContainerFile)
+        }
+
         return try await create(
-            containerFile: containerFile,
+            containerFile: renamedContainerFile,
             dataFiles: dataFiles,
             recipients: recipients,
             isDecrypted: false,

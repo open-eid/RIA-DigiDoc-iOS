@@ -151,7 +151,7 @@ struct ContainerUtilTests {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
         let expectedDir = cachesDir
             .appending(path: BundleUtil.getBundleIdentifier())
-            .appending(path: Constants.Folder.SignedContainerFolder)
+            .appending(path: Constants.Folder.ContainerFolder)
 
         mockFileManager.urlHandler = { directory, _, _, _ in
             #expect(directory == .cachesDirectory)
@@ -184,10 +184,10 @@ struct ContainerUtilTests {
     @Test
     func getContainerDataFilesDir_returnDirectoryWhenFileInSignatureDirAndUseCacheDir() throws {
         let cachesDir = URL(fileURLWithPath: "/mock/cache")
-        let signatureDir = cachesDir.appending(path: Constants.Folder.SignedContainerFolder)
+        let signatureDir = cachesDir.appending(path: Constants.Folder.ContainerFolder)
         let containerFile = signatureDir.appending(path: "file.asice")
         let expectedDataDir = cachesDir
-            .appending(path: Constants.Folder.SignedContainerFolder)
+            .appending(path: Constants.Folder.ContainerFolder)
             .appending(path: "file.asice-data-files")
 
         mockFileManager.urlHandler = { _, _, _, _ in cachesDir }

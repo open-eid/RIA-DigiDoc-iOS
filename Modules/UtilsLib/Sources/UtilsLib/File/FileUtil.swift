@@ -115,23 +115,30 @@ public struct FileUtil: FileUtilProtocol, Loggable {
             FileUtil.logger().info("Checking if file is from iCloud")
             // Check if file is opened from iCloud
             if isFileFromiCloud(fileURL: resolvedURL) {
-                if !isFileDownloadedFromiCloud(fileURL: resolvedURL) {
-                    FileUtil.logger().info(
-                        "File '\(resolvedURL.lastPathComponent)' from iCloud is not downloaded. Downloading..."
-                    )
+                do {
+                    return try await withCheckedThrowingContinuation { continuation in
+                        let coordinator = NSFileCoordinator()
+                        var error: NSError?
 
-                    let downloadedFileUrl = await downloadFileFromiCloud(fileURL: resolvedURL)
-                    if let fileUrl = downloadedFileUrl {
-                        FileUtil.logger().info("File '\(resolvedURL.lastPathComponent)' downloaded from iCloud")
-                        return fileUrl
-                    } else {
-                        FileUtil.logger().info(
-                            "Unable to download file '\(resolvedURL.lastPathComponent)' from iCloud")
-                        return nil
+                        coordinator.coordinate(
+                            readingItemAt: url,
+                            options: .withoutChanges,
+                            error: &error
+                        ) { coordURL in
+                            continuation.resume(returning: coordURL)
+                        }
+
+                        if let error {
+                            continuation.resume(throwing: error)
+                        }
                     }
-                } else {
-                    FileUtil.logger().info("File '\(resolvedURL.lastPathComponent)' from iCloud is already downloaded")
-                    return url
+                } catch {
+                    let fileName = resolvedURL.lastPathComponent
+                    let errorDescription = String(reflecting: error)
+                    FileUtil.logger().error(
+                        "Unable to download file '\(fileName, privacy: .public)' from iCloud. \(errorDescription)"
+                    )
+                    return nil
                 }
             }
         }
@@ -208,17 +215,18 @@ public struct FileUtil: FileUtilProtocol, Loggable {
     public func downloadFileFromiCloud(fileURL: URL) async -> URL? {
         do {
             try fileManager.startDownloadingUbiquitousItem(at: fileURL)
-            FileUtil.logger().info("Downloading file '\(fileURL.lastPathComponent)' from iCloud")
+            FileUtil.logger().info("Downloading file '\(fileURL.lastPathComponent, privacy: .public)' from iCloud")
 
             while !isFileDownloadedFromiCloud(fileURL: fileURL) {
                 try await Task.sleep(for: .seconds(0.5))
             }
 
-            FileUtil.logger().info("iCloud file '\(fileURL.lastPathComponent)' downloaded")
+            FileUtil.logger().info("iCloud file '\(fileURL.lastPathComponent, privacy: .public)' downloaded")
             return fileURL
         } catch {
+            let fileName = fileURL.lastPathComponent
             FileUtil.logger().error(
-                "Unable to start iCloud file '\(fileURL.lastPathComponent)' download: \(error.localizedDescription)"
+                "Unable to start iCloud file '\(fileName, privacy: .public)' download: \(error.localizedDescription)"
             )
             return nil
         }
@@ -318,12 +326,14 @@ public struct FileUtil: FileUtilProtocol, Loggable {
 
     private func removeDirectory(at url: URL) {
         let filePath = url.path(percentEncoded: false)
-        FileUtil.logger().info("Removing \(filePath)")
+        FileUtil.logger().info("Removing \(filePath, privacy: .public)")
         do {
             try fileManager.removeItem(at: url)
-            FileUtil.logger().info("\(filePath) removed")
+            FileUtil.logger().info("\(filePath, privacy: .public) removed")
         } catch {
-            FileUtil.logger().error("Unable to remove \(filePath): \(error.localizedDescription)")
+            FileUtil.logger().error(
+                "Unable to remove \(filePath, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
         }
     }
 }

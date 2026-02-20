@@ -298,7 +298,7 @@ struct ContainerWrapperTests {
             return
         }
 
-        let savedFileURL = try await containerWrapper.saveDataFile(containerFile: containerFile, dataFile: dataFile)
+        let savedFileURL = try await containerWrapper.saveDataFile(dataFile: dataFile)
 
         #expect(savedFileURL.isValidURL())
         #expect(savedFileURL.lastPathComponent == dataFile.fileName)
@@ -306,14 +306,6 @@ struct ContainerWrapperTests {
 
     @Test
     func saveDataFile_throwErrorWhenInvalidDataFile() async throws {
-        let sampleContainer = try await createSampleContainer(dataFileURLs: dataFileURLs)
-
-        guard let containerFile = await sampleContainer.getRawContainerFile() else { return }
-
-        defer {
-            try? FileManager.default.removeItem(at: containerFile)
-        }
-
         let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "",
             fileName: "datafile-\(UUID().uuidString)",
@@ -321,11 +313,15 @@ struct ContainerWrapperTests {
             mediaType: CommonsLib.Constants.Extension.Default)
 
         do {
-            _ = try await containerWrapper.saveDataFile(containerFile: containerFile, dataFile: dataFile)
+            _ = try await containerWrapper.saveDataFile(dataFile: dataFile)
             Issue.record("Expected an error")
             return
         } catch let error as DigiDocError {
-            #expect(error.localizedDescription.contains("unable to save data file"))
+            guard case .containerDataFileSavingFailed = error else {
+                Issue.record("Unexpected DigiDocError error: \(error)")
+                return
+            }
+            #expect(true)
         } catch {
             Issue.record("Unexpected error: \(error)")
             return

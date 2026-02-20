@@ -119,11 +119,11 @@ struct FileOpeningViewModelTests {
         await viewModel.handleFiles()
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let isNavigatingToSigningView = viewModel.isNavigatingToSigningView
         let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
-        #expect(!isNavigatingToNextView)
+        #expect(!isNavigatingToSigningView)
         #expect(error.localizedDescription == errorMessage)
     }
 
@@ -143,11 +143,11 @@ struct FileOpeningViewModelTests {
         await viewModel.handleFiles()
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let isNavigatingToSigningView = viewModel.isNavigatingToSigningView
         let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
-        #expect(!isNavigatingToNextView)
+        #expect(!isNavigatingToSigningView)
         #expect(error.localizedDescription == errorMessage)
     }
 
@@ -177,11 +177,11 @@ struct FileOpeningViewModelTests {
         await viewModel.handleFiles()
 
         let isFileOpeningLoading = viewModel.isFileOpeningLoading
-        let isNavigatingToNextView = viewModel.isNavigatingToNextView
+        let isNavigatingToSigningView = viewModel.isNavigatingToSigningView
         let errorMessage = viewModel.errorMessage?.key
 
         #expect(!isFileOpeningLoading)
-        #expect(!isNavigatingToNextView)
+        #expect(!isNavigatingToSigningView)
         #expect(error.localizedDescription == errorMessage)
     }
 
@@ -194,6 +194,9 @@ struct FileOpeningViewModelTests {
             #expect(isSivaConfirmed)
             return mockContainer
         }
+
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+        mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
 
         await viewModel.handleSivaConfirmation()
 
@@ -211,7 +214,7 @@ struct FileOpeningViewModelTests {
         )
 
         #expect(viewModel.isSivaConfirmed)
-        #expect(viewModel.isNavigatingToNextView)
+        #expect(viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -224,13 +227,15 @@ struct FileOpeningViewModelTests {
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
         mockSivaRepository.isTimestampedContainerHandler = { _ in true }
         mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+        mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
 
         await viewModel.handleSivaConfirmation()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
         #expect(viewModel.isSivaConfirmed)
-        #expect(viewModel.isNavigatingToNextView)
+        #expect(viewModel.isNavigatingToSigningView)
     }
 
     @Test
@@ -242,13 +247,15 @@ struct FileOpeningViewModelTests {
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
         mockSivaRepository.isTimestampedContainerHandler = { _ in false }
         mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+        mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
 
         await viewModel.handleSivaConfirmation()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
         #expect(viewModel.isSivaConfirmed)
-        #expect(viewModel.isNavigatingToNextView)
+        #expect(viewModel.isNavigatingToSigningView)
     }
 
     @Test
@@ -259,10 +266,12 @@ struct FileOpeningViewModelTests {
             )
         }
 
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+
         await viewModel.handleSivaConfirmation()
 
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
     }
 
     @Test
@@ -291,7 +300,7 @@ struct FileOpeningViewModelTests {
         #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
         #expect(!viewModel.isSivaConfirmed)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -321,6 +330,8 @@ struct FileOpeningViewModelTests {
             return mockSignedContainer
         }
 
+        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
+
         await viewModel.handleFiles()
 
         await viewModel.handleSivaCancellation()
@@ -334,7 +345,7 @@ struct FileOpeningViewModelTests {
                 .getRawContainerFile() == rawContainerFile
         )
         #expect(!viewModel.isSivaConfirmed)
-        #expect(viewModel.isNavigatingToNextView)
+        #expect(viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -372,7 +383,7 @@ struct FileOpeningViewModelTests {
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
         #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
         #expect(!viewModel.isSivaConfirmed)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -402,7 +413,7 @@ struct FileOpeningViewModelTests {
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
         #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
         #expect(!viewModel.isSivaConfirmed)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -415,7 +426,7 @@ struct FileOpeningViewModelTests {
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 0)
         #expect(mockSharedContainerViewModel.setAddedFilesCountCallCount == 1)
         #expect(!viewModel.isSivaConfirmed)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
         #expect(!viewModel.isFileOpeningLoading)
     }
 
@@ -475,7 +486,7 @@ struct FileOpeningViewModelTests {
 
         #expect(viewModel.errorMessage == nil)
         #expect(!viewModel.isFileOpeningLoading)
-        #expect(!viewModel.isNavigatingToNextView)
+        #expect(!viewModel.isNavigatingToSigningView)
     }
 
     @Test

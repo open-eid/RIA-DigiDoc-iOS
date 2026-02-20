@@ -253,7 +253,9 @@ struct EncryptView: View {
                                         fileURL: tempContainerURL,
                                         languageSettings: languageSettings,
                                         onComplete: {
-                                            viewModel.removeSavedFilesDirectory()
+                                            if !isNestedContainer {
+                                                viewModel.removeSavedFilesDirectory()
+                                            }
                                         },
                                         isFileSaved: $isFileSaved
                                     )
@@ -282,7 +284,9 @@ struct EncryptView: View {
                                             selectedDataFile: $selectedDataFile,
                                             showSivaMessage: $showSivaMessage,
                                             isFileSaved: $isFileSaved,
-                                            showRemoveDataFileModal: $showRemoveDataFileModal
+                                            showRemoveDataFileModal: $showRemoveDataFileModal,
+                                            navigateToNestedSignedContainerView:
+                                                $viewModel.navigateToNestedSignedContainerView
                                         )
                                         .background(
                                             FileSaverHandler(
@@ -290,7 +294,9 @@ struct EncryptView: View {
                                                 fileURL: viewModel.selectedDataFile,
                                                 languageSettings: languageSettings,
                                                 onComplete: {
-                                                    viewModel.removeSavedFilesDirectory()
+                                                    if !isNestedContainer {
+                                                        viewModel.removeSavedFilesDirectory()
+                                                    }
                                                 },
                                                 isFileSaved: $isFileSaved
                                             )
@@ -314,7 +320,9 @@ struct EncryptView: View {
                                                     selectedDataFile: $selectedDataFile,
                                                     showSivaMessage: $showSivaMessage,
                                                     isFileSaved: $isFileSaved,
-                                                    showRemoveDataFileModal: $showRemoveDataFileModal
+                                                    showRemoveDataFileModal: $showRemoveDataFileModal,
+                                                    navigateToNestedSignedContainerView:
+                                                        $viewModel.navigateToNestedSignedContainerView
                                                 )
                                             } else {
                                                 CryptoDataFilesLockedSection()
@@ -493,6 +501,12 @@ struct EncryptView: View {
                 languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
             )
             viewModel.resetSuccessMessage()
+        }
+        .onChange(of: viewModel.navigateToNestedSignedContainerView) { _, isNavigating in
+            if isNavigating {
+                viewModel.navigateToNestedSignedContainerView.toggle()
+                pathManager.navigate(to: .signingView)
+            }
         }
     }
 

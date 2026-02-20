@@ -28,6 +28,7 @@ struct CryptoImportButton: View {
     @Binding var showBottomSheet: Bool
 
     @Binding var isImporting: Bool
+    var fileOpeningMethod: FileOpeningMethod
 
     @State private var viewModel: CryptoHomeViewModel
 
@@ -39,7 +40,8 @@ struct CryptoImportButton: View {
         isNavigatingToNextView: Binding<Bool>,
         showBottomSheet: Binding<Bool>,
         isImporting: Binding<Bool>,
-        viewModel: CryptoHomeViewModel
+        viewModel: CryptoHomeViewModel,
+        fileOpeningMethod: FileOpeningMethod
     ) {
         self.title = title
         self.description = description
@@ -49,6 +51,7 @@ struct CryptoImportButton: View {
         self._showBottomSheet = showBottomSheet
         self._isImporting = isImporting
         self.viewModel = viewModel
+        self.fileOpeningMethod = fileOpeningMethod
     }
 
     var body: some View {
@@ -73,6 +76,7 @@ struct CryptoImportButton: View {
                 isFileOpeningLoading = true
                 isImporting = false
                 viewModel.setChosenFiles(result)
+                viewModel.setFileOpeningMethod(fileOpeningMethod)
 
                 for url in urls {
                     url.stopAccessingSecurityScopedResource()

@@ -19,20 +19,8 @@
 
 import Foundation
 
-public struct SystemUtil: Loggable {
-    public static var isSimulator: Bool {
-        #if targetEnvironment(simulator)
-            logger().info("App is running on a simulator")
-            return true
-        #else
-            return false
-        #endif
-    }
-
-    public static func getOSVersion() -> String {
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let versionString = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
-        logger().info("Operating system version: \(versionString, privacy: .public)")
-        return versionString
-    }
+public enum FileOpeningMethod: Int, Sendable {
+    case all = 0
+    case signing = 1
+    case crypto = 2
 }

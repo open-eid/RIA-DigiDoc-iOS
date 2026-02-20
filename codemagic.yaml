@@ -234,6 +234,7 @@ workflows:
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
+          export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
           export TSL_FILES_DIRECTORY="$CONFIG_DIRECTORY/tslFiles.bundle"
 
           # Create TSL folder and mock folders for each module

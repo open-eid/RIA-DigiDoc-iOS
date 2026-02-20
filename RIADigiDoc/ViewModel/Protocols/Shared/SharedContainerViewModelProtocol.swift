@@ -40,4 +40,7 @@ public protocol SharedContainerViewModelProtocol: Sendable {
 
     func setIsSignatureAdded(_ isAdded: Bool)
     func getIsSignatureAdded() -> Bool
+
+    func setFileOpeningMethod(_ method: FileOpeningMethod)
+    func getFileOpeningMethod() -> FileOpeningMethod
 }
