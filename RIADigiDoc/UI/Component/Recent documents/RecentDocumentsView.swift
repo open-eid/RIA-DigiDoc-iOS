@@ -33,6 +33,7 @@ struct RecentDocumentsView: View {
 
     @State private var isFileOpeningLoading = false
     @State private var isNavigatingToSigningView = false
+    @State private var isNavigatingToEncryptView = false
     @State private var selectedFile: FileItem?
     @State private var showRemoveContainerModal = false
 
@@ -150,7 +151,8 @@ struct RecentDocumentsView: View {
                             .fullScreenCover(isPresented: $isFileOpeningLoading) {
                                 FileOpeningView(
                                     isFileOpeningLoading: $isFileOpeningLoading,
-                                    isNavigatingToNextView: $isNavigatingToSigningView
+                                    isNavigatingToSigningView: $isNavigatingToSigningView,
+                                    isNavigatingToEncryptView: $isNavigatingToEncryptView
                                 )
                             }
                         }

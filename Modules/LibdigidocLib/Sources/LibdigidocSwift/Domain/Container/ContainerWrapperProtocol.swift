@@ -29,7 +29,7 @@ public protocol ContainerWrapperProtocol: Sendable {
     func create(file: URL, dataFiles: [String]) async throws
     func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
     @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol
-    func saveDataFile(containerFile: URL, dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
+    func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
     @discardableResult func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol
     func prepareSignature(
@@ -42,7 +42,7 @@ public protocol ContainerWrapperProtocol: Sendable {
 }
 
 extension ContainerWrapperProtocol {
-    func saveDataFile(containerFile: URL, dataFile: DataFileWrapper) async throws -> URL {
-        try await saveDataFile(containerFile: containerFile, dataFile: dataFile, to: nil)
+    func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
+        try await saveDataFile(dataFile: dataFile, to: nil)
     }
 }

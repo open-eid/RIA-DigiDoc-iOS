@@ -198,15 +198,7 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
     }
 
     public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
-        guard let containerFileURL = containerFile else {
-            throw DigiDocError.containerDataFileSavingFailed(
-                ErrorDetail(
-                    message: "Unable to save container. No container file found.",
-                    userInfo: ["fileName": containerFile?.lastPathComponent ?? "N/A"]
-                )
-            )
-        }
-        return try await container.saveDataFile(containerFile: containerFileURL, dataFile: dataFile, to: directory)
+        return try await container.saveDataFile(dataFile: dataFile, to: directory)
     }
 
     public func getNestedTimestampedContainer() async throws -> SignedContainerProtocol? {
@@ -362,7 +354,7 @@ extension SignedContainer {
         let fileManager = Container.shared.fileManager()
 
         let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.SignedContainerFolder],
+            subfolders: [Constants.Folder.ContainerFolder],
             fileManager: fileManager
         )
 

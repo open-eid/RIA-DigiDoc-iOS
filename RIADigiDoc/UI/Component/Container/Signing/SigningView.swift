@@ -58,8 +58,6 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
-    @State private var isNavigatingToContainerSigningView = false
-
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
     private var containerTitle: String {
@@ -231,7 +229,9 @@ struct SigningView: View {
                                         fileURL: tempContainerURL,
                                         languageSettings: languageSettings,
                                         onComplete: {
-                                            viewModel.removeSavedFilesDirectory()
+                                            if !isNestedContainer {
+                                                viewModel.removeSavedFilesDirectory()
+                                            }
                                         },
                                         isFileSaved: $isFileSaved
                                     )
@@ -255,7 +255,9 @@ struct SigningView: View {
                                                 selectedDataFile: $selectedDataFile,
                                                 showSivaMessage: $showSivaMessage,
                                                 isFileSaved: $isFileSaved,
-                                                showRemoveDataFileModal: $showRemoveDataFileModal
+                                                showRemoveDataFileModal: $showRemoveDataFileModal,
+                                                navigateToNestedCryptoContainerView:
+                                                    $viewModel.navigateToNestedCryptoContainerView
                                             )
                                         } else {
                                             SignaturesListView(
@@ -289,7 +291,9 @@ struct SigningView: View {
                                             selectedDataFile: $selectedDataFile,
                                             showSivaMessage: $showSivaMessage,
                                             isFileSaved: $isFileSaved,
-                                            showRemoveDataFileModal: $showRemoveDataFileModal
+                                            showRemoveDataFileModal: $showRemoveDataFileModal,
+                                            navigateToNestedCryptoContainerView:
+                                                $viewModel.navigateToNestedCryptoContainerView
                                         )
                                         .background(
                                             FileSaverHandler(
@@ -297,7 +301,9 @@ struct SigningView: View {
                                                 fileURL: viewModel.selectedDataFile,
                                                 languageSettings: languageSettings,
                                                 onComplete: {
-                                                    viewModel.removeSavedFilesDirectory()
+                                                    if !isNestedContainer {
+                                                        viewModel.removeSavedFilesDirectory()
+                                                    }
                                                 },
                                                 isFileSaved: $isFileSaved
                                             )
@@ -438,6 +444,12 @@ struct SigningView: View {
                 languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
             )
             viewModel.resetSuccessMessage()
+        }
+        .onChange(of: viewModel.navigateToNestedCryptoContainerView) { _, isNavigating in
+            if isNavigating {
+                viewModel.navigateToNestedCryptoContainerView.toggle()
+                pathManager.navigate(to: .encryptView(isWithEncryption: false))
+            }
         }
     }
 

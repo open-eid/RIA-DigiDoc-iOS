@@ -31,6 +31,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol {
     private var addedFilesCount: Int = 0
     private var nestedContainers: [GeneralContainer] = []
     private var isSignatureAdded: Bool = false
+    private var fileOpeningMethod: FileOpeningMethod = .all
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
@@ -56,6 +57,14 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol {
 
     func getAddedFilesCount() -> Int {
         return addedFilesCount
+    }
+
+    func setFileOpeningMethod(_ method: FileOpeningMethod) {
+        self.fileOpeningMethod = method
+    }
+
+    func getFileOpeningMethod() -> FileOpeningMethod {
+        return fileOpeningMethod
     }
 
     private func addNestedContainer(_ container: GeneralContainer?) {

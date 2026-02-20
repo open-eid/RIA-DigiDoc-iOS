@@ -22,12 +22,14 @@ import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
+import CryptoSwift
 
 @Observable
 @MainActor
 class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     var isFileOpeningLoading: Bool = false
-    var isNavigatingToNextView: Bool = false
+    var isNavigatingToSigningView: Bool = false
+    var isNavigatingToEncryptView: Bool = false
     var isSivaConfirmed = false
 
     var signedContainer: SignedContainerProtocol = SignedContainer(
@@ -86,14 +88,20 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
-            let container = try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
-            if await container.getContainerMimetype() == Constants.MimeType.Asics {
-                try await handleAsicsSivaConfirmation(parentContainer: container)
-            } else {
-                sharedContainerViewModel.setSignedContainer(container)
+            let container = try await openOrCreateContainer(withUrls: files)
+            if let signedContainer = container as? SignedContainerProtocol {
+                if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
+                    try await handleAsicsSivaConfirmation(parentContainer: signedContainer)
+                } else {
+                    sharedContainerViewModel.setSignedContainer(signedContainer)
+                }
+
+                try await signedContainer.getRawContainerFile()?.markAsOpened()
+            } else if let cryptoContainer = container as? CryptoContainerProtocol {
+                sharedContainerViewModel.setCryptoContainer(cryptoContainer)
+                try await cryptoContainer.getRawContainerFile()?.markAsOpened()
             }
 
-            try await container.getRawContainerFile()?.markAsOpened()
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
             FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)")
@@ -140,7 +148,8 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     func handleError() {
         errorMessage = nil
         isFileOpeningLoading = false
-        isNavigatingToNextView = false
+        isNavigatingToSigningView = false
+        isNavigatingToEncryptView = false
     }
 
     func isSivaConfirmationNeeded() async -> Bool {
@@ -161,9 +170,13 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     }
 
     private func handleLoadingSuccess(isSivaConfirmed: Bool) {
+        let currentContainer = sharedContainerViewModel.currentContainer()
+        let isSignedContainer = (currentContainer as? SignedContainerProtocol) != nil
+        let isCryptoContainer = (currentContainer as? CryptoContainerProtocol) != nil
         self.isSivaConfirmed = isSivaConfirmed
         isFileOpeningLoading = false
-        isNavigatingToNextView = true
+        isNavigatingToSigningView = isSignedContainer
+        isNavigatingToEncryptView = isCryptoContainer
     }
 
     private func handleError(_ error: Error) {
@@ -173,8 +186,44 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         if let dde = error as? DigiDocError {
             FileOpeningViewModel.logger().error("\(String(reflecting: dde), privacy: .public)")
             errorMessage = createToastMessage(for: dde)
+            let fileName = dde.errorDetail.userInfo["fileName"] as? String
+            guard let file = fileName else { return }
+            removeUnsuccessfulContainer(fileName: file)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)
+        }
+    }
+
+    private func removeUnsuccessfulContainer(fileName: String) {
+        do {
+            let containerUrl = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.ContainerFolder],
+                fileManager: fileManager
+            )
+                .appending(path: fileName, directoryHint: .notDirectory)
+
+            try fileManager.removeItem(at: containerUrl)
+        } catch {
+            FileOpeningViewModel.logger().error(
+                "Unable to remove unsuccessful container: \(String(reflecting: error))"
+            )
+        }
+    }
+
+    private func openOrCreateContainer(withUrls urls: [URL]) async throws -> GeneralContainer {
+        let fileOpeningMethod = sharedContainerViewModel.getFileOpeningMethod()
+        switch fileOpeningMethod {
+        case .all:
+            guard let firstFile = urls.first else { throw FileOpeningError.noDataFiles }
+            let isCryptoContainer = await firstFile.isCryptoContainer()
+            if isCryptoContainer {
+                return try await fileOpeningRepository.openOrCreateCryptoContainer(urls: urls)
+            }
+            return try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
+        case .signing:
+            return try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
+        case .crypto:
+            return try await fileOpeningRepository.openOrCreateCryptoContainer(urls: urls)
         }
     }
 

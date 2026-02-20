@@ -25,10 +25,12 @@ struct SigningImportButton: View {
     let description: String
     let assetImageName: String
     @Binding var isFileOpeningLoading: Bool
-    @Binding var isNavigatingToNextView: Bool
+    @Binding var isNavigatingToSigningView: Bool
+    @Binding var isNavigatingToEncryptView: Bool
     @Binding var showBottomSheet: Bool
 
     @Binding var isImporting: Bool
+    var fileOpeningMethod: FileOpeningMethod
 
     @State private var viewModel: HomeViewModel
 
@@ -37,19 +39,23 @@ struct SigningImportButton: View {
         description: String,
         assetImageName: String,
         isFileOpeningLoading: Binding<Bool>,
-        isNavigatingToNextView: Binding<Bool>,
+        isNavigatingToSigningView: Binding<Bool>,
+        isNavigatingToEncryptView: Binding<Bool>,
         showBottomSheet: Binding<Bool>,
         isImporting: Binding<Bool>,
-        viewModel: HomeViewModel
+        viewModel: HomeViewModel,
+        fileOpeningMethod: FileOpeningMethod
     ) {
         self.title = title
         self.description = description
         self.assetImageName = assetImageName
         self._isFileOpeningLoading = isFileOpeningLoading
-        self._isNavigatingToNextView = isNavigatingToNextView
+        self._isNavigatingToSigningView = isNavigatingToSigningView
+        self._isNavigatingToEncryptView = isNavigatingToEncryptView
         self._showBottomSheet = showBottomSheet
         self._isImporting = isImporting
         self.viewModel = viewModel
+        self.fileOpeningMethod = fileOpeningMethod
     }
 
     var body: some View {
@@ -74,6 +80,7 @@ struct SigningImportButton: View {
                 isFileOpeningLoading = true
                 isImporting = false
                 viewModel.setChosenFiles(result)
+                viewModel.setFileOpeningMethod(fileOpeningMethod)
 
                 for url in urls {
                     url.stopAccessingSecurityScopedResource()
@@ -86,7 +93,8 @@ struct SigningImportButton: View {
         .fullScreenCover(isPresented: $isFileOpeningLoading) {
             FileOpeningView(
                 isFileOpeningLoading: $isFileOpeningLoading,
-                isNavigatingToNextView: $isNavigatingToNextView
+                isNavigatingToSigningView: $isNavigatingToSigningView,
+                isNavigatingToEncryptView: $isNavigatingToEncryptView
             )
         }
     }

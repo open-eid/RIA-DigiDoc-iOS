@@ -29,7 +29,8 @@ struct FileOpeningView: View {
     @State private var viewModel: FileOpeningViewModel
 
     @Binding var isFileOpeningLoading: Bool
-    @Binding var isNavigatingToNextView: Bool
+    @Binding var isNavigatingToSigningView: Bool
+    @Binding var isNavigatingToEncryptView: Bool
 
     @State private var showSivaMessage = false
 
@@ -41,15 +42,22 @@ struct FileOpeningView: View {
         languageSettings.localized("Siva message url")
     }
 
+    private var isErrorShown: Bool {
+        guard let errorMessage = viewModel.errorMessage else { return false }
+        return !errorMessage.key.isEmpty
+    }
+
     @State private var fileHandlingTask: Task<Void, Never>?
 
     init(
         isFileOpeningLoading: Binding<Bool>,
-        isNavigatingToNextView: Binding<Bool>
+        isNavigatingToSigningView: Binding<Bool>,
+        isNavigatingToEncryptView: Binding<Bool>
     ) {
         _viewModel = State(wrappedValue: Container.shared.fileOpeningViewModel())
         _isFileOpeningLoading = isFileOpeningLoading
-        _isNavigatingToNextView = isNavigatingToNextView
+        _isNavigatingToSigningView = isNavigatingToSigningView
+        _isNavigatingToEncryptView = isNavigatingToEncryptView
     }
 
     var body: some View {
@@ -91,6 +99,11 @@ struct FileOpeningView: View {
 
         await viewModel.handleFiles()
 
+        if isErrorShown {
+            await handleFileOpening()
+            return
+        }
+
         if await viewModel.isSivaConfirmationNeeded() {
             showSivaMessage = true
         } else {
@@ -104,7 +117,8 @@ struct FileOpeningView: View {
         let errorMessage = viewModel.errorMessage
         if errorMessage == nil {
             isFileOpeningLoading = viewModel.isFileOpeningLoading
-            isNavigatingToNextView = viewModel.isNavigatingToNextView
+            isNavigatingToSigningView = viewModel.isNavigatingToSigningView
+            isNavigatingToEncryptView = viewModel.isNavigatingToEncryptView
 
             let isSivaConfirmed = viewModel.isSivaConfirmed
             let showFileAddedMessage = await viewModel.showFileAddedMessage()
@@ -120,7 +134,8 @@ struct FileOpeningView: View {
             Toast.show(languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? []))
             viewModel.handleError()
             isFileOpeningLoading = viewModel.isFileOpeningLoading
-            isNavigatingToNextView = viewModel.isNavigatingToNextView
+            isNavigatingToSigningView = viewModel.isNavigatingToSigningView
+            isNavigatingToEncryptView = viewModel.isNavigatingToEncryptView
         }
     }
 }
@@ -128,7 +143,8 @@ struct FileOpeningView: View {
 #Preview {
     FileOpeningView(
         isFileOpeningLoading: .constant(true),
-        isNavigatingToNextView: .constant(false)
+        isNavigatingToSigningView: .constant(false),
+        isNavigatingToEncryptView: .constant(false),
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

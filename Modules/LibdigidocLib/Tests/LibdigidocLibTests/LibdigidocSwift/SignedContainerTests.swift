@@ -187,7 +187,7 @@ final class SignedContainerTests {
 
         mockContainerUtil.getContainerFileHandler = { _, _ in uniqueFileURL }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
+        mockContainerWrapper.saveDataFileHandler = { _, _ in uniqueFileURL }
 
         mockFileManager.moveItemHandler = { _, _ in
             do {
@@ -274,7 +274,7 @@ final class SignedContainerTests {
             return uniqueFileURL
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _, _ in uniqueFileURL }
+        mockContainerWrapper.saveDataFileHandler = { _, _ in uniqueFileURL }
 
         mockFileManager.moveItemHandler = { _, _ in
             do {
@@ -371,7 +371,7 @@ final class SignedContainerTests {
             [MockDataFileWrapper.mockDataFileWrapper()]
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
             return URL(fileURLWithPath: "/tmp/mockFile.txt")
         }
 
@@ -451,7 +451,7 @@ final class SignedContainerTests {
             mockContainerDataFilesDirURL
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
             testContainer
         }
 
@@ -554,7 +554,7 @@ final class SignedContainerTests {
             mockContainerDataFilesDirURL
         }
 
-        mockContainerWrapper.saveDataFileHandler = { _, _, _ in
+        mockContainerWrapper.saveDataFileHandler = { _, _ in
             throw URLError(.fileDoesNotExist)
         }
 

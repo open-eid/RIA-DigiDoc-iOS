@@ -559,6 +559,6 @@ final class IdCardViewModelTests {
 
         #expect(result == nil)
         #expect(viewModel.errorMessage == "Signing technical error")
-        #expect(viewModel.idCardAlertMessageExtraArguments == ["ID card conditional speech"])
+        #expect(viewModel.errorExtraArguments == ["ID card conditional speech"])
     }
 }

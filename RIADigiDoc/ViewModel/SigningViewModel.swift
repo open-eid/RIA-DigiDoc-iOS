@@ -43,6 +43,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
+    var navigateToNestedCryptoContainerView = false
     private(set) var containerNotifications: [ContainerNotificationType] = []
     private(set) var errorMessage: ToastMessage?
     private(set) var successMessage: ToastMessage?
@@ -82,12 +83,12 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
-        SigningViewModel.logger().info("Loading container data")
+        SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
-            SigningViewModel.logger().error("Cannot load container data. Signed container is nil.")
+            SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
@@ -105,7 +106,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
-        SigningViewModel.logger().info("Container data loaded")
+        SigningViewModel.logger().info("Signed container data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
@@ -136,13 +137,13 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
         guard let containerLocation = containerURL else {
-            SigningViewModel.logger().error("Unable to get container to create copy for saving")
+            SigningViewModel.logger().error("Unable to get signed container to create copy for saving")
             return nil
         }
 
         do {
             let savedFilesDirectory = try Directories.getCacheDirectory(
-                subfolders: [CommonsLib.Constants.Folder.SavedFiles],
+                subfolders: [Constants.Folder.SavedFiles, Constants.Folder.Temp],
                 fileManager: fileManager
             )
 
@@ -380,8 +381,14 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                 return
             }
 
-            if Constants.MimeType.SignatureContainers.contains(mimeType) {
+            let isContainer = await fileURL.isContainer()
+            let isCryptoContainer = await fileURL.isCryptoContainer()
+
+            if isContainer {
                 do {
+                    await MainActor.run {
+                        navigateToNestedCryptoContainerView = false
+                    }
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
                     SigningViewModel.logger().error("Failed to open nested container: \(error)")
@@ -395,6 +402,19 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                         SigningViewModel.logger().error("Failed to open nested container: \(error)")
                         errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
                     }
+                }
+            } else if isCryptoContainer {
+                do {
+                    try await openNestedCryptoContainer(fileUrl: fileURL)
+                    await MainActor.run {
+                        navigateToNestedCryptoContainerView = true
+                    }
+                } catch {
+                    SigningViewModel.logger().error(
+                        "Failed to open nested crypto container: \(String(reflecting: error))"
+                    )
+                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
+                    return
                 }
             } else {
                 previewFile = fileURL
@@ -424,8 +444,10 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         switch result {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
-        case .failure:
-            errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
+        case .failure(let error):
+            SigningViewModel.logger().error(
+                "Unable to get data file '\(dataFile.fileName)' URL: \(String(reflecting: error))"
+            )
             return false
         }
     }
@@ -437,10 +459,14 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func handleBackButton() async -> Bool {
+        await MainActor.run {
+            navigateToNestedCryptoContainerView = false
+        }
         if sharedContainerViewModel.containers().count > 1 {
             sharedContainerViewModel.removeLastContainer()
             let currentContainer = sharedContainerViewModel.currentContainer() as? any SignedContainerProtocol
             sharedContainerViewModel.setSignedContainer(currentContainer)
+            if currentContainer == nil { return true }
             await loadContainerData(signedContainer: currentContainer)
             return false
         } else {
@@ -606,5 +632,11 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             sharedContainerViewModel.setSignedContainer(container)
             await loadContainerData(signedContainer: container)
         }
+    }
+
+    private func openNestedCryptoContainer(fileUrl: URL) async throws {
+        let container = try await fileOpeningService
+            .openOrCreateCryptoContainer(dataFiles: [fileUrl])
+        sharedContainerViewModel.setCryptoContainer(container)
     }
 }
