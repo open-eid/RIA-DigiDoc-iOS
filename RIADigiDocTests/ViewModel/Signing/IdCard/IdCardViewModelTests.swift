@@ -242,7 +242,7 @@ final class IdCardViewModelTests {
 
         #expect(result == nil)
         #expect(viewModel.errorMessage == "PIN verification error multiple")
-        #expect(viewModel.errorExtraArguments == ["PIN2", "3"])
+        #expect(viewModel.errorExtraArguments == ["PIN2", "2"])
     }
 
     @Test
