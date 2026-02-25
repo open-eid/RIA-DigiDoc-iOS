@@ -189,14 +189,17 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         } catch {
             SmartIdViewModel.logger().info("Smart-ID: Unable to request certificate or get response")
             handleSigningError(error)
+            await endLiveActivity()
             return nil
         }
 
         guard let cert = response.cert?.value else {
+            await endLiveActivity()
             return nil
         }
 
         guard let documentNumber = response.result?.documentNumber else {
+            await endLiveActivity()
             return nil
         }
 
@@ -212,6 +215,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         } catch {
             SmartIdViewModel.logger().info("Smart-ID: Unable to prepare signature for signing")
             handleSigningError(error)
+            await endLiveActivity()
             return nil
         }
 
@@ -236,6 +240,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().error(
                 "Smart-ID: Unable to send verification code (control code) notification. \(error)"
             )
+            await endLiveActivity()
         }
 
         let signatureData: Data
@@ -659,7 +664,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             attributes: attributes,
             content: ActivityContent(
                 state: initialState,
-                staleDate: Date.now.addingTimeInterval(100000),
+                staleDate: Date.now.addingTimeInterval(120),
                 relevanceScore: 100.0
             ),
             pushType: nil
@@ -709,5 +714,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         )
 
         self.activity = nil
+
+        SmartIdViewModel.logger().info("Smart-ID: Live Activity ended")
     }
 }

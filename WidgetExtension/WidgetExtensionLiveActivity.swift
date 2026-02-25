@@ -49,9 +49,23 @@ struct WidgetExtensionLiveActivity: Widget {
                             .bold()
                     }
                 }
-            } compactLeading: { Text(verbatim: context.state.compactTitle) }
-            compactTrailing: { Text(verbatim: context.state.controlCode) }
-            minimal: { Text(verbatim: context.state.controlCode) }
+            } compactLeading: {
+                Image("image_id_ee")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(2)
+                    .accessibilityLabel("DigiDoc")
+            }
+            compactTrailing: {
+                Text(verbatim: context.state.controlCode)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            minimal: {
+                Text(verbatim: context.state.controlCode)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
         }
     }
 }
