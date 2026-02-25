@@ -164,15 +164,14 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             return nil
         }
 
-        var isNotificationPermissionGranted = false
+        let isNotificationPermissionGranted = await notificationUtil.requestAuthorization()
+
         do {
             try startLiveActivity(withTexts: liveActivityTexts)
         } catch {
             SmartIdViewModel.logger().error(
-                "Smart-ID: Unable to start live activity for verification code (control code). \(error)"
+                "Smart-ID: Unable to start live activity for verification code (control code). \(String(reflecting: error))"
             )
-
-            isNotificationPermissionGranted = await notificationUtil.requestAuthorization()
         }
 
         let response: SmartIdSessionResponse
