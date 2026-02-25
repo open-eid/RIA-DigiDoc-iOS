@@ -277,8 +277,8 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
-					<string>application/vnd.etsi.asic-e+zip</string>
 					<string>application/octet-stream</string>
+					<string>application/vnd.etsi.asic-e+zip</string>
 				</array>
 			</dict>
 		</dict>
@@ -309,9 +309,9 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
+					<string>application/octet-stream</string>
 					<string>application/vnd.bdoc-1.0</string>
 					<string>application/vnd.etsi.asic-e+zip</string>
-					<string>application/octet-stream</string>
 				</array>
 			</dict>
 		</dict>
@@ -374,8 +374,8 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
-					<string>application/vnd.etsi.asic-e+zip</string>
 					<string>application/octet-stream</string>
+					<string>application/vnd.etsi.asic-e+zip</string>
 				</array>
 			</dict>
 		</dict>
@@ -406,6 +406,39 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
+					<string>application/octet-stream</string>
+					<string>application/x-cdoc</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+				<string>public.item</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>DigiDoc Container cdoc2</string>
+			<key>UTTypeIconFile</key>
+			<string>digidoc_icon</string>
+			<key>UTTypeIcons</key>
+			<dict>
+				<key>UTTypeIconBadgeName</key>
+				<string>digidoc_icon</string>
+			</dict>
+			<key>UTTypeIdentifier</key>
+			<string>ee.ria.digidoc-cdoc2</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cdoc2</string>
+					<string>CDOC2</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/octet-stream</string>
 					<string>application/x-cdoc</string>
 				</array>
 			</dict>
@@ -437,8 +470,8 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
-					<string>application/vnd.lt.archyvai.adoc-2008</string>
 					<string>application/octet-stream</string>
+					<string>application/vnd.lt.archyvai.adoc-2008</string>
 				</array>
 			</dict>
 		</dict>
@@ -500,8 +533,8 @@
 				</array>
 				<key>public.mime-type</key>
 				<array>
-					<string>application/vnd.etsi.asic-s+zip</string>
 					<string>application/octet-stream</string>
+					<string>application/vnd.etsi.asic-s+zip</string>
 				</array>
 			</dict>
 		</dict>
@@ -699,6 +732,38 @@
 				<array>
 					<string>cdoc</string>
 					<string>CDOC</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/x-cdoc</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+				<string>public.cdoc</string>
+				<string>public.item</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Digidoc Container cdoc2</string>
+			<key>UTTypeIconFile</key>
+			<string>digidoc_icon</string>
+			<key>UTTypeIcons</key>
+			<dict>
+				<key>UTTypeIconBadgeName</key>
+				<string>digidoc_icon</string>
+			</dict>
+			<key>UTTypeIdentifier</key>
+			<string>ee.ria.digidoc</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cdoc2</string>
+					<string>CDOC2</string>
 				</array>
 				<key>public.mime-type</key>
 				<array>
@@ -973,11 +1038,6 @@
 				</array>
 			</dict>
 		</dict>
-	</array>
-	<key>UISupportedExternalAccessoryProtocols</key>
-	<array>
-		<string>com.ftsafe.bR301</string>
-		<string>com.ftsafe.iR301</string>
 	</array>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
