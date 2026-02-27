@@ -98,7 +98,6 @@ struct OutlinedRadioButtonCard<Content: View>: View {
         )
         .cornerRadius(Dimensions.Corner.XSCornerRadius)
         .padding(.vertical, Dimensions.Padding.XSPadding)
-        .accessibilityElement(children: .contain)
     }
 }
 

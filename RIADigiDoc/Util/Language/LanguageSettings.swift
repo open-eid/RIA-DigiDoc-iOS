@@ -25,6 +25,11 @@ public final class LanguageSettings: LanguageSettingsProtocol {
     private(set) var selectedLanguage: String = DefaultValues.language
     private let dataStore: DataStoreProtocol
 
+    public let supportedLanguages: [SupportedLanguage] = [
+        SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
+        SupportedLanguage(code: "en", titleKey: "Init lang locale en", accessibilityInputLabel: "English")
+    ]
+
     public init(
         dataStore: DataStoreProtocol
     ) {

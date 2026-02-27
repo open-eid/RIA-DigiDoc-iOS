@@ -194,91 +194,123 @@ struct EncryptionSettingsView: View {
     }
 
     @ViewBuilder
-    private var chooseServerDialog: some View {
-        Color.black
-            .opacity(Dimensions.Shadow.LOpacity)
-            .ignoresSafeArea()
+        private var chooseServerDialog: some View {
+            Color.black
+                .opacity(Dimensions.Shadow.LOpacity)
+                .ignoresSafeArea()
 
-        VStack(
-            alignment: .leading,
-            spacing: Dimensions.Padding.MPadding,
-            content: {
-                Text(languageSettings.localized("Main settings crypto choose server option"))
-                    .foregroundStyle(theme.onSurface)
-                    .font(typography.headlineSmall)
-                    .accessibilityHeading(.h1)
-                    .accessibilityAddTraits([.isHeader])
-                    .accessibilityFocused($isDialogHeaderFocused)
+            ViewThatFits(in: .vertical) {
+                dialogContent
 
-                RadioButtonChooserView<EncryptionServerOption>(
-                    options: viewModel.getServerOptions(),
-                    isSelected: { serverOption in
-                        serverOption.id == dialogSelectedServerId
-                    },
-                    titleKey: { serverOption in serverOption.titleKey },
-                    onSelect: { serverOption in
-                        dialogSelectedServerId = serverOption.id
-                    },
-                    accessibilityLabel: { serverOption, isSelected in
-                        let title = languageSettings.localized(serverOption.titleKey)
-                        let selected = isSelected
-                        ? languageSettings.localized("Radiobutton selected")
-                        : languageSettings.localized("Radiobutton unselected")
-                        return "\(title) \(selected)"
-                    },
-                    accessibilityInputLabel: {serverOption in serverOption.accessibilityInputLabel},
-                    trailingSpacer: false
-                )
-
-                dialogButtonRow
+                ScrollView {
+                    dialogContent
+                }
             }
-        )
-        .padding(Dimensions.Padding.MPadding)
-        .background(RoundedRectangle(cornerRadius: Dimensions.Corner.MCornerRadius)
-            .fill(theme.surfaceContainerHighest)
-        )
-        .padding(.horizontal, Dimensions.Padding.XLPadding)
+            .padding(Dimensions.Padding.MPadding)
+            .background(RoundedRectangle(cornerRadius: Dimensions.Corner.MCornerRadius)
+                .fill(theme.surfaceContainerHighest)
+            )
+            .padding(.horizontal, Dimensions.Padding.XLPadding)
+            .padding(.vertical, Dimensions.Padding.XLPadding)
+        }
+
+        @ViewBuilder
+        private var dialogContent: some View {
+            VStack(
+                alignment: .leading,
+                spacing: Dimensions.Padding.MPadding,
+                content: {
+                    Text(languageSettings.localized("Main settings crypto choose server option"))
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.headlineSmall)
+                        .accessibilityHeading(.h1)
+                        .accessibilityAddTraits([.isHeader])
+                        .accessibilityFocused($isDialogHeaderFocused)
+
+                    RadioButtonChooserView<EncryptionServerOption>(
+                        options: viewModel.getServerOptions(),
+                        isSelected: { serverOption in
+                            serverOption.id == dialogSelectedServerId
+                        },
+                        titleKey: { serverOption in serverOption.titleKey },
+                        onSelect: { serverOption in
+                            dialogSelectedServerId = serverOption.id
+                        },
+                        accessibilityLabel: { serverOption, isSelected in
+                            let title = languageSettings.localized(serverOption.titleKey)
+                            let selected = isSelected
+                            ? languageSettings.localized("Radiobutton selected")
+                            : languageSettings.localized("Radiobutton unselected")
+                            return "\(title) \(selected)"
+                        },
+                        accessibilityInputLabel: {serverOption in serverOption.accessibilityInputLabel},
+                        trailingSpacer: false
+                    )
+
+                    dialogButtonRow
+                }
+            )
+        }
+
+        @ViewBuilder
+        private var dialogButtonRow: some View {
+        ViewThatFits {
+            HStack(
+                content: {
+                    Spacer()
+                    closeDialogButton.fixedSize()
+                    chooseDialogButton.fixedSize()
+                }
+            )
+
+            VStack(
+                alignment: .trailing,
+                spacing: Dimensions.Padding.MPadding,
+                content: {
+                    chooseDialogButton
+                    closeDialogButton
+                }
+            )
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
     }
 
     @ViewBuilder
-    private var dialogButtonRow: some View {
-        HStack(
-            content: {
-                Spacer()
-
-                Button(
-                    action: {
-                        dialogSelectedServerId = viewModel.serverId
-                        showDialog = false
-                    },
-                    label: {
-                        Text(languageSettings.localized("Close"))
-                            .font(typography.labelLarge)
-                            .foregroundStyle(theme.primary)
-                            .padding(.horizontal, Dimensions.Padding.MSPadding)
-                    }
-                )
-                .buttonStyle(.plain)
-
-                Button(
-                    action: {
-                        viewModel.serverId = dialogSelectedServerId
-                        Task {
-                            await viewModel.refreshServerInfo()
-                        }
-
-                        showDialog = false
-                    },
-                    label: {
-                        Text(languageSettings.localized("Choose button"))
-                            .font(typography.labelLarge)
-                            .foregroundStyle(theme.primary)
-                            .padding(.horizontal, Dimensions.Padding.MSPadding)
-                    }
-                )
-                .buttonStyle(.plain)
+    private var closeDialogButton: some View {
+        Button(
+            action: {
+                dialogSelectedServerId = viewModel.serverId
+                showDialog = false
+            },
+            label: {
+                Text(languageSettings.localized("Close"))
+                    .font(typography.labelLarge)
+                    .foregroundStyle(theme.primary)
+                    .padding(.horizontal, Dimensions.Padding.MSPadding)
             }
         )
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var chooseDialogButton: some View {
+        Button(
+            action: {
+                viewModel.serverId = dialogSelectedServerId
+                Task {
+                    await viewModel.refreshServerInfo()
+                }
+
+                showDialog = false
+            },
+            label: {
+                Text(languageSettings.localized("Choose button"))
+                    .font(typography.labelLarge)
+                    .foregroundStyle(theme.primary)
+                    .padding(.horizontal, Dimensions.Padding.MSPadding)
+            }
+        )
+        .buttonStyle(.plain)
     }
 }
 

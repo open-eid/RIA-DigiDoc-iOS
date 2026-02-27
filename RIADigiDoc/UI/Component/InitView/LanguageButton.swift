@@ -25,10 +25,11 @@ struct LanguageButton<T: Equatable>: View {
     let title: String
     let onTap: () -> Void
     let accessibilityLabel: String
-    let accessibilityInputLabel: String
+    let accessibilityInputLabel: String?
 
     private var accessibilityInputLabels: [String] {
-        [accessibilityInputLabel, accessibilityLabel]
+        guard let accessibilityInputLabel else { return [accessibilityLabel] }
+        return [accessibilityInputLabel, accessibilityLabel]
     }
 
     var body: some View {

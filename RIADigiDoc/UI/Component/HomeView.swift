@@ -43,6 +43,7 @@ struct HomeView: View {
     @State private var isNavigatingToSigningView = false
     @State private var isNavigatingToRecentDocumentsView = false
     @State private var isNavigatingToEncryptView = false
+    @State private var isVoiceOverFocusNavigationInProgress = false
 
     @State private var showFilesBottomSheet: Bool = false
     @State private var showSignatureBottomSheet: Bool = false
@@ -77,16 +78,20 @@ struct HomeView: View {
     private var signedFilesBottomSheetActions: [BottomSheetButton] {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
+                isVoiceOverFocusNavigationInProgress = true
                 isImporting = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isVoiceOverFocusNavigationInProgress = false
+                }
             },
             onRecentDocumentsClick: {
                 containerType = .asice
                 recentDocumentsExtensions = Constants.Container.ContainerExtensions
-                pathManager.navigate(to:
-                        .recentDocumentsView(
-                            folderURL: getRecentDocumentsFolder(containerType: containerType),
-                            extensions: recentDocumentsExtensions
-                        )
+                navigateWithVoiceOverFocusGuard(
+                    to: .recentDocumentsView(
+                        folderURL: getRecentDocumentsFolder(containerType: containerType),
+                        extensions: recentDocumentsExtensions
+                    )
                 )
             }
         )
@@ -95,16 +100,20 @@ struct HomeView: View {
     private var cryptoFilesBottomSheetActions: [BottomSheetButton] {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
+                isVoiceOverFocusNavigationInProgress = true
                 isCryptoImporting = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isVoiceOverFocusNavigationInProgress = false
+                }
             },
             onRecentDocumentsClick: {
                 containerType = .cdoc
                 recentDocumentsExtensions = Constants.Container.CryptoContainerExtensions
-                pathManager.navigate(to:
-                        .recentDocumentsView(
-                            folderURL: getRecentDocumentsFolder(containerType: containerType),
-                            extensions: recentDocumentsExtensions
-                        )
+                navigateWithVoiceOverFocusGuard(
+                    to: .recentDocumentsView(
+                        folderURL: getRecentDocumentsFolder(containerType: containerType),
+                        extensions: recentDocumentsExtensions
+                    )
                 )
             }
         )
@@ -113,13 +122,13 @@ struct HomeView: View {
     private var homeMenuBottomSheetActions: [BottomSheetButton] {
         HomeMenuBottomSheetActions.actions(
             onInfoClick: {
-                pathManager.navigate(to: .infoView)
+                navigateWithVoiceOverFocusGuard(to: .infoView)
             },
             onAccessibilityClick: {
-                pathManager.navigate(to: .accessibilityView)
+                navigateWithVoiceOverFocusGuard(to: .accessibilityView)
             },
             onDiagnosticsClick: {
-                pathManager.navigate(to: .diagnosticsView)
+                navigateWithVoiceOverFocusGuard(to: .diagnosticsView)
             }
         )
     }
@@ -146,7 +155,15 @@ struct HomeView: View {
                 showHomeMenuBottomSheet = true
             },
             onSettingsSheetDismiss: {
+                if isVoiceOverFocusNavigationInProgress { return }
                 focusFilesButtonWithDelay()
+            },
+            navigationWrapper: { _, defaultNavigate in
+                isVoiceOverFocusNavigationInProgress = true
+                defaultNavigate()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isVoiceOverFocusNavigationInProgress = false
+                }
             },
             content: {
                 ScrollView {
@@ -201,7 +218,7 @@ struct HomeView: View {
                             description: languageSettings.localized("Main home my eid description"),
                             assetImageName: "ic_m3_co_present_48pt_wght400",
                             action: {
-                                pathManager.navigate(to: .myEidRootView)
+                                navigateWithVoiceOverFocusGuard(to: .myEidRootView)
                             }
                         )
                     }
@@ -223,20 +240,19 @@ struct HomeView: View {
         }
         .onChange(of: isNavigatingToSigningView, { _, newValue in
             if newValue {
-                pathManager.navigate(to: .signingView)
+                navigateWithVoiceOverFocusGuard(to: .signingView)
                 isNavigatingToSigningView = false
             }
         })
         .onChange(of: isNavigatingToEncryptView, { _, newValue in
             if newValue {
-                pathManager.navigate(to: .encryptView(
-                    isWithEncryption: false
-                ))
+                navigateWithVoiceOverFocusGuard(to: .encryptView(isWithEncryption: false))
                 isNavigatingToEncryptView = false
             }
         })
         .onChange(of: isBottomSheetPresented) { oldValue, newValue in
             if oldValue && !newValue {
+                if isVoiceOverFocusNavigationInProgress { return }
                 focusFilesButtonWithDelay()
             }
         }
@@ -248,6 +264,14 @@ struct HomeView: View {
         }
         .onDisappear {
             sharedFilesLoadingTask?.cancel()
+        }
+    }
+
+    private func navigateWithVoiceOverFocusGuard(to destination: NavigationDestination) {
+        isVoiceOverFocusNavigationInProgress = true
+        pathManager.navigate(to: destination)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            isVoiceOverFocusNavigationInProgress = false
         }
     }
 

@@ -26,14 +26,14 @@ struct LanguageButtonChooserView<T: Equatable & Identifiable>: View {
     let titleKey: (T) -> String
     let onTap: (T) -> Void
     let accessibilityLabel: (T) -> String
-    let accessibilityInputLabel: (T) -> String
+    let accessibilityInputLabel: (T) -> String?
 
     init(
         options: [T],
         titleKey: @escaping (T) -> String,
         onTap: @escaping (T) -> Void,
         accessibilityLabel: @escaping (T) -> String,
-        accessibilityInputLabel: @escaping (T) -> String,
+        accessibilityInputLabel: @escaping (T) -> String?,
     ) {
         self.options = options
         self.titleKey = titleKey

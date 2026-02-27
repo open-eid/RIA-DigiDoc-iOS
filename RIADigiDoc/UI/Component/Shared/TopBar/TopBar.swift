@@ -61,6 +61,8 @@ struct TopBarContainer<Content: View>: View {
 
     var excludeDestinations: [SettingsMenuBottomSheetPages] = []
 
+    var navigationWrapper: ((NavigationDestination, @escaping () -> Void) -> Void)?
+
     let content: () -> Content
 
     @State private var navigateToLanguageChooser = false
@@ -130,6 +132,15 @@ struct TopBarContainer<Content: View>: View {
         .background(theme.surface)
     }
 
+    private func navigate(_ destination: NavigationDestination) {
+        let defaultNavigate = { pathManager.navigate(to: destination) }
+        if let navigationWrapper {
+            navigationWrapper(destination, defaultNavigate)
+        } else {
+            defaultNavigate()
+        }
+    }
+
     private func buildBottomSheetActions() -> [BottomSheetButton] {
         if let customActions = bottomSheetActions {
             return customActions
@@ -139,13 +150,13 @@ struct TopBarContainer<Content: View>: View {
                 showThemeChooserButton: !excludeDestinations.contains(.theme),
                 showAdvancedSettingsButton: !excludeDestinations.contains(.advanced),
                 onLanguageChooserClick: {
-                    pathManager.navigate(to: .languageChooserView)
+                    navigate(.languageChooserView)
                 },
                 onThemeChooserClick: {
-                    pathManager.navigate(to: .themeChooserView)
+                    navigate(.themeChooserView)
                 },
                 onAdvancedSettingsClick: {
-                    pathManager.navigate(to: .advancedSettingsView)
+                    navigate(.advancedSettingsView)
                 }
             )
         }

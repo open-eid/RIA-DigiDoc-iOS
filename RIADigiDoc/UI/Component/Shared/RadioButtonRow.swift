@@ -45,6 +45,7 @@ struct RadioButtonRow<T: Equatable>: View {
                     .font(typography.bodyLarge)
                     .foregroundStyle(theme.onSurface)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Spacer()
                 RadioButton(
@@ -53,9 +54,9 @@ struct RadioButtonRow<T: Equatable>: View {
             }
             .padding(.vertical, Dimensions.Padding.SPadding)
             .contentShape(Rectangle())
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityInputLabels(accessibilityInputLabels)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityInputLabels(accessibilityInputLabels)
     }
 }
