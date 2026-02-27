@@ -37,7 +37,10 @@ final class CertificateUtilTests {
                 GqR7wJ8Z2Q1NxF3mP9K5L8M3nR6tY4uI7oP2qS8vW1X2Y3
                 -----END CERTIFICATE-----
                 """
-        guard let pemData = pemString.data(using: .utf8) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
         let expectedBase64 =
         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7VXGqR7wJ8Z2Q1NxF3mP9K5L8M3nR6tY4uI7oP2qS8vW1X2Y3"
         let expectedDerData = Data(base64Encoded: expectedBase64)
@@ -53,7 +56,10 @@ final class CertificateUtilTests {
                 -----BEGIN CERTIFICATE-----
                 -----END CERTIFICATE-----
                 """
-        guard let pemData = pemString.data(using: .utf8) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
 
         let result = certificateUtil.pemToDerData(fromPEM: pemData)
 
@@ -63,7 +69,10 @@ final class CertificateUtilTests {
     @Test
     func pemToDerData_successWithNoHeaders() {
         let pemString = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7VX"
-        guard let pemData = pemString.data(using: .utf8) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
         let expectedDerData = Data(base64Encoded: pemString)
 
         let result = certificateUtil.pemToDerData(fromPEM: pemData)
@@ -117,9 +126,15 @@ final class CertificateUtilTests {
             HERHoea8LiuAkZCFBh6fTEd2Wetgble1vYsK/+t+0Y4J
             -----END CERTIFICATE-----
             """
-        guard let pemData = pemString.data(using: .utf8) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
 
-        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else { return }
+        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
+        }
 
         let notValidAfter = certificateUtil.getNotValidAfterWithExpiredLabel(cert: derData, expiredLabel: "Expired")
 
@@ -153,8 +168,14 @@ final class CertificateUtilTests {
             HorK9eEA1jaJ/RRRefXzhjOVHLOuYw==
             -----END CERTIFICATE-----
             """
-        guard let pemData = pemString.data(using: .utf8) else { return }
-        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
+        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
+        }
         let expiredLabel = "Expired"
 
         let notValidAfter = certificateUtil.getNotValidAfterWithExpiredLabel(cert: derData, expiredLabel: expiredLabel)
@@ -190,9 +211,15 @@ final class CertificateUtilTests {
             HERHoea8LiuAkZCFBh6fTEd2Wetgble1vYsK/+t+0Y4J
             -----END CERTIFICATE-----
             """
-        guard let pemData = pemString.data(using: .utf8) else { return }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
 
-        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else { return }
+        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
+        }
 
         let issuer = certificateUtil.getSubjectAttribute(
             cert: derData, attribute: .RDNAttributeType.commonName)
@@ -201,8 +228,8 @@ final class CertificateUtilTests {
     }
 
     @Test
-        func getSubjectAttribute_doesNotThrowWhenAttributeMissing() {
-            let pemString = """
+    func getSubjectAttribute_doesNotThrowWhenAttributeMissing() {
+        let pemString = """
                 -----BEGIN CERTIFICATE-----
                 MIICyjCCAbKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxleHBp
                 cmVkLnRlc3QwHhcNMjUxMDE2MTA0ODAzWhcNMjUxMTE1MTA0ODAzWjAXMRUwEwYD
@@ -221,36 +248,104 @@ final class CertificateUtilTests {
                 3vEfRF9Lf001QXyGNkBc9G4vTNT2MYrGz8Pxmb+uSK8ZEgyi0EQ4KEhCbeWvMA==
                 -----END CERTIFICATE-----
                 """
-            guard let pemData = pemString.data(using: .utf8) else { return }
-            guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else { return }
-
-            #expect(throws: Never.self) {
-                let missingAttributeResult = certificateUtil.getSubjectAttribute(
-                    cert: derData, attribute: .RDNAttributeType.streetAddress)
-                #expect(missingAttributeResult.isEmpty)
-            }
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
+        }
+        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
         }
 
-        @Test
-        func getSubjectAttribute_doesNotThrowOnInvalidDer() {
-            let invalidDer = Data([0x00, 0x01, 0x02])
+        #expect(throws: Never.self) {
+            let missingAttributeResult = certificateUtil.getSubjectAttribute(
+                cert: derData, attribute: .RDNAttributeType.streetAddress)
+            #expect(missingAttributeResult.isEmpty)
+        }
+    }
 
-            #expect(throws: Never.self) {
-                let result = certificateUtil.getSubjectAttribute(
-                    cert: invalidDer, attribute: .RDNAttributeType.commonName)
-                #expect(result == "")
-            }
+    @Test
+    func getSubjectAttribute_doesNotThrowOnInvalidDer() {
+        let invalidDer = Data([0x00, 0x01, 0x02])
+
+        #expect(throws: Never.self) {
+            let result = certificateUtil.getSubjectAttribute(
+                cert: invalidDer, attribute: .RDNAttributeType.commonName)
+            #expect(result == "")
+        }
+    }
+
+    @Test
+    func getNotValidAfterWithExpiredLabel_doesNotThrowOnInvalidDer() {
+        let invalidDer = Data([0x00, 0x01, 0x02])
+
+        #expect(throws: Never.self) {
+            let result = certificateUtil.getNotValidAfterWithExpiredLabel(
+                cert: invalidDer, expiredLabel: "Expired")
+            #expect(result == "")
+        }
+    }
+
+    @Test
+    func getNotValidDate_returnsNilOnNilInput() async throws {
+        #expect(try certificateUtil.getNotValidDate(nil) == nil)
+    }
+
+    @Test
+    func getNotValidDate_doesNotThrowOnInvalidCert() async throws {
+        let certData = Data([0x00, 0x01, 0x02])
+
+        #expect(throws: Never.self) {
+            let result = try certificateUtil.getNotValidDate(certData)
+            #expect(result == nil)
+        }
+    }
+
+    @Test
+    func getNotValidDate_success() throws {
+        let pemString = """
+            -----BEGIN CERTIFICATE-----
+            MIIEDTCCAvWgAwIBAgIUSqorLsfSI1K5t/9YhPnHqf3MBc4wDQYJKoZIhvcNAQEL
+            BQAwgZUxCzAJBgNVBAYTAkVFMQ4wDAYDVQQIDAVIYXJqdTEQMA4GA1UEBwwHVGFs
+            bGlubjEOMAwGA1UECgwFTXlPcmcxDzANBgNVBAsMBk15VW5pdDESMBAGA1UEAwwJ
+            VGVzdCBDZXJ0MR8wHQYJKoZIhvcNAQkBFhB0ZXN0QGV4YW1wbGUuY29tMQ4wDAYD
+            VQQFEwUxMjM0NTAeFw0yNTEwMTYxMDMyMjJaFw0yNjEwMTYxMDMyMjJaMIGVMQsw
+            CQYDVQQGEwJFRTEOMAwGA1UECAwFSGFyanUxEDAOBgNVBAcMB1RhbGxpbm4xDjAM
+            BgNVBAoMBU15T3JnMQ8wDQYDVQQLDAZNeVVuaXQxEjAQBgNVBAMMCVRlc3QgQ2Vy
+            dDEfMB0GCSqGSIb3DQEJARYQdGVzdEBleGFtcGxlLmNvbTEOMAwGA1UEBRMFMTIz
+            NDUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCWT6mHYaf1xuNus76z
+            MpVfk3HjI/ZxmswhbPG2LvAxldY7hXaCH8I0qMKorrnUqq3PmWZqG7Wzt78Lu5x8
+            SGCJ+fGKH4Fo3cXnGqXQpU1xnwARE08N/g3GlogDH3y0MsbUD/B7Vq218BrWqlEU
+            BiYI/aO7yfal4tZjVWugBalMWYehHhEOeh0ss4bDjGvEmmPAvRa36UoVbLGrjG95
+            vcZv2xCC8YlWyj11X4ci7RZHrbpNrZ21xWr59VU7dTxKIDJ64wfgddryXkiyPHJ3
+            R5Syf89qNn0I9SeEuSS13QsF0UEmcT/+rvXf2o8JXNWpPe2AGYVzlWAPHboOKHLI
+            2FILAgMBAAGjUzBRMB0GA1UdDgQWBBRLFCXwhwHQ2dmE3xocNJOtPB0DtzAfBgNV
+            HSMEGDAWgBRLFCXwhwHQ2dmE3xocNJOtPB0DtzAPBgNVHRMBAf8EBTADAQH/MA0G
+            CSqGSIb3DQEBCwUAA4IBAQB53+FGg8nzYBIq8K/C00GUB2R0XYxUvKsfvecMOcHy
+            Sl7TKOVZRDaL7Ji3G5CqouAwLFgnXqlf7aKYn4YfWNNXoS9Zm+eFJmvvWYJ/j/C0
+            Ntz2mfcMcElrXvCGVnCNiHmkAw193jnya+3JxgbgE8rHoxYMHGwNTZUzCe7QGqw/
+            tLdAYRezgyOx5NqaCq1GsOIP3n3eU9k92bMaWM0qtYHroL3H+oIvO0Whdsi2H7Fz
+            W+L77xnqmKNZDyWwyQ8MsShy8VAJt75TOLPrR6clKou1q3H77ELDtwUAHw7hJF7W
+            HERHoea8LiuAkZCFBh6fTEd2Wetgble1vYsK/+t+0Y4J
+            -----END CERTIFICATE-----
+            """
+        guard let pemData = pemString.data(using: .utf8) else {
+            Issue.record("Expected pemData to not be nil")
+            return
         }
 
-        @Test
-        func getNotValidAfterWithExpiredLabel_doesNotThrowOnInvalidDer() {
-            let invalidDer = Data([0x00, 0x01, 0x02])
-
-            #expect(throws: Never.self) {
-                let result = certificateUtil.getNotValidAfterWithExpiredLabel(
-                    cert: invalidDer, expiredLabel: "Expired")
-                #expect(result == "")
-            }
+        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
         }
+
+        let notValidDate = try certificateUtil.getNotValidDate(derData)
+
+        guard let notValidDate else {
+            Issue.record("Expected notValidDate to not be nil")
+            return
+        }
+        #expect(!notValidDate.isEmpty)
+    }
 
 }
