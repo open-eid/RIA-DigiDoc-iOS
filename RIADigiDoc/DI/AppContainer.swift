@@ -460,6 +460,18 @@ extension Container {
         }
         .shared
     }
+    
+    @MainActor
+    var webEidViewModel: Factory<WebEidViewModel> {
+        self { @MainActor in
+            WebEidViewModel(
+                // TODO: implement me
+                //webEidRepository: self.webEidRepository(),
+                //sharedWebEidSession: self.sharedWebEidSession()
+            )
+        }
+        .shared
+    }
 
     @MainActor
     var actionMethodSelectionViewModel: Factory<ActionMethodSelectionViewModel> {

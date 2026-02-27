@@ -2,13 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UISupportedExternalAccessoryProtocols</key>
-	<array>
-		<string>com.ftsafe.bR301</string>
-		<string>com.ftsafe.iR301</string>
-	</array>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -218,6 +211,21 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string>digidoc_icon</string>
+			<key>CFBundleURLName</key>
+			<string>ee.ria.digidoc</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>web-eid-mobile</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>sileo</string>
@@ -225,12 +233,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NFCReaderUsageDescription</key>
-	<string>This app uses NFC to scan ID-cards</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Bluetooth card reader is used to read data from ID card</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth card reader is used to read data from ID card</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto_Condensed-Bold.ttf</string>
@@ -247,6 +249,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>external-accessory</string>
+	</array>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.ftsafe.bR301</string>
+		<string>com.ftsafe.iR301</string>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
@@ -973,11 +980,6 @@
 				</array>
 			</dict>
 		</dict>
-	</array>
-	<key>UISupportedExternalAccessoryProtocols</key>
-	<array>
-		<string>com.ftsafe.bR301</string>
-		<string>com.ftsafe.iR301</string>
 	</array>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>

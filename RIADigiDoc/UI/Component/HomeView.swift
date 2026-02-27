@@ -256,6 +256,28 @@ struct HomeView: View {
             viewModel.setChosenFiles(.success(files))
         }
     }
+    
+    
+    private func handleIncoming(url: URL) {
+        let webEidURL = (url.scheme == "web-eid-mobile") ? url : nil
+
+        let externalFileURLs: [URL] = (webEidURL != nil) ? [] : getExternalFileURLs(from: url)
+        handleFiles(externalFileURLs)
+        
+        if let webEidUrl = webEidURL {
+            // iOS: no equivalent "calling browser package" is available.
+            // TODO: RESEARCH: dataStore.setWebEidBrowserIdentifier
+            
+            pathManager.navigate(to: .webEidView(webEidURL: webEidUrl))
+        }
+    }
+
+    private func getExternalFileURLs(from url: URL) -> [URL] {
+        if url.isFileURL {
+            return [url]
+        }
+        return []
+    }
 }
 
 #Preview {
