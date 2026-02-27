@@ -29,11 +29,6 @@ struct LanguageChooserView: View {
         _viewModel = State(wrappedValue: Container.shared.languageChooserViewModel())
     }
 
-    private let supportedLanguages: [SupportedLanguage] = [
-        SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
-        SupportedLanguage(code: "en", titleKey: "Init lang locale en", accessibilityInputLabel: "English")
-    ]
-
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Main settings menu language"),
@@ -43,7 +38,7 @@ struct LanguageChooserView: View {
             excludeDestinations: [.language],
             content: {
                 RadioButtonChooserView<SupportedLanguage>(
-                    options: supportedLanguages,
+                    options: languageSettings.supportedLanguages,
                     isSelected: { languageOption in
                         languageOption.code == viewModel.selectedLanguage
                     },
@@ -59,7 +54,10 @@ struct LanguageChooserView: View {
                         return "\(title) \(selected)"
                     },
                     accessibilityInputLabel: { languageOption in
-                        languageOption.accessibilityInputLabel
+                        let inputLabel = languageOption.accessibilityInputLabel
+                        let title = languageSettings.localized(languageOption.titleKey)
+                        if inputLabel == title { return nil }
+                        return inputLabel
                     }
                 )
                 .padding(.horizontal, Dimensions.Padding.SPadding)

@@ -27,10 +27,6 @@ struct InitView: View {
 
     @State private var viewModel: InitViewModel
 
-    private let supportedLanguages: [SupportedLanguage] = [
-        SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
-        SupportedLanguage(code: "en", titleKey: "Init lang locale en", accessibilityInputLabel: "English")
-    ]
     private var appName: String {
         languageSettings.localized("App name")
     }
@@ -64,7 +60,7 @@ struct InitView: View {
                             .accessibilityLabel(appName.lowercased())
 
                         LanguageButtonChooserView<SupportedLanguage>(
-                            options: supportedLanguages,
+                            options: languageSettings.supportedLanguages,
                             titleKey: { languageOption in languageOption.titleKey },
                             onTap: { languageOption in
                                 Task {
@@ -77,7 +73,10 @@ struct InitView: View {
                                 languageSettings.localized(languageOption.titleKey)
                             },
                             accessibilityInputLabel: { languageOption in
-                                languageOption.accessibilityInputLabel
+                                let inputLabel = languageOption.accessibilityInputLabel
+                                let title = languageSettings.localized(languageOption.titleKey)
+                                if inputLabel == title { return nil }
+                                return inputLabel
                             }
                         )
                         .padding(.vertical, Dimensions.Padding.MPadding)

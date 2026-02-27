@@ -17,9 +17,9 @@
  *
  */
 
-struct SupportedLanguage: Identifiable, Equatable, Hashable {
+public struct SupportedLanguage: Identifiable, Equatable, Hashable {
     let code: String
     let titleKey: String
     let accessibilityInputLabel: String
-    var id: String { code }
+    public var id: String { code }
 }

@@ -236,7 +236,6 @@ struct FloatingLabelTextField: View {
             Spacer()
             trailingIcon
         }
-        .accessibilityElement(children: .contain)
         .padding(.top,
             shouldFloatLabel ? max(
                 floatingLabelHeight / 2 - Dimensions.Padding.XXSPadding,
@@ -397,6 +396,7 @@ struct FloatingLabelTextField: View {
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .accessibilityLabel(languageSettings.localized("Clear text"))
+        .accessibilityInputLabels([languageSettings.localized("Clear text")])
     }
 
     @ViewBuilder
@@ -418,6 +418,11 @@ struct FloatingLabelTextField: View {
             isPasswordVisible
             ? languageSettings.localized("Hide password")
             : languageSettings.localized("Show password")
+        )
+        .accessibilityInputLabels(
+            isPasswordVisible
+            ? [languageSettings.localized("Hide password")]
+            : [languageSettings.localized("Show password")]
         )
     }
 

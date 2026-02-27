@@ -53,9 +53,11 @@ enum Dimensions {
     }
 
     enum Shadow {
+        static let zeroRadius: CGFloat = 0
         static let radius: CGFloat = Dimensions.Corner.XXSCornerRadius
         static let xOffset: CGFloat = 0
         static let yOffset: CGFloat = 4
+        static let ySOffset: CGFloat = 1
         static let SOpacity: Double = 0.15
         static let LOpacity: Double = 0.7
     }

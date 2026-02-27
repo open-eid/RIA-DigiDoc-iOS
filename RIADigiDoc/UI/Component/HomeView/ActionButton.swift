@@ -41,10 +41,10 @@ struct ActionButton: View {
 
             // MARK: - Elevated Style
             .shadow(
-                color: Color.black.opacity(Dimensions.Shadow.SOpacity),
-                radius: Dimensions.Shadow.radius,
+                color: theme.primary,
+                radius: Dimensions.Shadow.zeroRadius,
                 x: Dimensions.Shadow.xOffset,
-                y: Dimensions.Shadow.yOffset
+                y: Dimensions.Shadow.ySOffset
             )
         }
         .buttonStyle(.plain)
