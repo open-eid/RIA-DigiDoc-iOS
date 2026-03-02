@@ -1,0 +1,160 @@
+name: RIA DigiDoc iOS
+on: [push]
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+jobs:
+  build:
+    name: Build RIA DigiDoc on macOS
+    runs-on: macos-26
+    strategy:
+      matrix:
+        xcode:
+          - 26.2
+        platform:
+          - iOS
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Download Libdigidocpp iOS artifact
+      uses: dawidd6/action-download-artifact@v15
+      with:
+        workflow: build.yml
+        branch: master
+        name: iphoneos
+        path: libdigidocpp-ios
+        repo: open-eid/libdigidocpp
+    - name: Download Libdigidocpp iOS Simulator artifact
+      uses: dawidd6/action-download-artifact@v15
+      with:
+        workflow: build.yml
+        branch: master
+        name: iphonesimulator
+        path: libdigidocpp-ios-simulator
+        repo: open-eid/libdigidocpp
+    - name: Extract libdigidocpp artifacts
+      run: |
+        unzip -o libdigidocpp-ios/libdigidocpp.iphoneos.zip -d libdigidocpp.iphoneos
+        unzip -o libdigidocpp-ios-simulator/libdigidocpp.iphonesimulator.zip -d libdigidocpp.iphonesimulator
+    - name: Update libdigidocpp in project
+      run: |
+          export LIBDIGIDOCPP_PATH=${{ github.workspace }}/Modules/LibdigidocLib/Sources/LibdigidocObjC/Libs/digidocpp.xcframework
+          rm -rf $LIBDIGIDOCPP_PATH/ios-arm64 && mkdir $LIBDIGIDOCPP_PATH/ios-arm64 && cp -r ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64/
+          rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
+    - name: Set up Homebrew
+      id: set-up-homebrew
+      uses: Homebrew/actions/setup-homebrew@master
+    - name: Install Swift-sh
+      run: brew install swift-sh
+    - name: Install Mockolo
+      run: brew install mockolo
+    - name: Setup config and TSL files
+      run: |
+        export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
+        export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
+        export TSL_FILES_DIRECTORY="$RESOURCES_DIRECTORY/tslFiles"
+
+        # Create TSL folder and mock folders for each module
+        mkdir -p $TSL_FILES_DIRECTORY
+
+        # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
+        for module in CommonsLib ConfigLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
+          mock_dir="Modules/${module}/Tests/Mocks/Generated"
+          mkdir -p "$mock_dir"
+          echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
+        done
+
+        # Remove current files in tslFiles.bundle
+        echo "Removing current TSL files"
+        find $TSL_FILES_DIRECTORY -mindepth 1 ! -name ".keep" -delete
+
+        # Download latest 'eu-lotl.xml' file"
+        echo "Downloading latest 'eu-lotl.xml' file"
+        wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
+
+        if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
+          echo "Getting TSL (local LOTL)"
+          python3 scripts/TSLXMLDownloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+
+          echo "Finished downloading TSL"
+        else
+          echo "Getting TSL (remote LOTL)"
+          python3 scripts/TSLXMLDownloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+          echo "Finished downloading TSL"
+        fi
+
+        echo "Moving TSLs to app's TSL files directory"
+        mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
+        echo "Done moving TSLs"
+    - name: Setup environment
+      env:
+        GOOGLE_SERVICES_PLIST: ${{ secrets.GOOGLE_SERVICES_PLIST }}
+      run: |
+        export LANG=en_US.UTF-8
+
+        # Setup Google Services
+        echo $GOOGLE_SERVICES_PLIST | base64 --decode > "${{ github.workspace }}/RIADigiDoc/Supporting files/GoogleService-Info.plist"
+
+        # Setup app version
+        echo APP_VERSION=$(xcodebuild -project ${{ github.workspace }}/RIADigiDoc.xcodeproj -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =') >> $GITHUB_ENV
+    - name: Fetch default configuration
+      run: |
+        echo "Cleaning swift-sh cache"
+        swift-sh --clean-cache
+        echo "Fetching default configuration"
+        swift-sh SetupConfiguration/Sources/main.swift
+    - name: Run tests
+      run: |
+        cd ${{ github.workspace }}
+
+        sh scripts/GenerateMocks.sh
+
+        xcodebuild test \
+          -project RIADigiDoc.xcodeproj \
+          -scheme AllTests \
+          -destination 'platform=iOS Simulator,name=iPhone 17' \
+          -quiet
+    - name: Increment build number
+      run: |
+        agvtool new-version -all "${{ env.BUILD_NUMBER }}"
+    - name: Build
+      run: |
+        cd ${{ github.workspace }}
+
+        # Clean old data
+        rm -rf ~/Library/Developer/Xcode/DerivedData/*
+        rm -rf ${{ github.workspace }}/build
+        rm -rf ${{ github.workspace }}/.build
+
+        xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
+
+        xcodebuild clean build \
+          -project RIADigiDoc.xcodeproj \
+          -scheme RIADigiDoc \
+          -destination 'platform=iOS Simulator,name=iPhone 17' \
+          -derivedDataPath "${{ github.workspace }}/build" \
+          -quiet
+    - name: Rename app file
+      run: |
+        mv \
+          "${{ github.workspace }}/build/Build/Products/Debug-iphonesimulator/RIADigiDoc.app" \
+          "${{ github.workspace }}/build/Build/Products/Debug-iphonesimulator/RIA_DigiDoc_dev_${{ env.APP_VERSION }}.${{ env.BUILD_NUMBER }}.app"
+    - name: Zip app bundle
+      run: |
+        ditto -c -k --sequesterRsrc --keepParent \
+          "${{ github.workspace }}/build/Build/Products/Debug-iphonesimulator/RIA_DigiDoc_dev_${{ env.APP_VERSION }}.${{ env.BUILD_NUMBER }}.app" \
+          "${{ github.workspace }}/build/Build/Products/Debug-iphonesimulator/RIA_DigiDoc_dev_${{ env.APP_VERSION }}.${{ env.BUILD_NUMBER }}.zip"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      if: success()
+      with:
+        name: "RIA_DigiDoc_${{ env.APP_VERSION }}.${{ env.BUILD_NUMBER }}"
+        path: "${{ github.workspace }}/build/Build/Products/Debug-iphonesimulator/RIA_DigiDoc_dev_${{ env.APP_VERSION }}.${{ env.BUILD_NUMBER }}.zip"
+        archive: false
+    - name: Clean up
+      if: ${{ always() }}
+      run: |
+        rm -rf ~/Library/Developer/Xcode/DerivedData/*
+        rm -rf ${{ github.workspace }}/build
+        rm -rf ${{ github.workspace }}/.build
