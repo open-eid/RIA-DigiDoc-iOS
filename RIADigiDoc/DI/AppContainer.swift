@@ -551,8 +551,17 @@ extension Container {
     var crashReportManager: Factory<CrashReportManager> {
         self { @MainActor in
             CrashReportManager(
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                crashReportClient: self.crashReportClient()
             )
+        }
+        .singleton
+    }
+
+    @MainActor
+    var crashReportClient: Factory<CrashReportClient> {
+        self { @MainActor in
+            CrashReportClient()
         }
         .singleton
     }

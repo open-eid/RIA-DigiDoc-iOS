@@ -60,6 +60,7 @@ public enum CodeType: UInt, Sendable {
  * A protocol defining commands for interacting with a smart card.
  */
 
+/// @mockable
 public protocol CardCommands: Sendable {
     var canChangePUK: Bool { get }
     /**

@@ -81,7 +81,7 @@ workflows:
           mkdir -p $TSL_FILES_DIRECTORY
 
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib MobileIdLib SmartIdLib; do
+          for module in CommonsLib ConfigLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
             mock_dir="Modules/${module}/Tests/Mocks/Generated"
             mkdir -p "$mock_dir"
             echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
@@ -240,7 +240,7 @@ workflows:
           mkdir -p $TSL_FILES_DIRECTORY
           
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-          for module in CommonsLib ConfigLib LibdigidocLib UtilsLib; do
+          for module in CommonsLib ConfigLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
             mock_dir="Modules/${module}/Tests/Mocks/Generated"
             mkdir -p "$mock_dir"
             echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"

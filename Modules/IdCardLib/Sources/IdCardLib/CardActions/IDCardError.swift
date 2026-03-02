@@ -17,7 +17,7 @@
  *
  */
 
-public enum IdCardError: Error {
+public enum IdCardError: Error, Equatable {
     case wrongCAN,
          wrongPIN(triesLeft: Int),
          pinLocked,
@@ -26,7 +26,7 @@ public enum IdCardError: Error {
          cancelledByUser
 }
 
-public enum IdCardInternalError: Error {
+public enum IdCardInternalError: Error, Equatable {
     case missingRESTag,
          missingMACTag,
          invalidMACValue,
