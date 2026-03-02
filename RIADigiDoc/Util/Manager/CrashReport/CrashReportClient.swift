@@ -17,9 +17,21 @@
  *
  */
 
-import Testing
-@testable import nfclib
+import Foundation
+import FirebaseCrashlytics
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+@MainActor
+@Observable
+final class CrashReportClient: CrashReportClientProtocol {
+    func checkForUnsentReports() async -> Bool {
+        await Crashlytics.crashlytics().checkForUnsentReports()
+    }
+
+    func sendUnsentReports() {
+        Crashlytics.crashlytics().sendUnsentReports()
+    }
+
+    func deleteUnsentReports() {
+        Crashlytics.crashlytics().deleteUnsentReports()
+    }
 }

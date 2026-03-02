@@ -24,7 +24,7 @@ import CryptoTokenKit
 internal import SwiftECC
 import BigInt
 import Security
-internal import X509
+import ASN1Decoder
 
 public enum AuthenticateWithWebEidError: Error {
     case failedToReadPublicKey
@@ -104,19 +104,18 @@ extension OperationAuthenticateWithWebEID: @MainActor NFCTagReaderSessionDelegat
                 let certBytes = try await cardCommands.readAuthenticationCertificate()
                 let authCertificate = try convertBytesToX509Certificate(certBytes)
 
-                // assuming authCertificate is `Certificate` from Swift-Certificates
-                let certificate = try Certificate(authCertificate)
-                let notAfter = certificate.notValidAfter
-                let notBefore = certificate.notValidBefore
+                let certificate = try X509Certificate(data: certBytes)
+                let notAfterDate = certificate.notAfter
+                let notBeforeDate = certificate.notBefore
 
-                guard Date() >= notBefore else {
+                guard let notBefore = notBeforeDate, Date() >= notBefore else {
                     let errorMessage = "Certificate not yet valid"
                     session.invalidate(errorMessage: errorMessage)
                     continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateNotYetValid)
                     return
                 }
 
-                guard Date() <= notAfter else {
+                guard let notAfter = notAfterDate, Date() <= notAfter else {
                     let errorMessage = "Certificate has expired"
                     session.invalidate(errorMessage: errorMessage)
                     continuation?.resume(throwing: AuthenticateWithWebEidError.failedCertificateExpired)

@@ -26,18 +26,21 @@ import UtilsLib
 final class CrashReportManager: CrashReportManagerProtocol, Loggable {
 
     private let dataStore: DataStoreProtocol
+    private let crashReportClient: CrashReportClientProtocol
 
     var showCrashDialog = false
 
     init(
-        dataStore: DataStoreProtocol
+        dataStore: DataStoreProtocol,
+        crashReportClient: CrashReportClientProtocol
     ) {
         self.dataStore = dataStore
+        self.crashReportClient = crashReportClient
     }
 
     func evaluateCrashReporting() async {
         let isAlwaysEnabled = await dataStore.getIsCrashlyticsAlwaysEnabled()
-        let hasUnsentReports = await Crashlytics.crashlytics().checkForUnsentReports()
+        let hasUnsentReports = await crashReportClient.checkForUnsentReports()
 
         guard hasUnsentReports else {
             showCrashDialog = false
@@ -71,12 +74,12 @@ final class CrashReportManager: CrashReportManagerProtocol, Loggable {
     }
 
     private func checkForUnsentReports(send: Bool) async {
-        let hasUnsentReports = await Crashlytics.crashlytics().checkForUnsentReports()
+        let hasUnsentReports = await crashReportClient.checkForUnsentReports()
         CrashReportManager.logger().info("Has unsent crash reports: \(hasUnsentReports)")
         if send && hasUnsentReports {
-            Crashlytics.crashlytics().sendUnsentReports()
+            crashReportClient.sendUnsentReports()
         } else {
-            Crashlytics.crashlytics().deleteUnsentReports()
+            crashReportClient.deleteUnsentReports()
         }
     }
 }

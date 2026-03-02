@@ -13,6 +13,7 @@ modules=(
   "CryptoLib"
   "MobileIdLib"
   "SmartIdLib"
+  "IdCardLib"
 )
 
 extensions=(
@@ -57,6 +58,10 @@ for module in "${modules[@]}"; do
       ;;
     "SmartIdLib")
       custom_imports=("SmartIdLib")
+      testable_imports=""
+      ;;
+    "IdCardLib")
+      custom_imports=("IdCardLib")
       testable_imports=""
       ;;
     *)

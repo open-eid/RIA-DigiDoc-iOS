@@ -8,14 +8,14 @@ let package = Package(
         .library(
             name: "IdCardLib",
             targets: ["IdCardLib"]
-        )
+        ),
+        .library(name: "IdCardLibMocks", targets: ["IdCardLibMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 21, 0)),
         .package(url: "https://github.com/leif-ibsen/Digest.git", exact: .init(1, 13, 0)),
-        .package(url: "https://github.com/apple/swift-asn1.git", exact: .init(1, 4, 0)),
-        .package(url: "https://github.com/apple/swift-certificates.git", exact: .init(1, 7, 0)),
+        .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 0)),
         .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
         .package(path: "../UtilsLib"),
         .package(path: "../CommonsLib")
@@ -34,8 +34,7 @@ let package = Package(
         .target(
             name: "IdCardLib",
             dependencies: [
-                .product(name: "SwiftASN1", package: "swift-asn1"),
-                .product(name: "X509", package: "swift-certificates"),
+                "ASN1Decoder",
                 "BigInt",
                 "Digest",
                 "SwiftECC",
@@ -54,7 +53,21 @@ let package = Package(
             linkerSettings: [
                 .linkedFramework("CoreBluetooth", .when(platforms: [.iOS])),
                 .linkedFramework("ExternalAccessory", .when(platforms: [.iOS])),
-                .unsafeFlags(["-ObjC"], .when(platforms: [.iOS]))
+                .unsafeFlags(["-ObjC"], .when(platforms: [.iOS])),
+                .linkedLibrary("c++", .when(platforms: [.iOS]))
+            ]
+        ),
+        .target(
+            name: "IdCardLibMocks",
+            dependencies: ["IdCardLib"],
+            path: "Tests/Mocks/Generated"
+        ),
+        .testTarget(
+            name: "IdCardLibTests",
+            dependencies: [
+                "IdCardLib",
+                "IdCardLibMocks",
+                .product(name: "FactoryTesting", package: "Factory")
             ]
         )
     ]

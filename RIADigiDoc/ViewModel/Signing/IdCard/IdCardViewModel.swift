@@ -21,7 +21,7 @@ import Foundation
 import CryptoSwift
 import IdCardLib
 import CommonsLib
-import X509
+import ASN1Decoder
 import UtilsLib
 import LibdigidocLibSwift
 
@@ -288,9 +288,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         )
 
         let authCertData = try await idCardRepository.readAuthenticationCertificate()
-        let authCertificate = certificateUtil.certificate(from: authCertData)
-        guard let authCert = authCertificate else { return nil }
-        return try getNotValidDate(from: authCert)
+        return try getNotValidDate(from: authCertData)
     }
 
     private func readSignatureCertificateNotValidDate() async throws -> String? {
@@ -299,9 +297,7 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         )
 
         let signCertData = try await idCardRepository.readSignatureCertificate()
-        let signCertificate = certificateUtil.certificate(from: signCertData)
-        guard let signCert = signCertificate else { return nil }
-        return try getNotValidDate(from: signCert)
+        return try getNotValidDate(from: signCertData)
     }
 
     private func readCodeTryCounterRecord() async throws -> PinResponse {
@@ -330,9 +326,15 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         return try await idCardRepository.isPUKChangeable()
     }
 
-    private func getNotValidDate(from certificate: SecCertificate) throws -> String? {
-        let certificate = try Certificate(certificate)
-        let notValidAfter = certificate.notValidAfter
+    private func getNotValidDate(from certData: Data) throws -> String? {
+        let certificate = try X509Certificate(data: certData)
+        let notValidAfterDate = certificate.notAfter
+        guard let notValidAfter = notValidAfterDate else {
+            IdCardViewModel.logger().error(
+                "ID-CARD: Certificate does not contain a valid 'notAfter' date"
+            )
+            return nil
+        }
         return DateUtil.getFormattedDateTime(
             date: notValidAfter,
             isUTC: false
@@ -418,6 +420,10 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
 
     private func handleError(_ error: Error, codeType: CodeType) {
         switch error {
+        case let cancellationError as CancellationError:
+            IdCardViewModel.logger().error("ID-card signing manually cancelled: \(cancellationError)")
+            return
+
         case let idCardError as IdCardError:
             handleIdCardError(idCardError, pinType: codeType)
 
@@ -437,11 +443,6 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
     // swiftlint:disable:next cyclomatic_complexity
     private func handleSignatureAddingError(_ error: Error) {
         IdCardViewModel.logger().error("Unable to sign container with ID-card: \(error)")
-
-        if let cancellationError = error as? CancellationError {
-            IdCardViewModel.logger().error("ID-card signing manually cancelled: \(cancellationError)")
-            return
-        }
 
         guard let digidocError = error as? DigiDocError else {
             errorMessage = "General error"
