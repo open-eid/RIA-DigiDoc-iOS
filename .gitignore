@@ -21,3 +21,6 @@ xcuserdata
 # Xcode-Build-Server
 buildServer.json
 RIADigiDoc/Supporting files/GoogleService-Info.plist
+
+# AASA
+apple-app-site-association
