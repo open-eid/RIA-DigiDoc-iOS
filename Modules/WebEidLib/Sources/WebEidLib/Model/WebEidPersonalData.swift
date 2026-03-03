@@ -1,0 +1,55 @@
+/*
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import Foundation
+
+// MARK: - WebEidPersonalData
+
+struct WebEidPersonalData: Codable, Equatable, Sendable {
+
+    let givenNames: String
+    let surname: String
+    let personalCode: String
+
+    enum CodingKeys: String, CodingKey {
+        case givenNames
+        case surname
+        case personalCode
+    }
+}
+
+// MARK: - Convenience Helpers
+
+extension WebEidPersonalData {
+
+    /// Decode from raw JSON Data
+    static func from(jsonData: Data) throws -> WebEidPersonalData {
+        try JSONDecoder().decode(WebEidPersonalData.self, from: jsonData)
+    }
+
+    /// Encode to JSON Data
+    func toJSONData(pretty: Bool = false) throws -> Data {
+        let encoder = JSONEncoder()
+        if pretty {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        }
+        return try encoder.encode(self)
+    }
+}
+
