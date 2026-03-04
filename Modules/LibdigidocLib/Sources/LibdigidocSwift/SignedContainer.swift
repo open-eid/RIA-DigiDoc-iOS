@@ -319,42 +319,43 @@ extension SignedContainer {
             )
         }
 
-        let isFirstDataFilePDF = await firstFile.isPDF() && firstFile.isSignedPDF()
+        let isSingleFile = dataFiles.count == 1
+        let isSignedPDF = await firstFile.isPDF() && firstFile.isSignedPDF()
+        let isContainer = await firstFile.isContainer()
 
-        let isFirstDataFileContainer = await firstFile.isContainer() || isFirstDataFilePDF
-        var containerFile: URL? = firstFile
+        SignedContainer.logger().info("Is single file: \(isSingleFile, privacy: .public)")
+        SignedContainer.logger().info("Is signed PDF: \(isSignedPDF, privacy: .public)")
+        SignedContainer.logger().info("Is container: \(isContainer, privacy: .public)")
 
-        if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
-            firstFile.pathExtension != CommonsLib.Constants.Extension.Default {
-            let uniqueContainerFile = firstFile
-                .deletingPathExtension()
-                .appendingPathExtension(CommonsLib.Constants.Extension.Default)
-            containerFile = containerUtil.getContainerFile(
-                for: uniqueContainerFile,
-                in: uniqueContainerFile.deletingLastPathComponent()
+        guard isSingleFile && (isContainer || isSignedPDF) else {
+
+            let defaultExtension = CommonsLib.Constants.Extension.Default
+
+            // Replace file extension with container extension
+            let containerURL: URL
+            if firstFile.pathExtension != defaultExtension {
+                containerURL = firstFile
+                    .deletingPathExtension()
+                    .appendingPathExtension(defaultExtension)
+            } else {
+                containerURL = firstFile
+            }
+
+            SignedContainer.logger().info("Getting an unique container name")
+            // Get unique container name file (1) if name already exists
+            let uniqueContainerURL = containerUtil.getContainerFile(
+                for: containerURL,
+                in: containerURL.deletingLastPathComponent()
             )
+
+            SignedContainer.logger().info("Unique container name: \(uniqueContainerURL, privacy: .public)")
+
+            SignedContainer.logger().info("Creating a new container")
+            return try await create(containerFile: uniqueContainerURL, dataFiles: dataFiles)
         }
 
-        guard let containerFile else {
-            let error = isFirstDataFileContainer
-            ? DigiDocError.containerOpeningFailed(
-                ErrorDetail(
-                    message: "Cannot open container. Container file is nil"))
-            : DigiDocError.containerCreationFailed(
-                ErrorDetail(
-                    message: "Cannot create container. Container file is nil"
-                )
-            )
-            throw error
-        }
-
-        if dataFiles.count == 1 && isFirstDataFileContainer {
-            SignedContainer.logger().info("Opening existing container")
-            return try await open(file: containerFile, isSivaConfirmed: isSivaConfirmed)
-        }
-
-        SignedContainer.logger().info("Creating a new container")
-        return try await create(containerFile: containerFile, dataFiles: dataFiles)
+        SignedContainer.logger().info("Opening existing container")
+        return try await open(file: firstFile, isSivaConfirmed: isSivaConfirmed)
     }
 
     private static func open(file: URL, isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {

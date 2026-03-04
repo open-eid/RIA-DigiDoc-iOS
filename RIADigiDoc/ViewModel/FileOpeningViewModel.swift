@@ -68,7 +68,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
 
-            FileOpeningViewModel.logger().info("Found \(validFiles.count) valid file(s)")
+            FileOpeningViewModel.logger().info("Found \(validFiles.count, privacy: .public) valid file(s)")
 
             if validFiles.isEmpty {
                 FileOpeningViewModel.logger().info("No valid files found")
@@ -77,7 +77,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             files = validFiles
         } catch {
-            FileOpeningViewModel.logger().error("Unable to handle files. \(error)")
+            FileOpeningViewModel.logger().error("Unable to handle files. \(String(reflecting: error), privacy: .public)")
             handleError(error)
         }
     }
@@ -96,7 +96,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
             try await container.getRawContainerFile()?.markAsOpened()
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
-            FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(error)")
+            FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)")
             handleError(error)
         }
     }
@@ -121,7 +121,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
                 FileOpeningViewModel.logger().info("Asics signed container set successfully")
                 handleLoadingSuccess(isSivaConfirmed: false)
             } catch {
-                FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(error)")
+                FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)")
                 handleError(error)
             }
         }
@@ -168,10 +168,10 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
     private func handleError(_ error: Error) {
         let ddeMessage = (error as? DigiDocError)?.description ?? error.localizedDescription
-        FileOpeningViewModel.logger().error("\(ddeMessage)")
+        FileOpeningViewModel.logger().error("\(ddeMessage, privacy: .public)")
 
         if let dde = error as? DigiDocError {
-            FileOpeningViewModel.logger().error("\(dde)")
+            FileOpeningViewModel.logger().error("\(String(reflecting: dde), privacy: .public)")
             errorMessage = createToastMessage(for: dde)
         } else {
             errorMessage = ToastMessage(key: error.localizedDescription)

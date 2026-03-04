@@ -18,6 +18,7 @@
  */
 
 struct ContainerNameBottomSheetActions {
+    // swiftlint:disable:next function_parameter_count
     static func actions(
         isEditContainerButtonShown: Bool,
         isSaveButtonShown: Bool = true,

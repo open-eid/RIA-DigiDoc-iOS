@@ -129,7 +129,7 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
         else {
             throw ConfigurationLoaderError.publicKeyNotFound
         }
-        
+
         let signatureFile = configDir.appending(
             path: CommonsLib.Constants.Configuration.CachedConfigEcc
         )
