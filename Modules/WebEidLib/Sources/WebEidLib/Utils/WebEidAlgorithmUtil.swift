@@ -104,21 +104,13 @@ struct WebEidAlgorithmUtil: Loggable {
         return SecCertificateCreateWithData(nil, data as CFData)
     }
     
-    static func base64DecodeFlexible(_ s: String) -> Data? {
-        if let data = Data(base64Encoded: s) {
-            return data
+    static func base64DecodeFlexible(_ str: String) -> Data? {
+        var padded = str
+        let remainder = padded.count % 4
+        if remainder != 0 {
+            padded += String(repeating: "=", count: 4 - remainder)
         }
-
-        var t = s
-            .replacing("-", with: "+")
-            .replacing("_", with: "/")
-
-        let mod = t.count % 4
-        if mod != 0 {
-            t.append(String(repeating: "=", count: 4 - mod))
-        }
-
-        return Data(base64Encoded: t)
+        return Data(base64Encoded: padded, options: [.ignoreUnknownCharacters])
     }
     
     private static func getKeyAttributes(_ key: SecKey) throws -> [CFString: Any] {
