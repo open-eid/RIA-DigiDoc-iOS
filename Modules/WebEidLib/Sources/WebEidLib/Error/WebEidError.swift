@@ -20,8 +20,9 @@
 import Foundation
 
 enum WebEidErrorCode: String, Codable, Sendable {
-    case ERR_WEBEID_MOBILE_INVALID_REQUEST
-    case ERR_WEBEID_MOBILE_UNKNOWN_ERROR
+    case errWebEidMobileInvalidRequest
+    case errWebEidMobileUnknownError
+    case errWebEidUserCancelled
 }
 
 struct WebEidException: Error, LocalizedError, Sendable {
