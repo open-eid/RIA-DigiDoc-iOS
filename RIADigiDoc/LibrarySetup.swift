@@ -134,7 +134,7 @@ actor LibrarySetup: Loggable {
             case DigiDocError.alreadyInitialized:
                 LibrarySetup.logger().error("Cannot initialize Libdigidocpp: Already initialized")
             default: LibrarySetup.logger().error(
-                "Unknown initialization error: \(error.localizedDescription). Error: \(error)")
+                "Unknown initialization error: \(String(reflecting: error), privacy: .public)")
             }
         }
     }

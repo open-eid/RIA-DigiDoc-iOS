@@ -88,12 +88,7 @@ extension URL {
         fileUtil: FileUtilProtocol = fileUtil(),
         mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
     ) async -> Bool {
-        let mimetype = await mimeType(
-            fileUtil: fileUtil,
-            mimeTypeDecoder: mimeTypeDecoder
-        )
-
-        if Constants.MimeType.SignatureContainers.contains(mimetype) {
+        if await isAsicContainer(fileUtil: fileUtil) {
             return true
         }
 
@@ -271,6 +266,21 @@ extension URL {
             return fileURLs
         }
         return []
+    }
+
+    public func isAsicContainer(
+        fileUtil: FileUtilProtocol = fileUtil(),
+    ) async -> Bool {
+        do {
+            if try isZipFile(),
+               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "mimetype") != nil {
+                return true
+            }
+        } catch {
+            return false
+        }
+
+        return false
     }
 
     public func isCades(

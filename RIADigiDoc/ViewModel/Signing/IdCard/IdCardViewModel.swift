@@ -440,7 +440,6 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func handleSignatureAddingError(_ error: Error) {
         IdCardViewModel.logger().error("Unable to sign container with ID-card: \(error)")
 

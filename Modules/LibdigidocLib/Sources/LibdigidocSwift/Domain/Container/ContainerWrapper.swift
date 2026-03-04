@@ -84,7 +84,9 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 saveDataFile: dataFile.fileId,
                 to: tempSavedFileLocation.resolvedPath
             )
-            ContainerWrapper.logger().info("Successfully saved \(sanitizedFilename) to 'Saved Files' directory")
+            ContainerWrapper.logger().info(
+                "Successfully saved \(sanitizedFilename, privacy: .public) to 'Saved Files' directory"
+            )
             return tempSavedFileLocation
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot save data file", code: 2)
@@ -108,7 +110,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
-        ContainerWrapper.logger().info("Opening container file '\(containerFile.lastPathComponent)'")
+        ContainerWrapper.logger().info("Opening container file '\(containerFile.lastPathComponent, privacy: .public)'")
 
         do {
             let container = try DigiDocContainerWrapper.open(
@@ -149,7 +151,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
             return try await open(containerFile: containerFile, isSivaConfirmed: true)
         } catch {
-            ContainerWrapper.logger().error("Unable to add data files. \(error)")
+            ContainerWrapper.logger().error("Unable to add data files. \(error, privacy: .public)")
 
             let nsError = error as NSError
 
@@ -302,7 +304,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
         return dataFiles.compactMap { item in
             guard let dataFile = item as? DigiDocDataFile else {
-                ContainerWrapper.logger().error("Unexpected type: \(type(of: item))")
+                ContainerWrapper.logger().error("Unexpected type: \(type(of: item), privacy: .public)")
                 return DataFileWrapper(fileId: "", fileName: "", fileSize: 0, mediaType: "")
             }
 

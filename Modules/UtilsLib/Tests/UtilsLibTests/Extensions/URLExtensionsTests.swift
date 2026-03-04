@@ -111,6 +111,37 @@ struct URLExtensionsTests {
     }
 
     @Test
+    func isAsicContainer_successWithContainerFile() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Asice],
+            containerExtension: "asice")
+
+        let isContainer = await mockContainer?.isAsicContainer() ?? false
+
+        #expect(isContainer)
+    }
+
+    @Test
+    func isAsicContainer_returnFalseForRegularFile() async {
+        let nonexistentFileURL = URL(fileURLWithPath: "/path/to/file.txt")
+
+        let isContainer = await nonexistentFileURL.isAsicContainer()
+
+        #expect(!isContainer)
+    }
+
+    @Test
+    func isAsicContainer_returnFalseForZipFileWithNoMimetypeFile() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["test": "test"],
+            containerExtension: "asice")
+
+        let isContainer = await mockContainer?.isAsicContainer() ?? false
+
+        #expect(!isContainer)
+    }
+
+    @Test
     func isDdoc_success() async {
         do {
             let mockContainer = try TestContainerUtil.createMockContainer(

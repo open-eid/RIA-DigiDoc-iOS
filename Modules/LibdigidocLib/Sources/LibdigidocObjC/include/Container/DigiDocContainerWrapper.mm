@@ -188,7 +188,6 @@ public:
 + (nullable DigiDocContainer *)open:(NSString *)containerPath validateOnline:(BOOL)validateOnline error:(NSError **)error {
     // Having two container instances of the same file is causing crashes. Should synchronize all container operations?
     @synchronized (self) {
-        NSError *error = nil;
         std::unique_ptr<digidoc::Container> container;
         try {
             DigiDocContainerOpenCB cb(validateOnline);
@@ -200,7 +199,7 @@ public:
                 @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
             };
 
-            error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
+            *error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
             return nil;
         }
 
@@ -240,7 +239,7 @@ public:
                 @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
             };
 
-            error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
+            *error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
             return nil;
         }
     }
