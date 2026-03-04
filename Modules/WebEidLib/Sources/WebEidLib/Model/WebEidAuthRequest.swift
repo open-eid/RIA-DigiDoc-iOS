@@ -32,4 +32,3 @@ struct WebEidAuthRequest: JSONCodable, Equatable, Sendable {
         case origin
     }
 }
-

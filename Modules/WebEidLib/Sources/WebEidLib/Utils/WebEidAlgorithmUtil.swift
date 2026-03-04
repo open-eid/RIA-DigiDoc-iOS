@@ -30,7 +30,7 @@ struct WebEidAlgorithmUtil: Loggable {
         "SHA3-224",
         "SHA3-256",
         "SHA3-384",
-        "SHA3-512",
+        "SHA3-512"
     ]
 
     /// returns an array of JSON-like dictionaries.
@@ -97,13 +97,13 @@ struct WebEidAlgorithmUtil: Loggable {
         }
         return cert
     }
-    
+
     // MARK: - Helpers
 
     static func certificate(from data: Data) -> SecCertificate? {
         return SecCertificateCreateWithData(nil, data as CFData)
     }
-    
+
     static func base64DecodeFlexible(_ str: String) -> Data? {
         var padded = str
         let remainder = padded.count % 4
@@ -112,7 +112,7 @@ struct WebEidAlgorithmUtil: Loggable {
         }
         return Data(base64Encoded: padded, options: [.ignoreUnknownCharacters])
     }
-    
+
     private static func getKeyAttributes(_ key: SecKey) throws -> [CFString: Any] {
         guard let attrs = SecKeyCopyAttributes(key) as? [CFString: Any] else {
             throw WebEidAlgorithmUtilError.unsupportedKeyType

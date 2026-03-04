@@ -66,5 +66,3 @@ struct WebEidResponseUtil: Loggable {
             .replacing("=", with: "")
     }
 }
-
-

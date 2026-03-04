@@ -40,4 +40,3 @@ extension WebEidCertificateRequest {
         URL(string: responseUri)
     }
 }
-

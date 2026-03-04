@@ -37,4 +37,3 @@ extension JSONCodable {
         return try encoder.encode(self)
     }
 }
-

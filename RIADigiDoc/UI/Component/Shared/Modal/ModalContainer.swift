@@ -69,7 +69,7 @@ struct ModalContainer<Content: View>: View {
                         cancelButtonAccessibility ??
                         languageSettings.localized(cancelButtonTitle).lowercased()
                     )
-                if (isConfirmButtonVisible) {
+                if isConfirmButtonVisible {
                     Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
                         .font(typography.labelLarge)
                         .foregroundStyle(theme.primary)

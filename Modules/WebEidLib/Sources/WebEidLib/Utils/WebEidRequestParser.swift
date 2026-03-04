@@ -290,7 +290,7 @@ struct WebEidRequestParser: Loggable {
     }
 
     // MARK: - Personal Data Extraction using (SwiftASN1/X509)
-    
+
     private static func getSubjectAttribute(cert: Data, oidString: String) -> String {
         do {
             let x509 = try X509Certificate(data: cert)
@@ -302,13 +302,13 @@ struct WebEidRequestParser: Loggable {
             return ""
         }
     }
-    
+
     private static func extractPersonalData(from certDER: Data) throws -> WebEidPersonalData {
-        let commonName = "2.5.4.3" // CN OID: 2.5.4.3
-        let cn = getSubjectAttribute(cert: certDER, oidString: commonName)
+        let commonNameOID = "2.5.4.3" // CN OID: 2.5.4.3
+        let commonName = getSubjectAttribute(cert: certDER, oidString: commonNameOID)
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard !cn.isEmpty else {
+        guard !commonName.isEmpty else {
             throw WebEidException(
                 code: .errWebEidMobileInvalidRequest,
                 message: "Signing certificate CN missing",
@@ -316,7 +316,7 @@ struct WebEidRequestParser: Loggable {
             )
         }
 
-        let normalizedCN = cn
+        let normalizedCN = commonName
             .replacing("\\,", with: ",")
             .replacing("\\ ", with: " ")
 

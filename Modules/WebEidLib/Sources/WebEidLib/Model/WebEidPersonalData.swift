@@ -33,5 +33,3 @@ struct WebEidPersonalData: JSONCodable, Equatable, Sendable {
         case personalCode
     }
 }
-
-

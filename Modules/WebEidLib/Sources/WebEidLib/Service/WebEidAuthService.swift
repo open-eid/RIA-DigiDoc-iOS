@@ -22,9 +22,9 @@ import Security
 import UtilsLib
 
 public actor WebEidAuthService: WebEidAuthServiceProtocol, Loggable {
-    
+
     init() {}
-    
+
     public func buildAuthToken(
         authCert: Data,
         signingCert: Data?,
@@ -42,8 +42,9 @@ public actor WebEidAuthService: WebEidAuthServiceProtocol, Loggable {
         var token: [String: Any] = [
             "algorithm": algorithm,
             "unverifiedCertificate": authCert.base64EncodedString(),
-            "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0", //TODO: hardcoded? NB! clarify with RIA
-            "signature": signature.base64EncodedString(),
+            // TODO: hardcoded? NB! clarify with RIA
+            "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0",
+            "signature": signature.base64EncodedString()
         ]
 
         if let signingCert {

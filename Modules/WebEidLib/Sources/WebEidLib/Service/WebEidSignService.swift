@@ -34,7 +34,9 @@ public actor WebEidSignService: WebEidSignServiceProtocol, Loggable {
             throw WebEidBuilderError.missingPublicKey
         }
 
-        let supportedSignatureAlgorithms = try WebEidAlgorithmUtil.buildSupportedSignatureAlgorithms(publicKey: publicKey)
+        let supportedSignatureAlgorithms = try WebEidAlgorithmUtil.buildSupportedSignatureAlgorithms(
+            publicKey: publicKey
+        )
 
         let payload: [String: Any] = [
             "certificate": signingCert.base64EncodedString(),
@@ -59,7 +61,10 @@ public actor WebEidSignService: WebEidSignServiceProtocol, Loggable {
             throw WebEidBuilderError.missingPublicKey
         }
 
-        let signatureAlgorithm = try WebEidAlgorithmUtil.buildSignatureAlgorithm(publicKey: publicKey, hashFunction: hashFunction)
+        let signatureAlgorithm = try WebEidAlgorithmUtil.buildSignatureAlgorithm(
+            publicKey: publicKey,
+            hashFunction: hashFunction
+        )
 
         let payload: [String: Any] = [
             "signature": signature.base64EncodedString(),

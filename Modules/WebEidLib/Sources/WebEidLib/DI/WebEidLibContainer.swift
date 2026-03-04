@@ -26,7 +26,7 @@ extension Container {
             WebEidAuthService()
         }
     }
-    
+
     public var webEidSignService: Factory<WebEidSignServiceProtocol> {
         self {
             WebEidSignService()

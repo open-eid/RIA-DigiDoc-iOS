@@ -68,8 +68,8 @@ enum WebEidAlgorithmUtilError: Error, LocalizedError {
             return "Invalid Base64"
         case .invalidCertificate:
             return "Invalid X.509 certificate"
-        case .unsupportedHashFunction(let hf):
-            return "Unsupported hash function: \(hf)"
+        case .unsupportedHashFunction(let hashFunction):
+            return "Unsupported hash function: \(hashFunction)"
         }
     }
 }
@@ -85,4 +85,3 @@ enum WebEidResponseUtilError: Error, LocalizedError {
         }
     }
 }
-
