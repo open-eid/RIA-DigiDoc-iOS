@@ -110,8 +110,8 @@ struct WebEidAlgorithmUtil: Loggable {
         }
 
         var t = s
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
+            .replacing("-", with: "+")
+            .replacing("_", with: "/")
 
         let mod = t.count % 4
         if mod != 0 {
@@ -152,14 +152,16 @@ struct WebEidAlgorithmUtil: Loggable {
 }
 
 /// serialize the returned JSON objects into Data/String:
-extension Array where Element == [String: Any] {
-    func toJSONData(pretty: Bool = false) throws -> Data {
-        try JSONSerialization.data(withJSONObject: self, options: pretty ? [.prettyPrinted] : [])
-    }
-}
+protocol JSONSerializable {}
 
-extension Dictionary where Key == String, Value == Any {
+extension Array: JSONSerializable {}
+extension Dictionary: JSONSerializable {}
+
+extension JSONSerializable {
     func toJSONData(pretty: Bool = false) throws -> Data {
-        try JSONSerialization.data(withJSONObject: self, options: pretty ? [.prettyPrinted] : [])
+        try JSONSerialization.data(
+            withJSONObject: self,
+            options: pretty ? [.prettyPrinted] : []
+        )
     }
 }

@@ -19,7 +19,7 @@
 
 import Foundation
 
-struct WebEidAuthRequest: Codable, Equatable, Sendable {
+struct WebEidAuthRequest: JSONCodable, Equatable, Sendable {
     let challenge: String
     let loginUri: String
     let getSigningCertificate: Bool
@@ -33,15 +33,3 @@ struct WebEidAuthRequest: Codable, Equatable, Sendable {
     }
 }
 
-/// Convenience helpers (to parse from incoming JSON)
-extension WebEidAuthRequest {
-    static func from(jsonData: Data) throws -> WebEidAuthRequest {
-        try JSONDecoder().decode(WebEidAuthRequest.self, from: jsonData)
-    }
-
-    func toJSONData(pretty: Bool = false) throws -> Data {
-        let encoder = JSONEncoder()
-        if pretty { encoder.outputFormatting = [.prettyPrinted, .sortedKeys] }
-        return try encoder.encode(self)
-    }
-}

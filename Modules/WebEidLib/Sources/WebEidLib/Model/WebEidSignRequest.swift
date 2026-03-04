@@ -22,7 +22,7 @@ import Security
 
 // MARK: - WebEidSignRequest
 
-struct WebEidSignRequest: Codable, Equatable, Sendable {
+struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
 
     let responseUri: String
     let origin: String
@@ -98,21 +98,6 @@ struct WebEidSignRequest: Codable, Equatable, Sendable {
 // MARK: - Convenience Helpers
 
 extension WebEidSignRequest {
-
-    /// Decode from raw JSON Data
-    static func from(jsonData: Data) throws -> WebEidSignRequest {
-        try JSONDecoder().decode(WebEidSignRequest.self, from: jsonData)
-    }
-
-    /// Encode to JSON Data
-    func toJSONData(pretty: Bool = false) throws -> Data {
-        let encoder = JSONEncoder()
-        if pretty {
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        }
-        return try encoder.encode(self)
-    }
-
     /// Extract public key from certificate
     var publicKey: SecKey? {
         SecCertificateCopyKey(signingCertificate)

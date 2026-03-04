@@ -61,9 +61,9 @@ struct WebEidResponseUtil: Loggable {
         let b64 = data.base64EncodedString() // standard Base64, no wraps by default
         // Convert to Base64URL + remove padding
         return b64
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
+            .replacing("+", with: "-")
+            .replacing("/", with: "_")
+            .replacing("=", with: "")
     }
 }
 

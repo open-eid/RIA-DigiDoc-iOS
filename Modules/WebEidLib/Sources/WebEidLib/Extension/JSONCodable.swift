@@ -19,25 +19,22 @@
 
 import Foundation
 
-// MARK: - WebEidCertificateRequest
+// MARK: - Shared JSON helpers
 
-struct WebEidCertificateRequest: JSONCodable, Equatable, Sendable {
+protocol JSONCodable: Codable {}
 
-    let responseUri: String
-    let origin: String
-
-    enum CodingKeys: String, CodingKey {
-        case responseUri
-        case origin
+extension JSONCodable {
+    /// Decode from raw JSON Data
+    static func from(jsonData: Data, decoder: JSONDecoder = JSONDecoder()) throws -> Self {
+        try decoder.decode(Self.self, from: jsonData)
     }
-}
 
-// MARK: - Convenience Helpers
-
-extension WebEidCertificateRequest {
-    /// Convenience computed URL (safe conversion)
-    var responseURL: URL? {
-        URL(string: responseUri)
+    /// Encode to JSON Data
+    func toJSONData(pretty: Bool = false, encoder: JSONEncoder = JSONEncoder()) throws -> Data {
+        if pretty {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        }
+        return try encoder.encode(self)
     }
 }
 

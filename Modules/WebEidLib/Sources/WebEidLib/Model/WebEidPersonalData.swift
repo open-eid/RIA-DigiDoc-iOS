@@ -21,7 +21,7 @@ import Foundation
 
 // MARK: - WebEidPersonalData
 
-struct WebEidPersonalData: Codable, Equatable, Sendable {
+struct WebEidPersonalData: JSONCodable, Equatable, Sendable {
 
     let givenNames: String
     let surname: String
@@ -34,22 +34,4 @@ struct WebEidPersonalData: Codable, Equatable, Sendable {
     }
 }
 
-// MARK: - Convenience Helpers
-
-extension WebEidPersonalData {
-
-    /// Decode from raw JSON Data
-    static func from(jsonData: Data) throws -> WebEidPersonalData {
-        try JSONDecoder().decode(WebEidPersonalData.self, from: jsonData)
-    }
-
-    /// Encode to JSON Data
-    func toJSONData(pretty: Bool = false) throws -> Data {
-        let encoder = JSONEncoder()
-        if pretty {
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        }
-        return try encoder.encode(self)
-    }
-}
 

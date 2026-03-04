@@ -111,8 +111,13 @@ struct WebEidRequestParser: Loggable {
         }
 
         // Use ASN1Decoder to extract CN
-        let personalData = try? extractPersonalData(from: certDER)
-
+        guard let personalData = try? extractPersonalData(from: certDER) else {
+            throw WebEidException(
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
+                message: "Failed to extract personal data from certificate",
+                responseUri: responseURL.absoluteString
+            )
+        }
         return WebEidSignRequest(
             responseUri: responseURL.absoluteString,
             origin: try parseOrigin(responseURL),
@@ -312,8 +317,8 @@ struct WebEidRequestParser: Loggable {
         }
 
         let normalizedCN = cn
-            .replacingOccurrences(of: "\\,", with: ",")
-            .replacingOccurrences(of: "\\ ", with: " ")
+            .replacing("\\,", with: ",")
+            .replacing("\\ ", with: " ")
 
         let parts = normalizedCN
             .split(separator: ",", omittingEmptySubsequences: false)
