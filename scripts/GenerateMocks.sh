@@ -14,6 +14,7 @@ modules=(
   "MobileIdLib"
   "SmartIdLib"
   "IdCardLib"
+  "WebEidLib"
 )
 
 extensions=(
@@ -62,6 +63,10 @@ for module in "${modules[@]}"; do
       ;;
     "IdCardLib")
       custom_imports=("IdCardLib")
+      testable_imports=""
+      ;;
+    "WebEidLib")
+      custom_imports=("WebEidLib")
       testable_imports=""
       ;;
     *)
