@@ -127,6 +127,42 @@
         }
       }
     },
+    "authConsentText" : {
+      "comment" : "WebEid authentication consent text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By authenticating, I agree to the transfer of my name and personal identification code to the service provider."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentides nõustun oma nime ja isikukoodi edastamisega teenusepakkujale."
+          }
+        }
+      }
+    },
+    "Authenticate" : {
+      "comment" : "WebEid authenticate button text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentimine"
+          }
+        }
+      }
+    },
     "Authentication certificate" : {
       "comment" : "My eID PIN 1 title",
       "extractionState" : "manual",
@@ -159,6 +195,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Autentimine käib. Palun oodake."
+          }
+        }
+      }
+    },
+    "Authentication title" : {
+      "comment" : "WebEid auth header title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticate with ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentimine ID-kaardiga"
+          }
+        }
+      }
+    },
+    "authRequestFrom" : {
+      "comment" : "WebEid auth request from field title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication request from:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentimispäring:"
           }
         }
       }
@@ -426,6 +498,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sertifikaat on kehtetu"
+          }
+        }
+      }
+    },
+    "Certificate title" : {
+      "comment" : "WebEid cert header title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali sertifikaat"
+          }
+        }
+      }
+    },
+    "certificateConsentText" : {
+      "comment" : "WebEid certificate consent text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By choosing the certificate, I agree to the transfer of my name and personal identification code to the service provider."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaati valides nõustun oma nime ja isikukoodi edastamisega teenusepakkujale."
+          }
+        }
+      }
+    },
+    "certRequestFrom" : {
+      "comment" : "WebEid cert request from field title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certificate request from:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaadipäring:"
           }
         }
       }
@@ -748,6 +874,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Palun kontrolli internetiühendust ja võrgu sätteid"
+          }
+        }
+      }
+    },
+    "Confirm" : {
+      "comment" : "WebEid certificate button text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kinnita"
           }
         }
       }
@@ -1394,6 +1538,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dekrüpteerimise meetod muudetud"
+          }
+        }
+      }
+    },
+    "details" : {
+      "comment" : "WebEid details field title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andmed:"
+          }
+        }
+      }
+    },
+    "detailsForwarded" : {
+      "comment" : "WebEid details forwarded field title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details forwarded:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edastatavad andmed:"
           }
         }
       }
@@ -2387,6 +2567,24 @@
         }
       }
     },
+    "Invalid authentication request" : {
+      "comment" : "WebEid auth request error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid authentication request"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vigane autentimispäring"
+          }
+        }
+      }
+    },
     "Invalid country code" : {
       "comment" : "Shown in signing view when country code is not correct",
       "extractionState" : "manual",
@@ -2551,6 +2749,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku allkirjastamine ebaõnnestus. Kontrolli %@ teenuse ligipääsu seadeid"
+          }
+        }
+      }
+    },
+    "Invalid Web eID request" : {
+      "comment" : "WebEid invalid request error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid Web eID request"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vigane Web eID päring"
           }
         }
       }
@@ -5017,6 +5233,24 @@
         }
       }
     },
+    "namePersonalIdentificationCode" : {
+      "comment" : "WebEid name and personal code text title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAME, PERSONAL IDENTIFICATION CODE"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NIMI, ISIKUKOOD"
+          }
+        }
+      }
+    },
     "New PIN difference requirement" : {
       "comment" : "My eID new PIN or PUK difference description",
       "extractionState" : "manual",
@@ -6328,6 +6562,24 @@
         }
       }
     },
+    "rememberMeMessageWebEid" : {
+      "comment" : "WebEid remember me field message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The entered data will be filled the next time you authenticate."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Järgmisel kasutamisel on andmeväljad eeltäidetud."
+          }
+        }
+      }
+    },
     "Remove" : {
       "comment" : "Remove text for buttons",
       "extractionState" : "manual",
@@ -6540,6 +6792,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Korda uut %1$@-koodi"
+          }
+        }
+      }
+    },
+    "Request error" : {
+      "comment" : "WebEid request error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request error"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päringu viga"
           }
         }
       }
@@ -7241,6 +7511,24 @@
         }
       }
     },
+    "signatureConsentText" : {
+      "comment" : "WebEid signature consent text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By entering your PIN2, you give a handwritten-equivalent digital signature."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN2 koodi sisestamisega annad omakäelise digiallkirja."
+          }
+        }
+      }
+    },
     "Signed at" : {
       "comment" : "Signed date and time",
       "extractionState" : "manual",
@@ -7453,6 +7741,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Päringu saatmine ebaõnnestus. %@ teenuses esinevad tehnilised tõrked. Palun proovige mõne aja pärast uuesti"
+          }
+        }
+      }
+    },
+    "signRequestFrom" : {
+      "comment" : "WebEid signature request from field title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing request from:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamispäring:"
           }
         }
       }

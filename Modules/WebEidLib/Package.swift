@@ -25,6 +25,7 @@ let package = Package(
             name: "WebEidLib",
             dependencies: [
                 "Alamofire",
+                "ASN1Decoder",
                 "UtilsLib",
                 "CommonsLib",
                 .product(name: "FactoryKit", package: "Factory")

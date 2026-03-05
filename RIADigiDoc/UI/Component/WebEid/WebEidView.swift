@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ import UtilsLib
 
 struct WebEidView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
@@ -33,37 +34,194 @@ struct WebEidView: View {
     @AppTypography private var typography
 
     @State private var viewModel: WebEidViewModel
-
+    @State private var isWebEidAuthenticating: Bool = false
+    
     private var webEidUrl: URL
+    
+    private let signedContainer: GeneralContainer?
 
+    private let sharedContainerViewModel: SharedContainerViewModelProtocol
+    
+    private var errorMessage: String {
+        languageSettings.localized(
+            viewModel.errorKey ?? "",
+            viewModel.errorExtraArguments
+        )
+    }
+    
     init(
         webEidUrl: URL,
     ) {
         _viewModel = State(wrappedValue: Container.shared.webEidViewModel())
         self.webEidUrl = webEidUrl
+        self.sharedContainerViewModel = Container.shared.sharedContainerViewModel()
+        self.signedContainer = sharedContainerViewModel.currentContainer()
     }
 
     var body: some View {
         ZStack {
-            TopBarContainer(
-                title: languageSettings.localized("Main home web eid title"),
-                onLeftClick: {
-                    // TODO: implement me
-
-                    dismiss()
-                },
-                content: {
-                    ScrollView {
-                        VStack {
-                            // TODO: implement me
+            if (viewModel.authRequest != nil) {
+                if (!isWebEidAuthenticating) {
+                    let origin: String = {
+                        if let authRequest = viewModel.authRequest {
+                            return authRequest.origin
+                        } else {
+                            return ""
                         }
-                        .padding(.horizontal, Dimensions.Padding.SPadding)
-                    }
+                    }()
+                    WebEidAuthInfo(origin: origin)
                 }
-            )
+                NFCView(
+                    actionType: .auth,
+                    actionMethods: [
+                        .idCardViaNFC,
+                    ],
+                    pinType: CodeType.pin1,
+                    isWebEidAuthenticating: $isWebEidAuthenticating,
+                    onSuccessWebEid: {
+                        isWebEidAuthenticating = false
+                    },
+                    onErrorWebEid: {
+                        isWebEidAuthenticating = false
+                    }
+                )
+            }
+            if (viewModel.certRequest != nil || viewModel.signRequest != nil) {
+                if (!isWebEidAuthenticating) {
+                    let origin: String = {
+                        if let certRequest = viewModel.certRequest {
+                            return certRequest.origin
+                        } else if let signRequest = viewModel.signRequest {
+                            return signRequest.origin
+                        } else {
+                            return ""
+                        }
+                    }()
+
+                    let signingPersonInfo: String? = viewModel.signRequest?.personalData.map {
+                        "\($0.givenNames) \($0.surname), \($0.personalCode)"
+                    }
+                    
+                    WebEidSignOrCertificateInfo(
+                        origin: origin,
+                        isCertificateFlow: viewModel.certRequest != nil,
+                        signingPersonInfo: signingPersonInfo,
+                    )
+                }
+                if (viewModel.certRequest != nil) {
+                    NFCView(
+                        actionType: .certificate,
+                        actionMethods: [
+                            .idCardViaNFC,
+                        ],
+                        isWebEidAuthenticating: $isWebEidAuthenticating,
+                        onSuccessWebEid: {
+                            isWebEidAuthenticating = false
+                        },
+                        onErrorWebEid: {
+                            isWebEidAuthenticating = false
+                        }
+                    )
+                } else {
+                    NFCView(
+                        actionType: .signing,
+                        actionMethods: [
+                            .idCardViaNFC,
+                        ],
+                        pinType: CodeType.pin2,
+                        isWebEidAuthenticating: $isWebEidAuthenticating,
+                        onSuccessWebEid: {
+                            isWebEidAuthenticating = false
+                            /* TODO:
+                             sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
+                             sharedSettingsViewModel.dataStore.setWebEidSessionActive(false)
+                            */
+                        },
+                        onErrorWebEid: {
+                            isWebEidAuthenticating = false
+                        }
+                    )
+                }
+            }
+        }
+        .alert(
+            languageSettings.localized(
+                viewModel.alertMessageKey ?? "",
+                viewModel.alertMessageExtraArguments
+            ),
+            isPresented: $viewModel.showAlertMessage
+        ) {
+            Button(languageSettings.localized("OK")) {
+                viewModel.resetErrors()
+            }
+
+            if let messageUrl = viewModel.alertMessageUrl, !messageUrl.isEmpty {
+                Button(languageSettings.localized("Additional information")) {
+                    if let url = URL(string: languageSettings.localized(messageUrl)),
+                       UIApplication.shared.canOpenURL(url) {
+                        openURL(url)
+                    }
+                    viewModel.resetErrors()
+                }
+            }
         }
         .onAppear {
-            // TODO: implement me
+            if let host = webEidUrl.host {
+
+                switch host {
+                case "auth":
+                    viewModel.handleAuth(url: webEidUrl)
+                case "cert":
+                    viewModel.handleCertificate(url: webEidUrl)
+                case "sign":
+                    viewModel.handleSign(url: webEidUrl)
+                default:
+                    viewModel.handleUnknown(url: webEidUrl)
+                }
+            }
+        }
+        .onChange(of: viewModel.relyingPartyResponseEvents) { _, responseURL in
+            guard let responseURL else { return }
+            
+            openURL(responseURL)
+            dismiss()
+            
+            viewModel.relyingPartyResponseEvents = nil
+        }
+        .onChange(of: viewModel.errorKey) { _, newKey in
+            guard newKey != nil else { return }
+            Toast.show(errorMessage)
+        }
+        .onChange(of: webEidUrl) {_, url in
+            if let host = url.host {
+
+                switch host {
+                case "auth":
+                    viewModel.handleAuth(url: url)
+                case "cert":
+                    viewModel.handleCertificate(url: url)
+                case "sign":
+                    viewModel.handleSign(url: url)
+                default:
+                    viewModel.handleUnknown(url: url)
+                }
+            }
+        }
+        .onChange(of: viewModel.authRequest) {_, request in
+            /* TODO
+            if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
+                sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
+            }
+            sharedSettingsViewModel.dataStore.setWebEidSessionActive(true)
+            */
+        }
+        .onChange(of: viewModel.certRequest) {_, request in
+            /* TODO
+            if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
+                sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
+            }
+            sharedSettingsViewModel.dataStore.setWebEidSessionActive(true)
+            */
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,6 +45,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Container signing")
         case .myeid:
             languageSettings.localized("Identification title")
+        case .auth:
+            languageSettings.localized("Authentication title")
+        case .certificate:
+            languageSettings.localized("Certificate title")
+        case .signingWebEid:
+            languageSettings.localized("Container signing")
         }
     }
 
@@ -56,6 +62,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Signing method")
         case .myeid:
             languageSettings.localized("Identification method")
+        case .auth:
+            languageSettings.localized("Authentication method")
+        case .certificate:
+            languageSettings.localized("Certificate method")
+        case .signingWebEid:
+            languageSettings.localized("Signing method")
         }
     }
 
@@ -71,6 +83,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Sign")
         case .myeid:
             languageSettings.localized("Identify")
+        case .auth:
+            languageSettings.localized("Authenticate")
+        case .certificate:
+            languageSettings.localized("Confirm")
+        case .signingWebEid:
+            languageSettings.localized("Sign")
         }
     }
 
@@ -118,41 +136,43 @@ struct ActionInputScreen<Content: View>: View {
                             .accessibilityAddTraits([.isHeader])
 
                         if !isInProgress {
-                            VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
-                                Text(verbatim: selectedActionMethodLabel)
-                                    .font(typography.labelLarge)
-                                    .foregroundStyle(theme.onSurfaceVariant)
-                                    .accessibilityHidden(true)
+                            if (actionMethods.count > 1) {
+                                VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
+                                    Text(verbatim: selectedActionMethodLabel)
+                                        .font(typography.labelLarge)
+                                        .foregroundStyle(theme.onSurfaceVariant)
+                                        .accessibilityHidden(true)
 
-                                NavigationLink(
-                                    value: NavigationDestination.signingMethodSelectionView(
-                                        actionType: actionType,
-                                        methods: actionMethods
-                                    )
-                                ) {
-                                    HStack {
-                                        Text(verbatim: selectedSigningMethodText)
-                                            .font(typography.bodyLarge)
-                                            .foregroundStyle(theme.onSurface)
-                                            .accessibilityLabel(Text(verbatim:
-                                                "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
-                                            )
-                                        Spacer()
-                                        Image("ic_m3_arrow_right_48pt_wght400")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(
-                                                width: Dimensions.Icon.IconSizeXXS,
-                                                height: Dimensions.Icon.IconSizeXXS
-                                            )
-                                            .foregroundStyle(theme.onBackground)
-                                            .accessibilityHidden(true)
+                                    NavigationLink(
+                                        value: NavigationDestination.signingMethodSelectionView(
+                                            actionType: actionType,
+                                            methods: actionMethods
+                                        )
+                                    ) {
+                                        HStack {
+                                            Text(verbatim: selectedSigningMethodText)
+                                                .font(typography.bodyLarge)
+                                                .foregroundStyle(theme.onSurface)
+                                                .accessibilityLabel(Text(verbatim:
+                                                    "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
+                                                )
+                                            Spacer()
+                                            Image("ic_m3_arrow_right_48pt_wght400")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(
+                                                    width: Dimensions.Icon.IconSizeXXS,
+                                                    height: Dimensions.Icon.IconSizeXXS
+                                                )
+                                                .foregroundStyle(theme.onBackground)
+                                                .accessibilityHidden(true)
+                                        }
                                     }
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, Dimensions.Padding.SPadding)
+                                .padding(.bottom, Dimensions.Padding.MPadding)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, Dimensions.Padding.SPadding)
-                            .padding(.bottom, Dimensions.Padding.MPadding)
                         }
 
                         content
