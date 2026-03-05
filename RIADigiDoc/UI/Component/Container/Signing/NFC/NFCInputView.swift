@@ -120,13 +120,13 @@ struct NFCInputView: View {
                     }
                 }
             }
-            if (!isWebEidAuthenticating) {
+            if !isWebEidAuthenticating {
                 VStack(spacing: Dimensions.Padding.ZeroPadding) {
                     ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
                         .padding(.trailing, Dimensions.Padding.XSPadding)
                         .padding(.vertical, Dimensions.Padding.ZeroPadding)
                         .accessibilityLabel(Text(verbatim: "\(rememberMeLabel) \(rememberMe)"))
-                    
+
                     if rememberMe {
                         HStack {
                             Text(verbatim: languageSettings.localized("Remember me message"))

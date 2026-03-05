@@ -28,9 +28,9 @@ struct NFCView: View {
     @Environment(\.openURL) private var openURL
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
-    
+
     @Binding private var isWebEidAuthenticating: Bool
-    
+
     @State private var actionType: ActionType
     @State private var actionMethods: [ActionMethod]
     @State private var canNumber = ""
@@ -53,7 +53,7 @@ struct NFCView: View {
     @State private var taskSignWebEid: Task<Void, Never>?
     @State private var taskAuth: Task<Void, Never>?
     @State private var taskCertificate: Task<Void, Never>?
-    
+
     private var isNFCSupported: Bool {
         viewModel.isNFCSupported()
     }
@@ -162,11 +162,11 @@ struct NFCView: View {
                 case .auth:
                     saveInputData()
                     isInProgress = true
-                    
+
                     if !isNFCSupported {
                         return
                     }
-                    
+
                     isWebEidAuthenticating = true
                     Task {
                         // TODO: auth()
@@ -174,11 +174,11 @@ struct NFCView: View {
                 case .certificate:
                     saveInputData()
                     isInProgress = true
-                    
+
                     if !isNFCSupported {
                         return
                     }
-                    
+
                     isWebEidAuthenticating = true
                     Task {
                         // TODO: certificate()
@@ -407,7 +407,7 @@ struct NFCView: View {
         taskCertificate?.cancel()
         taskCertificate = nil
     }
-    
+
     private func sign(roleData: RoleData? = nil) {
         taskSign = Task {
             guard let container = signedContainer else { return }

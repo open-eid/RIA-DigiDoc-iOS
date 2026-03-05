@@ -20,12 +20,12 @@
 import SwiftUI
 
 struct WebEidSignOrCertificateInfo: View {
-    
+
     @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     let origin: String
     let isCertificateFlow: Bool
     let signingPersonInfo: String?
@@ -44,9 +44,9 @@ struct WebEidSignOrCertificateInfo: View {
 
     private var personLine: String {
         if !isCertificateFlow,
-           let s = signingPersonInfo?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !s.isEmpty {
-            return s
+           let info = signingPersonInfo?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !info.isEmpty {
+            return info
         }
         return "namePersonalIdentificationCode"
     }

@@ -20,12 +20,12 @@
 import SwiftUI
 
 struct WebEidAuthInfo: View {
-    
+
     @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
     @AppTypography private var typography
-    
+
     let origin: String
 
     private var titleText: String {
@@ -86,4 +86,3 @@ struct WebEidAuthInfo: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
-

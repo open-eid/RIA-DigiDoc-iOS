@@ -136,7 +136,7 @@ struct ActionInputScreen<Content: View>: View {
                             .accessibilityAddTraits([.isHeader])
 
                         if !isInProgress {
-                            if (actionMethods.count > 1) {
+                            if actionMethods.count > 1 {
                                 VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
                                     Text(verbatim: selectedActionMethodLabel)
                                         .font(typography.labelLarge)

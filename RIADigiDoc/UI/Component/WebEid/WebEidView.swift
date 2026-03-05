@@ -35,20 +35,20 @@ struct WebEidView: View {
 
     @State private var viewModel: WebEidViewModel
     @State private var isWebEidAuthenticating: Bool = false
-    
+
     private var webEidUrl: URL
-    
+
     private let signedContainer: GeneralContainer?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
-    
+
     private var errorMessage: String {
         languageSettings.localized(
             viewModel.errorKey ?? "",
             viewModel.errorExtraArguments
         )
     }
-    
+
     init(
         webEidUrl: URL,
     ) {
@@ -60,8 +60,8 @@ struct WebEidView: View {
 
     var body: some View {
         ZStack {
-            if (viewModel.authRequest != nil) {
-                if (!isWebEidAuthenticating) {
+            if viewModel.authRequest != nil {
+                if !isWebEidAuthenticating {
                     let origin: String = {
                         if let authRequest = viewModel.authRequest {
                             return authRequest.origin
@@ -74,7 +74,7 @@ struct WebEidView: View {
                 NFCView(
                     actionType: .auth,
                     actionMethods: [
-                        .idCardViaNFC,
+                        .idCardViaNFC
                     ],
                     pinType: CodeType.pin1,
                     isWebEidAuthenticating: $isWebEidAuthenticating,
@@ -86,8 +86,8 @@ struct WebEidView: View {
                     }
                 )
             }
-            if (viewModel.certRequest != nil || viewModel.signRequest != nil) {
-                if (!isWebEidAuthenticating) {
+            if viewModel.certRequest != nil || viewModel.signRequest != nil {
+                if !isWebEidAuthenticating {
                     let origin: String = {
                         if let certRequest = viewModel.certRequest {
                             return certRequest.origin
@@ -101,18 +101,18 @@ struct WebEidView: View {
                     let signingPersonInfo: String? = viewModel.signRequest?.personalData.map {
                         "\($0.givenNames) \($0.surname), \($0.personalCode)"
                     }
-                    
+
                     WebEidSignOrCertificateInfo(
                         origin: origin,
                         isCertificateFlow: viewModel.certRequest != nil,
                         signingPersonInfo: signingPersonInfo,
                     )
                 }
-                if (viewModel.certRequest != nil) {
+                if viewModel.certRequest != nil {
                     NFCView(
                         actionType: .certificate,
                         actionMethods: [
-                            .idCardViaNFC,
+                            .idCardViaNFC
                         ],
                         isWebEidAuthenticating: $isWebEidAuthenticating,
                         onSuccessWebEid: {
@@ -126,7 +126,7 @@ struct WebEidView: View {
                     NFCView(
                         actionType: .signing,
                         actionMethods: [
-                            .idCardViaNFC,
+                            .idCardViaNFC
                         ],
                         pinType: CodeType.pin2,
                         isWebEidAuthenticating: $isWebEidAuthenticating,
@@ -182,10 +182,10 @@ struct WebEidView: View {
         }
         .onChange(of: viewModel.relyingPartyResponseEvents) { _, responseURL in
             guard let responseURL else { return }
-            
+
             openURL(responseURL)
             dismiss()
-            
+
             viewModel.relyingPartyResponseEvents = nil
         }
         .onChange(of: viewModel.errorKey) { _, newKey in
@@ -207,7 +207,7 @@ struct WebEidView: View {
                 }
             }
         }
-        .onChange(of: viewModel.authRequest) {_, request in
+        .onChange(of: viewModel.authRequest) {_, _ in
             /* TODO
             if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
                 sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
@@ -215,7 +215,7 @@ struct WebEidView: View {
             sharedSettingsViewModel.dataStore.setWebEidSessionActive(true)
             */
         }
-        .onChange(of: viewModel.certRequest) {_, request in
+        .onChange(of: viewModel.certRequest) {_, _ in
             /* TODO
             if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
                 sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()

@@ -27,18 +27,18 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
 
     var errorKey: String?
     var errorExtraArguments: [String] = []
-    
+
     var showAlertMessage: Bool = false
     var alertMessageKey: String?
     var alertMessageExtraArguments: [String] = []
     var alertMessageUrl: String?
-    
+
     var authRequest: WebEidAuthRequest?
     var signRequest: WebEidSignRequest?
     var certRequest: WebEidCertificateRequest?
-    
+
     var relyingPartyResponseEvents: URL?
-    
+
     // TODO: implement me
     /*
     private let webEidRepository: WebEidRepositoryProtocol
@@ -52,15 +52,21 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         self.sharedWebEidSession = sharedWebEidSession
     }
     */
-    
+
     func handleAuth(url: URL) {
         do {
             authRequest = try WebEidRequestParser.parseAuthURL(url)
         } catch {
             if let webEidException = error as? WebEidException {
                 WebEidViewModel.logger().error("Invalid Web eID authentication request: \(url)")
-                let errorPayload = WebEidResponseUtil.createErrorPayload(code: webEidException.code, message: webEidException.message)
-                let responseUri = try? WebEidResponseUtil.createResponseURL(responseUri: webEidException.responseUri, payload: errorPayload)
+                let errorPayload = WebEidResponseUtil.createErrorPayload(
+                    code: webEidException.code,
+                    message: webEidException.message
+                )
+                let responseUri = try? WebEidResponseUtil.createResponseURL(
+                    responseUri: webEidException.responseUri,
+                    payload: errorPayload
+                )
                 relyingPartyResponseEvents = responseUri
             } else {
                 WebEidViewModel.logger().error("Unable parse Web eID authentication request: \(url)")
@@ -69,7 +75,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             }
         }
     }
-    
+
     func handleCertificate(url: URL) {
         do {
             certRequest = try WebEidRequestParser.parseCertificateURL(url)
@@ -86,8 +92,14 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         } catch {
             if let webEidException = error as? WebEidException {
                 WebEidViewModel.logger().error("Invalid Web eID signing request: \(url)")
-                let errorPayload = WebEidResponseUtil.createErrorPayload(code: webEidException.code, message: webEidException.message)
-                let responseUri = try? WebEidResponseUtil.createResponseURL(responseUri: webEidException.responseUri, payload: errorPayload)
+                let errorPayload = WebEidResponseUtil.createErrorPayload(
+                    code: webEidException.code,
+                    message: webEidException.message
+                )
+                let responseUri = try? WebEidResponseUtil.createResponseURL(
+                    responseUri: webEidException.responseUri,
+                    payload: errorPayload
+                )
                 relyingPartyResponseEvents = responseUri
             } else {
                 WebEidViewModel.logger().error("Unable parse Web eID signing request: \(url)")
@@ -102,7 +114,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         errorKey = "Invalid Web eID request"
         errorExtraArguments = []
     }
-    
+
     func resetErrors() {
         showAlertMessage = false
         alertMessageKey = nil
