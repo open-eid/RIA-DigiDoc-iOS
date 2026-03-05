@@ -129,6 +129,7 @@
 		1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-xcframeworks.sh"; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
 		1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-libcdoc-sim.sh"; sourceTree = "<group>"; };
+		1AD5532C2F57274C00A88151 /* WebEidLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WebEidLib; sourceTree = "<group>"; };
 		DF17B64D2CE26949009B1E17 /* UtilsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UtilsLib; sourceTree = "<group>"; };
 		DF2B1BF22F524F83008EC06F /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		DF2B1BF42F524F89008EC06F /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
@@ -595,6 +596,7 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				1AD5532C2F57274C00A88151 /* WebEidLib */,
 				DFCF22F92E83512D0015AE6B /* Test */,
 				DF64D0E12EC363C200FF73C6 /* SmartIdLib */,
 				DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */,
