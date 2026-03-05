@@ -45,6 +45,12 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Choose a signing method")
         case .myeid:
             languageSettings.localized("Identification method title")
+        case .auth:
+            "" // should not trigger
+        case .certificate:
+            ""  // should not trigger
+        case .signingWebEid:
+            ""  // should not trigger
         }
     }
 
@@ -56,6 +62,12 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Signing method")
         case .myeid:
             languageSettings.localized("Identification method")
+        case .auth:
+            "" // should not trigger
+        case .certificate:
+            ""  // should not trigger
+        case .signingWebEid:
+            ""  // should not trigger
         }
     }
 
@@ -67,6 +79,12 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Signing method changed")
         case .myeid:
             languageSettings.localized("Identification method changed")
+        case .auth:
+            "" // should not trigger
+        case .certificate:
+            ""  // should not trigger
+        case .signingWebEid:
+            ""  // should not trigger
         }
     }
 
@@ -137,6 +155,12 @@ struct ActionMethodSelectionView: View {
                     selectedMethod = await viewModel.getSelectedSigningMethod()
                 case .myeid:
                     selectedMethod = await viewModel.getSelectedMyEidMethod()
+                case .auth:
+                    selectedMethod = .idCardViaNFC // should not trigger
+                case .certificate:
+                    selectedMethod = .idCardViaNFC  // should not trigger
+                case .signingWebEid:
+                    selectedMethod = .idCardViaNFC  // should not trigger
                 }
             }
         }
@@ -162,6 +186,15 @@ struct ActionMethodSelectionView: View {
                 await viewModel.setSelectedSigningMethod(selectedMethod)
             case .myeid:
                 await viewModel.setSelectedMyEidMethod(selectedMethod)
+            case .auth:
+                // Do nothing
+                break
+            case .certificate:
+                // Do nothing
+                break
+            case .signingWebEid:
+                // Do nothing
+                break
             }
 
             await MainActor.run {

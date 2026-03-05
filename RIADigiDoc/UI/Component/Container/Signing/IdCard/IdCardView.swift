@@ -224,6 +224,15 @@ struct IdCardView: View {
                 case .myeid:
                     // Do nothing
                     break
+                case .auth:
+                    // Do nothing
+                    break
+                case .certificate:
+                    // Do nothing
+                    break
+                case .signingWebEid:
+                    // Do nothing
+                    break
                 }
             },
             content: {
@@ -324,18 +333,18 @@ struct IdCardView: View {
                         }
                         return
                     }
-
+                    
                     idCardData = await viewModel.getIdCardData(for: .pin1)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
                     }
-
+                    
                     await MainActor.run {
                         isShowingLoadingView = false
                         isShowingPinView = true
                     }
-
+                    
                 case .signing:
                     guard newValue == .sCardConnected else {
                         await MainActor.run {
@@ -344,27 +353,27 @@ struct IdCardView: View {
                         }
                         return
                     }
-
+                    
                     idCardData = await viewModel.getIdCardData(for: .pin2)
                     guard idCardData != nil else {
                         await handleCardError()
                         return
                     }
-
+                    
                     await MainActor.run {
                         isShowingLoadingView = false
                         isShowingPinView = true
                     }
-
+                    
                 case .myeid:
                     guard newValue == .sCardConnected else { return }
-
+                    
                     let cardData = await viewModel.getIdCardDataMyEid()
                     guard let cardData else {
                         await handleCardError()
                         return
                     }
-
+                    
                     await MainActor.run {
                         isInProgress = true
                         pathManager.replaceLast(
@@ -374,6 +383,15 @@ struct IdCardView: View {
                             )
                         )
                     }
+                case .auth:
+                    // Do nothing
+                    break
+                case .certificate:
+                    // Do nothing
+                    break
+                case .signingWebEid:
+                    // Do nothing
+                    break
                 }
             }
         }
