@@ -43,6 +43,7 @@ enum Dimensions {
 
     enum Padding {
         static let ZeroPadding: CGFloat = 0
+        static let XXXSPadding: CGFloat = 2
         static let XXSPadding: CGFloat = 4
         static let XSPadding: CGFloat = 8
         static let MSPadding: CGFloat = 12

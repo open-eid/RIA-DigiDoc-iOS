@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,10 @@ import Foundation
 
 // MARK: - WebEidCertificateRequest
 
-struct WebEidCertificateRequest: JSONCodable, Equatable, Sendable {
+public struct WebEidCertificateRequest: JSONCodable, Equatable, Sendable {
 
-    let responseUri: String
-    let origin: String
+    public let responseUri: String
+    public let origin: String
 
     enum CodingKeys: String, CodingKey {
         case responseUri
