@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ import Security
 import ASN1Decoder
 import UtilsLib
 
-struct WebEidRequestParser: Loggable {
+public struct WebEidRequestParser: Loggable {
 
     private static let minChallengeLength = 44
     private static let maxChallengeLength = 128
@@ -30,7 +30,7 @@ struct WebEidRequestParser: Loggable {
 
     // MARK: Public API
 
-    static func parseAuthURL(_ authURL: URL) throws -> WebEidAuthRequest {
+    public static func parseAuthURL(_ authURL: URL) throws -> WebEidAuthRequest {
         let request = try decodeURLFragment(authURL)
 
         let challenge = (request["challenge"] as? String) ?? ""
@@ -57,7 +57,7 @@ struct WebEidRequestParser: Loggable {
         )
     }
 
-    static func parseCertificateURL(_ url: URL) throws -> WebEidCertificateRequest {
+    public static func parseCertificateURL(_ url: URL) throws -> WebEidCertificateRequest {
         let request = try decodeURLFragment(url)
         let responseUriString = (request["responseUri"] as? String) ?? ""
         let responseURL = try validateResponseURL(responseUriString)
@@ -68,7 +68,7 @@ struct WebEidRequestParser: Loggable {
         )
     }
 
-    static func parseSignURL(_ url: URL) throws -> WebEidSignRequest {
+    public static func parseSignURL(_ url: URL) throws -> WebEidSignRequest {
         let request = try decodeURLFragment(url)
         let responseUriString = (request["responseUri"] as? String) ?? ""
         let responseURL = try validateResponseURL(responseUriString)
