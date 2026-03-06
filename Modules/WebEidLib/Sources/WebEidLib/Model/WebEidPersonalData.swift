@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,11 +21,11 @@ import Foundation
 
 // MARK: - WebEidPersonalData
 
-struct WebEidPersonalData: JSONCodable, Equatable, Sendable {
+public struct WebEidPersonalData: JSONCodable, Equatable, Sendable {
 
-    let givenNames: String
-    let surname: String
-    let personalCode: String
+    public let givenNames: String
+    public let surname: String
+    public let personalCode: String
 
     enum CodingKeys: String, CodingKey {
         case givenNames
