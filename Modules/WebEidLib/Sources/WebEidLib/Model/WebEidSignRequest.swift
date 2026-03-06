@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,14 +22,14 @@ import Security
 
 // MARK: - WebEidSignRequest
 
-struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
+public struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
 
-    let responseUri: String
-    let origin: String
-    let signingCertificate: SecCertificate
-    let hash: String?
-    let hashFunction: String?
-    let personalData: WebEidPersonalData?
+    public let responseUri: String
+    public let origin: String
+    public let signingCertificate: SecCertificate
+    public let hash: String?
+    public let hashFunction: String?
+    public let personalData: WebEidPersonalData?
 
     enum CodingKeys: String, CodingKey {
         case responseUri
@@ -40,7 +40,7 @@ struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
         case personalData
     }
 
-    init(
+    public init(
         responseUri: String,
         origin: String,
         signingCertificate: SecCertificate,
@@ -58,7 +58,7 @@ struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
 
     // MARK: - Codable
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         responseUri = try container.decode(String.self, forKey: .responseUri)
@@ -80,7 +80,7 @@ struct WebEidSignRequest: JSONCodable, Equatable, Sendable {
         personalData = try container.decodeIfPresent(WebEidPersonalData.self, forKey: .personalData)
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(responseUri, forKey: .responseUri)

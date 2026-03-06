@@ -46,6 +46,7 @@ struct MyEidRootView: View {
                         .idCardViaNFC,
                         .idCardViaUSB
                     ],
+                    isWebEidAuthenticating: .constant(false),
                     onSuccess: { _ in }
                 )
             case .idCardViaUSB:

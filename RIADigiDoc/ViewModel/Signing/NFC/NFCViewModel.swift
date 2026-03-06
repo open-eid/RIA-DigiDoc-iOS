@@ -92,7 +92,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     ) -> Bool {
         checkCANNumberValidity(canNumber: canNumber)
         let canNumberValid = (!canNumber.isEmpty && canNumberErrorKey?.isEmpty == true)
-        if actionType == .myeid {
+        if actionType == .myeid || actionType == .certificate {
             return canNumberValid
         }
 

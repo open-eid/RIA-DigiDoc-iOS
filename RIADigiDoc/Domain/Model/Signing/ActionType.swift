@@ -23,4 +23,7 @@ public enum ActionType {
     case signing
     case myeid
     case decrypt
+    case auth
+    case certificate
+    case signingWebEid
 }

@@ -59,6 +59,7 @@ struct DecryptRootView: View {
                             .idCardViaUSB
                         ],
                         pinType: CodeType.pin1,
+                        isWebEidAuthenticating: .constant(false),
                         cryptoContainer: container,
                         onSuccessDecrypt: { container in
                             sharedContainerViewModel.removeLastContainer()
