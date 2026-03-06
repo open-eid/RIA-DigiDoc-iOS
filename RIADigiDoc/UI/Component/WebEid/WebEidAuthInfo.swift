@@ -52,7 +52,7 @@ struct WebEidAuthInfo: View {
                 .foregroundStyle(theme.onSurfaceVariant)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 2)
+            Spacer().frame(height: Dimensions.Padding.XXXSPadding)
 
             Text(String(origin.prefix(80)))
                 .font(typography.bodyLarge)
@@ -62,21 +62,21 @@ struct WebEidAuthInfo: View {
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 16)
+            Spacer().frame(height: Dimensions.Padding.SPadding)
 
             Text(languageSettings.localized(detailsTitleText))
                 .font(typography.labelSmall)
                 .foregroundStyle(theme.onSurfaceVariant)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 2)
+            Spacer().frame(height: Dimensions.Padding.XXXSPadding)
 
             Text(languageSettings.localized(personLine))
                 .font(typography.bodyLarge)
                 .foregroundStyle(theme.onSurface)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer().frame(height: 16)
+            Spacer().frame(height: Dimensions.Padding.SPadding)
 
             Text(languageSettings.localized(consentText))
                 .font(typography.bodyLarge)
