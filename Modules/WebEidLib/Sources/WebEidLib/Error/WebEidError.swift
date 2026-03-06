@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,18 +19,18 @@
 
 import Foundation
 
-enum WebEidErrorCode: String, Codable, Sendable {
+public enum WebEidErrorCode: String, Codable, Sendable {
     case errWebEidMobileInvalidRequest
     case errWebEidMobileUnknownError
     case errWebEidUserCancelled
 }
 
-struct WebEidException: Error, LocalizedError, Sendable {
-    let code: WebEidErrorCode
-    let message: String
-    let responseUri: String
+public struct WebEidException: Error, LocalizedError, Sendable {
+    public let code: WebEidErrorCode
+    public let message: String
+    public let responseUri: String
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         "\(code.rawValue): \(message) (responseUri: \(responseUri))"
     }
 }

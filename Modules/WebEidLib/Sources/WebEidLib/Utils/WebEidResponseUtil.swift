@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,10 @@
 import Foundation
 import UtilsLib
 
-struct WebEidResponseUtil: Loggable {
+public struct WebEidResponseUtil: Loggable {
 
     /// Returns JSON-like dictionary (easy to JSON-serialize).
-    static func createErrorPayload(
+    public static func createErrorPayload(
         code: WebEidErrorCode,
         message: String
     ) -> [String: Any] {
@@ -35,7 +35,7 @@ struct WebEidResponseUtil: Loggable {
     }
 
     /// Builds URL with Base64URL-encoded JSON payload placed into URL.fragment.
-    static func createResponseURL(
+    public static func createResponseURL(
         responseUri: String,
         payload: [String: Any]
     ) throws -> URL {

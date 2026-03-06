@@ -228,6 +228,15 @@ struct IdCardView: View {
                 case .myeid:
                     // Do nothing
                     break
+                case .auth:
+                    // Do nothing
+                    break
+                case .certificate:
+                    // Do nothing
+                    break
+                case .signingWebEid:
+                    // Do nothing
+                    break
                 }
             },
             content: {
@@ -379,6 +388,15 @@ struct IdCardView: View {
                             )
                         )
                     }
+                case .auth:
+                    // Do nothing
+                    break
+                case .certificate:
+                    // Do nothing
+                    break
+                case .signingWebEid:
+                    // Do nothing
+                    break
                 }
             }
         }

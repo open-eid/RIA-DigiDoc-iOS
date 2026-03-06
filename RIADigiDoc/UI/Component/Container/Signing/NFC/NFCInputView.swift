@@ -39,6 +39,7 @@ struct NFCInputView: View {
     let onInputChange: () -> Void
 
     @State private var showPinField: Bool
+    @State private var isWebEidAuthenticating: Bool
 
     private var canNumberTitle: String {
         languageSettings.localized("CAN number")
@@ -66,6 +67,7 @@ struct NFCInputView: View {
         pinType: CodeType?,
         onInputChange: @escaping () -> Void,
         showPinField: Bool = true,
+        isWebEidAuthenticating: Bool = false,
     ) {
         self._canNumber = canNumber
         self._rememberMe = rememberMe
@@ -76,6 +78,7 @@ struct NFCInputView: View {
         self.pinType = pinType
         self.onInputChange = onInputChange
         self.showPinField = showPinField
+        self.isWebEidAuthenticating = isWebEidAuthenticating
     }
 
     var body: some View {
@@ -108,19 +111,20 @@ struct NFCInputView: View {
                     }
                 }
             }
+            if !isWebEidAuthenticating {
+                VStack(spacing: Dimensions.Padding.ZeroPadding) {
+                    ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
+                        .padding(.trailing, Dimensions.Padding.XSPadding)
+                        .padding(.vertical, Dimensions.Padding.ZeroPadding)
+                        .accessibilityLabel(Text(verbatim: "\(rememberMeLabel) \(rememberMe)"))
 
-            VStack(spacing: Dimensions.Padding.ZeroPadding) {
-                ToggleSection(isOn: $rememberMe, label: languageSettings.localized("Remember me"))
-                    .padding(.trailing, Dimensions.Padding.XSPadding)
-                    .padding(.vertical, Dimensions.Padding.ZeroPadding)
-                    .accessibilityLabel(Text(verbatim: "\(rememberMeLabel) \(rememberMe)"))
-
-                if rememberMe {
-                    HStack {
-                        Text(verbatim: languageSettings.localized("Remember me message"))
-                            .font(typography.bodyMedium)
-                            .foregroundStyle(theme.onSurfaceVariant)
-                        Spacer()
+                    if rememberMe {
+                        HStack {
+                            Text(verbatim: languageSettings.localized("Remember me message"))
+                                .font(typography.bodyMedium)
+                                .foregroundStyle(theme.onSurfaceVariant)
+                            Spacer()
+                        }
                     }
                 }
             }
