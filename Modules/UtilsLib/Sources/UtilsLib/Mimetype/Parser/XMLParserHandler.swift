@@ -36,7 +36,10 @@ final class XMLParserHandler: NSObject, XMLParserDelegate {
         qualifiedName _: String?,
         attributes attributeDict: [String: String]
     ) {
-        if elementName == "SignedDoc", attributeDict["format"] == "DIGIDOC-XML" {
+        let formatAttribute = attributeDict["format"]
+        if elementName == "SignedDoc", (
+            formatAttribute == "DIGIDOC-XML" || formatAttribute == "SK-XML"
+        ) {
             foundElement = true
             parser.abortParsing()
         }
