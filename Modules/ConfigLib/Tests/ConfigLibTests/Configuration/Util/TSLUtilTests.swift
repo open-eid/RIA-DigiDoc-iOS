@@ -51,11 +51,13 @@ struct TSLUtilTests {
             return true
         }
 
+        mockFileManager.removeItemHandler = { _ in }
+
         let destinationDir = URL(fileURLWithPath: "/mock/test/destination")
 
         try tslUtil.setupTSLFiles(
             tsls: fileNamePaths,
-            destinationDir: destinationDir,
+            destinationDir: destinationDir
         )
 
         #expect(mockFileManager.copyItemAtPathCallCount == 2)

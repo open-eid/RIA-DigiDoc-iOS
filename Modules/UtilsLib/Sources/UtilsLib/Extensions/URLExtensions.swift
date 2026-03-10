@@ -81,6 +81,10 @@ extension URL {
             return Constants.MimeType.Ddoc
         }
 
+        if await isCdoc(mimeTypeDecoder: mimeTypeDecoder) {
+            return Constants.MimeType.Cdoc
+        }
+
         return mimeTypeForFileExtension() ?? defaultMimeType
     }
 
@@ -95,8 +99,11 @@ extension URL {
         return await isDdoc(mimeTypeDecoder: mimeTypeDecoder)
     }
 
-    public func isCryptoContainer() async -> Bool {
-        return Constants.Extension.CryptoContainers.contains(self.pathExtension)
+    public func isCryptoContainer(
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> Bool {
+        let isCdoc = await isCdoc(mimeTypeDecoder: mimeTypeDecoder)
+        return isCdoc || Constants.Extension.CryptoContainers.contains(self.pathExtension)
     }
 
     public func isDdoc(
@@ -106,6 +113,18 @@ extension URL {
             let xmlData = try Data(contentsOf: self)
             let result = await mimeTypeDecoder.parse(xmlData: xmlData)
             return result == .ddoc
+        } catch {
+            return false
+        }
+    }
+
+    public func isCdoc(
+        mimeTypeDecoder: MimeTypeDecoderProtocol = mimeTypeDecoder()
+    ) async -> Bool {
+        do {
+            let xmlData = try Data(contentsOf: self)
+            let result = await mimeTypeDecoder.parse(xmlData: xmlData)
+            return result == .cdoc
         } catch {
             return false
         }
@@ -336,6 +355,9 @@ extension URL {
     private var lastOpenedXattrName: String { Constants.Identifier.GroupLastOpenedAttribute }
 
     public func markAsOpened() throws {
+        let accessing = self.startAccessingSecurityScopedResource()
+        defer { if accessing { self.stopAccessingSecurityScopedResource() } }
+
         var timestamp = Date().timeIntervalSince1970
         let data = Data(bytes: &timestamp, count: MemoryLayout.size(ofValue: timestamp))
 
@@ -349,9 +371,7 @@ extension URL {
                 0
             )
         }
-        guard result == 0 else {
-            throw FileLastOpenedError.writeFailed(errno: errno)
-        }
+        guard result == 0 else { return }
     }
 
     public func lastOpened() throws -> Date? {

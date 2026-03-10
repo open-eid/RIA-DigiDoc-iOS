@@ -121,7 +121,7 @@ struct ConfigurationLoaderTests {
         }
 
         try await configurationLoader.initConfiguration(
-            cacheDir: mockCacheDir,
+            configDir: mockCacheDir,
             proxyInfo: ProxyInfo(),
             userAgent: "TestUserAgent"
         )
@@ -349,7 +349,7 @@ struct ConfigurationLoaderTests {
         let mockCacheDir = URL(fileURLWithPath: "/mock/cache/dir")
 
         try await configurationLoader.initConfiguration(
-            cacheDir: mockCacheDir,
+            configDir: mockCacheDir,
             proxyInfo: ProxyInfo(),
             userAgent: "TestUserAgent"
         )

@@ -79,7 +79,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             files = validFiles
         } catch {
-            FileOpeningViewModel.logger().error("Unable to handle files. \(String(reflecting: error), privacy: .public)")
+            FileOpeningViewModel.logger().error(
+                "Unable to handle files. \(String(reflecting: error), privacy: .public)"
+            )
             handleError(error)
         }
     }
@@ -88,6 +90,23 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
+            guard let firstFile = files.first else {
+                throw FileOpeningError.noDataFiles
+            }
+
+            var firstFileUrl = firstFile
+
+            let isDdoc = await firstFile.isDdoc()
+            let isCdoc = await firstFile.isCdoc()
+
+            if isDdoc || isCdoc {
+                firstFileUrl = await handleExternalDdocAndCdoc(firstFile)
+            }
+
+            let uniqueContainerUrl = try getUniqueContainerUrl(file: firstFileUrl)
+
+            files[0] = uniqueContainerUrl
+
             let container = try await openOrCreateContainer(withUrls: files)
             if let signedContainer = container as? SignedContainerProtocol {
                 if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
@@ -104,9 +123,49 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
-            FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)")
+            FileOpeningViewModel.logger().error(
+                "Unable to handle container confirmation. \(String(reflecting: error), privacy: .public)"
+            )
             handleError(error)
         }
+    }
+
+    private func handleExternalDdocAndCdoc(_ file: URL) async -> URL {
+        let currentExtension = file.pathExtension.lowercased()
+
+        let isDdoc = await file.isDdoc()
+        let isCdoc = await file.isCdoc()
+
+        let renamedExtension: String?
+
+        if isDdoc && currentExtension != Constants.Extension.Ddoc {
+            renamedExtension = Constants.Extension.Ddoc
+        } else if isCdoc && currentExtension != Constants.Extension.Cdoc {
+            renamedExtension = Constants.Extension.Cdoc
+        } else {
+            renamedExtension = nil
+        }
+
+        guard let renamedExtension else { return file }
+
+        let renamedURL = file
+            .deletingPathExtension()
+            .appendingPathExtension(renamedExtension)
+
+        do {
+            if fileManager.fileExists(atPath: renamedURL.path) {
+                try fileManager.removeItem(at: renamedURL)
+            }
+
+            try fileManager.moveItem(at: file, to: renamedURL)
+            return renamedURL
+        } catch {
+            FileOpeningViewModel.logger().error(
+                "Unable to rename container. \(String(reflecting: error), privacy: .public)"
+            )
+        }
+
+        return file
     }
 
     func handleSivaCancellation() async {
@@ -129,7 +188,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
                 FileOpeningViewModel.logger().info("Asics signed container set successfully")
                 handleLoadingSuccess(isSivaConfirmed: false)
             } catch {
-                FileOpeningViewModel.logger().error("Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)")
+                FileOpeningViewModel.logger().error(
+                    "Unable to handle SiVa container. \(String(reflecting: error), privacy: .public)"
+                )
                 handleError(error)
             }
         }
@@ -154,6 +215,35 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
     func isSivaConfirmationNeeded() async -> Bool {
         return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
+    }
+
+    private func getUniqueContainerUrl(file: URL) throws -> URL {
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
+        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
+            signedContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
+            signedContainersDirectory.absoluteString
+        ) && !isFileInTempSignedContainerDirectory
+
+        var renamedContainerFile = file
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: file,
+                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
+                    file.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        }
+
+        return renamedContainerFile
     }
 
     private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {

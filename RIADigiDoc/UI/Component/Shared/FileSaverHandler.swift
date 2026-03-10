@@ -48,7 +48,7 @@ struct FileSaverHandler: View {
         switch result {
         case .success:
             isFileSaved = true
-            resultMessage = languageSettings.localized("File saved", [fileURL.lastPathComponent])
+            resultMessage = languageSettings.localized("File saved", [])
         case .failure:
             isFileSaved = false
             resultMessage = languageSettings.localized("Failed to save file", [fileURL.lastPathComponent])

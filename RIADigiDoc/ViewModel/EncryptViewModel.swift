@@ -279,7 +279,9 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     @discardableResult
     public func renameContainer(to newName: String) async -> URL? {
         do {
-            return try await cryptoContainer?.renameContainer(to: newName)
+            let renamedContainer = try await cryptoContainer?.renameContainer(to: newName)
+            containerName = renamedContainer?.lastPathComponent ?? Constants.Container.DefaultName
+            return renamedContainer
         } catch {
             EncryptViewModel.logger().error("Unable to rename container: \(error)")
             if let cryptoError = error as? CryptoError {

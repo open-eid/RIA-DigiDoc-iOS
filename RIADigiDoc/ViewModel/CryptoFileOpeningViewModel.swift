@@ -85,6 +85,14 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
+            guard let firstFile = files.first else {
+                throw FileOpeningError.noDataFiles
+            }
+
+            let uniqueContainerUrl = try getUniqueContainerUrl(file: firstFile)
+
+            files[0] = uniqueContainerUrl
+
             let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
             sharedContainerViewModel.setCryptoContainer(container)
 
@@ -109,6 +117,35 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
         errorMessage = nil
         isFileOpeningLoading = false
         isNavigatingToNextView = false
+    }
+
+    private func getUniqueContainerUrl(file: URL) throws -> URL {
+        let cryptoContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
+        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
+            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
+            cryptoContainersDirectory.absoluteString
+        ) && !isFileInTempSignedContainerDirectory
+
+        var renamedContainerFile = file
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: file,
+                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
+                    file.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        }
+
+        return renamedContainerFile
     }
 
     private func handleLoadingSuccess() {

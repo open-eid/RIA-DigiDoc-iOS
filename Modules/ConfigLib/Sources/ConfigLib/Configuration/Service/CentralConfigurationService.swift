@@ -55,7 +55,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
             return response
         } catch {
             CentralConfigurationService.logger()
-                .error("Unable to fetch central configuration: \(error)")
+                .error("Unable to fetch central configuration: \(String(reflecting: error))")
             throw URLError(.resourceUnavailable)
         }
     }
@@ -84,7 +84,7 @@ public actor CentralConfigurationService: CentralConfigurationServiceProtocol, L
             return responseString
         } catch {
             CentralConfigurationService.logger()
-                .error("Unable to fetch central configuration signature: \(error)")
+                .error("Unable to fetch central configuration signature: \(String(reflecting: error))")
             throw URLError(.resourceUnavailable)
         }
     }

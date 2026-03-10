@@ -177,6 +177,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func removeSavedFilesDirectory(savedFilesDirectory: URL? = nil) {
+        SigningViewModel.logger().info("Removing 'Saved Files' directory (SigningViewModel)")
         fileUtil.removeSavedFilesDirectory(savedFilesDirectory: savedFilesDirectory)
     }
 
@@ -619,8 +620,11 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     private func openNestedContainer(fileURL: URL, isSivaConfirmed: Bool) async throws {
-        let container = try await fileOpeningService
-            .openOrCreateContainer(dataFiles: [fileURL], isSivaConfirmed: isSivaConfirmed)
+        let container = try await fileOpeningService.openOrCreateContainer(
+            dataFiles: [fileURL],
+            isSivaConfirmed: isSivaConfirmed
+        )
+
         let isXades = await container.isXades()
         let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: container)
         if isSivaConfirmed && isTimestampedContainer && !isXades {
@@ -635,8 +639,10 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     private func openNestedCryptoContainer(fileUrl: URL) async throws {
-        let container = try await fileOpeningService
-            .openOrCreateCryptoContainer(dataFiles: [fileUrl])
+        let container = try await fileOpeningService.openOrCreateCryptoContainer(
+            dataFiles: [fileUrl]
+        )
+
         sharedContainerViewModel.setCryptoContainer(container)
     }
 }

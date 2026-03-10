@@ -96,7 +96,7 @@ actor LibrarySetup: Loggable {
             // Make sure "initDigiDoc" is still run even if configuration has an error
             do {
                 try await configurationLoader.initConfiguration(
-                    cacheDir: configDirectory,
+                    configDir: configDirectory,
                     proxyInfo: proxyInfo,
                     userAgent: userAgent
                 )

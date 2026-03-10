@@ -196,12 +196,18 @@ struct RecentDocumentsView: View {
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
                 }
-                .onChange(of: isNavigatingToSigningView, { _, newValue in
+                .onChange(of: isNavigatingToSigningView) { _, newValue in
                     if newValue {
                         pathManager.navigate(to: .signingView)
                         isNavigatingToSigningView = false
                     }
-                })
+                }
+                .onChange(of: isNavigatingToEncryptView) { _, newValue in
+                    if newValue {
+                        pathManager.navigate(to: .encryptView(isWithEncryption: false))
+                        isNavigatingToEncryptView = false
+                    }
+                }
             }
         )
     }
