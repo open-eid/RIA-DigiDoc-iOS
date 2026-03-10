@@ -25,11 +25,11 @@ public struct BundleUtil: Loggable {
     }
 
     public static func getBundleShortVersionString(bundle: Bundle = Bundle.main) -> String {
-        return bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.0.0"
+        return bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
     }
 
     public static func getBundleVersion(bundle: Bundle = Bundle.main) -> String {
-        return bundle.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return bundle.infoDictionary?["CFBundleVersion"] as? String ?? "-"
     }
 
     public static func getAppVersion(bundle: Bundle = Bundle.main) -> String {
