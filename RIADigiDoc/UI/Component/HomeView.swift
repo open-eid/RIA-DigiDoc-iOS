@@ -36,7 +36,8 @@ struct HomeView: View {
     private var fileOpeningViewModel: FileOpeningViewModel
     private var cryptoFileOpeningViewModel: CryptoFileOpeningViewModel
 
-    @State private var isImporting = false
+    @State private var isAllFilesImporting = false
+    @State private var isSigningImporting = false
     @State private var isCryptoImporting = false
     @State private var isFileOpeningLoading = false
     @State private var isCryptoFileOpeningLoading = false
@@ -59,7 +60,7 @@ struct HomeView: View {
     private var allContainerFilesBottomSheetActions: [BottomSheetButton] {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
-                isImporting = true
+                isAllFilesImporting = true
             },
             onRecentDocumentsClick: {
                 containerType = .none
@@ -79,7 +80,7 @@ struct HomeView: View {
         HomeViewBottomSheetActions.actions(
             onOpenFilesClick: {
                 isVoiceOverFocusNavigationInProgress = true
-                isImporting = true
+                isSigningImporting = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isVoiceOverFocusNavigationInProgress = false
                 }
@@ -179,7 +180,7 @@ struct HomeView: View {
                             isNavigatingToSigningView: $isNavigatingToSigningView,
                             isNavigatingToEncryptView: $isNavigatingToEncryptView,
                             showBottomSheet: $showFilesBottomSheet,
-                            isImporting: $isImporting,
+                            isImporting: $isAllFilesImporting,
                             viewModel: viewModel,
                             fileOpeningMethod: .all
                         )
@@ -194,7 +195,7 @@ struct HomeView: View {
                             isNavigatingToSigningView: $isNavigatingToSigningView,
                             isNavigatingToEncryptView: $isNavigatingToEncryptView,
                             showBottomSheet: $showSignatureBottomSheet,
-                            isImporting: $isImporting,
+                            isImporting: $isSigningImporting,
                             viewModel: viewModel,
                             fileOpeningMethod: .signing
                         )

@@ -19,25 +19,32 @@
 
 import SwiftUI
 import FactoryKit
-import CommonsLib
 
 struct RenameModalView: View {
     @Environment(LanguageSettings.self) private var languageSettings
     @AppTheme private var theme
     @AppTypography private var typography
 
-    @State private var signingViewModel: SigningViewModel
-    @Binding var showRenameModal: Bool
-    @Binding var newContainerName: String
+    @State private var containerName: String
+    let onConfirm: (String) -> Void
+    let onCancel: () -> Void
+
+    private var title: String {
+        languageSettings.localized("Change container name")
+    }
+
+    private var placeholder: String {
+        containerName.isEmpty ? languageSettings.localized("Container name") : containerName
+    }
 
     init(
-        signingViewModel: SigningViewModel,
-        showRenameModal: Binding<Bool>,
-        newContainerName: Binding<String>
+        containerName: String,
+        onConfirm: @escaping (String) -> Void,
+        onCancel: @escaping () -> Void,
     ) {
-        self.signingViewModel = signingViewModel
-        self._showRenameModal = showRenameModal
-        self._newContainerName = newContainerName
+        self.containerName = containerName
+        self.onConfirm = onConfirm
+        self.onCancel = onCancel
     }
 
     var body: some View {
@@ -49,40 +56,11 @@ struct RenameModalView: View {
 
             InputModal(
                 icon: "ic_m3_edit_48pt_wght400",
-                title: languageSettings.localized("Change container name"),
-                placeholder: signingViewModel.containerName,
-                text: Binding<String>(
-                    get: {
-                        URL(fileURLWithPath: signingViewModel.containerName)
-                            .deletingPathExtension()
-                            .lastPathComponent
-                    },
-                    set: { newValue in
-                        let existingExtension = URL(fileURLWithPath: signingViewModel.containerName).pathExtension
-                        let newValueURL = URL(fileURLWithPath: newValue)
-
-                        let containerExtension =
-                        existingExtension.isEmpty ? Constants.Extension.Default : existingExtension
-
-                        newContainerName = newValueURL
-                            .appendingPathExtension(containerExtension)
-                            .lastPathComponent
-                    }),
-                onConfirm: {
-                    showRenameModal = false
-                    Task {
-                        let uniqueContainerName = await signingViewModel.renameContainer(to: newContainerName)
-                        defer { newContainerName = "" }
-
-                        if let uniqueContainerName {
-                            signingViewModel.containerName = uniqueContainerName.lastPathComponent
-                        }
-                    }
-                },
-                onCancel: {
-                    showRenameModal = false
-                    newContainerName = ""
-                }
+                title: title,
+                placeholder: placeholder,
+                text: $containerName,
+                onConfirm: { onConfirm(containerName) },
+                onCancel: onCancel
             )
         }
     }

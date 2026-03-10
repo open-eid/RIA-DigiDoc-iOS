@@ -210,53 +210,49 @@ extension CryptoContainer {
             )
         }
 
-        let isFirstDataFileContainer = await firstFile.isCryptoContainer()
-        var containerFile: URL? = firstFile
+        let isSingleFile = dataFiles.count == 1
+        let isCryptoContainer = await firstFile.isCryptoContainer()
 
-        var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
-        if CDoc2Setting.isEncryptionEnabled {
-            defaultExtension = CommonsLib.Constants.Extension.Cdoc2
-        } else {
-            defaultExtension = CommonsLib.Constants.Extension.Cdoc
-        }
+        CryptoContainer.logger().info("Is single file: \(isSingleFile, privacy: .public)")
+        CryptoContainer.logger().info("Is crypto container: \(isCryptoContainer, privacy: .public)")
 
-        if (!isFirstDataFileContainer || (dataFiles.count) > 1) &&
-            firstFile.pathExtension != defaultExtension {
-            let uniqueContainerFile = firstFile
-                .deletingPathExtension()
-                .appendingPathExtension(defaultExtension)
-            containerFile = containerUtil.getContainerFile(
-                for: uniqueContainerFile,
-                in: uniqueContainerFile.deletingLastPathComponent()
+
+        guard isSingleFile && isCryptoContainer else {
+            var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
+            if CDoc2Setting.isEncryptionEnabled {
+                defaultExtension = CommonsLib.Constants.Extension.Cdoc2
+            } else {
+                defaultExtension = CommonsLib.Constants.Extension.Cdoc
+            }
+
+            let containerURL: URL
+            if firstFile.pathExtension != defaultExtension {
+                containerURL = firstFile
+                    .deletingPathExtension()
+                    .appendingPathExtension(defaultExtension)
+            } else {
+                containerURL = firstFile
+            }
+
+            CryptoContainer.logger().info("Getting an unique crypto container name")
+            // Get unique container name file (1) if name already exists
+            let uniqueContainerURL = containerUtil.getContainerFile(
+                for: containerURL,
+                in: containerURL.deletingLastPathComponent()
             )
-        }
 
-        guard let containerFile else {
-            let error = isFirstDataFileContainer
-                ? CryptoError.containerOpeningFailed(
-                    CryptoErrorDetail(
-                        message: "Cannot open crypto container. Container file is nil"))
-                : CryptoError.containerCreationFailed(
-                    CryptoErrorDetail(
-                        message: "Cannot create crypto container. Container file is nil"
-                    )
-                )
-            throw error
-        }
-
-        if dataFiles.count == 1 && isFirstDataFileContainer {
-            CryptoContainer.logger().info("Opening existing crypto container")
-            return try await open(containerFile: containerFile)
-        } else {
             CryptoContainer.logger().info("Creating a new crypto container")
             return try await create(
-                containerFile: containerFile,
+                containerFile: uniqueContainerURL,
                 dataFiles: dataFiles,
                 recipients: [],
                 isDecrypted: false,
                 isEncrypted: false
             )
         }
+
+        CryptoContainer.logger().info("Opening existing crypto container")
+        return try await open(containerFile: firstFile)
     }
 
     @MainActor
@@ -371,35 +367,8 @@ extension CryptoContainer {
             dataFiles.append(fileUrl)
         }
 
-        let fileManager = Container.shared.fileManager()
-
-        let cryptoContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.ContainerFolder],
-            fileManager: fileManager
-        )
-
-        let isFileInTempSignedContainerDirectory = containerFile.absoluteString.hasPrefix(
-            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
-        )
-
-        let isFileInRecentDocuments = containerFile.absoluteString.hasPrefix(
-            cryptoContainersDirectory.absoluteString
-        ) && !isFileInTempSignedContainerDirectory
-
-        var renamedContainerFile = containerFile
-
-        if !isFileInRecentDocuments {
-            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                for: containerFile,
-                in: isFileInRecentDocuments ? containerFile.deletingLastPathComponent() :
-                    containerFile.deletingLastPathComponent().deletingLastPathComponent()
-            )
-
-            try fileManager.moveItem(at: containerFile, to: renamedContainerFile)
-        }
-
         return try await create(
-            containerFile: renamedContainerFile,
+            containerFile: containerFile,
             dataFiles: dataFiles,
             recipients: recipients,
             isDecrypted: false,

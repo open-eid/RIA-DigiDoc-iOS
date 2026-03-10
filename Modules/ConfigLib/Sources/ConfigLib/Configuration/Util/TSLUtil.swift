@@ -113,6 +113,10 @@ public struct TSLUtil: TSLUtilProtocol {
         from sourcePath: String,
         to destinationPath: String,
     ) throws {
+        if fileManager.fileExists(atPath: destinationPath) {
+            try fileManager.removeItem(atPath: destinationPath)
+        }
+
         try fileManager.copyItem(atPath: sourcePath, toPath: destinationPath)
     }
 

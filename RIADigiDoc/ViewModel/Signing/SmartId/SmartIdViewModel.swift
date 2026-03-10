@@ -169,8 +169,9 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         do {
             try startLiveActivity(withTexts: liveActivityTexts)
         } catch {
+            let errorMessage = "Smart-ID: Unable to start live activity for verification code (control code)"
             SmartIdViewModel.logger().error(
-                "Smart-ID: Unable to start live activity for verification code (control code). \(String(reflecting: error))"
+                "\(errorMessage). \(String(reflecting: error), privacy: .public)"
             )
         }
 

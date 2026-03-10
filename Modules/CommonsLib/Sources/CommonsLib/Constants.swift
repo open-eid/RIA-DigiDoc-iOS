@@ -43,6 +43,7 @@ public struct Constants {
         public static let Asice = "application/vnd.etsi.asic-e+zip"  // Also .bdoc, .edoc, .sce
         public static let Asics = "application/vnd.etsi.asic-s+zip"  // Also .scs
         public static let Ddoc = "application/x-ddoc"
+        public static let Cdoc = "application/x-cdoc"
         public static let Bdoc = "application/vnd.bdoc-1.0"
         public static let Adoc = "application/vnd.lt.archyvai.adoc-2008"
         public static let SignatureContainers = [Asice, Asics, Ddoc, Bdoc, Adoc]

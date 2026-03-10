@@ -535,7 +535,7 @@ struct SigningViewModelTests: Loggable {
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _, newValue in
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
             throw DigiDocError.containerOpeningFailed(
                 ErrorDetail(
                     message: "Cannot open container. Container file is nil"))
@@ -586,84 +586,6 @@ struct SigningViewModelTests: Loggable {
         try? FileManager.default.removeItem(at: nestedSignedContainerUrl)
         try? FileManager.default.removeItem(at: localExampleContainer)
         try? FileManager.default.removeItem(at: tempDirectory)
-//        let signedContainerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
-//        let signedNestedContainerFile = TestFileUtil.pathForResourceFile(fileName: "example_no_signatures", ext: "asice")
-//
-//        guard let exampleContainer = signedContainerFile, let exampleNestedContainer = signedNestedContainerFile else {
-//            Issue.record("Unable to get resource files")
-//            return
-//        }
-//
-//        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
-//            subfolder: "SigningViewModelTests-successOpeningNestedContainer"
-//        )
-//
-//        let localExampleContainer = tempDirectory.appending(
-//            path: "\(UUID().uuidString)-\(exampleContainer.lastPathComponent)",
-//            directoryHint: .notDirectory
-//        )
-//
-//        let localExampleNestedContainer = tempDirectory.appending(
-//            path: "\(UUID().uuidString)-\(exampleNestedContainer.lastPathComponent)",
-//            directoryHint: .notDirectory
-//        )
-//
-//        try FileManager.default.copyItem(
-//            at: exampleContainer,
-//            to: localExampleContainer
-//        )
-//
-//        try FileManager.default.copyItem(
-//            at: exampleNestedContainer,
-//            to: localExampleNestedContainer
-//        )
-//
-//        let testFile = URL(fileURLWithPath: "/tmp/test.asice")
-//
-//        let mimeType = CommonsLib.Constants.MimeType.Asice
-//
-//        let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
-//            fileId: "1",
-//            fileName: testFile.lastPathComponent,
-//            fileSize: 123,
-//            mediaType: mimeType
-//        )
-//
-//        let signedContainer = try await SignedContainer.openOrCreate(
-//            dataFiles: [localExampleContainer],
-//            isSivaConfirmed: true
-//        )
-//
-//        mockMimeTypeDecoder.parseHandler = { _ in .asice }
-//
-//        mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
-//
-//        mockFileUtil.fileExistsHandler = { _ in true }
-//
-//        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
-//            throw DigiDocError.containerOpeningFailed(
-//                ErrorDetail(
-//                    message: "Cannot open container. Container file is nil"))
-//        }
-//
-//        mockSharedContainerViewModel.currentContainerHandler = { signedContainer }
-//
-//        await viewModel.loadContainerData(signedContainer: signedContainer)
-//
-//        await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
-//
-//        guard let errorKey = viewModel.errorMessage?.key, let args = viewModel.errorMessage?.args else {
-//            Issue.record("Expected error message to not be empty")
-//            return
-//        }
-//
-//        let currentSignedContainerName = await viewModel.signedContainer?.getContainerName()
-//        let signedContainerName = await signedContainer.getContainerName()
-//
-//        #expect(viewModel.previewFile == nil)
-//        #expect(errorKey == "Failed to open container")
-//        #expect(args == [testDataFile.fileName])
-//        #expect(currentSignedContainerName == signedContainerName)
     }
 
     @Test

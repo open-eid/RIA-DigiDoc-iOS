@@ -58,28 +58,32 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
     }
 
     public func initConfiguration(
-        cacheDir: URL,
+        configDir: URL,
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws {
         ConfigurationLoader.logger().info("Initializing configuration")
 
-        if !fileManager.fileExists(atPath: cacheDir.resolvedPath) {
+        if !fileManager.fileExists(atPath: configDir.resolvedPath) {
             try fileManager.createDirectory(
-                at: cacheDir, withIntermediateDirectories: true, attributes: nil)
+                at: configDir, withIntermediateDirectories: true, attributes: nil)
         }
 
-        try await loadCachedConfiguration(afterCentralCheck: false, cacheDir: cacheDir)
+        try await loadLocalConfiguration(configDir: configDir)
 
         try await loadConfigurationProperty()
 
         if try await shouldCheckForUpdates() {
             ConfigurationLoader.logger().info("Checking for configuration updates...")
-            try await loadCentralConfiguration(
-                cacheDir: cacheDir,
-                proxyInfo: proxyInfo,
-                userAgent: userAgent
-            )
+            do {
+                try await loadCentralConfiguration(
+                    cacheDir: configDir,
+                    proxyInfo: proxyInfo,
+                    userAgent: userAgent
+                )
+            } catch {
+                try await loadLocalConfiguration(configDir: configDir)
+            }
         }
 
         ConfigurationLoader.logger().info("Finished initializing configuration")
@@ -391,6 +395,15 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                     await self?.removeContinuation(token)
                 }
             }
+        }
+    }
+
+    private func loadLocalConfiguration(configDir: URL) async throws {
+        // Load default configuration if cached configuration does not succeed
+        do {
+            try await loadCachedConfiguration(afterCentralCheck: false, cacheDir: configDir)
+        } catch {
+            try await loadDefaultConfiguration(cacheDir: configDir)
         }
     }
 

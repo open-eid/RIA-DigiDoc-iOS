@@ -1909,13 +1909,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "File %@ saved"
+            "value" : "File saved"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fail %@ salvestatud"
+            "value" : "Fail salvestatud"
           }
         }
       }

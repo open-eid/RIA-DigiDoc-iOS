@@ -195,9 +195,24 @@ struct FileOpeningViewModelTests {
             return mockContainer
         }
 
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
+            [URL(filePath: "/mock/file.txt")]
+        }
         mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
         mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
 
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+
+        await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
 
         let rawContainerFile = await mockContainer.getRawContainerFile()
@@ -224,12 +239,27 @@ struct FileOpeningViewModelTests {
         let mockNestedSignedContainer = SignedContainerProtocolMock()
         mockMainSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
 
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
+            [URL(filePath: "/mock/file.txt")]
+        }
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
         mockSivaRepository.isTimestampedContainerHandler = { _ in true }
         mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
         mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
         mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
 
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+
+        await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
@@ -244,12 +274,27 @@ struct FileOpeningViewModelTests {
         let mockNestedSignedContainer = SignedContainerProtocolMock()
         mockMainSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
 
+        mockFileOpeningRepository.getValidFilesHandler = { _ in
+            [URL(filePath: "/mock/file.txt")]
+        }
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
         mockSivaRepository.isTimestampedContainerHandler = { _ in false }
         mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
         mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
         mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
 
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+
+        await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)

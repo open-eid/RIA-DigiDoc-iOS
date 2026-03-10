@@ -44,6 +44,8 @@ class RecentDocumentsViewModel: RecentDocumentsViewModelProtocol, Loggable {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileManager = fileManager
         self.fileInspector = fileInspector
+
+        sharedContainerViewModel.setFileOpeningMethod(.all)
     }
 
     func filteredFiles(using extensions: [String]) -> [FileItem] {

@@ -55,7 +55,6 @@ struct EncryptView: View {
     @State private var showRenameModal = false
     @State private var showRemoveDataFileModal = false
     @State private var showRemoveRecipientModal = false
-    @State private var newContainerName = Constants.Container.DefaultName
     @State private var isImportingAddedFiles: Bool = false
 
     @State private var showingShareSheet = false
@@ -149,6 +148,16 @@ struct EncryptView: View {
 
     private var isNestedContainer: Bool {
         viewModel.isNestedContainer()
+    }
+
+    private var containerName: String {
+        URL(fileURLWithPath: viewModel.containerName)
+            .deletingPathExtension()
+            .lastPathComponent
+    }
+
+    private var containerExtension: String {
+        URL(fileURLWithPath: viewModel.containerName).pathExtension
     }
 
     @State private var containerLoadingTask: Task<Void, Never>?
@@ -448,10 +457,16 @@ struct EncryptView: View {
             )
 
             if showRenameModal {
-                CryptoRenameModalView(
-                    encryptViewModel: viewModel,
-                    showRenameModal: $showRenameModal,
-                    newContainerName: $newContainerName
+                RenameModalView(
+                    containerName: containerName,
+                    onConfirm: { newContainerName in
+                        Task {
+                            await handleFileRename(to: newContainerName)
+                        }
+                    },
+                    onCancel: {
+                        showRenameModal = false
+                    }
                 )
             }
 
@@ -558,6 +573,17 @@ struct EncryptView: View {
                 pathManager.replaceLast(to: .signingView)
             }
         }
+    }
+
+    private func handleFileRename(to newContainerName: String) async {
+        showRenameModal = false
+        let sanitizedContainerName = newContainerName.sanitized()
+        guard !sanitizedContainerName.isEmpty else { return }
+        let containerNameWithExtension =
+            containerExtension.isEmpty
+            ? sanitizedContainerName
+            : "\(sanitizedContainerName).\(containerExtension)"
+        await viewModel.renameContainer(to: containerNameWithExtension)
     }
 }
 

@@ -23,7 +23,7 @@ import CommonsLib
 /// @mockable
 public protocol ConfigurationLoaderProtocol: Sendable {
     func initConfiguration(
-        cacheDir: URL,
+        configDir: URL,
         proxyInfo: ProxyInfo,
         userAgent: String
     ) async throws

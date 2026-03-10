@@ -353,37 +353,12 @@ extension SignedContainer {
     private static func open(file: URL, isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
         let fileManager = Container.shared.fileManager()
 
-        let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.ContainerFolder],
-            fileManager: fileManager
-        )
-
-        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
-            signedContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
-        )
-
-        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
-            signedContainersDirectory.absoluteString
-        ) && !isFileInTempSignedContainerDirectory
-
-        var renamedContainerFile = file
-
-        if !isFileInRecentDocuments {
-            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                for: file,
-                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
-                    file.deletingLastPathComponent().deletingLastPathComponent()
-            )
-
-            try fileManager.moveItem(at: file, to: renamedContainerFile)
-        }
-
         let container = try await ContainerWrapper(
             fileManager: fileManager
-        ).open(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
+        ).open(containerFile: file, isSivaConfirmed: isSivaConfirmed)
 
         return SignedContainer(
-            containerFile: renamedContainerFile,
+            containerFile: file,
             isExistingContainer: true,
             container: container,
             fileManager: Container.shared.fileManager(),
