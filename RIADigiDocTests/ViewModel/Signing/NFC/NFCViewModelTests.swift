@@ -40,6 +40,9 @@ final class NFCViewModelTests {
     private let mockOperationReadCertAndSign: OperationReadCertAndSignProtocolMock
     private let mockOperationReadCardData: OperationReadCardDataProtocolMock
     private let mockOperationDecrypt: OperationDecryptProtocolMock
+    private let mockOperationWebEidSign: OperationWebEidSignProtocolMock
+    private let mockOperationReadCert: OperationReadCertProtocolMock
+    private let mockOperationWebEidAuth: OperationWebEidAuthProtocolMock
 
     private let mockNFCSessionStrings: NFCSessionStrings!
 
@@ -53,6 +56,9 @@ final class NFCViewModelTests {
         mockOperationReadCertAndSign = OperationReadCertAndSignProtocolMock()
         mockOperationReadCardData = OperationReadCardDataProtocolMock()
         mockOperationDecrypt = OperationDecryptProtocolMock()
+        mockOperationWebEidSign = OperationWebEidSignProtocolMock()
+        mockOperationReadCert = OperationReadCertProtocolMock()
+        mockOperationWebEidAuth = OperationWebEidAuthProtocolMock()
 
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         var mockNFCStringsUtil: NFCSessionStringsUtil {
@@ -75,7 +81,10 @@ final class NFCViewModelTests {
             keychainStore: mockKeychainStore,
             encryptedDataUtil: mockEncryptedDataUtil,
             operationReadCertAndSign: mockOperationReadCertAndSign,
+            operationWebEidAuth: mockOperationWebEidAuth,
+            operationWebEidSign: mockOperationWebEidSign,
             operationReadCardData: mockOperationReadCardData,
+            operationReadCert: mockOperationReadCert,
             operationDecrypt: mockOperationDecrypt
         )
     }

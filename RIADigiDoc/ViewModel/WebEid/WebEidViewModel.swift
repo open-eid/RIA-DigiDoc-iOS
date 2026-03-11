@@ -118,7 +118,6 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         errorExtraArguments = []
     }
 
-    @MainActor
     func handleWebEidAuthResult(
         authCert: Data,
         signingCert: Data,
@@ -168,7 +167,6 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         }
     }
 
-    @MainActor
     func handleWebEidCertificateResult(signingCert: Data) async {
         guard let responseUri = certRequest?.responseUri,
               !responseUri.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -212,8 +210,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             }
         }
     }
-
-    @MainActor
+    
     func handleWebEidSignResult(
         signingCert: String,
         signature: Data,

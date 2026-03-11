@@ -20,6 +20,7 @@
 import Foundation
 
 /// @mockable
+@MainActor
 public protocol WebEidViewModelProtocol: Sendable {
     func handleAuth(url: URL)
     func handleCertificate(url: URL)
