@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import IdCardLib
 
 public struct NFCSessionStringsUtil {
     private let localize: (String, [String]) -> String
@@ -48,6 +49,7 @@ public struct NFCSessionStringsUtil {
 
     public func makeForUnblock(pinName: String) -> NFCSessionStrings {
         customLocalizations(
+            pinAction: .unblock,
             pinName: pinName,
             successMessage: localize("PIN unblocked", [pinName])
         )
@@ -55,12 +57,14 @@ public struct NFCSessionStringsUtil {
 
     public func makeForChangePin(pinName: String) -> NFCSessionStrings {
         customLocalizations(
+            pinAction: .change,
             pinName: pinName,
             successMessage: localize("PIN changed", [pinName])
         )
     }
 
     public func customLocalizations(
+        pinAction: MyEidPinCodeAction? = nil,
         pinName: String,
         initialMessage: String? = nil,
         step1Message: String? = nil,
@@ -90,9 +94,15 @@ public struct NFCSessionStringsUtil {
             successMessage: successMessage ?? localize("Data read", []),
             canErrorMessage: canErrorMessage ?? localize("Wrong CAN", []),
             pinWrongMultipleErrorMessage: pinWrongMultipleErrorMessage ?? localize(
-                "PIN verification error multiple", [pinName, "2"]),
-            pinWrongErrorMessage: pinWrongErrorMessage ?? localize("PIN verification error one", [pinName]),
-            pinBlockedErrorMessage: pinBlockedErrorMessage ?? localize("PIN blocked", [pinName]),
+                "PIN verification error multiple", [pinAction == .unblock ? CodeType.puk.name : pinName, "2"]),
+            pinWrongErrorMessage: pinWrongErrorMessage ?? localize(
+                "PIN verification error one",
+                [pinAction == .unblock ? CodeType.puk.name : pinName]
+            ),
+            pinBlockedErrorMessage: pinBlockedErrorMessage ?? localize(
+                "PIN blocked",
+                [pinAction == .unblock ? CodeType.puk.name : pinName]
+            ),
             technicalErrorMessage: technicalErrorMessage ?? localize("NFC technical error", []),
             sessionErrorMessage: sessionErrorMessage ?? localize("NFC session error", []),
             ocspTimeslotErrorMessage: ocspTimeslotErrorMessage ?? localize("OCSP response not in valid time slot", []),

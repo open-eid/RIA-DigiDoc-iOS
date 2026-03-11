@@ -314,17 +314,27 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
                 errorMessage = "PIN verification error multiple"
-                errorMessageExtraArguments = [pinType.name, String(triesLeft)]
+                errorMessageExtraArguments = [
+                    pinAction == .unblock ? CodeType.puk.name : pinType.name,
+                    String(triesLeft)
+                ]
                 resetToCurrentPinEntryStep()
             } else if triesLeft == 1 {
                 errorMessage = "PIN verification error one"
-                errorMessageExtraArguments = [pinType.name]
+                errorMessageExtraArguments = [
+                    pinAction == .unblock ? CodeType.puk.name : pinType.name
+                ]
                 resetToCurrentPinEntryStep()
             } else {
                 errorMessage = "PIN blocked"
-                errorMessageExtraArguments = [pinType.name]
+                errorMessageExtraArguments = [
+                    pinAction == .unblock ? CodeType.puk.name : pinType.name
+                ]
                 isBlocked = true
-                sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: true)
+                sharedMyEidSession.setIsPinBlocked(
+                    pinAction == .unblock ? CodeType.puk : codeType,
+                    isBlocked: true
+                )
             }
         case .sessionError:
             errorMessage = "General error"
