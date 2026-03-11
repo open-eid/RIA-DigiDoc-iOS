@@ -17,13 +17,11 @@
  *
  */
 
-import Foundation
-
 /// @mockable
-public protocol KeychainStoreProtocol: Sendable {
-    func save(key: String, info: Data, withPasscodeSetOnly: Bool) async -> Bool
-    func save(key: String, info: Data) async -> Bool
-    func retrieve(key: String) async -> Data?
-    func remove(key: String) async
-    func removeAll() async
+@MainActor
+public protocol OperationReadCertProtocol {
+    func startReading(
+        canNumber: String,
+        strings: NFCSessionStrings,
+    ) async throws -> String
 }

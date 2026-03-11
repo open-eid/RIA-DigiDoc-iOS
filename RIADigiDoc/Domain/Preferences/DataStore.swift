@@ -504,7 +504,17 @@ public actor DataStore: DataStoreProtocol {
     public func setIsCrashlyticsAlwaysEnabled(_ isAlwaysEnabled: Bool) async {
         userDefaults().set(isAlwaysEnabled, forKey: Keys.isCrashlyticsAlwaysEnabled)
     }
+    
+    // MARK: - Web eID
 
+    public func getWebEidRememberMe() async -> Bool {
+        userDefaults().bool(forKey: Keys.isWebEidRememberMe)
+    }
+
+    public func setWebEidRememberMe(_ value: Bool) async {
+        userDefaults().set(value, forKey: Keys.isWebEidRememberMe)
+    }
+    
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -571,5 +581,6 @@ public actor DataStore: DataStoreProtocol {
         static let enableLoggingThisSession = "enableLoggingThisSession"
         static let isLogFileSaved = "isLogFileSaved"
         static let isCrashlyticsAlwaysEnabled = "isCrashlyticsAlwaysEnabled"
+        static let isWebEidRememberMe = "isWebEidRememberMe"
     }
 }

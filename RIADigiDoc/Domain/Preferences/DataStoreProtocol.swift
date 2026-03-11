@@ -122,4 +122,8 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - Crashlytics
     func getIsCrashlyticsAlwaysEnabled() async -> Bool
     func setIsCrashlyticsAlwaysEnabled(_ isEnabled: Bool) async
+    
+    // MARK: - Web eID
+    func getWebEidRememberMe() async -> Bool
+    func setWebEidRememberMe(_ value: Bool) async
 }

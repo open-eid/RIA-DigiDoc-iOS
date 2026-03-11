@@ -39,19 +39,22 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
 
     var relyingPartyResponseEvents: URL?
 
-    // TODO: implement me
-    /*
-    private let webEidRepository: WebEidRepositoryProtocol
-    private let sharedWebEidSession: SharedWebEidSessionProtocol
+    private let authService: WebEidAuthServiceProtocol
+    private let signService: WebEidSignServiceProtocol
+    private let keychainStore: KeychainStoreProtocol
+    let dataStore: DataStoreProtocol
     
     init(
-        webEidRepository: WebEidRepositoryProtocol,
-        sharedWebEidSession: SharedWebEidSessionProtocol
+        dataStore: DataStoreProtocol,
+        keychainStore: KeychainStoreProtocol,
+        authService: WebEidAuthServiceProtocol,
+        signService: WebEidSignServiceProtocol
     ) {
-        self.webEidRepository = webEidRepository
-        self.sharedWebEidSession = sharedWebEidSession
+        self.dataStore = dataStore
+        self.keychainStore = keychainStore
+        self.authService = authService
+        self.signService = signService
     }
-    */
 
     func handleAuth(url: URL) {
         do {
@@ -115,6 +118,152 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         errorExtraArguments = []
     }
 
+    @MainActor
+    func handleWebEidAuthResult(
+        authCert: Data,
+        signingCert: Data,
+        signature: Data
+    ) async {
+        guard let authRequest else { return }
+
+        let loginUri = authRequest.loginUri
+        let getSigningCertificate = authRequest.getSigningCertificate
+
+        do {
+            let tokenData = try await authService.buildAuthToken(
+                authCert: authCert,
+                signingCert: getSigningCertificate ? signingCert : nil,
+                signature: signature
+            )
+
+            let tokenObject = try JSONSerialization.jsonObject(with: tokenData, options: [])
+
+            let payload: [String: Any] = [
+                "auth_token": tokenObject
+            ]
+
+            let responseURL = try WebEidResponseUtil.createResponseURL(
+                responseUri: loginUri,
+                payload: payload
+            )
+
+            relyingPartyResponseEvents = responseURL
+        } catch {
+            WebEidViewModel.logger().error("Unexpected error building auth token: \(String(reflecting: error))")
+
+            let errorPayload = WebEidResponseUtil.createErrorPayload(
+                code: .errWebEidMobileUnknownError,
+                message: "Unexpected error"
+            )
+
+            do {
+                let responseURL = try WebEidResponseUtil.createResponseURL(
+                    responseUri: loginUri,
+                    payload: errorPayload
+                )
+                relyingPartyResponseEvents = responseURL
+            } catch {
+                WebEidViewModel.logger().error("Failed to build error response URL: \(String(reflecting: error))")
+            }
+        }
+    }
+
+    @MainActor
+    func handleWebEidCertificateResult(signingCert: Data) async {
+        guard let responseUri = certRequest?.responseUri,
+              !responseUri.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            WebEidViewModel.logger().error("Missing responseUri in sign payload for certificate step")
+            return
+        }
+
+        do {
+            let payloadData = try await signService.buildCertificatePayload(signingCert: signingCert)
+            let payloadObject = try JSONSerialization.jsonObject(with: payloadData, options: [])
+
+            guard let payload = payloadObject as? [String: Any] else {
+                WebEidViewModel.logger().error("Invalid certificate payload JSON")
+                return
+            }
+
+            let responseURL = try WebEidResponseUtil.createResponseURL(
+                responseUri: responseUri,
+                payload: payload
+            )
+            relyingPartyResponseEvents = responseURL
+
+        } catch {
+            WebEidViewModel.logger().error("Unexpected error building certificate payload: \(String(reflecting: error))")
+
+            let errorPayload = WebEidResponseUtil.createErrorPayload(
+                code: .errWebEidMobileUnknownError,
+                message: "Unexpected error"
+            )
+
+            do {
+                let errorURL = try WebEidResponseUtil.createResponseURL(
+                    responseUri: responseUri,
+                    payload: errorPayload
+                )
+                relyingPartyResponseEvents = errorURL
+            } catch {
+                WebEidViewModel.logger().error("Failed to build error response URL: \(String(reflecting: error))")
+            }
+        }
+    }
+    
+    @MainActor
+    func handleWebEidSignResult(
+        signingCert: String,
+        signature: Data,
+        responseUri: String
+    ) async {
+        do {
+            guard let hashFunction = signRequest?.hashFunction,
+                  !hashFunction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                WebEidViewModel.logger().error("Missing signRequest")
+                return
+            }
+
+            let payloadData = try await signService.buildSignPayload(
+                signingCert: signingCert,
+                signature: signature,
+                hashFunction: hashFunction
+            )
+
+            let payloadObject = try JSONSerialization.jsonObject(with: payloadData, options: [])
+
+            guard let payload = payloadObject as? [String: Any] else {
+                WebEidViewModel.logger().error("Invalid sign payload JSON")
+                return
+            }
+
+            let responseURL = try WebEidResponseUtil.createResponseURL(
+                responseUri: responseUri,
+                payload: payload
+            )
+
+            relyingPartyResponseEvents = responseURL
+
+        } catch {
+            WebEidViewModel.logger().error("Unexpected error building sign payload: \(String(reflecting: error))")
+
+            let errorPayload = WebEidResponseUtil.createErrorPayload(
+                code: .errWebEidMobileUnknownError,
+                message: "Unexpected error"
+            )
+
+            do {
+                let errorURL = try WebEidResponseUtil.createResponseURL(
+                    responseUri: responseUri,
+                    payload: errorPayload
+                )
+                relyingPartyResponseEvents = errorURL
+            } catch {
+                WebEidViewModel.logger().error("Failed to build error response URL: \(String(reflecting: error))")
+            }
+        }
+    }
+    
     func resetErrors() {
         showAlertMessage = false
         alertMessageKey = nil
@@ -124,4 +273,20 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
         errorExtraArguments = []
     }
 
+    // MARK: - WebEid KeyChainStore
+    
+    func isWebEidSessionActive() async -> Bool {
+        if let data = await keychainStore.retrieve(key: KeychainKey.webEidSessionActive.rawValue) {
+            let value = data.first == 1
+            return value
+        }
+        
+        return false
+    }
+    
+    func setWebEidSessionActive(_ value: Bool) async {
+        let data = Data([value ? 1 : 0])
+
+        _ = await keychainStore.save(key: KeychainKey.webEidSessionActive.rawValue, info: data)
+    }
 }

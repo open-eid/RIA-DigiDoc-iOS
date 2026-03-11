@@ -27,7 +27,7 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         self.bundleIdentifier = bundleIdentifier ?? BundleUtil.getBundleIdentifier()
     }
 
-    public func save(key: KeychainKey, info: Data, withPasscodeSetOnly: Bool = false) async -> Bool {
+    public func save(key: String, info: Data, withPasscodeSetOnly: Bool = false) async -> Bool {
         let query = baseQuery(key: key)
 
         let attributes: [CFString: Any] = [
@@ -48,16 +48,16 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
             let addStatus = SecItemAdd(queryWithAttributes as CFDictionary, nil)
             return addStatus == errSecSuccess
         } else {
-            KeychainStore.logger().error("Unable to save \(key.rawValue): \(status)")
+            KeychainStore.logger().error("Unable to save \(key): \(status)")
             return false
         }
     }
 
-    public func save(key: KeychainKey, info: Data) async -> Bool {
+    public func save(key: String, info: Data) async -> Bool {
         return await save(key: key, info: info, withPasscodeSetOnly: false)
     }
 
-    public func retrieve(key: KeychainKey) async -> Data? {
+    public func retrieve(key: String) async -> Data? {
         var query = baseQuery(key: key)
         query[kSecReturnData] = true
         query[kSecMatchLimit] = kSecMatchLimitOne
@@ -72,7 +72,7 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         }
     }
 
-    public func remove(key: KeychainKey) async {
+    public func remove(key: String) async {
         let query = baseQuery(key: key)
         let status = SecItemDelete(query as CFDictionary)
 
@@ -83,16 +83,16 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
 
     public func removeAll() async {
         for key in KeychainKey.allCases {
-            await remove(key: key)
+            await remove(key: key.rawValue)
         }
     }
 
     // MARK: - Helper Methods
-    private func baseQuery(key: KeychainKey) -> [CFString: Any] {
+    private func baseQuery(key: String) -> [CFString: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: bundleIdentifier,
-            kSecAttrAccount: "\(bundleIdentifier).\(key.rawValue)"
+            kSecAttrAccount: "\(bundleIdentifier).\(key)"
         ]
     }
 }

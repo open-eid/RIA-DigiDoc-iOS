@@ -465,9 +465,10 @@ extension Container {
     var webEidViewModel: Factory<WebEidViewModel> {
         self { @MainActor in
             WebEidViewModel(
-                // TODO: implement me
-                // webEidRepository: self.webEidRepository(),
-                // sharedWebEidSession: self.sharedWebEidSession()
+                dataStore: self.dataStore(),
+                keychainStore: self.keychainStore(),
+                authService: self.webEidAuthService(),
+                signService: self.webEidSignService()
             )
         }
         .shared
@@ -520,7 +521,10 @@ extension Container {
                 keychainStore: self.keychainStore(),
                 encryptedDataUtil: self.encryptedDataUtil(),
                 operationReadCertAndSign: self.operationReadCertAndSign(),
+                operationWebEidAuth: self.operationWebEidAuth(),
+                operationWebEidSign: self.operationWebEidSign(),
                 operationReadCardData: self.operationReadCardData(),
+                operationReadCert: self.operationReadCert(),
                 operationDecrypt: self.operationDecrypt()
             )
         }
@@ -534,9 +538,23 @@ extension Container {
     }
 
     @MainActor
+    var operationWebEidSign: Factory<OperationWebEidSign> {
+        self { @MainActor in
+            OperationWebEidSign()
+        }
+    }
+    
+    @MainActor
     var operationReadCardData: Factory<OperationReadCardData> {
         self { @MainActor in
             OperationReadCardData()
+        }
+    }
+    
+    @MainActor
+    var operationReadCert: Factory<OperationReadCert> {
+        self { @MainActor in
+            OperationReadCert()
         }
     }
 
@@ -544,6 +562,13 @@ extension Container {
     var operationDecrypt: Factory<OperationDecrypt> {
         self { @MainActor in
             OperationDecrypt()
+        }
+    }
+    
+    @MainActor
+    var operationWebEidAuth: Factory<OperationWebEidAuth> {
+        self { @MainActor in
+            OperationWebEidAuth()
         }
     }
 
