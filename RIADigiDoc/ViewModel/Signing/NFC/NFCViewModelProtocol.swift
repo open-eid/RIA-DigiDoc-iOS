@@ -32,7 +32,7 @@ public protocol NFCViewModelProtocol: Sendable {
         pinType: CodeType?,
         actionType: ActionType?
     ) -> Bool
-    
+
     func saveInputData(
         canNumber: String,
         rememberMe: Bool,
@@ -40,23 +40,23 @@ public protocol NFCViewModelProtocol: Sendable {
         isWebEidAuthenticating: Bool
     ) async
 
-    func getInputData(_ actionType: ActionType, _ isWebEidAuthenticating: Bool) async -> NFCInputData 
+    func getInputData(_ actionType: ActionType, _ isWebEidAuthenticating: Bool) async -> NFCInputData
 
     func saveEncryptedCAN(_ can: String) async
     func retrieveEncryptedCAN() async -> String?
     func clearEncryptedCAN() async
-    
+
     func saveTempCAN(_ can: String) async
     func retrieveTempCAN() async -> String?
     func clearTempCAN() async
-    
+
     func getSigningCertificate() async -> String
     func setSigningCertificate(_ cert: String) async
-    
+
     func resetErrors()
-    
+
     func isRoleDataEnabled() async -> Bool
-    
+
     func decrypt(
         CAN: String,
         pin1: String,
@@ -72,6 +72,7 @@ public protocol NFCViewModelProtocol: Sendable {
         strings: NFCSessionStrings
     ) async -> SignedContainerProtocol?
 
+    // swiftlint:disable:next function_parameter_count
     func signWebEid(
         canNumber: String,
         pin2: String,
@@ -80,7 +81,7 @@ public protocol NFCViewModelProtocol: Sendable {
         expectedSigningCertBase64: String?,
         strings: NFCSessionStrings
     ) async -> WebEidSignReturnData?
-    
+
     func auth(
         canNumber: String,
         pin1: String,
@@ -88,14 +89,14 @@ public protocol NFCViewModelProtocol: Sendable {
         challenge: String,
         strings: NFCSessionStrings
     ) async -> WebEidAuthReturnData?
-    
+
     func certificate(
         canNumber: String,
         strings: NFCSessionStrings
     ) async -> String?
-    
+
     func saveMyEidCAN(_ can: String)
-    
+
     func readCardData(
         CAN: String,
         strings: NFCSessionStrings

@@ -84,7 +84,7 @@ public class OperationWebEidAuth: NFCOperationBase, OperationWebEidAuthProtocol 
             defer {
                 self.session = nil
             }
-            
+
             if userAgent.isEmpty {
                 let error = ReadCertAndSignError.userAgentEmpty
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
@@ -135,14 +135,14 @@ public class OperationWebEidAuth: NFCOperationBase, OperationWebEidAuthProtocol 
                 }
 
                 updateAlertMessage(step: 4)
-                
+
                 guard let hashAlgorithm = try resolveHashAlgorithm(from: publicKey) else {
                     let error = ReadCertAndSignError.missingPublicKey
                     OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
                     operationError = error
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ??
                                        "Unsupported algorithm")
-                    
+
                     return
                 }
 
@@ -153,7 +153,7 @@ public class OperationWebEidAuth: NFCOperationBase, OperationWebEidAuthProtocol 
                 let tbsHash = digest(signedData, using: hashAlgorithm)
 
                 let signatureArray = try await cardCommands.authenticate(for: tbsHash, withPin1: pin1Number)
-                
+
                 returnData = WebEidAuthReturnData(
                     authCert: authCert,
                     signingCert: signerCert,
@@ -215,7 +215,7 @@ public class OperationWebEidAuth: NFCOperationBase, OperationWebEidAuthProtocol 
 
         continuationToResume.resume(throwing: error)
     }
-    
+
     // MARK: - Helpers
     private func resolveHashAlgorithm(from publicKey: SecKey) throws -> HashAlgorithm? {
         guard let attrs = SecKeyCopyAttributes(publicKey) as? [CFString: Any],

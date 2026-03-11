@@ -206,7 +206,7 @@ struct TopBar: View {
 
     var body: some View {
         HStack {
-            if (showNavigationIcon) {
+            if showNavigationIcon {
                 Button(action: onLeftClick) {
                     Image(leftIcon)
                         .resizable()
@@ -224,7 +224,7 @@ struct TopBar: View {
                     .padding(.leading, Dimensions.Padding.XSPadding)
                     .accessibilityAddTraits(.isHeader)
             }
-            
+
             Spacer()
 
             if showRightIcons {

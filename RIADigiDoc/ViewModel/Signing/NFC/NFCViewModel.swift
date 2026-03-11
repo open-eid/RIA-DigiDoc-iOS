@@ -115,16 +115,16 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         canNumber: String,
         rememberMe: Bool,
         actionType: ActionType,
-        isWebEidAuthenticating: Bool
+        isWebEidAuthenticating _: Bool
     ) async {
         await {
-            if (actionType == .certificate || actionType == .signingWebEid || actionType == .auth) {
+            if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
                 await dataStore.setNFCRememberMe(rememberMe)
             } else {
                 await dataStore.setWebEidRememberMe(rememberMe)
             }
         }()
-        
+
         if (actionType == .auth || actionType == .certificate) && rememberMe {
             await saveEncryptedCAN(canNumber)
             await clearTempCAN()
@@ -143,7 +143,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
     func getInputData(_ actionType: ActionType, _ isWebEidAuthenticating: Bool) async -> NFCInputData {
         let rememberMe = await {
-            if (actionType == .certificate || actionType == .signingWebEid || actionType == .auth) {
+            if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
                 return await dataStore.getNFCRememberMe()
             } else {
                 return await dataStore.getWebEidRememberMe()
@@ -168,7 +168,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             }
             return ""
         }()
-        
+
         return NFCInputData(
             canNumber: initialCan,
             rememberMe: rememberMe
@@ -184,10 +184,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         if let canData, let can = String(data: canData, encoding: .utf8) {
             return can
         }
-        
+
         return nil
     }
-    
+
     func clearEncryptedCAN() async {
         _ = await keychainStore.remove(key: KeychainKey.nfcCANKey.rawValue)
     }
@@ -201,26 +201,26 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         if let canData, let can = String(data: canData, encoding: .utf8) {
             return can
         }
-        
+
         return nil
     }
-    
+
     func clearTempCAN() async {
         _ = await keychainStore.remove(key: KeychainKey.tempCANKey.rawValue)
     }
-    
+
     func getSigningCertificate() async -> String {
         let currentCan = await retrieveEncryptedCAN()
         if let currentCan {
             let certKey = KeychainKey.signingCertKey.rawValue
             let key =  "\(certKey)_\(currentCan)"
-            
+
             let certData = await keychainStore.retrieve(key: key)
             if let certData, let cert = String(data: certData, encoding: .utf8) {
                 return cert
             }
         }
-        
+
         return ""
     }
 
@@ -229,11 +229,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         if let currentCan {
             let certKey = KeychainKey.signingCertKey.rawValue
             let key =  "\(certKey)_\(currentCan)"
-            
+
             _ = await keychainStore.save(key: key, info: Data(cert.utf8))
         }
     }
-    
+
     func resetErrors() {
         canNumberErrorKey = nil
         canNumberErrorExtraArguments = []
@@ -246,7 +246,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     func isRoleDataEnabled() async -> Bool {
         await dataStore.getIsRoleAndAddressEnabled()
     }
-    
+
     func decrypt(
         CAN: String,
         pin1: String,
@@ -293,7 +293,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return nil
         }
     }
-    
+
     func sign(
         canNumber: String,
         pin2: String,
@@ -360,7 +360,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return nil
         }
     }
-    
+
     func auth(
         canNumber: String,
         pin1: String,
@@ -464,7 +464,8 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return nil
         }
     }
-    
+
+    // swiftlint:disable:next function_parameter_count
     func signWebEid(
         canNumber: String,
         pin2: String,
@@ -574,11 +575,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             return nil
         }
     }
-    
+
     public func saveMyEidCAN(_ can: String) {
         sharedMyEidSession.setCAN(can)
     }
-    
+
     private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
         NFCViewModel.logger().error("NFC: ID Card error: \(error)")
 
@@ -617,11 +618,20 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         switch error {
         case .cancelled:
             nfcErrorKey = nil
-        case .signedContainerNil, .roleDataNil, .containerPathNil, .userAgentEmpty, .hashInvalid, .invalidCertificate, .missingPublicKey, .unsupportedAlgorithm:
+        case .signedContainerNil,
+        .roleDataNil,
+        .containerPathNil,
+        .userAgentEmpty,
+        .hashInvalid,
+        .invalidCertificate,
+        .missingPublicKey,
+        .unsupportedAlgorithm:
             NFCViewModel.logger().error("NFC: Configuration error")
             nfcErrorKey = "NFC session error"
         case .certMismatch:
-            NFCViewModel.logger().error("Web eID signing failed - signing certificate does not match previously used certificate")
+            NFCViewModel.logger().error(
+                "Web eID signing failed - signing certificate does not match previously used certificate"
+            )
             nfcErrorKey = "NFC certificate mismatch error"
         case .unknown(let underlying):
             NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
@@ -688,7 +698,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         }
         canNumberErrorKey = ""
     }
-    
+
     private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
         let minLen = if pinType == .pin1 {
             Constants.Validation.Pin1MinimumLength

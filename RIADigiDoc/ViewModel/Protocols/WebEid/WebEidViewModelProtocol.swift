@@ -25,7 +25,7 @@ public protocol WebEidViewModelProtocol: Sendable {
     func handleCertificate(url: URL)
     func handleSign(url: URL)
     func handleUnknown(url: URL)
-    
+
     func handleWebEidAuthResult(
         authCert: Data,
         signingCert: Data,
@@ -37,9 +37,9 @@ public protocol WebEidViewModelProtocol: Sendable {
         signature: Data,
         responseUri: String
     ) async
-    
+
     func resetErrors()
-    
+
     func isWebEidSessionActive() async -> Bool
     func setWebEidSessionActive(_ value: Bool) async
 }

@@ -543,14 +543,14 @@ extension Container {
             OperationWebEidSign()
         }
     }
-    
+
     @MainActor
     var operationReadCardData: Factory<OperationReadCardData> {
         self { @MainActor in
             OperationReadCardData()
         }
     }
-    
+
     @MainActor
     var operationReadCert: Factory<OperationReadCert> {
         self { @MainActor in
@@ -564,7 +564,7 @@ extension Container {
             OperationDecrypt()
         }
     }
-    
+
     @MainActor
     var operationWebEidAuth: Factory<OperationWebEidAuth> {
         self { @MainActor in

@@ -43,7 +43,7 @@ struct NFCView: View {
     @State private var roleData: RoleData?
 
     @State private var signingCert: String = ""
-    
+
     @State private var nfcActionMessage: String = "NFC hold card"
 
     @State private var viewModel: NFCViewModel
@@ -57,8 +57,6 @@ struct NFCView: View {
     @State private var taskAuth: Task<Void, Never>?
     @State private var taskCertificate: Task<Void, Never>?
 
-    
-    
     private var isNFCSupported: Bool {
         viewModel.isNFCSupported()
     }
@@ -316,7 +314,7 @@ struct NFCView: View {
                 let inputData = await viewModel.getInputData(actionType, isWebEidAuthenticating)
                 canNumber = inputData.canNumber
                 rememberMe = inputData.rememberMe
-                
+
                 signingCert = await viewModel.getSigningCertificate()
             }
         }
@@ -327,7 +325,7 @@ struct NFCView: View {
         .onDisappear {
             Task {
                 let webEidActive = await webEidViewModel.isWebEidSessionActive()
-                if (!rememberMe && !webEidActive) {
+                if !rememberMe && !webEidActive {
                     await viewModel.clearTempCAN()
                 }
             }
@@ -467,7 +465,7 @@ struct NFCView: View {
             }
         }
     }
-    
+
     private func auth() {
         taskAuth = Task {
             await viewModel.saveInputData(
@@ -481,7 +479,7 @@ struct NFCView: View {
             nfcActionMessage = "NFC hold card"
 
             let strings = nfcStringsUtil.makeDefault(pinName: CodeType.pin1.name)
-            
+
             let webEidAuthResult = await viewModel.auth(
                 canNumber: canNumber,
                 pin1: pinNumber,
@@ -489,15 +487,14 @@ struct NFCView: View {
                 challenge: webEidViewModel.authRequest?.challenge ?? "",
                 strings: strings
             )
-            
+
             cancelAuth()
             isInProgress = false
 
             guard let result = webEidAuthResult else {
                 return
             }
-            
-            
+
             let encodedCert = result.signingCert.base64EncodedString()
             await viewModel.setSigningCertificate(encodedCert)
 
@@ -506,12 +503,12 @@ struct NFCView: View {
                 signingCert: result.signingCert,
                 signature: result.signatureArray
             )
-            
+
             onSuccessWebEid()
             dismiss()
         }
     }
-    
+
     private func certificate() {
         taskCertificate = Task {
             await viewModel.saveInputData(
@@ -527,12 +524,12 @@ struct NFCView: View {
             let strings = nfcStringsUtil.makeDefault()
 
             let cachedCert = await viewModel.getSigningCertificate()
-            
-            if (!cachedCert.isEmpty) {
+
+            if !cachedCert.isEmpty {
                 guard let certBytes = Data(base64Encoded: cachedCert) else {
                     return
                 }
-                
+
                 await webEidViewModel.handleWebEidCertificateResult(signingCert: certBytes)
                 onSuccessWebEid()
             } else {
@@ -540,11 +537,11 @@ struct NFCView: View {
                     canNumber: canNumber,
                     strings: strings
                 )
-                
+
                 guard let signCert = webEidCertResult else {
                     return
                 }
-                
+
                 await viewModel.setSigningCertificate(signCert)
                 guard let certBytes = Data(base64Encoded: signCert) else {
                     return
@@ -552,14 +549,14 @@ struct NFCView: View {
                 await webEidViewModel.handleWebEidCertificateResult(signingCert: certBytes)
                 onSuccessWebEid()
             }
-            
+
             cancelCertificate()
             isInProgress = false
 
             dismiss()
         }
     }
-    
+
     private func signWebEid() {
         taskSignWebEid = Task {
             await viewModel.saveInputData(
@@ -583,25 +580,25 @@ struct NFCView: View {
                 expectedSigningCertBase64: expectedSigningCertBase64,
                 strings: strings
             )
-            
+
             cancelSigningWebEid()
             isInProgress = false
 
             guard let result = webEidSignResult else {
                 return
             }
-            
+
             await webEidViewModel.handleWebEidSignResult(
                 signingCert: result.signerCertB64,
                 signature: result.signatureArray,
                 responseUri: result.responseUri
             )
-            
+
             onSuccessWebEid()
             dismiss()
         }
     }
-    
+
     private func cancelDecrypt() {
         pinNumber.isEmpty ? () : (pinNumber.removeAll())
         isActionEnabled = viewModel

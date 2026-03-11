@@ -43,7 +43,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
     private let signService: WebEidSignServiceProtocol
     private let keychainStore: KeychainStoreProtocol
     let dataStore: DataStoreProtocol
-    
+
     init(
         dataStore: DataStoreProtocol,
         keychainStore: KeychainStoreProtocol,
@@ -192,7 +192,9 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             relyingPartyResponseEvents = responseURL
 
         } catch {
-            WebEidViewModel.logger().error("Unexpected error building certificate payload: \(String(reflecting: error))")
+            WebEidViewModel.logger().error(
+                "Unexpected error building certificate payload: \(String(reflecting: error))"
+            )
 
             let errorPayload = WebEidResponseUtil.createErrorPayload(
                 code: .errWebEidMobileUnknownError,
@@ -210,7 +212,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             }
         }
     }
-    
+
     @MainActor
     func handleWebEidSignResult(
         signingCert: String,
@@ -263,7 +265,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             }
         }
     }
-    
+
     func resetErrors() {
         showAlertMessage = false
         alertMessageKey = nil
@@ -274,16 +276,16 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
     }
 
     // MARK: - WebEid KeyChainStore
-    
+
     func isWebEidSessionActive() async -> Bool {
         if let data = await keychainStore.retrieve(key: KeychainKey.webEidSessionActive.rawValue) {
             let value = data.first == 1
             return value
         }
-        
+
         return false
     }
-    
+
     func setWebEidSessionActive(_ value: Bool) async {
         let data = Data([value ? 1 : 0])
 

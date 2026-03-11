@@ -40,7 +40,7 @@ public class OperationWebEidSign: NFCOperationBase, OperationWebEidSignProtocol 
     private var pin2Number: SecureData = SecureData([0x00])
     private var responseUri: String = ""
     private var hashToSign: String = ""
-    private var expectedSigningCertBase64: String? = nil
+    private var expectedSigningCertBase64: String?
     private var userAgent: String = ""
     private var returnData: WebEidSignReturnData?
 
@@ -86,7 +86,7 @@ public class OperationWebEidSign: NFCOperationBase, OperationWebEidSignProtocol 
             defer {
                 self.session = nil
             }
-            
+
             if userAgent.isEmpty {
                 let error = ReadCertAndSignError.userAgentEmpty
                 OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
@@ -117,7 +117,7 @@ public class OperationWebEidSign: NFCOperationBase, OperationWebEidSignProtocol 
                 }
 
                 let signerCert = try await cardCommands.readSignatureCertificate()
-                
+
                 if let expectedSigningCertBase64,
                    !expectedSigningCertBase64.isEmpty,
                    let expectedCert = Data(base64Encoded: expectedSigningCertBase64) {
@@ -133,7 +133,7 @@ public class OperationWebEidSign: NFCOperationBase, OperationWebEidSignProtocol 
                 }
 
                 let signerCertB64 = signerCert.base64EncodedString()
-                
+
                 guard let hashBytes = Data(base64Encoded: hashToSign) else {
                     let error = ReadCertAndSignError.hashInvalid
                     OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")

@@ -214,7 +214,7 @@ struct WebEidView: View {
         }
         .onChange(of: viewModel.authRequest) {_, _ in
             Task {
-                if (await viewModel.isWebEidSessionActive()) {
+                if await viewModel.isWebEidSessionActive() {
                     await nfcViewModel.clearTempCAN()
                 }
                 await viewModel.setWebEidSessionActive(true)
@@ -222,7 +222,7 @@ struct WebEidView: View {
         }
         .onChange(of: viewModel.certRequest) {_, _ in
             Task {
-                if (await viewModel.isWebEidSessionActive()) {
+                if await viewModel.isWebEidSessionActive() {
                     await nfcViewModel.clearTempCAN()
                 }
                 await viewModel.setWebEidSessionActive(true)
