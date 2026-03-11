@@ -133,6 +133,7 @@ struct ContainerNameView: View {
                             }
                             .font(typography.labelLarge)
                             .foregroundStyle(theme.primary)
+                            .padding(.horizontal, Dimensions.Padding.MSPadding)
                             .accessibilityLabel(leftActionButtonAccessibilityLabel)
                         }
 

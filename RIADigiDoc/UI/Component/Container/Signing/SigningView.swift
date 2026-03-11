@@ -186,7 +186,7 @@ struct SigningView: View {
                                     isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
                                     showLeftActionButton: isContainerSigned && isSignButtonShown,
                                     showRightActionButton: isContainerSigned && !isNestedContainer,
-                                    leftActionButtonName: signLabel,
+                                    leftActionButtonName: languageSettings.localized("Add signature"),
                                     rightActionButtonName: encryptLabel,
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
                                     rightActionButtonAccessibilityLabel: encryptAccessibilityLabel.lowercased(),
