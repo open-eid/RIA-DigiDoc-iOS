@@ -5333,6 +5333,24 @@
         }
       }
     },
+    "NFC certificate mismatch error" : {
+      "comment" : "NFC certificate mismatch error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected ID card does not match the previously used certificate. Please use the same ID card you authenticated with."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valitud ID-kaart ei vasta varem kasutatud sertifikaadile. Palun kasuta sama ID-kaarti, millega autentisid."
+          }
+        }
+      }
+    },
     "NFC hold card" : {
       "comment" : "NFC hold card message",
       "extractionState" : "manual",

@@ -19,7 +19,7 @@
 
 import Foundation
 
-public enum ActionType {
+public enum ActionType: Sendable {
     case signing
     case myeid
     case decrypt

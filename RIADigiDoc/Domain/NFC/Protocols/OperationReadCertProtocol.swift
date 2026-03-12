@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,11 @@
  *
  */
 
-import Foundation
-
 /// @mockable
-public protocol KeychainStoreProtocol: Sendable {
-    func save(key: String, info: Data, withPasscodeSetOnly: Bool) async -> Bool
-    func save(key: String, info: Data) async -> Bool
-    func save(key: KeychainKey, info: Data) async -> Bool
-    func retrieve(key: String) async -> Data?
-    func retrieve(key: KeychainKey) async -> Data?
-    func remove(key: String) async
-    func remove(key: KeychainKey) async
-    func removeAll() async
+@MainActor
+public protocol OperationReadCertProtocol {
+    func startReading(
+        canNumber: String,
+        strings: NFCSessionStrings,
+    ) async throws -> String
 }

@@ -30,6 +30,7 @@ struct TopBarContainer<Content: View>: View {
 
     var title: String?
     var titleAccessibility: String?
+    var showNavigationIcon = true
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
     var leftIconAccessibility: String = "Back"
@@ -87,6 +88,7 @@ struct TopBarContainer<Content: View>: View {
             TopBar(
                 title: title,
                 titleAccessibility: titleAccessibility,
+                showNavigationIcon: showNavigationIcon,
                 leftIcon: leftIcon,
                 leftIconAccessibility: leftIconAccessibility,
                 leftIconAccessibilityInput: leftIconAccessibilityInput,
@@ -169,7 +171,7 @@ struct TopBar: View {
 
     var title: String?
     var titleAccessibility: String?
-
+    var showNavigationIcon = true
     var leftIcon: String
     var leftIconAccessibility: String
     var leftIconAccessibilityInput: String?
@@ -204,16 +206,17 @@ struct TopBar: View {
 
     var body: some View {
         HStack {
-            Button(action: onLeftClick) {
-                Image(leftIcon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .foregroundStyle(theme.onSurfaceVariant)
+            if showNavigationIcon {
+                Button(action: onLeftClick) {
+                    Image(leftIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                        .foregroundStyle(theme.onSurfaceVariant)
+                }
+                .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
+                .accessibilityInputLabels(getInputLabels(leftIconAccessibilityInput, leftIconAccessibility))
             }
-            .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
-            .accessibilityInputLabels(getInputLabels(leftIconAccessibilityInput, leftIconAccessibility))
-
             if let title = title {
                 Text(title)
                     .foregroundStyle(theme.onSurface)

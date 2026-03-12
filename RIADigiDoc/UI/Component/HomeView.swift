@@ -315,9 +315,6 @@ struct HomeView: View {
         handleFiles(externalFileURLs)
 
         if let webEidUrl = webEidURL {
-            // iOS: no equivalent "calling browser package" is available.
-            // TODO: RESEARCH: dataStore.setWebEidBrowserIdentifier
-
             pathManager.navigate(to: .webEidView(webEidURL: webEidUrl))
         }
     }
