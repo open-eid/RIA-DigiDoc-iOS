@@ -53,7 +53,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     private let keychainStore: KeychainStoreProtocol
     private let encryptedDataUtil: EncryptedDataUtilProtocol
     private let operationReadCertAndSign: OperationReadCertAndSignProtocol
+    private let operationWebEidAuth: OperationWebEidAuthProtocol
+    private let operationWebEidSign: OperationWebEidSignProtocol
     private let operationReadCardData: OperationReadCardDataProtocol
+    private let operationReadCert: OperationReadCertProtocol
     private let operationDecrypt: OperationDecryptProtocol
 
     init(
@@ -64,7 +67,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         keychainStore: KeychainStoreProtocol,
         encryptedDataUtil: EncryptedDataUtilProtocol,
         operationReadCertAndSign: OperationReadCertAndSignProtocol,
+        operationWebEidAuth: OperationWebEidAuthProtocol,
+        operationWebEidSign: OperationWebEidSignProtocol,
         operationReadCardData: OperationReadCardDataProtocol,
+        operationReadCert: OperationReadCertProtocol,
         operationDecrypt: OperationDecryptProtocol
     ) {
         self.dataStore = dataStore
@@ -74,7 +80,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         self.keychainStore = keychainStore
         self.encryptedDataUtil = encryptedDataUtil
         self.operationReadCertAndSign = operationReadCertAndSign
+        self.operationWebEidAuth = operationWebEidAuth
+        self.operationWebEidSign = operationWebEidSign
         self.operationReadCardData = operationReadCardData
+        self.operationReadCert = operationReadCert
         self.operationDecrypt = operationDecrypt
     }
 
@@ -102,102 +111,126 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         return result
     }
 
-    func saveInputData(canNumber: String, rememberMe: Bool) async {
-        await dataStore.setNFCRememberMe(rememberMe)
+    func saveInputData(
+        canNumber: String,
+        rememberMe: Bool,
+        actionType: ActionType,
+        isWebEidAuthenticating _: Bool
+    ) async {
+        await {
+            if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
+                await dataStore.setNFCRememberMe(rememberMe)
+            } else {
+                await dataStore.setWebEidRememberMe(rememberMe)
+            }
+        }()
 
-        if rememberMe && !canNumber.isEmpty {
+        if (actionType == .auth || actionType == .certificate) && rememberMe {
             await saveEncryptedCAN(canNumber)
+            await clearTempCAN()
+        } else if (actionType == .auth || actionType == .certificate) && !rememberMe {
+            await saveEncryptedCAN("")
+            await clearEncryptedCAN()
+            await saveTempCAN(canNumber)
         } else {
-            await keychainStore.remove(key: .nfcCANKey)
-        }
-
-    }
-
-    func getInputData() async -> NFCInputData {
-        let rememberMe = await dataStore.getNFCRememberMe()
-
-        if rememberMe {
-            if let decryptedCAN = await retrieveEncryptedCAN() {
-                return NFCInputData(
-                    canNumber: decryptedCAN,
-                    rememberMe: true
-                )
-            }
-        }
-
-        return NFCInputData(canNumber: "", rememberMe: rememberMe)
-    }
-
-    private func saveEncryptedCAN(_ can: String) async {
-        do {
-            let symmetricKey = try encryptedDataUtil.getSymmetricKey(fileName: self.nfcCANKeyFilename)
-
-            if let encryptedCAN = encryptedDataUtil.encryptSecret(can, with: symmetricKey) {
-                let saved = await keychainStore.save(
-                    key: .nfcCANKey,
-                    info: encryptedCAN,
-                    withPasscodeSetOnly: true
-                )
-
-                if saved {
-                    NFCViewModel.logger().info("CAN encrypted and saved successfully")
-                } else {
-                    NFCViewModel.logger().error("Failed to save encrypted CAN to keychain")
-                }
+            if rememberMe && !canNumber.isEmpty {
+                await saveEncryptedCAN(canNumber)
             } else {
-                NFCViewModel.logger().error("Encryption failed for CAN string")
-            }
-        } catch {
-            do {
-                let symKeyURL = try encryptedDataUtil.saveSymmetricKeyToAppSupport(
-                    fileName: self.nfcCANKeyFilename
-                )
-                let symKey = try encryptedDataUtil.getSymmetricKey(
-                    fileName: symKeyURL.lastPathComponent
-                )
-
-                if let encryptedCAN = encryptedDataUtil.encryptSecret(can, with: symKey) {
-                    let saved = await keychainStore.save(
-                        key: .nfcCANKey,
-                        info: encryptedCAN,
-                        withPasscodeSetOnly: true
-                    )
-
-                    if saved {
-                        NFCViewModel.logger().info("CAN encrypted and saved with new key")
-                    } else {
-                        NFCViewModel.logger().error("Failed to save encrypted CAN after creating new key")
-                    }
-                } else {
-                    NFCViewModel.logger().error("Encryption failed for CAN after saving new symmetric key")
-                }
-            } catch {
-                NFCViewModel.logger().error("Unable to save or retrieve symmetric key: \(error.localizedDescription)")
+                await clearEncryptedCAN()
             }
         }
     }
 
-    private func retrieveEncryptedCAN() async -> String? {
-        do {
-            guard let encryptedCANData = await keychainStore.retrieve(key: .nfcCANKey) else {
-                NFCViewModel.logger().info("No encrypted CAN found in keychain")
-                return nil
-            }
-
-            let symmetricKey = try encryptedDataUtil.getSymmetricKey(
-                fileName: self.nfcCANKeyFilename
-            )
-
-            if let decryptedCAN = encryptedDataUtil.decryptSecret(encryptedCANData, with: symmetricKey) {
-                NFCViewModel.logger().info("CAN decrypted successfully")
-                return decryptedCAN
+    func getInputData(_ actionType: ActionType, _ isWebEidAuthenticating: Bool) async -> NFCInputData {
+        let rememberMe = await {
+            if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
+                return await dataStore.getNFCRememberMe()
             } else {
-                NFCViewModel.logger().error("Failed to decrypt CAN")
-                return nil
+                return await dataStore.getWebEidRememberMe()
             }
-        } catch {
-            NFCViewModel.logger().error("Unable to get stored CAN symmetric key: \(error.localizedDescription)")
-            return nil
+        }()
+
+        let storedCan = await retrieveEncryptedCAN()
+        let tempCan = await retrieveTempCAN()
+
+        let initialCan: String = {
+            if actionType == .certificate {
+                return storedCan ?? ""
+            }
+            if actionType == .signingWebEid, let tempCan, !tempCan.isEmpty {
+                return tempCan
+            }
+            if let storedCan, !storedCan.isEmpty {
+                return storedCan
+            }
+            if isWebEidAuthenticating, let tempCan, !tempCan.isEmpty {
+                return tempCan
+            }
+            return ""
+        }()
+
+        return NFCInputData(
+            canNumber: initialCan,
+            rememberMe: rememberMe
+        )
+    }
+
+    func saveEncryptedCAN(_ can: String) async {
+        _ = await keychainStore.save(key: .tempCANKey, info: Data(can.utf8))
+    }
+
+    func retrieveEncryptedCAN() async -> String? {
+        let canData = await keychainStore.retrieve(key: .nfcCANKey)
+        if let canData, let can = String(data: canData, encoding: .utf8) {
+            return can
+        }
+
+        return nil
+    }
+
+    func clearEncryptedCAN() async {
+        _ = await keychainStore.remove(key: .nfcCANKey)
+    }
+
+    func saveTempCAN(_ can: String) async {
+        _ = await keychainStore.save(key: .tempCANKey, info: Data(can.utf8))
+    }
+
+    func retrieveTempCAN() async -> String? {
+        let canData = await keychainStore.retrieve(key: .tempCANKey)
+        if let canData, let can = String(data: canData, encoding: .utf8) {
+            return can
+        }
+
+        return nil
+    }
+
+    func clearTempCAN() async {
+        _ = await keychainStore.remove(key: .tempCANKey)
+    }
+
+    func getSigningCertificate() async -> String {
+        let currentCan = await retrieveEncryptedCAN()
+        if let currentCan {
+            let certKey = KeychainKey.signingCertKey.rawValue
+            let key =  "\(certKey)_\(currentCan)"
+
+            let certData = await keychainStore.retrieve(key: key)
+            if let certData, let cert = String(data: certData, encoding: .utf8) {
+                return cert
+            }
+        }
+
+        return ""
+    }
+
+    func setSigningCertificate(_ cert: String) async {
+        let currentCan = await retrieveEncryptedCAN()
+        if let currentCan {
+            let certKey = KeychainKey.signingCertKey.rawValue
+            let key =  "\(certKey)_\(currentCan)"
+
+            _ = await keychainStore.save(key: key, info: Data(cert.utf8))
         }
     }
 
@@ -208,6 +241,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         pinNumberErrorExtraArguments = []
         nfcErrorKey = nil
         nfcErrorExtraArguments = []
+    }
+
+    func isRoleDataEnabled() async -> Bool {
+        await dataStore.getIsRoleAndAddressEnabled()
     }
 
     func decrypt(
@@ -255,117 +292,6 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             nfcErrorExtraArguments = []
             return nil
         }
-    }
-
-    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
-        NFCViewModel.logger().error("NFC: ID Card error: \(error)")
-
-        switch error {
-        case .cancelledByUser:
-            nfcErrorKey = nil
-            nfcErrorExtraArguments = []
-        case .pinLocked:
-            showNfcAlertMessage = true
-            nfcAlertMessageKey = "PIN2 locked"
-            nfcAlertMessageUrl = "PIN2 locked URL"
-        case .wrongCAN:
-            nfcErrorKey = "Wrong CAN"
-            nfcErrorExtraArguments = []
-        case .wrongPIN(let triesLeft):
-            if triesLeft > 1 {
-                nfcErrorKey = "PIN verification error multiple"
-                nfcErrorExtraArguments = [pinType.name, String(triesLeft)]
-            } else if triesLeft == 1 {
-                nfcErrorKey = "PIN verification error one"
-                nfcErrorExtraArguments = [pinType.name]
-            } else {
-                nfcErrorKey = "PIN blocked"
-                nfcErrorExtraArguments = [pinType.name]
-            }
-        case .sessionError:
-            nfcErrorKey = "NFC session error"
-            nfcErrorExtraArguments = []
-        default:
-            nfcErrorKey = "NFC technical error"
-            nfcErrorExtraArguments = []
-        }
-    }
-
-    private func handleReadCertAndSignError(error: ReadCertAndSignError) {
-        switch error {
-        case .cancelled:
-            nfcErrorKey = nil
-        case .signedContainerNil, .roleDataNil, .containerPathNil, .userAgentEmpty:
-            NFCViewModel.logger().error("NFC: Configuration error")
-            nfcErrorKey = "NFC session error"
-        case .unknown(let underlying):
-            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
-            nfcErrorKey = "General error"
-        }
-    }
-
-    private func handleDigiDocError(error: DigiDocError) {
-        switch error {
-        case .signatureAddingFailed(let underlying):
-            handleDigiDocSignError(errorDetail: underlying)
-        default:
-            NFCViewModel.logger().error("NFC: Unknown DigiDoc error - \(error)")
-            nfcErrorKey = "General error"
-        }
-    }
-
-    private func handleDigiDocSignError(errorDetail: ErrorDetail) {
-        NFCViewModel.logger().error("NFC: DigiDoc signature adding error - \(errorDetail.description)")
-        switch errorDetail.code {
-        case 5, 6:
-            nfcErrorKey = "Certificate status revoked"
-        case 7:
-            showNfcAlertMessage = true
-            nfcAlertMessageKey = "OCSP response not in valid time slot"
-            nfcAlertMessageUrl = "OCSP response not in valid time slot url"
-        case 18:
-            showNfcAlertMessage = true
-            nfcAlertMessageKey = "Too many requests"
-            nfcAlertMessageUrl = "Too many requests url"
-            nfcAlertMessageExtraArguments = ["NFC"]
-        case 20:
-            nfcErrorKey = "No Internet connection"
-        case 101, 102:
-            nfcErrorKey = "SSL handshake failed"
-        default:
-            nfcErrorKey = "General error"
-        }
-    }
-
-    private func handleDecryptError(error: DecryptError) {
-        switch error {
-        case .cancelled:
-            nfcErrorKey = nil
-        case .containerFileInvalid, .recipientsEmpty:
-            NFCViewModel.logger().error("NFC: Configuration error")
-            nfcErrorKey = "NFC session error"
-        case .unknown(let underlying):
-            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
-            nfcErrorKey = "General error"
-        }
-    }
-
-    func isRoleDataEnabled() async -> Bool {
-        await dataStore.getIsRoleAndAddressEnabled()
-    }
-
-    private func checkCANNumberValidity(canNumber: String) {
-        guard canNumber.isEmpty || (
-            canNumber.count == Constants.Validation.CANNumberLength &&
-            canNumber.allSatisfy { $0.isNumber }
-        ) else {
-            canNumberErrorKey = "CAN length requirement"
-            canNumberErrorExtraArguments = [String(
-                Constants.Validation.CANNumberLength
-            )]
-            return
-        }
-        canNumberErrorKey = ""
     }
 
     func sign(
@@ -435,31 +361,172 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         }
     }
 
-    private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
-        let minLen = if pinType == .pin1 {
-            Constants.Validation.Pin1MinimumLength
-        } else if pinType == .pin2 {
-            Constants.Validation.Pin2MinimumLength
-        } else {
-            Constants.Validation.PukMinimumLength
+    func auth(
+        canNumber: String,
+        pin1: String,
+        origin: String,
+        challenge: String,
+        strings: NFCSessionStrings
+    ) async -> WebEidAuthReturnData? {
+        NFCViewModel.logger().info("NFC: Starting NFC Web eID signing")
+        let pin1Data = pin1.data(using: .utf8)
+        guard let pin1Data else {
+            NFCViewModel.logger().error("NFC: Failed to convert PIN1 to Data")
+            return nil
         }
 
-        let maxLen = Constants.Validation.PinMaximumLength
+        NFCViewModel.logger().info("NFC: Getting language")
+        let appLanguage = await dataStore.getSelectedLanguage()
 
-        guard pinNumber.isEmpty || (
-            pinNumber.count >= minLen &&
-            pinNumber.count <= maxLen &&
-            pinNumber.allSatisfy { $0.isNumber }
-        ) else {
-            pinNumberErrorKey = "PIN length requirement"
-            pinNumberErrorExtraArguments = [pinType?.name ?? "", String(minLen), String(maxLen)]
-            return
+        NFCViewModel.logger().info("NFC: Getting User-Agent")
+        let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
+
+        do {
+            NFCViewModel.logger().info("NFC: Starting Web eID signing operation")
+            let result = try await operationWebEidAuth.startOperation(
+                canNumber: canNumber,
+                pin1Number: SecureData(pin1Data),
+                origin: origin,
+                challenge: challenge,
+                userAgent: userAgent,
+                strings: strings
+            )
+            NFCViewModel.logger().info("NFC: Web eID signature added successfully")
+            return result
+        } catch {
+            NFCViewModel.logger().error("NFC: Web eID signing operation failed")
+
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: .pin2)
+                return nil
+            }
+
+            if let readCertSignError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+                handleReadCertAndSignError(error: readCertSignError)
+                return nil
+            }
+
+            if let digiDocError = error as? DigiDocError {
+                NFCViewModel.logger().error("NFC: DigiDocError: \(digiDocError.localizedDescription)")
+                handleDigiDocError(error: digiDocError)
+                return nil
+            }
+
+            NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+            NFCViewModel.logger().error("NFC: Error details: \(error)")
+            nfcErrorKey = "General error"
+            return nil
         }
-        pinNumberErrorKey = ""
     }
 
-    public func saveMyEidCAN(_ can: String) {
-        sharedMyEidSession.setCAN(can)
+    func certificate(
+        canNumber: String,
+        strings: NFCSessionStrings
+    ) async -> String? {
+        NFCViewModel.logger().info("NFC: Starting NFC Web eID signing")
+
+        do {
+            NFCViewModel.logger().info("NFC: Starting Web eID signing operation")
+            let result = try await operationReadCert.startReading(
+                canNumber: canNumber,
+                strings: strings
+            )
+            NFCViewModel.logger().info("NFC: Web eID signature added successfully")
+            return result
+        } catch {
+            NFCViewModel.logger().error("NFC: Web eID signing operation failed")
+
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: .pin2)
+                return nil
+            }
+
+            if let readCertSignError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+                handleReadCertAndSignError(error: readCertSignError)
+                return nil
+            }
+
+            if let digiDocError = error as? DigiDocError {
+                NFCViewModel.logger().error("NFC: DigiDocError: \(digiDocError.localizedDescription)")
+                handleDigiDocError(error: digiDocError)
+                return nil
+            }
+
+            NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+            NFCViewModel.logger().error("NFC: Error details: \(error)")
+            nfcErrorKey = "General error"
+            return nil
+        }
+    }
+
+    // swiftlint:disable:next function_parameter_count
+    func signWebEid(
+        canNumber: String,
+        pin2: String,
+        responseUri: String,
+        hash: String,
+        expectedSigningCertBase64: String?,
+        strings: NFCSessionStrings
+    ) async -> WebEidSignReturnData? {
+        NFCViewModel.logger().info("NFC: Starting NFC Web eID signing")
+        let pin2Data = pin2.data(using: .utf8)
+        guard let pin2Data else {
+            NFCViewModel.logger().error("NFC: Failed to convert PIN2 to Data")
+            return nil
+        }
+
+        NFCViewModel.logger().info("NFC: Getting language")
+        let appLanguage = await dataStore.getSelectedLanguage()
+
+        NFCViewModel.logger().info("NFC: Getting User-Agent")
+        let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
+
+        do {
+            NFCViewModel.logger().info("NFC: Starting Web eID signing operation")
+            let result = try await operationWebEidSign.startOperation(
+                canNumber: canNumber,
+                pin2Number: SecureData(pin2Data),
+                responseUri: responseUri,
+                hash: hash,
+                expectedSigningCertBase64: expectedSigningCertBase64,
+                userAgent: userAgent,
+                strings: strings
+            )
+            NFCViewModel.logger().info("NFC: Web eID signature added successfully")
+            return result
+        } catch {
+            NFCViewModel.logger().error("NFC: Web eID signing operation failed")
+
+            if let idCardInternalError = error as? IdCardInternalError {
+                let idCardError = idCardInternalError.getIdCardError()
+                NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
+                handleIdCardError(idCardError, pinType: .pin2)
+                return nil
+            }
+
+            if let readCertSignError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+                handleReadCertAndSignError(error: readCertSignError)
+                return nil
+            }
+
+            if let digiDocError = error as? DigiDocError {
+                NFCViewModel.logger().error("NFC: DigiDocError: \(digiDocError.localizedDescription)")
+                handleDigiDocError(error: digiDocError)
+                return nil
+            }
+
+            NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
+            NFCViewModel.logger().error("NFC: Error details: \(error)")
+            nfcErrorKey = "General error"
+            return nil
+        }
     }
 
     public func readCardData(
@@ -507,5 +574,151 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             nfcErrorKey = "General error"
             return nil
         }
+    }
+
+    public func saveMyEidCAN(_ can: String) {
+        sharedMyEidSession.setCAN(can)
+    }
+
+    private func handleIdCardError(_ error: IdCardError, pinType: CodeType) {
+        NFCViewModel.logger().error("NFC: ID Card error: \(error)")
+
+        switch error {
+        case .cancelledByUser:
+            nfcErrorKey = nil
+            nfcErrorExtraArguments = []
+        case .pinLocked:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "PIN2 locked"
+            nfcAlertMessageUrl = "PIN2 locked URL"
+        case .wrongCAN:
+            nfcErrorKey = "Wrong CAN"
+            nfcErrorExtraArguments = []
+        case .wrongPIN(let triesLeft):
+            if triesLeft > 1 {
+                nfcErrorKey = "PIN verification error multiple"
+                nfcErrorExtraArguments = [pinType.name, String(triesLeft)]
+            } else if triesLeft == 1 {
+                nfcErrorKey = "PIN verification error one"
+                nfcErrorExtraArguments = [pinType.name]
+            } else {
+                nfcErrorKey = "PIN blocked"
+                nfcErrorExtraArguments = [pinType.name]
+            }
+        case .sessionError:
+            nfcErrorKey = "NFC session error"
+            nfcErrorExtraArguments = []
+        default:
+            nfcErrorKey = "NFC technical error"
+            nfcErrorExtraArguments = []
+        }
+    }
+
+    private func handleReadCertAndSignError(error: ReadCertAndSignError) {
+        switch error {
+        case .cancelled:
+            nfcErrorKey = nil
+        case .signedContainerNil,
+        .roleDataNil,
+        .containerPathNil,
+        .userAgentEmpty,
+        .hashInvalid,
+        .invalidCertificate,
+        .missingPublicKey,
+        .unsupportedAlgorithm:
+            NFCViewModel.logger().error("NFC: Configuration error")
+            nfcErrorKey = "NFC session error"
+        case .certMismatch:
+            NFCViewModel.logger().error(
+                "Web eID signing failed - signing certificate does not match previously used certificate"
+            )
+            nfcErrorKey = "NFC certificate mismatch error"
+        case .unknown(let underlying):
+            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDigiDocError(error: DigiDocError) {
+        switch error {
+        case .signatureAddingFailed(let underlying):
+            handleDigiDocSignError(errorDetail: underlying)
+        default:
+            NFCViewModel.logger().error("NFC: Unknown DigiDoc error - \(error)")
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDigiDocSignError(errorDetail: ErrorDetail) {
+        NFCViewModel.logger().error("NFC: DigiDoc signature adding error - \(errorDetail.description)")
+        switch errorDetail.code {
+        case 5, 6:
+            nfcErrorKey = "Certificate status revoked"
+        case 7:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "OCSP response not in valid time slot"
+            nfcAlertMessageUrl = "OCSP response not in valid time slot url"
+        case 18:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = "Too many requests"
+            nfcAlertMessageUrl = "Too many requests url"
+            nfcAlertMessageExtraArguments = ["NFC"]
+        case 20:
+            nfcErrorKey = "No Internet connection"
+        case 101, 102:
+            nfcErrorKey = "SSL handshake failed"
+        default:
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func handleDecryptError(error: DecryptError) {
+        switch error {
+        case .cancelled:
+            nfcErrorKey = nil
+        case .containerFileInvalid, .recipientsEmpty:
+            NFCViewModel.logger().error("NFC: Configuration error")
+            nfcErrorKey = "NFC session error"
+        case .unknown(let underlying):
+            NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
+            nfcErrorKey = "General error"
+        }
+    }
+
+    private func checkCANNumberValidity(canNumber: String) {
+        guard canNumber.isEmpty || (
+            canNumber.count == Constants.Validation.CANNumberLength &&
+            canNumber.allSatisfy { $0.isNumber }
+        ) else {
+            canNumberErrorKey = "CAN length requirement"
+            canNumberErrorExtraArguments = [String(
+                Constants.Validation.CANNumberLength
+            )]
+            return
+        }
+        canNumberErrorKey = ""
+    }
+
+    private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
+        let minLen = if pinType == .pin1 {
+            Constants.Validation.Pin1MinimumLength
+        } else if pinType == .pin2 {
+            Constants.Validation.Pin2MinimumLength
+        } else {
+            Constants.Validation.PukMinimumLength
+        }
+
+        let maxLen = Constants.Validation.PinMaximumLength
+
+        guard pinNumber.isEmpty || (
+            pinNumber.count >= minLen &&
+            pinNumber.count <= maxLen &&
+            pinNumber.allSatisfy { $0.isNumber }
+        ) else {
+            pinNumberErrorKey = "PIN length requirement"
+            pinNumberErrorExtraArguments = [pinType?.name ?? "", String(minLen), String(maxLen)]
+            return
+        }
+        pinNumberErrorKey = ""
     }
 }
