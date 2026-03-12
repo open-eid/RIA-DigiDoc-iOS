@@ -56,6 +56,10 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
     public func save(key: String, info: Data) async -> Bool {
         return await save(key: key, info: info, withPasscodeSetOnly: false)
     }
+    
+    public func save(key: KeychainKey, info: Data) async -> Bool {
+        return await save(key: key.rawValue, info: info, withPasscodeSetOnly: false)
+    }
 
     public func retrieve(key: String) async -> Data? {
         var query = baseQuery(key: key)
@@ -72,6 +76,10 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         }
     }
 
+    public func retrieve(key: KeychainKey) async -> Data? {
+        return await retrieve(key: key.rawValue)
+    }
+    
     public func remove(key: String) async {
         let query = baseQuery(key: key)
         let status = SecItemDelete(query as CFDictionary)
@@ -79,6 +87,10 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         if status != errSecSuccess {
             KeychainStore.logger().error("Error removing key from Keychain: \(status)")
         }
+    }
+    
+    public func remove(key: KeychainKey) async {
+        await remove(key: key.rawValue)
     }
 
     public func removeAll() async {

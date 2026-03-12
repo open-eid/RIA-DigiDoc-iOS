@@ -45,7 +45,7 @@ public struct ProxyUtil: ProxyUtilProtocol {
             return getSystemProxyInfo()
         }
 
-        let passwordData = await keychainStore.retrieve(key: KeychainKey.proxyPassword.rawValue)
+        let passwordData = await keychainStore.retrieve(key: .proxyPassword)
         if let passwordData, let password = String(data: passwordData, encoding: .utf8) {
             proxyInfo.password = password
         }
@@ -64,10 +64,10 @@ public struct ProxyUtil: ProxyUtilProtocol {
 
         await dataStore.setProxyInfo(proxyInfo)
         if proxyInfo.password.isEmpty {
-            await keychainStore.remove(key: KeychainKey.proxyPassword.rawValue)
+            await keychainStore.remove(key: .proxyPassword)
         } else {
             let passwordData = Data(proxyInfo.password.utf8)
-            _ = await keychainStore.save(key: KeychainKey.proxyPassword.rawValue, info: passwordData)
+            _ = await keychainStore.save(key: .proxyPassword, info: passwordData)
         }
         DigiDocConf.setProxyInfo(proxyInfo: proxyInfo)
     }

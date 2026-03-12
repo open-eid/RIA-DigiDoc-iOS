@@ -275,7 +275,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
     // MARK: - WebEid KeyChainStore
 
     func isWebEidSessionActive() async -> Bool {
-        if let data = await keychainStore.retrieve(key: KeychainKey.webEidSessionActive.rawValue) {
+        if let data = await keychainStore.retrieve(key: .webEidSessionActive) {
             let value = data.first == 1
             return value
         }
@@ -286,6 +286,6 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
     func setWebEidSessionActive(_ value: Bool) async {
         let data = Data([value ? 1 : 0])
 
-        _ = await keychainStore.save(key: KeychainKey.webEidSessionActive.rawValue, info: data)
+        _ = await keychainStore.save(key: .webEidSessionActive, info: data)
     }
 }

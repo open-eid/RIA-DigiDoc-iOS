@@ -176,11 +176,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     }
 
     func saveEncryptedCAN(_ can: String) async {
-        _ = await keychainStore.save(key: KeychainKey.tempCANKey.rawValue, info: Data(can.utf8))
+        _ = await keychainStore.save(key: .tempCANKey, info: Data(can.utf8))
     }
 
     func retrieveEncryptedCAN() async -> String? {
-        let canData = await keychainStore.retrieve(key: KeychainKey.nfcCANKey.rawValue)
+        let canData = await keychainStore.retrieve(key: .nfcCANKey)
         if let canData, let can = String(data: canData, encoding: .utf8) {
             return can
         }
@@ -189,15 +189,15 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     }
 
     func clearEncryptedCAN() async {
-        _ = await keychainStore.remove(key: KeychainKey.nfcCANKey.rawValue)
+        _ = await keychainStore.remove(key: .nfcCANKey)
     }
 
     func saveTempCAN(_ can: String) async {
-        _ = await keychainStore.save(key: KeychainKey.tempCANKey.rawValue, info: Data(can.utf8))
+        _ = await keychainStore.save(key: .tempCANKey, info: Data(can.utf8))
     }
 
     func retrieveTempCAN() async -> String? {
-        let canData = await keychainStore.retrieve(key: KeychainKey.tempCANKey.rawValue)
+        let canData = await keychainStore.retrieve(key: .tempCANKey)
         if let canData, let can = String(data: canData, encoding: .utf8) {
             return can
         }
@@ -206,7 +206,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     }
 
     func clearTempCAN() async {
-        _ = await keychainStore.remove(key: KeychainKey.tempCANKey.rawValue)
+        _ = await keychainStore.remove(key: .tempCANKey)
     }
 
     func getSigningCertificate() async -> String {

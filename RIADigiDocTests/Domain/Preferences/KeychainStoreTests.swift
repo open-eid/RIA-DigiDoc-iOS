@@ -34,8 +34,8 @@ final class KeychainStoreTests {
         let key: KeychainKey = .proxyPassword
         let testData = Data("test-initial".utf8)
 
-        let status = await keychainStore.save(key: key.rawValue, info: testData)
-        let retrievedData = await keychainStore.retrieve(key: key.rawValue)
+        let status = await keychainStore.save(key: key, info: testData)
+        let retrievedData = await keychainStore.retrieve(key: key)
 
         #expect(status == true)
         #expect(testData == retrievedData)
@@ -48,12 +48,12 @@ final class KeychainStoreTests {
         let testInitialData = Data("test-initial".utf8)
         let testNewData = Data("test-new".utf8)
 
-        var status = await keychainStore.save(key: key.rawValue, info: testInitialData)
+        var status = await keychainStore.save(key: key, info: testInitialData)
         #expect(status == true)
 
-        status = await keychainStore.save(key: key.rawValue, info: testNewData)
+        status = await keychainStore.save(key: key, info: testNewData)
 
-        let retrievedData = await keychainStore.retrieve(key: key.rawValue)
+        let retrievedData = await keychainStore.retrieve(key: key)
         #expect(testNewData == retrievedData)
     }
 
@@ -62,12 +62,12 @@ final class KeychainStoreTests {
         let key: KeychainKey = .proxyPassword
         let testInitialData = Data("test-initial".utf8)
 
-        let status = await keychainStore.save(key: key.rawValue, info: testInitialData)
+        let status = await keychainStore.save(key: key, info: testInitialData)
         #expect(status == true)
 
-        await keychainStore.remove(key: key.rawValue)
+        await keychainStore.remove(key: key)
 
-        let retrievedData = await keychainStore.retrieve(key: key.rawValue)
+        let retrievedData = await keychainStore.retrieve(key: key)
 
         #expect(retrievedData == nil)
     }
@@ -77,13 +77,13 @@ final class KeychainStoreTests {
         let testInitialData = Data("test-initial".utf8)
 
         for key in KeychainKey.allCases {
-            _ = await keychainStore.save(key: key.rawValue, info: testInitialData)
+            _ = await keychainStore.save(key: key, info: testInitialData)
         }
 
         await keychainStore.removeAll()
 
         for key in KeychainKey.allCases {
-            let retrievedData = await keychainStore.retrieve(key: key.rawValue)
+            let retrievedData = await keychainStore.retrieve(key: key)
             #expect(retrievedData == nil)
         }
     }
