@@ -535,7 +535,7 @@ struct SigningViewModelTests: Loggable {
 
         mockMimeTypeCache.getMimeTypeHandler = { _ in mimeType }
 
-        mockFileOpeningService.openOrCreateContainerHandler = { _, newValue in
+        mockFileOpeningService.openOrCreateContainerHandler = { _, _ in
             throw DigiDocError.containerOpeningFailed(
                 ErrorDetail(
                     message: "Cannot open container. Container file is nil"))
