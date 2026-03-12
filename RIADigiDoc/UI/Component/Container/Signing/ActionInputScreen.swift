@@ -122,6 +122,10 @@ struct ActionInputScreen<Content: View>: View {
     var body: some View {
         TopBarContainer(
             title: nil,
+            showNavigationIcon: (actionType == .signingWebEid
+                                 || actionType == .certificate
+                                 || actionType == .auth
+                                ) ? false : true,
             onLeftClick: onBackClick,
             showRightIcons: !isInProgress,
             content: {
