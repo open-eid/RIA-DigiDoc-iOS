@@ -210,7 +210,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             }
         }
     }
-    
+
     func handleWebEidSignResult(
         signingCert: String,
         signature: Data,
