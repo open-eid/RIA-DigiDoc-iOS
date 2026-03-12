@@ -34,6 +34,7 @@ struct WebEidView: View {
     @AppTypography private var typography
 
     @State private var viewModel: WebEidViewModel
+    @State private var nfcViewModel: NFCViewModel
     @State private var isWebEidAuthenticating: Bool = false
 
     private var webEidUrl: URL
@@ -53,6 +54,7 @@ struct WebEidView: View {
         webEidUrl: URL,
     ) {
         _viewModel = State(wrappedValue: Container.shared.webEidViewModel())
+        _nfcViewModel = State(wrappedValue: Container.shared.nfcViewModel())
         self.webEidUrl = webEidUrl
         self.sharedContainerViewModel = Container.shared.sharedContainerViewModel()
         self.signedContainer = sharedContainerViewModel.currentContainer()
@@ -83,7 +85,8 @@ struct WebEidView: View {
                     },
                     onErrorWebEid: {
                         isWebEidAuthenticating = false
-                    }
+                    },
+                    webEidViewModel: viewModel
                 )
             }
             if viewModel.certRequest != nil || viewModel.signRequest != nil {
@@ -120,7 +123,8 @@ struct WebEidView: View {
                         },
                         onErrorWebEid: {
                             isWebEidAuthenticating = false
-                        }
+                        },
+                        webEidViewModel: viewModel
                     )
                 } else {
                     NFCView(
@@ -132,14 +136,15 @@ struct WebEidView: View {
                         isWebEidAuthenticating: $isWebEidAuthenticating,
                         onSuccessWebEid: {
                             isWebEidAuthenticating = false
-                            /* TODO:
-                             sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
-                             sharedSettingsViewModel.dataStore.setWebEidSessionActive(false)
-                            */
+                            Task {
+                                await nfcViewModel.clearTempCAN()
+                                await viewModel.setWebEidSessionActive(false)
+                            }
                         },
                         onErrorWebEid: {
                             isWebEidAuthenticating = false
-                        }
+                        },
+                        webEidViewModel: viewModel
                     )
                 }
             }
@@ -208,20 +213,20 @@ struct WebEidView: View {
             }
         }
         .onChange(of: viewModel.authRequest) {_, _ in
-            /* TODO
-            if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
-                sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
+            Task {
+                if await viewModel.isWebEidSessionActive() {
+                    await nfcViewModel.clearTempCAN()
+                }
+                await viewModel.setWebEidSessionActive(true)
             }
-            sharedSettingsViewModel.dataStore.setWebEidSessionActive(true)
-            */
         }
         .onChange(of: viewModel.certRequest) {_, _ in
-            /* TODO
-            if (!sharedSettingsViewModel.dataStore.isWebEidSessionActive()) {
-                sharedSettingsViewModel.dataStore.clearTemporaryCanNumber()
+            Task {
+                if await viewModel.isWebEidSessionActive() {
+                    await nfcViewModel.clearTempCAN()
+                }
+                await viewModel.setWebEidSessionActive(true)
             }
-            sharedSettingsViewModel.dataStore.setWebEidSessionActive(true)
-            */
         }
     }
 }
