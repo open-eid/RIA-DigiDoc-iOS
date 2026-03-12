@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,22 @@
  *
  */
 
+import CommonsLib
 import Foundation
+import IdCardLib
+import LibdigidocLibSwift
 
-public enum ActionType: Sendable {
-    case signing
-    case myeid
-    case decrypt
-    case auth
-    case certificate
-    case signingWebEid
+/// @mockable
+@MainActor
+public protocol OperationWebEidSignProtocol {
+    // swiftlint:disable:next function_parameter_count
+    func startOperation(
+        canNumber: String,
+        pin2Number: SecureData,
+        responseUri: String,
+        hash: String,
+        expectedSigningCertBase64: String?,
+        userAgent: String,
+        strings: NFCSessionStrings
+    ) async throws -> WebEidSignReturnData
 }
