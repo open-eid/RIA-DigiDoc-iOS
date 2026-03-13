@@ -138,7 +138,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             let tokenObject = try JSONSerialization.jsonObject(with: tokenData, options: [])
 
             let payload: [String: Any] = [
-                "auth_token": tokenObject
+                "authToken": tokenObject
             ]
 
             let responseURL = try WebEidResponseUtil.createResponseURL(
@@ -151,7 +151,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             WebEidViewModel.logger().error("Unexpected error building auth token: \(String(reflecting: error))")
 
             let errorPayload = WebEidResponseUtil.createErrorPayload(
-                code: .errWebEidMobileUnknownError,
+                code: .ERR_WEBEID_MOBILE_UNKNOWN_ERROR,
                 message: "Unexpected error"
             )
 
@@ -195,7 +195,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             )
 
             let errorPayload = WebEidResponseUtil.createErrorPayload(
-                code: .errWebEidMobileUnknownError,
+                code: .ERR_WEBEID_MOBILE_UNKNOWN_ERROR,
                 message: "Unexpected error"
             )
 
@@ -247,7 +247,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             WebEidViewModel.logger().error("Unexpected error building sign payload: \(String(reflecting: error))")
 
             let errorPayload = WebEidResponseUtil.createErrorPayload(
-                code: .errWebEidMobileUnknownError,
+                code: .ERR_WEBEID_MOBILE_UNKNOWN_ERROR,
                 message: "Unexpected error"
             )
 
@@ -260,6 +260,35 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             } catch {
                 WebEidViewModel.logger().error("Failed to build error response URL: \(String(reflecting: error))")
             }
+        }
+    }
+
+    func handleUserCancelled() async {
+        do {
+            let responseUri =
+                authRequest?.loginUri ??
+                certRequest?.responseUri ??
+                signRequest?.responseUri
+
+            guard let responseUri,
+                  !responseUri.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                Self.logger().error("Cannot send cancel response — missing response URI")
+                return
+            }
+
+            let errorPayload = WebEidResponseUtil.createErrorPayload(
+                code: .ERR_WEBEID_USER_CANCELLED,
+                message: "User cancelled"
+            )
+
+            let errorURL = try WebEidResponseUtil.createResponseURL(
+                responseUri: responseUri,
+                payload: errorPayload
+            )
+
+            relyingPartyResponseEvents = errorURL
+        } catch {
+            WebEidViewModel.logger().error("Failed to send cancel response: \(String(reflecting: error))")
         }
     }
 
