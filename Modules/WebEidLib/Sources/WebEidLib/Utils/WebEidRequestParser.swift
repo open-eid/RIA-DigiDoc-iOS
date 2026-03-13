@@ -41,7 +41,7 @@ public struct WebEidRequestParser: Loggable {
             challenge.count < minChallengeLength ||
             challenge.count > maxChallengeLength {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid challenge length",
                 responseUri: responseURL.absoluteString
             )
@@ -78,7 +78,7 @@ public struct WebEidRequestParser: Loggable {
 
         if hash.isEmpty || hashFunction.isEmpty {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid signing request: missing hash or hashFunction",
                 responseUri: responseURL.absoluteString
             )
@@ -95,7 +95,7 @@ public struct WebEidRequestParser: Loggable {
 
         if signingCertificateB64.isEmpty {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid signing request: missing signingCertificate",
                 responseUri: responseURL.absoluteString
             )
@@ -104,7 +104,7 @@ public struct WebEidRequestParser: Loggable {
         guard let certDER = WebEidAlgorithmUtil.base64DecodeFlexible(signingCertificateB64),
               let cert = WebEidAlgorithmUtil.certificate(from: certDER) else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid signingCertificate encoding",
                 responseUri: responseURL.absoluteString
             )
@@ -113,7 +113,7 @@ public struct WebEidRequestParser: Loggable {
         // Use ASN1Decoder to extract CN
         guard let personalData = try? extractPersonalData(from: certDER) else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Failed to extract personal data from certificate",
                 responseUri: responseURL.absoluteString
             )
@@ -133,7 +133,7 @@ public struct WebEidRequestParser: Loggable {
     private static func validateResponseURL(_ responseUri: String) throws -> URL {
         guard let components = URLComponents(string: responseUri) else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid response URI",
                 responseUri: responseUri
             )
@@ -141,7 +141,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard let scheme = components.scheme, !scheme.isEmpty else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid response URI scheme",
                 responseUri: responseUri
             )
@@ -149,7 +149,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard scheme.lowercased() == "https" else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Response URI must use HTTPS scheme",
                 responseUri: responseUri
             )
@@ -157,7 +157,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard let host = components.host, !host.isEmpty else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid response URI host",
                 responseUri: responseUri
             )
@@ -165,7 +165,7 @@ public struct WebEidRequestParser: Loggable {
 
         if components.user != nil || components.password != nil {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Response URI must not contain userinfo",
                 responseUri: responseUri
             )
@@ -173,7 +173,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard let url = components.url else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid response URI",
                 responseUri: responseUri
             )
@@ -186,7 +186,7 @@ public struct WebEidRequestParser: Loggable {
         guard let fragment = URLComponents(url: url, resolvingAgainstBaseURL: false)?.fragment,
               !fragment.isEmpty else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Missing URI fragment",
                 responseUri: url.absoluteString
             )
@@ -194,7 +194,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard let decoded = WebEidAlgorithmUtil.base64DecodeFlexible(fragment) else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid URI fragment",
                 responseUri: url.absoluteString
             )
@@ -204,7 +204,7 @@ public struct WebEidRequestParser: Loggable {
             let obj = try JSONSerialization.jsonObject(with: decoded, options: [])
             guard let dict = obj as? [String: Any] else {
                 throw WebEidException(
-                    code: .errWebEidMobileInvalidRequest,
+                    code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                     message: "Invalid URI fragment JSON",
                     responseUri: url.absoluteString
                 )
@@ -212,7 +212,7 @@ public struct WebEidRequestParser: Loggable {
             return dict
         } catch {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid URI fragment",
                 responseUri: url.absoluteString
             )
@@ -224,7 +224,7 @@ public struct WebEidRequestParser: Loggable {
               let scheme = components.scheme,
               let host = components.host else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid origin",
                 responseUri: url.absoluteString
             )
@@ -235,7 +235,7 @@ public struct WebEidRequestParser: Loggable {
 
         if origin.count > maxOriginLength {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid origin length",
                 responseUri: url.absoluteString
             )
@@ -250,7 +250,7 @@ public struct WebEidRequestParser: Loggable {
     ) throws -> Data {
         guard let hashBytes = WebEidAlgorithmUtil.base64DecodeFlexible(hashBase64) else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Invalid hash encoding",
                 responseUri: responseUri
             )
@@ -258,7 +258,7 @@ public struct WebEidRequestParser: Loggable {
 
         if hashFunction.count > 8 {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "hashFunction value is invalid",
                 responseUri: responseUri
             )
@@ -272,7 +272,7 @@ public struct WebEidRequestParser: Loggable {
         case "SHA-512", "SHA3-512": expectedLength = 64
         default:
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Unsupported hashFunction: \(hashFunction)",
                 responseUri: responseUri
             )
@@ -280,7 +280,7 @@ public struct WebEidRequestParser: Loggable {
 
         if hashBytes.count != expectedLength {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "\(hashFunction) hash must be \(expectedLength) bytes long, but is \(hashBytes.count)",
                 responseUri: responseUri
             )
@@ -310,7 +310,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard !commonName.isEmpty else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Signing certificate CN missing",
                 responseUri: ""
             )
@@ -326,7 +326,7 @@ public struct WebEidRequestParser: Loggable {
 
         guard parts.count >= 3 else {
             throw WebEidException(
-                code: .errWebEidMobileInvalidRequest,
+                code: .ERR_WEBEID_MOBILE_INVALID_REQUEST,
                 message: "Unexpected signing certificate CN format: \(normalizedCN)",
                 responseUri: ""
             )
