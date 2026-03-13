@@ -128,7 +128,7 @@ struct WebEidView: View {
                     )
                 } else {
                     NFCView(
-                        actionType: .signing,
+                        actionType: .signingWebEid,
                         actionMethods: [
                             .idCardViaNFC
                         ],
@@ -189,7 +189,6 @@ struct WebEidView: View {
             guard let responseURL else { return }
 
             openURL(responseURL)
-            dismiss()
 
             viewModel.relyingPartyResponseEvents = nil
         }
