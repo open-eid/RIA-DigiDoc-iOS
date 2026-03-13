@@ -199,7 +199,9 @@ struct ActionInputScreen<Content: View>: View {
                             PrimaryButton(
                                 text: languageSettings.localized("Cancel"),
                                 isButtonEnabled: true,
-                                action: onBackClick
+                                action: onBackClick,
+                                focusedField: nil,
+                                currentFocus: .constant(nil)
                             )
                         }
                     }
