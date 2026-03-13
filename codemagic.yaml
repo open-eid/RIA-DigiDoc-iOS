@@ -302,7 +302,8 @@ workflows:
           xcode-project build-ipa \
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
-            --scheme "$XCODE_SCHEME"
+            --scheme "$XCODE_SCHEME" \
+            -v
       - name: Rename and move IPA
         script: |
           mv -v build/ios/ipa/RIADigiDoc.ipa build/ios/ipa/"RIA_DigiDoc_release_$APP_VERSION.$LATEST_BUILD_NUMBER.ipa"
