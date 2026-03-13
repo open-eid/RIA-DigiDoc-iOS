@@ -295,6 +295,7 @@ workflows:
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
             --scheme "$XCODE_SCHEME" \
+            --log-stream stdout \
             -v
       - name: Rename and move IPA
         script: |
