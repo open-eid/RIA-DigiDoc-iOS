@@ -192,6 +192,14 @@ struct ActionInputScreen<Content: View>: View {
                             )
                             .padding(.vertical, Dimensions.Padding.MPadding)
                         }
+                        
+                        if (actionType == .signingWebEid || actionType == .auth || actionType == .certificate) {
+                            PrimaryButton(
+                                text: languageSettings.localized("Cancel"),
+                                isButtonEnabled: true,
+                                action: onBackClick
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal, Dimensions.Padding.SPadding)

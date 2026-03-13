@@ -119,34 +119,28 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     ) async {
         await {
             if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
-                await dataStore.setNFCRememberMe(rememberMe)
-            } else {
                 await dataStore.setWebEidRememberMe(rememberMe)
+            } else {
+                await dataStore.setNFCRememberMe(rememberMe)
             }
         }()
 
-        if (actionType == .auth || actionType == .certificate) && rememberMe {
+        if (rememberMe) {
             await saveEncryptedCAN(canNumber)
             await clearTempCAN()
-        } else if (actionType == .auth || actionType == .certificate) && !rememberMe {
+        } else {
             await saveEncryptedCAN("")
             await clearEncryptedCAN()
             await saveTempCAN(canNumber)
-        } else {
-            if rememberMe && !canNumber.isEmpty {
-                await saveEncryptedCAN(canNumber)
-            } else {
-                await clearEncryptedCAN()
-            }
         }
     }
 
     func getInputData(_ actionType: ActionType, _ isWebEidAuthenticating: Bool) async -> NFCInputData {
         let rememberMe = await {
             if actionType == .certificate || actionType == .signingWebEid || actionType == .auth {
-                return await dataStore.getNFCRememberMe()
-            } else {
                 return await dataStore.getWebEidRememberMe()
+            } else {
+                return await dataStore.getNFCRememberMe()
             }
         }()
 
@@ -176,7 +170,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     }
 
     func saveEncryptedCAN(_ can: String) async {
-        _ = await keychainStore.save(key: .tempCANKey, info: Data(can.utf8))
+        _ = await keychainStore.save(key: .nfcCANKey, info: Data(can.utf8))
     }
 
     func retrieveEncryptedCAN() async -> String? {
@@ -258,7 +252,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         let containerFile = await cryptoContainer?.getRawContainerFile() ?? URL(fileURLWithPath: "")
         let recipients = await cryptoContainer?.getRecipients() ?? []
         let pinSecureData = SecureData(Array(pin1.utf8))
-
+        await clearTempCAN()
         do {
             NFCViewModel.logger().info("NFC: Starting decryption operation")
             let container = try await operationDecrypt.processDecrypt(
@@ -318,7 +312,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
         NFCViewModel.logger().info("NFC: Getting User-Agent")
         let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
-
+        await clearTempCAN()
         do {
             NFCViewModel.logger().info("NFC: Starting signing operation")
             let result = try await operationReadCertAndSign.startOperation(

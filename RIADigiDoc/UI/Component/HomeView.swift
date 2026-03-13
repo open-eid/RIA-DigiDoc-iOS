@@ -230,7 +230,7 @@ struct HomeView: View {
         )
         .bottomSheet(isPresented: $showHomeMenuBottomSheet, actions: homeMenuBottomSheetActions)
         .onOpenURL { url in
-            handleFiles([url])
+            handleIncoming(url: url)
         }
         .onAppear {
             focusFilesButtonWithDelay()
