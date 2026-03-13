@@ -125,7 +125,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             }
         }()
 
-        if (rememberMe) {
+        if rememberMe {
             await saveEncryptedCAN(canNumber)
             await clearTempCAN()
         } else {

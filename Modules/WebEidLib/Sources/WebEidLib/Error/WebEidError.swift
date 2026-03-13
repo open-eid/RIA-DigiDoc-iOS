@@ -18,13 +18,13 @@
  */
 
 import Foundation
-
+// swiftlint:disable identifier_name
 public enum WebEidErrorCode: String, Codable, Sendable {
     case ERR_WEBEID_MOBILE_INVALID_REQUEST
     case ERR_WEBEID_MOBILE_UNKNOWN_ERROR
     case ERR_WEBEID_USER_CANCELLED
 }
-
+// swiftlint:enable identifier_name
 public struct WebEidException: Error, LocalizedError, Sendable {
     public let code: WebEidErrorCode
     public let message: String

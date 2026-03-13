@@ -291,7 +291,7 @@ class WebEidViewModel: WebEidViewModelProtocol, Loggable {
             WebEidViewModel.logger().error("Failed to send cancel response: \(String(reflecting: error))")
         }
     }
-    
+
     func resetErrors() {
         showAlertMessage = false
         alertMessageKey = nil

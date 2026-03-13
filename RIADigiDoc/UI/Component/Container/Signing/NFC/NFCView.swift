@@ -151,7 +151,7 @@ struct NFCView: View {
             isInProgress: $isInProgress,
             onBackClick: {
                 onErrorWebEid()
-                if (actionType == .signingWebEid || actionType == .auth || actionType == .certificate) {
+                if actionType == .signingWebEid || actionType == .auth || actionType == .certificate {
                     Task {
                         await webEidViewModel.handleUserCancelled()
                         if let urlToOpen = webEidViewModel.relyingPartyResponseEvents {
