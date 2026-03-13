@@ -150,6 +150,15 @@ struct NFCView: View {
             isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
             onBackClick: {
+                onErrorWebEid()
+                if actionType == .signingWebEid || actionType == .auth || actionType == .certificate {
+                    Task {
+                        await webEidViewModel.handleUserCancelled()
+                        if let urlToOpen = webEidViewModel.relyingPartyResponseEvents {
+                            openURL(urlToOpen)
+                        }
+                    }
+                }
                 Task {
                     await viewModel.clearTempCAN()
                     await webEidViewModel.setWebEidSessionActive(false)
@@ -263,7 +272,7 @@ struct NFCView: View {
                                     actionType: actionType
                                 )
                         },
-                        showPinField: actionType != .myeid,
+                        showPinField: actionType != .myeid && actionType != .certificate,
                         isWebEidAuthenticating: isWebEidAuthenticating,
                     )
                 }
@@ -492,6 +501,7 @@ struct NFCView: View {
             isInProgress = false
 
             guard let result = webEidAuthResult else {
+                onErrorWebEid()
                 return
             }
 
@@ -527,6 +537,7 @@ struct NFCView: View {
 
             if !cachedCert.isEmpty {
                 guard let certBytes = Data(base64Encoded: cachedCert) else {
+                    onErrorWebEid()
                     return
                 }
 
@@ -539,11 +550,13 @@ struct NFCView: View {
                 )
 
                 guard let signCert = webEidCertResult else {
+                    onErrorWebEid()
                     return
                 }
 
                 await viewModel.setSigningCertificate(signCert)
                 guard let certBytes = Data(base64Encoded: signCert) else {
+                    onErrorWebEid()
                     return
                 }
                 await webEidViewModel.handleWebEidCertificateResult(signingCert: certBytes)
@@ -585,6 +598,7 @@ struct NFCView: View {
             isInProgress = false
 
             guard let result = webEidSignResult else {
+                onErrorWebEid()
                 return
             }
 
