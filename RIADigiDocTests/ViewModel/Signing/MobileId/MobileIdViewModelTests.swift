@@ -176,14 +176,14 @@ struct MobileIdViewModelTests {
 
     @Test
     func resetErrors_success() {
-        viewModel.mobileIdMessageKey = "error"
+        viewModel.mobileIdErrorMessageKey = "error"
         viewModel.showMobileIdAlertMessage = true
         viewModel.mobileIdAlertMessageExtraArguments = ["x"]
         viewModel.mobileIdAlertMessageUrl = "url"
 
         viewModel.resetErrors()
 
-        #expect(viewModel.mobileIdMessageKey == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == nil)
         #expect(!viewModel.showMobileIdAlertMessage)
         #expect(viewModel.mobileIdAlertMessageExtraArguments.isEmpty)
         #expect(viewModel.mobileIdAlertMessageUrl == nil)
@@ -215,7 +215,7 @@ struct MobileIdViewModelTests {
 
         #expect(result != nil)
         #expect(viewModel.controlCode == "1234")
-        #expect(viewModel.mobileIdMessageKey == "Signature added")
+        #expect(viewModel.mobileIdSuccessMessageKey == "Signature added")
     }
 
     @Test
@@ -230,7 +230,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "General error")
+        #expect(viewModel.mobileIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -266,7 +266,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "General error")
+        #expect(viewModel.mobileIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -356,7 +356,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Signing technical error")
+        #expect(viewModel.mobileIdErrorMessageKey == "Signing technical error")
     }
 
     @Test
@@ -417,7 +417,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "No Internet connection")
+        #expect(viewModel.mobileIdErrorMessageKey == "No Internet connection")
     }
 
     @Test
@@ -436,7 +436,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Not a mobile-id client")
+        #expect(viewModel.mobileIdErrorMessageKey == "Not a mobile-id client")
     }
 
     @Test
@@ -455,7 +455,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Expired mobile-ID transaction")
+        #expect(viewModel.mobileIdErrorMessageKey == "Expired mobile-ID transaction")
     }
 
     @Test
@@ -474,7 +474,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "User denied or cancelled")
+        #expect(viewModel.mobileIdErrorMessageKey == "User denied or cancelled")
     }
 
     @Test
@@ -534,7 +534,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == nil)
     }
 
     @Test
@@ -568,7 +568,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "SSL handshake failed")
+        #expect(viewModel.mobileIdErrorMessageKey == "SSL handshake failed")
     }
 
     @Test
@@ -638,7 +638,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Certificate status revoked")
+        #expect(viewModel.mobileIdErrorMessageKey == "Certificate status revoked")
     }
 
     @Test
@@ -672,7 +672,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Invalid proxy settings")
+        #expect(viewModel.mobileIdErrorMessageKey == "Invalid proxy settings")
     }
 
     @Test
@@ -706,7 +706,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Signing technical error")
+        #expect(viewModel.mobileIdErrorMessageKey == "Signing technical error")
     }
 
     @Test
@@ -725,7 +725,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == nil)
         #expect(viewModel.showMobileIdAlertMessage == false)
     }
 
@@ -745,7 +745,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "General error")
+        #expect(viewModel.mobileIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -764,7 +764,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Mobile-ID incorrect parameters")
+        #expect(viewModel.mobileIdErrorMessageKey == "Mobile-ID incorrect parameters")
     }
 
     @Test
@@ -783,7 +783,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Failed mobile-ID transaction")
+        #expect(viewModel.mobileIdErrorMessageKey == "Failed mobile-ID transaction")
     }
 
     @Test
@@ -802,7 +802,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Phone is not in coverage area")
+        #expect(viewModel.mobileIdErrorMessageKey == "Phone is not in coverage area")
     }
 
     @Test
@@ -821,7 +821,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "Request sending error")
+        #expect(viewModel.mobileIdErrorMessageKey == "Request sending error")
     }
 
     @Test
@@ -840,7 +840,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "SIM error")
+        #expect(viewModel.mobileIdErrorMessageKey == "SIM error")
     }
 
     @Test
@@ -859,7 +859,7 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdMessageKey == "No Internet connection")
+        #expect(viewModel.mobileIdErrorMessageKey == "No Internet connection")
     }
 
     private static func defaultConfiguration() throws -> ConfigurationProvider {

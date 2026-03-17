@@ -487,7 +487,10 @@ struct IdCardView: View {
             isShowingPinView = false
             isShowingLoadingView = false
 
-            Toast.show(languageSettings.localized("Signature added"))
+            Toast.show(
+                languageSettings.localized("Signature added"),
+                type: .success
+            )
 
             onSuccess(container)
             dismiss()

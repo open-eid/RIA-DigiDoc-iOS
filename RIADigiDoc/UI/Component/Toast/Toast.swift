@@ -20,13 +20,18 @@
 import SwiftUI
 
 struct Toast {
-    static func show(_ message: String, duration: TimeInterval = 5.0) {
+    static func show(
+        _ message: String,
+        duration: TimeInterval = 5.0,
+        type: ToastType = .error
+    ) {
         if message.isEmpty { return }
 
         Task {
             await ToastQueue.shared.enqueue(
                 message: message,
-                duration: duration
+                duration: duration,
+                type: type
             )
         }
     }

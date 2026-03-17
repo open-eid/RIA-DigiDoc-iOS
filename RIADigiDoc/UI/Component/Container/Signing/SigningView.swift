@@ -456,7 +456,8 @@ struct SigningView: View {
         .onChange(of: viewModel.successMessage) { _, message in
             guard let message else { return }
             Toast.show(
-                languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+                languageSettings.localized(message.key, [message.args.joined(separator: ", ")]),
+                type: .success
             )
             viewModel.resetSuccessMessage()
         }
@@ -530,7 +531,10 @@ struct SigningView: View {
     private func convertToCryptoContainer() async {
         let isConverted = await viewModel.convertToCryptoContainer()
         if isConverted {
-            Toast.show(languageSettings.localized("Converted to crypto container"))
+            Toast.show(
+                languageSettings.localized("Converted to crypto container"),
+                type: .success
+            )
             await MainActor.run {
                 pathManager.replaceLast(to: .encryptView(isWithEncryption: false))
             }

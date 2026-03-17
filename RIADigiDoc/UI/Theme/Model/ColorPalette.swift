@@ -30,6 +30,10 @@ struct ColorPalette {
 
     let error: Color
     let errorContainer: Color
+    let success: Color
+    let successContainer: Color
+    let warning: Color
+    let warningContainer: Color
 
     let onPrimary: Color
     let onPrimaryContainer: Color
@@ -38,6 +42,10 @@ struct ColorPalette {
     let onTertiaryContainer: Color
     let onError: Color
     let onErrorContainer: Color
+    let onSuccess: Color
+    let onSuccessContainer: Color
+    let onWarning: Color
+    let onWarningContainer: Color
 
     let background: Color
     let onBackground: Color

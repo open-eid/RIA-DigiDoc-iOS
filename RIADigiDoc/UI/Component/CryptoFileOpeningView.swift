@@ -87,7 +87,7 @@ struct CryptoFileOpeningView: View {
                 ? languageSettings.localized("Files successfully added")
                 : languageSettings.localized("File successfully added")
 
-                Toast.show(message)
+                Toast.show(message, type: .success)
             }
         } else {
             Toast.show(languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? []))

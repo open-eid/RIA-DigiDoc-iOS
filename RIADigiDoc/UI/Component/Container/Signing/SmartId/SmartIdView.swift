@@ -137,12 +137,23 @@ struct SmartIdView: View {
                 }
             }
         }
-        .onChange(of: viewModel.smartIdMessageKey, { _, newValue in
+        .onChange(of: viewModel.smartIdSuccessMessageKey, { _, newValue in
+            if let messageKey = newValue, !messageKey.isEmpty {
+                Toast.show(
+                    languageSettings.localized(messageKey),
+                    type: .success
+                )
+                viewModel.smartIdSuccessMessageKey = nil
+            }
+        })
+        .onChange(of: viewModel.smartIdErrorMessageKey, { _, newValue in
             if let messageKey = newValue, !messageKey.isEmpty {
                 let extraArguments = viewModel.smartIdAlertMessageExtraArguments
                 Toast.show(
                     languageSettings.localized(messageKey, extraArguments)
                 )
+                viewModel.smartIdErrorMessageKey = nil
+                viewModel.smartIdAlertMessageExtraArguments = []
             }
         })
         .fullScreenCover(isPresented: $showRoleView) {

@@ -94,7 +94,7 @@ struct ProxySettingsView: View {
                                 let message = isConnected
                                 ? languageSettings.localized("Main settings proxy check connection success")
                                 : languageSettings.localized("Main settings proxy check connection unsuccessful")
-                                Toast.show(message)
+                                Toast.show(message, type: isConnected ? .success : .error)
 
                                 if voiceOverEnabled {
                                     var saveButtonAccessibilityAnnouncement = AttributedString(message)

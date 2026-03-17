@@ -48,11 +48,11 @@ struct MyEidDetailView: View {
     let myEidDataItem: MyEidDataItem
 
     private var tagBackgroundColor: Color {
-        myEidDataItem.status == .valid ? AppColors.Green50 : AppColors.Red50
+        myEidDataItem.status == .valid ? theme.successContainer : theme.errorContainer
     }
 
     private var tagContentColor: Color {
-        myEidDataItem.status == .valid ? AppColors.Green700 : AppColors.Red800
+        myEidDataItem.status == .valid ? theme.onSuccessContainer : theme.onErrorContainer
     }
 
     var body: some View {

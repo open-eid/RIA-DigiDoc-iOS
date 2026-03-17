@@ -226,6 +226,7 @@
 				Domain/Service/Siva/SivaServiceProtocol.swift,
 				LibrarySetup.swift,
 				"Supporting files/Localizable.xcstrings",
+				UI/Component/Toast/ToastType.swift,
 				UI/Theme/AppColors.swift,
 				UI/Theme/AppTheme.swift,
 				UI/Theme/Model/ColorPalette.swift,

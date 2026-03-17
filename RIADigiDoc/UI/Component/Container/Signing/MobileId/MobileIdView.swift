@@ -124,13 +124,25 @@ struct MobileIdView: View {
                 }
             }
         }
-        .onChange(of: viewModel.mobileIdMessageKey, { _, newValue in
+        .onChange(of: viewModel.mobileIdSuccessMessageKey, { _, newValue in
+            if let messageKey = newValue,
+               !messageKey.isEmpty {
+                Toast.show(
+                    languageSettings.localized(messageKey),
+                    type: .success
+                )
+                viewModel.mobileIdSuccessMessageKey = nil
+            }
+        })
+        .onChange(of: viewModel.mobileIdErrorMessageKey, { _, newValue in
             if let messageKey = newValue,
                !messageKey.isEmpty {
                 let extraArguments = viewModel.mobileIdAlertMessageExtraArguments
                 Toast.show(
                     languageSettings.localized(messageKey, extraArguments)
                 )
+                viewModel.mobileIdErrorMessageKey = nil
+                viewModel.mobileIdAlertMessageExtraArguments = []
             }
         })
         .fullScreenCover(isPresented: $showRoleView) {

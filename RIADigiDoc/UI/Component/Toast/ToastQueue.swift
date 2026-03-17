@@ -25,8 +25,8 @@ actor ToastQueue {
     private var queue: [ToastItem] = []
     private var isPresenting = false
 
-    func enqueue(message: String, duration: TimeInterval) {
-        queue.append(ToastItem(message: message, duration: duration))
+    func enqueue(message: String, duration: TimeInterval, type: ToastType) {
+        queue.append(ToastItem(message: message, duration: duration, type: type))
         processQueueIfNeeded()
     }
 

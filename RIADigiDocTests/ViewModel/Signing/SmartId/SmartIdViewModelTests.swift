@@ -135,7 +135,7 @@ struct SmartIdViewModelTests {
 
     @Test
     func resetErrors_clearsAllErrorStates() {
-        viewModel.smartIdMessageKey = "Error"
+        viewModel.smartIdErrorMessageKey = "Error"
         viewModel.smartIdAlertMessageKey = "Alert"
         viewModel.smartIdAlertMessageExtraArguments = ["Smart-ID"]
         viewModel.showSmartIdAlertMessage = true
@@ -143,7 +143,7 @@ struct SmartIdViewModelTests {
 
         viewModel.resetErrors()
 
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
         #expect(viewModel.smartIdAlertMessageKey == nil)
         #expect(viewModel.smartIdAlertMessageExtraArguments.isEmpty)
         #expect(viewModel.showSmartIdAlertMessage == false)
@@ -171,7 +171,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -198,7 +198,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -234,7 +234,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -308,7 +308,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -462,7 +462,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
         #expect(viewModel.showSmartIdAlertMessage == false)
     }
 
@@ -509,7 +509,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
         #expect(viewModel.showSmartIdAlertMessage == false)
     }
 
@@ -565,7 +565,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "Signing technical error")
+        #expect(viewModel.smartIdErrorMessageKey == "Signing technical error")
         #expect(viewModel.showSmartIdAlertMessage == false)
         #expect(mockNotificationUtil.removeNotificationCallCount == 1)
     }
@@ -612,7 +612,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "Signing technical error")
+        #expect(viewModel.smartIdErrorMessageKey == "Signing technical error")
         #expect(viewModel.showSmartIdAlertMessage == false)
         #expect(mockNotificationUtil.removeNotificationCallCount == 1)
     }
@@ -659,7 +659,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
         #expect(viewModel.showSmartIdAlertMessage == false)
     }
 
@@ -706,7 +706,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "Signing technical error")
+        #expect(viewModel.smartIdErrorMessageKey == "Signing technical error")
         #expect(viewModel.showSmartIdAlertMessage == false)
     }
 
@@ -735,7 +735,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -763,7 +763,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
     }
 
     @Test(
@@ -799,7 +799,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -827,7 +827,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
     }
 
     @Test(
@@ -863,7 +863,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "No Internet connection")
+        #expect(viewModel.smartIdErrorMessageKey == "No Internet connection")
     }
 
     @Test
@@ -891,7 +891,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "Invalid personal code")
+        #expect(viewModel.smartIdErrorMessageKey == "Invalid personal code")
     }
 
     @Test(
@@ -924,7 +924,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "Expired Smart-ID transaction")
+        #expect(viewModel.smartIdErrorMessageKey == "Expired Smart-ID transaction")
     }
 
     @Test(
@@ -969,7 +969,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == expectedMessage)
+        #expect(viewModel.smartIdErrorMessageKey == expectedMessage)
 
         viewModel.resetErrors()
     }
@@ -1110,7 +1110,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == "General error")
+        #expect(viewModel.smartIdErrorMessageKey == "General error")
     }
 
     @Test
@@ -1161,7 +1161,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdMessageKey == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
     }
 
     @Test(
@@ -1236,7 +1236,7 @@ struct SmartIdViewModelTests {
             #expect(viewModel.smartIdAlertMessageKey == expectedMessage)
             #expect(viewModel.smartIdAlertMessageExtraArguments.contains(extraArg))
         } else {
-            #expect(viewModel.smartIdMessageKey == expectedMessage)
+            #expect(viewModel.smartIdErrorMessageKey == expectedMessage)
         }
 
         viewModel.resetErrors()

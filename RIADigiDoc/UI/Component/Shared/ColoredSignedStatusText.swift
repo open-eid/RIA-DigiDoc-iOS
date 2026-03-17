@@ -21,6 +21,7 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct ColoredSignedStatusText: View {
+    @AppTheme private var theme
     @AppTypography private var typography
 
     let text: String
@@ -31,19 +32,19 @@ struct ColoredSignedStatusText: View {
     }
 
     private var tagBackgroundColor: Color {
-        isSignatureValidOrWarning ? AppColors.Green50 : AppColors.Red50
+        isSignatureValidOrWarning ? theme.successContainer : theme.errorContainer
     }
 
     private var tagContentColor: Color {
-        isSignatureValidOrWarning ? AppColors.Green700 : AppColors.Red800
+        isSignatureValidOrWarning ? theme.onSuccessContainer : theme.onErrorContainer
     }
 
     private var additionalTextColor: Color {
         switch status {
         case .valid:
-            return AppColors.Red800
+            return theme.errorContainer
         default:
-            return AppColors.Yellow800
+            return theme.warning
         }
     }
 

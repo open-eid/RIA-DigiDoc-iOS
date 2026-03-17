@@ -61,7 +61,7 @@ struct DecryptRootView: View {
 
                             Toast.show(languageSettings.localized(
                                 "Container successfully decrypted"
-                            ))
+                            ), type: .success)
                         }
                     )
                 }
@@ -80,7 +80,7 @@ struct DecryptRootView: View {
 
                             Toast.show(languageSettings.localized(
                                 "Container successfully decrypted"
-                            ))
+                            ), type: .success)
                         }
                     )
                 }

@@ -39,7 +39,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     var countryCodeAndPhoneErrorKey: String?
     var personalCodeErrorKey: String?
 
-    var mobileIdMessageKey: String?
+    var mobileIdSuccessMessageKey: String?
+    var mobileIdErrorMessageKey: String?
     var mobileIdAlertMessageKey: String?
     var mobileIdAlertMessageExtraArguments: [String] = []
     var showMobileIdAlertMessage: Bool = false
@@ -100,7 +101,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     }
 
     func resetErrors() {
-        mobileIdMessageKey = nil
+        mobileIdErrorMessageKey = nil
         mobileIdAlertMessageKey = nil
         mobileIdAlertMessageExtraArguments = []
         showMobileIdAlertMessage = false
@@ -120,7 +121,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             MobileIdViewModel.logger().error(
                 "Mobile-ID: Unable to get configuration to sign with Mobile-ID"
             )
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             return nil
         }
 
@@ -236,7 +237,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             )
 
             MobileIdViewModel.logger().info("Signature added successfully (Mobile-ID)")
-            mobileIdMessageKey = "Signature added"
+            mobileIdSuccessMessageKey = "Signature added"
             return updatedContainer
         } catch {
             MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
@@ -275,7 +276,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             base64Encoded: certResponse.cert ?? ""
         ) else {
             MobileIdViewModel.logger().error("Unable to get Mobile-ID certificate as data")
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             throw MobileIdError.generalError
         }
 
@@ -313,7 +314,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         MobileIdViewModel.logger().info("Mobile-ID: Getting sessionID")
         guard let sessionId = signatureResponse.sessionID else {
             MobileIdViewModel.logger().error("Unable to get Mobile-ID sessionID")
-            mobileIdMessageKey = "Technical error"
+            mobileIdErrorMessageKey = "Technical error"
             throw MobileIdError.technicalError
         }
 
@@ -369,7 +370,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         )
         guard let verificationCode = await mobileIdSignService.getVerificationCode(hash: hash) else {
             MobileIdViewModel.logger().error("Unable to get Mobile-ID verification code")
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             throw MobileIdError.generalError
         }
 
@@ -381,7 +382,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             MobileIdViewModel.logger().error(
                 "Unable to sign with Mobile-ID. Unable to get container file"
             )
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             throw MobileIdError.generalError
         }
 
@@ -415,45 +416,45 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         }
 
         guard let mobileIdError = error as? MobileIdError else {
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             return
         }
 
         switch mobileIdError {
         case .notMidClient:
-            mobileIdMessageKey = "Not a mobile-id client"
+            mobileIdErrorMessageKey = "Not a mobile-id client"
 
         case .generalError, .uninitializedSession:
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
 
         case .explicitlyCancelled:
             // Do not throw an error if user cancelled signing with back button
             MobileIdViewModel.logger().info("Mobile-ID signing manually cancelled")
-            mobileIdMessageKey = nil
+            mobileIdErrorMessageKey = nil
 
         case .timeout:
-            mobileIdMessageKey = "Expired mobile-ID transaction"
+            mobileIdErrorMessageKey = "Expired mobile-ID transaction"
 
         case .incorrectParameters:
-            mobileIdMessageKey = "Mobile-ID incorrect parameters"
+            mobileIdErrorMessageKey = "Mobile-ID incorrect parameters"
 
         case .userCancelled:
-            mobileIdMessageKey = "User denied or cancelled"
+            mobileIdErrorMessageKey = "User denied or cancelled"
 
         case .signatureHashMismatch:
-            mobileIdMessageKey = "Failed mobile-ID transaction"
+            mobileIdErrorMessageKey = "Failed mobile-ID transaction"
 
         case .phoneAbsent:
-            mobileIdMessageKey = "Phone is not in coverage area"
+            mobileIdErrorMessageKey = "Phone is not in coverage area"
 
         case .deliveryError:
-            mobileIdMessageKey = "Request sending error"
+            mobileIdErrorMessageKey = "Request sending error"
 
         case .simError:
-            mobileIdMessageKey = "SIM error"
+            mobileIdErrorMessageKey = "SIM error"
 
         case .noInternetConnection:
-            mobileIdMessageKey = "No Internet connection"
+            mobileIdErrorMessageKey = "No Internet connection"
 
         case .tooManyRequests:
             showMobileIdAlertMessage = true
@@ -462,7 +463,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
 
         case .exceededUnsuccessfulRequests:
-            mobileIdMessageKey = "Exceeded unsuccessful requests"
+            mobileIdErrorMessageKey = "Exceeded unsuccessful requests"
 
         case .invalidAccessRights:
             showMobileIdAlertMessage = true
@@ -471,7 +472,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
 
         case .technicalError:
-            mobileIdMessageKey = "Signing technical error"
+            mobileIdErrorMessageKey = "Signing technical error"
             mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
         }
     }
@@ -486,7 +487,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         }
 
         guard let digidocError = error as? DigiDocError else {
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
             return
         }
 
@@ -504,7 +505,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
             switch true {
             case message.contains(sslError):
-                mobileIdMessageKey = "SSL handshake failed"
+                mobileIdErrorMessageKey = "SSL handshake failed"
 
             case message.contains(tooManyRequestsError):
                 showMobileIdAlertMessage = true
@@ -518,21 +519,21 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 mobileIdAlertMessageUrl = "OCSP response not in valid time slot url"
 
             case message.contains(revokedCertError):
-                mobileIdMessageKey = "Certificate status revoked"
+                mobileIdErrorMessageKey = "Certificate status revoked"
 
             case message.contains(connectError), message.contains(failedToConnectError):
-                mobileIdMessageKey = "No Internet connection"
+                mobileIdErrorMessageKey = "No Internet connection"
 
             case message.contains(proxyError):
-                mobileIdMessageKey = "Invalid proxy settings"
+                mobileIdErrorMessageKey = "Invalid proxy settings"
 
             default:
-                mobileIdMessageKey = "Signing technical error"
+                mobileIdErrorMessageKey = "Signing technical error"
                 mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
             }
 
         default:
-            mobileIdMessageKey = "General error"
+            mobileIdErrorMessageKey = "General error"
         }
     }
 

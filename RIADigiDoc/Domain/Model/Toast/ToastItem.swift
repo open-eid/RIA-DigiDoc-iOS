@@ -22,4 +22,5 @@ import Foundation
 struct ToastItem: Sendable {
     let message: String
     let duration: TimeInterval
+    let type: ToastType
 }

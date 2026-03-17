@@ -131,7 +131,7 @@ struct AdvancedSettingsView: View {
                 saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
                 AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
             }
-            Toast.show(message)
+            Toast.show(message, type: .success)
         }
     }
 }
