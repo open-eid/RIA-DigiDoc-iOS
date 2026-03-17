@@ -44,7 +44,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
     var personalCodeErrorKey: String?
 
-    var smartIdMessageKey: String?
+    var smartIdSuccessMessageKey: String?
+    var smartIdErrorMessageKey: String?
     var smartIdAlertMessageKey: String?
     var smartIdAlertMessageExtraArguments: [String] = []
     var showSmartIdAlertMessage: Bool = false
@@ -111,7 +112,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     }
 
     func resetErrors() {
-        smartIdMessageKey = nil
+        smartIdErrorMessageKey = nil
         smartIdAlertMessageKey = nil
         smartIdAlertMessageExtraArguments = []
         showSmartIdAlertMessage = false
@@ -134,7 +135,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().error(
                 "Smart-ID: Unable to get configuration to sign with Smart-ID"
             )
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
             return nil
         }
 
@@ -279,7 +280,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             )
 
             SmartIdViewModel.logger().info("Signature added successfully (Smart-ID)")
-            smartIdMessageKey = "Signature added"
+            smartIdSuccessMessageKey = "Signature added"
             notificationUtil.removeNotification(id: notificationIdentifier)
             await endLiveActivity()
             return updatedContainer
@@ -453,7 +454,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().error(
                 "Unable to sign with Smart-ID. Unable to get container file"
             )
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
             throw SmartIdError.generalError
         }
 
@@ -502,39 +503,39 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         }
 
         guard let smartIdError = error as? SmartIdError else {
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
             return
         }
 
         switch smartIdError {
         case .generalError, .uninitializedSession, .missingSessionId:
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
 
         case .explicitlyCancelled:
             // Do not throw an error if user cancelled signing with back button
             SmartIdViewModel.logger().info("Smart-ID signing manually cancelled")
-            smartIdMessageKey = nil
+            smartIdErrorMessageKey = nil
 
         case .noInternetConnection, .noResponse:
-            smartIdMessageKey = "No Internet connection"
+            smartIdErrorMessageKey = "No Internet connection"
 
         case .incorrectParameters:
-            smartIdMessageKey = "Invalid personal code"
+            smartIdErrorMessageKey = "Invalid personal code"
 
         case .timeout, .accountNotFound:
-            smartIdMessageKey = "Expired Smart-ID transaction"
+            smartIdErrorMessageKey = "Expired Smart-ID transaction"
 
         case .documentUnusable:
-            smartIdMessageKey = "Failed Smart-ID transaction"
+            smartIdErrorMessageKey = "Failed Smart-ID transaction"
 
         case .wrongVC:
-            smartIdMessageKey = "Smart-ID wrong vc"
+            smartIdErrorMessageKey = "Smart-ID wrong vc"
 
         case .userRefused:
-            smartIdMessageKey = "User denied or cancelled"
+            smartIdErrorMessageKey = "User denied or cancelled"
 
         case .sessionNotFound:
-            smartIdMessageKey = "Smart-ID session not found"
+            smartIdErrorMessageKey = "Smart-ID session not found"
 
         case .tooManyRequests:
             showSmartIdAlertMessage = true
@@ -543,10 +544,10 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             smartIdAlertMessageExtraArguments = ["Smart-ID"]
 
         case .exceededUnsuccessfulRequests:
-            smartIdMessageKey = "Exceeded unsuccessful requests"
+            smartIdErrorMessageKey = "Exceeded unsuccessful requests"
 
         case .notQualified:
-            smartIdMessageKey = "Smart-ID certificate level not qualified"
+            smartIdErrorMessageKey = "Smart-ID certificate level not qualified"
 
         case .invalidAccessRights:
             showSmartIdAlertMessage = true
@@ -555,16 +556,16 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             smartIdAlertMessageExtraArguments = ["Smart-ID"]
 
         case .oldApi:
-            smartIdMessageKey = "Smart-ID old api"
+            smartIdErrorMessageKey = "Smart-ID old api"
 
         case .underMaintenance:
-            smartIdMessageKey = "Smart-ID under maintenance"
+            smartIdErrorMessageKey = "Smart-ID under maintenance"
 
         case .invalidSslHandshake:
-            smartIdMessageKey = "SSL handshake failed"
+            smartIdErrorMessageKey = "SSL handshake failed"
 
         case .technicalError:
-            smartIdMessageKey = "Signing technical error"
+            smartIdErrorMessageKey = "Signing technical error"
             smartIdAlertMessageExtraArguments = ["Smart-ID"]
 
         case .ocspInvalidTimeSlot:
@@ -573,7 +574,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             smartIdAlertMessageUrl = "OCSP response not in valid time slot url"
 
         case .certificateRevoked:
-            smartIdMessageKey = "Certificate status revoked"
+            smartIdErrorMessageKey = "Certificate status revoked"
         }
     }
 
@@ -587,7 +588,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         }
 
         guard let digidocError = error as? DigiDocError else {
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
             return
         }
 
@@ -605,7 +606,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
             switch true {
             case message.contains(sslError):
-                smartIdMessageKey = "SSL handshake failed"
+                smartIdErrorMessageKey = "SSL handshake failed"
 
             case message.contains(tooManyRequestsError):
                 showSmartIdAlertMessage = true
@@ -619,21 +620,21 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
                 smartIdAlertMessageUrl = "OCSP response not in valid time slot url"
 
             case message.contains(revokedCertError):
-                smartIdMessageKey = "Certificate status revoked"
+                smartIdErrorMessageKey = "Certificate status revoked"
 
             case message.contains(connectError), message.contains(failedToConnectError):
-                smartIdMessageKey = "No Internet connection"
+                smartIdErrorMessageKey = "No Internet connection"
 
             case message.contains(proxyError):
-                smartIdMessageKey = "Invalid proxy settings"
+                smartIdErrorMessageKey = "Invalid proxy settings"
 
             default:
-                smartIdMessageKey = "Signing technical error"
+                smartIdErrorMessageKey = "Signing technical error"
                 smartIdAlertMessageExtraArguments = ["Smart-ID"]
             }
 
         default:
-            smartIdMessageKey = "General error"
+            smartIdErrorMessageKey = "General error"
         }
     }
 

@@ -224,7 +224,7 @@ struct EncryptView: View {
 
                                                     Toast.show(languageSettings.localized(
                                                         "Container successfully encrypted"
-                                                    ))
+                                                    ), type: .success)
 
                                                     encryptionButtonEnabled = true
                                                 }
@@ -438,7 +438,7 @@ struct EncryptView: View {
 
                                 Toast.show(languageSettings.localized(
                                     "Container successfully decrypted"
-                                ))
+                                ), type: .success)
                                 isWithDecryption = false
                             } else {
                                 await viewModel.loadContainerData(
@@ -513,7 +513,8 @@ struct EncryptView: View {
         .onChange(of: viewModel.successMessage) { _, message in
             guard let message else { return }
             Toast.show(
-                languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+                languageSettings.localized(message.key, [message.args.joined(separator: ", ")]),
+                type: .success
             )
             viewModel.resetSuccessMessage()
         }
@@ -568,7 +569,10 @@ struct EncryptView: View {
     private func convertToSignedContainer() async {
         let isConverted = await viewModel.convertToSignedContainer()
         if isConverted {
-            Toast.show(languageSettings.localized("Converted to a signature container"))
+            Toast.show(
+                languageSettings.localized("Converted to a signature container"),
+                type: .success
+            )
             await MainActor.run {
                 pathManager.replaceLast(to: .signingView)
             }

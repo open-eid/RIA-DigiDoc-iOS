@@ -44,17 +44,20 @@ struct FileSaverHandler: View {
 
     private func handleFileMoveResult(_ result: Result<URL, Error>, fileURL: URL) {
         let resultMessage: String
+        let toastType: ToastType
 
         switch result {
         case .success:
             isFileSaved = true
+            toastType = .success
             resultMessage = languageSettings.localized("File saved", [])
         case .failure:
             isFileSaved = false
+            toastType = .error
             resultMessage = languageSettings.localized("Failed to save file", [fileURL.lastPathComponent])
         }
 
-        Toast.show(resultMessage)
+        Toast.show(resultMessage, type: toastType)
         isPresented = false
         onComplete?()
     }

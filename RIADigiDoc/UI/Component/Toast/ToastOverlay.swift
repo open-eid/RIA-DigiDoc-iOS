@@ -25,34 +25,63 @@ struct ToastOverlay: View {
     @AppTheme private var theme
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Spacer()
 
             if toast.isVisible, let message = toast.message {
-                Text(message)
-                    .lineLimit(nil)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, Dimensions.Padding.SPadding)
-                    .padding(.vertical, Dimensions.Padding.MSPadding)
-                    .background(theme.onBackground.opacity(0.9))
-                    .foregroundStyle(theme.background)
-                    .clipShape(RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius))
-                    .shadow(radius: Dimensions.Corner.XXSCornerRadius)
-                    .padding(.horizontal, Dimensions.Padding.SPadding)
-                    .transition(
-                        .asymmetric(
-                            insertion: .move(edge: .bottom)
-                                .combined(with: .opacity),
-                            removal: .move(edge: .bottom)
-                                .combined(with: .opacity)
+                HStack(spacing: Dimensions.Padding.XSPadding) {
+                    Image("ic_m3_info_48pt_wght400")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(
+                            width: Dimensions.Icon.IconSizeXXS,
+                            height: Dimensions.Icon.IconSizeXXS
                         )
+                        .foregroundStyle(getForegroundColor(toast.type))
+
+                    Text(verbatim: message)
+                        .lineLimit(nil)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Dimensions.Padding.SPadding)
+                .padding(.vertical, Dimensions.Padding.MSPadding)
+                .background(getBackgroundColor(toast.type).opacity(0.9))
+                .foregroundStyle(getForegroundColor(toast.type))
+                .clipShape(RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius))
+                .shadow(radius: Dimensions.Corner.XXSCornerRadius)
+                .padding(.horizontal, Dimensions.Padding.MSPadding)
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: .bottom) .combined(with: .opacity),
+                        removal: .move(edge: .bottom) .combined(with: .opacity)
                     )
-                    .animation(.easeInOut(duration: 0.3), value: toast.isVisible)
-                    .padding(.bottom, Dimensions.Padding.LPadding)
+                )
+                .animation(.easeInOut(duration: 0.3), value: toast.isVisible)
+                .padding(.bottom, Dimensions.Padding.XXLPadding)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, Dimensions.Padding.MSPadding)
         .allowsHitTesting(false)
         .zIndex(999)
+    }
+
+    private func getBackgroundColor(_ type: ToastType) -> Color {
+        switch type {
+        case .success:
+            return theme.successContainer
+        case .error:
+            return theme.errorContainer
+        }
+    }
+
+    private func getForegroundColor(_ type: ToastType) -> Color {
+        switch type {
+        case .success:
+            return theme.onSuccessContainer
+        case .error:
+            return theme.onErrorContainer
+        }
     }
 }

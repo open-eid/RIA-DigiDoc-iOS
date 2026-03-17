@@ -89,8 +89,8 @@ struct TagBadge: View {
 #Preview {
     TagBadge(
         text: "TagBadge",
-        tagBackgroundColor: AppColors.Green50,
-        tagContentColor: AppColors.Green700,
-        additionalTextColor: AppColors.Yellow800
+        tagBackgroundColor: AppColors.light.successContainer,
+        tagContentColor: AppColors.light.onSuccessContainer,
+        additionalTextColor: AppColors.light.warningContainer
     )
 }

@@ -248,7 +248,7 @@ struct TopBar: View {
                                         .foregroundStyle(Color.white)
                                         .padding(Dimensions.Padding.XXSPadding)
                                         .minimumScaleFactor(0.5)
-                                        .background(Circle().fill(theme.onError))
+                                        .background(Circle().fill(theme.error))
                                         .offset(x: Dimensions.Padding.XSPadding, y: -Dimensions.Padding.XSPadding)
                                 }
                             }

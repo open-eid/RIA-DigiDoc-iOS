@@ -50,6 +50,7 @@ enum Dimensions {
         static let MPadding: CGFloat = 24
         static let LPadding: CGFloat = 32
         static let XLPadding: CGFloat = 48
+        static let XXLPadding: CGFloat = 80
     }
 
     enum Shadow {

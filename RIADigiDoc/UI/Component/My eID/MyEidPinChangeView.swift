@@ -290,7 +290,7 @@ struct MyEidPinChangeView: View {
                             }
                         }()
 
-                        Toast.show(message)
+                        Toast.show(message, type: .success)
                         AccessibilityUtil.announceMessage(message)
 
                         dismiss()
