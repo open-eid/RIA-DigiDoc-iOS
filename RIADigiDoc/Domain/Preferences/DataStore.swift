@@ -505,6 +505,15 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(isAlwaysEnabled, forKey: Keys.isCrashlyticsAlwaysEnabled)
     }
 
+    // MARK: - Migration
+    public func getIsRecentDocumentsMigrationDone() async -> Bool {
+        userDefaults().bool(forKey: Keys.isRecentDocumentsMigrationDone)
+    }
+
+    public func setIsRecentDocumentsMigrationDone(_ isDone: Bool) async {
+        userDefaults().set(isDone, forKey: Keys.isRecentDocumentsMigrationDone)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -571,5 +580,6 @@ public actor DataStore: DataStoreProtocol {
         static let enableLoggingThisSession = "enableLoggingThisSession"
         static let isLogFileSaved = "isLogFileSaved"
         static let isCrashlyticsAlwaysEnabled = "isCrashlyticsAlwaysEnabled"
+        static let isRecentDocumentsMigrationDone = "isRecentDocumentsMigrationDone"
     }
 }

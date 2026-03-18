@@ -42,6 +42,7 @@ struct RIADigiDocApp: App {
     private let fileManager: FileManagerProtocol
     private let fileUtil: FileUtilProtocol
     private let librarySetup: LibrarySetup
+    private let documentsMigrator: DocumentsMigratorProtocol
 
     init() {
         _languageSettings = State(wrappedValue: Container.shared.languageSettings())
@@ -54,6 +55,7 @@ struct RIADigiDocApp: App {
         self.fileManager = Container.shared.fileManager()
         self.fileUtil = Container.shared.fileUtil()
         self.librarySetup = Container.shared.librarySetup()
+        self.documentsMigrator = Container.shared.documentsMigrator()
     }
 
     private func onLaunchScreenViewAppear() {
@@ -68,6 +70,13 @@ struct RIADigiDocApp: App {
             await librarySetup.setupLibraries()
             await crashReportManager.evaluateCrashReporting()
             fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nil)
+
+            let isRecentDocumentsMigrationDone = await dataStore.getIsRecentDocumentsMigrationDone()
+            if !isRecentDocumentsMigrationDone {
+                try await documentsMigrator.migrateRecentDocuments()
+                await dataStore.setIsRecentDocumentsMigrationDone(true)
+            }
+
             isInitialLanguageSelected = await dataStore.getIsInitialLanguageSelected()
             await MainActor.run {
                 self.isSetupComplete = true

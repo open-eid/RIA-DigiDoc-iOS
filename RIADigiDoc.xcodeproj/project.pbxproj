@@ -243,6 +243,8 @@
 				Util/Manager/CrashReport/CrashReportClientProtocol.swift,
 				Util/Manager/CrashReport/CrashReportManager.swift,
 				Util/Manager/CrashReport/CrashReportManagerProtocol.swift,
+				Util/Migration/DocumentsMigrator.swift,
+				Util/Migration/DocumentsMigratorProtocol.swift,
 				Util/Proxy/ProxyUtil.swift,
 				Util/Proxy/ProxyUtilProtocol.swift,
 				Util/Recipient/RecipientUtil.swift,

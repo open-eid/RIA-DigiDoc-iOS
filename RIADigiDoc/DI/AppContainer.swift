@@ -615,4 +615,14 @@ extension Container {
         }
         .singleton
     }
+
+    @MainActor
+    var documentsMigrator: Factory<DocumentsMigratorProtocol> {
+        self { @MainActor in
+            DocumentsMigrator(
+                containerUtil: self.containerUtil(),
+                fileManager: self.fileManager()
+            )
+        }
+    }
 }
