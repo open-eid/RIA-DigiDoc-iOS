@@ -122,4 +122,8 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - Crashlytics
     func getIsCrashlyticsAlwaysEnabled() async -> Bool
     func setIsCrashlyticsAlwaysEnabled(_ isEnabled: Bool) async
+
+    // MARK: - Migration
+    func getIsRecentDocumentsMigrationDone() async -> Bool
+    func setIsRecentDocumentsMigrationDone(_ isDone: Bool) async
 }
