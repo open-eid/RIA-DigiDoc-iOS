@@ -27,13 +27,13 @@ import WebEidLibMocks
 
 struct WebEidAuthServiceTests {
     private var service: WebEidAuthServiceProtocol
-    
+
     // swiftlint:disable line_length
     private let testCert = "MIIEDjCCA2+gAwIBAgIQfS1XPVaqF6id70AX3+4UQzAKBggqhkjOPQQDBDBgMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzEbMBkGA1UEAwwSVEVTVCBvZiBFU1RFSUQyMDE4MB4XDTI1MDQyMjEwMTg0OFoXDTMwMDQyMTIwNTk1OVowfzELMAkGA1UEBhMCRUUxKjAoBgNVBAMMIUrDlUVPUkcsSkFBSy1LUklTVEpBTiwzODAwMTA4NTcxODEQMA4GA1UEBAwHSsOVRU9SRzEWMBQGA1UEKgwNSkFBSy1LUklTVEpBTjEaMBgGA1UEBRMRUE5PRUUtMzgwMDEwODU3MTgwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAASJtW601r+uC3ipDFbn4st6lxtAjqICVTUTIQ0Wq/hsxHPjzSUfWDJqhWXuDBg0E9hDnnQlkIiX+c7vYeBOhHG0kbzjhQ+iz9xF3fnuDHVb/QtXBbXrh4fXWu5tVOb6IkejggHNMIIByTAJBgNVHRMEAjAAMB8GA1UdIwQYMBaAFMCEmSnETp87AjT2meEKVgAIKT57MHMGCCsGAQUFBwEBBGcwZTA1BggrBgEFBQcwAoYpaHR0cDovL2Muc2suZWUvVGVzdF9vZl9FU1RFSUQyMDE4LmRlci5jcnQwLAYIKwYBBQUHMAGGIGh0dHA6Ly9haWEuZGVtby5zay5lZS9lc3RlaWQyMDE4MB8GA1UdEQQYMBaBFDM4MDAxMDg1NzE4QGVlc3RpLmVlMEcGA1UdIARAMD4wMgYLKwYBBAGDkSEBAQEwIzAhBggrBgEFBQcCARYVaHR0cHM6Ly93d3cuc2suZWUvQ1BTMAgGBgQAj3oBAjAgBgNVHSUBAf8EFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwawYIKwYBBQUHAQMEXzBdMAgGBgQAjkYBATBRBgYEAI5GAQUwRzBFFj9odHRwczovL3NrLmVlL2VuL3JlcG9zaXRvcnkvY29uZGl0aW9ucy1mb3ItdXNlLW9mLWNlcnRpZmljYXRlcy8TAmVuMB0GA1UdDgQWBBRR540dJ/FCuVZGORkQFu/jLdK1PDAOBgNVHQ8BAf8EBAMCA4gwCgYIKoZIzj0EAwQDgYwAMIGIAkIBSoNaxY9V3Z7w0/tKUcLvzHLfJVb0v6OPHPlBm1wXQBw0dXSOoz3b67OFINismuBWLnvSHvIzLWZv73wth37ERIICQgDCQAFgi70IOKSLBbEGJEmJpjPq+r3VcbfBy/lXhuPOxzaIkAaCejOuehBl31gogGSIQp4LmFmR/4OOszWPOvu41w=="
     private let testSignature =
         "UYyRpzkKNwFgtgcbI1YQc2l1XQQTj7gy+FW/x94TsEberwzS2Rnu4dqC/JhYB3se2iOk1c6FAK2TN5WJTiIcQ9Nt3o/x7kfEsdkc5c39eUXuD83GXfUsyUxR9IQBQrpL"
     // swiftlint:enable line_length
-    
+
     init() async throws {
         service = WebEidAuthService()
     }
@@ -47,9 +47,12 @@ struct WebEidAuthServiceTests {
             "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0",
             "algorithm": "ES384",
             "format": "web-eid:1.0",
-            "signature": "UYyRpzkKNwFgtgcbI1YQc2l1XQQTj7gy+FW/x94TsEberwzS2Rnu4dqC/JhYB3se2iOk1c6FAK2TN5WJTiIcQ9Nt3o/x7kfEsdkc5c39eUXuD83GXfUsyUxR9IQBQrpL"]
-        
-        let expected = try JSONSerialization.data(withJSONObject: token, options: [])
+            "signature": testSignature]
+
+        let expected = try JSONSerialization.data(
+            withJSONObject: token,
+            options: []
+        )
         let result = try await service.buildAuthToken(
             authCert: authCert,
             signingCert: nil,
@@ -58,12 +61,12 @@ struct WebEidAuthServiceTests {
 
         #expect(result.count == expected.count)
     }
-    
+
     @Test
     func buildAuthToken_throwinvalidCertificateWhenCertIsInvalid() async throws {
         let invalidCert = Data([0x00, 0x01, 0x02])
         let signature = Data(base64Encoded: testSignature) ?? Data()
-        
+
         await #expect(throws: WebEidBuilderError.invalidCertificate) {
             try await service.buildAuthToken(
                 authCert: invalidCert,
@@ -72,12 +75,12 @@ struct WebEidAuthServiceTests {
             )
         }
     }
-    
+
     @Test
     func buildAuthToken_throwUnsupportedKeyTypeWhenCertKeyIsUnsupported() async throws {
         let cert = TestCertificateUtil.getSampleCertificate()
         let signature = Data(base64Encoded: testSignature) ?? Data()
-        
+
         await #expect(throws: WebEidAlgorithmUtilError.unsupportedKeyType) {
             try await service.buildAuthToken(
                 authCert: cert,
