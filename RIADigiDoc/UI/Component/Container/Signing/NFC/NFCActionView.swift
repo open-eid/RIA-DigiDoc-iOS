@@ -37,14 +37,14 @@ struct NFCActionView: View {
                 Image(leftIcon)
                     .resizable()
                     .scaledToFit()
-                    .foregroundStyle(theme.onBackground)
+                    .foregroundStyle(theme.onSurfaceVariant)
                     .frame(width: Dimensions.Icon.IconSizeXXL, height: Dimensions.Icon.IconSizeXXL)
                     .accessibilityHidden(true)
 
                 Image(rightIcon)
                     .resizable()
                     .scaledToFit()
-                    .foregroundStyle(theme.onBackground)
+                    .foregroundStyle(theme.onSurfaceVariant)
                     .frame(width: Dimensions.Icon.IconSizeXXL, height: Dimensions.Icon.IconSizeXXL)
                     .accessibilityHidden(true)
             }

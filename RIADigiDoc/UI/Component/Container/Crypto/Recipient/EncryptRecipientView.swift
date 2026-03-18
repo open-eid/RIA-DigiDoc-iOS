@@ -62,6 +62,10 @@ struct EncryptRecipientView: View {
         viewModel.searchText.isEmpty
     }
 
+    var encryptLabel: String {
+        languageSettings.localized("Encrypt")
+    }
+
     var body: some View {
         TopBarContainer(
             isTopBarHidden: isSearchExpanded,
@@ -244,27 +248,48 @@ struct EncryptRecipientView: View {
                     }
                 }
                 .safeAreaInset(edge: .bottom) {
-                    UnsignedBottomBarView(
-                        showLeftButton: false,
-                        leftButtonIconName: "ic_m3_add_48pt_wght400",
-                        leftButtonLabel: "",
-                        leftButtonAccessibilityLabel: "",
-                        leftButtonAction: {
-                            // do nothing
-                        },
-
-                        rightButtonEnabled: encryptionButtonEnabled,
-                        rightButtonIconName: "ic_m3_encrypted_48pt_wght400",
-                        rightButtonLabel: languageSettings.localized("Encrypt"),
-                        rightButtonAccessibilityLabel: languageSettings.localized("Encrypt").lowercased(),
-                        rightButtonAction: {
+                    HStack(spacing: Dimensions.Padding.XSPadding) {
+                        Button(action: {
                             if encryptionButtonEnabled {
                                 encryptionButtonEnabled = false
                                 pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
                                 encryptionButtonEnabled = true
                             }
-                        }
+                        }, label: {
+                            HStack(spacing: Dimensions.Padding.XSPadding) {
+                                Image("ic_m3_encrypted_48pt_wght400")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(
+                                        width: Dimensions.Icon.IconSizeXXS,
+                                        height: Dimensions.Icon.IconSizeXXS
+                                    )
+                                    .foregroundStyle(theme.onPrimaryContainer)
+                                    .accessibilityHidden(true)
+
+                                Text(verbatim: encryptLabel)
+                                    .foregroundStyle(theme.onPrimaryContainer)
+                                    .font(typography.bodyLarge)
+                                    .accessibilityHidden(true)
+                            }
+                        })
+                    }
+                    .padding(Dimensions.Padding.MSPadding)
+                    .background(
+                        RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
+                            .fill(theme.primaryContainer)
+                            .shadow(
+                                color: theme.onSurfaceVariant.opacity(Dimensions.Shadow.SOpacity),
+                                radius: Dimensions.Shadow.radius,
+                                x: Dimensions.Shadow.xOffset,
+                                y: Dimensions.Shadow.yOffset
+                            )
                     )
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(Dimensions.Padding.MPadding)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(encryptLabel.lowercased())
+                    .accessibilityIdentifier("bottomEncryptButton")
                 }
                 .onAppear {
                     Task { @MainActor in

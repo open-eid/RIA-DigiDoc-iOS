@@ -171,7 +171,7 @@ struct RecipientView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                            .foregroundStyle(theme.onBackground)
+                            .foregroundStyle(theme.onSurfaceVariant)
                             .accessibilityLabel(
                                 Text(verbatim:
                                         "\(languageSettings.localized("Recipient")) " +

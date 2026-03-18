@@ -37,7 +37,7 @@ struct IdCardActionView: View {
             Image(icon)
                 .resizable()
                 .scaledToFit()
-                .foregroundStyle(theme.onBackground)
+                .foregroundStyle(theme.onSurfaceVariant)
                 .frame(
                     width: Dimensions.Icon.IconSizeXXL,
                     height: Dimensions.Icon.IconSizeXXL

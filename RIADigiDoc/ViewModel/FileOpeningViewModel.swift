@@ -270,17 +270,22 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     }
 
     private func handleError(_ error: Error) {
-        let ddeMessage = (error as? DigiDocError)?.description ?? error.localizedDescription
-        FileOpeningViewModel.logger().error("\(ddeMessage, privacy: .public)")
-
         if let dde = error as? DigiDocError {
             FileOpeningViewModel.logger().error("\(String(reflecting: dde), privacy: .public)")
             errorMessage = createToastMessage(for: dde)
             let fileName = dde.errorDetail.userInfo["fileName"] as? String
             guard let file = fileName else { return }
             removeUnsuccessfulContainer(fileName: file)
+        } else if let foe = error as? FileOpeningError {
+            FileOpeningViewModel.logger().error(
+                "\(String(reflecting: foe), privacy: .public)"
+            )
+            errorMessage = createToastMessage(for: foe)
         } else {
-            errorMessage = ToastMessage(key: error.localizedDescription)
+            FileOpeningViewModel.logger().error(
+                "\(String(reflecting: error.localizedDescription), privacy: .public)"
+            )
+            errorMessage = ToastMessage(key: "General error")
         }
     }
 
@@ -340,6 +345,15 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
             return ToastMessage(key: "Libdigidocpp is already initialized")
         default:
             return ToastMessage(key: "General error")
+        }
+    }
+
+    private func createToastMessage(for error: FileOpeningError) -> ToastMessage {
+        switch error {
+        case .unableToRetrieveFileSize, .invalidFileSize:
+            return ToastMessage(key: "Invalid file size")
+        case .emptyFile, .noDataFiles:
+            return ToastMessage(key: "Could not load selected files")
         }
     }
 }

@@ -180,7 +180,7 @@ struct DiagnosticsView: View {
 
             let updateMessage = languageSettings.localized(messageKey)
 
-            Toast.show(updateMessage, type: .success)
+            Toast.show(updateMessage, type: isUpdated ? .success : .error)
 
             if voiceOverEnabled {
                 var saveButtonAccessibilityAnnouncement = AttributedString(updateMessage)

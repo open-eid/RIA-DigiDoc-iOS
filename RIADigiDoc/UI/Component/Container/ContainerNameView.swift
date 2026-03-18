@@ -112,7 +112,7 @@ struct ContainerNameView: View {
                                 width: Dimensions.Icon.IconSizeXXS,
                                 height: Dimensions.Icon.IconSizeXXS
                             )
-                            .foregroundStyle(theme.onBackground)
+                            .foregroundStyle(theme.onSurfaceVariant)
                     })
                     .accessibilityFocusRestore(
                         focusedField: $focusedField,

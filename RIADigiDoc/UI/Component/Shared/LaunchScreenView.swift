@@ -31,7 +31,7 @@ struct LaunchScreenView: View {
 
     var body: some View {
         ZStack {
-            AppColors.BlueBackground.ignoresSafeArea()
+            AppColors.initialLaunchScreenBackground.ignoresSafeArea()
             VStack(spacing: Dimensions.Padding.ZeroPadding) {
                 Image("image_eesti_shield")
                     .resizable()

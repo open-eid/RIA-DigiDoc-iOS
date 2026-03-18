@@ -212,7 +212,7 @@ struct TopBar: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .foregroundStyle(theme.onBackground)
+                    .foregroundStyle(theme.onSurfaceVariant)
             }
             .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
             .accessibilityInputLabels(getInputLabels(leftIconAccessibilityInput, leftIconAccessibility))
@@ -237,7 +237,7 @@ struct TopBar: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                                    .foregroundStyle(theme.onBackground)
+                                    .foregroundStyle(theme.onSurfaceVariant)
                                 if extraBadgeCount > 0 {
                                     Text(verbatim: "\(extraBadgeCount)")
                                         .frame(
@@ -264,7 +264,7 @@ struct TopBar: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                                .foregroundStyle(theme.onBackground)
+                                .foregroundStyle(theme.onSurfaceVariant)
                         }
                         .accessibilityLabel(languageSettings.localized(rightPrimaryIconAccessibility))
                         .accessibilityInputLabels(getInputLabels(rightPrimaryIconAccessibilityInput,
@@ -278,7 +278,7 @@ struct TopBar: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                            .foregroundStyle(theme.onBackground)
+                            .foregroundStyle(theme.onSurfaceVariant)
                     }
                     .accessibilityLabel(languageSettings.localized(rightSecondaryIconAccessibility))
                     .accessibilityInputLabels(getInputLabels(rightSecondaryIconAccessibilityInput,

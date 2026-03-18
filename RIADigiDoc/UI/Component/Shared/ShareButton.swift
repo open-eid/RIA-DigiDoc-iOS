@@ -46,7 +46,7 @@ struct ShareButton: View {
             RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
                 .fill(theme.surfaceContainerHigh)
                 .shadow(
-                    color: theme.onBackground.opacity(Dimensions.Shadow.SOpacity),
+                    color: theme.onSurfaceVariant.opacity(Dimensions.Shadow.SOpacity),
                     radius: Dimensions.Shadow.radius,
                     x: Dimensions.Shadow.xOffset,
                     y: Dimensions.Shadow.yOffset

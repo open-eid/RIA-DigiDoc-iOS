@@ -215,7 +215,7 @@ struct MyEidPinChangeView: View {
                                         width: Dimensions.Icon.IconSizeM,
                                         height: Dimensions.Icon.IconSizeM
                                     )
-                                    .foregroundStyle(theme.onBackground)
+                                    .foregroundStyle(theme.onSurfaceVariant)
                                     .accessibilityHidden(true)
 
                                 Text(verbatim: stepTitle)

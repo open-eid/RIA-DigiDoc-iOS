@@ -45,7 +45,7 @@ struct ShareButtonBottomBar: View {
                 )
             }
         }
-        .padding(.horizontal, Dimensions.Padding.SPadding)
+        .padding(.horizontal, Dimensions.Padding.MPadding)
         .padding(.top, Dimensions.Padding.XSPadding)
         .padding(.bottom, Dimensions.Padding.SPadding)
         .sheet(isPresented: $showingShareSheet) {

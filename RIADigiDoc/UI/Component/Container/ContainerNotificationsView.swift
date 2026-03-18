@@ -46,7 +46,7 @@ struct ContainerNotificationsView: View {
                                 Image("ic_m3_notifications_48pt_wght400")
                                     .resizable()
                                     .scaledToFit()
-                                    .foregroundStyle(theme.onBackground)
+                                    .foregroundStyle(theme.onSurfaceVariant)
                                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                                     .padding(Dimensions.Padding.XSPadding)
                                     .accessibilityHidden(true)
