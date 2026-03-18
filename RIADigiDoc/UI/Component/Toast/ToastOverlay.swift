@@ -24,20 +24,37 @@ struct ToastOverlay: View {
 
     @AppTheme private var theme
 
+    private var style: (icon: String, background: Color, foreground: Color) {
+        switch toast.type {
+        case .success:
+            return (
+                icon: "ic_m3_check_48pt_wght400",
+                background: theme.successContainer,
+                foreground: theme.onSuccessContainer
+            )
+        case .error:
+            return (
+                icon: "ic_m3_error_48pt_wght400",
+                background: theme.errorContainer,
+                foreground: theme.onErrorContainer
+            )
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             Spacer()
 
             if toast.isVisible, let message = toast.message {
                 HStack(spacing: Dimensions.Padding.XSPadding) {
-                    Image("ic_m3_info_48pt_wght400")
+                    Image(style.icon)
                         .resizable()
                         .scaledToFit()
                         .frame(
                             width: Dimensions.Icon.IconSizeXXS,
                             height: Dimensions.Icon.IconSizeXXS
                         )
-                        .foregroundStyle(getForegroundColor(toast.type))
+                        .foregroundStyle(style.foreground)
 
                     Text(verbatim: message)
                         .lineLimit(nil)
@@ -46,8 +63,8 @@ struct ToastOverlay: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Dimensions.Padding.SPadding)
                 .padding(.vertical, Dimensions.Padding.MSPadding)
-                .background(getBackgroundColor(toast.type).opacity(0.9))
-                .foregroundStyle(getForegroundColor(toast.type))
+                .background(style.background.opacity(0.9))
+                .foregroundStyle(style.foreground)
                 .clipShape(RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius))
                 .shadow(radius: Dimensions.Corner.XXSCornerRadius)
                 .padding(.horizontal, Dimensions.Padding.MSPadding)
@@ -65,23 +82,5 @@ struct ToastOverlay: View {
         .padding(.horizontal, Dimensions.Padding.MSPadding)
         .allowsHitTesting(false)
         .zIndex(999)
-    }
-
-    private func getBackgroundColor(_ type: ToastType) -> Color {
-        switch type {
-        case .success:
-            return theme.successContainer
-        case .error:
-            return theme.errorContainer
-        }
-    }
-
-    private func getForegroundColor(_ type: ToastType) -> Color {
-        switch type {
-        case .success:
-            return theme.onSuccessContainer
-        case .error:
-            return theme.onErrorContainer
-        }
     }
 }

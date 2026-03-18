@@ -36,7 +36,7 @@ struct ControlCodeView: View {
             Image(icon)
                 .resizable()
                 .scaledToFit()
-                .foregroundStyle(theme.onBackground)
+                .foregroundStyle(theme.onSurfaceVariant)
                 .frame(width: Dimensions.Icon.IconSizeXXL, height: Dimensions.Icon.IconSizeXXL)
                 .padding(.vertical, Dimensions.Padding.LPadding)
                 .padding(.top, Dimensions.Padding.SPadding)

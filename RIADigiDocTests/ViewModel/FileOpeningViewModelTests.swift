@@ -96,7 +96,7 @@ struct FileOpeningViewModelTests {
 
     @Test
     func handleFiles_throwNoDataFilesErrorWhenNoFileOpeningResultNil() async throws {
-        let error = FileOpeningError.noDataFiles
+        let expectedError = "Could not load selected files"
 
         mockSharedContainerViewModel.getFileOpeningResultHandler = {
             return nil
@@ -124,7 +124,7 @@ struct FileOpeningViewModelTests {
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToSigningView)
-        #expect(error.localizedDescription == errorMessage)
+        #expect(expectedError == errorMessage)
     }
 
     @Test
@@ -148,12 +148,11 @@ struct FileOpeningViewModelTests {
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToSigningView)
-        #expect(error.localizedDescription == errorMessage)
+        #expect(errorMessage == "Could not load selected files")
     }
 
     @Test
     func handleFiles_throwNoDataFilesWhenValidFilesEmpty() async throws {
-        let error = FileOpeningError.noDataFiles
         let result: Result<[URL], Error> = .success([])
 
         mockSharedContainerViewModel.getFileOpeningResultHandler = {
@@ -182,7 +181,7 @@ struct FileOpeningViewModelTests {
 
         #expect(!isFileOpeningLoading)
         #expect(!isNavigatingToSigningView)
-        #expect(error.localizedDescription == errorMessage)
+        #expect(errorMessage == "Could not load selected files")
     }
 
     @Test

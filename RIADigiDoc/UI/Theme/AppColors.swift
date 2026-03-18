@@ -21,14 +21,13 @@ import SwiftUI
 
 enum AppColors {
 
-    static let BlueBackground = Color(hex: 0xFF003168)
+    static let initialLaunchScreenBackground = Color(hex: 0x103064)
 
     static let light: ColorPalette = {
-        let primary = Color(hex: 0xFF002048)
-        let primaryContainer = Color(hex: 0xFF194178)
-        let secondaryContainer = Color(hex: 0xFFD9E4FF)
-        let tertiary = Color(hex: 0xFF300e41)
-        let tertiaryContainer = Color(hex: 0xFF533166)
+        let primary = Color(hex: 0x002048)
+        let primaryContainer = Color(hex: 0x194178)
+        let secondary = Color(hex: 0x535F77)
+        let secondaryContainer = Color(hex: 0xD9E4FF)
         let error = Color(hex: 0xB00020)
         let errorContainer = Color(hex: 0xFFDAD6)
         let success = Color(hex: 0x0F6B38)
@@ -37,10 +36,9 @@ enum AppColors {
         let warningContainer = Color(hex: 0xFFDEA6)
 
         let onPrimary = Color.white
-        let onPrimaryContainer = Color(hex: 0xFFC5D7FF)
-        let onSecondaryContainer = Color(hex: 0xFF3D4960)
-        let onTertiary = Color.white
-        let onTertiaryContainer = Color(hex: 0xFFF3C7FF)
+        let onPrimaryContainer = Color(hex: 0xC5D7FF)
+        let onSecondaryContainer = Color(hex: 0x3D4960)
+        let onSecondary = Color.white
         let onError = Color.white
         let onErrorContainer = Color(hex: 0x410002)
         let onSuccess = Color.white
@@ -48,30 +46,27 @@ enum AppColors {
         let onWarning = Color.white
         let onWarningContainer = Color(hex: 0x2A1400)
 
-        let background = Color.white
-        let onBackground = Color.black
+        let outline = Color(hex: 0x747781)
+        let outlineVariant = Color(hex: 0xC3C6D1)
+        let surface = Color(hex: 0xFAF9FE)
+        let surfaceContainer = Color(hex: 0xEEEDF3)
+        let surfaceContainerLowest = Color.white
+        let surfaceContainerLow = Color(hex: 0xF4F3F8)
+        let surfaceContainerHigh = Color(hex: 0xE8E7ED)
+        let surfaceContainerHighest = Color(hex: 0xE2E2E7)
+        let surfaceVariant = Color(hex: 0xE0E2ED)
+        let onSurface = Color(hex: 0x1A1C1F)
+        let onSurfaceVariant = Color(hex: 0x434750)
 
-        let outline = Color(hex: 0xFF747781)
-        let outlineVariant = Color(hex: 0xFFC3C6D1)
-        let surface = Color(hex: 0xFFFAF9FE)
-        let surfaceContainer = Color(hex: 0xFFEEEDF3)
-        let surfaceContainerLow = Color(hex: 0xFFF4F3F8)
-        let surfaceContainerHigh = Color(hex: 0xFFE8E7ED)
-        let surfaceContainerHighest = Color(hex: 0xFFE2E2E7)
-        let surfaceVariant = Color(hex: 0xFFEEEDF3)
-        let onSurface = Color(hex: 0xFF1A1C1F)
-        let onSurfaceVariant = Color(hex: 0xFF434750)
-
-        let inversePrimary = Color(hex: 0xFFAAC7FF)
-        let inverseSurface = Color(hex: 0xFF2F3034)
-        let inverseOnSurface = Color(hex: 0xFFF1F0F5)
+        let inversePrimary = Color(hex: 0xAAC7FF)
+        let inverseSurface = Color(hex: 0x2F3034)
+        let inverseOnSurface = Color(hex: 0xF1F0F5)
 
         return ColorPalette(
             primary: primary,
             primaryContainer: primaryContainer,
+            secondary: secondary,
             secondaryContainer: secondaryContainer,
-            tertiary: tertiary,
-            tertiaryContainer: tertiaryContainer,
             error: error,
             errorContainer: errorContainer,
             success: success,
@@ -81,20 +76,17 @@ enum AppColors {
             onPrimary: onPrimary,
             onPrimaryContainer: onPrimaryContainer,
             onSecondaryContainer: onSecondaryContainer,
-            onTertiary: onTertiary,
-            onTertiaryContainer: onTertiaryContainer,
             onError: onError,
             onErrorContainer: onErrorContainer,
             onSuccess: onSuccess,
             onSuccessContainer: onSuccessContainer,
             onWarning: onWarning,
             onWarningContainer: onWarningContainer,
-            background: background,
-            onBackground: onBackground,
             outline: outline,
             outlineVariant: outlineVariant,
             surface: surface,
             surfaceContainer: surfaceContainer,
+            surfaceContainerLowest: surfaceContainerLowest,
             surfaceContainerLow: surfaceContainerLow,
             surfaceContainerHigh: surfaceContainerHigh,
             surfaceContainerHighest: surfaceContainerHighest,
@@ -108,11 +100,10 @@ enum AppColors {
     }()
 
     static let dark: ColorPalette = {
-        let primary = Color(hex: 0xFFAAC7FF)
-        let primaryContainer = Color(hex: 0xFF002958)
-        let secondaryContainer = Color(hex: 0xFF313D54)
-        let tertiary = Color(hex: 0xFFE8B4F8)
-        let tertiaryContainer = Color(hex: 0xFF401750)
+        let primary = Color(hex: 0xAAC7FF)
+        let primaryContainer = Color(hex: 0x002958)
+        let secondary = Color(hex: 0xBAC7E3)
+        let secondaryContainer = Color(hex: 0x313D54)
         let error = Color(hex: 0xFF6F70)
         let errorContainer = Color(hex: 0x7A1818)
         let success = Color(hex: 0x4DD17A)
@@ -120,14 +111,10 @@ enum AppColors {
         let warning = Color(hex: 0xFFBC57)
         let warningContainer = Color(hex: 0x5A2E00)
 
-        let background = Color.black
-        let onBackground = Color.white
-
-        let onPrimary = Color(hex: 0xFF002F65)
-        let onPrimaryContainer = Color(hex: 0xFF95B6F5)
-        let onSecondaryContainer = Color(hex: 0xFFC4D1ED)
-        let onTertiary = Color(hex: 0xFF471E57)
-        let onTertiaryContainer = Color(hex: 0xFFD7A4E6)
+        let onPrimary = Color(hex: 0x002F65)
+        let onPrimaryContainer = Color(hex: 0x95B6F5)
+        let onSecondary = Color(hex: 0x253146)
+        let onSecondaryContainer = Color(hex: 0xC4D1ED)
         let onError = Color(hex: 0x690005)
         let onErrorContainer = Color(hex: 0xFFB0B0)
         let onSuccess = Color(hex: 0x00210F)
@@ -135,27 +122,27 @@ enum AppColors {
         let onWarning = Color(hex: 0x2A1400)
         let onWarningContainer = Color(hex: 0xFFC87A)
 
-        let outline = Color(hex: 0xFF8D909B)
-        let outlineVariant = Color(hex: 0xFF434750)
-        let surface = Color(hex: 0xFF121317)
-        let surfaceContainer = Color(hex: 0xFF1E2023)
-        let surfaceContainerLow = Color(hex: 0xFF1A1C1F)
-        let surfaceContainerHigh = Color(hex: 0xFF282A2E)
-        let surfaceContainerHighest = Color(hex: 0xFF333539)
-        let surfaceVariant = Color(hex: 0xFF1E2023)
-        let onSurface = Color(hex: 0xFFE2E2E7)
-        let onSurfaceVariant = Color(hex: 0xFFC3C6D1)
+        let outline = Color(hex: 0x8D909B)
+        let outlineVariant = Color(hex: 0x434750)
+        let surface = Color(hex: 0x121317)
+        let surfaceContainer = Color(hex: 0x1E2023)
+        let surfaceContainerLowest = Color(hex: 0x0D0E12)
+        let surfaceContainerLow = Color(hex: 0x1A1C1F)
+        let surfaceContainerHigh = Color(hex: 0x282A2E)
+        let surfaceContainerHighest = Color(hex: 0x333539)
+        let surfaceVariant = Color(hex: 0x434750)
+        let onSurface = Color(hex: 0xE2E2E7)
+        let onSurfaceVariant = Color(hex: 0xC3C6D1)
 
-        let inversePrimary = Color(hex: 0xFF3B5E97)
-        let inverseSurface = Color(hex: 0xFFE2E2E7)
-        let inverseOnSurface = Color(hex: 0xFF2F3034)
+        let inversePrimary = Color(hex: 0x3B5E97)
+        let inverseSurface = Color(hex: 0xE2E2E7)
+        let inverseOnSurface = Color(hex: 0x2F3034)
 
         return ColorPalette(
             primary: primary,
             primaryContainer: primaryContainer,
+            secondary: secondary,
             secondaryContainer: secondaryContainer,
-            tertiary: tertiary,
-            tertiaryContainer: tertiaryContainer,
             error: error,
             errorContainer: errorContainer,
             success: success,
@@ -165,20 +152,17 @@ enum AppColors {
             onPrimary: onPrimary,
             onPrimaryContainer: onPrimaryContainer,
             onSecondaryContainer: onSecondaryContainer,
-            onTertiary: onTertiary,
-            onTertiaryContainer: onTertiaryContainer,
             onError: onError,
             onErrorContainer: onErrorContainer,
             onSuccess: onSuccess,
             onSuccessContainer: onSuccessContainer,
             onWarning: onWarning,
             onWarningContainer: onWarningContainer,
-            background: background,
-            onBackground: onBackground,
             outline: outline,
             outlineVariant: outlineVariant,
             surface: surface,
             surfaceContainer: surfaceContainer,
+            surfaceContainerLowest: surfaceContainerLowest,
             surfaceContainerLow: surfaceContainerLow,
             surfaceContainerHigh: surfaceContainerHigh,
             surfaceContainerHighest: surfaceContainerHighest,

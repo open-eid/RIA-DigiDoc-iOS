@@ -40,7 +40,7 @@ struct InitView: View {
 
     var body: some View {
         ZStack {
-            AppColors.BlueBackground.ignoresSafeArea()
+            AppColors.initialLaunchScreenBackground.ignoresSafeArea()
             GeometryReader { geometry in
                 ScrollView {
                     VStack(

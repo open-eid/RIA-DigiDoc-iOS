@@ -145,7 +145,7 @@ struct ActionInputScreen<Content: View>: View {
                                                 width: Dimensions.Icon.IconSizeXXS,
                                                 height: Dimensions.Icon.IconSizeXXS
                                             )
-                                            .foregroundStyle(theme.onBackground)
+                                            .foregroundStyle(theme.onSurfaceVariant)
                                             .accessibilityHidden(true)
                                     }
                                 }

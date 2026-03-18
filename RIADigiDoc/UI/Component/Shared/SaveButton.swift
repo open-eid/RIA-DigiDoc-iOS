@@ -33,7 +33,7 @@ struct SaveButton: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .foregroundStyle(theme.onBackground)
+                    .foregroundStyle(theme.onSurfaceVariant)
                     .accessibilityLabel(languageSettings.localized("Save"))
             }
             .foregroundStyle(theme.onSurface)
