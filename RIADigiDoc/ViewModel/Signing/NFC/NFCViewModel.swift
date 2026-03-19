@@ -45,7 +45,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcAlertMessageUrl: String?
 
     var certMismatch: Bool = false
-    
+
     private let nfcCANKeyFilename = Constants.File.nfcCANKey
 
     private let dataStore: DataStoreProtocol
@@ -134,7 +134,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             await saveEncryptedCAN("")
             await clearEncryptedCAN()
             await saveTempCAN(canNumber)
-            
+
             if actionType == .auth {
                 await setSigningCertificate("")
             }

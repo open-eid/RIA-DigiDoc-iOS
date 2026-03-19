@@ -274,12 +274,11 @@ struct NFCView: View {
                                 )
                             Task {
                                 let rememberedCan = await viewModel.retrieveEncryptedCAN() ?? ""
-                                
+
                                 if rememberMe &&
                                     !rememberedCertInvalidated &&
                                     !rememberedCan.isEmpty &&
-                                    canNumber != rememberedCan
-                                {
+                                    canNumber != rememberedCan {
                                     await viewModel.setSigningCertificate("")
                                     rememberedCertInvalidated = true
                                 }
@@ -345,7 +344,7 @@ struct NFCView: View {
             Toast.show(nfcErrorMessage)
         }
         .onChange(of: viewModel.certMismatch) { _, mismatch in
-            if (mismatch) {
+            if mismatch {
                 canNumber = ""
             }
             viewModel.certMismatch = false
@@ -558,7 +557,7 @@ struct NFCView: View {
 
             let canSkipCertificateRead = rememberMe && !cachedCert.isEmpty &&
                     !rememberedCan.isEmpty && canNumber == rememberedCan
-            
+
             if canSkipCertificateRead {
                 guard let certBytes = Data(base64Encoded: cachedCert) else {
                     onErrorWebEid()
