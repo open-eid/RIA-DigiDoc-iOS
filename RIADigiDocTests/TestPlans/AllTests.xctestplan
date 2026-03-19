@@ -14,37 +14,9 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:Modules\/IdCardLib",
-        "identifier" : "IdCardLibTests",
-        "name" : "IdCardLibTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:RIADigiDoc.xcodeproj",
-        "identifier" : "DFCE022A2D148B4D00216362",
-        "name" : "FileImportShareExtensionTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:Modules\/SmartIdLib",
-        "identifier" : "SmartIdLibTests",
-        "name" : "SmartIdLibTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:RIADigiDoc.xcodeproj",
-        "identifier" : "DFDB148B2CC97B1000153876",
-        "name" : "RIADigiDocTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:Modules\/UtilsLib",
-        "identifier" : "UtilsLibTests",
-        "name" : "UtilsLibTests"
+        "containerPath" : "container:Modules\/LibdigidocLib",
+        "identifier" : "LibdigidocLibTests",
+        "name" : "LibdigidocLibTests"
       }
     },
     {
@@ -63,9 +35,44 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Modules\/LibdigidocLib",
-        "identifier" : "LibdigidocLibTests",
-        "name" : "LibdigidocLibTests"
+        "containerPath" : "container:Modules\/SmartIdLib",
+        "identifier" : "SmartIdLibTests",
+        "name" : "SmartIdLibTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:RIADigiDoc.xcodeproj",
+        "identifier" : "DFDB148B2CC97B1000153876",
+        "name" : "RIADigiDocTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Modules\/WebEidLib",
+        "identifier" : "WebEidLibTests",
+        "name" : "WebEidLibTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Modules\/UtilsLib",
+        "identifier" : "UtilsLibTests",
+        "name" : "UtilsLibTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:RIADigiDoc.xcodeproj",
+        "identifier" : "DFCE022A2D148B4D00216362",
+        "name" : "FileImportShareExtensionTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Modules\/IdCardLib",
+        "identifier" : "IdCardLibTests",
+        "name" : "IdCardLibTests"
       }
     }
   ],

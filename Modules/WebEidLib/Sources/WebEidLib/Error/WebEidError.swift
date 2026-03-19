@@ -51,7 +51,7 @@ enum WebEidBuilderError: Error, LocalizedError, Sendable {
     }
 }
 
-enum WebEidAlgorithmUtilError: Error, LocalizedError {
+enum WebEidAlgorithmUtilError: Error, LocalizedError, Sendable, Equatable {
     case unsupportedKeyType
     case unsupportedECKeyLength(Int)
     case invalidBase64
