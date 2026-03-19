@@ -216,7 +216,6 @@ extension CryptoContainer {
         CryptoContainer.logger().info("Is single file: \(isSingleFile, privacy: .public)")
         CryptoContainer.logger().info("Is crypto container: \(isCryptoContainer, privacy: .public)")
 
-
         guard isSingleFile && isCryptoContainer else {
             var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
             if CDoc2Setting.isEncryptionEnabled {
