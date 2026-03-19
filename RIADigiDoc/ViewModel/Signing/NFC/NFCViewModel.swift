@@ -44,6 +44,8 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcAlertMessageExtraArguments: [String] = []
     var nfcAlertMessageUrl: String?
 
+    var certMismatch: Bool = false
+    
     private let nfcCANKeyFilename = Constants.File.nfcCANKey
 
     private let dataStore: DataStoreProtocol
@@ -132,6 +134,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             await saveEncryptedCAN("")
             await clearEncryptedCAN()
             await saveTempCAN(canNumber)
+            
+            if actionType == .auth {
+                await setSigningCertificate("")
+            }
         }
     }
 
@@ -623,6 +629,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             NFCViewModel.logger().error("NFC: Configuration error")
             nfcErrorKey = "NFC session error"
         case .certMismatch:
+            certMismatch = true
             NFCViewModel.logger().error(
                 "Web eID signing failed - signing certificate does not match previously used certificate"
             )

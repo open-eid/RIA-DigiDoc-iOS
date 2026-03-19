@@ -37,6 +37,7 @@ struct NFCView: View {
     @State private var pinNumber = ""
     @State private var pinType: CodeType?
     @State private var rememberMe: Bool = true
+    @State private var rememberedCertInvalidated: Bool = false
     @State private var isActionEnabled = false
     @State private var isInProgress: Bool = false
     @State private var showRoleView: Bool = false
@@ -271,6 +272,18 @@ struct NFCView: View {
                                     pinType: pinType,
                                     actionType: actionType
                                 )
+                            Task {
+                                let rememberedCan = await viewModel.retrieveEncryptedCAN() ?? ""
+                                
+                                if rememberMe &&
+                                    !rememberedCertInvalidated &&
+                                    !rememberedCan.isEmpty &&
+                                    canNumber != rememberedCan
+                                {
+                                    await viewModel.setSigningCertificate("")
+                                    rememberedCertInvalidated = true
+                                }
+                            }
                         },
                         showPinField: actionType != .myeid && actionType != .certificate,
                         isWebEidAuthenticating: isWebEidAuthenticating,
@@ -330,6 +343,11 @@ struct NFCView: View {
         .onChange(of: viewModel.nfcErrorKey) { _, newKey in
             guard newKey != nil else { return }
             Toast.show(nfcErrorMessage)
+        }
+        .onChange(of: viewModel.certMismatch) { _, mismatch in
+            if (mismatch) {
+                canNumber = ""
+            }
         }
         .onDisappear {
             Task {
@@ -535,7 +553,12 @@ struct NFCView: View {
 
             let cachedCert = await viewModel.getSigningCertificate()
 
-            if !cachedCert.isEmpty {
+            let rememberedCan = await viewModel.retrieveEncryptedCAN() ?? ""
+
+            let canSkipCertificateRead = rememberMe && !cachedCert.isEmpty &&
+                    !rememberedCan.isEmpty && canNumber == rememberedCan
+            
+            if canSkipCertificateRead {
                 guard let certBytes = Data(base64Encoded: cachedCert) else {
                     onErrorWebEid()
                     return
