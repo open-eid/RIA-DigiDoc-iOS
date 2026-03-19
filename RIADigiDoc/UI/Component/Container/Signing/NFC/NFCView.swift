@@ -348,6 +348,7 @@ struct NFCView: View {
             if (mismatch) {
                 canNumber = ""
             }
+            viewModel.certMismatch = false
         }
         .onDisappear {
             Task {
