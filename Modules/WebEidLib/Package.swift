@@ -18,7 +18,8 @@ let package = Package(
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
         .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
         .package(path: "../UtilsLib"),
-        .package(path: "../CommonsLib")
+        .package(path: "../CommonsLib"),
+        .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
         .target(
@@ -49,6 +50,7 @@ let package = Package(
                 "WebEidLibMocks",
                 "UtilsLib",
                 "CommonsLib",
+                "CommonsTestShared",
                 .product(name: "UtilsLibMocks", package: "utilslib"),
                 .product(name: "CommonsLibMocks", package: "commonslib"),
                 .product(name: "FactoryTesting", package: "Factory")

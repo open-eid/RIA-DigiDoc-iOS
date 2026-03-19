@@ -46,6 +46,7 @@ public actor WebEidSignService: WebEidSignServiceProtocol, Loggable {
         guard JSONSerialization.isValidJSONObject(payload) else {
             throw WebEidBuilderError.invalidJSON
         }
+
         return try JSONSerialization.data(withJSONObject: payload, options: [])
     }
 
@@ -74,6 +75,7 @@ public actor WebEidSignService: WebEidSignServiceProtocol, Loggable {
         guard JSONSerialization.isValidJSONObject(payload) else {
             throw WebEidBuilderError.invalidJSON
         }
+
         return try JSONSerialization.data(withJSONObject: payload, options: [])
     }
 }
