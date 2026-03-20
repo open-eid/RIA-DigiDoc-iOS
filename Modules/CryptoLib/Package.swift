@@ -13,7 +13,8 @@ let package = Package(
         .library(
             name: "CryptoLib",
             targets: ["CryptoSwift"]
-        )
+        ),
+        .library(name: "CryptoSwiftMocks", targets: ["CryptoSwiftMocks"])
     ],
     dependencies: [
         .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 0)),
@@ -85,6 +86,15 @@ let package = Package(
                 .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
                 .enableUpcomingFeature("InferIsolatedConformances")
             ]
+        ),
+        .target(
+            name: "CryptoSwiftMocks",
+            dependencies: [
+                "CryptoSwift",
+                "CryptoObjC",
+                "CryptoObjCWrapper"
+            ],
+            path: "Tests/Mocks/Generated"
         )
     ]
 )
