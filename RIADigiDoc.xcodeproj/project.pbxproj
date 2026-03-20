@@ -12,6 +12,8 @@
 		1A4A77602EF1983F001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775F2EF1983F001747D8 /* ConfigLib */; };
 		1A4A77622EF1983F001747D8 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A77612EF1983F001747D8 /* ConfigLibMocks */; };
 		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
+		1ADBD1B62F6D66E500A27C88 /* CryptoSwiftMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADBD1B52F6D66E500A27C88 /* CryptoSwiftMocks */; };
+		1ADBD1BE2F6D6A6D00A27C88 /* WebEidLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */; };
 		1ADC32232F59744600D34877 /* WebEidLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADC32222F59744600D34877 /* WebEidLib */; };
 		DF1D595A2F3BF88000855E2E /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D59592F3BF88000855E2E /* FirebaseCore */; };
 		DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */; };
@@ -537,6 +539,7 @@
 			files = (
 				DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */,
 				DF64D0EE2EC36F7700FF73C6 /* SmartIdLib in Frameworks */,
+				1ADBD1B62F6D66E500A27C88 /* CryptoSwiftMocks in Frameworks */,
 				1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */,
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
@@ -564,6 +567,7 @@
 				DF2B1BEA2F520815008EC06F /* SmartIdLib in Frameworks */,
 				DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
+				1ADBD1BE2F6D6A6D00A27C88 /* WebEidLibMocks in Frameworks */,
 				DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */,
 				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
 				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
@@ -794,6 +798,7 @@
 				DF1D59592F3BF88000855E2E /* FirebaseCore */,
 				DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */,
 				1ADC32222F59744600D34877 /* WebEidLib */,
+				1ADBD1B52F6D66E500A27C88 /* CryptoSwiftMocks */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -835,6 +840,7 @@
 				DF2B1BE92F520815008EC06F /* SmartIdLib */,
 				DF2B1BF62F525021008EC06F /* IdCardLib */,
 				DF2B1BF82F52520D008EC06F /* IdCardLibMocks */,
+				1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -916,6 +922,8 @@
 				1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */,
 				1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */,
 				DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				1ADBD1B42F6D66E500A27C88 /* XCLocalSwiftPackageReference "Modules/CryptoLib" */,
+				1ADBD1BC2F6D6A6D00A27C88 /* XCLocalSwiftPackageReference "Modules/WebEidLib" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -1705,6 +1713,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		1ADBD1B42F6D66E500A27C88 /* XCLocalSwiftPackageReference "Modules/CryptoLib" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/CryptoLib;
+		};
+		1ADBD1BC2F6D6A6D00A27C88 /* XCLocalSwiftPackageReference "Modules/WebEidLib" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/WebEidLib;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1792,6 +1811,14 @@
 		1A5026EC2E8BFCF400C184D7 /* IdCardLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IdCardLib;
+		};
+		1ADBD1B52F6D66E500A27C88 /* CryptoSwiftMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CryptoSwiftMocks;
+		};
+		1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebEidLibMocks;
 		};
 		1ADC32222F59744600D34877 /* WebEidLib */ = {
 			isa = XCSwiftPackageProductDependency;

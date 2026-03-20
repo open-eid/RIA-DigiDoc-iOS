@@ -25,6 +25,18 @@ public struct WebEidAuthRequest: JSONCodable, Equatable, Sendable {
     public let getSigningCertificate: Bool
     public let origin: String
 
+    public init(
+        challenge: String,
+        loginUri: String,
+        getSigningCertificate: Bool,
+        origin: String
+    ) {
+        self.challenge = challenge
+        self.loginUri = loginUri
+        self.getSigningCertificate = getSigningCertificate
+        self.origin = origin
+    }
+
     enum CodingKeys: String, CodingKey {
         case challenge
         case loginUri
