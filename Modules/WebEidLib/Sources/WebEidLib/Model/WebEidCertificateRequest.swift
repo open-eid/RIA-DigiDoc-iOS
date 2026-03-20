@@ -26,6 +26,14 @@ public struct WebEidCertificateRequest: JSONCodable, Equatable, Sendable {
     public let responseUri: String
     public let origin: String
 
+    public init(
+        responseUri: String,
+        origin: String
+    ) {
+        self.responseUri = responseUri
+        self.origin = origin
+    }
+
     enum CodingKeys: String, CodingKey {
         case responseUri
         case origin
