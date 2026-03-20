@@ -19,6 +19,7 @@
 
 import CommonsLib
 import CryptoSwift
+import CryptoSwiftMocks
 import Foundation
 import IdCardLib
 import LibdigidocLibSwift
@@ -71,6 +72,29 @@ final class NFCViewModelTests {
         mockOperationReadCertAndSign.startOperationHandler =
         { _, _, _, _, _, _, _ in
             return SignedContainerProtocolMock()
+        }
+
+        mockOperationWebEidAuth.startOperationHandler =
+        { _, _, _, _, _, _ in
+            return WebEidAuthReturnData(
+                authCert: Data(),
+                signingCert: Data(),
+                signatureArray: Data()
+            )
+        }
+
+        mockOperationReadCert.startReadingHandler =
+        { _, _ in
+            return "ouput"
+        }
+
+        mockOperationWebEidSign.startOperationHandler =
+        { _, _, _, _, _, _, _ in
+            return WebEidSignReturnData(
+                signerCertB64: "",
+                signatureArray: Data(),
+                responseUri: ""
+            )
         }
 
         viewModel = NFCViewModel(
@@ -360,6 +384,272 @@ final class NFCViewModelTests {
         #expect(mockSharedMyEidSession.setCANArgValues.first == "123456")
     }
 
+    // MARK: - saveInputData
+
+    @Test
+    func saveInputData_forAuthWithRememberMeTrue_savesWebEidRememberMeAndEncryptedCANAndClearsTempCAN() async {
+        mockDataStore.setWebEidRememberMeHandler = { _ in }
+        mockKeychainStore.saveKeyInfoHandler = { key, info in
+            if key == .nfcCANKey {
+                #expect(String(data: info, encoding: .utf8) == "123456")
+            }
+            return true
+        }
+        mockKeychainStore.removeKeyHandler = { key in
+            #expect(key == .tempCANKey)
+        }
+
+        await viewModel.saveInputData(
+            canNumber: "123456",
+            rememberMe: true,
+            actionType: .auth,
+            isWebEidAuthenticating: true
+        )
+        #expect(mockDataStore.setWebEidRememberMeCallCount == 1)
+        #expect(mockKeychainStore.saveKeyInfoCallCount >= 1)
+        #expect(mockKeychainStore.removeKeyCallCount >= 1)
+    }
+
+    @Test
+    func saveInputData_forSigningWithRememberMeFalse_clearsEncryptedCANAndSavesTempCAN() async {
+        mockDataStore.setNFCRememberMeHandler = { _ in }
+        mockKeychainStore.saveKeyInfoHandler = { key, info in
+            let string = String(data: info, encoding: .utf8)
+            if key == .nfcCANKey {
+                #expect(string == "")
+            }
+            if key == .tempCANKey {
+                #expect(string == "123456")
+            }
+            return true
+        }
+        mockKeychainStore.removeKeyHandler = { key in
+            #expect(key == .nfcCANKey)
+        }
+
+        await viewModel.saveInputData(
+            canNumber: "123456",
+            rememberMe: false,
+            actionType: .signing,
+            isWebEidAuthenticating: false
+        )
+
+        #expect(mockDataStore.setNFCRememberMeCallCount == 1)
+        #expect(mockKeychainStore.saveKeyInfoCallCount >= 2)
+        #expect(mockKeychainStore.removeKeyCallCount >= 1)
+    }
+
+    @Test
+    func saveInputData_forAuthWithRememberMeFalse_clearsStoredSigningCertificate() async {
+        mockDataStore.setWebEidRememberMeHandler = { _ in }
+        mockKeychainStore.saveKeyHandler = { _, _ in true }
+        mockKeychainStore.removeKeyHandler = { _ in }
+        mockKeychainStore.retrieveKeyHandler = { key in
+            if key == .nfcCANKey {
+                return Data("123456".utf8)
+            }
+            return nil
+        }
+
+        await viewModel.saveInputData(
+            canNumber: "123456",
+            rememberMe: false,
+            actionType: .auth,
+            isWebEidAuthenticating: true
+        )
+
+        #expect(mockKeychainStore.retrieveKeyCallCount >= 1)
+        #expect(mockKeychainStore.saveKeyInfoCallCount >= 2)
+    }
+
+    // MARK: - getInputData
+
+    @Test
+    func getInputData_forCertificate_returnsStoredCanOnly() async {
+        mockDataStore.getWebEidRememberMeHandler = { true }
+        mockKeychainStore.retrieveKeyHandler = { key in
+            switch key {
+            case .nfcCANKey:
+                return Data("654321".utf8)
+            case .tempCANKey:
+                return Data("123456".utf8)
+            default:
+                return nil
+            }
+        }
+
+        let result = await viewModel.getInputData(.certificate, false)
+
+        #expect(result.canNumber == "654321")
+        #expect(result.rememberMe == true)
+    }
+
+    @Test
+    func getInputData_forSigningWebEid_prefersTempCanWhenPresent() async {
+        mockDataStore.getWebEidRememberMeHandler = { false }
+        mockKeychainStore.retrieveKeyHandler = { key in
+            switch key {
+            case .nfcCANKey:
+                return Data("654321".utf8)
+            case .tempCANKey:
+                return Data("123456".utf8)
+            default:
+                return nil
+            }
+        }
+
+        let result = await viewModel.getInputData(.signingWebEid, false)
+
+        #expect(result.canNumber == "123456")
+        #expect(result.rememberMe == false)
+    }
+
+    @Test
+    func getInputData_whenStoredCanMissingAndWebEidAuthenticating_usesTempCan() async {
+        mockDataStore.getNFCRememberMeHandler = { false }
+        mockKeychainStore.retrieveKeyHandler = { key in
+            switch key {
+            case .nfcCANKey:
+                return nil
+            case .tempCANKey:
+                return Data("123456".utf8)
+            default:
+                return nil
+            }
+        }
+
+        let result = await viewModel.getInputData(.signing, true)
+
+        #expect(result.canNumber == "123456")
+    }
+
+    @Test
+    func getInputData_returnsEmptyCanWhenNothingStored() async {
+        mockDataStore.getNFCRememberMeHandler = { false }
+        mockKeychainStore.retrieveKeyHandler = { _ in nil }
+
+        let result = await viewModel.getInputData(.signing, false)
+
+        #expect(result.canNumber == "")
+        #expect(result.rememberMe == false)
+    }
+
+    // MARK: - keychain CAN helpers
+
+    @Test
+    func retrieveEncryptedCAN_returnsDecodedString() async {
+        mockKeychainStore.retrieveKeyHandler = { key in
+            #expect(key == .nfcCANKey)
+            return Data("123456".utf8)
+        }
+
+        let result = await viewModel.retrieveEncryptedCAN()
+
+        #expect(result == "123456")
+    }
+
+    @Test
+    func retrieveEncryptedCAN_returnsNilForInvalidUtf8() async {
+        mockKeychainStore.retrieveKeyHandler = { key in
+            #expect(key == .nfcCANKey)
+            return Data([0xFF, 0xFE])
+        }
+
+        let result = await viewModel.retrieveEncryptedCAN()
+
+        #expect(result == nil)
+    }
+
+    @Test
+    func clearEncryptedCAN_removesNfcCANKey() async {
+        mockKeychainStore.removeKeyHandler = { key in
+            #expect(key == .nfcCANKey)
+        }
+
+        await viewModel.clearEncryptedCAN()
+
+        #expect(mockKeychainStore.removeKeyCallCount == 1)
+    }
+
+    @Test
+    func retrieveTempCAN_returnsDecodedString() async {
+        mockKeychainStore.retrieveKeyHandler = { key in
+            #expect(key == .tempCANKey)
+            return Data("123456".utf8)
+        }
+
+        let result = await viewModel.retrieveTempCAN()
+
+        #expect(result == "123456")
+    }
+
+    @Test
+    func clearTempCAN_removesTempCANKey() async {
+        mockKeychainStore.removeKeyHandler = { key in
+            #expect(key == .tempCANKey)
+        }
+
+        await viewModel.clearTempCAN()
+
+        #expect(mockKeychainStore.removeKeyCallCount == 1)
+    }
+
+    // MARK: - signing certificate helpers
+
+    @Test
+    func getSigningCertificate_returnsStoredCertificateForCurrentEncryptedCAN() async {
+        let expectedKey = "\(KeychainKey.signingCertKey.rawValue)_123456"
+
+        mockKeychainStore.retrieveKeyHandler = { key in
+            if key == .nfcCANKey {
+                return Data("123456".utf8)
+            }
+            return nil
+        }
+
+        mockKeychainStore.retrieveHandler = { key in
+            if key == expectedKey {
+                return Data("cert-data".utf8)
+            }
+            return nil
+        }
+
+        let result = await viewModel.getSigningCertificate()
+
+        #expect(result == "cert-data")
+    }
+
+    @Test
+    func getSigningCertificate_returnsEmptyStringWhenNoEncryptedCAN() async {
+        mockKeychainStore.retrieveHandler = { _ in nil }
+
+        let result = await viewModel.getSigningCertificate()
+
+        #expect(result == "")
+    }
+
+    @Test
+    func setSigningCertificate_savesCertificateUsingCANScopedKey() async {
+        let expectedKey = "\(KeychainKey.signingCertKey.rawValue)_123456"
+
+        mockKeychainStore.retrieveKeyHandler = { key in
+            if key == .nfcCANKey {
+                return Data("123456".utf8)
+            }
+            return nil
+        }
+
+        mockKeychainStore.saveHandler = { key, info, _ in
+            #expect(key == expectedKey)
+            #expect(String(data: info, encoding: .utf8) == "cert-data")
+            return true
+        }
+
+        await viewModel.setSigningCertificate("cert-data")
+
+        #expect(mockKeychainStore.saveKeyCallCount == 1)
+    }
+
     // MARK: - Sign Tests
 
     @Test
@@ -520,6 +810,312 @@ final class NFCViewModelTests {
         }
     }
 
+    @Test
+    func auth_success() async {
+        mockDataStore.getSelectedLanguageHandler = {
+            "et"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, language in
+            #expect(language == "et")
+            return "TestUserAgent"
+        }
+
+        _ = await viewModel.auth(
+            canNumber: "123456",
+            pin1: "12345",
+            origin: "origin",
+            challenge: "challenge",
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(mockDataStore.getSelectedLanguageCallCount == 1)
+        #expect(mockUserAgentUtil.userAgentCallCount == 1)
+        #expect(mockOperationWebEidAuth.startOperationCallCount == 1)
+        #expect(viewModel.nfcErrorKey == nil)
+    }
+
+    @Test
+    func auth_setsNfcErrorKeyOnOperationFailure() async {
+        mockDataStore.getSelectedLanguageHandler = {
+            "et"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, language in
+            #expect(language == "et")
+            return "TestUserAgent"
+        }
+
+        mockOperationWebEidAuth.startOperationHandler =
+        { _, _, _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.auth(
+                canNumber: "123456",
+                pin1: "12345",
+                origin: "origin",
+                challenge: "challenge",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(mockDataStore.getSelectedLanguageCallCount == 1)
+            #expect(mockUserAgentUtil.userAgentCallCount == 1)
+            #expect(viewModel.nfcErrorKey != nil)
+        }
+    }
+
+    @Test
+    func auth_errorsChangeBetweenSignCalls() async {
+        viewModel.nfcErrorKey = "Previous error"
+
+        mockDataStore.getSelectedLanguageHandler = {
+            "en"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, _ in
+            "TestUserAgent"
+        }
+
+        mockOperationWebEidAuth.startOperationHandler =
+        { _, _, _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.auth(
+                canNumber: "123456",
+                pin1: "12345",
+                origin: "origin",
+                challenge: "challenge",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(viewModel.nfcErrorKey != "Previous error")
+        }
+    }
+
+    @Test
+    func certificate_success() async {
+        _ = await viewModel.certificate(
+            canNumber: "123456",
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(mockOperationReadCert.startReadingCallCount == 1)
+        #expect(viewModel.nfcErrorKey == nil)
+    }
+
+    @Test
+    func certificate_setsNfcErrorKeyOnOperationFailure() async {
+        mockOperationReadCert.startReadingHandler =
+        { _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.certificate(
+                canNumber: "123456",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(viewModel.nfcErrorKey != nil)
+        }
+    }
+
+    @Test
+    func certificate_errorsChangeBetweenSignCalls() async {
+        viewModel.nfcErrorKey = "Previous error"
+
+        mockOperationReadCert.startReadingHandler =
+        { _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.certificate(
+                canNumber: "123456",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(viewModel.nfcErrorKey != "Previous error")
+        }
+    }
+
+    @Test
+    func signWebEid_success() async {
+        mockDataStore.getSelectedLanguageHandler = {
+            "et"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, language in
+            #expect(language == "et")
+            return "TestUserAgent"
+        }
+
+        _ = await viewModel.signWebEid(
+            canNumber: "123456",
+            pin2: "12345",
+            responseUri: "url",
+            hash: "hash",
+            expectedSigningCertBase64: "cert",
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(mockDataStore.getSelectedLanguageCallCount == 1)
+        #expect(mockUserAgentUtil.userAgentCallCount == 1)
+        #expect(mockOperationWebEidSign.startOperationCallCount == 1)
+        #expect(viewModel.nfcErrorKey == nil)
+    }
+
+    @Test
+    func signWebEid_setsNfcErrorKeyOnOperationFailure() async {
+        mockDataStore.getSelectedLanguageHandler = {
+            "et"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, language in
+            #expect(language == "et")
+            return "TestUserAgent"
+        }
+
+        mockOperationWebEidSign.startOperationHandler =
+        { _, _, _, _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.signWebEid(
+                canNumber: "123456",
+                pin2: "12345",
+                responseUri: "url",
+                hash: "hash",
+                expectedSigningCertBase64: "cert",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(mockDataStore.getSelectedLanguageCallCount == 1)
+            #expect(mockUserAgentUtil.userAgentCallCount == 1)
+            #expect(viewModel.nfcErrorKey != nil)
+        }
+    }
+
+    @Test
+    func signWebEid_errorsChangeBetweenSignCalls() async {
+        viewModel.nfcErrorKey = "Previous error"
+
+        mockDataStore.getSelectedLanguageHandler = {
+            "en"
+        }
+
+        mockUserAgentUtil.userAgentHandler = { _, _ in
+            "TestUserAgent"
+        }
+
+        mockOperationWebEidSign.startOperationHandler =
+        { _, _, _, _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: nil)
+        }
+
+        await #expect(throws: Never.self) {
+            _ = await viewModel.signWebEid(
+                canNumber: "123456",
+                pin2: "12345",
+                responseUri: "url",
+                hash: "hash",
+                expectedSigningCertBase64: "cert",
+                strings: mockNFCSessionStrings
+            )
+
+            #expect(viewModel.nfcErrorKey != "Previous error")
+        }
+    }
+
+    // MARK: - decrypt
+
+    @Test
+    func decrypt_success() async {
+        let mockContainer = CryptoContainerProtocolMock()
+        let expectedResult = CryptoContainerProtocolMock()
+
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/tmp/test.cdoc")
+        }
+        mockContainer.getRecipientsHandler = {
+            []
+        }
+        mockKeychainStore.removeKeyHandler = { key in
+            #expect(key == .tempCANKey)
+        }
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            expectedResult
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result != nil)
+        #expect(mockOperationDecrypt.processDecryptCallCount == 1)
+        #expect(viewModel.nfcErrorKey == nil)
+    }
+
+    @Test
+    func decrypt_setsGeneralErrorOnUnexpectedFailure() async {
+        let mockContainer = CryptoContainerProtocolMock()
+
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/tmp/test.cdoc")
+        }
+        mockContainer.getRecipientsHandler = {
+            []
+        }
+        mockKeychainStore.removeHandler = { _ in }
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            throw NSError(domain: "Test", code: 1)
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.nfcErrorKey == "NFC session error")
+    }
+
+    @Test
+    func decrypt_handlesDecryptCancelledWithoutErrorKey() async {
+        let mockContainer = CryptoContainerProtocolMock()
+
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/tmp/test.cdoc")
+        }
+        mockContainer.getRecipientsHandler = {
+            []
+        }
+        mockKeychainStore.removeHandler = { _ in }
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            throw DecryptError.cancelled
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.nfcErrorKey == nil)
+    }
+
     // MARK: - readCardData tests
 
     @Test
@@ -585,4 +1181,18 @@ final class NFCViewModelTests {
         #expect(mockCertificateUtil.getNotValidDateCallCount == 2)
     }
 
+    @Test
+    func readCardData_setsGeneralErrorOnUnexpectedFailure() async {
+        mockOperationReadCardData.startReadingHandler = { _, _ in
+            throw NSError(domain: "Test", code: 1)
+        }
+
+        let result = await viewModel.readCardData(
+            CAN: "123456",
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.nfcErrorKey == "General error")
+    }
 }
