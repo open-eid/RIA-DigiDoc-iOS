@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,9 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 import CryptoObjCWrapper
 
-/// @mockable
-public protocol OpenLdapProtocol: Sendable {
-    @MainActor func search(identityCode: String) async -> OpenLdapSearchResult
+public struct OpenLdapSearchResult: Sendable {
+    public var addressees: [Addressee]
+    public var tooManyResults: Bool
 }
