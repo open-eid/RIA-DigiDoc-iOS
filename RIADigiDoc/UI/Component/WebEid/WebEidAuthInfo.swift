@@ -80,7 +80,7 @@ struct WebEidAuthInfo: View {
 
             Text(languageSettings.localized(consentText))
                 .font(typography.bodyLarge)
-                .foregroundStyle(theme.onBackground)
+                .foregroundStyle(theme.onSurfaceVariant)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
