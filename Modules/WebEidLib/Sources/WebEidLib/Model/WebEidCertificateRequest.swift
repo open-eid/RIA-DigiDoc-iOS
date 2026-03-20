@@ -33,7 +33,7 @@ public struct WebEidCertificateRequest: JSONCodable, Equatable, Sendable {
         self.responseUri = responseUri
         self.origin = origin
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case responseUri
         case origin

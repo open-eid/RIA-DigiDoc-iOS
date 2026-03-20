@@ -95,6 +95,6 @@ let package = Package(
                 "CryptoObjCWrapper"
             ],
             path: "Tests/Mocks/Generated"
-        ),
+        )
     ]
 )

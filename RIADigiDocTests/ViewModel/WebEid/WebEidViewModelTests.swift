@@ -72,8 +72,9 @@ final class WebEidViewModelTests {
     // MARK: - Helpers
 
     private func makeTestCertificate() throws -> SecCertificate {
+        // swiftlint:disable line_length
         let base64 = "MIID7DCCA02gAwIBAgIQK33iqGajpAnSrLD7w+X3TjAKBggqhkjOPQQDBDBgMQswCQYDVQQGEwJFRTEbMBkGA1UECgwSU0sgSUQgU29sdXRpb25zIEFTMRcwFQYDVQRhDA5OVFJFRS0xMDc0NzAxMzEbMBkGA1UEAwwSVEVTVCBvZiBFU1RFSUQyMDE4MB4XDTI1MDQyMjEwMTg0OVoXDTMwMDQyMTIwNTk1OVowfzELMAkGA1UEBhMCRUUxKjAoBgNVBAMMIUrDlUVPUkcsSkFBSy1LUklTVEpBTiwzODAwMTA4NTcxODEQMA4GA1UEBAwHSsOVRU9SRzEWMBQGA1UEKgwNSkFBSy1LUklTVEpBTjEaMBgGA1UEBRMRUE5PRUUtMzgwMDEwODU3MTgwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAATYWYk4C8W5+RAMeuvIQVa0sVdobkxXKASvA4lUh5K/whRAT5f3p8n2rw8O3nsCt/1LFyKXVVrZdtWZ1Vh894TA2QHEm6xaXnJs4ZmYo4blrm/nXE1PcEZan9023+73sE+jggGrMIIBpzAJBgNVHRMEAjAAMB8GA1UdIwQYMBaAFMCEmSnETp87AjT2meEKVgAIKT57MHMGCCsGAQUFBwEBBGcwZTA1BggrBgEFBQcwAoYpaHR0cDovL2Muc2suZWUvVGVzdF9vZl9FU1RFSUQyMDE4LmRlci5jcnQwLAYIKwYBBQUHMAGGIGh0dHA6Ly9haWEuZGVtby5zay5lZS9lc3RlaWQyMDE4MEgGA1UdIARBMD8wMgYLKwYBBAGDkSEBAQEwIzAhBggrBgEFBQcCARYVaHR0cHM6Ly93d3cuc2suZWUvQ1BTMAkGBwQAi+xAAQIwgYoGCCsGAQUFBwEDBH4wfDAIBgYEAI5GAQEwCAYGBACORgEEMBMGBgQAjkYBBjAJBgcEAI5GAQYBMFEGBgQAjkYBBTBHMEUWP2h0dHBzOi8vc2suZWUvZW4vcmVwb3NpdG9yeS9jb25kaXRpb25zLWZvci11c2Utb2YtY2VydGlmaWNhdGVzLxMCZW4wHQYDVR0OBBYEFFh+R2KDfE2Tdj///kXTCqcz6rRuMA4GA1UdDwEB/wQEAwIGQDAKBggqhkjOPQQDBAOBjAAwgYgCQgD7B3WI1xpXX94+9e3TdaIcUNCj5JkCX15pj1mjRqv/Vx9Hlg3tbgwW2yOhqnTF04+e9rVHCtA8YRINp5BfDFqj/wJCAVuUlCu7GNVSFeU7A6lEORkB6obIALZusUFxT4bsaFWTpKllmvlX6lZm3QEbHgeiD8k7VMPdcw5V51p+B+2WUWBh"
-
+        // swiftlint:enable line_length
         guard
             let data = Data(base64Encoded: base64),
             let cert = SecCertificateCreateWithData(nil, data as CFData)
@@ -120,7 +121,7 @@ final class WebEidViewModelTests {
 
     @Test
     func handleUnknown_setsInvalidRequestError() {
-        let url = URL(string: "web-eid://unknown")!
+        let url = try #require(URL(string: "web-eid://unknown"))
 
         viewModel.handleUnknown(url: url)
 
@@ -132,7 +133,7 @@ final class WebEidViewModelTests {
 
     @Test
     func handleCertificate_setsErrorOnInvalidURL() {
-        let url = URL(string: "https://example.com/not-a-valid-certificate-request")!
+        let url = try #require(URL(string: "https://example.com/not-a-valid-certificate-request"))
 
         viewModel.handleCertificate(url: url)
 
@@ -145,7 +146,7 @@ final class WebEidViewModelTests {
 
     @Test
     func handleAuth_setsErrorOrResponseOnInvalidURL() {
-        let url = URL(string: "https://example.com/not-a-valid-auth-request")!
+        let url = try #require(URL(string: "https://example.com/not-a-valid-auth-request"))
 
         viewModel.handleAuth(url: url)
 
@@ -160,7 +161,7 @@ final class WebEidViewModelTests {
 
     @Test
     func handleSign_setsErrorOrResponseOnInvalidURL() {
-        let url = URL(string: "https://example.com/not-a-valid-sign-request")!
+        let url = try #require(URL(string: "https://example.com/not-a-valid-sign-request"))
 
         viewModel.handleSign(url: url)
 

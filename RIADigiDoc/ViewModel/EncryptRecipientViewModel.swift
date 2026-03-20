@@ -75,7 +75,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     func loadRecipients() async {
         if !searchText.isEmpty {
             let result = await openLdap.search(identityCode: searchText)
-            
+
             if result.tooManyResults {
                 recipients = []
                 errorMessage = "Too many results"

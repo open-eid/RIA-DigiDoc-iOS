@@ -82,21 +82,21 @@ final class NFCViewModelTests {
                 signatureArray: Data()
             )
         }
-        
+
         mockOperationReadCert.startReadingHandler =
         { _, _ in
             return "ouput"
         }
-        
+
         mockOperationWebEidSign.startOperationHandler =
-        { _, _, _, _, _, _ , _ in
+        { _, _, _, _, _, _, _ in
             return WebEidSignReturnData(
                 signerCertB64: "",
                 signatureArray: Data(),
                 responseUri: ""
             )
         }
-        
+
         viewModel = NFCViewModel(
             dataStore: mockDataStore,
             userAgentUtil: mockUserAgentUtil,
@@ -606,7 +606,7 @@ final class NFCViewModelTests {
             }
             return nil
         }
-        
+
         mockKeychainStore.retrieveHandler = { key in
             if key == expectedKey {
                 return Data("cert-data".utf8)
@@ -649,7 +649,7 @@ final class NFCViewModelTests {
 
         #expect(mockKeychainStore.saveKeyCallCount == 1)
     }
-    
+
     // MARK: - Sign Tests
 
     @Test
@@ -834,7 +834,7 @@ final class NFCViewModelTests {
         #expect(mockOperationWebEidAuth.startOperationCallCount == 1)
         #expect(viewModel.nfcErrorKey == nil)
     }
-    
+
     @Test
     func auth_setsNfcErrorKeyOnOperationFailure() async {
         mockDataStore.getSelectedLanguageHandler = {
@@ -895,7 +895,7 @@ final class NFCViewModelTests {
             #expect(viewModel.nfcErrorKey != "Previous error")
         }
     }
-    
+
     @Test
     func certificate_success() async {
         _ = await viewModel.certificate(
@@ -906,7 +906,7 @@ final class NFCViewModelTests {
         #expect(mockOperationReadCert.startReadingCallCount == 1)
         #expect(viewModel.nfcErrorKey == nil)
     }
-    
+
     @Test
     func certificate_setsNfcErrorKeyOnOperationFailure() async {
         mockOperationReadCert.startReadingHandler =
@@ -942,7 +942,7 @@ final class NFCViewModelTests {
             #expect(viewModel.nfcErrorKey != "Previous error")
         }
     }
-    
+
     @Test
     func signWebEid_success() async {
         mockDataStore.getSelectedLanguageHandler = {
@@ -968,7 +968,7 @@ final class NFCViewModelTests {
         #expect(mockOperationWebEidSign.startOperationCallCount == 1)
         #expect(viewModel.nfcErrorKey == nil)
     }
-    
+
     @Test
     func signWebEid_setsNfcErrorKeyOnOperationFailure() async {
         mockDataStore.getSelectedLanguageHandler = {
@@ -1031,7 +1031,7 @@ final class NFCViewModelTests {
             #expect(viewModel.nfcErrorKey != "Previous error")
         }
     }
-    
+
     // MARK: - decrypt
 
     @Test
@@ -1115,7 +1115,7 @@ final class NFCViewModelTests {
         #expect(result == nil)
         #expect(viewModel.nfcErrorKey == nil)
     }
-    
+
     // MARK: - readCardData tests
 
     @Test
@@ -1180,7 +1180,7 @@ final class NFCViewModelTests {
         #expect(mockOperationReadCardData.startReadingCallCount == 1)
         #expect(mockCertificateUtil.getNotValidDateCallCount == 2)
     }
-    
+
     @Test
     func readCardData_setsGeneralErrorOnUnexpectedFailure() async {
         mockOperationReadCardData.startReadingHandler = { _, _ in

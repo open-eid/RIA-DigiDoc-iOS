@@ -36,7 +36,7 @@ public struct WebEidAuthRequest: JSONCodable, Equatable, Sendable {
         self.getSigningCertificate = getSigningCertificate
         self.origin = origin
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case challenge
         case loginUri
