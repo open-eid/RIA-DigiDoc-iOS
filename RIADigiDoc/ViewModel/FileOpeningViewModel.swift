@@ -103,9 +103,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
                 firstFileUrl = await handleExternalDdocAndCdoc(firstFile)
             }
 
-            let uniqueContainerUrl = try getUniqueContainerUrl(file: firstFileUrl)
-
-            files[0] = uniqueContainerUrl
+            files[0] = firstFileUrl
 
             let container = try await openOrCreateContainer(withUrls: files)
             if let signedContainer = container as? SignedContainerProtocol {
@@ -217,33 +215,22 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
     }
 
-    private func getUniqueContainerUrl(file: URL) throws -> URL {
+    private func getFirstFileLocation(file: URL) async throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
             subfolders: [Constants.Folder.ContainerFolder],
             fileManager: fileManager
         )
 
-        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
-            signedContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
-        )
+        let movedFileLocation = signedContainersDirectory.appending(path: file.lastPathComponent)
 
-        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
-            signedContainersDirectory.absoluteString
-        ) && !isFileInTempSignedContainerDirectory
-
-        var renamedContainerFile = file
-
-        if !isFileInRecentDocuments {
-            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                for: file,
-                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
-                    file.deletingLastPathComponent().deletingLastPathComponent()
-            )
-
-            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        if await file.isCryptoContainer() &&
+            fileManager.fileExists(atPath: movedFileLocation.path(percentEncoded: false)) {
+            try fileManager.removeItem(at: file)
         }
 
-        return renamedContainerFile
+        try fileManager.moveItem(at: file, to: movedFileLocation)
+
+        return movedFileLocation
     }
 
     private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
@@ -311,7 +298,7 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         case .all:
             guard let firstFile = urls.first else { throw FileOpeningError.noDataFiles }
             let isCryptoContainer = await firstFile.isCryptoContainer()
-            if isCryptoContainer {
+            if isCryptoContainer && urls.count == 1 {
                 return try await fileOpeningRepository.openOrCreateCryptoContainer(urls: urls)
             }
             return try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)

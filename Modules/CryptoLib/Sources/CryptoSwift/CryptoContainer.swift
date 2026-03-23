@@ -234,11 +234,18 @@ extension CryptoContainer {
                 containerURL = firstFile
             }
 
+            let fileManager = Container.shared.fileManager()
+
+            let cryptoContainersDirectory = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.ContainerFolder],
+                fileManager: fileManager
+            )
+
             CryptoContainer.logger().info("Getting an unique crypto container name")
             // Get unique container name file (1) if name already exists
             let uniqueContainerURL = containerUtil.getContainerFile(
                 for: containerURL,
-                in: containerURL.deletingLastPathComponent()
+                in: cryptoContainersDirectory
             )
 
             CryptoContainer.logger().info("Creating a new crypto container")
@@ -348,7 +355,34 @@ extension CryptoContainer {
     }
 
     private static func open(containerFile: URL) async throws -> CryptoContainerProtocol {
-        guard let cdocInfo = try Decrypt.cdocInfo(containerFile.resolvedPath) as? CdocInfo else {
+        let fileManager = Container.shared.fileManager()
+
+        let cryptoContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
+        let isFileInTempCryptoContainersDirectory = containerFile.absoluteString.hasPrefix(
+            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = containerFile.absoluteString.hasPrefix(
+            cryptoContainersDirectory.absoluteString
+        ) && !isFileInTempCryptoContainersDirectory
+
+        var renamedContainerFile = containerFile
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: containerFile,
+                in: isFileInRecentDocuments ? containerFile.deletingLastPathComponent() :
+                    containerFile.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: containerFile, to: renamedContainerFile)
+        }
+
+        guard let cdocInfo = try Decrypt.cdocInfo(renamedContainerFile.resolvedPath) as? CdocInfo else {
             throw CryptoError.containerOpeningFailed(
                 CryptoErrorDetail(
                     message: "Cannot open container with invalid CDOC info"
@@ -368,7 +402,7 @@ extension CryptoContainer {
         }
 
         return try await create(
-            containerFile: containerFile,
+            containerFile: renamedContainerFile,
             dataFiles: dataFiles,
             recipients: recipients,
             isDecrypted: false,
