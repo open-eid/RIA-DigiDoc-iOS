@@ -333,17 +333,10 @@ extension SignedContainer {
                 containerURL = firstFile
             }
 
-            SignedContainer.logger().info("Getting an unique container name")
-            // Get unique container name file (1) if name already exists
-            let uniqueContainerURL = containerUtil.getContainerFile(
-                for: containerURL,
-                in: containerURL.deletingLastPathComponent()
-            )
-
-            SignedContainer.logger().info("Unique container name: \(uniqueContainerURL, privacy: .public)")
+            SignedContainer.logger().info("Container: \(containerURL, privacy: .public)")
 
             SignedContainer.logger().info("Creating a new container")
-            return try await create(containerFile: uniqueContainerURL, dataFiles: dataFiles)
+            return try await create(containerFile: containerURL, dataFiles: dataFiles)
         }
 
         SignedContainer.logger().info("Opening existing container")
@@ -353,12 +346,37 @@ extension SignedContainer {
     private static func open(file: URL, isSivaConfirmed: Bool) async throws -> SignedContainerProtocol {
         let fileManager = Container.shared.fileManager()
 
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
+        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
+            signedContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        )
+
+        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
+            signedContainersDirectory.absoluteString
+        ) && !isFileInTempSignedContainerDirectory
+
+        var renamedContainerFile = file
+
+        if !isFileInRecentDocuments {
+            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                for: file,
+                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
+                    file.deletingLastPathComponent().deletingLastPathComponent()
+            )
+
+            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        }
+
         let container = try await ContainerWrapper(
             fileManager: fileManager
-        ).open(containerFile: file, isSivaConfirmed: isSivaConfirmed)
+        ).open(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
 
         return SignedContainer(
-            containerFile: file,
+            containerFile: renamedContainerFile,
             isExistingContainer: true,
             container: container,
             fileManager: Container.shared.fileManager(),
@@ -375,9 +393,14 @@ extension SignedContainer {
             fileManager: fileManager
         )
 
+        let signedContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder],
+            fileManager: fileManager
+        )
+
         let renamedContainerFile = Container.shared.containerUtil().getContainerFile(
             for: containerFile,
-            in: containerFile.deletingLastPathComponent().deletingLastPathComponent()
+            in: signedContainersDirectory
         )
 
         try await containerWrapper

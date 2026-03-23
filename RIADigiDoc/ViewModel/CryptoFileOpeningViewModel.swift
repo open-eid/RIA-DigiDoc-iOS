@@ -89,9 +89,7 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
                 throw FileOpeningError.noDataFiles
             }
 
-            let uniqueContainerUrl = try getUniqueContainerUrl(file: firstFile)
-
-            files[0] = uniqueContainerUrl
+            files[0] = firstFile
 
             let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
             sharedContainerViewModel.setCryptoContainer(container)
@@ -119,33 +117,22 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
         isNavigatingToNextView = false
     }
 
-    private func getUniqueContainerUrl(file: URL) throws -> URL {
+    private func getFirstFileLocation(file: URL) async throws -> URL {
         let cryptoContainersDirectory = try Directories.getCacheDirectory(
             subfolders: [Constants.Folder.ContainerFolder],
             fileManager: fileManager
         )
 
-        let isFileInTempSignedContainerDirectory = file.absoluteString.hasPrefix(
-            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
-        )
+        let movedFileLocation = cryptoContainersDirectory.appending(path: file.lastPathComponent)
 
-        let isFileInRecentDocuments = file.absoluteString.hasPrefix(
-            cryptoContainersDirectory.absoluteString
-        ) && !isFileInTempSignedContainerDirectory
-
-        var renamedContainerFile = file
-
-        if !isFileInRecentDocuments {
-            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                for: file,
-                in: isFileInRecentDocuments ? file.deletingLastPathComponent() :
-                    file.deletingLastPathComponent().deletingLastPathComponent()
-            )
-
-            try fileManager.moveItem(at: file, to: renamedContainerFile)
+        if await file.isContainer() &&
+            fileManager.fileExists(atPath: movedFileLocation.path(percentEncoded: false)) {
+            try fileManager.removeItem(at: file)
         }
 
-        return renamedContainerFile
+        try fileManager.moveItem(at: file, to: movedFileLocation)
+
+        return movedFileLocation
     }
 
     private func handleLoadingSuccess() {
