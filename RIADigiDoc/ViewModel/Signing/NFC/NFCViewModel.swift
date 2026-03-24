@@ -399,7 +399,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             if let idCardInternalError = error as? IdCardInternalError {
                 let idCardError = idCardInternalError.getIdCardError()
                 NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
-                handleIdCardError(idCardError, pinType: .pin2)
+                handleIdCardError(idCardError, pinType: .pin1)
                 return nil
             }
 

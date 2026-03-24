@@ -249,6 +249,41 @@ struct NFCView: View {
                 }
             },
             content: {
+                if webEidViewModel.authRequest != nil {
+                    if !isWebEidAuthenticating {
+                        let origin: String = {
+                            if let authRequest = webEidViewModel.authRequest {
+                                return authRequest.origin
+                            } else {
+                                return ""
+                            }
+                        }()
+                        WebEidAuthInfo(origin: origin)
+                    }
+                }
+                if webEidViewModel.certRequest != nil || webEidViewModel.signRequest != nil {
+                    if !isWebEidAuthenticating {
+                        let origin: String = {
+                            if let certRequest = webEidViewModel.certRequest {
+                                return certRequest.origin
+                            } else if let signRequest = webEidViewModel.signRequest {
+                                return signRequest.origin
+                            } else {
+                                return ""
+                            }
+                        }()
+                        
+                        let signingPersonInfo: String? = webEidViewModel.signRequest?.personalData.map {
+                            "\($0.givenNames) \($0.surname), \($0.personalCode)"
+                        }
+                        
+                        WebEidSignOrCertificateInfo(
+                            origin: origin,
+                            isCertificateFlow: webEidViewModel.certRequest != nil,
+                            signingPersonInfo: signingPersonInfo,
+                        )
+                    }
+                }
                 if isInProgress {
                     NFCActionView(
                         leftIcon: "ic_m3_phonelink_ring_48pt_wght400",
