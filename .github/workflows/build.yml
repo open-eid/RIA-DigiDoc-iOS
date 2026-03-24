@@ -48,7 +48,10 @@ jobs:
     - name: Install Swift-sh
       run: brew install swift-sh
     - name: Install Mockolo
-      run: brew install mockolo
+      run: |
+        curl -L https://github.com/uber/mockolo/releases/download/2.5.0/mockolo.artifactbundle.zip -o mockolo.zip
+        unzip mockolo.zip
+        sudo cp mockolo.artifactbundle/mockolo/macos/mockolo /usr/local/bin/mockolo
     - name: Setup config and TSL files
       run: |
         export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
