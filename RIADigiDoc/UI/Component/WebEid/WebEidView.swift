@@ -63,16 +63,6 @@ struct WebEidView: View {
     var body: some View {
         ZStack {
             if viewModel.authRequest != nil {
-                if !isWebEidAuthenticating {
-                    let origin: String = {
-                        if let authRequest = viewModel.authRequest {
-                            return authRequest.origin
-                        } else {
-                            return ""
-                        }
-                    }()
-                    WebEidAuthInfo(origin: origin)
-                }
                 NFCView(
                     actionType: .auth,
                     actionMethods: [
@@ -90,27 +80,6 @@ struct WebEidView: View {
                 )
             }
             if viewModel.certRequest != nil || viewModel.signRequest != nil {
-                if !isWebEidAuthenticating {
-                    let origin: String = {
-                        if let certRequest = viewModel.certRequest {
-                            return certRequest.origin
-                        } else if let signRequest = viewModel.signRequest {
-                            return signRequest.origin
-                        } else {
-                            return ""
-                        }
-                    }()
-
-                    let signingPersonInfo: String? = viewModel.signRequest?.personalData.map {
-                        "\($0.givenNames) \($0.surname), \($0.personalCode)"
-                    }
-
-                    WebEidSignOrCertificateInfo(
-                        origin: origin,
-                        isCertificateFlow: viewModel.certRequest != nil,
-                        signingPersonInfo: signingPersonInfo,
-                    )
-                }
                 if viewModel.certRequest != nil {
                     NFCView(
                         actionType: .certificate,
