@@ -368,7 +368,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         challenge: String,
         strings: NFCSessionStrings
     ) async -> WebEidAuthReturnData? {
-        NFCViewModel.logger().info("NFC: Starting NFC Web eID signing")
+        NFCViewModel.logger().info("NFC: Starting NFC Web eID auth")
         let pin1Data = pin1.data(using: .utf8)
         guard let pin1Data else {
             NFCViewModel.logger().error("NFC: Failed to convert PIN1 to Data")
@@ -382,7 +382,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
 
         do {
-            NFCViewModel.logger().info("NFC: Starting Web eID signing operation")
+            NFCViewModel.logger().info("NFC: Starting Web eID auth operation")
             let result = try await operationWebEidAuth.startOperation(
                 canNumber: canNumber,
                 pin1Number: SecureData(pin1Data),
@@ -391,21 +391,21 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 userAgent: userAgent,
                 strings: strings
             )
-            NFCViewModel.logger().info("NFC: Web eID signature added successfully")
+            NFCViewModel.logger().info("NFC: Web eID authenticated successfully")
             return result
         } catch {
-            NFCViewModel.logger().error("NFC: Web eID signing operation failed")
+            NFCViewModel.logger().error("NFC: Web eID auth operation failed")
 
             if let idCardInternalError = error as? IdCardInternalError {
                 let idCardError = idCardInternalError.getIdCardError()
                 NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
-                handleIdCardError(idCardError, pinType: .pin2)
+                handleIdCardError(idCardError, pinType: .pin1)
                 return nil
             }
 
-            if let readCertSignError = error as? ReadCertAndSignError {
-                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
-                handleReadCertAndSignError(error: readCertSignError)
+            if let webEidAuthError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: WebEidAuthError: \(webEidAuthError.localizedDescription)")
+                handleReadCertAndSignError(error: webEidAuthError)
                 return nil
             }
 
@@ -426,18 +426,18 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         canNumber: String,
         strings: NFCSessionStrings
     ) async -> String? {
-        NFCViewModel.logger().info("NFC: Starting NFC Web eID signing")
+        NFCViewModel.logger().info("NFC: Starting NFC Web eID certificate")
 
         do {
-            NFCViewModel.logger().info("NFC: Starting Web eID signing operation")
+            NFCViewModel.logger().info("NFC: Starting Web eID certificate operation")
             let result = try await operationReadCert.startReading(
                 canNumber: canNumber,
                 strings: strings
             )
-            NFCViewModel.logger().info("NFC: Web eID signature added successfully")
+            NFCViewModel.logger().info("NFC: Web eID certificate operation success")
             return result
         } catch {
-            NFCViewModel.logger().error("NFC: Web eID signing operation failed")
+            NFCViewModel.logger().error("NFC: Web eID certificate operation failed")
 
             if let idCardInternalError = error as? IdCardInternalError {
                 let idCardError = idCardInternalError.getIdCardError()
@@ -446,9 +446,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 return nil
             }
 
-            if let readCertSignError = error as? ReadCertAndSignError {
-                NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
-                handleReadCertAndSignError(error: readCertSignError)
+            if let readCertError = error as? ReadCertAndSignError {
+                NFCViewModel.logger().error("NFC: ReadCertError: \(readCertError.localizedDescription)")
+                handleReadCertAndSignError(error: readCertError)
                 return nil
             }
 
