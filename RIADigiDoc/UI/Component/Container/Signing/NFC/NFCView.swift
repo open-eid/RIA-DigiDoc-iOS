@@ -313,17 +313,6 @@ struct NFCView: View {
                                     pinType: pinType,
                                     actionType: actionType
                                 )
-                            Task {
-                                let rememberedCan = await viewModel.retrieveEncryptedCAN() ?? ""
-
-                                if rememberMe &&
-                                    !rememberedCertInvalidated &&
-                                    !rememberedCan.isEmpty &&
-                                    canNumber != rememberedCan {
-                                    await viewModel.setSigningCertificate("")
-                                    rememberedCertInvalidated = true
-                                }
-                            }
                         },
                         showPinField: actionType != .myeid && actionType != .certificate,
                         isWebEidAuthenticating: isWebEidAuthenticating,
