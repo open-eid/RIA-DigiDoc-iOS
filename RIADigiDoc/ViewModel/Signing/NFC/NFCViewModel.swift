@@ -135,9 +135,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             await clearEncryptedCAN()
             await saveTempCAN(canNumber)
 
-            if actionType == .auth {
-                await setSigningCertificate("")
-            }
+            await setSigningCertificate("")
         }
     }
 
