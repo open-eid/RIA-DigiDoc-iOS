@@ -50,8 +50,15 @@ public actor WebEidAuthService: WebEidAuthServiceProtocol, Loggable {
         if let signingCert {
             let supportedSignatureAlgorithms = try WebEidAlgorithmUtil
                 .buildSupportedSignatureAlgorithms(publicKey: publicKey)
-            token["unverifiedSigningCertificate"] = signingCert.base64EncodedString()
-            token["supportedSignatureAlgorithms"] = supportedSignatureAlgorithms
+            
+            let signingCertificates: [[String: Any]] = [
+                [
+                    "certificate": signingCert.base64EncodedString(),
+                    "supportedSignatureAlgorithms": supportedSignatureAlgorithms
+                ]
+            ]
+            
+            token["unverifiedSigningCertificates"] = signingCertificates
             token["format"] = "web-eid:1.1"
         } else {
             token["format"] = "web-eid:1.0"
