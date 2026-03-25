@@ -120,7 +120,7 @@ final class WebEidViewModelTests {
     // MARK: - handleUnknown
 
     @Test
-    func handleUnknown_setsInvalidRequestError() {
+    func handleUnknown_setsInvalidRequestError() throws {
         let url = try #require(URL(string: "web-eid://unknown"))
 
         viewModel.handleUnknown(url: url)
@@ -132,7 +132,7 @@ final class WebEidViewModelTests {
     // MARK: - handleCertificate
 
     @Test
-    func handleCertificate_setsErrorOnInvalidURL() {
+    func handleCertificate_setsErrorOnInvalidURL() throws {
         let url = try #require(URL(string: "https://example.com/not-a-valid-certificate-request"))
 
         viewModel.handleCertificate(url: url)
@@ -145,7 +145,7 @@ final class WebEidViewModelTests {
     // MARK: - handleAuth
 
     @Test
-    func handleAuth_setsErrorOrResponseOnInvalidURL() {
+    func handleAuth_setsErrorOrResponseOnInvalidURL() throws {
         let url = try #require(URL(string: "https://example.com/not-a-valid-auth-request"))
 
         viewModel.handleAuth(url: url)
@@ -160,7 +160,7 @@ final class WebEidViewModelTests {
     // MARK: - handleSign
 
     @Test
-    func handleSign_setsErrorOrResponseOnInvalidURL() {
+    func handleSign_setsErrorOrResponseOnInvalidURL() throws {
         let url = try #require(URL(string: "https://example.com/not-a-valid-sign-request"))
 
         viewModel.handleSign(url: url)
