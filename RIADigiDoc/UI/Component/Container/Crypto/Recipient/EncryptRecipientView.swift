@@ -37,6 +37,8 @@ struct EncryptRecipientView: View {
 
     @State private var encryptionButtonEnabled = true
 
+    @State private var showNoRecipientsFoundMessage = false
+
     @State private var selectedRecipient: Addressee?
     @State private var showRemoveRecipientModal = false
 
@@ -64,6 +66,57 @@ struct EncryptRecipientView: View {
 
     var encryptLabel: String {
         languageSettings.localized("Encrypt")
+    }
+    
+    var noSearchResultsMessage: String {
+        languageSettings.localized("Person or company does not own a valid certificate")
+    }
+    
+    private var addedRecipientsSection: some View {
+        VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+            if noSearchResults {
+                Text(verbatim: languageSettings.localized("Added recipients"))
+            } else {
+                Text(verbatim: languageSettings.localized("Recently added"))
+            }
+
+            Spacer().frame(height: Dimensions.Padding.MSPadding)
+
+            if #available(iOS 26.0, *) {
+                ForEach(addedRecipients.enumerated(), id: \.offset) { index, item in
+                    addedRecipientRow(index: index, item: item)
+                }
+            } else {
+                ForEach(Array(addedRecipients.enumerated()), id: \.offset) { index, item in
+                    addedRecipientRow(index: index, item: item)
+                }
+            }
+        }
+        .padding(.horizontal, Dimensions.Padding.SPadding)
+        .listStyle(.plain)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .listRowSpacing(0)
+        .listSectionSpacing(.compact)
+    }
+    
+    private var filteredRecipientsSection: some View {
+        VStack {
+            if #available(iOS 26.0, *) {
+                ForEach(filteredRecipients.enumerated(), id: \.offset) { index, item in
+                    recipientRow(index: index, item: item)
+                }
+            } else {
+                ForEach(Array(filteredRecipients.enumerated()), id: \.offset) { index, item in
+                    recipientRow(index: index, item: item)
+                }
+            }
+        }
+        .listStyle(.plain)
+        .scrollDisabled(true)
+        .scrollContentBackground(.hidden)
+        .listRowSpacing(0)
+        .listSectionSpacing(.compact)
     }
 
     var body: some View {
@@ -114,6 +167,11 @@ struct EncryptRecipientView: View {
 
                                 Task {
                                     await viewModel.loadRecipients()
+
+                                    if noRecipients {
+                                        showNoRecipientsFoundMessage = true
+                                    }
+
                                     isSearchFocused = true
                                 }
                             }
@@ -160,64 +218,16 @@ struct EncryptRecipientView: View {
                                 .listStyle(.plain)
                                 .scrollDisabled(true)
                                 .scrollContentBackground(.hidden)
-                            } else if noRecipients {
-                                ContentUnavailableView {
-                                    Text(verbatim: languageSettings.localized("No recipients found"))
-                                        .font(typography.bodyLarge)
-                                        .foregroundStyle(theme.onSurfaceVariant)
-                                }
-                                .listRowSeparator(.hidden)
+                            } else if showNoRecipientsFoundMessage {
+                                emptyStateView(languageSettings.localized("Person or company does not own a valid certificate"))
                             } else {
-                                VStack {
-                                    if #available(iOS 26.0, *) {
-                                        ForEach(filteredRecipients.enumerated(), id: \.offset
-                                        ) { index, item in
-                                            recipientRow(index: index, item: item)
-                                        }
-                                    } else {
-                                        ForEach(Array(filteredRecipients.enumerated()), id: \.offset
-                                        ) { index, item in
-                                            recipientRow(index: index, item: item)
-                                        }
-                                    }
-                                }
-                                .listStyle(.plain)
-                                .scrollDisabled(true)
-                                .scrollContentBackground(.hidden)
-                                .listRowSpacing(0)
-                                .listSectionSpacing(.compact)
+                                filteredRecipientsSection
                             }
 
                             Spacer().frame(height: Dimensions.Padding.MSPadding)
 
                             if addedRecipients.count > 0 {
-                                VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                                    if noSearchResults {
-                                        Text(verbatim: languageSettings.localized("Added recipients"))
-                                    } else {
-                                        Text(verbatim: languageSettings.localized("Recently added"))
-                                    }
-
-                                    Spacer().frame(height: Dimensions.Padding.MSPadding)
-
-                                    if #available(iOS 26.0, *) {
-                                        ForEach(addedRecipients.enumerated(), id: \.offset
-                                        ) { index, item in
-                                            addedRecipientRow(index: index, item: item)
-                                        }
-                                    } else {
-                                        ForEach(Array(addedRecipients.enumerated()), id: \.offset
-                                        ) { index, item in
-                                            addedRecipientRow(index: index, item: item)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, Dimensions.Padding.SPadding)
-                                .listStyle(.plain)
-                                .scrollDisabled(true)
-                                .scrollContentBackground(.hidden)
-                                .listRowSpacing(0)
-                                .listSectionSpacing(.compact)
+                                addedRecipientsSection
                             }
                         }
                     }
@@ -297,6 +307,9 @@ struct EncryptRecipientView: View {
                         addedRecipients = await viewModel.filteredAddedRecipients()
                     }
                 }
+                .onChange(of: viewModel.searchText) { _, _ in
+                    showNoRecipientsFoundMessage = false
+                }
                 .onChange(of: viewModel.errorMessage) { _, error in
                     guard !error.isEmpty else { return }
                     Toast.show(languageSettings.localized(error))
@@ -306,7 +319,6 @@ struct EncryptRecipientView: View {
         )
     }
 
-    @ViewBuilder
     private func recipientRow(index: Int, item: Addressee) -> some View {
         RecipientsView(
             recipient: item,
@@ -329,7 +341,6 @@ struct EncryptRecipientView: View {
         .background(theme.surface)
     }
 
-    @ViewBuilder
     private func addedRecipientRow(index: Int, item: Addressee) -> some View {
         RecipientsView(
             recipient: item,
@@ -353,6 +364,15 @@ struct EncryptRecipientView: View {
         .contentShape(Rectangle())
         .buttonStyle(.plain)
         .background(theme.surface)
+    }
+    
+    private func emptyStateView(_ text: String) -> some View {
+        ContentUnavailableView {
+            Text(verbatim: text)
+                .font(typography.bodyLarge)
+                .foregroundStyle(theme.onSurfaceVariant)
+        }
+        .listRowSeparator(.hidden)
     }
 }
 

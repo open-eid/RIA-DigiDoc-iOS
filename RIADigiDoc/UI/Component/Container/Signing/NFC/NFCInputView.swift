@@ -96,7 +96,7 @@ struct NFCInputView: View {
                     Text(verbatim: canNumberLocationLabel)
                         .font(typography.labelMedium)
                         .foregroundStyle(theme.onSecondaryContainer)
-                        .padding(.vertical, Dimensions.Padding.XXSPadding)
+                        .padding(.bottom, Dimensions.Padding.MPadding)
                 }
             }
             .padding(.vertical, Dimensions.Padding.ZeroPadding)

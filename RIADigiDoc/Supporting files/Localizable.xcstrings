@@ -5215,24 +5215,6 @@
         }
       }
     },
-    "No recipients found" : {
-      "comment" : "Text for when no recipients are found",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No recipients found"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adressaati ei leitud"
-          }
-        }
-      }
-    },
     "Not a mobile-id client" : {
       "comment" : "Mobile-ID error when user is not found or not active",
       "extractionState" : "manual",
@@ -5408,6 +5390,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ava fail"
+          }
+        }
+      }
+    },
+    "Person or company does not own a valid certificate" : {
+      "comment" : "LDAP search message when no results found",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Person or company does not own a valid certificate. It is necessary to have a valid certificate for encryption"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isikul või asutusel puudub kehtiv sertifikaat. Krüpteerimiseks on vaja kehtivat sertifikaati"
           }
         }
       }
