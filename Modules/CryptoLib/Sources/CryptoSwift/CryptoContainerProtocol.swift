@@ -28,7 +28,7 @@ public protocol CryptoContainerProtocol: GeneralContainer, Sendable {
     func getContainerName() async -> String
     func getContainerMimetype() async -> String
     func getRawContainerFile() async -> URL?
-    func addDataFiles(_ filesToAdd: [URL]) async
+    func addDataFiles(_ filesToAdd: [URL]) async throws
     func addRecipients(_ recipientsToAdd: [Addressee]) async
 
     func getDataFiles() async -> [URL]

@@ -68,12 +68,11 @@ struct EncryptRecipientView: View {
 
     var body: some View {
         TopBarContainer(
-            isTopBarHidden: isSearchExpanded,
             title: nil,
             onLeftClick: {
                 pathManager.replaceLast(to: .encryptView(isWithEncryption: false))
             },
-            showRightIcons: true,
+            showRightIcons: !isSearchExpanded,
             content: {
                 ZStack {
                     VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {

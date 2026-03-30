@@ -32,7 +32,7 @@
 
 - (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
     std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(label);
-    id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : nil;
+    id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : [NSString stringWithStdString:label];
     id type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
     id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
     CertType certType = CertTypeUnknownType;

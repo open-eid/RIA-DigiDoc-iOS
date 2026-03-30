@@ -66,6 +66,10 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     private(set) var isEditButtonShown = false
     private(set) var shouldShowDatafiles = false
 
+    var isContainerUnencrypted: Bool {
+        !isContainerEncrypted && !isContainerDecrypted
+    }
+
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
         fileOpeningService: FileOpeningServiceProtocol,
@@ -159,13 +163,75 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             return
         }
 
-        await cryptoContainer?.addDataFiles(files)
-        EncryptViewModel.logger().info("Added data files to container")
-        successMessage = ToastMessage(
-            key: files.count == 1 ? "File successfully added" : "Files successfully added",
-            args: []
-        )
+        do {
+            try await cryptoContainer?.addDataFiles(files)
+
+            EncryptViewModel.logger().info("Added data files to crypto container")
+            successMessage = ToastMessage(
+                key: files.count == 1 ? "File successfully added" : "Files successfully added",
+                args: []
+            )
+        } catch {
+            EncryptViewModel.logger().error(
+                "Unable to add data files to container: \(String(reflecting: error))"
+            )
+
+            guard let containerUrl = containerURL else {
+                errorMessage = ToastMessage(key: "General error")
+                return
+            }
+
+            await handleAddFilesError(error)
+        }
+
         await loadContainerData(cryptoContainer: cryptoContainer)
+    }
+
+    private func handleAddFilesError(_ error: Error) async {
+        SigningViewModel.logger().error("Unable to add data files to container: \(error.localizedDescription)")
+
+        var totalFileCount = 0
+        var failedFileCount = 0
+        var duplicateFileCount = 0
+
+        guard let cryptoError = error as? CryptoError else {
+            errorMessage = ToastMessage(key: "General error", args: [])
+            return
+        }
+
+        switch cryptoError {
+        case .addingFilesToContainerFailed(let errorDetail):
+            totalFileCount = Int(errorDetail.userInfo["totalFileCount"] ?? "0") ?? 0
+            failedFileCount = Int(errorDetail.userInfo["failedFileCount"] ?? "0") ?? 0
+            duplicateFileCount = Int(errorDetail.userInfo["duplicateFileCount"] ?? "0") ?? 0
+
+            if duplicateFileCount > 1 {
+                errorMessage = ToastMessage(key: "Multiple documents already exist", args: [String(duplicateFileCount)])
+            } else if duplicateFileCount == 1 {
+                if let fileName = errorDetail.userInfo["fileName"] {
+                    errorMessage = ToastMessage(key: "Document already exists", args: [fileName])
+                } else {
+                    errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
+                }
+            } else {
+                errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
+            }
+
+        default:
+            errorMessage = ToastMessage(key: "General error", args: [])
+        }
+
+        // Update container when at least one file has been added to container
+        guard totalFileCount > failedFileCount, totalFileCount > duplicateFileCount else { return }
+
+        let successfulFilesCount = totalFileCount - failedFileCount - duplicateFileCount
+
+        successMessage = successfulFilesCount == 1 ?
+        ToastMessage(key: "Single document added") :
+        ToastMessage(
+            key: "Multiple documents added",
+            args: [String(successfulFilesCount)]
+        )
     }
 
     private func validateFiles(_ files: [URL]) throws {
@@ -388,7 +454,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         case .success(let fileURL):
             return await sivaRepository.isSivaConfirmationNeeded(files: [fileURL])
         case .failure:
-            errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+            errorMessage = ToastMessage(key: "Failed to open file", args: [dataFile.lastPathComponent])
             return false
         }
     }
@@ -694,6 +760,23 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             containerUtil: Container.shared.containerUtil()
         )
 
-        sharedContainerViewModel.setSignedContainer(signedContainer)
+        sharedContainerViewModel.setSignedContainer(
+            try await getEffectiveContainer(
+                parentContainer: signedContainer
+            )
+        )
+    }
+
+    private func getEffectiveContainer(parentContainer: SignedContainerProtocol) async throws -> SignedContainerProtocol {
+        let isTimestamped = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
+        let isCades = await parentContainer.isCades()
+        let isXades = await parentContainer.isXades()
+
+        guard isTimestamped && !isCades && !isXades else {
+            return parentContainer
+        }
+
+        return try await sivaRepository
+            .getTimestampedContainer(parentContainer: parentContainer)
     }
 }

@@ -38,9 +38,8 @@ final class XMLParserHandler: NSObject, XMLParserDelegate {
     ) {
         let formatAttribute = attributeDict["format"]
         let nameAttribute = attributeDict["Name"]
-        if elementName == "SignedDoc", (
-            formatAttribute == "DIGIDOC-XML" || formatAttribute == "SK-XML"
-        ) {
+        if elementName == "SignedDoc",
+           formatAttribute == "DIGIDOC-XML" || formatAttribute == "SK-XML" {
             foundElement = .ddoc
             parser.abortParsing()
         } else if elementName == "denc:EncryptionProperty" &&

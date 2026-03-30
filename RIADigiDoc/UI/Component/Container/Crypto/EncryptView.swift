@@ -202,7 +202,7 @@ struct EncryptView: View {
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
                                     isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
                                     isSignButtonShown: viewModel.isSignButtonShown,
-                                    isEncryptButtonShown: viewModel.isEncryptButtonShown,
+                                    isEncryptButtonShown: false,
                                     showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
                                         viewModel.isDecryptButtonShown,
@@ -324,7 +324,8 @@ struct EncryptView: View {
                                                     viewModel: viewModel,
                                                     showOpenFileButton: viewModel.isContainerUnlocked,
                                                     showSaveFileButton: viewModel.isContainerUnlocked,
-                                                    showRemoveFileButton: viewModel.isContainerWithoutRecipients,
+                                                    showRemoveFileButton: !viewModel.isContainerEncrypted &&
+                                                        !viewModel.isContainerDecrypted,
                                                     isNestedContainer: isNestedContainer,
                                                     selectedDataFile: $selectedDataFile,
                                                     showSivaMessage: $showSivaMessage,
@@ -353,6 +354,7 @@ struct EncryptView: View {
                             }
                         }
                         .padding(Dimensions.Padding.SPadding)
+
                         if viewModel.isShareButtonShown {
                             if let containerFile = viewModel.containerURL {
                                 ShareButtonBottomBar(
@@ -362,25 +364,25 @@ struct EncryptView: View {
                                     containerUrl: containerFile
                                 )
                             }
-                        } else if !viewModel.isContainerEncrypted && !viewModel.isContainerDecrypted {
-                            let rightButtonLabel = viewModel.isContainerWithoutRecipients ? nextLabel : encryptLabel
-                            let rightButtonIconName = viewModel.isContainerWithoutRecipients
-                                ? "ic_m3_arrow_forward_48pt_wght400"
-                                : "ic_m3_encrypted_48pt_wght400"
+                        } else if viewModel.isContainerUnencrypted {
+                            let rightButtonLabel = viewModel.isContainerUnencrypted ? nextLabel : encryptLabel
+                            let rightButtonIconName = viewModel.isContainerUnencrypted
+                            ? "ic_m3_arrow_forward_48pt_wght400"
+                            : "ic_m3_encrypted_48pt_wght400"
                             UnsignedBottomBarView(
-                                showLeftButton: viewModel.isContainerWithoutRecipients,
+                                showLeftButton: viewModel.isContainerUnencrypted,
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
                                 leftButtonAction: {
                                     isImportingAddedFiles = true
                                 },
-                                rightButtonEnabled: viewModel.isContainerWithoutRecipients || encryptionButtonEnabled,
+                                rightButtonEnabled: viewModel.isContainerUnencrypted || encryptionButtonEnabled,
                                 rightButtonIconName: rightButtonIconName,
                                 rightButtonLabel: rightButtonLabel,
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
-                                    if viewModel.isContainerWithoutRecipients {
+                                    if viewModel.isContainerUnencrypted {
                                         pathManager.replaceLast(to: .encryptRecipientView)
                                     } else {
                                         if encryptionButtonEnabled {

@@ -82,6 +82,7 @@ struct CryptoDataFilesSection: View {
                 showRemoveDataFileModal = true
             }
         )
+        .alert(sivaMessage, isPresented: $showSivaMessage, actions: alertActions)
         .background(fileSaverBackground)
         .quickLookPreview($viewModel.previewFile)
     }
