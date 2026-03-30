@@ -251,6 +251,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                         to: Data(new),
                         verifyCode: Data(current)
                     )
+                    sharedMyEidSession.setIsPinLocked(codeType, isLocked: false)
                 case .unblock:
                     try await idCardRepository
                         .unblockCode(codeType, puk: Data(current), newCode: Data(new))
@@ -267,6 +268,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                         newPin: SecureData(new),
                         strings: nfcStringsUtil.makeForChangePin(pinName: codeType.name)
                     )
+                    sharedMyEidSession.setIsPinLocked(codeType, isLocked: false)
                 case .unblock:
                     try await operationUnblockPin.startReading(
                         canNumber: canNumber,
