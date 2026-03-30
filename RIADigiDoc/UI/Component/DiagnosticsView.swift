@@ -144,11 +144,13 @@ struct DiagnosticsView: View {
                         languageSettings.localized("Main diagnostics restart message deactivate"),
                         isPresented: $viewModel.showRestartDeactivateAlert
                     ) {alertContent}
-                    .task {
-                        await viewModel
-                            .getConfigurationData(
-                                configuration: viewModel.configuration
-                            )
+                    .onAppear {
+                        Task {
+                            await viewModel
+                                .getConfigurationData(
+                                    configuration: viewModel.configuration
+                                )
+                        }
                     }
                     .onChange(of: viewModel.configuration, { _, newConfig in
                         if let newConfig {

@@ -114,6 +114,14 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     func getRpUuid() async -> String {
         await dataStore.getRelyingPartyUUID()
     }
+    
+    func getTsaUrl() async -> String {
+        await dataStore.getTSAUrl()
+    }
+    
+    func getSivaUrl() async -> String {
+        await dataStore.getValidationServiceURL()
+    }
 
     private func getVersionContent() {
         self.versionSectionContent =
@@ -134,12 +142,14 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         guard let config = configuration else { return }
 
         let rpUuid = await getRpUuid()
+        let tsaUrl = await getTsaUrl()
+        let sivaUrl = await getSivaUrl()
 
         self.urlSectionContent = [
             ("CONFIG_URL", config.metaInf.url),
             ("TSL_URL", config.tslUrl.absoluteString),
-            ("SIVA_URL", config.sivaUrl.absoluteString),
-            ("TSA_URL", config.tsaUrl.absoluteString),
+            ("SIVA_URL", !sivaUrl.isEmpty ? sivaUrl : config.sivaUrl.absoluteString),
+            ("TSA_URL", !tsaUrl.isEmpty ? tsaUrl : config.tsaUrl.absoluteString),
             ("LDAP_PERSON_URL", config.ldapPersonUrl.absoluteString),
             ("LDAP_CORP_URL", config.ldapCorpUrl.absoluteString),
             ("MID_PROXY_URL", config.midRestUrl.absoluteString),
@@ -148,7 +158,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
             ("SIDV2_SK_URL", config.sidV2SkRestUrl.absoluteString),
             ("RPUUID", rpUuid == Constants.Signing.RelyingPartyUUID
              ? "Main diagnostics rpuuid default"
-             : rpUuid
+             : "Main diagnostics rpuuid custom"
             )
         ]
     }

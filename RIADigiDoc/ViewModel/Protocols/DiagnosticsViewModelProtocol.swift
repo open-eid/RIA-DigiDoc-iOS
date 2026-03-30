@@ -51,5 +51,7 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
 
     func removeObservers() async
     func getRpUuid() async -> String
+    func getTsaUrl() async -> String
+    func getSivaUrl() async -> String
     func observeConfigurationUpdates() async
 }
