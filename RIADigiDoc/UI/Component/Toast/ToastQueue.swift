@@ -24,8 +24,11 @@ actor ToastQueue {
 
     private var queue: [ToastItem] = []
     private var isPresenting = false
+    private var currentMessage: String? = nil
 
     func enqueue(message: String, duration: TimeInterval, type: ToastType) {
+        // Avoid consecutive duplicate messages
+        if message == currentMessage || message == queue.last?.message { return }
         queue.append(ToastItem(message: message, duration: duration, type: type))
         processQueueIfNeeded()
     }
@@ -34,6 +37,7 @@ actor ToastQueue {
         guard !isPresenting, let next = queue.first else { return }
 
         isPresenting = true
+        currentMessage = next.message
         queue.removeFirst()
 
         Task {
@@ -44,6 +48,7 @@ actor ToastQueue {
 
     private func toastDidFinish() {
         isPresenting = false
+        currentMessage = nil
         processQueueIfNeeded()
     }
 }

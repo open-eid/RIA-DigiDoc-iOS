@@ -32,7 +32,7 @@ extension DecryptError: LocalizedError {
         case .containerFileInvalid:
             return "Container file is invalid"
         case .recipientsEmpty:
-            return "No recipients found in container"
+            return "Person or company does not own a valid certificate"
         case .cancelled:
             return "Operation cancelled by user"
         case .unknown(let error):

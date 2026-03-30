@@ -95,7 +95,7 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
                 OperationDecrypt.logger().error("NFC: \(error.localizedDescription)")
                 operationError = error
                 session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "No recipients found")
+                                   "Person or company does not own a valid certificate")
                 return
             }
 
