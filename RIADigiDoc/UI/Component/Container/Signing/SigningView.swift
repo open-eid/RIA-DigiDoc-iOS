@@ -18,7 +18,6 @@
  */
 
 import SwiftUI
-import QuickLook
 import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
@@ -317,7 +316,7 @@ struct SigningView: View {
                                                 isFileSaved: $isFileSaved
                                             )
                                         )
-                                        .quickLookPreview($viewModel.previewFile)
+                                        .filePreview(item: $viewModel.previewFile)
                                     }
                                     .padding(.vertical, Dimensions.Padding.MPadding)
                                 }

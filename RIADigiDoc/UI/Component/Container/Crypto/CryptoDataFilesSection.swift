@@ -84,7 +84,7 @@ struct CryptoDataFilesSection: View {
         )
         .alert(sivaMessage, isPresented: $showSivaMessage, actions: alertActions)
         .background(fileSaverBackground)
-        .quickLookPreview($viewModel.previewFile)
+        .filePreview(item: $viewModel.previewFile)
     }
 
     private func openFile(_ dataFile: URL) {

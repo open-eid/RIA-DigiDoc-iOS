@@ -398,3 +398,12 @@ extension URL {
         }
     }
 }
+
+extension URL {
+    public var isPlainText: Bool {
+        guard let type = UTType(
+            filenameExtension: pathExtension.lowercased()
+        ) else { return false }
+        return type.conforms(to: .text)
+    }
+}

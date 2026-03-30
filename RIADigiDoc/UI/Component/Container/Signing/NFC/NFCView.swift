@@ -23,7 +23,9 @@ import CryptoSwift
 import IdCardLib
 import LibdigidocLibSwift
 import CommonsLib
+
 struct NFCView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(LanguageSettings.self) private var languageSettings
@@ -94,6 +96,10 @@ struct NFCView: View {
         NFCSessionStringsUtil { key, args in
             languageSettings.localized(key, args)
         }
+    }
+    
+    private var signatureAddedMessage: String {
+        languageSettings.localized("Signature added")
     }
 
     let signedContainer: SignedContainerProtocol?
@@ -358,6 +364,8 @@ struct NFCView: View {
             guard let container = updatedContainer else {
                 return
             }
+            
+            Toast.show(signatureAddedMessage, type: .success)
 
             onSuccess(container)
             dismiss()

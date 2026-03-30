@@ -219,6 +219,7 @@ struct TopBar: View {
                     .foregroundStyle(theme.onSurface)
                     .font(typography.titleLarge)
                     .padding(.leading, Dimensions.Padding.XSPadding)
+                    .minimumScaleFactor(0.5)
                     .accessibilityLabel(titleAccessibility ?? title)
                     .accessibilityAddTraits(.isHeader)
             }

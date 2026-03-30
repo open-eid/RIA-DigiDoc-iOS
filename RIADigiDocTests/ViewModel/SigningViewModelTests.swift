@@ -367,7 +367,7 @@ struct SigningViewModelTests: Loggable {
 
         await viewModel.handleFileOpening(dataFile: testDataFile, isSivaConfirmed: true)
 
-        #expect(viewModel.previewFile?.lastPathComponent == "test.txt")
+        #expect(viewModel.previewFile?.url.lastPathComponent == "test.txt")
         #expect(viewModel.errorMessage == nil)
     }
 

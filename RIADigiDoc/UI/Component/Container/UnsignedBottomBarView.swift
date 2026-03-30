@@ -52,6 +52,7 @@ struct UnsignedBottomBarView: View {
                         Text(languageSettings.localized(leftButtonLabel))
                             .foregroundStyle(theme.primary)
                             .font(typography.titleMedium)
+                            .minimumScaleFactor(0.5)
                             .accessibilityLabel(leftButtonAccessibilityLabel)
                     })
                     .foregroundStyle(theme.surfaceContainer)
@@ -72,6 +73,7 @@ struct UnsignedBottomBarView: View {
                     Text(languageSettings.localized(rightButtonLabel))
                         .foregroundStyle(theme.primary)
                         .font(typography.titleMedium)
+                        .minimumScaleFactor(0.5)
                         .accessibilityLabel(rightButtonAccessibilityLabel)
                 }
                 .padding(.horizontal, Dimensions.Padding.MPadding)

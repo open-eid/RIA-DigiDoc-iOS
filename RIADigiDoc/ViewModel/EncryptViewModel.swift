@@ -34,7 +34,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     var containerName: String = CommonsLib.Constants.Container.DefaultName
     var containerMimetype: String = "N/A"
     var containerURL: URL?
-    var previewFile: URL?
+    var previewFile: FileItem?
     var selectedDataFile: URL?
     var isShowingContainerFileSaver = false
     var isShowingFileSaver = false
@@ -426,7 +426,11 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                     return
                 }
             } else {
-                previewFile = fileURL
+                previewFile = FileItem(
+                    name: fileURL.lastPathComponent,
+                    url: fileURL,
+                    lastOpened: Date.now
+                )
             }
         case .failure:
             errorMessage = ToastMessage(key: "Failed to open file", args: [dataFile.lastPathComponent])

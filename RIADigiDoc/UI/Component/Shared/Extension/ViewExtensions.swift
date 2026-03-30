@@ -56,3 +56,27 @@ extension View {
             }
     }
 }
+
+extension View {
+    func filePreview(item: Binding<FileItem?>) -> some View {
+        self.sheet(item: item) { file in
+            FilePreviewSheet(url: file.url, isPresented: Binding(
+                get: { item.wrappedValue != nil },
+                set: { if !$0 { item.wrappedValue = nil } }
+            ))
+        }
+    }
+}
+
+private struct FilePreviewSheet: View {
+    let url: URL
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        if url.isPlainText {
+            TextFilePreview(url: url, isPresented: $isPresented)
+        } else {
+            PreviewController(url: url, isPresented: $isPresented)
+        }
+    }
+}

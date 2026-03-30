@@ -29,6 +29,8 @@ struct FloatingLabelTextField: View {
 
     @AccessibilityFocusState private var isAccessibilityFocused: Bool
 
+    @State private var selection: TextSelection? = nil
+
     @State private var floatingLabelHeight: CGFloat = 0
 
     // MARK: - Parameters
@@ -257,8 +259,6 @@ struct FloatingLabelTextField: View {
     private var containerContent: some View {
         HStack(spacing: Dimensions.Padding.XSPadding) {
             inputField
-                .accessibilityLabel(Text(verbatim: textFieldAccessibility))
-                .accessibilityValue(Text(verbatim: ""))
             Spacer()
             trailingIcon
         }
@@ -290,48 +290,26 @@ struct FloatingLabelTextField: View {
                     prompt: Text(verbatim: placeholder)
                         .foregroundStyle(theme.onSurfaceVariant)
                 )
-                .multilineTextAlignment(.leading)
-                .disabled(isDisabled)
-                .keyboardType(keyboardType)
-                .submitLabel(submitLabel)
-                .textContentType(.none)
-                .autocorrectionDisabled(true)
-                .textInputAutocapitalization(.never)
-                .privacySensitive()
-                .speechSpellsOutCharacters(spellOutCharacters && isPasswordVisible)
-                .accessibilityFocused($isAccessibilityFocused)
-                .onSubmit {
-                    isFocused = false
-                    isAccessibilityFocused = true
-                    onDone()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .keyboard) {
-                        if fieldIsFocused {
-                            HStack {
-                                if showDashButton {
-                                    Button(
-                                        action: { text.append("-") },
-                                        label: { Text(verbatim: "-") }
-                                    )
-                                }
-
-                                if keyboardType.needsDoneButton {
-                                    Button(
-                                        action: {
-                                            fieldIsFocused = false
-                                            isAccessibilityFocused = true
-                                            onDone()
-                                        },
-                                        label: { Text(verbatim: languageSettings.localized("Done")) }
-                                    )
-                                }
-                            }
-                        }
+                .textFieldModifiers(
+                    isDisabled: isDisabled,
+                    keyboardType: keyboardType,
+                    submitLabel: submitLabel,
+                    spellOut: spellOutCharacters && isPasswordVisible,
+                    isAccessibilityFocused: $isAccessibilityFocused,
+                    onAppear: {},
+                    onSubmit: {
+                        isFocused = false
+                        isAccessibilityFocused = true
+                        onDone()
                     }
-                }
-                .accessibilityValue(Text(verbatim: ""))
+                )
+                .privacySensitive()
+                .toolbar { keyboardToolbar }
+                .onChange(of: errorText, { _, newValue in
+                    AccessibilityUtil.announceMessage(newValue)
+                })
                 .accessibilitySortPriority(sortPriority)
+                .accessibilityLabel(Text(verbatim: title))
             } else {
                 TextField(
                     placeholder,
@@ -339,47 +317,24 @@ struct FloatingLabelTextField: View {
                     prompt: Text(verbatim: placeholder)
                         .foregroundStyle(theme.onSurfaceVariant)
                 )
-                .multilineTextAlignment(.leading)
-                .disabled(isDisabled)
-                .keyboardType(keyboardType)
-                .submitLabel(submitLabel)
-                .textContentType(.none)
-                .autocorrectionDisabled(true)
-                .textInputAutocapitalization(.never)
-                .speechSpellsOutCharacters(spellOutCharacters && !isSecure && isPasswordVisible)
-                .accessibilityFocused($isAccessibilityFocused)
-                .onSubmit {
-                    fieldIsFocused = false
-                    isAccessibilityFocused = true
-                    onDone()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .keyboard) {
-                        if fieldIsFocused {
-                            HStack {
-                                if showDashButton {
-                                    Button(
-                                        action: { text.append("-") },
-                                        label: { Text(verbatim: "-") }
-                                    )
-                                }
-
-                                if keyboardType.needsDoneButton {
-                                    Button(
-                                        action: {
-                                            fieldIsFocused = false
-                                            isAccessibilityFocused = true
-                                            onDone()
-                                        },
-                                        label: { Text(verbatim: languageSettings.localized("Done")) }
-                                    )
-                                }
-                            }
-                        }
+                .textFieldModifiers(
+                    isDisabled: isDisabled,
+                    keyboardType: keyboardType,
+                    submitLabel: submitLabel,
+                    spellOut: spellOutCharacters && !isSecure && isPasswordVisible,
+                    isAccessibilityFocused: $isAccessibilityFocused,
+                    onAppear: {
+                        selection = TextSelection(insertionPoint: text.endIndex)
+                    },
+                    onSubmit: {
+                        fieldIsFocused = false
+                        isAccessibilityFocused = true
+                        onDone()
                     }
-                }
-                .accessibilityValue(Text(verbatim: ""))
+                )
+                .toolbar { keyboardToolbar }
                 .accessibilitySortPriority(sortPriority)
+                .accessibilityLabel(Text(verbatim: title))
             }
         }
         .font(typography.bodyLarge)
@@ -396,7 +351,33 @@ struct FloatingLabelTextField: View {
             AccessibilityUtil.announceMessage(newValue)
         })
         .frame(height: Dimensions.Icon.IconSizeXXS)
-        .accessibilityValue(Text(verbatim: ""))
+    }
+
+    @ToolbarContentBuilder
+    private var keyboardToolbar: some ToolbarContent {
+        ToolbarItem(placement: .keyboard) {
+            if fieldIsFocused {
+                HStack {
+                    if showDashButton {
+                        Button(
+                            action: { text.append("-") },
+                            label: { Text(verbatim: "-") }
+                        )
+                    }
+
+                    if keyboardType.needsDoneButton {
+                        Button(
+                            action: {
+                                fieldIsFocused = false
+                                isAccessibilityFocused = true
+                                onDone()
+                            },
+                            label: { Text(verbatim: languageSettings.localized("Done")) }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Icons
@@ -506,6 +487,31 @@ struct FloatingLabelTextField: View {
         }
         .padding(.leading, Dimensions.Padding.SPadding)
         .allowsHitTesting(false)
+    }
+}
+
+private extension View {
+    func textFieldModifiers(
+        isDisabled: Bool,
+        keyboardType: UIKeyboardType,
+        submitLabel: SubmitLabel,
+        spellOut: Bool,
+        isAccessibilityFocused: AccessibilityFocusState<Bool>.Binding,
+        onAppear: @escaping () -> Void,
+        onSubmit: @escaping () -> Void
+    ) -> some View {
+        self
+            .multilineTextAlignment(.leading)
+            .disabled(isDisabled)
+            .keyboardType(keyboardType)
+            .submitLabel(submitLabel)
+            .textContentType(.none)
+            .autocorrectionDisabled(true)
+            .textInputAutocapitalization(.never)
+            .speechSpellsOutCharacters(spellOut)
+            .accessibilityFocused(isAccessibilityFocused)
+            .onAppear(perform: onAppear)
+            .onSubmit(onSubmit)
     }
 }
 

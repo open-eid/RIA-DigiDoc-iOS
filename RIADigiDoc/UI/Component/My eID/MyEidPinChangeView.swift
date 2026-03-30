@@ -259,6 +259,7 @@ struct MyEidPinChangeView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .accessibilitySortPriority(1)
                             }
+                            .accessibilityElement(children: .contain)
                         }
                     }
 
