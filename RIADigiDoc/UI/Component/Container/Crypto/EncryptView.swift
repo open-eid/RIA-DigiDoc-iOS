@@ -159,6 +159,14 @@ struct EncryptView: View {
     private var containerExtension: String {
         URL(fileURLWithPath: viewModel.containerName).pathExtension
     }
+    
+    private var containerIcon: String {
+        viewModel.isContainerDecrypted
+            ? "ic_m3_encrypted_off_48pt_wght400"
+            : (viewModel.isContainerEncrypted
+                ? "ic_m3_encrypted_48pt_wght400"
+                : "ic_m3_folder_48pt_wght400")
+    }
 
     @State private var containerLoadingTask: Task<Void, Never>?
 
@@ -196,7 +204,7 @@ struct EncryptView: View {
                         ScrollView {
                             VStack {
                                 ContainerNameView(
-                                    icon: "ic_m3_stylus_note_48pt_wght400",
+                                    icon: containerIcon,
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: viewModel.isEditButtonShown,
