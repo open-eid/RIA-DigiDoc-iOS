@@ -23,6 +23,7 @@ import LibdigidocLibSwift
 import CommonsLib
 
 struct MobileIdView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
@@ -136,19 +137,27 @@ struct MobileIdView: View {
         .onChange(of: viewModel.mobileIdSuccessMessageKey, { _, newValue in
             if let messageKey = newValue,
                !messageKey.isEmpty {
-                Toast.show(
-                    languageSettings.localized(messageKey),
-                    type: .success
-                )
+                let message = languageSettings.localized(messageKey)
+
+                Toast.show(message, type: .success)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
+
                 viewModel.mobileIdSuccessMessageKey = nil
             }
         })
         .onChange(of: viewModel.mobileIdErrorMessageKey, { _, newValue in
             if let messageKey = newValue,
                !messageKey.isEmpty {
-                Toast.show(
-                    languageSettings.localized(messageKey, localizedArguments)
-                )
+                let extraArguments = viewModel.mobileIdAlertMessageExtraArguments
+                let message = languageSettings.localized(messageKey, extraArguments)
+                
+                Toast.show(message)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
+
                 viewModel.mobileIdErrorMessageKey = nil
                 viewModel.mobileIdAlertMessageExtraArguments = []
             }

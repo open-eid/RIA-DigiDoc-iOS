@@ -25,6 +25,7 @@ import IdCardLib
 import CommonsLib
 
 struct IdCardView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
@@ -114,6 +115,10 @@ struct IdCardView: View {
 
     private var isIdCardAlertError: Bool {
         viewModel.idCardAlertMessageKey?.isEmpty == false
+    }
+
+    private var signatureAddedMessage: String {
+        languageSettings.localized("Signature added")
     }
 
     init(
@@ -490,10 +495,10 @@ struct IdCardView: View {
             isShowingPinView = false
             isShowingLoadingView = false
 
-            Toast.show(
-                languageSettings.localized("Signature added"),
-                type: .success
-            )
+            Toast.show(signatureAddedMessage, type: .success)
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(signatureAddedMessage)
+            }
 
             onSuccess(container)
             dismiss()

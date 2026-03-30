@@ -38,6 +38,7 @@ struct ConfirmModalView: View {
                 .opacity(Dimensions.Shadow.LOpacity)
                 .ignoresSafeArea()
                 .accessibilityHidden(true)
+                .allowsHitTesting(true)
 
             TextModal(
                 title: title,
@@ -54,5 +55,6 @@ struct ConfirmModalView: View {
             .accessibilityAddTraits(.isModal)
             .accessibilityElement(children: .contain)
         }
+        .accessibilityAddTraits(.isModal)
     }
 }

@@ -18,7 +18,6 @@
  */
 
 import SwiftUI
-import QuickLook
 import FactoryKit
 import CryptoObjCWrapper
 import CommonsLib
@@ -318,7 +317,7 @@ struct EncryptView: View {
                                                 isFileSaved: $isFileSaved
                                             )
                                         )
-                                        .quickLookPreview($viewModel.previewFile)
+                                        .filePreview(item: $viewModel.previewFile)
                                     }
                                     .padding(.vertical, Dimensions.Padding.MPadding)
                                 } else {

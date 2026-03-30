@@ -87,7 +87,8 @@ struct NFCInputView: View {
                         text: $canNumber,
                         isError: !(canNumberError?.isEmpty ?? true),
                         errorText: canNumberError ?? "",
-                        keyboardType: .numberPad
+                        keyboardType: .numberPad,
+                        sortPriority: 0
                     )
                     .onChange(of: canNumber) {
                         onInputChange()
@@ -96,10 +97,12 @@ struct NFCInputView: View {
                     Text(verbatim: canNumberLocationLabel)
                         .font(typography.labelMedium)
                         .foregroundStyle(theme.onSecondaryContainer)
-                        .padding(.bottom, Dimensions.Padding.MPadding)
+                        .padding(.top, Dimensions.Padding.XXSPadding)
+                        .accessibilitySortPriority(1)
                 }
+                .accessibilityElement(children: .contain)
             }
-            .padding(.vertical, Dimensions.Padding.ZeroPadding)
+            .padding(.bottom, Dimensions.Padding.MPadding)
 
             if showPinField {
                 VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {

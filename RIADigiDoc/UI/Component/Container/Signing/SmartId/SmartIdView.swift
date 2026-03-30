@@ -24,6 +24,7 @@ import CommonsLib
 
 struct SmartIdView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
@@ -139,19 +140,25 @@ struct SmartIdView: View {
         }
         .onChange(of: viewModel.smartIdSuccessMessageKey, { _, newValue in
             if let messageKey = newValue, !messageKey.isEmpty {
-                Toast.show(
-                    languageSettings.localized(messageKey),
-                    type: .success
-                )
+                let message = languageSettings.localized(messageKey)
+
+                Toast.show(message, type: .success)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
+
                 viewModel.smartIdSuccessMessageKey = nil
             }
         })
         .onChange(of: viewModel.smartIdErrorMessageKey, { _, newValue in
             if let messageKey = newValue, !messageKey.isEmpty {
                 let extraArguments = viewModel.smartIdAlertMessageExtraArguments
-                Toast.show(
-                    languageSettings.localized(messageKey, extraArguments)
-                )
+                let message = languageSettings.localized(messageKey, extraArguments)
+                Toast.show(message)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
+
                 viewModel.smartIdErrorMessageKey = nil
                 viewModel.smartIdAlertMessageExtraArguments = []
             }

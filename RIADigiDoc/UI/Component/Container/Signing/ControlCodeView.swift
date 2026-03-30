@@ -31,6 +31,12 @@ struct ControlCodeView: View {
     @Binding var controlCode: String
     @Binding var infoMessage: String
 
+    @AccessibilityFocusState private var isControlCodeFocused: Bool
+
+    private var isControlCodeValid: Bool {
+        !controlCode.isEmpty && controlCode.allSatisfy { $0.isNumber }
+    }
+
     var body: some View {
         VStack(alignment: .center) {
             Image(icon)
@@ -46,18 +52,30 @@ struct ControlCodeView: View {
                 Text(verbatim: languageSettings.localized("Control code"))
                     .font(typography.bodyLarge)
                     .foregroundStyle(theme.onSurface)
+                    .accessibilityHidden(!isControlCodeValid)
 
                 Text(verbatim: controlCode)
+                    .speechSpellsOutCharacters(true)
                     .font(typography.displayMedium)
                     .foregroundStyle(theme.onSurface)
                     .scaleEffect(x: Dimensions.Scaling.WideScaling, y: Dimensions.Scaling.DefaultScaling)
                     .accessibilityIdentifier("controlCode")
+                    .accessibilityHidden(!isControlCodeValid)
 
                 Text(verbatim: languageSettings.localized(infoMessage))
                     .font(typography.bodyLarge)
                     .foregroundStyle(theme.onSurface)
                     .accessibilityIdentifier("infoMessage")
             }
+            .onChange(of: controlCode) { _, newValue in
+                if (!newValue.isEmpty && newValue.allSatisfy { $0.isNumber }) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isControlCodeFocused = true
+                    }
+                }
+            }
+            .accessibilityFocused($isControlCodeFocused)
+            .accessibilityElement(children: .combine)
         }
         .onDisappear {
             controlCode = "- - - -"
