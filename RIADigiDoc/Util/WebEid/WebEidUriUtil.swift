@@ -23,9 +23,10 @@ public enum WebEidOperation: String, CaseIterable, Sendable {
     case auth
     case cert
     case sign
+    case unknown
 
-    public static func fromOperation(_ operation: String) -> WebEidOperation? {
-        Self.allCases.first { $0.rawValue == operation }
+    public static func fromOperation(_ operation: String) -> WebEidOperation {
+        Self.allCases.first { $0.rawValue == operation } ?? WebEidOperation.unknown
     }
 }
 
@@ -34,31 +35,28 @@ public enum WebEidUriUtil {
     private static let appLinksHost = "riadigidoc.ee"
 
     public static func isWebEidUri(_ url: URL) -> Bool {
-        getOperation(from: url) != nil
+        getOperation(from: url) != WebEidOperation.unknown
     }
 
-    public static func getOperation(from url: URL) -> WebEidOperation? {
-        let operation: String?
+    public static func getOperation(from url: URL) -> WebEidOperation {
+        var operation: String?
 
         #if DEBUG
-            if url.scheme == customScheme {
-                operation = url.host
-            } else if url.scheme == "https", url.host == appLinksHost {
-                let pathComponents = url.pathComponents.filter { $0 != "/" }
-                operation = pathComponents.first
-            } else {
-                operation = nil
-            }
+        let isCustomSchemeMatch = url.scheme == customScheme
         #else
-            if url.scheme == "https", url.host == appLinksHost {
-                let pathComponents = url.pathComponents.filter { $0 != "/" }
-                operation = pathComponents.first
-            } else {
-                operation = nil
-            }
+        let isCustomSchemeMatch = false
         #endif
 
-        guard let operation else { return nil }
+        if isCustomSchemeMatch {
+            operation = url.host
+        } else if url.scheme == "https", url.host == appLinksHost {
+            operation = url.pathComponents.dropFirst().first
+        } else {
+            operation = WebEidOperation.unknown.rawValue
+        }
+        
+
+        guard let operation else { return WebEidOperation.unknown }
         return WebEidOperation.fromOperation(operation)
     }
 }

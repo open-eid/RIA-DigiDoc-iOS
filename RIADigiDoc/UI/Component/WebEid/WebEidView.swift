@@ -74,16 +74,15 @@ struct WebEidView: View {
     }
 
     private func handleWebEidOperation(for url: URL) {
-        if let operation = WebEidUriUtil.getOperation(from: url) {
-            switch operation {
-            case .auth:
-                viewModel.handleAuth(url: url)
-            case .cert:
-                viewModel.handleCertificate(url: url)
-            case .sign:
-                viewModel.handleSign(url: url)
-            }
-        } else {
+        let operation = WebEidUriUtil.getOperation(from: url)
+        switch operation {
+        case .auth:
+            viewModel.handleAuth(url: url)
+        case .cert:
+            viewModel.handleCertificate(url: url)
+        case .sign:
+            viewModel.handleSign(url: url)
+        case .unknown:
             viewModel.handleUnknown(url: url)
         }
     }

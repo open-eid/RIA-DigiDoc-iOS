@@ -79,12 +79,12 @@ struct WebEidUriUtilTests {
 
     @Test
     func getOperation_appLinks_unknownOperation_returnsNil() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/unknown")) == nil)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/unknown")) == .unknown)
     }
 
     @Test
     func getOperation_unrelatedUri_returnsNil() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://example.com/auth")) == nil)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://example.com/auth")) == .unknown)
     }
 
     @Test
@@ -124,6 +124,6 @@ struct WebEidUriUtilTests {
 
     @Test
     func getOperation_unknownOperation_returnsNil() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("web-eid-mobile://unknown")) == nil)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("web-eid-mobile://unknown")) == .unknown)
     }
 }
