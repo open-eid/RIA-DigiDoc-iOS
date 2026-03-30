@@ -50,6 +50,53 @@ struct WebEidView: View {
         )
     }
 
+    private var alertTitle: String {
+        languageSettings.localized(
+            viewModel.alertMessageKey ?? "",
+            viewModel.alertMessageExtraArguments
+        )
+    }
+
+    private var alertInfoURL: URL? {
+        guard
+            let messageUrl = viewModel.alertMessageUrl,
+            !messageUrl.isEmpty
+        else {
+            return nil
+        }
+
+        let localizedUrl = languageSettings.localized(messageUrl)
+        guard let url = URL(string: localizedUrl), UIApplication.shared.canOpenURL(url) else {
+            return nil
+        }
+
+        return url
+    }
+
+    private func handleWebEidOperation(for url: URL) {
+        if let operation = WebEidUriUtil.getOperation(from: url) {
+            switch operation {
+            case .auth:
+                viewModel.handleAuth(url: url)
+            case .cert:
+                viewModel.handleCertificate(url: url)
+            case .sign:
+                viewModel.handleSign(url: url)
+            }
+        } else {
+            viewModel.handleUnknown(url: url)
+        }
+    }
+
+    private func activateWebEidSession() {
+        Task {
+            if await viewModel.isWebEidSessionActive() {
+                await nfcViewModel.clearTempCAN()
+            }
+            await viewModel.setWebEidSessionActive(true)
+        }
+    }
+
     init(
         webEidUrl: URL,
     ) {
@@ -119,40 +166,22 @@ struct WebEidView: View {
             }
         }
         .alert(
-            languageSettings.localized(
-                viewModel.alertMessageKey ?? "",
-                viewModel.alertMessageExtraArguments
-            ),
+            alertTitle,
             isPresented: $viewModel.showAlertMessage
         ) {
             Button(languageSettings.localized("OK")) {
                 viewModel.resetErrors()
             }
 
-            if let messageUrl = viewModel.alertMessageUrl, !messageUrl.isEmpty {
+            if let alertInfoURL {
                 Button(languageSettings.localized("Additional information")) {
-                    if let url = URL(string: languageSettings.localized(messageUrl)),
-                       UIApplication.shared.canOpenURL(url) {
-                        openURL(url)
-                    }
+                    openURL(alertInfoURL)
                     viewModel.resetErrors()
                 }
             }
         }
         .onAppear {
-            if let host = webEidUrl.host {
-
-                switch host {
-                case "auth":
-                    viewModel.handleAuth(url: webEidUrl)
-                case "cert":
-                    viewModel.handleCertificate(url: webEidUrl)
-                case "sign":
-                    viewModel.handleSign(url: webEidUrl)
-                default:
-                    viewModel.handleUnknown(url: webEidUrl)
-                }
-            }
+            handleWebEidOperation(for: webEidUrl)
         }
         .onChange(of: viewModel.relyingPartyResponseEvents) { _, responseURL in
             guard let responseURL else { return }
@@ -166,35 +195,13 @@ struct WebEidView: View {
             Toast.show(errorMessage)
         }
         .onChange(of: webEidUrl) {_, url in
-            if let host = url.host {
-
-                switch host {
-                case "auth":
-                    viewModel.handleAuth(url: url)
-                case "cert":
-                    viewModel.handleCertificate(url: url)
-                case "sign":
-                    viewModel.handleSign(url: url)
-                default:
-                    viewModel.handleUnknown(url: url)
-                }
-            }
+            handleWebEidOperation(for: url)
         }
         .onChange(of: viewModel.authRequest) {_, _ in
-            Task {
-                if await viewModel.isWebEidSessionActive() {
-                    await nfcViewModel.clearTempCAN()
-                }
-                await viewModel.setWebEidSessionActive(true)
-            }
+            activateWebEidSession()
         }
         .onChange(of: viewModel.certRequest) {_, _ in
-            Task {
-                if await viewModel.isWebEidSessionActive() {
-                    await nfcViewModel.clearTempCAN()
-                }
-                await viewModel.setWebEidSessionActive(true)
-            }
+            activateWebEidSession()
         }
     }
 }
