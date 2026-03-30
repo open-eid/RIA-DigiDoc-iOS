@@ -75,8 +75,74 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
         return containerFile
     }
 
-    public func addDataFiles(_ filesToAdd: [URL]) async {
-        dataFiles?.append(contentsOf: filesToAdd)
+    public func addDataFiles(_ filesToAdd: [URL]) async throws {
+        let cryptoContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+            fileManager: fileManager
+        )
+
+        var movedFiles: [URL] = []
+        var duplicateFileCount = 0
+        var failedFileCount = 0
+        let totalFileCount = filesToAdd.count
+
+        let existingDataFiles = Set(dataFiles?.compactMap { $0?.lastPathComponent } ?? [])
+
+        var duplicateFileName: String?
+
+        for fileToAdd in filesToAdd {
+            let fileName = fileToAdd.lastPathComponent
+            let destinationURL = cryptoContainersDirectory.appendingPathComponent(fileName)
+
+            if existingDataFiles.contains(fileName) ||
+                movedFiles.contains(where: { $0.lastPathComponent == fileName }) {
+
+                duplicateFileCount += 1
+
+                if duplicateFileCount == 1 {
+                    duplicateFileName = fileName
+                }
+
+                continue
+            }
+
+            do {
+                if fileManager.fileExists(atPath: destinationURL.path) {
+                    try fileManager.removeItem(at: destinationURL)
+                }
+
+                try fileManager.copyItem(at: fileToAdd, to: destinationURL)
+                movedFiles.append(destinationURL)
+
+            } catch {
+                failedFileCount += 1
+            }
+        }
+
+        if dataFiles == nil {
+            dataFiles = movedFiles
+        } else {
+            dataFiles?.append(contentsOf: movedFiles)
+        }
+
+        if duplicateFileCount > 0 || failedFileCount > 0 {
+            var userInfo: [String: String] = [
+                "totalFileCount": String(totalFileCount),
+                "failedFileCount": String(failedFileCount),
+                "duplicateFileCount": String(duplicateFileCount)
+            ]
+
+            if duplicateFileCount == 1, let name = duplicateFileName {
+                userInfo["fileName"] = name
+            }
+
+            throw CryptoError.addingFilesToContainerFailed(
+                CryptoErrorDetail(
+                    message: "Unable to add files to container",
+                    userInfo: userInfo
+                )
+            )
+        }
     }
 
     public func addRecipients(_ recipientsToAdd: [Addressee]) async {
@@ -215,7 +281,6 @@ extension CryptoContainer {
 
         CryptoContainer.logger().info("Is single file: \(isSingleFile, privacy: .public)")
         CryptoContainer.logger().info("Is crypto container: \(isCryptoContainer, privacy: .public)")
-
 
         guard isSingleFile && isCryptoContainer else {
             var defaultExtension = CommonsLib.Constants.Extension.DefaultCrypto
@@ -362,17 +427,25 @@ extension CryptoContainer {
             fileManager: fileManager
         )
 
-        let isFileInTempCryptoContainersDirectory = containerFile.absoluteString.hasPrefix(
-            cryptoContainersDirectory.appending(path: Constants.Folder.Temp, directoryHint: .isDirectory).absoluteString
+        let savedContainersDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.SavedFiles],
+            fileManager: fileManager
+        )
+
+        // Do not rename when nested container opened
+        let isFileInSavedContainersDirectory = containerFile.absoluteString.hasPrefix(
+            savedContainersDirectory.absoluteString
         )
 
         let isFileInRecentDocuments = containerFile.absoluteString.hasPrefix(
             cryptoContainersDirectory.absoluteString
-        ) && !isFileInTempCryptoContainersDirectory
+        )
+
+        let shouldRenameContainer = isFileInRecentDocuments && !isFileInSavedContainersDirectory
 
         var renamedContainerFile = containerFile
 
-        if !isFileInRecentDocuments {
+        if shouldRenameContainer {
             renamedContainerFile = Container.shared.containerUtil().getContainerFile(
                 for: containerFile,
                 in: isFileInRecentDocuments ? containerFile.deletingLastPathComponent() :

@@ -298,7 +298,6 @@ extension SignedContainer {
     @MainActor
     public static func openOrCreate(
         dataFiles: [URL],
-        containerUtil: ContainerUtilProtocol = Container.shared.containerUtil(),
         isSivaConfirmed: Bool
     ) async throws -> SignedContainerProtocol {
         logger().info("Opening or creating container. Found \(dataFiles.count) datafile(s)")

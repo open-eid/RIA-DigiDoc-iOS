@@ -147,13 +147,15 @@ struct RecipientView: View {
                         )
 
                     let certType = recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
-                    Text(verbatim:
-                            "\(languageSettings.localized(certType)) " +
-                            "\(languageSettings.localized("Valid to", [validToDate]))")
-                    .font(typography.bodyMedium)
-                    .foregroundStyle(theme.onSurfaceVariant)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .multilineTextAlignment(.leading)
+                    let validPart = validToDate.isEmpty
+                        ? ""
+                        : " " + languageSettings.localized("Valid to", [validToDate])
+
+                    Text(verbatim: languageSettings.localized(certType) + validPart)
+                        .font(typography.bodyMedium)
+                        .foregroundStyle(theme.onSurfaceVariant)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
                 }
                 .accessibilityElement(children: .combine)
 

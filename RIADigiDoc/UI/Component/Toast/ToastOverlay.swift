@@ -55,6 +55,7 @@ struct ToastOverlay: View {
                             height: Dimensions.Icon.IconSizeXXS
                         )
                         .foregroundStyle(style.foreground)
+                        .accessibilityHidden(true)
 
                     Text(verbatim: message)
                         .lineLimit(nil)

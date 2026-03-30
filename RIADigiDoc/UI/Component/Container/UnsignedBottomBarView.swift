@@ -84,8 +84,8 @@ struct UnsignedBottomBarView: View {
             .disabled(!rightButtonEnabled)
             .foregroundStyle(theme.surfaceContainer)
         }
-        .padding(.vertical,Dimensions.Padding.SPadding)
-        .padding(.horizontal,Dimensions.Padding.MPadding)
+        .padding(.vertical, Dimensions.Padding.SPadding)
+        .padding(.horizontal, Dimensions.Padding.MPadding)
         .background(theme.surfaceContainer)
     }
 }
