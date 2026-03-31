@@ -416,7 +416,6 @@ struct IdCardView: View {
         pinNumber.isEmpty ? () : (pinNumber.removeAll())
         isActionEnabled = viewModel
             .isActionEnabled(pinNumber: pinNumber, pinType: pinCodeType)
-        resetIdCardAction()
     }
 
     private func resetIdCardAction() {

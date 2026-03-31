@@ -1722,6 +1722,24 @@
         }
       }
     },
+    "Failed to find lock for cert" : {
+      "comment" : "Decrypting with ID-card not in recipient list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to find lock for cert"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sertifikaadi võtmega lukku ei leitud"
+          }
+        }
+      }
+    },
     "Failed to open container" : {
       "comment" : "Error message when unable to create a new container",
       "extractionState" : "manual",
