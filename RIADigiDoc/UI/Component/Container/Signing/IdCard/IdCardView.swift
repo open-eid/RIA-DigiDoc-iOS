@@ -183,6 +183,7 @@ struct IdCardView: View {
                                 await MainActor.run {
                                     Toast.show(errorMessage)
                                     viewModel.resetErrors()
+                                    resetIdCardAction()
                                     if shouldDismiss {
                                         dismiss()
                                     }
@@ -198,6 +199,7 @@ struct IdCardView: View {
 
                             await viewModel.stopDiscoveringReaders()
                             cancelIdCardAction()
+                            resetIdCardAction()
                             isInProgress = false
                             isShowingPinView = false
                             isShowingLoadingView = false
@@ -388,6 +390,7 @@ struct IdCardView: View {
         await MainActor.run {
             Toast.show(errorMessage)
             viewModel.resetErrors()
+            resetIdCardAction()
 
             // Let ID-card alert closure handle dismiss
             // Dismiss is run when user has pressed OK button on alert
@@ -460,6 +463,7 @@ struct IdCardView: View {
                 await MainActor.run {
                     Toast.show(errorMessage)
                     viewModel.resetErrors()
+                    resetIdCardAction()
                     if shouldDismiss {
                         dismiss()
                     }
