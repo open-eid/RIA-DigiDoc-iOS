@@ -263,6 +263,7 @@
 				Util/Signature/SignatureUtilProtocol.swift,
 				Util/Theme/ThemeSettings.swift,
 				Util/Theme/ThemeSettingsProtocol.swift,
+				Util/WebEid/WebEidUriUtil.swift,
 				ViewModel/AdvancedSettingsViewModel.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/Crypto/DecryptRootViewModel.swift,

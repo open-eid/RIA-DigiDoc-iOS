@@ -309,7 +309,7 @@ struct HomeView: View {
     }
 
     private func handleIncoming(url: URL) {
-        let webEidURL = (url.scheme == "web-eid-mobile") ? url : nil
+        let webEidURL = (WebEidUriUtil.isWebEidUri(url)) ? url : nil
 
         let externalFileURLs: [URL] = (webEidURL != nil) ? [] : getExternalFileURLs(from: url)
         handleFiles(externalFileURLs)
