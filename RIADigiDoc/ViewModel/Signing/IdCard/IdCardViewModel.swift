@@ -111,6 +111,16 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             return container
         } catch {
             IdCardViewModel.logger().error("ID-CARD: Unable to decrypt container with ID-card reader. \(error)")
+            
+            let nsError = error as NSError
+            if nsError.localizedDescription == "Failed to find lock for cert" {
+                IdCardViewModel.logger().error("ID-CARD: Failed to find lock for cert")
+                errorMessage = "Failed to find lock for cert"
+                errorExtraArguments = []
+                shouldDismissForError = true
+                return nil
+            }
+            
             guard let exception = error as? IdCardInternalError else {
                 IdCardViewModel.logger().error("ID-CARD: ID Card General error.")
                 errorMessage = "General error"
@@ -195,19 +205,19 @@ class IdCardViewModel: IdCardViewModelProtocol, Loggable {
             let pinResponse = try await readCodeTryCounterRecord()
             let isPUKChangeable = try await isPukChangeable()
 
-            if codeType == CodeType.pin1 {
+            if codeType == .pin1 {
                 if pinResponse.pin1RetryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(0)
                 }
             }
-            if codeType == CodeType.pin2 {
+            if codeType == .pin2 {
                 if pinResponse.pin2RetryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(0)
                 }
-            }
-
-            if !pinResponse.pin2Active {
-                throw IdCardInternalError.pinLocked
+                
+                if !pinResponse.pin2Active {
+                    throw IdCardInternalError.pinLocked
+                }
             }
 
             return IdCardData(

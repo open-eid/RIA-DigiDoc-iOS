@@ -76,6 +76,7 @@ public struct NFCSessionStringsUtil {
         pinWrongMultipleErrorMessage: String? = nil,
         pinWrongErrorMessage: String? = nil,
         pinBlockedErrorMessage: String? = nil,
+        wrongCardErrorMessage: String? = nil,
         technicalErrorMessage: String? = nil,
         sessionErrorMessage: String? = nil,
         ocspTimeslotErrorMessage: String? = nil,
@@ -103,6 +104,7 @@ public struct NFCSessionStringsUtil {
                 "PIN blocked",
                 [pinAction == .unblock ? CodeType.puk.name : pinName]
             ),
+            wrongCardErrorMessage: wrongCardErrorMessage ?? localize("Failed to find lock for cert", []),
             technicalErrorMessage: technicalErrorMessage ?? localize("NFC technical error", []),
             sessionErrorMessage: sessionErrorMessage ?? localize("NFC session error", []),
             ocspTimeslotErrorMessage: ocspTimeslotErrorMessage ?? localize("OCSP response not in valid time slot", []),

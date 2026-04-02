@@ -112,6 +112,11 @@ final public class OperationReadCardData: NFCOperationBase, OperationReadCardDat
 
                 success()
             } catch {
+                if (error as NSError).localizedDescription == "Failed to find lock for cert" {
+                    handleNoCertLockError(error: error, session: session)
+                    return
+                }
+
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
                     return
