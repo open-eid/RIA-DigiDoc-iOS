@@ -59,7 +59,8 @@ struct PrimaryButton: View {
                     .lineLimit(nil)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(Dimensions.Padding.XSPadding)
+                    .padding(.horizontal, Dimensions.Padding.XSPadding)
+                    .padding(.vertical, Dimensions.Padding.MSPadding)
                     .frame(maxWidth: .infinity)
                     .background(
                         Capsule()

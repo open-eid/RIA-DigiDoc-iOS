@@ -84,6 +84,8 @@ struct ResponseHandler: ResponseHandlerProtocol {
             throw SmartIdError.incorrectParameters
         case 401:
             throw SmartIdError.invalidAccessRights
+        case 404:
+            throw SmartIdError.accountNotFound
         case 409:
             throw SmartIdError.exceededUnsuccessfulRequests
         case 429:

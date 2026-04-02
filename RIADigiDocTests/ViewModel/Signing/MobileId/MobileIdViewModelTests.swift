@@ -764,7 +764,8 @@ struct MobileIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.mobileIdErrorMessageKey == "Mobile-ID incorrect parameters")
+        #expect(viewModel.mobileIdErrorMessageKey == "Invalid signing access rights")
+        #expect(viewModel.mobileIdAlertMessageExtraArguments == ["Mobile-ID"])
     }
 
     @Test

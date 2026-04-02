@@ -867,7 +867,7 @@ struct SmartIdViewModelTests {
     }
 
     @Test
-    func sign_setInvalidPersonalCodeWhenIncorrectParametersErrorThrown() async {
+    func sign_setInvalidSigningAccessRightsWhenIncorrectParametersErrorThrown() async {
         mockConfigurationRepository.getConfigurationHandler = {
             try? TestConfigurationProvider.mockConfigurationProvider()
         }
@@ -891,7 +891,7 @@ struct SmartIdViewModelTests {
         )
 
         #expect(result == nil)
-        #expect(viewModel.smartIdErrorMessageKey == "Invalid personal code")
+        #expect(viewModel.smartIdErrorMessageKey == "Invalid signing access rights")
     }
 
     @Test(
