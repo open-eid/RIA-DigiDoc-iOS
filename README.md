@@ -1,4 +1,4 @@
-# RIA-DigiDoc-iOS v3
+# RIA-DigiDoc-iOS
 
 ![EU Regional Development Fund](docs/images/EL_Regionaalarengu_Fond_horisontaalne-vaike.jpg)
 
@@ -24,6 +24,7 @@ RIA-DigiDoc-iOS is using static version of libcdoc. libcdoc is used in app for e
 * Validating ASiC-E, BDOC, ASIC-S and DDOC containers
 * Validating detached XAdES and CAdES
 * Encrypting, decrypting and validating CDOC and CDOC2 containers
+* Change and unlock ID-card PIN codes (via USB card reader and NFC)
 
 ## Overview and how to use
 App requirements, container format overview, documentation links and how to use instructions are available in Wiki:
