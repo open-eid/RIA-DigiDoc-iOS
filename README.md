@@ -33,8 +33,8 @@ App requirements, container format overview, documentation links and how to use 
 Installation instructions are available in Wiki: 
 [Building source code with Xcode](https://github.com/open-eid/RIA-DigiDoc-iOS/wiki/Building-source-code-with-Xcode)
 
-## Signing documents in third-party application
-In [releases](https://github.com/open-eid/RIA-DigiDoc-iOS/releases) you will find framework, that you can use in your own application to implement document signing feature. For more detailed instructions check out [wiki page](https://github.com/open-eid/RIA-DigiDoc-iOS/wiki).
+## Development
+In [releases](https://github.com/open-eid/RIA-DigiDoc-iOS/releases) you will find application and modules, that you can use in your own application to implement document signing and encryption features. For more detailed instructions check out [wiki page](https://github.com/open-eid/RIA-DigiDoc-iOS/wiki).
 
 ## Support
 Official builds are provided through official distribution point [https://www.id.ee/en/article/install-id-software/](https://www.id.ee/en/article/install-id-software/). If you want support, you need to be using official builds. Contact our support via www.id.ee for assistance.
