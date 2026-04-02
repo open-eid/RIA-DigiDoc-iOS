@@ -179,6 +179,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         let response: SmartIdSessionResponse
         do {
             response = try await requestCertificate(
+                uuid: uuid,
                 sidUrl: sidUrl,
                 country: country,
                 personalCode: personalCode,
@@ -247,6 +248,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         let signatureData: Data
         do {
             signatureData = try await requestSignature(
+                uuid: uuid,
                 sidUrl: sidUrl,
                 documentNumber: documentNumber,
                 hash: hash,
@@ -318,6 +320,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
     // swiftlint:disable:next function_parameter_count
     private func requestCertificate(
+        uuid: String,
         sidUrl: URL,
         country: SmartIdCountry,
         personalCode: String,
@@ -331,7 +334,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             .getCertificateRequest(
                 url: "\(sidUrl)\(SmartIdViewModel.certificateEndpoint)",
                 relyingPartyName: Constants.Signing.RelyingPartyName,
-                relyingPartyUUID: Constants.Signing.RelyingPartyUUID,
+                relyingPartyUUID: uuid,
                 country: getCountry(smartIdCountry: country),
                 nationalIdentityNumber: personalCode,
                 trustedCertificates: trustedCertificates,
@@ -357,6 +360,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
     // swiftlint:disable:next function_parameter_count
     private func requestSignature(
+        uuid: String,
         sidUrl: URL,
         documentNumber: String,
         hash: Data,
@@ -374,7 +378,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             .getSignatureRequest(
                 url: "\(sidUrl)\(SmartIdViewModel.signatureEndpoint)",
                 relyingPartyName: Constants.Signing.RelyingPartyName,
-                relyingPartyUUID: Constants.Signing.RelyingPartyUUID,
+                relyingPartyUUID: uuid,
                 documentNumber: documentNumber,
                 hash: hash,
                 hashType: hashType,
@@ -520,7 +524,8 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             smartIdErrorMessageKey = "No Internet connection"
 
         case .incorrectParameters:
-            smartIdErrorMessageKey = "Invalid personal code"
+            smartIdErrorMessageKey = "Invalid signing access rights"
+            smartIdAlertMessageExtraArguments = ["Smart-ID"]
 
         case .timeout, .accountNotFound:
             smartIdErrorMessageKey = "Expired Smart-ID transaction"

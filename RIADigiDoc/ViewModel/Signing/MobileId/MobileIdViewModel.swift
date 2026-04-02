@@ -154,6 +154,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         let cert: Data
         do {
             cert = try await requestCertificate(
+                uuid: uuid,
                 midUrl: midUrl,
                 phoneNumber: phoneNumber,
                 personalCode: personalCode,
@@ -196,6 +197,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         let sessionId: String
         do {
             sessionId = try await requestSignature(
+                uuid: uuid,
                 midUrl: midUrl,
                 phoneNumber: phoneNumber,
                 personalCode: personalCode,
@@ -252,6 +254,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
     // swiftlint:disable:next function_parameter_count
     private func requestCertificate(
+        uuid: String,
         midUrl: URL,
         phoneNumber: String,
         personalCode: String,
@@ -264,7 +267,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             .getCertificateRequest(
                 url: "\(midUrl)\(MobileIdViewModel.certificateEndpoint)",
                 relyingPartyName: Constants.Signing.RelyingPartyName,
-                relyingPartyUUID: Constants.Signing.RelyingPartyUUID,
+                relyingPartyUUID: uuid,
                 phoneNumber: phoneNumber,
                 nationalIdentityNumber: personalCode,
                 trustedCertificates: trustedCertificates,
@@ -285,6 +288,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
     // swiftlint:disable:next function_parameter_count
     private func requestSignature(
+        uuid: String,
         midUrl: URL,
         phoneNumber: String,
         personalCode: String,
@@ -298,7 +302,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         let signatureResponse = try await mobileIdSignService.getSignatureRequest(
             url: "\(midUrl)\(MobileIdViewModel.signatureEndpoint)",
             relyingPartyName: Constants.Signing.RelyingPartyName,
-            relyingPartyUUID: Constants.Signing.RelyingPartyUUID,
+            relyingPartyUUID: uuid,
             phoneNumber: phoneNumber,
             nationalIdentityNumber: personalCode,
             hash: hash,
@@ -436,7 +440,8 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             mobileIdErrorMessageKey = "Expired mobile-ID transaction"
 
         case .incorrectParameters:
-            mobileIdErrorMessageKey = "Mobile-ID incorrect parameters"
+            mobileIdErrorMessageKey = "Invalid signing access rights"
+            mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
 
         case .userCancelled:
             mobileIdErrorMessageKey = "User denied or cancelled"

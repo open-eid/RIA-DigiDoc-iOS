@@ -4874,24 +4874,6 @@
         }
       }
     },
-    "Mobile-ID incorrect parameters" : {
-      "comment" : "Signing error when input parameters are not correct for Mobile-ID",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incorrect mobile number and/or personal code, non-Estonian mobile numbers must be prefixed with the country code"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vigane telefoninumber ja/või isikukood, välismaa telefoninumber peab algama riigikoodiga"
-          }
-        }
-      }
-    },
     "Mobile-ID signing info message" : {
       "comment" : "Displayed under control code when signing with Mobile-ID",
       "extractionState" : "manual",

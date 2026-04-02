@@ -107,6 +107,8 @@ struct ResponseHandler: ResponseHandlerProtocol {
             throw MobileIdError.incorrectParameters
         case 401:
             throw MobileIdError.invalidAccessRights
+        case 404:
+            throw MobileIdError.notMidClient
         case 409:
             throw MobileIdError.exceededUnsuccessfulRequests
         case 429:

@@ -42,6 +42,15 @@ struct MobileIdView: View {
         languageSettings.localized(viewModel.infoMessage)
     }
 
+    private var localizedArguments: [String] {
+        var localized: [String] = []
+        for arg in viewModel.mobileIdAlertMessageExtraArguments {
+            localized.append(languageSettings.localized(arg))
+        }
+
+        return localized
+    }
+
     let signedContainer: SignedContainerProtocol
     let onSuccess: (SignedContainerProtocol) -> Void
 
@@ -137,9 +146,8 @@ struct MobileIdView: View {
         .onChange(of: viewModel.mobileIdErrorMessageKey, { _, newValue in
             if let messageKey = newValue,
                !messageKey.isEmpty {
-                let extraArguments = viewModel.mobileIdAlertMessageExtraArguments
                 Toast.show(
-                    languageSettings.localized(messageKey, extraArguments)
+                    languageSettings.localized(messageKey, localizedArguments)
                 )
                 viewModel.mobileIdErrorMessageKey = nil
                 viewModel.mobileIdAlertMessageExtraArguments = []
