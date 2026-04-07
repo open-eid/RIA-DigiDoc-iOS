@@ -98,6 +98,12 @@ struct SigningView: View {
         languageSettings.localized("Back")
     }
 
+    private var containerIcon: String {
+        viewModel.isSigned()
+        ? "ic_m3_stylus_note_48pt_wght400"
+        : "ic_m3_folder_48pt_wght400"
+    }
+
     private var containerNotificationsIconAccessibility: String {
         let containerNotificationsCount = viewModel.containerNotifications.count
         let notificationKey = containerNotificationsCount == 1
@@ -185,7 +191,7 @@ struct SigningView: View {
                         ScrollView {
                             VStack {
                                 ContainerNameView(
-                                    icon: "ic_m3_stylus_note_48pt_wght400",
+                                    icon: containerIcon,
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
                                     isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
