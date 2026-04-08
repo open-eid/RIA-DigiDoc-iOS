@@ -609,6 +609,15 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             let cryptoContainer = try await
                 CryptoContainer.openOrCreate(dataFiles: dataFileURLs)
 
+            let cryptoContainerName = URL(fileURLWithPath: containerName)
+                .deletingPathExtension()
+                .appendingPathExtension(Constants.Extension.DefaultCrypto)
+                .lastPathComponent
+
+            try await cryptoContainer.renameContainer(
+                to: cryptoContainerName
+            )
+
             sharedContainerViewModel.setSignedContainer(nil)
             sharedContainerViewModel.clearContainers()
             sharedContainerViewModel.setAddedFilesCount(addedFiles: dataFileURLs.count)

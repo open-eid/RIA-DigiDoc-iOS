@@ -20,6 +20,7 @@
 import SwiftUI
 import QuickLook
 
+// swiftlint:disable unused_parameter
 struct PreviewController: UIViewControllerRepresentable {
     let url: URL
     @Binding var isPresented: Bool
@@ -109,3 +110,4 @@ class PreviewQLController: QLPreviewController {
         super.pressesBegan(presses, with: event)
     }
 }
+// swiftlint:enable unused_parameter

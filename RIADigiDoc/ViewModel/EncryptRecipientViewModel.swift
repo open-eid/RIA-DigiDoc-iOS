@@ -31,7 +31,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     var isImporting = false
     var recipients: [Addressee] = []
     var searchText: String = ""
-    var errorMessage: String = ""
+    var errorMessage: String?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let openLdap: OpenLdapProtocol
@@ -79,6 +79,10 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
                 recipients = []
                 errorMessage = "Too many results"
                 EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
+            } else if result.addressees.isEmpty {
+                recipients = []
+                errorMessage = "No recipients found"
+                EncryptRecipientViewModel.logger().error("No recipients found for \(self.searchText)")
             } else {
                 recipients = result.addressees
             }

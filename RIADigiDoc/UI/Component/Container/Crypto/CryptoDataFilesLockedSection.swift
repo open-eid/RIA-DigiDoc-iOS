@@ -40,8 +40,8 @@ struct CryptoDataFilesLockedSection: View {
                 Text(verbatim: languageSettings.localized("Crypto files encrypted"))
                     .font(typography.bodyMedium)
                     .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(4)
-                    .truncationMode(.middle)
+                    .lineLimit(nil)
+                    .minimumScaleFactor(0.5)
                     .multilineTextAlignment(TextAlignment.leading)
                     .accessibilityLabel(
                         Text(

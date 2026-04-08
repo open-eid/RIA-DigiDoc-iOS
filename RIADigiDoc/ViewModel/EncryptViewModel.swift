@@ -723,10 +723,19 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                     isSivaConfirmed: true
                 )
 
+                let signedContainerName = URL(fileURLWithPath: containerName)
+                    .deletingPathExtension()
+                    .appendingPathExtension(Constants.Extension.Default)
+                    .lastPathComponent
+
+                let renamedContainer = try await signedContainer.renameContainer(
+                    to: signedContainerName
+                )
+
                 sharedContainerViewModel.setCryptoContainer(nil)
                 sharedContainerViewModel.clearContainers()
                 sharedContainerViewModel.setAddedFilesCount(addedFiles: dataFileURLs.count)
-                sharedContainerViewModel.setSignedContainer(signedContainer)
+                sharedContainerViewModel.setSignedContainer(renamedContainer)
 
                 return true
             }
@@ -771,7 +780,9 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         )
     }
 
-    private func getEffectiveContainer(parentContainer: SignedContainerProtocol) async throws -> SignedContainerProtocol {
+    private func getEffectiveContainer(
+        parentContainer: SignedContainerProtocol
+    ) async throws -> SignedContainerProtocol {
         let isTimestamped = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
         let isCades = await parentContainer.isCades()
         let isXades = await parentContainer.isXades()

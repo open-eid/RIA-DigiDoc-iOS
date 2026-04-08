@@ -24,7 +24,7 @@ actor ToastQueue {
 
     private var queue: [ToastItem] = []
     private var isPresenting = false
-    private var currentMessage: String? = nil
+    private var currentMessage: String?
 
     func enqueue(message: String, duration: TimeInterval, type: ToastType) {
         // Avoid consecutive duplicate messages

@@ -121,6 +121,10 @@ struct IdCardView: View {
         languageSettings.localized("Signature added")
     }
 
+    private var generalErrorMessage: String {
+        languageSettings.localized("General error")
+    }
+
     init(
         actionType: ActionType,
         actionMethods: [ActionMethod],
@@ -186,7 +190,8 @@ struct IdCardView: View {
                                 }
 
                                 await MainActor.run {
-                                    Toast.show(errorMessage)
+                                    showMessage(message: errorMessage, type: .error)
+
                                     viewModel.resetErrors()
                                     resetIdCardAction()
                                     if shouldDismiss {
@@ -395,7 +400,8 @@ struct IdCardView: View {
     private func handleCardError() async {
         await viewModel.stopDiscoveringReaders()
         await MainActor.run {
-            Toast.show(errorMessage)
+            showMessage(message: errorMessage, type: .error)
+
             viewModel.resetErrors()
             resetIdCardAction()
 
@@ -438,9 +444,7 @@ struct IdCardView: View {
         resetIdCardAction()
 
         guard let container = signedContainer else {
-            Toast.show(
-                languageSettings.localized("General error")
-            )
+            showMessage(message: generalErrorMessage, type: .error)
             return
         }
 
@@ -468,7 +472,7 @@ struct IdCardView: View {
                 }
 
                 await MainActor.run {
-                    Toast.show(errorMessage)
+                    showMessage(message: errorMessage, type: .error)
                     viewModel.resetErrors()
                     resetIdCardAction()
                     if shouldDismiss {
@@ -497,15 +501,19 @@ struct IdCardView: View {
             await MainActor.run {
                 idCardActionMessage = ""
 
-                Toast.show(signatureAddedMessage, type: .success)
-
-                if voiceOverEnabled {
-                    AccessibilityUtil.announceMessage(signatureAddedMessage)
-                }
+                showMessage(message: signatureAddedMessage, type: .success)
 
                 onSuccess(container)
                 dismiss()
             }
+        }
+    }
+
+    private func showMessage(message: String, type: ToastType) {
+        Toast.show(message, type: type)
+
+        if voiceOverEnabled {
+            AccessibilityUtil.announceMessage(message)
         }
     }
 }

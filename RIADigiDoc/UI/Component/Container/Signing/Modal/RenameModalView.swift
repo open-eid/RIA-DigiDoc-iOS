@@ -26,6 +26,7 @@ struct RenameModalView: View {
     @AppTypography private var typography
 
     @State private var containerName: String
+    @State private var keyboardHeight: CGFloat = 0
     let onConfirm: (String) -> Void
     let onCancel: () -> Void
 
@@ -62,6 +63,18 @@ struct RenameModalView: View {
                 onConfirm: { onConfirm(containerName) },
                 onCancel: onCancel
             )
+            .offset(y: -keyboardHeight / 2)
+            .animation(.easeOut(duration: Dimensions.Duration.focusAnimation), value: keyboardHeight)
+        }
+        .ignoresSafeArea(.keyboard)
+        .onReceive(
+            NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+        ) { notification in
+            guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            keyboardHeight = frame.height
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardHeight = 0
         }
     }
 }

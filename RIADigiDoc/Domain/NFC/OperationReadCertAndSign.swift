@@ -75,6 +75,7 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
 
     // MARK: - NFCTagReaderSessionDelegate
 
+    // swiftlint:disable:next cyclomatic_complexity
     public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
             defer {

@@ -152,7 +152,7 @@ struct MobileIdView: View {
                !messageKey.isEmpty {
                 let extraArguments = viewModel.mobileIdAlertMessageExtraArguments
                 let message = languageSettings.localized(messageKey, extraArguments)
-                
+
                 Toast.show(message)
                 if voiceOverEnabled {
                     AccessibilityUtil.announceMessage(message)

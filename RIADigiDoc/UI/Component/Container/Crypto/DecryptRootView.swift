@@ -24,6 +24,7 @@ import IdCardLib
 import CommonsLib
 
 struct DecryptRootView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
@@ -35,6 +36,10 @@ struct DecryptRootView: View {
     private let cryptoContainer: GeneralContainer?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
+
+    private var containerSuccessfullyDecryptedMessage: String {
+        languageSettings.localized("Container successfully decrypted")
+    }
 
     init() {
         _viewModel = State(wrappedValue: Container.shared.decryptRootViewModel())
@@ -59,9 +64,7 @@ struct DecryptRootView: View {
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setCryptoContainer(container)
 
-                            Toast.show(languageSettings.localized(
-                                "Container successfully decrypted"
-                            ), type: .success)
+                            showContainerSuccessfullyDecryptedMessage()
                         }
                     )
                 }
@@ -78,9 +81,7 @@ struct DecryptRootView: View {
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setCryptoContainer(container)
 
-                            Toast.show(languageSettings.localized(
-                                "Container successfully decrypted"
-                            ), type: .success)
+                            showContainerSuccessfullyDecryptedMessage()
                         }
                     )
                 }
@@ -94,6 +95,16 @@ struct DecryptRootView: View {
             Task {
                 chosenMethod = await viewModel.getSelectedDecryptMethod()
             }
+        }
+    }
+
+    func showContainerSuccessfullyDecryptedMessage() {
+        Toast.show(languageSettings.localized(
+            containerSuccessfullyDecryptedMessage
+        ), type: .success)
+
+        if voiceOverEnabled {
+            AccessibilityUtil.announceMessage(containerSuccessfullyDecryptedMessage)
         }
     }
 }

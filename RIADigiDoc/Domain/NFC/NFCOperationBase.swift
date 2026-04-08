@@ -78,16 +78,17 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
             nfcError = strings?.technicalErrorMessage ?? ""
         }
     }
-    
+
     func handleNoCertLockError(
         error: Error,
         session: NFCTagReaderSession
     ) {
-        Self.logger().error("NFC: Failed to find lock for cert")
+        Self.logger().error("NFC: Failed to find lock for cert, error: \(error)")
         nfcError = strings?.wrongCardErrorMessage ?? ""
+        operationError = DecryptError.noCertLock
         session.invalidate(errorMessage: nfcError)
     }
-    
+
     func handleIdCardInternalError(
         _ error: IdCardInternalError,
         session: NFCTagReaderSession

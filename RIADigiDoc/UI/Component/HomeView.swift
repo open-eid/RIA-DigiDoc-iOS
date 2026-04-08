@@ -303,6 +303,7 @@ struct HomeView: View {
         if !files.isEmpty {
             isFileOpeningLoading = true
             viewModel.isImporting = false
+            viewModel.setFileOpeningMethod(.all)
             viewModel.setChosenFiles(.success(files))
         }
     }
