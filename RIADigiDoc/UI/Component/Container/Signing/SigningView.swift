@@ -24,7 +24,7 @@ import CommonsLib
 import UtilsLib
 
 struct SigningView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppTheme private var theme
     @AppTypography private var typography
@@ -463,17 +463,24 @@ struct SigningView: View {
         .animation(.easeInOut, value: showRemoveSignatureModal)
         .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
-            Toast.show(
-                languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
-            )
+            let localizedMessage = languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
+            Toast.show(localizedMessage)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
             viewModel.resetErrorMessage()
         }
         .onChange(of: viewModel.successMessage) { _, message in
             guard let message else { return }
-            Toast.show(
-                languageSettings.localized(message.key, [message.args.joined(separator: ", ")]),
-                type: .success
-            )
+            let localizedMessage = languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+            Toast.show(localizedMessage, type: .success)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
             viewModel.resetSuccessMessage()
         }
         .onChange(of: viewModel.navigateToNestedCryptoContainerView) { _, isNavigating in

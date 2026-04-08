@@ -25,6 +25,7 @@ import UtilsLib
 
 struct EncryptView: View {
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppTheme private var theme
     @AppTypography private var typography
     @Environment(NavigationPathManager.self) private var pathManager
@@ -158,7 +159,7 @@ struct EncryptView: View {
     private var containerExtension: String {
         URL(fileURLWithPath: viewModel.containerName).pathExtension
     }
-    
+
     private var containerIcon: String {
         viewModel.isContainerDecrypted
             ? "ic_m3_encrypted_off_48pt_wght400"
@@ -513,18 +514,27 @@ struct EncryptView: View {
         .animation(.easeInOut, value: showRenameModal)
         .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
-            Toast.show(
-                languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
-            )
+            let localizedMessage = languageSettings
+                .localized(error.key, [error.args.joined(separator: ", ")])
+            Toast.show(localizedMessage)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
             viewModel.resetErrorMessage()
             encryptionButtonEnabled = true
         }
         .onChange(of: viewModel.successMessage) { _, message in
             guard let message else { return }
-            Toast.show(
-                languageSettings.localized(message.key, [message.args.joined(separator: ", ")]),
-                type: .success
-            )
+            let localizedMessage = languageSettings
+                .localized(message.key, [message.args.joined(separator: ", ")])
+            Toast.show(localizedMessage, type: .success)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
             viewModel.resetSuccessMessage()
         }
         .onChange(of: viewModel.navigateToNestedSignedContainerView) { _, isNavigating in

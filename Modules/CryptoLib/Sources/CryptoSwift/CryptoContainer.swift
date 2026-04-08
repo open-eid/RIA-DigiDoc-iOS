@@ -420,42 +420,7 @@ extension CryptoContainer {
     }
 
     private static func open(containerFile: URL) async throws -> CryptoContainerProtocol {
-        let fileManager = Container.shared.fileManager()
-
-        let cryptoContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.ContainerFolder],
-            fileManager: fileManager
-        )
-
-        let savedContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.SavedFiles],
-            fileManager: fileManager
-        )
-
-        // Do not rename when nested container opened
-        let isFileInSavedContainersDirectory = containerFile.absoluteString.hasPrefix(
-            savedContainersDirectory.absoluteString
-        )
-
-        let isFileInRecentDocuments = containerFile.absoluteString.hasPrefix(
-            cryptoContainersDirectory.absoluteString
-        )
-
-        let shouldRenameContainer = isFileInRecentDocuments && !isFileInSavedContainersDirectory
-
-        var renamedContainerFile = containerFile
-
-        if shouldRenameContainer {
-            renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                for: containerFile,
-                in: isFileInRecentDocuments ? containerFile.deletingLastPathComponent() :
-                    containerFile.deletingLastPathComponent().deletingLastPathComponent()
-            )
-
-            try fileManager.moveItem(at: containerFile, to: renamedContainerFile)
-        }
-
-        guard let cdocInfo = try Decrypt.cdocInfo(renamedContainerFile.resolvedPath) as? CdocInfo else {
+        guard let cdocInfo = try Decrypt.cdocInfo(containerFile.resolvedPath) as? CdocInfo else {
             throw CryptoError.containerOpeningFailed(
                 CryptoErrorDetail(
                     message: "Cannot open container with invalid CDOC info"
@@ -475,7 +440,7 @@ extension CryptoContainer {
         }
 
         return try await create(
-            containerFile: renamedContainerFile,
+            containerFile: containerFile,
             dataFiles: dataFiles,
             recipients: recipients,
             isDecrypted: false,

@@ -22,6 +22,7 @@ import FactoryKit
 import LibdigidocLibSwift
 
 struct CryptoFileOpeningView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
 
@@ -88,9 +89,19 @@ struct CryptoFileOpeningView: View {
                 : languageSettings.localized("File successfully added")
 
                 Toast.show(message, type: .success)
+
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
             }
         } else {
-            Toast.show(languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? []))
+            let localizedMessage = languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? [])
+            Toast.show(localizedMessage)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
             viewModel.handleError()
             isFileOpeningLoading = viewModel.isFileOpeningLoading
             isNavigatingToNextView = viewModel.isNavigatingToNextView

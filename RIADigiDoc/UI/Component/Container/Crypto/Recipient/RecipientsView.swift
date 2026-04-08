@@ -108,13 +108,9 @@ struct RecipientsView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                             .accessibilityLabel({
-                                if recipientIndex != 0 {
-                                    let prefix = languageSettings.localized("Recipient")
-                                    let name = nameText.lowercased()
-                                    return Text(verbatim: "\(prefix) \(recipientIndex), \(name)")
-                                } else {
-                                    return Text(verbatim: nameText.lowercased())
-                                }
+                                let prefix = languageSettings.localized("Recipient")
+                                let name = nameText.lowercased()
+                                return Text(verbatim: "\(prefix) \(recipientIndex + 1), \(name)")
                             }())
 
                         let certType = recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
@@ -142,7 +138,7 @@ struct RecipientsView: View {
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onSurface)
                             .accessibilityLabel(
-                                Text(verbatim: languageSettings.localized("Remove container"))
+                                Text(verbatim: languageSettings.localized("Remove recipient"))
                             )
                     })
             }

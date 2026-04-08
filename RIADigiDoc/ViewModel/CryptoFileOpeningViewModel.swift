@@ -89,7 +89,45 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
                 throw FileOpeningError.noDataFiles
             }
 
-            files[0] = firstFile
+            let cryptoContainersDirectory = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.ContainerFolder],
+                fileManager: fileManager
+            )
+
+            let savedContainersDirectory = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.SavedFiles],
+                fileManager: fileManager
+            )
+
+            // Do not rename when nested container opened
+            let isFileInSavedContainersDirectory = firstFile.absoluteString.hasPrefix(
+                savedContainersDirectory.absoluteString
+            )
+
+            let sameFileNameAlreadyExists = fileManager.fileExists(
+                atPath: cryptoContainersDirectory.appending(
+                    path: firstFile.path(percentEncoded: false),
+                    directoryHint: .notDirectory
+                )
+                .path(percentEncoded: false)
+            )
+
+            let shouldRenameContainer = sameFileNameAlreadyExists && !isFileInSavedContainersDirectory
+
+            var renamedContainerFile = firstFile
+
+            if shouldRenameContainer {
+                renamedContainerFile = Container.shared.containerUtil().getContainerFile(
+                    for: firstFile,
+                    in: cryptoContainersDirectory
+                )
+            }
+
+            if firstFile.path != renamedContainerFile.path {
+                try fileManager.moveItem(at: firstFile, to: renamedContainerFile)
+            }
+
+            files[0] = renamedContainerFile
 
             let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
             sharedContainerViewModel.setCryptoContainer(container)

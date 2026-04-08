@@ -97,7 +97,7 @@ struct NFCView: View {
             languageSettings.localized(key, args)
         }
     }
-    
+
     private var signatureAddedMessage: String {
         languageSettings.localized("Signature added")
     }
@@ -257,6 +257,12 @@ struct NFCView: View {
         .onChange(of: viewModel.nfcErrorKey) { _, newKey in
             guard newKey != nil else { return }
             Toast.show(nfcErrorMessage)
+
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(nfcErrorMessage)
+            }
+
+            viewModel.resetErrors()
         }
         .onDisappear {
             cancelSigning()
@@ -364,7 +370,7 @@ struct NFCView: View {
             guard let container = updatedContainer else {
                 return
             }
-            
+
             Toast.show(signatureAddedMessage, type: .success)
 
             if voiceOverEnabled {

@@ -114,11 +114,11 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     func getRpUuid() async -> String {
         await dataStore.getRelyingPartyUUID()
     }
-    
+
     func getTsaUrl() async -> String {
         await dataStore.getTSAUrl()
     }
-    
+
     func getSivaUrl() async -> String {
         await dataStore.getValidationServiceURL()
     }

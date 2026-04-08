@@ -29,7 +29,7 @@ struct FloatingLabelTextField: View {
 
     @AccessibilityFocusState private var isAccessibilityFocused: Bool
 
-    @State private var selection: TextSelection? = nil
+    @State private var selection: TextSelection?
 
     @State private var floatingLabelHeight: CGFloat = 0
 
@@ -49,6 +49,7 @@ struct FloatingLabelTextField: View {
     let identifier: String
     let sortPriority: Double
     let spellOutCharacters: Bool
+    let showBorder: Bool
     let onDone: (() -> Void)
 
     init(
@@ -67,6 +68,7 @@ struct FloatingLabelTextField: View {
         identifier: String = "",
         sortPriority: Double = 0,
         spellOutCharacters: Bool = false,
+        showBorder: Bool = true,
         onDone: @escaping (() -> Void) = {}
     ) {
         self.title = title
@@ -84,6 +86,7 @@ struct FloatingLabelTextField: View {
         self.identifier = identifier
         self.sortPriority = sortPriority
         self.spellOutCharacters = spellOutCharacters
+        self.showBorder = showBorder
         self.onDone = onDone
     }
 
@@ -107,7 +110,7 @@ struct FloatingLabelTextField: View {
     }
 
     private var shouldFloatLabel: Bool {
-        !text.isEmpty || isFocused
+        !title.isEmpty && !text.isEmpty && isFocused
     }
 
     private var isInteractionEnabled: Bool {
@@ -234,7 +237,7 @@ struct FloatingLabelTextField: View {
                 )
                 .padding(.horizontal, Dimensions.Padding.SPadding)
                 .padding(.vertical, Dimensions.Padding.MSPadding)
-                .background(borderBackground)
+                .background(showBorder ? borderBackground : nil)
                 .contentShape(Rectangle())
             }
         )
@@ -270,8 +273,10 @@ struct FloatingLabelTextField: View {
         )
         .padding(.horizontal, Dimensions.Padding.SPadding)
         .padding(.vertical, Dimensions.Padding.MSPadding)
-        .background(borderBackground)
-        .contentShape(Rectangle())
+        .background(
+            (showBorder ? borderBackground : nil)
+                .contentShape(Rectangle())
+        )
     }
 
     @ViewBuilder
@@ -474,7 +479,7 @@ struct FloatingLabelTextField: View {
                 .offset(
                     y: shouldFloatLabel ?
                     -(Dimensions.Padding.MSPadding + textFieldTopPadding + labelHeight / 2) :
-                        Dimensions.Padding.MSPadding
+                        0
                 )
                 .animation(
                     .easeInOut(
@@ -491,6 +496,7 @@ struct FloatingLabelTextField: View {
 }
 
 private extension View {
+    // swiftlint:disable:next function_parameter_count
     func textFieldModifiers(
         isDisabled: Bool,
         keyboardType: UIKeyboardType,

@@ -344,6 +344,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         case .containerFileInvalid, .recipientsEmpty:
             NFCViewModel.logger().error("NFC: Configuration error")
             nfcErrorKey = "NFC session error"
+        case .noCertLock:
+            NFCViewModel.logger().error("NFC: Failed to find lock for cert")
+            nfcErrorKey = "Failed to find lock for cert"
         case .unknown(let underlying):
             NFCViewModel.logger().error("NFC: Unknown error - \(underlying)")
             nfcErrorKey = "General error"

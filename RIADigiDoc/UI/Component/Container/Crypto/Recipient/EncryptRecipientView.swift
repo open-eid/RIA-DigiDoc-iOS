@@ -24,6 +24,7 @@ import CommonsLib
 import CryptoObjCWrapper
 
 struct EncryptRecipientView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
 
@@ -32,6 +33,9 @@ struct EncryptRecipientView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @AccessibilityFocusState private var isTitleFocused: Bool
+    @AccessibilityFocusState private var isSearchFieldFocused: Bool
+    @AccessibilityFocusState private var focusedRecipientIndex: Int?
     @FocusState private var isSearchFocused: Bool
     @State private var isSearchExpanded = false
 
@@ -67,11 +71,11 @@ struct EncryptRecipientView: View {
     var encryptLabel: String {
         languageSettings.localized("Encrypt")
     }
-    
+
     var noSearchResultsMessage: String {
         languageSettings.localized("Person or company does not own a valid certificate")
     }
-    
+
     private var addedRecipientsSection: some View {
         VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
             if noSearchResults {
@@ -99,7 +103,7 @@ struct EncryptRecipientView: View {
         .listRowSpacing(0)
         .listSectionSpacing(.compact)
     }
-    
+
     private var filteredRecipientsSection: some View {
         VStack {
             if #available(iOS 26.0, *) {
@@ -134,21 +138,59 @@ struct EncryptRecipientView: View {
                                 .foregroundStyle(theme.onSurface)
                                 .font(typography.headlineSmall)
                                 .padding(.top, Dimensions.Padding.SPadding)
+                                .minimumScaleFactor(0.5)
                                 .accessibilityHeading(.h1)
                                 .accessibilityAddTraits([.isHeader])
+                                .accessibilityFocused($isTitleFocused)
+                                .accessibilitySortPriority(3)
+                                .onAppear {
+                                    if noSearchResults {
+                                        isTitleFocused = true
+                                    }
+                                }
                         }
                         HStack {
                             Image(systemName: "magnifyingglass")
                                 .foregroundStyle(theme.onSurfaceVariant)
                                 .accessibilityHidden(true)
 
-                            TextField(
-                                languageSettings.localized("Search recipients"),
-                                text: $viewModel.searchText
+                            FloatingLabelTextField(
+                                title: "",
+                                placeholder: languageSettings.localized("Search recipients"),
+                                text: $viewModel.searchText,
+                                submitLabel: .done,
+                                identifier: "searchRecipients",
+                                sortPriority: 1,
+                                showBorder: false,
+                                onDone: {
+                                    if viewModel.searchText.allSatisfy(\.isNumber) &&
+                                        viewModel.searchText.count == 11 &&
+                                        !PersonalCodeValidator.isPersonalCodeValid(viewModel.searchText) {
+                                        let personalCodeNotValidMessage = languageSettings.localized(
+                                            "Personal code is not valid"
+                                        )
+
+                                        Toast.show(personalCodeNotValidMessage)
+
+                                        if voiceOverEnabled {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                AccessibilityUtil.announceMessage(
+                                                    personalCodeNotValidMessage
+                                                )
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    isTitleFocused = true
+                                                }
+                                            }
+                                        }
+                                        return
+                                    }
+
+                                    Task {
+                                        await viewModel.loadRecipients()
+                                    }
+                                }
                             )
-                            .submitLabel(.done)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled(true)
+                            .accessibilityFocused($isSearchFieldFocused)
                             .focused($isSearchFocused)
                             .onChange(of: isSearchFocused) {  _, newValue in
                                 isSearchExpanded = newValue
@@ -156,54 +198,15 @@ struct EncryptRecipientView: View {
                             .onChange(of: viewModel.searchText) {
                                 viewModel.handleSearchTextChange()
                             }
-                            .onSubmit {
-                                if viewModel.searchText.allSatisfy(\.isNumber) &&
-                                    viewModel.searchText.count == 11 &&
-                                    !PersonalCodeValidator.isPersonalCodeValid(viewModel.searchText) {
-                                    Toast.show(languageSettings.localized("Personal code is not valid"))
-                                    return
-                                }
-
-                                Task {
-                                    await viewModel.loadRecipients()
-
-                                    if noRecipients {
-                                        showNoRecipientsFoundMessage = true
-                                    }
-
-                                    isSearchFocused = true
-                                }
-                            }
-
-                            if isSearchExpanded {
-                                Button(
-                                    action: {
-                                        isSearchFocused = false
-                                        viewModel.searchText = ""
-
-                                        Task {
-                                            await viewModel.loadRecipients()
-                                        }
-                                    },
-                                    label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: Dimensions.Icon.IconSizeXXXS,
-                                                   height: Dimensions.Icon.IconSizeXXXS)
-                                            .foregroundStyle(theme.onSurfaceVariant)
-                                    })
-                                .accessibilityLabel(languageSettings.localized("Clear text"))
-                            }
                         }
                         .padding(.horizontal, Dimensions.Padding.SPadding)
-                        .padding(.vertical, Dimensions.Padding.MSPadding)
                         .background(
                             RoundedRectangle(cornerRadius: Dimensions.Padding.MPadding, style: .continuous)
                                 .fill(Color(.systemGray6))
                         )
                         .padding(.top, Dimensions.Padding.LPadding)
                         .padding(.bottom, Dimensions.Padding.SPadding)
+
                         ScrollView {
                             if noSearchResults && !isSearchExpanded {
                                 VStack {
@@ -218,7 +221,11 @@ struct EncryptRecipientView: View {
                                 .scrollDisabled(true)
                                 .scrollContentBackground(.hidden)
                             } else if showNoRecipientsFoundMessage {
-                                emptyStateView(languageSettings.localized("Person or company does not own a valid certificate"))
+                                emptyStateView(
+                                    languageSettings.localized(
+                                        "Person or company does not own a valid certificate"
+                                    )
+                                )
                             } else {
                                 filteredRecipientsSection
                             }
@@ -229,8 +236,10 @@ struct EncryptRecipientView: View {
                                 addedRecipientsSection
                             }
                         }
+                        .accessibilitySortPriority(filteredRecipients.isEmpty ? 2 : 0)
                     }
                     .padding(.horizontal, Dimensions.Padding.SPadding)
+                    .accessibilityElement(children: .contain)
 
                     if showRemoveRecipientModal {
                         ConfirmModalView(
@@ -256,32 +265,37 @@ struct EncryptRecipientView: View {
                         )
                     }
                 }
-                .safeAreaInset(edge: .bottom) {
+                .overlay(alignment: .bottom) {
                     HStack(spacing: Dimensions.Padding.XSPadding) {
-                        Button(action: {
-                            if encryptionButtonEnabled {
-                                encryptionButtonEnabled = false
-                                pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
-                                encryptionButtonEnabled = true
-                            }
-                        }, label: {
-                            HStack(spacing: Dimensions.Padding.XSPadding) {
-                                Image("ic_m3_encrypted_48pt_wght400")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(
-                                        width: Dimensions.Icon.IconSizeXXS,
-                                        height: Dimensions.Icon.IconSizeXXS
-                                    )
-                                    .foregroundStyle(theme.onPrimaryContainer)
-                                    .accessibilityHidden(true)
+                        if encryptionButtonEnabled {
+                            Button(action: {
+                                if encryptionButtonEnabled {
+                                    encryptionButtonEnabled = false
+                                    pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
+                                    encryptionButtonEnabled = true
+                                }
+                            }, label: {
+                                HStack(spacing: Dimensions.Padding.XSPadding) {
+                                    Image("ic_m3_encrypted_48pt_wght400")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(
+                                            width: Dimensions.Icon.IconSizeXXS,
+                                            height: Dimensions.Icon.IconSizeXXS
+                                        )
+                                        .foregroundStyle(theme.onPrimaryContainer)
+                                        .accessibilityHidden(true)
 
-                                Text(verbatim: encryptLabel)
-                                    .foregroundStyle(theme.onPrimaryContainer)
-                                    .font(typography.bodyLarge)
-                                    .accessibilityHidden(true)
-                            }
-                        })
+                                    Text(verbatim: encryptLabel)
+                                        .foregroundStyle(theme.onPrimaryContainer)
+                                        .font(typography.bodyLarge)
+                                        .accessibilityHidden(true)
+                                }
+                            })
+                            .accessibilityLabel(encryptLabel.lowercased())
+                            .accessibilityAddTraits([.isButton])
+                            .accessibilityIdentifier("bottomEncryptButton")
+                        }
                     }
                     .padding(Dimensions.Padding.MSPadding)
                     .background(
@@ -296,9 +310,6 @@ struct EncryptRecipientView: View {
                     )
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(Dimensions.Padding.MPadding)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(encryptLabel.lowercased())
-                    .accessibilityIdentifier("bottomEncryptButton")
                 }
                 .onAppear {
                     Task { @MainActor in
@@ -310,9 +321,23 @@ struct EncryptRecipientView: View {
                     showNoRecipientsFoundMessage = false
                 }
                 .onChange(of: viewModel.errorMessage) { _, error in
-                    guard !error.isEmpty else { return }
-                    Toast.show(languageSettings.localized(error))
-                    encryptionButtonEnabled = true
+                    guard let errorMessage = error, !errorMessage.isEmpty else { return }
+
+                    isTitleFocused = false
+
+                    let localizedMessage = languageSettings.localized(errorMessage)
+                    Toast.show(localizedMessage)
+
+                    if voiceOverEnabled {
+                        encryptionButtonEnabled = false
+                        AccessibilityUtil.announceMessage(localizedMessage)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            isTitleFocused = true
+
+                        }
+                    }
+
+                    viewModel.errorMessage = nil
                 }
             }
         )
@@ -338,6 +363,7 @@ struct EncryptRecipientView: View {
         .contentShape(Rectangle())
         .buttonStyle(.plain)
         .background(theme.surface)
+        .accessibilityFocused($focusedRecipientIndex, equals: index)
     }
 
     private func addedRecipientRow(index: Int, item: Addressee) -> some View {
@@ -364,7 +390,7 @@ struct EncryptRecipientView: View {
         .buttonStyle(.plain)
         .background(theme.surface)
     }
-    
+
     private func emptyStateView(_ text: String) -> some View {
         ContentUnavailableView {
             Text(verbatim: text)
@@ -377,7 +403,7 @@ struct EncryptRecipientView: View {
 
 #Preview {
     EncryptRecipientView()
-    .environment(Container.shared.languageSettings())
-    .environment(Container.shared.themeSettings())
-    .environment(NavigationPathManager())
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }
