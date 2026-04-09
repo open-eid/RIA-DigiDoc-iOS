@@ -50,10 +50,10 @@ struct WebEidResponseUtilTests {
     @Test
     func createResponseURL_returnURL() async throws {
         let result = try WebEidResponseUtil.createResponseURL(
-            responseUri: "https://riadigidoc.ee/auth",
+            responseUri: "https://id-test.eesti.ee/auth",
             payload: ["test": "test"]
         )
-        let expected =  "https://riadigidoc.ee/auth#eyJ0ZXN0IjoidGVzdCJ9"
+        let expected =  "https://id-test.eesti.ee/auth#eyJ0ZXN0IjoidGVzdCJ9"
 
         #expect(result.absoluteString == expected)
     }

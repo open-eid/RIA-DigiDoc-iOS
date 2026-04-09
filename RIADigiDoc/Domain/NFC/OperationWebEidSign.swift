@@ -123,7 +123,7 @@ public class OperationWebEidSign: NFCOperationBase, OperationWebEidSignProtocol 
                    let expectedCert = Data(base64Encoded: expectedSigningCertBase64) {
 
                     if expectedCert != signerCert {
-                        let error = ReadCertAndSignError.userAgentEmpty
+                        let error = ReadCertAndSignError.certMismatch
                         OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
                         operationError = error
                         session.invalidate(errorMessage: strings?.technicalErrorMessage ??

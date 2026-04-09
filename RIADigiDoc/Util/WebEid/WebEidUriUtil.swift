@@ -32,7 +32,7 @@ public enum WebEidOperation: String, CaseIterable, Sendable {
 
 public enum WebEidUriUtil {
     private static let customScheme = "web-eid-mobile"
-    private static let appLinksHost = "riadigidoc.ee"
+    private static let appLinksHost = "id-test.eesti.ee"
 
     public static func isWebEidUri(_ url: URL) -> Bool {
         getOperation(from: url) != WebEidOperation.unknown

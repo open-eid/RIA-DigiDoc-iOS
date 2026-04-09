@@ -29,22 +29,22 @@ struct WebEidUriUtilTests {
 
     @Test
     func isWebEidUri_appLinks_auth() {
-        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://riadigidoc.ee/auth")))
+        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://id-test.eesti.ee/auth")))
     }
 
     @Test
     func isWebEidUri_appLinks_cert() {
-        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://riadigidoc.ee/cert")))
+        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://id-test.eesti.ee/cert")))
     }
 
     @Test
     func isWebEidUri_appLinks_sign() {
-        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://riadigidoc.ee/sign")))
+        #expect(WebEidUriUtil.isWebEidUri(makeURL("https://id-test.eesti.ee/sign")))
     }
 
     @Test
     func isWebEidUri_appLinks_unknownOperation() {
-        #expect(!WebEidUriUtil.isWebEidUri(makeURL("https://riadigidoc.ee/unknown")))
+        #expect(!WebEidUriUtil.isWebEidUri(makeURL("https://id-test.eesti.ee/unknown")))
     }
 
     @Test
@@ -64,22 +64,22 @@ struct WebEidUriUtilTests {
 
     @Test
     func getOperation_appLinks_auth() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/auth#dGVzdA")) == .auth)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://id-test.eesti.ee/auth#dGVzdA")) == .auth)
     }
 
     @Test
     func getOperation_appLinks_cert() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/cert#dGVzdA")) == .cert)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://id-test.eesti.ee/cert#dGVzdA")) == .cert)
     }
 
     @Test
     func getOperation_appLinks_sign() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/sign#dGVzdA")) == .sign)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://id-test.eesti.ee/sign#dGVzdA")) == .sign)
     }
 
     @Test
     func getOperation_appLinks_unknownOperation_returnsNil() {
-        #expect(WebEidUriUtil.getOperation(from: makeURL("https://riadigidoc.ee/unknown")) == .unknown)
+        #expect(WebEidUriUtil.getOperation(from: makeURL("https://id-test.eesti.ee/unknown")) == .unknown)
     }
 
     @Test

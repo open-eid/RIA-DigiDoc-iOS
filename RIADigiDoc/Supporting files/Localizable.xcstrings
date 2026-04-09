@@ -5340,13 +5340,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The selected ID card does not match the previously used certificate. Please use the same ID card you authenticated with."
+            "value" : "The selected ID card does not match the requested person. Please use the correct ID card."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valitud ID-kaart ei vasta varem kasutatud sertifikaadile. Palun kasuta sama ID-kaarti, millega autentisid."
+            "value" : "Valitud ID-kaart ei vasta nõutud isikule. Palun kasuta õiget ID-kaarti."
           }
         }
       }
