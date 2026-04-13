@@ -64,6 +64,7 @@ struct IdCardActionView: View {
                 isIdCardActionMessageFocused = true
             }
         }
+        .accessibilityElement(children: .combine)
     }
 }
 

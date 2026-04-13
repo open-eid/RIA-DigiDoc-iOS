@@ -230,36 +230,14 @@ struct MyEidPinChangeView: View {
                             .padding(.bottom, Dimensions.Padding.LPadding)
                             .frame(maxWidth: .infinity)
 
-                            VStack {
-                                FloatingLabelTextField(
-                                    title: flowCodeType,
-                                    placeholder: flowCodeType,
-                                    text: $viewModel.input,
-                                    isSecure: true,
-                                    isError: isInputError,
-                                    errorText: inputErrorMessage,
-                                    keyboardType: .numberPad,
-                                    identifier: "pinInput",
-                                    sortPriority: 0,
-                                    spellOutCharacters: true,
-                                    onDone: {
-                                        if voiceOverEnabled || (viewModel.step == .confirm || (
-                                            viewModel.input.isEmpty || !inputErrorMessage.isEmpty
-                                        )) { return }
-
-                                        Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
-                                    }
-                                )
-
-                                Text(verbatim: flowDescription)
-                                    .font(typography.bodySmall)
-                                    .foregroundStyle(isInputError ? theme.error : theme.onSurface)
-                                    .padding(.vertical, Dimensions.Padding.MSPadding)
-                                    .multilineTextAlignment(.leading)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .accessibilitySortPriority(1)
+                            // Allow keyboard to focus on input fields
+                            // but have custom sort priority (contain to VStack) for these elements only with VoiceOver
+                            if voiceOverEnabled {
+                                pinInputField
+                                    .accessibilityElement(children: .contain)
+                            } else {
+                                pinInputField
                             }
-                            .accessibilityElement(children: .contain)
                         }
                     }
 
@@ -321,34 +299,35 @@ struct MyEidPinChangeView: View {
         )
     }
 
-//    @ViewBuilder
-//    private var inputGroup: some View {
-//        VStack {
-//            FloatingLabelTextField(
-//                title: flowCodeType,
-//                placeholder: flowCodeType,
-//                text: $viewModel.input,
-//                isSecure: true,
-//                isError: isInputError,
-//                errorText: inputErrorMessage,
-//                keyboardType: .numberPad,
-//                identifier: "pinInput",
-//                sortPriority: 0,
-//                spellOutCharacters: true,
-//                onDone: {
-//                    if voiceOverEnabled || (viewModel.step == .confirm || (
-//                        viewModel.input.isEmpty || !inputErrorMessage.isEmpty
-//                    )) { return }
-//
-//                    Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
-//                }
-//            )
-//
-//            Text(verbatim: flowDescription)
-//                .font(typography.bodySmall)
-//                .foregroundStyle(isInputError ? theme.error : theme.onSurface)
-//                .padding(.vertical, Dimensions.Padding.MSPadding)
-//                .accessibilitySortPriority(1)
-//        }
-//    }
+    private var pinInputField: some View {
+        VStack {
+            FloatingLabelTextField(
+                title: flowCodeType,
+                placeholder: flowCodeType,
+                text: $viewModel.input,
+                isSecure: true,
+                isError: isInputError,
+                errorText: inputErrorMessage,
+                keyboardType: .numberPad,
+                identifier: "pinInput",
+                sortPriority: 0,
+                spellOutCharacters: true,
+                onDone: {
+                    if voiceOverEnabled || (viewModel.step == .confirm || (
+                        viewModel.input.isEmpty || !inputErrorMessage.isEmpty
+                    )) { return }
+
+                    Task { await viewModel.submit(nfcStringsUtil: nfcStringsUtil) }
+                }
+            )
+
+            Text(verbatim: flowDescription)
+                .font(typography.bodySmall)
+                .foregroundStyle(isInputError ? theme.error : theme.onSurface)
+                .padding(.vertical, Dimensions.Padding.MSPadding)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilitySortPriority(1)
+        }
+    }
 }

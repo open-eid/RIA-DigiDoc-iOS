@@ -28,6 +28,8 @@ struct IdCardInputView: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    @AccessibilityFocusState private var isActionMessageFocused: Bool
+
     let personIdentifier: String
     @Binding var pinNumber: String
     @Binding var pinError: String
@@ -73,6 +75,7 @@ struct IdCardInputView: View {
             Text(verbatim: actionMessage)
                 .font(typography.labelLarge)
                 .foregroundStyle(theme.onSurfaceVariant)
+                .accessibilityFocused($isActionMessageFocused)
 
             Text(verbatim: personIdentifier)
                 .font(typography.bodyLarge)
@@ -95,6 +98,11 @@ struct IdCardInputView: View {
                 Text(verbatim: pinError)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.async {
+                isActionMessageFocused = true
             }
         }
     }

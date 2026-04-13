@@ -22,6 +22,7 @@ import FactoryKit
 import IdCardLib
 
 struct NFCInputView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(LanguageSettings.self) private var languageSettings
 
     @AppTheme private var theme
@@ -80,27 +81,14 @@ struct NFCInputView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: Dimensions.Padding.MPadding) {
-                VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
-                    FloatingLabelTextField(
-                        title: canNumberTitle,
-                        placeholder: canNumberTitle,
-                        text: $canNumber,
-                        isError: !(canNumberError?.isEmpty ?? true),
-                        errorText: canNumberError ?? "",
-                        keyboardType: .numberPad,
-                        sortPriority: 0
-                    )
-                    .onChange(of: canNumber) {
-                        onInputChange()
-                    }
-
-                    Text(verbatim: canNumberLocationLabel)
-                        .font(typography.labelMedium)
-                        .foregroundStyle(theme.onSecondaryContainer)
-                        .padding(.top, Dimensions.Padding.XXSPadding)
-                        .accessibilitySortPriority(1)
+                // Allow keyboard to focus on input fields
+                // but have custom sort priority (contain to VStack) for these elements only with VoiceOver
+                if voiceOverEnabled {
+                    nfcInputFields
+                        .accessibilityElement(children: .contain)
+                } else {
+                    nfcInputFields
                 }
-                .accessibilityElement(children: .contain)
             }
             .padding(.bottom, Dimensions.Padding.MPadding)
 
@@ -136,6 +124,29 @@ struct NFCInputView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var nfcInputFields: some View {
+        VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
+            FloatingLabelTextField(
+                title: canNumberTitle,
+                placeholder: canNumberTitle,
+                text: $canNumber,
+                isError: !(canNumberError?.isEmpty ?? true),
+                errorText: canNumberError ?? "",
+                keyboardType: .numberPad,
+                sortPriority: 0
+            )
+            .onChange(of: canNumber) {
+                onInputChange()
+            }
+
+            Text(verbatim: canNumberLocationLabel)
+                .font(typography.labelMedium)
+                .foregroundStyle(theme.onSecondaryContainer)
+                .padding(.top, Dimensions.Padding.XXSPadding)
+                .accessibilitySortPriority(1)
         }
     }
 }

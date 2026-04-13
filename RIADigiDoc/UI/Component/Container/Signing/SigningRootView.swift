@@ -29,6 +29,7 @@ struct SigningRootView: View {
     @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var chosenMethod: ActionMethod = .idCardViaNFC
+    @State private var isSuccess = false
 
     @State private var viewModel: SigningRootViewModel
 
@@ -58,6 +59,7 @@ struct SigningRootView: View {
                         pinType: CodeType.pin2,
                         signedContainer: container,
                         onSuccess: { container in
+                            isSuccess = true
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setSignedContainer(container)
                             sharedContainerViewModel.setIsSignatureAdded(true)
@@ -76,11 +78,13 @@ struct SigningRootView: View {
                         ],
                         signedContainer: container,
                         onSuccess: { container in
+                            isSuccess = true
                             sharedContainerViewModel.removeLastContainer()
                             sharedContainerViewModel.setSignedContainer(container)
                             sharedContainerViewModel.setIsSignatureAdded(true)
                         }
                     )
+                    .accessibilityHidden(isSuccess)
                 }
             case .mobileId:
                 if let container = signedContainer as? SignedContainerProtocol {

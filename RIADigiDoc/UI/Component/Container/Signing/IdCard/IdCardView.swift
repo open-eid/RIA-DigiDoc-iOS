@@ -205,9 +205,6 @@ struct IdCardView: View {
                             await viewModel.stopDiscoveringReaders()
                             cancelIdCardAction()
                             resetIdCardAction()
-                            isInProgress = false
-                            isShowingPinView = false
-                            isShowingLoadingView = false
 
                             onSuccessDecrypt(container)
                             dismiss()
@@ -239,6 +236,7 @@ struct IdCardView: View {
                         icon: "ic_m3_smart_card_reader_48pt_wght400",
                         message: $idCardActionMessage
                     )
+                    .accessibilityHidden(!isInProgress)
                 } else if isInProgress && isShowingPinView {
                     IdCardInputView(
                         personIdentifier: personIdentifier,
@@ -385,6 +383,10 @@ struct IdCardView: View {
             }
         }
         .onDisappear {
+            isInProgress = false
+            isShowingPinView = false
+            isShowingLoadingView = false
+            idCardActionMessage = ""
             pinNumber.removeAll()
             cancelIdCardAction()
         }
@@ -491,17 +493,19 @@ struct IdCardView: View {
 
             await viewModel.stopDiscoveringReaders()
             cancelIdCardAction()
-            isInProgress = false
-            isShowingPinView = false
-            isShowingLoadingView = false
 
-            Toast.show(signatureAddedMessage, type: .success)
-            if voiceOverEnabled {
-                AccessibilityUtil.announceMessage(signatureAddedMessage)
+            await MainActor.run {
+                idCardActionMessage = ""
+
+                Toast.show(signatureAddedMessage, type: .success)
+
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(signatureAddedMessage)
+                }
+
+                onSuccess(container)
+                dismiss()
             }
-
-            onSuccess(container)
-            dismiss()
         }
     }
 }

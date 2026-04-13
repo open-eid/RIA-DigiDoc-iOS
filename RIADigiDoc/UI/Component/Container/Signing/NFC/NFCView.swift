@@ -367,6 +367,10 @@ struct NFCView: View {
             
             Toast.show(signatureAddedMessage, type: .success)
 
+            if voiceOverEnabled {
+                AccessibilityUtil.announceMessage(signatureAddedMessage)
+            }
+
             onSuccess(container)
             dismiss()
         }
