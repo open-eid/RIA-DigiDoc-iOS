@@ -60,6 +60,7 @@ struct ToastOverlay: View {
                     Text(verbatim: message)
                         .lineLimit(nil)
                         .minimumScaleFactor(0.5)
+                        .accessibilityHidden(true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Dimensions.Padding.SPadding)

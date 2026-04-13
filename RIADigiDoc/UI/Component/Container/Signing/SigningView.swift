@@ -25,6 +25,7 @@ import UtilsLib
 
 struct SigningView: View {
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppTheme private var theme
     @AppTypography private var typography
     @Environment(LanguageSettings.self) private var languageSettings
@@ -56,7 +57,8 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
-    @AccessibilityFocusState private var focusedField: AccessibilityField?
+    @State private var scrollPosition: Int?
+    @State private var focusedSignatureIndex: Int?
 
     private var containerTitle: String {
         !isContainerSigned && !isNestedContainer ?
@@ -282,6 +284,7 @@ struct SigningView: View {
                                                 selectedSignature: $selectedSignature,
                                                 containerMimetype: $viewModel.containerMimetype,
                                                 dataFilesCount: viewModel.dataFiles.count,
+                                                focusedIndex: $focusedSignatureIndex,
                                                 showRemoveSignatureButton: viewModel.isSignatureRemoveButtonShown(),
                                                 showRemoveSignatureModal: $showRemoveSignatureModal,
                                                 nameUtil: nameUtil,
@@ -329,6 +332,11 @@ struct SigningView: View {
                             }
                         }
                         .padding(Dimensions.Padding.SPadding)
+                        .scrollPosition(id: $scrollPosition, anchor: .bottom)
+                        .onChange(of: viewModel.signatures.count) { previousCount, newCount in
+                            guard newCount > previousCount else { return }
+                            scrollToBottom()
+                        }
 
                         if isSignedContainer {
                             if let containerFile = viewModel.containerURL {
@@ -386,8 +394,10 @@ struct SigningView: View {
                         }
                     }
                     .onAppear {
-                        if viewModel.isSignatureAdded() {
-                            selectedTab = .signatures
+                        DispatchQueue.main.async {
+                            if viewModel.isSignatureAdded() {
+                                selectedTab = .signatures
+                            }
                         }
 
                         containerLoadingTask = Task {
@@ -470,6 +480,18 @@ struct SigningView: View {
             if isNavigating {
                 viewModel.navigateToNestedCryptoContainerView.toggle()
                 pathManager.navigate(to: .encryptView(isWithEncryption: false))
+            }
+        }
+    }
+
+    private func scrollToBottom() {
+        DispatchQueue.main.async {
+            guard let lastSignature = viewModel.signatures.indices.last else { return }
+
+            scrollPosition = lastSignature
+
+            DispatchQueue.main.async {
+                focusedSignatureIndex = lastSignature
             }
         }
     }

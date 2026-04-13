@@ -31,11 +31,14 @@ struct SignaturesListView: View {
     @Binding var selectedSignature: SignatureWrapper?
     @Binding var containerMimetype: String
     var dataFilesCount: Int
+    @Binding var focusedIndex: Int?
     var showRemoveSignatureButton: Bool
     @Binding var showRemoveSignatureModal: Bool
 
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
+
+    @AccessibilityFocusState private var focusedSignatureIndex: Int?
 
     var body: some View {
         VStack {
@@ -55,6 +58,7 @@ struct SignaturesListView: View {
                             selectedSignature = timestamp
                         }
                     )
+                    .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             } else {
                 ForEach(Array(timestamps.enumerated()), id: \.offset) { index, timestamp in
@@ -72,8 +76,10 @@ struct SignaturesListView: View {
                             selectedSignature = timestamp
                         }
                     )
+                    .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             }
+
             if #available(iOS 26.0, *) {
                 ForEach(signatures.enumerated(), id: \.offset) { index, signature in
                     SignatureView(
@@ -89,6 +95,13 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
+                    .id(index)
+                    .accessibilityFocused($focusedSignatureIndex, equals: index)
+                }
+                .onChange(of: focusedIndex) { _, newValue in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        focusedSignatureIndex = newValue
+                    }
                 }
             } else {
                 ForEach(Array(signatures.enumerated()), id: \.offset) { index, signature in
@@ -105,6 +118,7 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
+                    .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             }
         }
@@ -140,6 +154,7 @@ struct SignaturesListView: View {
         selectedSignature: .constant(signature),
         containerMimetype: .constant("application/vnd.etsi.asic-e+zip"),
         dataFilesCount: 1,
+        focusedIndex: .constant(nil),
         showRemoveSignatureButton: true,
         showRemoveSignatureModal: .constant(false),
         nameUtil: Container.shared.nameUtil(),
