@@ -223,6 +223,17 @@ struct HomeView: View {
                                 navigateWithVoiceOverFocusGuard(to: .myEidRootView)
                             }
                         )
+
+                        // TODO: Remove. For testing only
+                        Button(
+                            action: {
+                                let value: String? = nil
+                                print(value!)
+                            }, label: {
+                                Text("Test closing app")
+                            }
+                        )
+
                     }
                     .padding(Dimensions.Padding.SPadding)
 
