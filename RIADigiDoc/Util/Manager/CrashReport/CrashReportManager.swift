@@ -48,7 +48,7 @@ final class CrashReportManager: CrashReportManagerProtocol, Loggable {
         }
 
         if isAlwaysEnabled {
-            await checkForUnsentReports(send: true)
+            handleUnsentReports(hasUnsentReports: true, send: true)
         } else {
             showCrashDialog = true
         }
@@ -56,25 +56,24 @@ final class CrashReportManager: CrashReportManagerProtocol, Loggable {
 
     func sendReport() async {
         CrashReportManager.logger().info("Sending crash report")
-        await checkForUnsentReports(send: true)
+        handleUnsentReports(hasUnsentReports: true, send: true)
         showCrashDialog = false
     }
 
     func alwaysSendReport() async {
         CrashReportManager.logger().info("(Always) sending crash report")
         await dataStore.setIsCrashlyticsAlwaysEnabled(true)
-        await checkForUnsentReports(send: true)
+        handleUnsentReports(hasUnsentReports: true, send: true)
         showCrashDialog = false
     }
 
     func doNotSendReport() async {
         CrashReportManager.logger().info("Not sending crash report")
-        await checkForUnsentReports(send: false)
+        handleUnsentReports(hasUnsentReports: true, send: false)
         showCrashDialog = false
     }
 
-    private func checkForUnsentReports(send: Bool) async {
-        let hasUnsentReports = await crashReportClient.checkForUnsentReports()
+    private func handleUnsentReports(hasUnsentReports: Bool, send: Bool) {
         CrashReportManager.logger().info("Has unsent crash reports: \(hasUnsentReports)")
         if send && hasUnsentReports {
             crashReportClient.sendUnsentReports()
