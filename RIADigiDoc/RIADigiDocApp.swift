@@ -77,6 +77,7 @@ struct RIADigiDocApp: App {
                 await dataStore.setIsRecentDocumentsMigrationDone(true)
             }
 
+            await languageSettings.loadSelectedLanguage()
             isInitialLanguageSelected = await dataStore.getIsInitialLanguageSelected()
             await MainActor.run {
                 self.isSetupComplete = true

@@ -174,6 +174,10 @@ struct FloatingLabelTextField: View {
             .joined(separator: " ")
     }
 
+    private var shouldShowToolbar: Bool {
+        fieldIsFocused && (showDashButton || keyboardType.needsDoneButton)
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -361,28 +365,36 @@ struct FloatingLabelTextField: View {
     @ToolbarContentBuilder
     private var keyboardToolbar: some ToolbarContent {
         ToolbarItem(placement: .keyboard) {
-            if fieldIsFocused {
+            if shouldShowToolbar {
                 HStack {
                     if showDashButton {
-                        Button(
-                            action: { text.append("-") },
-                            label: { Text(verbatim: "-") }
-                        )
+                        dashButton
                     }
 
                     if keyboardType.needsDoneButton {
-                        Button(
-                            action: {
-                                fieldIsFocused = false
-                                isAccessibilityFocused = true
-                                onDone()
-                            },
-                            label: { Text(verbatim: languageSettings.localized("Done")) }
-                        )
+                        doneButton
                     }
                 }
             }
         }
+    }
+
+    private var dashButton: some View {
+        Button(
+            action: { text.append("-") },
+            label: { Text(verbatim: "-") }
+        )
+    }
+
+    private var doneButton: some View {
+        Button(
+            action: {
+                fieldIsFocused = false
+                isAccessibilityFocused = true
+                onDone()
+            },
+            label: { Text(verbatim: languageSettings.localized("Done")) }
+        )
     }
 
     // MARK: - Icons
