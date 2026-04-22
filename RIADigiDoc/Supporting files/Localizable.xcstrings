@@ -1843,7 +1843,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adressaati eemaldamine ebaõnnestus"
+            "value" : "Adressaadi eemaldamine ebaõnnestus"
           }
         }
       }
@@ -6216,6 +6216,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adressaat"
+          }
+        }
+      }
+    },
+    "Recipient added" : {
+      "comment" : "Toast message when recipient added in encryption view",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient added"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaat lisatud"
           }
         }
       }

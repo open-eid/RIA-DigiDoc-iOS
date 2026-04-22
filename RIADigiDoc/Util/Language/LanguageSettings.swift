@@ -25,6 +25,8 @@ public final class LanguageSettings: LanguageSettingsProtocol {
     private(set) var selectedLanguage: String = DefaultValues.language
     private let dataStore: DataStoreProtocol
 
+    private var localizedBundle = Bundle.main.path(forResource: "en", ofType: "lproj").flatMap(Bundle.init)
+
     public let supportedLanguages: [SupportedLanguage] = [
         SupportedLanguage(code: "et", titleKey: "Init lang locale et", accessibilityInputLabel: "Estonian"),
         SupportedLanguage(code: "en", titleKey: "Init lang locale en", accessibilityInputLabel: "English")
@@ -34,12 +36,14 @@ public final class LanguageSettings: LanguageSettingsProtocol {
         dataStore: DataStoreProtocol
     ) {
         self.dataStore = dataStore
-        Task {
-            self.selectedLanguage = await dataStore.getSelectedLanguage()
-        }
     }
 
     // MARK: - Public Methods
+
+    public func loadSelectedLanguage() async {
+        self.selectedLanguage = await dataStore.getSelectedLanguage()
+        localizedBundle = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj").flatMap(Bundle.init)
+    }
 
     public func getSelectedLanguage() -> String {
         return selectedLanguage
@@ -47,17 +51,15 @@ public final class LanguageSettings: LanguageSettingsProtocol {
 
     public func setSelectedLanguage(newLanguageCode: String) async {
         selectedLanguage = newLanguageCode
+        localizedBundle = Bundle.main.path(forResource: newLanguageCode, ofType: "lproj").flatMap(Bundle.init)
         await dataStore.setSelectedLanguage(newLanguageCode: newLanguageCode)
     }
 
     public func localized(_ key: String, _ args: [CVarArg] = []) -> String {
-        guard let path = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj"),
-              let bundle = Bundle(path: path) else {
-            return key
-        }
-
+        let bundle = localizedBundle ??
+        Bundle.main.path(forResource: selectedLanguage, ofType: "lproj").flatMap(Bundle.init) ?? Bundle.main
         let format = bundle.localizedString(forKey: key, value: nil, table: nil)
-        return String.localizedStringWithFormat(format, args)
+        return args.isEmpty ? format : String.localizedStringWithFormat(format, args)
     }
 
     // MARK: - Constants

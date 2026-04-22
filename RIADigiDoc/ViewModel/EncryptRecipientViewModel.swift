@@ -31,7 +31,8 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     var isImporting = false
     var recipients: [Addressee] = []
     var searchText: String = ""
-    var errorMessage: String?
+    private(set) var successMessage: ToastMessage?
+    private(set) var errorMessage: ToastMessage?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let openLdap: OpenLdapProtocol
@@ -64,12 +65,15 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
         let recipients = await cryptoContainer.getRecipients()
 
         for recipient in recipients where chosenRecipient.data == recipient.data {
-            errorMessage = "Recipient already exists in the container"
+            errorMessage = ToastMessage(key: "Recipient already exists in the container", args: [])
             EncryptRecipientViewModel.logger().error("Recipient already exists in the container")
             return
         }
 
         await cryptoContainer.addRecipients([chosenRecipient])
+
+        successMessage = ToastMessage(key: "Recipient added", args: [])
+        EncryptRecipientViewModel.logger().info("Recipient added")
     }
 
     func loadRecipients() async {
@@ -77,11 +81,11 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
             let result = await openLdap.search(identityCode: searchText)
             if result.tooManyResults {
                 recipients = []
-                errorMessage = "Too many results"
+                errorMessage = ToastMessage(key: "Too many results", args: [])
                 EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
             } else if result.addressees.isEmpty {
                 recipients = []
-                errorMessage = "No recipients found"
+                errorMessage = ToastMessage(key: "Person or company does not own a valid certificate", args: [])
                 EncryptRecipientViewModel.logger().error("No recipients found for \(self.searchText)")
             } else {
                 recipients = result.addressees
@@ -120,8 +124,16 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
 
             try await cryptoContainer.removeRecipient(recipient)
         } catch {
-            errorMessage = "Failed to remove recipient"
+            errorMessage = ToastMessage(key: "Failed to remove recipient", args: [])
             EncryptRecipientViewModel.logger().error("Unable to delete recipient: \(error)")
         }
+    }
+
+    func resetErrorMessage() {
+        errorMessage = nil
+    }
+
+    func resetSuccessMessage() {
+        successMessage = nil
     }
 }

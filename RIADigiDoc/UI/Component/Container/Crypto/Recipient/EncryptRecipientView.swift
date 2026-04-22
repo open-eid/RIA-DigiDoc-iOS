@@ -80,8 +80,12 @@ struct EncryptRecipientView: View {
         VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
             if noSearchResults {
                 Text(verbatim: languageSettings.localized("Added recipients"))
+                    .accessibilityHeading(.h2)
+                    .accessibilityAddTraits([.isHeader])
             } else {
                 Text(verbatim: languageSettings.localized("Recently added"))
+                    .accessibilityHeading(.h2)
+                    .accessibilityAddTraits([.isHeader])
             }
 
             Spacer().frame(height: Dimensions.Padding.MSPadding)
@@ -237,6 +241,49 @@ struct EncryptRecipientView: View {
                             }
                         }
                         .accessibilitySortPriority(filteredRecipients.isEmpty ? 2 : 0)
+
+                        HStack {
+                            Spacer()
+
+                            Button(action: {
+                                encryptionButtonEnabled = false
+                                pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
+                            }, label: {
+                                HStack(spacing: Dimensions.Padding.XSPadding) {
+                                    Image("ic_m3_encrypted_48pt_wght400")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(
+                                            width: Dimensions.Icon.IconSizeXXS,
+                                            height: Dimensions.Icon.IconSizeXXS
+                                        )
+                                        .foregroundStyle(theme.onPrimaryContainer)
+
+                                    Text(verbatim: encryptLabel)
+                                        .foregroundStyle(theme.onPrimaryContainer)
+                                        .font(typography.bodyLarge)
+                                }
+                                .accessibilityHidden(true)
+                            })
+                            .contentShape(Rectangle())
+                            .disabled(!encryptionButtonEnabled)
+                            .padding(Dimensions.Padding.MSPadding)
+                            .background(
+                                RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
+                                    .fill(theme.primaryContainer)
+                                    .shadow(
+                                        color: theme.onSurfaceVariant.opacity(Dimensions.Shadow.SOpacity),
+                                        radius: Dimensions.Shadow.radius,
+                                        x: Dimensions.Shadow.xOffset,
+                                        y: Dimensions.Shadow.yOffset
+                                    )
+                            )
+                            .padding(Dimensions.Padding.MPadding)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(encryptLabel.lowercased())
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityIdentifier("bottomEncryptButton")
+                        }
                     }
                     .padding(.horizontal, Dimensions.Padding.SPadding)
                     .accessibilityElement(children: .contain)
@@ -265,52 +312,6 @@ struct EncryptRecipientView: View {
                         )
                     }
                 }
-                .overlay(alignment: .bottom) {
-                    HStack(spacing: Dimensions.Padding.XSPadding) {
-                        if encryptionButtonEnabled {
-                            Button(action: {
-                                if encryptionButtonEnabled {
-                                    encryptionButtonEnabled = false
-                                    pathManager.replaceLast(to: .encryptView(isWithEncryption: true))
-                                    encryptionButtonEnabled = true
-                                }
-                            }, label: {
-                                HStack(spacing: Dimensions.Padding.XSPadding) {
-                                    Image("ic_m3_encrypted_48pt_wght400")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(
-                                            width: Dimensions.Icon.IconSizeXXS,
-                                            height: Dimensions.Icon.IconSizeXXS
-                                        )
-                                        .foregroundStyle(theme.onPrimaryContainer)
-                                        .accessibilityHidden(true)
-
-                                    Text(verbatim: encryptLabel)
-                                        .foregroundStyle(theme.onPrimaryContainer)
-                                        .font(typography.bodyLarge)
-                                        .accessibilityHidden(true)
-                                }
-                            })
-                            .accessibilityLabel(encryptLabel.lowercased())
-                            .accessibilityAddTraits([.isButton])
-                            .accessibilityIdentifier("bottomEncryptButton")
-                        }
-                    }
-                    .padding(Dimensions.Padding.MSPadding)
-                    .background(
-                        RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius)
-                            .fill(theme.primaryContainer)
-                            .shadow(
-                                color: theme.onSurfaceVariant.opacity(Dimensions.Shadow.SOpacity),
-                                radius: Dimensions.Shadow.radius,
-                                x: Dimensions.Shadow.xOffset,
-                                y: Dimensions.Shadow.yOffset
-                            )
-                    )
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(Dimensions.Padding.MPadding)
-                }
                 .onAppear {
                     Task { @MainActor in
                         await viewModel.loadRecipients()
@@ -321,15 +322,14 @@ struct EncryptRecipientView: View {
                     showNoRecipientsFoundMessage = false
                 }
                 .onChange(of: viewModel.errorMessage) { _, error in
-                    guard let errorMessage = error, !errorMessage.isEmpty else { return }
+                    guard let error, !error.key.isEmpty else { return }
 
                     isTitleFocused = false
 
-                    let localizedMessage = languageSettings.localized(errorMessage)
+                    let localizedMessage = languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
                     Toast.show(localizedMessage)
 
                     if voiceOverEnabled {
-                        encryptionButtonEnabled = false
                         AccessibilityUtil.announceMessage(localizedMessage)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             isTitleFocused = true
@@ -337,7 +337,22 @@ struct EncryptRecipientView: View {
                         }
                     }
 
-                    viewModel.errorMessage = nil
+                    encryptionButtonEnabled = true
+
+                    viewModel.resetErrorMessage()
+                }
+                .onChange(of: viewModel.successMessage) { _, message in
+                    guard let message, !message.key.isEmpty else { return }
+                    let localizedMessage = languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+                    Toast.show(localizedMessage, type: .success)
+
+                    if voiceOverEnabled {
+                        AccessibilityUtil.announceMessage(localizedMessage)
+                    }
+
+                    encryptionButtonEnabled = true
+
+                    viewModel.resetSuccessMessage()
                 }
             }
         )
