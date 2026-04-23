@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.3
 import PackageDescription
 
 let package = Package(
@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
-        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 21, 0)),
+        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 23, 0)),
         .package(url: "https://github.com/leif-ibsen/Digest.git", exact: .init(1, 13, 0)),
         .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 0)),
         .package(url: "https://github.com/leif-ibsen/SwiftECC.git", exact: .init(5, 5, 0)),
@@ -60,7 +60,10 @@ let package = Package(
         .target(
             name: "IdCardLibMocks",
             dependencies: ["IdCardLib"],
-            path: "Tests/Mocks/Generated"
+            path: "Tests/Mocks/Generated",
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
         ),
         .testTarget(
             name: "IdCardLibTests",

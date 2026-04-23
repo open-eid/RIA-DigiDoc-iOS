@@ -1693,24 +1693,24 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/leif-ibsen/BigInt";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.21.0;
+				kind = exactVersion;
+				version = 1.23.0;
 			};
 		};
 		1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/leif-ibsen/SwiftECC";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.5.0;
+				kind = exactVersion;
+				version = 5.5.0;
 			};
 		};
 		1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/filom/ASN1Decoder";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.10.0;
+				kind = exactVersion;
+				version = 1.10.0;
 			};
 		};
 		DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -1718,15 +1718,15 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = exactVersion;
-				version = 12.9.0;
+				version = 12.12.1;
 			};
 		};
 		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-certificates.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.0;
+				kind = exactVersion;
+				version = 1.19.0;
 			};
 		};
 		DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */ = {
@@ -1742,7 +1742,7 @@
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = exactVersion;
-				version = 5.10.2;
+				version = 5.11.2;
 			};
 		};
 		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
@@ -1750,7 +1750,7 @@
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
 			requirement = {
 				kind = exactVersion;
-				version = 0.57.0;
+				version = 0.63.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

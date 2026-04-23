@@ -164,6 +164,7 @@
       }
     },
     "Back" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -325,6 +326,7 @@
     },
     "Certificate details" : {
       "comment" : "Title of Certificate Details view",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -647,6 +649,7 @@
       }
     },
     "Close" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -808,6 +811,7 @@
     },
     "Container files" : {
       "comment" : "Signing view container files title",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -987,6 +991,7 @@
     },
     "Continue" : {
       "comment" : "My eID PIN change or unblock view step button",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1994,6 +1999,7 @@
     },
     "General error" : {
       "comment" : "General error",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2593,6 +2599,7 @@
     },
     "Libdigidocpp is already initialized" : {
       "comment" : "Meant to be shown in logging only",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2629,6 +2636,7 @@
     },
     "Loading" : {
       "comment" : "Loading label",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4769,6 +4777,7 @@
       }
     },
     "Menu" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4894,6 +4903,7 @@
     },
     "More options" : {
       "comment" : "More options button name",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6635,6 +6645,7 @@
       }
     },
     "Save" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6777,6 +6788,7 @@
       }
     },
     "Settings" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7100,6 +7112,7 @@
     },
     "Signature details" : {
       "comment" : "Title for Signature Details view",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

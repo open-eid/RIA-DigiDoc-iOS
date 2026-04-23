@@ -176,11 +176,6 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                 "Unable to add data files to container: \(String(reflecting: error))"
             )
 
-            guard let containerUrl = containerURL else {
-                errorMessage = ToastMessage(key: "General error")
-                return
-            }
-
             await handleAddFilesError(error)
         }
 
