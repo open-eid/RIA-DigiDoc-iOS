@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 10, 2)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 11, 2)),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib")
     ],

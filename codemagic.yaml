@@ -28,7 +28,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 26.4
     inputs:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
@@ -69,11 +69,7 @@ workflows:
           echo Run tests?: ${{ inputs.enableTests_input }}
       - name: Setup dependencies
         script: |
-          brew install swift-sh
-
-          curl -L https://github.com/uber/mockolo/releases/download/2.5.0/mockolo.artifactbundle.zip -o mockolo.zip
-          unzip mockolo.zip
-          sudo cp mockolo.artifactbundle/mockolo/macos/mockolo /usr/local/bin/mockolo
+          brew install swift-sh mockolo
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
@@ -230,15 +226,11 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 26.4
     scripts:
       - name: Setup dependencies
         script: |
-          brew install swift-sh
-
-          curl -L https://github.com/uber/mockolo/releases/download/2.5.0/mockolo.artifactbundle.zip -o mockolo.zip
-          unzip mockolo.zip
-          sudo cp mockolo.artifactbundle/mockolo/macos/mockolo /usr/local/bin/mockolo
+          brew install swift-sh mockolo
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |

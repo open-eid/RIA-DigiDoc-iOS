@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - 26.2
+          - 26.4
         platform:
           - iOS
     steps:
@@ -18,7 +18,7 @@ jobs:
       with:
         submodules: recursive
     - name: Download Libdigidocpp iOS artifact
-      uses: dawidd6/action-download-artifact@v15
+      uses: dawidd6/action-download-artifact@v20
       with:
         workflow: build.yml
         branch: master
@@ -26,7 +26,7 @@ jobs:
         path: libdigidocpp-ios
         repo: open-eid/libdigidocpp
     - name: Download Libdigidocpp iOS Simulator artifact
-      uses: dawidd6/action-download-artifact@v15
+      uses: dawidd6/action-download-artifact@v20
       with:
         workflow: build.yml
         branch: master
@@ -44,14 +44,9 @@ jobs:
           rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
     - name: Set up Homebrew
       id: set-up-homebrew
-      uses: Homebrew/actions/setup-homebrew@master
-    - name: Install Swift-sh
-      run: brew install swift-sh
-    - name: Install Mockolo
-      run: |
-        curl -L https://github.com/uber/mockolo/releases/download/2.5.0/mockolo.artifactbundle.zip -o mockolo.zip
-        unzip mockolo.zip
-        sudo cp mockolo.artifactbundle/mockolo/macos/mockolo /usr/local/bin/mockolo
+      uses: Homebrew/actions/setup-homebrew@main
+    - name: Install dependencies
+      run: brew install swift-sh mockolo
     - name: Setup config and TSL files
       run: |
         export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
@@ -95,6 +90,8 @@ jobs:
         GOOGLE_SERVICES_PLIST: ${{ secrets.GOOGLE_SERVICES_PLIST }}
       run: |
         export LANG=en_US.UTF-8
+        
+        sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
 
         # Setup Google Services
         echo $GOOGLE_SERVICES_PLIST | base64 --decode > "${{ github.workspace }}/RIADigiDoc/Supporting files/GoogleService-Info.plist"

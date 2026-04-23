@@ -25,7 +25,7 @@ import UtilsLib
 import ConfigLib
 import CommonsLib
 import CryptoKit
-import ActivityKit
+@preconcurrency import ActivityKit
 
 @Observable
 @MainActor
