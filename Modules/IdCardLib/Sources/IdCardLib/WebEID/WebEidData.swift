@@ -21,14 +21,14 @@ import Foundation
 
 public final class WebEidData: Sendable {
     public let unverifiedCertificate: String
-    public let signingCertificate: String
+    public let signingCertificate: String?
     public let algorithm: String
     public let signature: String
 
     init(unverifiedCertificate: String,
          algorithm: String,
          signature: String,
-         signingCertificate: String) {
+         signingCertificate: String?) {
         self.unverifiedCertificate = unverifiedCertificate
         self.algorithm = algorithm
         self.signature = signature
@@ -44,7 +44,7 @@ public final class WebEidData: Sendable {
         ====
         signature: \(signature)
         ====
-        signingCertificate: \(signingCertificate)
+        signingCertificate: \(signingCertificate ?? "")
         """
     }
 }
