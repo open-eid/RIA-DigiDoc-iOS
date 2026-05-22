@@ -1,0 +1,10 @@
+framework module nfclib {
+  umbrella header "nfclib.h"
+  export *
+
+  module * { export * }
+}
+
+module nfclib.Swift {
+  header "nfclib-Swift.h"
+}

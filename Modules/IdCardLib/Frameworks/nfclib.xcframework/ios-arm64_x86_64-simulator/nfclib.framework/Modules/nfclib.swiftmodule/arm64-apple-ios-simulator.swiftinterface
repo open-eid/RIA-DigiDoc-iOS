@@ -1,0 +1,229 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.3.2 effective-5.10 (swiftlang-6.3.2.1.108 clang-2100.1.1.101)
+// swift-module-flags: -target arm64-apple-ios16.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -Onone -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name nfclib
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.3.2
+import BigInt
+import CommonCrypto
+@preconcurrency import CoreNFC
+import CryptoKit
+import CryptoTokenKit
+import Darwin
+import Foundation
+import OSLog
+import Security
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+@_exported import nfclib
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor public class OperationSignHash : ObjectiveC.NSObject {
+  @_Concurrency.MainActor public func startSigning(CAN: Swift.String, PIN2: nfclib.SecureData, hash: Foundation.Data) async throws -> Foundation.Data
+  @_Concurrency.MainActor @objc override dynamic public init()
+  @objc deinit
+}
+extension nfclib.OperationSignHash : @_Concurrency.MainActor CoreNFC.NFCTagReaderSessionDelegate {
+  @_Concurrency.MainActor public func tagReaderSession(_ session: CoreNFC.NFCTagReaderSession, didDetect tags: [CoreNFC.NFCTag])
+  @_Concurrency.MainActor public func tagReaderSessionDidBecomeActive(_: CoreNFC.NFCTagReaderSession)
+  @_Concurrency.MainActor public func tagReaderSession(_: CoreNFC.NFCTagReaderSession, didInvalidateWithError _: any Swift.Error)
+}
+@_hasMissingDesignatedInitializers final public class WebEidData : Swift.Sendable {
+  final public let unverifiedCertificate: Swift.String
+  final public let signingCertificate: Swift.String
+  final public let algorithm: Swift.String
+  final public let signature: Swift.String
+  final public var formattedDescription: Swift.String {
+    get
+  }
+  @objc deinit
+}
+final public class SecureData : Swift.Sendable {
+  public init(_ bytes: [Swift.UInt8])
+  public init(_ data: Foundation.Data)
+  @objc deinit
+  final public var count: Swift.Int {
+    get
+  }
+  final public func secureZero()
+}
+public let rsaAlgorithmName: Swift.String
+public let ecAlgorithmName: Swift.String
+public let unknownAlgorithmName: Swift.String
+public enum AuthenticateWithWebEidError : Swift.Error {
+  case failedToReadPublicKey
+  case failedToDetermineAlgorithm
+  case failedToHashData
+  case failedToMapAlgorithm
+  case failedCertificateExpired
+  case failedCertificateNotYetValid
+  public static func == (a: nfclib.AuthenticateWithWebEidError, b: nfclib.AuthenticateWithWebEidError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_Concurrency.MainActor public class OperationAuthenticateWithWebEID : ObjectiveC.NSObject {
+  @_Concurrency.MainActor public init(CAN: Swift.String, pin1: nfclib.SecureData, challenge: Swift.String, origin: Swift.String)
+  @_Concurrency.MainActor public func startReading() async throws -> nfclib.WebEidData
+  @objc deinit
+}
+extension nfclib.OperationAuthenticateWithWebEID : @_Concurrency.MainActor CoreNFC.NFCTagReaderSessionDelegate {
+  @_Concurrency.MainActor public func tagReaderSession(_ session: CoreNFC.NFCTagReaderSession, didDetect tags: [CoreNFC.NFCTag])
+  @_Concurrency.MainActor public func getAlgorithmNameTypeAndLength(from key: Security.SecKey) -> (algorithm: Swift.String, keyLength: Swift.Int)?
+  @_Concurrency.MainActor public func tagReaderSessionDidBecomeActive(_: CoreNFC.NFCTagReaderSession)
+  @_Concurrency.MainActor public func tagReaderSession(_: CoreNFC.NFCTagReaderSession, didInvalidateWithError _: any Swift.Error)
+  @_Concurrency.MainActor public func mapToAlgorithm(algorithm: Swift.String, bitLength: Swift.Int) -> Swift.String?
+}
+public struct SignatureAlgorithmInfo {
+}
+public enum ReadCertificateError : Swift.Error {
+  case certificateUsageNotSpecified
+  case failedToReadCertificate
+  case general
+  public static func == (a: nfclib.ReadCertificateError, b: nfclib.ReadCertificateError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum CertificateUsage {
+  case auth
+  case sign
+  public static func == (a: nfclib.CertificateUsage, b: nfclib.CertificateUsage) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+extension CoreNFC.NFCTagReaderSession : @unchecked @retroactive Swift.Sendable {
+}
+extension CoreNFC.NFCTag : @unchecked @retroactive Swift.Sendable {
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor public class OperationReadCertificate : ObjectiveC.NSObject {
+  @_Concurrency.MainActor public func startReading(CAN: Swift.String, certUsage: nfclib.CertificateUsage) async throws -> Security.SecCertificate
+  @_Concurrency.MainActor @objc override dynamic public init()
+  @objc deinit
+}
+extension nfclib.OperationReadCertificate : @_Concurrency.MainActor CoreNFC.NFCTagReaderSessionDelegate {
+  @_Concurrency.MainActor public func tagReaderSession(_ session: CoreNFC.NFCTagReaderSession, didDetect tags: [CoreNFC.NFCTag])
+  @_Concurrency.MainActor public func tagReaderSessionDidBecomeActive(_: CoreNFC.NFCTagReaderSession)
+  @_Concurrency.MainActor public func tagReaderSession(_: CoreNFC.NFCTagReaderSession, didInvalidateWithError _: any Swift.Error)
+}
+public enum UnblockPINError : Swift.Error {
+  case missingRequiredParameter
+  case failed
+  case general
+  public static func == (a: nfclib.UnblockPINError, b: nfclib.UnblockPINError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor public class OperationUnblockPin : ObjectiveC.NSObject {
+  @_Concurrency.MainActor public func startReading(CAN: Swift.String, codeType: nfclib.CodeType, puk: nfclib.SecureData, newPin: nfclib.SecureData) async throws
+  @_Concurrency.MainActor @objc override dynamic public init()
+  @objc deinit
+}
+extension nfclib.OperationUnblockPin : @_Concurrency.MainActor CoreNFC.NFCTagReaderSessionDelegate {
+  @_Concurrency.MainActor public func tagReaderSession(_ session: CoreNFC.NFCTagReaderSession, didDetect tags: [CoreNFC.NFCTag])
+  @_Concurrency.MainActor public func tagReaderSessionDidBecomeActive(_: CoreNFC.NFCTagReaderSession)
+  @_Concurrency.MainActor public func tagReaderSession(_: CoreNFC.NFCTagReaderSession, didInvalidateWithError _: any Swift.Error)
+}
+@_Concurrency.MainActor public class NFCConnection {
+  @_Concurrency.MainActor public init()
+  @_Concurrency.MainActor public func setup(_ session: CoreNFC.NFCTagReaderSession, tags: [CoreNFC.NFCTag]) async throws -> any CoreNFC.NFCISO7816Tag
+  @_Concurrency.MainActor public func getCardCommands(_: CoreNFC.NFCTagReaderSession, tag: any CoreNFC.NFCISO7816Tag, CAN: Swift.String) async throws -> any nfclib.CardCommands
+  @objc deinit
+}
+public enum IdCardError : Swift.Error {
+  case wrongCAN, wrongPIN(triesLeft: Swift.Int), invalidNewPIN, sessionError
+}
+public enum IdCardInternalError : Swift.Error {
+  case missingRESTag, missingMACTag, invalidMACValue, failedReadingField(nfclib.CardField), hexConversionFailed, AESCBCError, sendCommandFailed(message: Swift.String), invalidResponse(message: Swift.String), swError(Swift.UInt16), pinVerificationFailed, remainingPinRetryCount(Swift.Int), invalidNewPin, notSupportedCodeType, dataPaddingError, invalidAPDU, authenticationFailed, canAuthenticationFailed, invalidTag, cardNotSupported, nfcNotSupported, connectionFailed, multipleTagsDetected, couldNotVerifyChipsMAC, cancelledByUser, sessionInvalidated, readerProcessFailed, failedToRemovePadding, notSupportedAlgorithm
+  public func getIdCardError() -> nfclib.IdCardError
+}
+public struct PinError : Swift.Error {
+}
+public struct CardInfo : Swift.Sendable, Swift.Hashable {
+  public var givenName: Swift.String
+  public var surname: Swift.String
+  public var personalCode: Swift.String
+  public var citizenship: Swift.String
+  public var documentNumber: Swift.String
+  public var dateOfExpiry: Swift.String
+  public init(givenName: Swift.String = "", surname: Swift.String = "", personalCode: Swift.String = "", citizenship: Swift.String = "", documentNumber: Swift.String = "", dateOfExpiry: Swift.String = "")
+  public var formattedDescription: Swift.String {
+    get
+  }
+  public static func == (a: nfclib.CardInfo, b: nfclib.CardInfo) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum CardField : Swift.Int, Swift.Sendable {
+  case surname, firstName, sex, citizenship, dateAndPlaceOfBirth, personalCode, documentNr, dateOfExpiry
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor final public class OperationReadPublicData : ObjectiveC.NSObject {
+  @_Concurrency.MainActor final public func startReading(CAN: Swift.String) async throws -> nfclib.CardInfo
+  @_Concurrency.MainActor @objc override dynamic public init()
+  @objc deinit
+}
+extension nfclib.OperationReadPublicData : @_Concurrency.MainActor CoreNFC.NFCTagReaderSessionDelegate {
+  @_Concurrency.MainActor final public func tagReaderSession(_ session: CoreNFC.NFCTagReaderSession, didDetect tags: [CoreNFC.NFCTag])
+  @_Concurrency.MainActor final public func tagReaderSessionDidBecomeActive(_: CoreNFC.NFCTagReaderSession)
+  @_Concurrency.MainActor final public func tagReaderSession(_: CoreNFC.NFCTagReaderSession, didInvalidateWithError _: any Swift.Error)
+}
+public enum CodeType : Swift.UInt, Swift.Sendable {
+  case puk
+  case pin1
+  case pin2
+  public var name: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.UInt)
+  public typealias RawValue = Swift.UInt
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+public protocol CardCommands : Swift.Sendable {
+  var canChangePUK: Swift.Bool { get }
+  func readPublicData() async throws -> nfclib.CardInfo
+  func readAuthenticationCertificate() async throws -> Foundation.Data
+  func readSignatureCertificate() async throws -> Foundation.Data
+  func readCodeTryCounterRecord(_ type: nfclib.CodeType) async throws -> (retryCount: Swift.UInt8, pinActive: Swift.Bool)
+  func changeCode(_ type: nfclib.CodeType, to code: nfclib.SecureData, verifyCode: nfclib.SecureData) async throws
+  func verifyCode(_ type: nfclib.CodeType, code: nfclib.SecureData) async throws
+  func unblockCode(_ type: nfclib.CodeType, puk: nfclib.SecureData, newCode: nfclib.SecureData) async throws
+  func authenticate(for hash: Foundation.Data, withPin1 pin1: nfclib.SecureData) async throws -> Foundation.Data
+  func calculateSignature(for hash: Foundation.Data, withPin2 pin2: nfclib.SecureData) async throws -> Foundation.Data
+  func decryptData(_ hash: Foundation.Data, withPin1 pin1: nfclib.SecureData) async throws -> Foundation.Data
+}
+extension Foundation.DataProtocol where Self : Foundation.MutableDataProtocol, Self.Index == Swift.Int {
+  public static func ^ (xVal: Self, yVal: Self) -> Self
+}
+extension nfclib.OperationSignHash : Swift.Sendable {}
+extension nfclib.AuthenticateWithWebEidError : Swift.Equatable {}
+extension nfclib.AuthenticateWithWebEidError : Swift.Hashable {}
+extension nfclib.OperationAuthenticateWithWebEID : Swift.Sendable {}
+extension nfclib.CodeType : Swift.Equatable {}
+extension nfclib.CodeType : Swift.Hashable {}
+extension nfclib.CodeType : Swift.RawRepresentable {}
+extension nfclib.ReadCertificateError : Swift.Equatable {}
+extension nfclib.ReadCertificateError : Swift.Hashable {}
+extension nfclib.CertificateUsage : Swift.Equatable {}
+extension nfclib.CertificateUsage : Swift.Hashable {}
+extension nfclib.OperationReadCertificate : Swift.Sendable {}
+extension nfclib.UnblockPINError : Swift.Equatable {}
+extension nfclib.UnblockPINError : Swift.Hashable {}
+extension nfclib.OperationUnblockPin : Swift.Sendable {}
+extension nfclib.NFCConnection : Swift.Sendable {}
+extension nfclib.CardField : Swift.Equatable {}
+extension nfclib.CardField : Swift.Hashable {}
+extension nfclib.CardField : Swift.RawRepresentable {}
+extension nfclib.OperationReadPublicData : Swift.Sendable {}
