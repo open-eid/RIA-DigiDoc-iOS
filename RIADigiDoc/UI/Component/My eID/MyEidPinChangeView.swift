@@ -19,7 +19,7 @@
 
 import SwiftUI
 import FactoryKit
-import IdCardLib
+import nfclib
 import CommonsLib
 
 struct MyEidPinChangeView: View {
@@ -285,11 +285,6 @@ struct MyEidPinChangeView: View {
                     }
                     viewModel.resetErrors()
                 })
-                .onChange(of: viewModel.usbReaderStatus) { _, newValue in
-                    if newValue != .sCardConnected {
-                        dismiss()
-                    }
-                }
                 .onChange(of: viewModel.step) { _, _ in
                     DispatchQueue.main.async {
                         stepTitleFocused = true

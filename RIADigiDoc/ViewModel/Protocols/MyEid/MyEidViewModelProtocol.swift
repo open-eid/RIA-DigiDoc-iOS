@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 /// @mockable
 @MainActor
@@ -28,5 +28,4 @@ public protocol MyEidViewModelProtocol: Sendable {
     func getDocumentExpirationStatus(expiryDate: String) -> MyEidDocumentStatus
     func setIsPinBlocked(_ codeType: CodeType, isBlocked: Bool)
     func getIsPinBlocked(for codeType: CodeType) -> Bool
-    func stopDiscoveringReaders() async
 }

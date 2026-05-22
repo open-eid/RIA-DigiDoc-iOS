@@ -20,7 +20,7 @@
 import SwiftUI
 import FactoryKit
 import CryptoSwift
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import CommonsLib
 
@@ -422,7 +422,6 @@ struct NFCView: View {
         actionType: .signing,
         actionMethods: [
             .idCardViaNFC,
-            .idCardViaUSB,
             .mobileId,
             .smartId
         ],

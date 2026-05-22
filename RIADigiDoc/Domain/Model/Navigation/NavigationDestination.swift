@@ -20,7 +20,7 @@
 import Foundation
 import CryptoObjCWrapper
 import LibdigidocLibSwift
-import IdCardLib
+import nfclib
 
 public enum NavigationDestination: Hashable {
     case contentView

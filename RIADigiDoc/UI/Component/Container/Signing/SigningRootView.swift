@@ -19,7 +19,7 @@
 
 import SwiftUI
 import FactoryKit
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import CommonsLib
 
@@ -52,7 +52,6 @@ struct SigningRootView: View {
                         actionType: .signing,
                         actionMethods: [
                             .idCardViaNFC,
-                            .idCardViaUSB,
                             .mobileId,
                             .smartId
                         ],
@@ -65,26 +64,6 @@ struct SigningRootView: View {
                             sharedContainerViewModel.setIsSignatureAdded(true)
                         }
                     )
-                }
-            case .idCardViaUSB:
-                if let container = signedContainer as? SignedContainerProtocol {
-                    IdCardView(
-                        actionType: .signing,
-                        actionMethods: [
-                            .idCardViaNFC,
-                            .idCardViaUSB,
-                            .mobileId,
-                            .smartId
-                        ],
-                        signedContainer: container,
-                        onSuccess: { container in
-                            isSuccess = true
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setSignedContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
-                        }
-                    )
-                    .accessibilityHidden(isSuccess)
                 }
             case .mobileId:
                 if let container = signedContainer as? SignedContainerProtocol {

@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 public enum ReadCertAndSignError: Error {
     case signedContainerNil

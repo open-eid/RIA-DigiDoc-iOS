@@ -21,10 +21,8 @@ import Foundation
 import CoreNFC
 import CommonCrypto
 import CryptoTokenKit
-internal import SwiftECC
-import BigInt
 import CryptoKit
-import IdCardLib
+import nfclib
 import CryptoObjCWrapper
 import CryptoSwift
 import UtilsLib
@@ -45,6 +43,12 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
         strings: NFCSessionStrings,
     ) async throws -> CryptoContainerProtocol {
 
+        self.canNumber = canNumber
+        self.pin1Number = pin1Number
+        self.containerFile = containerFile
+        self.recipients = recipients
+        self.strings = strings
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -52,11 +56,6 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
                 continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
                 return
             }
-            self.canNumber = canNumber
-            self.pin1Number = pin1Number
-            self.containerFile = containerFile
-            self.recipients = recipients
-            self.strings = strings
 
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
@@ -133,6 +132,11 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
+                    return
+                }
+
+                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                    handleIdCardInternalError(nfcIdCardError, session: session)
                     return
                 }
 

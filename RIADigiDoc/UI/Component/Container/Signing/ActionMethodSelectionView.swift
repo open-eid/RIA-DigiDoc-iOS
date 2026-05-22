@@ -173,7 +173,6 @@ struct ActionMethodSelectionView: View {
         actionType: .signing,
         methods: [
             .idCardViaNFC,
-            .idCardViaUSB,
             .mobileId,
             .smartId
         ]

@@ -17,7 +17,6 @@
 		DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
 		DF2B1BEA2F520815008EC06F /* SmartIdLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF2B1BE92F520815008EC06F /* SmartIdLib */; };
 		DF2B1BF72F525021008EC06F /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF2B1BF62F525021008EC06F /* IdCardLib */; };
-		DF2B1BF92F52520D008EC06F /* IdCardLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF2B1BF82F52520D008EC06F /* IdCardLibMocks */; };
 		DF3D9BB22E8355F9009B086E /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DF0B681B2D0779EF00A5457C /* CommonsTestShared */; };
 		DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A7E2CE269C900137235 /* UtilsLib */; };
 		DF3E4A8F2CE2CDD100137235 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */; };
@@ -29,7 +28,6 @@
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
-		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 		DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */; };
 		DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903772ECCC42500D1A278 /* SmartIdLibMocks */; };
 		DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
@@ -55,6 +53,7 @@
 		DFB663A22F16917E00804545 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFB663A12F16917E00804545 /* SwiftUI.framework */; };
 		DFB663AF2F16918100804545 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
+		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,7 +123,7 @@
 		1A1548DE2E85801500DC2339 /* IdCardLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IdCardLib; sourceTree = "<group>"; };
 		1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphonesimulator.sh"; sourceTree = "<group>"; };
 		1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphoneos.sh"; sourceTree = "<group>"; };
-		1A438FCF2E7224CE00546B86 /* GenerateMocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = GenerateMocks.sh; sourceTree = "<group>"; };
+		1A438FCF2E7224CE00546B86 /* generate-mocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "generate-mocks.sh"; sourceTree = "<group>"; };
 		1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TSLXMLDownloader.py; sourceTree = "<group>"; };
 		1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-xcframeworks.sh"; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
@@ -193,6 +192,8 @@
 				Domain/Model/SupportedLanguage.swift,
 				Domain/Model/SupportedTheme.swift,
 				Domain/Model/ToastMessage.swift,
+				Domain/NFC/IdCardError.swift,
+				Domain/NFC/IdCardInternalError.swift,
 				Domain/NFC/NFCOperationBase.swift,
 				Domain/NFC/NFCSessionStrings.swift,
 				Domain/NFC/NFCSessionStringsUtil.swift,
@@ -201,6 +202,7 @@
 				Domain/NFC/OperationReadCardData.swift,
 				Domain/NFC/OperationReadCertAndSign.swift,
 				Domain/NFC/OperationUnblockPin.swift,
+				Domain/NFC/ProgressBar.swift,
 				Domain/NFC/Protocols/OperationChangePinProtocol.swift,
 				Domain/NFC/Protocols/OperationDecryptProtocol.swift,
 				Domain/NFC/Protocols/OperationReadCardDataProtocol.swift,
@@ -214,14 +216,10 @@
 				Domain/Repository/AdvancedSettings/AdvancedSettingsRepositoryProtocol.swift,
 				Domain/Repository/FileOpening/FileOpeningRepository.swift,
 				Domain/Repository/FileOpening/FileOpeningRepositoryProtocol.swift,
-				Domain/Repository/IdCard/IdCardRepository.swift,
-				Domain/Repository/IdCard/IdCardRepositoryProtocol.swift,
 				Domain/Repository/Siva/SivaRepository.swift,
 				Domain/Repository/Siva/SivaRepositoryProtocol.swift,
 				Domain/Service/FileOpening/FileOpeningService.swift,
 				Domain/Service/FileOpening/FileOpeningServiceProtocol.swift,
-				Domain/Service/IdCard/IdCardService.swift,
-				Domain/Service/IdCard/IdCardServiceProtocol.swift,
 				Domain/Service/Siva/SivaService.swift,
 				Domain/Service/Siva/SivaServiceProtocol.swift,
 				LibrarySetup.swift,
@@ -294,7 +292,6 @@
 				ViewModel/Protocols/ProxySettingsViewModelProtocol.swift,
 				ViewModel/Protocols/RecentDocumentsViewModelProtocol.swift,
 				ViewModel/Protocols/Shared/SharedContainerViewModelProtocol.swift,
-				ViewModel/Protocols/Shared/SharedIdCardViewModelProtocol.swift,
 				ViewModel/Protocols/SignatureDetailViewModelProtocol.swift,
 				ViewModel/Protocols/SigningViewModelProtocol.swift,
 				ViewModel/Protocols/TimeStampSettingsViewModelProtocol.swift,
@@ -302,12 +299,9 @@
 				ViewModel/ProxySettingsViewModel.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
-				ViewModel/Shared/SharedIdCardViewModel.swift,
 				ViewModel/SignatureDetailViewModel.swift,
 				ViewModel/Signing/ActionMethod/ActionMethodSelectionViewModel.swift,
 				ViewModel/Signing/ActionMethod/ActionMethodSelectionViewModelProtocol.swift,
-				ViewModel/Signing/IdCard/IdCardViewModel.swift,
-				ViewModel/Signing/IdCard/IdCardViewModelProtocol.swift,
 				ViewModel/Signing/MobileId/MobileIdViewModel.swift,
 				ViewModel/Signing/MobileId/MobileIdViewModelProtocol.swift,
 				ViewModel/Signing/NFC/NFCViewModel.swift,
@@ -531,13 +525,13 @@
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
-				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
 				1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */,
 				DFA23CBD2EB6DC64000403E4 /* MobileIdLib in Frameworks */,
 				DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */,
 				DF3E922D2D2C371200F2990A /* Alamofire in Frameworks */,
 				DF1D595A2F3BF88000855E2E /* FirebaseCore in Frameworks */,
 				DF3E922B2D285A1D00F2990A /* ConfigLib in Frameworks */,
+				DF54F82F2D431BD50021D05A /* X509 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -556,7 +550,6 @@
 				DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */,
 				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
 				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
-				DF2B1BF92F52520D008EC06F /* IdCardLibMocks in Frameworks */,
 				DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */,
 				DFA23CBF2EB6DC73000403E4 /* MobileIdLib in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
@@ -584,7 +577,7 @@
 				1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */,
 				1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */,
 				1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */,
-				1A438FCF2E7224CE00546B86 /* GenerateMocks.sh */,
+				1A438FCF2E7224CE00546B86 /* generate-mocks.sh */,
 				1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */,
 			);
 			path = scripts;
@@ -771,7 +764,6 @@
 				DF3E4A7E2CE269C900137235 /* UtilsLib */,
 				DF3E4A8E2CE2CDD100137235 /* LibdigidocLib */,
 				DFB1F1302CF0217C00185A7F /* CommonsLib */,
-				DF54F82E2D431BD50021D05A /* X509 */,
 				DF3E922A2D285A1D00F2990A /* ConfigLib */,
 				DF3E922C2D2C371200F2990A /* Alamofire */,
 				DF9AFE912E00D30A0062C64D /* FactoryKit */,
@@ -781,6 +773,7 @@
 				DF64D0ED2EC36F7700FF73C6 /* SmartIdLib */,
 				DF1D59592F3BF88000855E2E /* FirebaseCore */,
 				DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */,
+				DF54F82E2D431BD50021D05A /* X509 */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -821,7 +814,6 @@
 				DF5903772ECCC42500D1A278 /* SmartIdLibMocks */,
 				DF2B1BE92F520815008EC06F /* SmartIdLib */,
 				DF2B1BF62F525021008EC06F /* IdCardLib */,
-				DF2B1BF82F52520D008EC06F /* IdCardLibMocks */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -897,12 +889,11 @@
 			packageReferences = (
 				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
-				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 				DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */,
 				1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */,
-				1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */,
 				1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */,
 				DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
@@ -1689,14 +1680,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1A2D04BC2E85850500A7269B /* XCRemoteSwiftPackageReference "BigInt" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/leif-ibsen/BigInt";
-			requirement = {
-				kind = exactVersion;
-				version = 1.23.0;
-			};
-		};
 		1A2D04BD2E8588F100A7269B /* XCRemoteSwiftPackageReference "SwiftECC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/leif-ibsen/SwiftECC";
@@ -1721,14 +1704,6 @@
 				version = 12.12.1;
 			};
 		};
-		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-certificates.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.19.0;
-			};
-		};
 		DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hmlongco/Factory";
@@ -1751,6 +1726,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 0.63.2;
+			};
+		};
+		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-certificates.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.19.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1798,10 +1781,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = IdCardLib;
 		};
-		DF2B1BF82F52520D008EC06F /* IdCardLibMocks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = IdCardLibMocks;
-		};
 		DF3E4A7E2CE269C900137235 /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
@@ -1838,11 +1817,6 @@
 		DF4E6D832D120CFC00F6111A /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
-		};
-		DF54F82E2D431BD50021D05A /* X509 */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
-			productName = X509;
 		};
 		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1942,6 +1916,11 @@
 		DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LibdigidocLib;
+		};
+		DF54F82E2D431BD50021D05A /* X509 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
+			productName = X509;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

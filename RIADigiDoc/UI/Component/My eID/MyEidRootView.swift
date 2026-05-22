@@ -19,53 +19,19 @@
 
 import SwiftUI
 import FactoryKit
-import IdCardLib
-import LibdigidocLibSwift
-import CommonsLib
+import nfclib
 
 struct MyEidRootView: View {
     @Environment(\.dismiss) private var dismiss
 
     @Environment(NavigationPathManager.self) private var pathManager
 
-    @State private var chosenMethod: ActionMethod = .idCardViaNFC
-
-    @State private var viewModel: MyEidRootViewModel
-
-    init() {
-        _viewModel = State(wrappedValue: Container.shared.myEidRootViewModel())
-    }
-
     var body: some View {
-        ZStack {
-            switch chosenMethod {
-            case .idCardViaNFC:
-                NFCView(
-                    actionType: .myeid,
-                    actionMethods: [
-                        .idCardViaNFC,
-                        .idCardViaUSB
-                    ],
-                    onSuccess: { _ in }
-                )
-            case .idCardViaUSB:
-                IdCardView(
-                    actionType: .myeid,
-                    actionMethods: [
-                        .idCardViaNFC,
-                        .idCardViaUSB
-                    ],
-                    onSuccess: { _ in }
-                )
-            default:
-                EmptyView()
-            }
-        }
-        .onAppear {
-            Task {
-                chosenMethod = await viewModel.getSelectedMyEidMethod()
-            }
-        }
+        NFCView(
+            actionType: .myeid,
+            actionMethods: [.idCardViaNFC],
+            onSuccess: { _ in }
+        )
     }
 }
 

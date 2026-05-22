@@ -18,17 +18,15 @@
  */
 
 import Testing
-import IdCardLib
+import nfclib
 
 @MainActor
 final class MyEidPinChangeViewModelTests {
-    private let mockIdCardRepository: IdCardRepositoryProtocolMock
     private let mockSharedMyEidSession: SharedMyEidSessionProtocolMock
     private let mockOperationChangePin: OperationChangePinProtocolMock
     private let mockOperationUnblockPin: OperationUnblockPinProtocolMock
 
     public init() async throws {
-        mockIdCardRepository = IdCardRepositoryProtocolMock()
         mockSharedMyEidSession = SharedMyEidSessionProtocolMock()
         mockOperationChangePin = OperationChangePinProtocolMock()
         mockOperationUnblockPin = OperationUnblockPinProtocolMock()
@@ -51,7 +49,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -65,23 +62,6 @@ final class MyEidPinChangeViewModelTests {
         #expect(viewModel.isFirstStep == true)
     }
 
-    @Test
-    func init_unblockPin2Success() async throws {
-        let viewModel = MyEidPinChangeViewModel(
-            pinAction: .unblock,
-            codeType: .pin2,
-            personalCode: "39001010000",
-            actionMethod: .idCardViaUSB,
-            idCardRepository: mockIdCardRepository,
-            sharedMyEidSession: mockSharedMyEidSession,
-            operationChangePin: mockOperationChangePin,
-            operationUnblockPin: mockOperationUnblockPin
-        )
-
-        #expect(viewModel.pinAction == .unblock)
-        #expect(viewModel.codeType == .pin2)
-        #expect(viewModel.actionMethod == .idCardViaUSB)
-    }
 
     // MARK: - handleBackButton tests
 
@@ -92,7 +72,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -111,7 +90,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -137,7 +115,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -155,7 +132,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -173,7 +149,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin2,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -191,7 +166,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin2,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -209,7 +183,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -227,7 +200,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .puk,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -245,7 +217,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -265,7 +236,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -284,7 +254,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -305,7 +274,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -325,7 +293,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -347,7 +314,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -373,7 +339,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -400,7 +365,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -428,7 +392,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -455,7 +418,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin
@@ -480,7 +442,6 @@ final class MyEidPinChangeViewModelTests {
             codeType: .pin1,
             personalCode: "39001010000",
             actionMethod: .idCardViaNFC,
-            idCardRepository: mockIdCardRepository,
             sharedMyEidSession: mockSharedMyEidSession,
             operationChangePin: mockOperationChangePin,
             operationUnblockPin: mockOperationUnblockPin

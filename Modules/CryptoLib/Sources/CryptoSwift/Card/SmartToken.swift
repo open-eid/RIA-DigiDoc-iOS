@@ -18,10 +18,10 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 import CryptoObjCWrapper
 
-public class SmartToken: AbstractSmartToken {
+public class SmartToken: AbstractSmartToken, @unchecked Sendable {
     let pin1: SecureData
     let card: CardCommands
 

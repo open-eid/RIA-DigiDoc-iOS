@@ -19,7 +19,7 @@
 
 import Foundation
 import CoreNFC
-import IdCardLib
+import nfclib
 import UtilsLib
 
 @MainActor
@@ -119,6 +119,11 @@ final public class OperationReadCardData: NFCOperationBase, OperationReadCardDat
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
+                    return
+                }
+
+                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                    handleIdCardInternalError(nfcIdCardError, session: session)
                     return
                 }
 

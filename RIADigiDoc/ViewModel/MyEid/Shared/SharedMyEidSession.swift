@@ -18,13 +18,11 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 @Observable
 @MainActor
 final class SharedMyEidSession: SharedMyEidSessionProtocol {
-
-    var usbReaderStatus: UsbReaderStatus = .sInitial
 
     private var isPin1Blocked = false
     private var isPin2Blocked = false
@@ -36,13 +34,7 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
     private var isPin2Locked = false
     private var isPukLocked = false
 
-    private let idCardRepository: IdCardRepositoryProtocol
-    private var task: Task<Void, Never>?
-
-    init(idCardRepository: IdCardRepositoryProtocol) {
-        self.idCardRepository = idCardRepository
-        startStatusStream()
-    }
+    init() { }
 
     public func setIsPinLocked(_ codeType: CodeType, isLocked: Bool) {
         switch codeType {
@@ -52,6 +44,8 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
             self.isPin2Locked = isLocked
         case .puk:
             self.isPukLocked = isLocked
+        @unknown default:
+            break
         }
     }
 
@@ -63,6 +57,8 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
             return self.isPin2Locked
         case .puk:
             return self.isPukLocked
+        @unknown default:
+            return false
         }
     }
 
@@ -74,6 +70,8 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
             self.isPin2Blocked = isBlocked
         case .puk:
             self.isPukBlocked = isBlocked
+        @unknown default:
+            break
         }
     }
 
@@ -85,22 +83,10 @@ final class SharedMyEidSession: SharedMyEidSessionProtocol {
             return self.isPin2Blocked
         case .puk:
             return self.isPukBlocked
+        @unknown default:
+            return false
         }
     }
-
-    private func startStatusStream() {
-        task = Task {
-            for await status in await idCardRepository.statusStream() {
-                usbReaderStatus = status
-            }
-        }
-    }
-
-    public func stopStatusStream() {
-        task?.cancel()
-    }
-
-    // MARK: - NFC methods
 
     public func setCAN(_ can: String) {
         self.canNumber = can

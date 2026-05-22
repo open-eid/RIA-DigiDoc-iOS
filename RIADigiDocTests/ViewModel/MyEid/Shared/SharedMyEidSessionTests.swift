@@ -23,20 +23,8 @@ import Testing
 final class SharedMyEidSessionTests {
     private let sharedMyEidSession: SharedMyEidSession
 
-    private let mockIdCardRepository: IdCardRepositoryProtocolMock
-
     init() async throws {
-        mockIdCardRepository = IdCardRepositoryProtocolMock()
-
-        mockIdCardRepository.statusStreamHandler = {
-            AsyncStream { continuation in
-                continuation.finish()
-            }
-        }
-
-        sharedMyEidSession = SharedMyEidSession(
-            idCardRepository: mockIdCardRepository
-        )
+        sharedMyEidSession = SharedMyEidSession()
     }
 
     // MARK: - PIN1 tests

@@ -19,7 +19,7 @@
 
 import SwiftUI
 import FactoryKit
-import IdCardLib
+import nfclib
 
 struct NFCInputView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled

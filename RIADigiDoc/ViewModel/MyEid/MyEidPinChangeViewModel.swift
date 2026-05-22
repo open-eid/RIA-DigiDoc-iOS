@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 import CommonsLib
 import UtilsLib
 
@@ -45,14 +45,9 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
     private(set) var errorMessageExtraArguments: [String] = []
     private(set) var isBlocked: Bool = false
 
-    private let idCardRepository: IdCardRepositoryProtocol
     private let sharedMyEidSession: SharedMyEidSessionProtocol
     private let operationChangePin: OperationChangePinProtocol
     private let operationUnblockPin: OperationUnblockPinProtocol
-
-    var usbReaderStatus: UsbReaderStatus {
-        sharedMyEidSession.usbReaderStatus
-    }
 
     var isFirstStep: Bool {
         stepIndex == 0
@@ -63,7 +58,6 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         codeType: CodeType,
         personalCode: String,
         actionMethod: ActionMethod,
-        idCardRepository: IdCardRepositoryProtocol,
         sharedMyEidSession: SharedMyEidSessionProtocol,
         operationChangePin: OperationChangePinProtocol,
         operationUnblockPin: OperationUnblockPinProtocol
@@ -72,7 +66,6 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         self.codeType = codeType
         self.personalCode = personalCode
         self.actionMethod = actionMethod
-        self.idCardRepository = idCardRepository
         self.sharedMyEidSession = sharedMyEidSession
         self.operationChangePin = operationChangePin
         self.operationUnblockPin = operationUnblockPin
@@ -243,42 +236,26 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         nfcStringsUtil: NFCSessionStringsUtil
     ) async {
         do {
-            if actionMethod == .idCardViaUSB {
-                switch action {
-                case .change:
-                    try await idCardRepository.changeCode(
-                        codeType,
-                        to: Data(new),
-                        verifyCode: Data(current)
-                    )
-                    sharedMyEidSession.setIsPinLocked(codeType, isLocked: false)
-                case .unblock:
-                    try await idCardRepository
-                        .unblockCode(codeType, puk: Data(current), newCode: Data(new))
-                    sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
-                }
-            } else if actionMethod == .idCardViaNFC {
-                let canNumber = sharedMyEidSession.getCAN()
-                switch action {
-                case .change:
-                    try await operationChangePin.startChanging(
-                        canNumber: canNumber,
-                        codeType: codeType,
-                        currentPin: SecureData(current),
-                        newPin: SecureData(new),
-                        strings: nfcStringsUtil.makeForChangePin(pinName: codeType.name)
-                    )
-                    sharedMyEidSession.setIsPinLocked(codeType, isLocked: false)
-                case .unblock:
-                    try await operationUnblockPin.startReading(
-                        canNumber: canNumber,
-                        codeType: codeType,
-                        puk: SecureData(current),
-                        newPin: SecureData(new),
-                        strings: nfcStringsUtil.makeForUnblock(pinName: codeType.name)
-                    )
-                    sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
-                }
+            let canNumber = sharedMyEidSession.getCAN()
+            switch action {
+            case .change:
+                try await operationChangePin.startChanging(
+                    canNumber: canNumber,
+                    codeType: codeType,
+                    currentPin: SecureData(current),
+                    newPin: SecureData(new),
+                    strings: nfcStringsUtil.makeForChangePin(pinName: codeType.name)
+                )
+                sharedMyEidSession.setIsPinLocked(codeType, isLocked: false)
+            case .unblock:
+                try await operationUnblockPin.startReading(
+                    canNumber: canNumber,
+                    codeType: codeType,
+                    puk: SecureData(current),
+                    newPin: SecureData(new),
+                    strings: nfcStringsUtil.makeForUnblock(pinName: codeType.name)
+                )
+                sharedMyEidSession.setIsPinBlocked(codeType, isBlocked: false)
             }
             isSuccess = true
         } catch {
@@ -288,6 +265,8 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                 let idCardError = idCardInternalError.getIdCardError()
                 MyEidPinChangeViewModel.logger().error("IdCardInternalError: \(idCardError)")
                 handleIdCardError(idCardError, pinType: codeType)
+            } else if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                handleIdCardError(IdCardError(nfcIdCardError.getIdCardError()), pinType: codeType)
             } else if let idCardError = error as? IdCardError {
                 MyEidPinChangeViewModel.logger().error("IdCardError: \(idCardError)")
                 handleIdCardError(idCardError, pinType: codeType)
@@ -442,6 +421,30 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         }
 
         return false
+    }
+}
+
+extension CodeType {
+    var minimumLength: Int {
+        switch self {
+        case .pin1:
+            return Constants.Validation.Pin1MinimumLength
+        case .pin2:
+            return Constants.Validation.Pin2MinimumLength
+        case .puk:
+            return Constants.Validation.PukMinimumLength
+        @unknown default:
+            return 0
+        }
+    }
+
+    var validLength: ClosedRange<Int> {
+        switch self {
+        case .pin1, .pin2, .puk:
+            return minimumLength...Constants.Validation.PinMaximumLength
+        @unknown default:
+            return 0...0
+        }
     }
 }
 

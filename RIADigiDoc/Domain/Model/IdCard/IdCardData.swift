@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 public struct IdCardData: Sendable, Hashable {
     public let publicData: CardInfo

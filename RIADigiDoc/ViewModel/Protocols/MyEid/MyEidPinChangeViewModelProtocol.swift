@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 @MainActor
 protocol MyEidPinChangeViewModelProtocol: Sendable {

@@ -108,7 +108,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}
 
-        sh scripts/GenerateMocks.sh
+        sh scripts/generate-mocks.sh
 
         xcodebuild test \
           -project RIADigiDoc.xcodeproj \

@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 
 public struct NFCSessionStringsUtil {
     private let localize: (String, [String]) -> String

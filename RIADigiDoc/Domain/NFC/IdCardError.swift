@@ -17,20 +17,25 @@
  *
  */
 
-public struct ProgressBar {
-    private let totalSteps: Int
-    private let currentStep: Int
+import nfclib
 
-    public init(currentStep: Int, totalSteps: Int = 4) {
-        self.currentStep = currentStep
-        self.totalSteps = totalSteps
-    }
+public enum IdCardError: Error {
+    case cancelledByUser
+    case wrongCAN
+    case wrongPIN(triesLeft: Int)
+    case invalidNewPIN
+    case sessionError
+    case pinLocked
+}
 
-    public func generate() -> String {
-        if currentStep > 0 {
-            return (0..<totalSteps).map { $0 < currentStep ? "🔵" : "⚪️" }.joined(separator: " ")
-        } else {
-            return ""
+extension IdCardError {
+    public init(_ nfcError: nfclib.IdCardError) {
+        switch nfcError {
+        case .wrongCAN: self = .wrongCAN
+        case .wrongPIN(let tries): self = .wrongPIN(triesLeft: tries)
+        case .invalidNewPIN: self = .invalidNewPIN
+        case .sessionError: self = .sessionError
+        @unknown default: self = .sessionError
         }
     }
 }

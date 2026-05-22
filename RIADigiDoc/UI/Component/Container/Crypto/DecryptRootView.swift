@@ -20,18 +20,12 @@
 import SwiftUI
 import FactoryKit
 import CryptoSwift
-import IdCardLib
+import nfclib
 import CommonsLib
 
 struct DecryptRootView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
-    @Environment(NavigationPathManager.self) private var pathManager
-
-    @State private var chosenMethod: ActionMethod = .idCardViaNFC
-
-    @State private var viewModel: DecryptRootViewModel
 
     private let cryptoContainer: GeneralContainer?
 
@@ -42,58 +36,25 @@ struct DecryptRootView: View {
     }
 
     init() {
-        _viewModel = State(wrappedValue: Container.shared.decryptRootViewModel())
         self.sharedContainerViewModel = Container.shared.sharedContainerViewModel()
         self.cryptoContainer = sharedContainerViewModel.currentContainer()
     }
 
     var body: some View {
         ZStack {
-            switch chosenMethod {
-            case .idCardViaNFC:
-                if let container = cryptoContainer as? CryptoContainerProtocol {
-                    NFCView(
-                        actionType: .decrypt,
-                        actionMethods: [
-                            .idCardViaNFC,
-                            .idCardViaUSB
-                        ],
-                        pinType: CodeType.pin1,
-                        cryptoContainer: container,
-                        onSuccessDecrypt: { container in
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setCryptoContainer(container)
+            if let container = cryptoContainer as? CryptoContainerProtocol {
+                NFCView(
+                    actionType: .decrypt,
+                    actionMethods: [.idCardViaNFC],
+                    pinType: CodeType.pin1,
+                    cryptoContainer: container,
+                    onSuccessDecrypt: { container in
+                        sharedContainerViewModel.removeLastContainer()
+                        sharedContainerViewModel.setCryptoContainer(container)
 
-                            showContainerSuccessfullyDecryptedMessage()
-                        }
-                    )
-                }
-            case .idCardViaUSB:
-                if let container = cryptoContainer as? CryptoContainerProtocol {
-                    IdCardView(
-                        actionType: .decrypt,
-                        actionMethods: [
-                            .idCardViaNFC,
-                            .idCardViaUSB
-                        ],
-                        cryptoContainer: container,
-                        onSuccessDecrypt: { container in
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setCryptoContainer(container)
-
-                            showContainerSuccessfullyDecryptedMessage()
-                        }
-                    )
-                }
-            case .mobileId:
-                EmptyView()
-            case .smartId:
-                EmptyView()
-            }
-        }
-        .onAppear {
-            Task {
-                chosenMethod = await viewModel.getSelectedDecryptMethod()
+                        showContainerSuccessfullyDecryptedMessage()
+                    }
+                )
             }
         }
     }

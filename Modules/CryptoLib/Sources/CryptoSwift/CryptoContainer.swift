@@ -21,7 +21,7 @@ import Foundation
 import FactoryKit
 import CryptoObjC
 import CryptoObjCWrapper
-import IdCardLib
+import nfclib
 import CommonsLib
 import UtilsLib
 
