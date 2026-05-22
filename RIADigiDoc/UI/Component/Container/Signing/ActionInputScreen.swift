@@ -78,7 +78,6 @@ struct ActionInputScreen<Content: View>: View {
         actionType: ActionType = .signing,
         actionMethods: [ActionMethod] = [
             .idCardViaNFC,
-            .idCardViaUSB,
             .mobileId,
             .smartId
         ],
@@ -124,30 +123,39 @@ struct ActionInputScreen<Content: View>: View {
                                     .foregroundStyle(theme.onSurfaceVariant)
                                     .accessibilityHidden(true)
 
-                                NavigationLink(
-                                    value: NavigationDestination.signingMethodSelectionView(
-                                        actionType: actionType,
-                                        methods: actionMethods
-                                    )
-                                ) {
-                                    HStack {
-                                        Text(verbatim: selectedSigningMethodText)
-                                            .font(typography.bodyLarge)
-                                            .foregroundStyle(theme.onSurface)
-                                            .accessibilityLabel(Text(verbatim:
-                                                "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
-                                            )
-                                        Spacer()
-                                        Image("ic_m3_arrow_right_48pt_wght400")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(
-                                                width: Dimensions.Icon.IconSizeXXS,
-                                                height: Dimensions.Icon.IconSizeXXS
-                                            )
-                                            .foregroundStyle(theme.onSurfaceVariant)
-                                            .accessibilityHidden(true)
+                                if actionType == .signing {
+                                    NavigationLink(
+                                        value: NavigationDestination.signingMethodSelectionView(
+                                            actionType: actionType,
+                                            methods: actionMethods
+                                        )
+                                    ) {
+                                        HStack {
+                                            Text(verbatim: selectedSigningMethodText)
+                                                .font(typography.bodyLarge)
+                                                .foregroundStyle(theme.onSurface)
+                                                .accessibilityLabel(Text(verbatim:
+                                                    "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
+                                                )
+                                            Spacer()
+                                            Image("ic_m3_arrow_right_48pt_wght400")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(
+                                                    width: Dimensions.Icon.IconSizeXXS,
+                                                    height: Dimensions.Icon.IconSizeXXS
+                                                )
+                                                .foregroundStyle(theme.onSurfaceVariant)
+                                                .accessibilityHidden(true)
+                                        }
                                     }
+                                } else {
+                                    Text(verbatim: selectedSigningMethodText)
+                                        .font(typography.bodyLarge)
+                                        .foregroundStyle(theme.onSurface)
+                                        .accessibilityLabel(
+                                            Text(verbatim: "\(selectedActionMethodLabel) \(selectedSigningMethodText)")
+                                        )
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -157,10 +165,7 @@ struct ActionInputScreen<Content: View>: View {
 
                         content
 
-                        // ID-card via USB shows the button later in the process
-                        if (!isInProgress ||
-                            selectedActionMethod == .idCardViaUSB
-                        ) && showSubmitButton {
+                        if !isInProgress && showSubmitButton {
                             PrimaryButton(
                                 text: buttonTitle,
                                 isButtonEnabled: isActionEnabled,

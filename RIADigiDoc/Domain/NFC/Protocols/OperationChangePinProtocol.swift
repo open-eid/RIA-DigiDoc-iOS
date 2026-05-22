@@ -17,7 +17,7 @@
  *
  */
 
-import IdCardLib
+import nfclib
 
 /// @mockable
 @MainActor

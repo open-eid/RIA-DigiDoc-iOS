@@ -20,7 +20,7 @@
 import CryptoObjCWrapper
 import CryptoSwift
 import Foundation
-import IdCardLib
+import nfclib
 
 /// @mockable
 @MainActor

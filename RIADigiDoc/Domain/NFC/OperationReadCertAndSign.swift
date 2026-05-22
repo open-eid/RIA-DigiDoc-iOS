@@ -22,10 +22,8 @@ import CoreNFC
 import CommonCrypto
 import CommonsLib
 import CryptoTokenKit
-internal import SwiftECC
-import BigInt
 import Security
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -51,6 +49,14 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         strings: NFCSessionStrings
     ) async throws -> SignedContainerProtocol {
 
+        self.canNumber = canNumber
+        self.pin2Number = pin2Number
+        self.signedContainer = signedContainer
+        self.containerPath = containerPath
+        self.roleData = roleData
+        self.userAgent = userAgent
+        self.strings = strings
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -58,14 +64,6 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
                 continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
                 return
             }
-
-            self.canNumber = canNumber
-            self.pin2Number = pin2Number
-            self.signedContainer = signedContainer
-            self.containerPath = containerPath
-            self.roleData = roleData
-            self.userAgent = userAgent
-            self.strings = strings
 
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
@@ -160,6 +158,11 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
+                    return
+                }
+
+                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                    handleIdCardInternalError(nfcIdCardError, session: session)
                     return
                 }
 

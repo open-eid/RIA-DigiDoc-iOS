@@ -20,7 +20,7 @@
 import CommonsLib
 import CryptoSwift
 import Foundation
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import LibdigidocLibSwiftMocks
 import Testing

@@ -21,10 +21,8 @@ import Foundation
 import CoreNFC
 import CommonCrypto
 import CryptoTokenKit
-internal import SwiftECC
-import BigInt
 import Security
-import IdCardLib
+import nfclib
 
 @MainActor
 public class OperationUnblockPin: NFCOperationBase, OperationUnblockPinProtocol {
@@ -40,6 +38,12 @@ public class OperationUnblockPin: NFCOperationBase, OperationUnblockPinProtocol 
         newPin: SecureData,
         strings: NFCSessionStrings
     ) async throws {
+        self.canNumber = canNumber
+        self.codeType = codeType
+        self.puk = puk
+        self.newPin = newPin
+        self.strings = strings
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -48,11 +52,6 @@ public class OperationUnblockPin: NFCOperationBase, OperationUnblockPinProtocol 
                 return
             }
 
-            self.canNumber = canNumber
-            self.codeType = codeType
-            self.puk = puk
-            self.newPin = newPin
-            self.strings = strings
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
             session?.begin()
@@ -96,6 +95,11 @@ public class OperationUnblockPin: NFCOperationBase, OperationUnblockPinProtocol 
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
+                    return
+                }
+
+                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                    handleIdCardInternalError(nfcIdCardError, session: session)
                     return
                 }
 

@@ -19,7 +19,7 @@
 
 import Foundation
 import CoreNFC
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import UtilsLib
 
@@ -94,6 +94,17 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         session: NFCTagReaderSession
     ) {
         let idCardError = error.getIdCardError()
+        Self.logger().error("NFC: IdCardError detected: \(idCardError)")
+        operationError = error
+        handleIdCardError(idCardError)
+        session.invalidate(errorMessage: nfcError)
+    }
+
+    func handleIdCardInternalError(
+        _ error: nfclib.IdCardInternalError,
+        session: NFCTagReaderSession
+    ) {
+        let idCardError = IdCardError(error.getIdCardError())
         Self.logger().error("NFC: IdCardError detected: \(idCardError)")
         operationError = error
         handleIdCardError(idCardError)

@@ -19,7 +19,7 @@
 
 import Foundation
 import CryptoSwift
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import CommonsLib
 

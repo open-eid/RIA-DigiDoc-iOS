@@ -20,7 +20,7 @@
 import Foundation
 import CoreNFC
 import UtilsLib
-import IdCardLib
+import nfclib
 
 @MainActor
 public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
@@ -36,6 +36,12 @@ public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
         newPin: SecureData,
         strings: NFCSessionStrings,
     ) async throws {
+        self.canNumber = canNumber
+        self.codeType = codeType
+        self.currentPin = currentPin
+        self.newPin = newPin
+        self.strings = strings
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -44,11 +50,6 @@ public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
                 return
             }
 
-            self.canNumber = canNumber
-            self.codeType = codeType
-            self.currentPin = currentPin
-            self.newPin = newPin
-            self.strings = strings
             session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
             updateAlertMessage(step: 0)
             session?.begin()
@@ -96,6 +97,11 @@ public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
 
                 if let idCardInternalError = error as? IdCardInternalError {
                     handleIdCardInternalError(idCardInternalError, session: session)
+                    return
+                }
+
+                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                    handleIdCardInternalError(nfcIdCardError, session: session)
                     return
                 }
 

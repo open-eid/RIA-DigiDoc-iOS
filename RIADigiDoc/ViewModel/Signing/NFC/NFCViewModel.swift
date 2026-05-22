@@ -20,7 +20,7 @@
 import Foundation
 import CryptoObjCWrapper
 import CryptoSwift
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 import CommonsLib
 import UtilsLib
@@ -243,6 +243,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 return nil
             }
 
+            if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                handleIdCardError(IdCardError(nfcIdCardError.getIdCardError()), pinType: CodeType.pin1)
+                return nil
+            }
+
             if let decryptError = error as? DecryptError {
                 NFCViewModel.logger().error("NFC: ReadCertAndDecryptError: \(decryptError.localizedDescription)")
                 handleDecryptError(error: decryptError)
@@ -419,6 +424,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 return nil
             }
 
+            if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                handleIdCardError(IdCardError(nfcIdCardError.getIdCardError()), pinType: .pin2)
+                return nil
+            }
+
             if let readCertSignError = error as? ReadCertAndSignError {
                 NFCViewModel.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
                 handleReadCertAndSignError(error: readCertSignError)
@@ -502,6 +512,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 let idCardError = idCardInternalError.getIdCardError()
                 NFCViewModel.logger().error("NFC: IdCardError: \(idCardError)")
                 handleIdCardError(idCardError, pinType: .pin2)
+                return nil
+            }
+
+            if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+                handleIdCardError(IdCardError(nfcIdCardError.getIdCardError()), pinType: .pin2)
                 return nil
             }
 

@@ -55,14 +55,14 @@ final class ActionMethodSelectionViewModelTests {
     func setSelectedMyEidMethod_success() async {
         mockDataStore.setSelectedMyEidMethodHandler = { _ in }
 
-        await viewModel.setSelectedMyEidMethod(.idCardViaUSB)
+        await viewModel.setSelectedMyEidMethod(.idCardViaNFC)
 
         #expect(mockDataStore.setSelectedMyEidMethodCallCount == 1)
     }
 
     @Test
     func getSelectedMyEidMethod_success() async {
-        let actionMethod: ActionMethod = .idCardViaUSB
+        let actionMethod: ActionMethod = .idCardViaNFC
 
         mockDataStore.getSelectedMyEidMethodHandler = { actionMethod }
 

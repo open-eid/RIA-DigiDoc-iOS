@@ -14,13 +14,6 @@
   "testTargets" : [
     {
       "target" : {
-        "containerPath" : "container:Modules\/IdCardLib",
-        "identifier" : "IdCardLibTests",
-        "name" : "IdCardLibTests"
-      }
-    },
-    {
-      "target" : {
         "containerPath" : "container:RIADigiDoc.xcodeproj",
         "identifier" : "DFCE022A2D148B4D00216362",
         "name" : "FileImportShareExtensionTests"

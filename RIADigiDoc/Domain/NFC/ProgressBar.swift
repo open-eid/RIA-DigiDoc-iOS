@@ -17,15 +17,18 @@
  *
  */
 
-import CryptoTokenKit
-internal import SwiftECC
+struct ProgressBar {
+    let currentStep: Int
+    let totalSteps: Int
 
-extension TKBERTLVRecord {
-    convenience init<T: DataProtocol>(tag: TKTLVTag, bytes: T) {
-        self.init(tag: tag, value: Data(bytes))
+    init(currentStep: Int, totalSteps: Int = 4) {
+        self.currentStep = min(currentStep, totalSteps)
+        self.totalSteps = totalSteps
     }
 
-    convenience init(tag: TKTLVTag, publicKey: ECPublicKey) throws {
-        self.init(tag: tag, bytes: (try publicKey.x963Representation()))
+    func generate() -> String {
+        let filled = String(repeating: "●", count: currentStep)
+        let empty = String(repeating: "○", count: max(0, totalSteps - currentStep))
+        return filled + empty
     }
 }

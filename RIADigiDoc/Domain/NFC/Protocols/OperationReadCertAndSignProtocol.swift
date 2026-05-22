@@ -19,7 +19,7 @@
 
 import CommonsLib
 import Foundation
-import IdCardLib
+import nfclib
 import LibdigidocLibSwift
 
 /// @mockable

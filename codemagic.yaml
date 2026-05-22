@@ -145,7 +145,7 @@ workflows:
         script: xcode-project use-profiles
       - name: Run tests
         script: |
-          sh scripts/GenerateMocks.sh
+          sh scripts/generate-mocks.sh
           
           sh scripts/run-ci-tests.sh
         when:
@@ -279,7 +279,7 @@ workflows:
         script: xcode-project use-profiles
       - name: Run tests
         script: |
-          sh scripts/GenerateMocks.sh
+          sh scripts/generate-mocks.sh
 
           sh scripts/run-ci-tests.sh
       - *get_app_version

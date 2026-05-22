@@ -21,7 +21,7 @@ import SwiftUI
 import FactoryKit
 import LibdigidocLibSwift
 import CommonsLib
-import IdCardLib
+import nfclib
 import UtilsLib
 
 struct MyEidView: View {
@@ -102,10 +102,6 @@ struct MyEidView: View {
                 title: languageSettings.localized("Main home my eid title"),
                 titleAccessibility: languageSettings.localized("My eid title accessibility"),
                 onLeftClick: {
-                    Task {
-                        await viewModel.stopDiscoveringReaders()
-                    }
-
                     dismiss()
                 },
                 content: {
@@ -220,15 +216,6 @@ struct MyEidView: View {
                     }
                 )
                 .accessibilityAddTraits(.isModal)
-            }
-        }
-        .task(id: viewModel.usbReaderStatus) {
-            if actionMethod == .idCardViaUSB &&
-                viewModel.usbReaderStatus != .sCardConnected {
-                await viewModel.stopDiscoveringReaders()
-                await MainActor.run {
-                    pathManager.replaceLast(to: .myEidRootView)
-                }
             }
         }
         .onAppear {

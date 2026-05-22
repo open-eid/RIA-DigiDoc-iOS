@@ -22,7 +22,7 @@ import ConfigLib
 import FactoryKit
 import Foundation
 import UtilsLib
-import IdCardLib
+import nfclib
 
 extension Container {
     @MainActor
@@ -414,38 +414,9 @@ extension Container {
     }
 
     @MainActor
-    var idCardViewModel: Factory<IdCardViewModel> {
-        self { @MainActor in
-            IdCardViewModel(
-                idCardRepository: self.idCardRepository(),
-                sharedMyEidSession: self.sharedMyEidSession(),
-                certificateUtil: self.certificateUtil(),
-                nameUtil: self.nameUtil(),
-                dataStore: self.dataStore(),
-                userAgentUtil: self.userAgentUtil()
-            )
-        }
-    }
-
-    @MainActor
-    var idCardService: Factory<IdCardServiceProtocol> {
-        self { @MainActor in
-            IdCardService(usbReaderConnection: self.usbReaderConnection())
-        }
-    }
-
-    @MainActor
-    var idCardRepository: Factory<IdCardRepositoryProtocol> {
-        self { @MainActor in
-            IdCardRepository(idCardService: self.idCardService())
-        }
-        .shared
-    }
-
-    @MainActor
     var sharedMyEidSession: Factory<SharedMyEidSessionProtocol> {
         self { @MainActor in
-            SharedMyEidSession(idCardRepository: self.idCardRepository())
+            SharedMyEidSession()
         }
         .shared
     }
@@ -454,7 +425,6 @@ extension Container {
     var myEidViewModel: Factory<MyEidViewModel> {
         self { @MainActor in
             MyEidViewModel(
-                idCardRepository: self.idCardRepository(),
                 sharedMyEidSession: self.sharedMyEidSession()
             )
         }
@@ -578,7 +548,6 @@ extension Container {
                 codeType: codeType,
                 personalCode: personalCode,
                 actionMethod: actionMethod,
-                idCardRepository: self.idCardRepository(),
                 sharedMyEidSession: self.sharedMyEidSession(),
                 operationChangePin: self.operationChangePin(),
                 operationUnblockPin: self.operationUnblockPin()

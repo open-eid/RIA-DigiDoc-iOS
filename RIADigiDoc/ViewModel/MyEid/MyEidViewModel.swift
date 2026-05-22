@@ -18,7 +18,7 @@
  */
 
 import Foundation
-import IdCardLib
+import nfclib
 import UtilsLib
 import CommonsLib
 
@@ -26,18 +26,9 @@ import CommonsLib
 @MainActor
 class MyEidViewModel: MyEidViewModelProtocol, Loggable {
 
-    private let idCardRepository: IdCardRepositoryProtocol
     private let sharedMyEidSession: SharedMyEidSessionProtocol
 
-    var usbReaderStatus: UsbReaderStatus {
-        sharedMyEidSession.usbReaderStatus
-    }
-
-    init(
-        idCardRepository: IdCardRepositoryProtocol,
-        sharedMyEidSession: SharedMyEidSessionProtocol
-    ) {
-        self.idCardRepository = idCardRepository
+    init(sharedMyEidSession: SharedMyEidSessionProtocol) {
         self.sharedMyEidSession = sharedMyEidSession
     }
 
@@ -85,8 +76,4 @@ class MyEidViewModel: MyEidViewModelProtocol, Loggable {
         return (date < today) ? .expired : .valid
     }
 
-    public func stopDiscoveringReaders() async {
-        await idCardRepository.stopDiscoveringReaders()
-        sharedMyEidSession.stopStatusStream()
-    }
 }

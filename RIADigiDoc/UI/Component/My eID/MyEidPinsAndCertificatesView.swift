@@ -18,7 +18,7 @@
  */
 
 import SwiftUI
-import IdCardLib
+import nfclib
 
 struct MyEidPinsAndCertificatesView: View {
     @Environment(LanguageSettings.self) private var languageSettings
