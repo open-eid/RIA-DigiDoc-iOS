@@ -26,12 +26,11 @@
 
 #include <cdoc/CdocReader.h>
 #include <cdoc/Lock.h>
-#include <cdoc/Recipient.h>
 
 @implementation Addressee (label)
 
 - (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
-    std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(label);
+    std::map<std::string, std::string> info = libcdoc::Lock::parseLabel(label);
     id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : [NSString stringWithStdString:label];
     id type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
     id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
@@ -102,7 +101,7 @@
     NSMutableArray<Addressee*> *addressees = [[NSMutableArray alloc] init];
     for(const libcdoc::Lock &lock: reader->getLocks())
     {
-        if(lock.isCertificate()) {
+        if(lock.isCDoc1()) {
             NSString* concatKDFAlgorithmURI = @"";
             if (!lock.isRSA()) {
                 concatKDFAlgorithmURI = [NSString stringWithStdString:lock.getString(libcdoc::Lock::CONCAT_DIGEST)];
@@ -111,7 +110,7 @@
         } else if(lock.isPKI()) {
             [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)] concatKDFAlgorithmURI:@""]];
         } else if(lock.isSymmetric()) {
-            std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(lock.label);
+            std::map<std::string, std::string> info = libcdoc::Lock::parseLabel(lock.label);
             NSString *cnVal = info.contains("label")
                 ? [NSString stringWithStdString:info["label"]]
                 : @"";

@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
 namespace libcdoc {
 
@@ -209,45 +210,6 @@ struct CDOC_EXPORT MultiDataSource : public DataSource {
     result_t next(FileInfo& info) { return next(info.name, info.size); }
 };
 
-struct CDOC_EXPORT ChainedConsumer : public DataConsumer {
-	ChainedConsumer(DataConsumer *dst, bool take_ownership) : _dst(dst), _owned(take_ownership) {}
-	~ChainedConsumer() {
-		if (_owned) delete _dst;
-	}
-    result_t write(const uint8_t *src, size_t size) noexcept override {
-		return _dst->write(src, size);
-	}
-    result_t close() noexcept override {
-		if (_owned) return _dst->close();
-        return OK;
-	}
-    bool isError() noexcept override {
-		return _dst->isError();
-	}
-protected:
-	DataConsumer *_dst;
-	bool _owned;
-};
-
-struct CDOC_EXPORT ChainedSource : public DataSource {
-	ChainedSource(DataSource *src, bool take_ownership) : _src(src), _owned(take_ownership) {}
-	~ChainedSource() {
-		if (_owned) delete _src;
-	}
-    result_t read(uint8_t *dst, size_t size) noexcept override {
-		return _src->read(dst, size);
-	}
-    bool isError() noexcept override {
-		return _src->isError();
-	}
-    bool isEof() noexcept override {
-		return _src->isEof();
-	}
-protected:
-	DataSource *_src;
-	bool _owned;
-};
-
 struct CDOC_EXPORT IStreamSource : public DataSource {
 	IStreamSource(std::istream *ifs, bool take_ownership = false) : _ifs(ifs), _owned(take_ownership) {}
 	IStreamSource(const std::string& path);
@@ -259,7 +221,7 @@ struct CDOC_EXPORT IStreamSource : public DataSource {
         if(_ifs->bad()) return INPUT_STREAM_ERROR;
         _ifs->clear();
 		_ifs->seekg(pos);
-        return bool(_ifs->bad()) ? INPUT_STREAM_ERROR : OK;
+        return _ifs->bad() ? INPUT_STREAM_ERROR : OK;
 	}
 
     result_t read(uint8_t *dst, size_t size) noexcept override try {
@@ -302,7 +264,7 @@ protected:
 };
 
 struct CDOC_EXPORT VectorSource : public DataSource {
-	VectorSource(const std::vector<uint8_t>& data) : _data(data), _ptr(0) {}
+    VectorSource(const std::vector<uint8_t>& data) : _data(data) {}
 
     result_t seek(size_t pos) override {
 		if (pos > _data.size()) return INPUT_STREAM_ERROR;
@@ -321,7 +283,7 @@ struct CDOC_EXPORT VectorSource : public DataSource {
     bool isEof() noexcept override { return _ptr >= _data.size(); }
 protected:
 	const std::vector<uint8_t>& _data;
-	size_t _ptr;
+    size_t _ptr{0};
 };
 
 struct CDOC_EXPORT VectorConsumer : public DataConsumer {
@@ -333,7 +295,7 @@ struct CDOC_EXPORT VectorConsumer : public DataConsumer {
         return OUTPUT_STREAM_ERROR;
 	}
     result_t close() noexcept final { return OK; }
-    virtual bool isError() noexcept final { return false; }
+    bool isError() noexcept final { return false; }
 protected:
     std::vector<uint8_t>& _data;
 };
@@ -355,25 +317,7 @@ struct CDOC_EXPORT FileListConsumer : public MultiDataConsumer {
     bool isError() noexcept final {
 		return ofs.bad();
 	}
-    result_t open(const std::string& name, int64_t size) override final {
-        std::string fileName;
-        if (ofs.is_open()) {
-            ofs.close();
-        }
-        size_t lastSlashPos = name.find_last_of("\\/");
-        if (lastSlashPos != std::string::npos)
-        {
-            fileName = name.substr(lastSlashPos + 1);
-        }
-        else
-        {
-            fileName = name;
-        }
-        std::filesystem::path path(base);
-        path /= fileName;
-		ofs.open(path.string(), std::ios_base::binary);
-        return ofs.bad() ? OUTPUT_STREAM_ERROR : OK;
-	}
+    result_t open(const std::string &name, int64_t size) final;
 
 protected:
 	std::filesystem::path base;
@@ -390,7 +334,7 @@ struct CDOC_EXPORT FileListSource : public MultiDataSource {
 protected:
 	std::filesystem::path _base;
 	const std::vector<std::string>& _files;
-	int64_t _current;
+    int64_t _current = -1;
 	std::ifstream _ifs;
 };
 

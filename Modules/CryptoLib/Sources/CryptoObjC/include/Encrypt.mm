@@ -25,7 +25,8 @@
 
 #include <cdoc/CDocWriter.h>
 #include <cdoc/Recipient.h>
-#include <cdoc/ILogger.h>
+#include <cdoc/Logger.h>
+
 @implementation Encrypt
 
 + (void)setCerts:(nullable NSArray<NSData *> *)certs {
@@ -66,14 +67,14 @@ static inline NSString *NSStringFromStringView(std::string_view sv) {
                                   encoding:NSUTF8StringEncoding] ?: @"";
 }
 
-static inline NSString *NSStringFromLogLevel(libcdoc::ILogger::LogLevel level) {
+static inline NSString *NSStringFromLogLevel(libcdoc::LogLevel level) {
     switch (level) {
-        case libcdoc::ILogger::LEVEL_FATAL:   return @"FATAL";
-        case libcdoc::ILogger::LEVEL_ERROR:   return @"ERROR";
-        case libcdoc::ILogger::LEVEL_WARNING: return @"WARN";
-        case libcdoc::ILogger::LEVEL_INFO:    return @"INFO";
-        case libcdoc::ILogger::LEVEL_DEBUG:   return @"DEBUG";
-        case libcdoc::ILogger::LEVEL_TRACE:   return @"TRACE";
+        case libcdoc::LEVEL_FATAL:   return @"FATAL";
+        case libcdoc::LEVEL_ERROR:   return @"ERROR";
+        case libcdoc::LEVEL_WARNING: return @"WARN";
+        case libcdoc::LEVEL_INFO:    return @"INFO";
+        case libcdoc::LEVEL_DEBUG:   return @"DEBUG";
+        case libcdoc::LEVEL_TRACE:   return @"TRACE";
     }
     return @"UNKNOWN";
 }
@@ -91,9 +92,9 @@ static inline NSString *BasenameFromPath(NSString *path) {
     return path;
 }
 
-class ObjCLogger final : public libcdoc::ILogger {
-public:
-    void LogMessage(libcdoc::ILogger::LogLevel level,
+class ObjCLogger final : public libcdoc::Logger {
+protected:
+    void logMessage(libcdoc::LogLevel level,
                     std::string_view file,
                     int line,
                     std::string_view message) override
@@ -132,8 +133,8 @@ public:
     // Install only once, even if enableLogging:YES is called many times
     static std::once_flag once;
     std::call_once(once, [] {
-        libcdoc::ILogger::setLogger(&gLogger);
-        gLogger.SetMinLogLevel(libcdoc::ILogger::LEVEL_TRACE);
+        libcdoc::setLogger(&gLogger);
+        gLogger.setMinLogLevel(libcdoc::LEVEL_TRACE);
     });
 }
 
@@ -152,7 +153,7 @@ public:
     if (version == 2 && Settings::isOnlineEncryptionEnabled()) {
         NSString *server_id = Settings::getUUID();
         for (Addressee *addressee in addressees) {
-            if (writer->addRecipient(libcdoc::Recipient::makeServer({}, [addressee.data toVector], [server_id toString])) != 0) {
+            if (writer->addRecipient(libcdoc::Recipient::makeCertificate({}, [addressee.data toVector], [server_id toString])) != 0) {
                 return completion([NSError cryptoError:@"Failed to add recipient"]);
             }
         }

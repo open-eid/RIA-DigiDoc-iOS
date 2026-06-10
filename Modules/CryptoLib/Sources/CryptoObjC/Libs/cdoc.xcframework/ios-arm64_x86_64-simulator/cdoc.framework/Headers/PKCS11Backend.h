@@ -78,7 +78,9 @@ struct CDOC_EXPORT PKCS11Backend : public CryptoBackend {
      *
      * Opens slot, logs in with pin and finds the correct secret key.
      * Both key id and label have to match unless either one is empty.
-     * If the key is found, it is loaded internally for subsequent cryptographic operations.
+     * If the key is found, it is loaded internally for subsequent cryptographic operations and PKCS11 session remains OPEN.
+     * If the key is not found, the session closed.
+     * 
      * @param slot a PKCS11 slot to use
      * @param pin a user pin
      * @param id the key id or empty vector
@@ -91,7 +93,9 @@ struct CDOC_EXPORT PKCS11Backend : public CryptoBackend {
      *
      * Opens slot, logs in with pin and finds the correct private key.
      * Both key id and label have to match unless either one is empty.
-     * If the key is found, it is loaded internally for subsequent cryptographic operations.
+     * If the key is found, it is loaded internally for subsequent cryptographic operations and PKCS11 session remains OPEN.
+     * If the key is not found, the session closed.
+     * 
      * @param slot a PKCS11 slot to use
      * @param pin a user pin
      * @param id the key id
@@ -105,29 +109,29 @@ struct CDOC_EXPORT PKCS11Backend : public CryptoBackend {
      *
      * Get a certificate value given slot, label and id.
      * Both key id and label have to match unless either one is empty.
+     * 
      * @param val a destination container for value
-     * @param rsa will be set true is certificate uses RSA key
      * @param slot the slot to use
-     * @param pin the pin code
+     * @param pin the pin code or empty if public
      * @param id certificate id or empty vector
      * @param label certificate label or empty vector
      * @return error code or OK
      */
-    result_t getCertificate(std::vector<uint8_t>& val, bool& rsa, int slot, const std::vector<uint8_t>& pin, const std::vector<uint8_t>& id, const std::string& label);
+    result_t getCertificate(std::vector<uint8_t>& val, int slot, const std::vector<uint8_t>& pin, const std::vector<uint8_t>& id, const std::string& label);
     /**
      * @brief get public key value
      *
      * Get a public key value given slot, label and id.
      * Both key id and label have to match unless either one is empty.
+     * 
      * @param val a destination container for value
-     * @param rsa will be set true is public key uses RSA key
      * @param slot the slot to use
-     * @param pin the pin code
+     * @param pin the pin code or empty if public
      * @param id public key id or empty vector
      * @param label public key label or empty vector
      * @return error code or OK
      */
-    result_t getPublicKey(std::vector<uint8_t>& val, bool& rsa, int slot, const std::vector<uint8_t>& pin, const std::vector<uint8_t>& id, const std::string& label);
+    result_t getPublicKey(std::vector<uint8_t>& val, int slot, const std::vector<uint8_t>& pin, const std::vector<uint8_t>& id, const std::string& label);
 
     /**
      * @brief loads key for encryption/decryption
@@ -135,6 +139,8 @@ struct CDOC_EXPORT PKCS11Backend : public CryptoBackend {
      * A method to load the correct private/secret key for given capsule or receiver. The subclass implementation should
      * call either useSecretKey or usePrivateKey with proper pin, PKCS11 label and/or id to actually load the key for subsequent
      * cryptographic operation.
+     * On success, the PKCS11 session remains OPEN.
+     * 
      * @param idx lock or recipient index (0-based) in CDoc container
      * @param priv whether to connect to private or secret key
      * @return error code or OK
@@ -145,7 +151,7 @@ struct CDOC_EXPORT PKCS11Backend : public CryptoBackend {
      *
      * A subclass should overwrite this to inform the backend about the correct padding.
      * @param idx a lock idx
-     * @return true if PSS padding is sued
+     * @return true if PSS padding is used
      */
     virtual result_t usePSS(int idx) {return true;}
 
