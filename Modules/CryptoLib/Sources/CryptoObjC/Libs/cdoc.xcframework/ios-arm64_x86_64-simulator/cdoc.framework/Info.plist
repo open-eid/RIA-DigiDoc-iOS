@@ -12,17 +12,19 @@
 	<string>ee.ria.cdoc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.8</string>
+	<string>0.5.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0</string>
+	<string>42</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>MinimumOSVersion</key>
-	<string>15.0</string>
+	<string>16.3</string>
 </dict>
 </plist>

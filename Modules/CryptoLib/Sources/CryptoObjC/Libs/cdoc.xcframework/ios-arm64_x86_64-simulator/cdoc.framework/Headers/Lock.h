@@ -19,7 +19,7 @@
 #ifndef __LOCK_H__
 #define __LOCK_H__
 
-#include <cdoc/Exports.h>
+#include <cdoc/CDoc.h>
 
 #include <cstdint>
 #include <string>
@@ -42,7 +42,7 @@ struct CDOC_EXPORT Lock
     /**
      * @brief The lock type
      */
-	enum Type : unsigned char {
+    enum Type : unsigned char {
         /**
          * @brief Valid capsule but not supported by this library version
          * 
@@ -51,7 +51,7 @@ struct CDOC_EXPORT Lock
         /**
          * @brief Symmetric AES key
          */
-		SYMMETRIC_KEY,
+        SYMMETRIC_KEY,
         /**
          * @brief PBKDF key (derived from password)
          */
@@ -68,30 +68,18 @@ struct CDOC_EXPORT Lock
          * @brief Public key stored on keyserver
          */
         SERVER,
+#ifdef HAS_KEYSHARES
         /**
          * @brief Symmetric key distributed on several servers
          */
         SHARE_SERVER
-	};
-
-    /**
-     * @brief The public key type
-     */
-	enum PKType : unsigned char {
-        /**
-         * Elliptic curve
-         */
-        ECC,
-        /**
-         * RSA
-         */
-		RSA
-	};
+#endif
+    };
 
     /**
      * @brief Extra parameters depending on key type
      */
-	enum Params : unsigned int {
+    enum Params : unsigned int {
         /**
          * @brief HKDF salt (SYMMETRIC_KEY, PASSWORD and SHARE_SERVER)
          */
@@ -128,10 +116,12 @@ struct CDOC_EXPORT Lock
          * @brief Keyshare recipient ID
          */
         RECIPIENT_ID,
+#ifdef HAS_KEYSHARES
         /**
          * @brief Keyshare server urls (separated by ';')
          */
         SHARE_URLS,
+#endif
         /**
          * @brief CDoc1 specific
          */
@@ -152,7 +142,7 @@ struct CDOC_EXPORT Lock
          * @brief CDoc1 specific
          */
         PARTY_VINFO
-	};
+    };
 
     /**
      * @brief get lock parameter value
@@ -176,20 +166,24 @@ struct CDOC_EXPORT Lock
     /**
      * @brief The lock type
      */
-	Type type = Type::UNKNOWN;
+    Type type = Type::UNKNOWN;
     /**
-     * @brief algorithm type for public key based locks
+     * @brief The algorithm type for public key based locks
      */
-	PKType pk_type = PKType::ECC;
+    Algorithm pk_type = Algorithm::ECC;
+    /**
+     * @brief The elliptic curve used
+     */
+    Curve ec_type = Curve::SECP_384_R1;
 
     /**
      * @brief the lock label
      */
-	std::string label;
+    std::string label;
     /**
      * @brief encrypted FMK (File Master Key)
      */
-	std::vector<uint8_t> encrypted_fmk;
+    std::vector<uint8_t> encrypted_fmk;
 
     /**
      * @brief check whether lock is valid
@@ -207,11 +201,6 @@ struct CDOC_EXPORT Lock
      */
     constexpr bool isPKI() const noexcept { return (type == Type::CDOC1) || (type == Type::PUBLIC_KEY) || (type == Type::SERVER); }
     /**
-     * @brief check whether lock is based on certificate
-     * @return true if type is CDOC1
-     */
-    constexpr bool isCertificate() const noexcept { return (type == Type::CDOC1); }
-    /**
      * @brief check whether lock is CDoc1 version
      * @return true if type is CDOC1
      */
@@ -220,42 +209,23 @@ struct CDOC_EXPORT Lock
      * @brief check whether public key lock uses RSA algorithm
      * @return true if pk_type is RSA
      */
-    constexpr bool isRSA() const noexcept { return pk_type == PKType::RSA; }
+    constexpr bool isRSA() const noexcept { return pk_type == Algorithm::RSA; }
 
-    /**
-     * @brief check whether two locks have the same public key
-     *
-     * This convenience method checks whether both locks are public key based, and if they are,
-     * whether the RCPT_KEY parameters are identical (i.e. both can be decrypted by the same private key)
-     * @param other the other lock
-     * @return true if both have the same public key
-     */
-    bool hasTheSameKey(const Lock &other) const;
-    /**
-     * @brief check whether lock has the given public key
-     *
-     * This convenience method checks whether lock is public key based, and if it is,
-     * whether the RCPT_KEY parameters is identical to ptovided key(i.e. it can be decrypted by the corresponding private key)
-     * @param public_key the public key (short format)
-     * @return true if lock has the same public key
-     */
-    bool hasTheSameKey(const std::vector<uint8_t>& public_key) const;
-
-	Lock() noexcept = default;
-	Lock(Type _type) noexcept : type(_type) {};
+    Lock() noexcept = default;
+    Lock(Type _type) noexcept : type(_type) {};
 
     /**
      * @brief Set lock parameter value
      * @param param a parameter type
      * @param val the value
      */
-    void setBytes(Params param, const std::vector<uint8_t>& val) { params[param] = val; }
+    void setBytes(Params param, std::vector<uint8_t> val) { params[param] = std::move(val); }
     /**
      * @brief Set lock parameter value from string
      * @param param a parameter type
      * @param val the value
      */
-    void setString(Params param, const std::string& val) { params[param] = std::vector<uint8_t>(val.cbegin(), val.cend()); }
+    void setString(Params param, const std::string& val) { setBytes(param, {val.cbegin(), val.cend()}); }
     /**
      * @brief Set lock parameter value from integer
      * @param param a parameter type
@@ -264,15 +234,16 @@ struct CDOC_EXPORT Lock
     void setInt(Params param, int32_t val);
 
     /**
-     * @brief A convenience method to initialize CERTIFICATE, RCPT_KEY and PK_TYPE values from given certificate
-     * @param cert the certificate (der-encoded)
+     * @brief parse machine-readable CDoc2 label
+     * @param label the label
+     * @return a map of key-value pairs
      */
-	void setCertificate(const std::vector<uint8_t>& cert);
+    static std::map<std::string, std::string> parseLabel(const std::string& label);
 
-    bool operator== (const Lock& other) const = default;
+    bool operator== (const Lock& other) const noexcept = default;
 
 private:
-	std::map<Params,std::vector<uint8_t>> params;
+    std::map<Params,std::vector<uint8_t>> params;
 };
 
 } // namespace libcdoc

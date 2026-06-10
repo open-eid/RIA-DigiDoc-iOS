@@ -21,7 +21,7 @@
 
 #include "CDoc.h"
 
-#include <cstdint>
+#include <vector>
 
 namespace libcdoc {
     struct Configuration;
@@ -38,7 +38,7 @@ namespace libcdoc {
  */
 class CDOC_EXPORT CDocWriter {
 public:
-	virtual ~CDocWriter();
+    virtual ~CDocWriter() noexcept;
 
     /**
      * @brief The container version (1 or 2)
@@ -154,6 +154,7 @@ public:
     static CDocWriter *createWriter(int version, const std::string& path, Configuration *conf, CryptoBackend *crypto, NetworkBackend *network);
 protected:
 	explicit CDocWriter(int _version, DataConsumer *dst, bool take_ownership);
+    CDOC_DISABLE_MOVE_COPY(CDocWriter);
 
 	void setLastError(const std::string& message) { last_error = message; }
 

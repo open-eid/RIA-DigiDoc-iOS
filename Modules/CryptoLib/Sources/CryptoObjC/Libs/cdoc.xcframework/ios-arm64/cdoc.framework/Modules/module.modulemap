@@ -10,8 +10,7 @@ framework module cdoc {
   header "CryptoBackend.h"
   header "NetworkBackend.h"
   header "PKCS11Backend.h"
-  header "ILogger.h"
-  header "ConsoleLogger.h"
+  header "Logger.h"
   export *
   requires cplusplus
 }

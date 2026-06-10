@@ -29,6 +29,7 @@ struct CDOC_EXPORT NetworkBackend {
      * 
      */
 	static constexpr int NETWORK_ERROR = -300;
+#ifdef HAS_KEYSHARES
     // MID/SID error codes
     // User refused the session
     static constexpr int MIDSID_USER_REFUSED = -350;
@@ -62,9 +63,10 @@ struct CDOC_EXPORT NetworkBackend {
     static constexpr int MIDSID_DELIVERY_ERROR = -364;
     // Invalid response from card
     static constexpr int MIDSID_SIM_ERROR = -365;
+#endif
 
     /**
-     * @brief Share information returned by server
+     * @brief Capsule information returned by capsule server
      * 
      */
     struct CapsuleInfo {
@@ -79,8 +81,9 @@ struct CDOC_EXPORT NetworkBackend {
          */
         uint64_t expiry_time;
     };
+#ifdef HAS_KEYSHARES
     /**
-     * @brief Share information returned by server
+     * @brief Share information returned by share server
      * 
      */
     struct ShareInfo {
@@ -95,6 +98,7 @@ struct CDOC_EXPORT NetworkBackend {
          */
         std::string recipient;
     };
+#endif
 
     /**
      * @brief Proxy credentials used for network access
@@ -115,8 +119,10 @@ struct CDOC_EXPORT NetworkBackend {
         std::string username;
         /**
          * @brief Proxy password
+         * 
+         * It is the implementer's responsibility to ensure that the buffer remains valid during CDocWriter getFMK and beginEncryption calls
          */
-        std::string password;
+        std::string_view password;
     };
 
     NetworkBackend() = default;
@@ -141,11 +147,12 @@ struct CDOC_EXPORT NetworkBackend {
      * @param url server url
      * @param rcpt_key recipient's public key
      * @param key_material encrypted KEK or ECDH public Key used to derive shared secret
-	 * @param type algorithm type, currently either "rsa" or "ecc_secp384r1"
+	 * @param type algorithm type, currently either "rsa", "ecc_secp384r1", "ecc_secp256r1" or "ecc_secp521r1"
      * @param expiry_ts the requested capsule expiry timestamp, 0 - use server default
 	 * @return error code or OK
 	 */
     virtual result_t sendKey (CapsuleInfo& dst, const std::string& url, const std::vector<uint8_t>& rcpt_key, const std::vector<uint8_t> &key_material, const std::string& type, uint64_t expiry_ts);
+#ifdef HAS_KEYSHARES
     /**
      * @brief send key share to server
      *
@@ -157,6 +164,7 @@ struct CDOC_EXPORT NetworkBackend {
      * @return error code or OK
      */
     virtual result_t sendShare(std::vector<uint8_t>& dst, const std::string& url, const std::string& recipient, const std::vector<uint8_t>& share);
+#endif
 	/**
 	 * @brief fetch key material from keyserver
      *
@@ -167,6 +175,7 @@ struct CDOC_EXPORT NetworkBackend {
 	 * @return error code or OK
 	 */
     virtual result_t fetchKey (std::vector<uint8_t>& dst, const std::string& url, const std::string& transaction_id);
+#ifdef HAS_KEYSHARES
     /**
      * @brief fetch authentication nonce from share server
      * @param dst a destination container for nonce
@@ -185,7 +194,7 @@ struct CDOC_EXPORT NetworkBackend {
      * @return error code or OK
      */
     virtual result_t fetchShare(ShareInfo& share, const std::string& url, const std::string& share_id, const std::string& ticket, const std::vector<uint8_t>& cert);
-
+#endif
 
     /**
      * @brief get client TLS certificate in der format
@@ -234,6 +243,7 @@ struct CDOC_EXPORT NetworkBackend {
         return NOT_IMPLEMENTED;
     }
 
+#ifdef HAS_KEYSHARES
     /**
      * @brief show MID/SID verification code
      * 
@@ -277,9 +287,6 @@ struct CDOC_EXPORT NetworkBackend {
     result_t signMID(std::vector<uint8_t>& dst, std::vector<uint8_t>& cert,
         const std::string& url, const std::string& rp_uuid, const std::string& rp_name, const std::string& phone,
         const std::string& rcpt_id, const std::vector<uint8_t>& digest, CryptoBackend::HashAlgorithm algo);
-
-#if LIBCDOC_TESTING
-    virtual int64_t test(std::vector<std::vector<uint8_t>> &dst);
 #endif
 };
 

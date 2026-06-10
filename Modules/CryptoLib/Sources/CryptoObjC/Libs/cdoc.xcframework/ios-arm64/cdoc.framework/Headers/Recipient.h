@@ -19,14 +19,16 @@
 #ifndef __RECIPIENT_H__
 #define __RECIPIENT_H__
 
-#include <cdoc/Exports.h>
+#include <cdoc/CDoc.h>
 
-#include <map>
 #include <string>
 #include <vector>
+#include <map>
 #include <cstdint>
 
 namespace libcdoc {
+
+struct Lock;
 
 /**
  * @brief A descriptor of encryption method and key to be used in container
@@ -50,24 +52,12 @@ struct CDOC_EXPORT Recipient {
          * @brief Public key
          */
         PUBLIC_KEY,
+#ifdef HAS_KEYSHARES
         /**
          * @brief n of n shared symmetric key
          */
         KEYSHARE
-	};
-
-    /**
-     * @brief The public key type
-     */
-    enum PKType : uint8_t {
-        /**
-         * Elliptic curve
-         */
-		ECC,
-        /**
-         * RSA
-         */
-		RSA
+#endif
 	};
 
 	Recipient() = default;
@@ -79,7 +69,8 @@ struct CDOC_EXPORT Recipient {
     /**
      * @brief The public key type
      */
-	PKType pk_type = PKType::ECC;
+	Algorithm pk_type = Algorithm::ECC;
+    Curve ec_type = Curve::SECP_384_R1;
     /**
      * @brief The number of iterations for PBKDF. Value 0 means directly provided symmetric key.
      */
@@ -96,10 +87,12 @@ struct CDOC_EXPORT Recipient {
      * @brief The recipient's certificate (if present)
      */
     std::vector<uint8_t> cert;
+#ifdef HAS_KEYSHARES
     /**
      * @brief The recipient id for share server (PNOEE-XXXXXXXXXXX)
      */
     std::string id;
+#endif
     /**
      * @brief The keyserver or share server list id (if present)
      */
@@ -109,16 +102,6 @@ struct CDOC_EXPORT Recipient {
      * 
      */
     uint64_t expiry_ts = 0;
-    /**
-     * @brief key/certificate filename for machine-readable label
-     * 
-     */
-    std::string file_name;
-    /**
-     * @brief public key/password name for machine-readable label
-     * 
-     */
-    std::string key_name;
 
     /**
      * @brief test whether the Recipient structure is initialized
@@ -145,16 +128,13 @@ struct CDOC_EXPORT Recipient {
      * @return true if type is SERVER
      */
     bool isKeyServer() const { return (type == Type::PUBLIC_KEY) && !server_id.empty(); }
+#ifdef HAS_KEYSHARES
     /**
      * @brief check whether Recipient is keyshare
      * @return true if type is KEYSHARE
      */
     bool isKeyShare() const { return type == Type::KEYSHARE; }
-
-    /**
-     * @brief Clear all values and set type to NONE
-     */
-    void clear() { type = Type::NONE; pk_type = PKType::ECC; label.clear(); kdf_iter = 0; rcpt_key.clear(); cert.clear(); }
+#endif
 
     /**
      * @brief A convenience method to check whether two recipients are both public key based and have the same keys.
@@ -162,8 +142,9 @@ struct CDOC_EXPORT Recipient {
      * @return true if the public keys are identical
      */
 	bool isTheSameRecipient(const Recipient &other) const;
+
     /**
-     * @brief A convenience method to check whether a recipient is public key based and has the given keys.
+     * @brief A convenience method to check whether a recipient is public key based and has the given key.
      * @param public_key a public key to test
      * @return true if the public keys are identical
      */
@@ -171,52 +152,52 @@ struct CDOC_EXPORT Recipient {
 
     /**
      * @brief Create a new symmetric key based Recipient
+     * 
+     * If the label is empty, a machine-readable label will be created according to CDoc2 specification
+     * 
      * @param label the label text
      * @param kdf_iter the number of PBKDF iterations (0 if full key is provided)
      * @return a new Recipient structure
      */
 	static Recipient makeSymmetric(std::string label, int32_t kdf_iter);
+
     /**
      * @brief Create a new public key based Recipient
+     * 
+     * If the label is empty, a machine-readable label will be created according to CDoc2 specification
+     * 
      * @param label the label text
      * @param public_key the public key value
-     * @param pk_type the algorithm type (either ECC or RSA)
+     * @param server_id the keyserver id or empty string for offline capsule
      * @return a new Recipient structure
      */
-    static Recipient makePublicKey(std::string label, std::vector<uint8_t> public_key, PKType pk_type);
+    static Recipient makePublicKey(std::string label, const std::vector<uint8_t> &public_key, std::string server_id = {});
+
+    /**
+     * @brief Create a new public key based Recipient
+     * @param lock Lock to derive parameters from
+     * @param server_id the keyserver id or empty string for offline capsule
+     * @return a new Recipient structure
+     */
+    static Recipient makePublicKey(const Lock &lock, std::string server_id = {});
+
     /**
      * @brief Create a new certificate based Recipient
+     * 
+     * If the label is empty, a machine-readable label will be created according to CDoc2 specification
+     * 
      * @param label the label text
      * @param cert the certificate value (der-encoded)
+     * @param server_id the keyserver id or empty string for offline capsule
      * @return a new Recipient structure
      */
-    static Recipient makeCertificate(std::string label, std::vector<uint8_t> cert);
+    static Recipient makeCertificate(std::string label, std::vector<uint8_t> cert, std::string server_id = {});
 
-    /**
-     * @brief Create a new capsule server based Recipient
-     * If the label is empty, a machine-readable label text (public key version) is automatically generated according to CDoc2 specification.
-     * 
-     * @param label the label text
-     * @param public_key the public key value
-     * @param pk_type the algorithm type (either ECC or RSA)
-     * @param server_id the keyserver id
-     * @return a new Recipient structure
-     */
-    static Recipient makeServer(std::string label, std::vector<uint8_t> public_key, PKType pk_type, std::string server_id);
-
-    /**
-     * @brief Create a new capsule server based Recipient
-     * If the label is empty, a machine-readable label text (either eID or certificate version) is automatically generated according to CDoc2 specification.
-     * 
-     * @param label the label text
-     * @param cert the recipient's certificate (der-encoded) 
-     * @param server_id the keyserver id
-     * @return a new Recipient structure
-     */
-    static Recipient makeServer(std::string label, std::vector<uint8_t> cert, std::string server_id);
-
+#ifdef HAS_KEYSHARES
     /**
      * @brief Create new keyshare recipient
+     * 
+     * If the label text is empty, a machine-readable label will be created according to CDoc2 specification
      * 
      * @param label the label text
      * @param server_id the id of share server group
@@ -224,6 +205,7 @@ struct CDOC_EXPORT Recipient {
      * @return Recipient a new Recipient structure
      */
     static Recipient makeShare(std::string label, std::string server_id, std::string recipient_id);
+#endif
 
     /**
      * @brief Get the label for this recipient
@@ -233,18 +215,30 @@ struct CDOC_EXPORT Recipient {
      * @param extra additional parameter values to use
      * @return a label value
      */
-    std::string getLabel(const std::vector<std::pair<std::string_view, std::string_view>> &extra) const;
+    std::string getLabel(std::map<std::string_view, std::string_view> extra) const;
 
     /**
-     * @brief parse machine-readable CDoc2 label
-     * @param label the label
-     * @return a map of key-value pairs
+     * @brief Set a property for automatic label generation
+     * 
+     * @param key the property name
+     * @param value the property value
      */
-    static std::map<std::string, std::string> parseLabel(const std::string& label);
+    void setLabelValue(std::string_view key, std::string_view value) {
+        lbl_parts[std::string(key)] = value;
+    }
+
+    /**
+     * @brief Validate recipient record
+     * 
+     * @return true if Recipient is valid
+     */
+    bool validate() const;
 
     bool operator== (const Recipient& other) const = default;
 protected:
 	Recipient(Type _type) : type(_type) {};
+private:
+    std::map<std::string,std::string> lbl_parts;
 };
 
 } // namespace libcdoc
