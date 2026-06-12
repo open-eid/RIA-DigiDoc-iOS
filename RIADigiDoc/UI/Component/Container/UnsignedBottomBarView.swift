@@ -36,6 +36,7 @@ struct UnsignedBottomBarView: View {
     let rightButtonLabel: String
     let rightButtonAccessibilityLabel: String
     let rightButtonAction: () -> Void
+    var showBackground: Bool = true
 
     var body: some View {
         HStack {
@@ -88,7 +89,7 @@ struct UnsignedBottomBarView: View {
         }
         .padding(.vertical, Dimensions.Padding.SPadding)
         .padding(.horizontal, Dimensions.Padding.MPadding)
-        .background(theme.surfaceContainer)
+        .background(showBackground ? theme.surfaceContainer : Color.clear)
     }
 }
 

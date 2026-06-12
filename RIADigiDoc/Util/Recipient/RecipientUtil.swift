@@ -37,6 +37,8 @@ struct RecipientUtil: RecipientUtilProtocol {
                 return "Smart-ID"
             case .eSealType:
                 return "Certificate for Encryption"
+            case .passwordType:
+                return "Password"
             }
     }
 }

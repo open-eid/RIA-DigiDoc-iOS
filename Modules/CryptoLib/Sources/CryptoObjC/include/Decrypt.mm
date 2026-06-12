@@ -111,7 +111,17 @@
         } else if(lock.isPKI()) {
             [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)] concatKDFAlgorithmURI:@""]];
         } else if(lock.isSymmetric()) {
-            [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:[NSString stringWithStdString:lock.label]]];
+            std::map<std::string, std::string> info = libcdoc::Recipient::parseLabel(lock.label);
+            NSString *cnVal = info.contains("label")
+                ? [NSString stringWithStdString:info["label"]]
+                : @"";
+            [addressees addObject:[[Addressee alloc]
+                initWithCnVal:cnVal
+                 serialNumber:nil
+                     certType:CertTypePasswordType
+                      validTo:nil
+                         data:[NSData data]
+            concatKDFAlgorithmURI:@""]];
         } else {
             [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:@"Unknown capsule"]];
         }

@@ -58,9 +58,9 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
                             .foregroundStyle(isSelected ? theme.primary : theme.onSurface)
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
-                            .minimumScaleFactor(0.9)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .frame(maxWidth: .infinity)
                             .padding(.horizontal, Dimensions.Padding.XSPadding)
+                            .padding(.vertical, Dimensions.Padding.XSPadding)
                             .accessibilityLabel(Text(verbatim:
                                 "\(title), " +
                                 "\(languageSettings.localized("Tab")) \(index + 1) / \(titles.count), " +
@@ -72,22 +72,20 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
                     }
                     .buttonStyle(.plain)
                     .frame(maxWidth: .infinity, minHeight: tabMinHeight)
-                    .overlay(alignment: .bottom) {
-                        Rectangle()
-                            .fill(theme.outlineVariant)
-                            .frame(height: Dimensions.Height.SBorder)
-                    }
-                    .overlay(alignment: .bottom) {
-                        if isSelected {
-                            Rectangle()
-                                .fill(theme.primary)
-                                .frame(height: Dimensions.Height.SBorder)
-                        }
-                    }
                     .accessibilityLabel(titles[index].lowercased())
                 }
             }
-            .padding(.top, Dimensions.Padding.LPadding)
+            .fixedSize(horizontal: false, vertical: true)
+            .overlay(alignment: .bottom) {
+                HStack(spacing: Dimensions.Padding.ZeroPadding) {
+                    ForEach(titles.indices, id: \.self) { index in
+                        Rectangle()
+                            .fill(selectedIndex.wrappedValue == index ? theme.primary : theme.outlineVariant)
+                            .frame(height: Dimensions.Height.SBorder)
+                    }
+                }
+            }
+
             content()
         }
     }

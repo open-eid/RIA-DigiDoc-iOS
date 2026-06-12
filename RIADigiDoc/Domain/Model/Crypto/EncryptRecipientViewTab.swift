@@ -17,7 +17,7 @@
  *
  */
 
-public enum EncryptViewTab: Int, Sendable {
-    case files = 0
-    case recipients = 1
+enum EncryptRecipientViewTab: Int, Sendable {
+    case recipient = 0
+    case password = 1
 }

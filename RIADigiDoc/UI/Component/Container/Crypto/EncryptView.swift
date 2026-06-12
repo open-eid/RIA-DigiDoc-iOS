@@ -19,6 +19,7 @@
 
 import SwiftUI
 import FactoryKit
+import CryptoSwift
 import CryptoObjCWrapper
 import CommonsLib
 import UtilsLib
@@ -38,6 +39,9 @@ struct EncryptView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: EncryptViewTab = .files
     @State private var selectedRecipient: Addressee?
+    @State private var cdocOption: EncryptionCdocOption
+    @State private var showDecryptPasswordModal = false
+    @State private var passwordDecryptKeyLabel = ""
 
     @State private var viewModel: EncryptViewModel
 
@@ -173,10 +177,14 @@ struct EncryptView: View {
     init(
         isWithEncryption: Bool = false,
         isWithDecryption: Bool = false,
+        cdocOption: EncryptionCdocOption = .cdoc1,
+        selectedTab: EncryptViewTab = .files,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         fileUtil: FileUtilProtocol = Container.shared.fileUtil()
     ) {
+        _cdocOption = State(wrappedValue: cdocOption)
+        _selectedTab = State(wrappedValue: selectedTab)
         _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
         self.isWithEncryption = isWithEncryption
         self.isWithDecryption = isWithDecryption
@@ -238,9 +246,14 @@ struct EncryptView: View {
                                                 }
                                             }
                                         } else if viewModel.isDecryptButtonShown {
-                                            isWithEncryption = false
-                                            isWithDecryption = false
-                                            pathManager.navigate(to: .decryptRootView)
+                                            if let passwordRecipient = viewModel.recipients.first(where: { $0.certType == .passwordType }) {
+                                                passwordDecryptKeyLabel = passwordRecipient.identifier
+                                                showDecryptPasswordModal = true
+                                            } else {
+                                                isWithEncryption = false
+                                                isWithDecryption = false
+                                                pathManager.navigate(to: .decryptRootView)
+                                            }
                                         }
                                     },
                                     onSaveContainerButtonClick: {
@@ -358,6 +371,7 @@ struct EncryptView: View {
                                             .environment(languageSettings)
                                         }
                                     }
+                                    .padding(.top, Dimensions.Padding.LPadding)
                                 }
                             }
                         }
@@ -391,7 +405,7 @@ struct EncryptView: View {
                                 rightButtonAccessibilityLabel: rightButtonLabel.lowercased(),
                                 rightButtonAction: {
                                     if viewModel.isContainerUnencrypted {
-                                        pathManager.replaceLast(to: .encryptRecipientView)
+                                        pathManager.replaceLast(to: .encryptRecipientView(cdocOption: cdocOption))
                                     } else {
                                         if encryptionButtonEnabled {
                                             encryptionButtonEnabled = false
@@ -465,6 +479,18 @@ struct EncryptView: View {
                     }
                 }
             )
+
+            if showDecryptPasswordModal {
+                DecryptPasswordModalView(
+                    keyLabel: passwordDecryptKeyLabel,
+                    onDecrypt: { password in
+                        // Add password decryption functionality
+                    },
+                    onCancel: {
+                        showDecryptPasswordModal = false
+                    }
+                )
+            }
 
             if showRenameModal {
                 RenameModalView(

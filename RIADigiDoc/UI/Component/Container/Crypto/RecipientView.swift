@@ -75,21 +75,23 @@ struct RecipientView: View {
         }
     }
 
+    private var isPasswordRecipient: Bool {
+        recipient.certType == .passwordType
+    }
+
     var nameText: String {
-        return {
-            if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
-                return nameUtil.formatName(
-                    surname: recipient.surname,
-                    givenName: recipient.givenName,
-                    identifier: recipient.identifier
-                )
-            } else {
-                return nameUtil.formatCompanyName(
-                    identifier: recipient.identifier,
-                    serialNumber: recipient.serialNumber
-                )
-            }
-        }()
+        if isPasswordRecipient { return recipient.identifier }
+        if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
+            return nameUtil.formatName(
+                surname: recipient.surname,
+                givenName: recipient.givenName,
+                identifier: recipient.identifier
+            )
+        }
+        return nameUtil.formatCompanyName(
+            identifier: recipient.identifier,
+            serialNumber: recipient.serialNumber
+        )
     }
 
     var validToDate: String {
@@ -147,7 +149,7 @@ struct RecipientView: View {
                         )
 
                     let certType = recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
-                    let validPart = validToDate.isEmpty
+                    let validPart = (validToDate.isEmpty || isPasswordRecipient)
                         ? ""
                         : " " + languageSettings.localized("Valid to", [validToDate])
 
