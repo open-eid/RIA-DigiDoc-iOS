@@ -27,39 +27,55 @@
 #include <cdoc/CdocReader.h>
 #include <cdoc/Lock.h>
 
+static CertType certTypeFromLabel(NSString * _Nullable type) {
+    if (type == nil)                                 return CertTypeESealType;
+    if ([type isEqualToString:@"ID-card"] ||
+        [type isEqualToString:@"cert"])              return CertTypeIDCardType;
+    if ([type isEqualToString:@"Digi-ID"])           return CertTypeDigiIDType;
+    if ([type isEqualToString:@"Digi-ID E-RESIDENT"]) return CertTypeEResidentType;
+    return CertTypeUnknownType;
+}
+
 @implementation Addressee (label)
 
 - (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
     std::map<std::string, std::string> info = libcdoc::Lock::parseLabel(label);
-    id cn = info.contains("cn") ? [NSString stringWithStdString:info["cn"]] : [NSString stringWithStdString:label];
-    id type = info.contains("type") ? [NSString stringWithStdString:info["type"]] : nil;
-    id serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
-    CertType certType = CertTypeUnknownType;
+    NSString *cn     = info.contains("cn")            ? [NSString stringWithStdString:info["cn"]]            : [NSString stringWithStdString:label];
+    NSString *type   = info.contains("type")          ? [NSString stringWithStdString:info["type"]]          : nil;
+    NSString *serial = info.contains("serial_number") ? [NSString stringWithStdString:info["serial_number"]] : nil;
+
+    // A single-segment CN with no explicit last_name key is an e-seal, not a person.
     NSArray<NSString *> *split = [cn componentsSeparatedByString:@","];
     if (!info.contains("last_name") && split.count == 1) {
         type = nil;
     }
-    
-    if ([type isEqualToString:@"ID-card"] || [type isEqualToString:@"cert"]) {
-        certType = CertTypeIDCardType;
-    } else if ([type isEqualToString:@"Digi-ID"]) {
-        certType = CertTypeDigiIDType;
-    } else if ([type isEqualToString:@"Digi-ID E-RESIDENT"]) {
-        certType = CertTypeEResidentType;
-    } else if (type == nil) {
-        certType = CertTypeESealType;
-    }
-    id validTo = nil;
+
+    NSDate *validTo = nil;
     if (info.contains("server_exp")) {
         long long epochTime = [[NSString stringWithStdString:info["server_exp"]] longLongValue];
         validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
     }
-    if (self = [self initWithCnVal:cn serialNumber:serial certType:certType validTo:validTo data:pub  concatKDFAlgorithmURI:concatKDFAlgorithmURI]) {
+
+    if (self = [self initWithCnVal:cn serialNumber:serial certType:certTypeFromLabel(type) validTo:validTo data:pub concatKDFAlgorithmURI:concatKDFAlgorithmURI lockLabel:@"" lockType:@""]) {
     }
     return self;
 }
 
 @end
+
+static NSString *lockTypeName(libcdoc::Lock::Type type) {
+    switch (type) {
+        case libcdoc::Lock::Type::PASSWORD:      return @"PASSWORD";
+        case libcdoc::Lock::Type::SYMMETRIC_KEY: return @"SYMMETRIC_KEY";
+        case libcdoc::Lock::Type::PUBLIC_KEY:    return @"PUBLIC_KEY";
+        case libcdoc::Lock::Type::CDOC1:         return @"CDOC1";
+        case libcdoc::Lock::Type::SERVER:        return @"SERVER";
+#ifdef HAS_KEYSHARES
+        case libcdoc::Lock::Type::SHARE_SERVER:  return @"SHARE_SERVER";
+#endif
+        default:                                 return @"UNKNOWN";
+    }
+}
 
 @implementation Decrypt
 
@@ -114,13 +130,16 @@
             NSString *cnVal = info.contains("label")
                 ? [NSString stringWithStdString:info["label"]]
                 : @"";
+            NSString *rawLockLabel = [NSString stringWithStdString:lock.label] ?: @"";
             [addressees addObject:[[Addressee alloc]
                 initWithCnVal:cnVal
                  serialNumber:nil
                      certType:CertTypePasswordType
                       validTo:nil
                          data:[NSData data]
-            concatKDFAlgorithmURI:@""]];
+            concatKDFAlgorithmURI:@""
+                    lockLabel:rawLockLabel
+                     lockType:lockTypeName(lock.type)]];
         } else {
             [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:@"Unknown capsule"]];
         }
@@ -198,12 +217,27 @@
         }
     } crypto {password};
     std::unique_ptr<libcdoc::CDocReader> reader(libcdoc::CDocReader::createReader(fullPath.UTF8String, nullptr, &crypto, nullptr));
+    if (!reader) {
+        return [NSError cryptoError:@"Failed to create CDocReader" error:error];
+    }
 
-    auto idx = 0; // TODO: reader->getLockForCert(network.cert);
-    if(idx < 0)
+    int idx = -1;
+    const auto& locks = reader->getLocks();
+    for (size_t i = 0; i < locks.size(); i++) {
+        if (locks[i].type == libcdoc::Lock::Type::PASSWORD) {
+            idx = (int)i;
+            break;
+        }
+    }
+    if (idx < 0) {
         return [NSError cryptoError:@"Decrypting failed" error:error];
+    }
     std::vector<uint8_t> fmk;
-    if(reader->getFMK(fmk, unsigned(idx)) != 0 || fmk.empty()) {
+    auto fmkResult = reader->getFMK(fmk, unsigned(idx));
+    if (fmkResult == libcdoc::WRONG_KEY) {
+        return [NSError cryptoWrongKeyError:error];
+    }
+    if (fmkResult != libcdoc::OK || fmk.empty()) {
         return [NSError cryptoError:@"Decrypting failed" error:error];
     }
     return [self decryptReader:*reader withFMK:fmk error:error];

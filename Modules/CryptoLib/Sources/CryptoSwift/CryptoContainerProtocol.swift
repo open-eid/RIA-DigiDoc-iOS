@@ -22,6 +22,7 @@ import CommonsLib
 import CryptoObjC
 import CryptoObjCWrapper
 
+/// @mockable
 public protocol CryptoContainerProtocol: GeneralContainer, Sendable {
     func isDecrypted() async -> Bool
     func isEncrypted() async -> Bool

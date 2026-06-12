@@ -28,6 +28,13 @@
     },
     {
       "target" : {
+        "containerPath" : "container:Modules\/CryptoLib",
+        "identifier" : "CryptoSwiftTests",
+        "name" : "CryptoSwiftTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:RIADigiDoc.xcodeproj",
         "identifier" : "DFDB148B2CC97B1000153876",
         "name" : "RIADigiDocTests"

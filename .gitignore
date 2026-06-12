@@ -15,8 +15,8 @@ build-cdoc-debug/
 Packages/
 xcuserdata
 
-# Module lockfiles
-Modules/**/Package.resolved
+# Module lockfiles (SPM packages and the Xcode workspace's own copy)
+**/Package.resolved
 
 # Mockolo
 **/Mocks/**

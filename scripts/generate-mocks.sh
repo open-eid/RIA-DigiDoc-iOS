@@ -107,6 +107,11 @@ main_output_file="${main_output_dir}/${main_module_name}+Mocks.swift"
 
 mkdir -p "$main_output_dir"
 echo "\n\nGenerating mocks for $main_module_name...\n"
-mockolo -s "$main_src_dir" -d "$main_output_file" --enable-args-history
+mockolo \
+  -s "$main_src_dir" \
+  -s "Modules/CryptoLib/Sources/CryptoSwift" \
+  -d "$main_output_file" \
+  --custom-imports "CryptoSwift" "CryptoObjCWrapper" \
+  --enable-args-history
 
 echo "\n\nDone\n\n"

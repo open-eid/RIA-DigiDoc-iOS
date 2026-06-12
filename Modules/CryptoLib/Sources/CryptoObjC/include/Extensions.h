@@ -22,9 +22,12 @@
 #include <string>
 #include <vector>
 
+static const NSInteger CryptoLibWrongKeyErrorCode = -109; // libcdoc::WRONG_KEY
+
 @interface NSError (CryptoLib)
 + (NSError*)cryptoError:(NSString*)msg;
 + (id)cryptoError:(NSString*)msg error:(NSError**)error;
++ (id)cryptoWrongKeyError:(NSError**)error;
 @end
 
 @interface NSString (std_string)
@@ -74,6 +77,15 @@
 + (id)cryptoError:(NSString*)msg error:(NSError**)error {
     if (error) {
         *error = [NSError cryptoError:msg];
+    }
+    return nil;
+}
+
++ (id)cryptoWrongKeyError:(NSError**)error {
+    if (error) {
+        *error = [[NSError alloc] initWithDomain:@"ee.ria.digidoc.CryptoLib"
+                                           code:CryptoLibWrongKeyErrorCode
+                                       userInfo:@{NSLocalizedDescriptionKey: @"Wrong password"}];
     }
     return nil;
 }

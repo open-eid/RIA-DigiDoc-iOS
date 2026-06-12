@@ -30,6 +30,8 @@ import Foundation
     public let validTo: Date?
     @MainActor
     @objc public var concatKDFAlgorithmURI: String
+    @objc public let lockLabel: String
+    @objc public let lockType: String
 
     @objc public init(
         data: Data,
@@ -39,7 +41,9 @@ import Foundation
         serialNumber: String?,
         certType: CertType,
         validTo: Date?,
-        concatKDFAlgorithmURI: String = ""
+        concatKDFAlgorithmURI: String = "",
+        lockLabel: String = "",
+        lockType: String = ""
     ) {
         self.identifier = cnVal
         self.data = data
@@ -49,6 +53,8 @@ import Foundation
         self.certType = certType
         self.validTo = validTo
         self.concatKDFAlgorithmURI = concatKDFAlgorithmURI
+        self.lockLabel = lockLabel
+        self.lockType = lockType
     }
 
     @objc public convenience init(data: Data, cnVal: String) {
@@ -69,7 +75,9 @@ import Foundation
         certType: CertType,
         validTo: Date?,
         data: Data,
-        concatKDFAlgorithmURI: String = ""
+        concatKDFAlgorithmURI: String = "",
+        lockLabel: String = "",
+        lockType: String = ""
     ) {
         let split = cnVal.split(separator: ",").map { String($0) }
         if split.count >= 3 {
@@ -86,6 +94,8 @@ import Foundation
         self.validTo = validTo
         self.data = data
         self.concatKDFAlgorithmURI = concatKDFAlgorithmURI
+        self.lockLabel = lockLabel
+        self.lockType = lockType
     }
 
     public init(cert: Data, x509: X509Certificate?) {
@@ -105,6 +115,8 @@ import Foundation
         certType = x509?.certType() ?? .unknownType
         validTo = x509?.notAfter
         concatKDFAlgorithmURI = ""
+        lockLabel = ""
+        lockType = ""
     }
 
     convenience public init(cert: Data) {

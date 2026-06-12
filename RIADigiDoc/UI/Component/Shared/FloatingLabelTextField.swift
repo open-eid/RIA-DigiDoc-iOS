@@ -116,6 +116,11 @@ struct FloatingLabelTextField: View {
         !title.isEmpty && !text.isEmpty && isFocused
     }
 
+    // Dont show password saving options
+    private var fieldContentType: UITextContentType? {
+        isSecure ? .oneTimeCode : .init(rawValue: "")
+    }
+
     private var isInteractionEnabled: Bool {
         !isDisabled && !isDropdown
     }
@@ -315,6 +320,7 @@ struct FloatingLabelTextField: View {
                     keyboardType: keyboardType,
                     submitLabel: submitLabel,
                     spellOut: spellOutCharacters && isPasswordVisible,
+                    contentType: fieldContentType,
                     isAccessibilityFocused: $isAccessibilityFocused,
                     onAppear: {},
                     onSubmit: {
@@ -342,6 +348,7 @@ struct FloatingLabelTextField: View {
                     keyboardType: keyboardType,
                     submitLabel: submitLabel,
                     spellOut: spellOutCharacters && !isSecure && isPasswordVisible,
+                    contentType: fieldContentType,
                     isAccessibilityFocused: $isAccessibilityFocused,
                     onAppear: {
                         selection = TextSelection(insertionPoint: text.endIndex)
@@ -527,6 +534,7 @@ private extension View {
         keyboardType: UIKeyboardType,
         submitLabel: SubmitLabel,
         spellOut: Bool,
+        contentType: UITextContentType?,
         isAccessibilityFocused: AccessibilityFocusState<Bool>.Binding,
         onAppear: @escaping () -> Void,
         onSubmit: @escaping () -> Void
@@ -536,7 +544,7 @@ private extension View {
             .disabled(isDisabled)
             .keyboardType(keyboardType)
             .submitLabel(submitLabel)
-            .textContentType(.init(rawValue: ""))
+            .textContentType(contentType)
             .autocorrectionDisabled(true)
             .textInputAutocapitalization(.never)
             .speechSpellsOutCharacters(spellOut)

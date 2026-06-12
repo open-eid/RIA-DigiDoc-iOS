@@ -343,30 +343,7 @@ extension CryptoContainer {
                 withCert: cert,
                 withToken: SmartToken(card: cardCommands, pin1: pin)
             )
-        var cryptoDataFiles: [CryptoDataFile] = []
-        var urlDataFiles: [URL] = []
-        cryptoDataFiles.removeAll()
-        for dataFile in decryptedData {
-
-            let sanitizedName = dataFile.key.sanitized()
-
-            let destinationPath = try Directories.getCacheDirectory(
-                subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
-                fileManager: fileManager
-            )
-
-            let fileUrl = destinationPath.appending(path: sanitizedName, directoryHint: .notDirectory)
-
-            cryptoDataFiles.append(CryptoDataFile(filename: dataFile.key, filePath: destinationPath.resolvedPath))
-            urlDataFiles.append(fileUrl)
-            let isCreated = fileManager.createFile(
-                atPath: fileUrl.resolvedPath, contents: dataFile.value, attributes: nil
-            )
-
-            if !isCreated {
-                CryptoContainer.logger().error("Unable to create file at path: \(destinationPath.resolvedPath)")
-            }
-        }
+        let urlDataFiles = try writeDecryptedFiles(decryptedData, fileManager: fileManager)
 
         return try await create(
             containerFile: containerFile,
@@ -377,6 +354,8 @@ extension CryptoContainer {
         )
     }
 
+    private static let libcdocWrongKeyCode = -109 // libcdoc::WRONG_KEY
+
     @MainActor
     public static func decryptWithPassword(
         containerFile: URL,
@@ -384,34 +363,20 @@ extension CryptoContainer {
         password: String,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
-        let path = containerFile.resolvedPath
         let decryptedData: [String: Data] = try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
-                    let result = try Decrypt.decryptFile(path, withPassword: password)
+                    let result = try Decrypt.decryptFile(containerFile.resolvedPath, withPassword: password)
                     continuation.resume(returning: result)
+                } catch let nsError as NSError where nsError.code == libcdocWrongKeyCode {
+                    continuation.resume(throwing: CryptoError.wrongDecryptionKey)
                 } catch {
                     continuation.resume(throwing: error)
                 }
             }
         }
 
-        var urlDataFiles: [URL] = []
-        for dataFile in decryptedData {
-            let sanitizedName = dataFile.key.sanitized()
-            let destinationPath = try Directories.getCacheDirectory(
-                subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
-                fileManager: fileManager
-            )
-            let fileUrl = destinationPath.appending(path: sanitizedName, directoryHint: .notDirectory)
-            urlDataFiles.append(fileUrl)
-            let isCreated = fileManager.createFile(
-                atPath: fileUrl.resolvedPath, contents: dataFile.value, attributes: nil
-            )
-            if !isCreated {
-                CryptoContainer.logger().error("Unable to create file at path: \(destinationPath.resolvedPath)")
-            }
-        }
+        let urlDataFiles = try writeDecryptedFiles(decryptedData, fileManager: fileManager)
 
         return try await create(
             containerFile: containerFile,
@@ -420,6 +385,55 @@ extension CryptoContainer {
             isDecrypted: true,
             isEncrypted: false
         )
+    }
+
+    private static func writeDecryptedFiles(
+        _ decryptedData: [String: Data],
+        fileManager: FileManagerProtocol
+    ) throws -> [URL] {
+        let destinationPath = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+            fileManager: fileManager
+        )
+        return try decryptedData.map { name, data in
+            let fileUrl = destinationPath.appending(path: name.sanitized(), directoryHint: .notDirectory)
+            guard fileManager.createFile(atPath: fileUrl.resolvedPath, contents: data, attributes: nil) else {
+                throw CryptoError.containerDataFileSavingFailed(
+                    CryptoErrorDetail(message: "Unable to create decrypted file", userInfo: ["fileName": name])
+                )
+            }
+            return fileUrl
+        }
+    }
+
+    @MainActor
+    public static func encryptWithPassword(
+        containerFile: URL,
+        dataFiles: [URL],
+        label: String,
+        password: String
+    ) async throws -> CryptoContainerProtocol {
+        if dataFiles.isEmpty {
+            throw CryptoError.containerCreationFailed(
+                CryptoErrorDetail(message: "Cannot create an empty crypto container")
+            )
+        }
+
+        var cryptoDataFiles: [CryptoDataFile] = []
+        for dataFile in dataFiles {
+            cryptoDataFiles.append(
+                CryptoDataFile(filename: dataFile.lastPathComponent, filePath: dataFile.resolvedPath)
+            )
+        }
+
+        try await Encrypt.encryptFile(
+            containerFile.resolvedPath,
+            withDataFiles: cryptoDataFiles,
+            withLabel: label,
+            withPassword: password
+        )
+
+        return try await open(containerFile: containerFile)
     }
 
     @MainActor

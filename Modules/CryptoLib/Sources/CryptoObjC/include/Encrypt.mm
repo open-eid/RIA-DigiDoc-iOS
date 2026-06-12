@@ -213,12 +213,14 @@ protected:
         return completion([NSError cryptoError:@"Failed to create writer"]);
     }
 
-    if (writer->beginEncryption() != 0) {
-        return completion([NSError cryptoError:@"Failed to start encryption"]);
+    auto passwordRecipient = libcdoc::Recipient::makeSymmetric("", 65536);
+    passwordRecipient.setLabelValue("label", std::string(label.UTF8String));
+    if (writer->addRecipient(passwordRecipient) != 0) {
+        return completion([NSError cryptoError:@"Failed to create key"]);
     }
 
-    if (writer->addRecipient(libcdoc::Recipient::makeSymmetric(label.UTF8String, 65536))) {
-        return completion([NSError cryptoError:@"Failed to create key"]);
+    if (writer->beginEncryption() != 0) {
+        return completion([NSError cryptoError:@"Failed to start encryption"]);
     }
 
     for (CryptoDataFile *dataFile in dataFiles) {

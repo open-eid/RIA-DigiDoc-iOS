@@ -373,19 +373,10 @@ struct EncryptRecipientView: View {
 
                     if showPasswordEncryptModal {
                         EncryptPasswordModalView(
-                            onEncrypt: { _, _, _ in
-                                showPasswordEncryptModal = false
-                                pathManager.replaceLast(
-                                    to: .encryptView(
-                                        isWithEncryption: false,
-                                        cdocOption: cdocOption,
-                                        selectedTab: .recipients
-                                    )
-                                )
+                            onEncrypt: { keyLabel, password in
+                                Task { await handlePasswordEncrypt(label: keyLabel, password: password) }
                             },
-                            onCancel: {
-                                showPasswordEncryptModal = false
-                            }
+                            onCancel: { showPasswordEncryptModal = false }
                         )
                     }
 
@@ -508,6 +499,19 @@ struct EncryptRecipientView: View {
         .contentShape(Rectangle())
         .buttonStyle(.plain)
         .background(theme.surface)
+    }
+
+    private func handlePasswordEncrypt(label: String, password: String) async {
+        do {
+            try await viewModel.encryptWithPassword(label: label, password: password)
+            showPasswordEncryptModal = false
+            pathManager.replaceLast(
+                to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .recipients)
+            )
+            Toast.show(languageSettings.localized("Container successfully encrypted"), type: .success)
+        } catch {
+            Toast.show(languageSettings.localized("Encrypt general error"))
+        }
     }
 
     private func emptyStateView(_ text: String) -> some View {
