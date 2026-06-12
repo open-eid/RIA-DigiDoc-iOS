@@ -23,7 +23,6 @@ import LibdigidocLibSwift
 
 struct CryptoFileOpeningView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
 
     @Environment(LanguageSettings.self) private var languageSettings
@@ -31,16 +30,6 @@ struct CryptoFileOpeningView: View {
 
     @Binding var isFileOpeningLoading: Bool
     @Binding var isNavigatingToNextView: Bool
-
-    @State private var showSivaMessage = false
-
-    private var sivaMessage: String {
-        languageSettings.localized("Siva message")
-    }
-
-    private var sivaMessageUrl: String {
-        languageSettings.localized("Siva message url")
-    }
 
     @State private var fileHandlingTask: Task<Void, Never>?
 
@@ -96,8 +85,7 @@ struct CryptoFileOpeningView: View {
             }
         } else {
             let localizedMessage = languageSettings.localized(
-                errorMessage?.key ?? "General error",
-                errorMessage?.args ?? []
+                errorMessage?.key ?? "General error", errorMessage?.args ?? []
             )
             Toast.show(localizedMessage)
 

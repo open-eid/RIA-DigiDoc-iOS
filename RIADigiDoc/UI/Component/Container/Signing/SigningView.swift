@@ -48,6 +48,7 @@ struct SigningView: View {
     @State private var showRenameModal = false
     @State private var showRemoveSignatureModal = false
     @State private var showRemoveDataFileModal = false
+    @State private var showExtendSignaturesModal = false
     @State private var isImportingAddedFiles: Bool = false
 
     @State private var showingShareSheet = false
@@ -143,6 +144,14 @@ struct SigningView: View {
         viewModel.isNestedContainer()
     }
 
+    private var isExtendSignaturesButtonShown: Bool {
+        isSignedContainer && !isNestedContainer
+    }
+
+    private var extendSignaturesLabel: String {
+        languageSettings.localized("Extend signatures")
+    }
+
     private var containerName: String {
         URL(fileURLWithPath: viewModel.containerName)
             .deletingPathExtension()
@@ -200,6 +209,7 @@ struct SigningView: View {
                                     isSaveButtonShown: true,
                                     isSignButtonShown: false,
                                     isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
+                                    isExtendSignaturesButtonShown: isExtendSignaturesButtonShown,
                                     showLeftActionButton: isContainerSigned && isSignButtonShown,
                                     showRightActionButton: isContainerSigned && !isNestedContainer,
                                     leftActionButtonName: languageSettings.localized("Add signature"),
@@ -237,6 +247,9 @@ struct SigningView: View {
                                         Task {
                                             await convertToCryptoContainer()
                                         }
+                                    },
+                                    onExtendSignaturesClick: {
+                                        showExtendSignaturesModal = true
                                     }
                                 )
                                 .background(
@@ -459,9 +472,44 @@ struct SigningView: View {
                     onCancel: { showRemoveDataFileModal = false }
                 )
             }
+
+            if showExtendSignaturesModal {
+                ConfirmModalView(
+                    title: languageSettings.localized("Extend signatures"),
+                    message: languageSettings.localized("Extend signatures confirm message"),
+                    confirmButtonTitle: languageSettings.localized("Extend"),
+                    onConfirm: {
+                        showExtendSignaturesModal = false
+                        Task {
+                            await viewModel.extendSignatures()
+                        }
+                    },
+                    onCancel: { showExtendSignaturesModal = false }
+                )
+            }
         }
         .animation(.easeInOut, value: showRenameModal)
         .animation(.easeInOut, value: showRemoveSignatureModal)
+        .animation(.easeInOut, value: showExtendSignaturesModal)
+        .sivaConfirmationAlert(
+            isPresented: $viewModel.showExtendSivaConfirmation,
+            onConfirm: { confirmed in
+                Task { await viewModel.openExtendedContainer(isSivaConfirmed: confirmed) }
+            },
+            onReadMore: {
+                Task { await viewModel.openExtendedContainer(isSivaConfirmed: false) }
+            }
+        )
+        .alert(
+            languageSettings.localized("Container validity cannot be extended"),
+            isPresented: $viewModel.showCannotExtendContainerDialog
+        ) {
+            Button(languageSettings.localized("OK")) {}
+        } message: {
+            Text(verbatim: languageSettings.localized(
+                "Failed to extend signatures and wrapped to timestamped container."
+            ))
+        }
         .onChange(of: viewModel.errorMessage) { _, error in
             guard let error else { return }
             let localizedMessage = languageSettings.localized(error.key, [error.args.joined(separator: ", ")])
@@ -480,6 +528,10 @@ struct SigningView: View {
 
             if voiceOverEnabled {
                 AccessibilityUtil.announceMessage(localizedMessage)
+            }
+
+            if message.key == "Signatures extended" {
+                selectedTab = .signatures
             }
 
             viewModel.resetSuccessMessage()

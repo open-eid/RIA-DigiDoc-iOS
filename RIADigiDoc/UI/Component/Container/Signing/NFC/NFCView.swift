@@ -102,6 +102,10 @@ struct NFCView: View {
         languageSettings.localized("Signature added")
     }
 
+    private var extendingSignaturesFailedMessage: String {
+        languageSettings.localized("Extending signatures failed")
+    }
+
     let signedContainer: SignedContainerProtocol?
     let cryptoContainer: CryptoContainerProtocol?
 
@@ -371,10 +375,16 @@ struct NFCView: View {
                 return
             }
 
-            Toast.show(signatureAddedMessage, type: .success)
-
-            if voiceOverEnabled {
-                AccessibilityUtil.announceMessage(signatureAddedMessage)
+            if viewModel.signatureExtensionFailed {
+                Toast.show(extendingSignaturesFailedMessage, type: .error)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(extendingSignaturesFailedMessage)
+                }
+            } else {
+                Toast.show(signatureAddedMessage, type: .success)
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(signatureAddedMessage)
+                }
             }
 
             onSuccess(container)

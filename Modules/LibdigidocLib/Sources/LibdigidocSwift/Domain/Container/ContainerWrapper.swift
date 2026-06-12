@@ -64,6 +64,10 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         return self.mediatype
     }
 
+    public func getContainerURL() async -> URL {
+        return self.containerURL
+    }
+
     @MainActor
     public func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL {
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
@@ -267,6 +271,71 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    @discardableResult
+    public func extendSignatureToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol {
+        do {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                DigiDocContainerWrapper.extendLastSignature(toLTA: containerFile.resolvedPath) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+            }
+            return try await open(containerFile: containerFile, isSivaConfirmed: true)
+        } catch {
+            let nsError = (error as NSError?) ??
+                NSError(domain: "ContainerWrapper - cannot extend signature to LTA", code: 8)
+            throw DigiDocError.signatureExtensionFailed(ErrorDetail(nsError: nsError))
+        }
+    }
+
+    @discardableResult
+    public func extendSignaturesToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol {
+        do {
+            ContainerWrapper.logger().info("Extending signatures to LTA")
+            let outputURL = containerFile
+                .deletingPathExtension()
+                .appendingPathExtension(CommonsLib.Constants.Extension.Asics)
+
+            let savedPath: String = try await withCheckedThrowingContinuation { continuation in
+                DigiDocContainerWrapper.extendContainer(
+                    toLTA: containerFile.resolvedPath,
+                    outputAsicsPath: outputURL.resolvedPath
+                ) { resultPath, error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(returning: resultPath ?? containerFile.resolvedPath)
+                    }
+                }
+            }
+
+            let isWrappedIntoAsics = savedPath != containerFile.resolvedPath
+            ContainerWrapper.logger().info(
+                "Extended signatures to LTA. Wrapped into new ASiC-S: \(isWrappedIntoAsics, privacy: .public)"
+            )
+
+            if isWrappedIntoAsics {
+                do {
+                    try fileManager.removeItem(at: containerFile)
+                } catch {
+                    ContainerWrapper.logger().error(
+                        "Unable to remove original container after wrapping to ASiC-S: \(error, privacy: .public)"
+                    )
+                }
+            }
+
+            return try await open(containerFile: URL(fileURLWithPath: savedPath), isSivaConfirmed: true)
+        } catch {
+            ContainerWrapper.logger().error("Unable to extend signatures to LTA: \(error, privacy: .public)")
+            let nsError = (error as NSError?) ??
+                NSError(domain: "ContainerWrapper - cannot extend signatures to LTA", code: 9)
+            throw DigiDocError.signatureExtensionFailed(ErrorDetail(nsError: nsError))
+        }
+    }
+
     private static func signatureStatusToDigiDocStatus(_ status: DigiDocSignatureStatus) -> SignatureStatus {
         switch status {
         case .Valid:
@@ -343,7 +412,9 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 status: signatureStatusToDigiDocStatus(signature.status),
                 format: signature.format,
                 messageImprint: signature.messageImprint,
-                diagnosticsInfo: signature.diagnosticsInfo
+                diagnosticsInfo: signature.diagnosticsInfo,
+                archiveTimestampTime: signature.archiveTimestampTime,
+                archiveTimestampCert: signature.archiveTimestampCert
             )
         }
     }

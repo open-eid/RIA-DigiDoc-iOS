@@ -54,6 +54,10 @@ actor SivaService: SivaServiceProtocol {
         let isCades = await file.isCades(fileUtil: fileUtil)
         let isXades = await file.isXades(fileUtil: fileUtil)
 
+        if mimetype == Constants.MimeType.Asics {
+            return await file.containsDdoc(fileUtil: fileUtil) || isCades
+        }
+
         return Constants.MimeType.SivaContainers.contains(mimetype) && !isXades || (
             Constants.MimeType.Pdf == mimetype && file.isSignedPDF()
         ) || isCades

@@ -25,6 +25,7 @@ public protocol ContainerWrapperProtocol: Sendable {
     func getSignatures() async -> [SignatureWrapper]
     func getDataFiles() async -> [DataFileWrapper]
     func getMimetype() async -> String
+    func getContainerURL() async -> URL
     func create(file: URL, dataFiles: [String]) async throws
     func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
     @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol
@@ -38,6 +39,8 @@ public protocol ContainerWrapperProtocol: Sendable {
         userAgent: String
     ) async throws -> Data
     func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol
+    @discardableResult func extendSignatureToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol
+    @discardableResult func extendSignaturesToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol
 }
 
 extension ContainerWrapperProtocol {

@@ -28,6 +28,12 @@ import CryptoSwift
 @MainActor
 class SigningViewModel: SigningViewModelProtocol, Loggable {
 
+    // A BDOC/DDOC extend that was wrapped into an ASiC-S needing SiVa, awaiting the user's view choice.
+    private struct PendingExtendedContainer {
+        let url: URL
+        let isWrapped: Bool
+    }
+
     var dataFiles: [DataFileWrapper] = []
     var signatures: [SignatureWrapper] = []
     var timestamps: [SignatureWrapper] = []
@@ -44,6 +50,9 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isXadesContainer = false
     var isLastDataFileRemoved = false
     var navigateToNestedCryptoContainerView = false
+    var showExtendSivaConfirmation = false
+    var showCannotExtendContainerDialog = false
+    private var pendingExtendedContainer: PendingExtendedContainer?
     private(set) var containerNotifications: [ContainerNotificationType] = []
     private(set) var errorMessage: ToastMessage?
     private(set) var successMessage: ToastMessage?
@@ -582,6 +591,64 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         successMessage = nil
     }
 
+    func extendSignatures() async {
+        guard let container = signedContainer else {
+            SigningViewModel.logger().error("Cannot extend signatures: container is nil")
+            errorMessage = ToastMessage(key: "Extending signatures failed", args: [])
+            return
+        }
+        let previousMimetype = containerMimetype
+        SigningViewModel.logger().info("Extending signatures (mimetype: \(previousMimetype, privacy: .public))")
+        do {
+            let extended = try await container.extendSignatures()
+            let isWrapped = await extended.getContainerMimetype() == Constants.MimeType.Asics
+                && previousMimetype != Constants.MimeType.Asics
+            SigningViewModel.logger().info("Signatures extended (wrapped into ASiC-S: \(isWrapped, privacy: .public))")
+
+            if let extendedURL = await extended.getRawContainerFile(),
+               await sivaRepository.isSivaConfirmationNeeded(files: [extendedURL]) {
+                SigningViewModel.logger().info("Extended container needs SiVa; prompting for view choice")
+                pendingExtendedContainer = PendingExtendedContainer(url: extendedURL, isWrapped: isWrapped)
+                showExtendSivaConfirmation = true
+            } else {
+                sharedContainerViewModel.removeLastContainer()
+                sharedContainerViewModel.setSignedContainer(extended)
+                await loadContainerData(signedContainer: extended)
+                finishExtend(isWrapped: isWrapped)
+            }
+        } catch {
+            SigningViewModel.logger().error("Unable to extend signatures: \(error)")
+            errorMessage = ToastMessage(key: "Extending signatures failed", args: [])
+        }
+    }
+
+    func openExtendedContainer(isSivaConfirmed: Bool) async {
+        showExtendSivaConfirmation = false
+        guard let pending = pendingExtendedContainer else { return }
+        pendingExtendedContainer = nil
+        SigningViewModel.logger().info("Opening extended container (SiVa: \(isSivaConfirmed, privacy: .public))")
+        do {
+            sharedContainerViewModel.removeLastContainer()
+            try await openNestedContainer(fileURL: pending.url, isSivaConfirmed: isSivaConfirmed)
+            finishExtend(isWrapped: pending.isWrapped)
+        } catch {
+            SigningViewModel.logger().error("Unable to open extended container: \(error)")
+            errorMessage = ToastMessage(key: "Extending signatures failed", args: [])
+        }
+    }
+
+    // A wrapped container (BDOC/DDOC that could not be extended in place) informs the user via a dialog;
+    // an in-place extension just shows the success toast.
+    private func finishExtend(isWrapped: Bool) {
+        if isWrapped {
+            SigningViewModel.logger().info("Container wrapped into ASiC-S. Showing 'cannot be extended' dialog")
+            showCannotExtendContainerDialog = true
+        } else {
+            SigningViewModel.logger().info("Signatures extended")
+            successMessage = ToastMessage(key: "Signatures extended", args: [])
+        }
+    }
+
     func convertToCryptoContainer() async -> Bool {
         do {
             guard let container = signedContainer else {
@@ -638,9 +705,9 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             isSivaConfirmed: isSivaConfirmed
         )
 
-        let isXades = await container.isXades()
-        let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: container)
-        if isSivaConfirmed && isTimestampedContainer && !isXades {
+        // Only open the nested container when SiVa is actually needed (ASiC-S wrapping a DDOC); an ASiC-S
+        // wrapping a BDOC stays a regular ASiC-S container (matches DigiDoc4).
+        if isSivaConfirmed, await sivaRepository.shouldOpenNestedTimestampedContainer(container) {
             let nestedTimestampedContainer = try await sivaRepository
                 .getTimestampedContainer(parentContainer: container)
             sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)

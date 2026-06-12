@@ -778,11 +778,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     private func getEffectiveContainer(
         parentContainer: SignedContainerProtocol
     ) async throws -> SignedContainerProtocol {
-        let isTimestamped = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
-        let isCades = await parentContainer.isCades()
-        let isXades = await parentContainer.isXades()
-
-        guard isTimestamped && !isCades && !isXades else {
+        guard await sivaRepository.shouldOpenNestedTimestampedContainer(parentContainer) else {
             return parentContainer
         }
 

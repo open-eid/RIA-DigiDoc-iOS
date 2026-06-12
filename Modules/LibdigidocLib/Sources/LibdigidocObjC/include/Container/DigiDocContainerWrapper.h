@@ -39,6 +39,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)libdigidocppVersion;
 + (NSString *)mediaType;
 
++ (void)extendLastSignatureToLTA:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion;
+
+// Extends validity of all signatures. Legacy containers (DDOC, BDOC time-mark) are wrapped into a new
+// ASiC-S container (written to outputAsicsPath) with an archive timestamp. ASiC-E containers are extended in place.
+// The completion returns the path that was actually written.
++ (void)extendContainerToLTA:(NSString *)containerPath
+             outputAsicsPath:(NSString *)outputAsicsPath
+                  completion:(void (^)(NSString * _Nullable savedPath, NSError * _Nullable error))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

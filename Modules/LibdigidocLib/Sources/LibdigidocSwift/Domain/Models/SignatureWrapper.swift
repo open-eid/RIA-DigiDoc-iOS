@@ -52,6 +52,13 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var status: SignatureStatus
     public var diagnosticsInfo: String
 
+    public var archiveTimestampTime: String
+    public var archiveTimestampCert: Data
+
+    public var isLTAExtended: Bool {
+        !archiveTimestampCert.isEmpty
+    }
+
     public init(pos: Int,
                 signingCert: Data,
                 timestampCert: Data,
@@ -71,7 +78,9 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 status: SignatureStatus = .unknown,
                 format: String,
                 messageImprint: Data,
-                diagnosticsInfo: String) {
+                diagnosticsInfo: String,
+                archiveTimestampTime: String = "",
+                archiveTimestampCert: Data = Data()) {
         self.pos = pos
         self.signingCert = signingCert
         self.timestampCert = timestampCert
@@ -92,5 +101,7 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.format = format
         self.messageImprint = messageImprint
         self.diagnosticsInfo = diagnosticsInfo
+        self.archiveTimestampTime = archiveTimestampTime
+        self.archiveTimestampCert = archiveTimestampCert
     }
 }

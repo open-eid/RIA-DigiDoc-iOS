@@ -23,7 +23,6 @@ import LibdigidocLibSwift
 
 struct FileOpeningView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
-    @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
 
     @Environment(LanguageSettings.self) private var languageSettings
@@ -34,14 +33,6 @@ struct FileOpeningView: View {
     @Binding var isNavigatingToEncryptView: Bool
 
     @State private var showSivaMessage = false
-
-    private var sivaMessage: String {
-        languageSettings.localized("Siva message")
-    }
-
-    private var sivaMessageUrl: String {
-        languageSettings.localized("Siva message url")
-    }
 
     private var isErrorShown: Bool {
         guard let errorMessage = viewModel.errorMessage else { return false }
@@ -70,27 +61,20 @@ struct FileOpeningView: View {
                 .onDisappear {
                     fileHandlingTask?.cancel()
                 }
-                .alert(sivaMessage, isPresented: $showSivaMessage) {
-                    Button(languageSettings.localized("OK")) {
+                .sivaConfirmationAlert(
+                    isPresented: $showSivaMessage,
+                    onConfirm: { confirmed in
                         Task {
-                            await viewModel.handleSivaConfirmation()
+                            if confirmed {
+                                await viewModel.handleSivaConfirmation()
+                            } else {
+                                await viewModel.handleSivaCancellation()
+                            }
                             await handleFileOpening()
                         }
-                    }
-                    Button(languageSettings.localized("Cancel")) {
-                        Task {
-                            await viewModel.handleSivaCancellation()
-                            await handleFileOpening()
-                        }
-                    }
-                    Button(languageSettings.localized("Read more here")) {
-                        if let url = URL(string: sivaMessageUrl),
-                           UIApplication.shared.canOpenURL(url) {
-                            openURL(url)
-                        }
-                        dismiss()
-                    }
-                }
+                    },
+                    onReadMore: { dismiss() }
+                )
         }
     }
 
@@ -137,8 +121,7 @@ struct FileOpeningView: View {
             }
         } else {
             let localizedMessage = languageSettings.localized(
-                errorMessage?.key ?? "General error",
-                errorMessage?.args ?? []
+                errorMessage?.key ?? "General error", errorMessage?.args ?? []
             )
             Toast.show(localizedMessage)
 

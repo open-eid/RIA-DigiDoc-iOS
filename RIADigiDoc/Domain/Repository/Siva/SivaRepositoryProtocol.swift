@@ -28,3 +28,14 @@ public protocol SivaRepositoryProtocol: Sendable {
         parentContainer: SignedContainerProtocol
     ) async throws -> SignedContainerProtocol
 }
+
+extension SivaRepositoryProtocol {
+    func shouldOpenNestedTimestampedContainer(_ container: SignedContainerProtocol) async -> Bool {
+        guard await isTimestampedContainer(signedContainer: container) else { return false }
+        let isCades = await container.isCades()
+        let isXades = await container.isXades()
+        guard !isCades, !isXades else { return false }
+        guard let containerFile = await container.getRawContainerFile() else { return false }
+        return await isSivaConfirmationNeeded(files: [containerFile])
+    }
+}

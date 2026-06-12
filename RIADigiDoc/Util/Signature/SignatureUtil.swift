@@ -21,18 +21,18 @@ import SwiftUI
 import LibdigidocLibSwift
 
 struct SignatureUtil: SignatureUtilProtocol {
-    func getSignatureStatusText(status: SignatureStatus) -> String {
+    func getSignatureStatusText(status: SignatureStatus, isTimestamp: Bool) -> String {
         switch status {
             case .valid:
-                return "Signature is valid"
+                return isTimestamp ? "Timestamp is valid" : "Signature is valid"
             case .warning:
-                return "Signature is valid with warnings"
+                return isTimestamp ? "Timestamp is valid" : "Signature is valid with warnings"
             case .nonQSCD:
-                return "Signature is valid non qscd"
+                return isTimestamp ? "Timestamp is valid" : "Signature is valid non qscd"
             case .invalid:
-                return "Signature is invalid"
+                return isTimestamp ? "Timestamp is invalid" : "Signature is invalid"
             case .unknown:
-                return "Signature is unknown"
+                return isTimestamp ? "Timestamp is unknown" : "Signature is unknown"
             }
     }
 }

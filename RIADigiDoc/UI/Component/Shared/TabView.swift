@@ -87,6 +87,7 @@ struct TabView<Tab: RawRepresentable, Content: View>: View where Tab.RawValue ==
             }
 
             content()
+                .padding(.top, Dimensions.Padding.SPadding)
         }
     }
 }

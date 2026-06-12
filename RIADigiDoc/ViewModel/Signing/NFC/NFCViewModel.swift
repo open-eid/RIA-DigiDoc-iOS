@@ -44,6 +44,8 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcAlertMessageExtraArguments: [String] = []
     var nfcAlertMessageUrl: String?
 
+    var signatureExtensionFailed = false
+
     private let nfcCANKeyFilename = Constants.File.nfcCANKey
 
     private let dataStore: DataStoreProtocol
@@ -384,6 +386,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         strings: NFCSessionStrings
     ) async -> SignedContainerProtocol? {
         NFCViewModel.logger().info("NFC: Starting NFC signing")
+        signatureExtensionFailed = false
         let pin2Data = pin2.data(using: .utf8)
         guard let pin2Data else {
             NFCViewModel.logger().error("NFC: Failed to convert PIN2 to Data")
@@ -413,7 +416,14 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 strings: strings
             )
             NFCViewModel.logger().info("NFC: Signature added successfully")
-            return result
+            let isLTAEnabled = await dataStore.getIsDefaultLTAEnabled()
+            do {
+                return try await result.extendSignature(isLTAEnabled)
+            } catch {
+                NFCViewModel.logger().error("NFC: Unable to extend signature: \(error)")
+                signatureExtensionFailed = true
+                return result
+            }
         } catch {
             NFCViewModel.logger().error("NFC: Signing operation failed")
 

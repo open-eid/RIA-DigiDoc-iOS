@@ -363,6 +363,15 @@ extension Container {
         }
     }
 
+    @MainActor
+    var ltaSettingsViewModel: Factory<LTASettingsViewModel> {
+        self { @MainActor in
+            LTASettingsViewModel(
+                dataStore: self.dataStore()
+            )
+        }
+    }
+
     var signatureUtil: Factory<SignatureUtilProtocol> {
         self { SignatureUtil() }
     }
