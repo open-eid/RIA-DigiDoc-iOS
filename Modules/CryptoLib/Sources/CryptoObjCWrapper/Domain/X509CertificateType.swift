@@ -27,6 +27,7 @@ import ASN1Decoder
     case mobileIDType
     case smartIDType
     case eSealType
+    case passwordType
 }
 
 extension X509Certificate {

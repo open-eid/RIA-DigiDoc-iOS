@@ -154,6 +154,7 @@ struct RecipientDetailView: View {
                                     }
                                 }
                             })
+                        .padding(.top, Dimensions.Padding.LPadding)
                     }
                 }
                 .padding(Dimensions.Padding.SPadding)

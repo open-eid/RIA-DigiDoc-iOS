@@ -325,7 +325,9 @@ struct SignatureDetailView: View {
                                         )
                                     }
                                 }
+                                .padding(.top, Dimensions.Padding.SPadding)
                             })
+                        .padding(.top, Dimensions.Padding.SPadding)
                     }
                 }
                 .padding(Dimensions.Padding.SPadding)

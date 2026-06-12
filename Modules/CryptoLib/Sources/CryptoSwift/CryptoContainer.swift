@@ -378,6 +378,51 @@ extension CryptoContainer {
     }
 
     @MainActor
+    public static func decryptWithPassword(
+        containerFile: URL,
+        recipients: [Addressee],
+        password: String,
+        fileManager: FileManagerProtocol = Container.shared.fileManager()
+    ) async throws -> CryptoContainerProtocol {
+        let path = containerFile.resolvedPath
+        let decryptedData: [String: Data] = try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    let result = try Decrypt.decryptFile(path, withPassword: password)
+                    continuation.resume(returning: result)
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+
+        var urlDataFiles: [URL] = []
+        for dataFile in decryptedData {
+            let sanitizedName = dataFile.key.sanitized()
+            let destinationPath = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+                fileManager: fileManager
+            )
+            let fileUrl = destinationPath.appending(path: sanitizedName, directoryHint: .notDirectory)
+            urlDataFiles.append(fileUrl)
+            let isCreated = fileManager.createFile(
+                atPath: fileUrl.resolvedPath, contents: dataFile.value, attributes: nil
+            )
+            if !isCreated {
+                CryptoContainer.logger().error("Unable to create file at path: \(destinationPath.resolvedPath)")
+            }
+        }
+
+        return try await create(
+            containerFile: containerFile,
+            dataFiles: urlDataFiles,
+            recipients: recipients,
+            isDecrypted: true,
+            isEncrypted: false
+        )
+    }
+
+    @MainActor
     public static func encrypt(
         containerFile: URL,
         dataFiles: [URL],

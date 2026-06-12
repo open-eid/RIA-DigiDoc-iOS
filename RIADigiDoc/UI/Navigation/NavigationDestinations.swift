@@ -40,8 +40,8 @@ struct NavigationDestinations: ViewModifier {
         case .recentDocumentsView(let folderURL, let extensions):
             RecentDocumentsView(folderURL: folderURL, extensions: extensions)
 
-        case .encryptRecipientView:
-            EncryptRecipientView()
+        case .encryptRecipientView(let cdocOption):
+            EncryptRecipientView(cdocOption: cdocOption)
 
         case .signingView:
             SigningView()
@@ -72,10 +72,14 @@ struct NavigationDestinations: ViewModifier {
             ActionMethodSelectionView(actionType: actionType, methods: methods)
 
         case .encryptView(
-            let isWithEncryption
+            let isWithEncryption,
+            let cdocOption,
+            let selectedTab
         ):
             EncryptView(
                 isWithEncryption: isWithEncryption,
+                cdocOption: cdocOption,
+                selectedTab: selectedTab
             )
         case .recipientDetailView(
             let recipient,

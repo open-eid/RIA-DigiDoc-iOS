@@ -126,6 +126,7 @@ struct MyEidView: View {
                                         documentExpirationStatus: viewModel
                                             .getDocumentExpirationStatus(expiryDate: idCardData.publicData.dateOfExpiry)
                                     )
+                                    .padding(.top, Dimensions.Padding.SPadding)
                                 } else if selectedTab == .pinsAndCertificates {
                                     MyEidPinsAndCertificatesView(
                                         isPin1Blocked: $isPin1Blocked,
@@ -137,8 +138,10 @@ struct MyEidView: View {
                                         signCertValidTo: idCardData.signCertNotValidDate ?? "",
                                         isPUKChangeable: idCardData.isPUKChangeable
                                     )
+                                    .padding(.top, Dimensions.Padding.SPadding)
                                 }
                             }
+                            .padding(.top, Dimensions.Padding.SPadding)
                             .accessibilityFocused($isTabFocused)
                             .onAppear {
                                 DispatchQueue.main.async {

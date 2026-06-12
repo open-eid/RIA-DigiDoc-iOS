@@ -50,6 +50,7 @@ struct FloatingLabelTextField: View {
     let sortPriority: Double
     let spellOutCharacters: Bool
     let showBorder: Bool
+    let accessibilityHint: String
     let onDone: (() -> Void)
 
     init(
@@ -69,6 +70,7 @@ struct FloatingLabelTextField: View {
         sortPriority: Double = 0,
         spellOutCharacters: Bool = false,
         showBorder: Bool = true,
+        accessibilityHint: String = "",
         onDone: @escaping (() -> Void) = {}
     ) {
         self.title = title
@@ -87,6 +89,7 @@ struct FloatingLabelTextField: View {
         self.sortPriority = sortPriority
         self.spellOutCharacters = spellOutCharacters
         self.showBorder = showBorder
+        self.accessibilityHint = accessibilityHint
         self.onDone = onDone
     }
 
@@ -172,6 +175,14 @@ struct FloatingLabelTextField: View {
             .compactMap { $0 }
             .filter { !$0.isEmpty }
             .joined(separator: " ")
+    }
+
+    private var fieldAccessibilityValue: String {
+        if text.isEmpty { return "" }
+        if isSecure && !isPasswordVisible {
+            return String(repeating: "•", count: text.count)
+        }
+        return text
     }
 
     private var shouldShowToolbar: Bool {
@@ -359,7 +370,9 @@ struct FloatingLabelTextField: View {
         .onChange(of: errorText, { _, newValue in
             AccessibilityUtil.announceMessage(newValue)
         })
-        .frame(height: Dimensions.Icon.IconSizeXXS)
+        .accessibilityHint(Text(verbatim: accessibilityHint))
+        .accessibilityValue(Text(verbatim: fieldAccessibilityValue))
+        .frame(minHeight: Dimensions.Icon.IconSizeXXS)
     }
 
     @ToolbarContentBuilder
@@ -523,7 +536,7 @@ private extension View {
             .disabled(isDisabled)
             .keyboardType(keyboardType)
             .submitLabel(submitLabel)
-            .textContentType(.none)
+            .textContentType(.init(rawValue: ""))
             .autocorrectionDisabled(true)
             .textInputAutocapitalization(.never)
             .speechSpellsOutCharacters(spellOut)

@@ -1259,6 +1259,186 @@
         }
       }
     },
+    "Crypto password encryption description" : {
+      "comment" : "Encrypt with password tab description",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password encryption is intended for long-term storage. The password cannot be changed or recovered."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parooliga krüpteerimine on mõeldud pikaajalise säilitamise jaoks. Parooli ei ole võimalik muuta ega taastada."
+          }
+        }
+      }
+    },
+    "Crypto password field label" : {
+      "comment" : "Password dialog — password field label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumendi parool"
+          }
+        }
+      }
+    },
+    "Crypto password key label" : {
+      "comment" : "Password dialog — key label field placeholder",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key label"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Võtme silt"
+          }
+        }
+      }
+    },
+    "Crypto password key label description" : {
+      "comment" : "Password dialog — key label helper text shown below the field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipient name or ID"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadi nimi või ID"
+          }
+        }
+      }
+    },
+    "Crypto password length requirement" : {
+      "comment" : "Password dialog — length requirement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Length: 20 – 64 characters"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pikkus: 20 – 64 tähemärki"
+          }
+        }
+      }
+    },
+    "Crypto password lowercase requirement" : {
+      "comment" : "Password dialog — lowercase letter requirement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contains at least one lowercase letter"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisaldab vähemalt ühte väiketähte"
+          }
+        }
+      }
+    },
+    "Crypto password number requirement" : {
+      "comment" : "Password dialog — number requirement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contains at least one number (0 – 9)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisaldab vähemalt ühte numbrit (0 – 9)"
+          }
+        }
+      }
+    },
+    "Crypto password repeat label" : {
+      "comment" : "Password dialog — repeat password field label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repeat password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korda parooli"
+          }
+        }
+      }
+    },
+    "Crypto password save warning" : {
+      "comment" : "Password dialog — info box warning text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Be sure to save the password in a secure place - without the password, you won't be able to open the file again."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta parool kindlasse kohta – ilma paroolita ei saa te faili enam avada."
+          }
+        }
+      }
+    },
+    "Crypto password uppercase requirement" : {
+      "comment" : "Password dialog — uppercase letter requirement",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contains at least one uppercase letter"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisaldab vähemalt ühte suurtähte"
+          }
+        }
+      }
+    },
     "Crypto recipients description" : {
       "comment" : "Crypto recipients description",
       "extractionState" : "manual",
@@ -1547,6 +1727,24 @@
         }
       }
     },
+    "Encrypt based on recipient" : {
+      "comment" : "Encrypt recipient tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encrypt based on recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeri adressaadi põhjal"
+          }
+        }
+      }
+    },
     "Encrypt container" : {
       "comment" : "Accessibility variant of Encrypt",
       "extractionState" : "manual",
@@ -1579,6 +1777,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku krüpteerimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Encrypt with password" : {
+      "comment" : "Encrypt with password tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encrypt with password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeri parooliga"
           }
         }
       }
@@ -5400,6 +5616,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ava fail"
+          }
+        }
+      }
+    },
+    "Password" : {
+      "comment" : "Crypto recipient password type label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parool"
+          }
+        }
+      }
+    },
+    "Password range to accessibility" : {
+      "comment" : "Password dialog — VoiceOver word spoken in place of the en dash in ranges like 20 – 64",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "to"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kuni"
+          }
+        }
+      }
+    },
+    "Password requirements" : {
+      "comment" : "Password dialog — VoiceOver heading announced before the requirement list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password requirements"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parooli nõuded"
           }
         }
       }

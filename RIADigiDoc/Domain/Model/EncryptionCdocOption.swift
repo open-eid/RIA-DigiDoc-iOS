@@ -17,7 +17,7 @@
  *
  */
 
-public enum EncryptionCdocOption: Int, Sendable {
+public enum EncryptionCdocOption: Int, Sendable, Hashable {
     case cdoc1 = 0
     case cdoc2 = 1
 }

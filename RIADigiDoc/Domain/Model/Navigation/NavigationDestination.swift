@@ -30,7 +30,7 @@ public enum NavigationDestination: Hashable {
         extensions: [String]
     )
 
-    case encryptRecipientView
+    case encryptRecipientView(cdocOption: EncryptionCdocOption)
 
     case signingView
     case signatureDetailView(
@@ -51,8 +51,11 @@ public enum NavigationDestination: Hashable {
     )
 
     case encryptView(
-        isWithEncryption: Bool
+        isWithEncryption: Bool,
+        cdocOption: EncryptionCdocOption,
+        selectedTab: EncryptViewTab
     )
+
     case recipientDetailView(
         recipient: Addressee,
     )

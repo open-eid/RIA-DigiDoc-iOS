@@ -293,6 +293,7 @@ struct SigningView: View {
                                             .environment(languageSettings)
                                         }
                                     }
+                                    .padding(.top, Dimensions.Padding.LPadding)
                                 } else {
                                     VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
                                         Text(verbatim: languageSettings.localized("Container files"))
@@ -486,7 +487,10 @@ struct SigningView: View {
         .onChange(of: viewModel.navigateToNestedCryptoContainerView) { _, isNavigating in
             if isNavigating {
                 viewModel.navigateToNestedCryptoContainerView.toggle()
-                pathManager.navigate(to: .encryptView(isWithEncryption: false))
+                Task { @MainActor in
+                    let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
+                    pathManager.navigate(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
+                }
             }
         }
     }
@@ -569,8 +573,9 @@ struct SigningView: View {
                 languageSettings.localized("Converted to crypto container"),
                 type: .success
             )
+            let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
             await MainActor.run {
-                pathManager.replaceLast(to: .encryptView(isWithEncryption: false))
+                pathManager.replaceLast(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
             }
         }
     }

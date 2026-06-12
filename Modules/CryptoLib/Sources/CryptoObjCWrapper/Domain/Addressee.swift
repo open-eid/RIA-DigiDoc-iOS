@@ -72,7 +72,7 @@ import Foundation
         concatKDFAlgorithmURI: String = ""
     ) {
         let split = cnVal.split(separator: ",").map { String($0) }
-        if split.count > 1 {
+        if split.count >= 3 {
             surname = split[0]
             givenName = split[1]
             identifier = split[2]
@@ -92,7 +92,7 @@ import Foundation
         data = cert
         let cnVal = x509?.subject(oid: .commonName)?.joined(separator: ",") ?? ""
         let split = cnVal.split(separator: ",").map { String($0) }
-        if split.count > 1 {
+        if split.count >= 3 {
             surname = split[0]
             givenName = split[1]
             identifier = split[2]
