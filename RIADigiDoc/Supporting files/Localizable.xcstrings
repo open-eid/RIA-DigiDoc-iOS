@@ -1475,6 +1475,24 @@
         }
       }
     },
+    "Crypto password repeat mismatch" : {
+      "comment" : "Password dialog — repeat password does not match error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords do not match"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paroolid ei kattu"
+          }
+        }
+      }
+    },
     "Crypto password save warning" : {
       "comment" : "Password dialog — info box warning text",
       "extractionState" : "manual",
@@ -1831,6 +1849,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri dokument"
+          }
+        }
+      }
+    },
+    "Decrypt general error" : {
+      "comment" : "CryptoContainer password decrypt error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container decryption was unsuccessful"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku dekrüpteerimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Decrypt wrong password error" : {
+      "comment" : "CryptoContainer password decrypt — wrong password error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vale parool"
           }
         }
       }
@@ -6730,6 +6784,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Viimati lisatud"
+          }
+        }
+      }
+    },
+    "Lock type" : {
+      "comment" : "Recipient detail view — lock type label for password recipients",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock type"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luku tüüp"
           }
         }
       }

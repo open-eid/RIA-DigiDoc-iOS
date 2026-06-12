@@ -27,6 +27,7 @@ public enum CryptoError: Error {
     case containerSavingFailed(CryptoErrorDetail)
     case containerRenamingFailed(CryptoErrorDetail)
     case containerDataFileSavingFailed(CryptoErrorDetail)
+    case wrongDecryptionKey
 
     public var errorDetail: CryptoErrorDetail {
         switch self {
@@ -38,6 +39,8 @@ public enum CryptoError: Error {
                 .containerRenamingFailed(let errorDetail),
                 .containerDataFileSavingFailed(let errorDetail):
             return errorDetail
+        case .wrongDecryptionKey:
+            return CryptoErrorDetail(message: "Wrong decryption key")
         }
     }
 

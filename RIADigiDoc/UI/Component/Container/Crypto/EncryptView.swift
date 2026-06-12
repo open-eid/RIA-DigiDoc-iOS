@@ -489,8 +489,8 @@ struct EncryptView: View {
             if showDecryptPasswordModal {
                 DecryptPasswordModalView(
                     keyLabel: passwordDecryptKeyLabel,
-                    onDecrypt: { _ in
-                        // Add password decryption functionality
+                    onDecrypt: { password in
+                        Task { await handlePasswordDecrypt(password) }
                     },
                     onCancel: {
                         showDecryptPasswordModal = false
@@ -574,6 +574,33 @@ struct EncryptView: View {
                 viewModel.navigateToNestedSignedContainerView.toggle()
                 pathManager.navigate(to: .signingView)
             }
+        }
+    }
+
+    private func handlePasswordDecrypt(_ password: String) async {
+        guard let containerFile = viewModel.containerURL else {
+            Toast.show(languageSettings.localized("Decrypt general error"))
+            return
+        }
+        do {
+            let decryptedContainer = try await CryptoContainer.decryptWithPassword(
+                containerFile: containerFile,
+                recipients: viewModel.recipients,
+                password: password
+            )
+            let sharedVM = Container.shared.sharedContainerViewModel()
+            sharedVM.removeLastContainer()
+            sharedVM.setCryptoContainer(decryptedContainer)
+            await viewModel.loadContainerData(cryptoContainer: decryptedContainer)
+            showDecryptPasswordModal = false
+            selectedTab = .files
+            await updateAsyncLabels()
+            await viewModel.updateAsyncProperties()
+            Toast.show(languageSettings.localized("Container successfully decrypted"), type: .success)
+        } catch CryptoError.wrongDecryptionKey {
+            Toast.show(languageSettings.localized("Decrypt wrong password error"))
+        } catch {
+            Toast.show(languageSettings.localized("Decrypt general error"))
         }
     }
 

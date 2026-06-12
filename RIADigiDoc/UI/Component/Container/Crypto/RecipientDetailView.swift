@@ -30,42 +30,29 @@ struct RecipientDetailView: View {
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(\.openURL) var openURL
 
-    @State private var selectedTab: RecipientDetailViewTab = .recipientDetails
-
     @State private var viewModel: SignatureDetailViewModel
 
     private let recipient: Addressee
-
     private let nameUtil: NameUtilProtocol
 
-    var recipientDetailsTitle: String {
-        return languageSettings.localized("Recipient")
+    private var nameText: String {
+        if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
+            return nameUtil.formatName(
+                surname: recipient.surname,
+                givenName: recipient.givenName,
+                identifier: recipient.identifier
+            )
+        } else {
+            return nameUtil.formatCompanyName(
+                identifier: recipient.identifier,
+                serialNumber: recipient.serialNumber
+            )
+        }
     }
 
-    var nameText: String {
-        return {
-            if PersonalCodeValidator.isPersonalCodeValid(recipient.identifier) {
-                return nameUtil.formatName(
-                    surname: recipient.surname,
-                    givenName: recipient.givenName,
-                    identifier: recipient.identifier
-                )
-            } else {
-                return nameUtil.formatCompanyName(
-                    identifier: recipient.identifier,
-                    serialNumber: recipient.serialNumber
-                )
-            }
-        }()
-    }
-
-    var validToDate: String {
+    private var validToDate: String {
         guard let validToDate = recipient.validTo else { return "" }
-
-        return DateUtil.getFormattedDateTime(
-            date: validToDate,
-            isUTC: false
-        ).date
+        return DateUtil.getFormattedDateTime(date: validToDate, isUTC: false).date
     }
 
     init(
@@ -74,7 +61,6 @@ struct RecipientDetailView: View {
     ) {
         _viewModel = State(wrappedValue: Container.shared.signatureDetailViewModel())
         self.recipient = recipient
-
         self.nameUtil = nameUtil
     }
 
@@ -92,73 +78,64 @@ struct RecipientDetailView: View {
                     )
 
                     VStack(alignment: .leading) {
-                        TabView(
-                            selectedTab: $selectedTab,
-                            titles: [recipientDetailsTitle],
-                            content: {
-                                VStack(alignment: .leading) {
-                                    if selectedTab == .recipientDetails {
-                                        let issuerName = viewModel.getIssuerName(cert: recipient.data)
-                                        if !issuerName.isEmpty {
-                                            SignerDetailView(
-                                                signatureDataItem: SignatureDataItem(
-                                                    title: languageSettings.localized("Recipient certificate issuer"),
-                                                    value: viewModel.getIssuerName(cert: recipient.data)
-                                                )
-                                            )
-                                        }
-
-                                        if !nameText.isEmpty {
-                                            NavigationLink(
-                                                value: NavigationDestination
-                                                    .certificateDetailView(certificate: recipient.data)
-                                            ) {
-                                                SignerDetailView(
-                                                    signatureDataItem: SignatureDataItem(
-                                                        title: languageSettings.localized("Recipient certificate"),
-                                                        value: nameText,
-                                                        extraIcon: "ic_m3_expand_content_48pt_wght400",
-                                                    )
-                                                )
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-                                        if !recipient.concatKDFAlgorithmURI.isEmpty {
-                                            Button {
-                                                if let url = URL(string: recipient.concatKDFAlgorithmURI) {
-                                                    openURL(url)
-                                                }
-                                            } label: {
-                                                SignerDetailView(
-                                                    signatureDataItem: SignatureDataItem(
-                                                        title: languageSettings.localized("ConcatKDF reference method"),
-                                                        value: recipient.concatKDFAlgorithmURI,
-                                                        extraIcon: "ic_m3_open_in_new_48pt_wght400",
-                                                    )
-                                                )
-                                            }
-                                            .buttonStyle(.plain)
-                                            .accessibilityRemoveTraits([.isButton])
-                                            .accessibilityAddTraits([.isLink])
-                                        }
-                                        if !validToDate.isEmpty {
-                                            SignerDetailView(
-                                                signatureDataItem: SignatureDataItem(
-                                                    title: languageSettings.localized(
-                                                        "Recipient certificate expiry date"
-                                                    ),
-                                                    value: validToDate
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            })
-                        .padding(.top, Dimensions.Padding.LPadding)
+                        recipientDetails
                     }
+                    .padding(.top, Dimensions.Padding.LPadding)
                 }
                 .padding(Dimensions.Padding.SPadding)
             })
+    }
+
+    @ViewBuilder
+    private var recipientDetails: some View {
+        if recipient.certType == .passwordType {
+            passwordRecipientDetails
+        } else {
+            certificateRecipientDetails
+        }
+    }
+
+    @ViewBuilder
+    private var passwordRecipientDetails: some View {
+        detailRow("Recipient", value: recipient.lockLabel)
+        detailRow("Lock type", value: recipient.lockType)
+    }
+
+    @ViewBuilder
+    private var certificateRecipientDetails: some View {
+        detailRow("Recipient certificate issuer", value: viewModel.getIssuerName(cert: recipient.data))
+        if !nameText.isEmpty {
+            NavigationLink(value: NavigationDestination.certificateDetailView(certificate: recipient.data)) {
+                detailRow("Recipient certificate", value: nameText, extraIcon: "ic_m3_expand_content_48pt_wght400")
+            }
+            .buttonStyle(.plain)
+        }
+        if let uri = URL(string: recipient.concatKDFAlgorithmURI), !recipient.concatKDFAlgorithmURI.isEmpty {
+            Button { openURL(uri) } label: {
+                detailRow(
+                    "ConcatKDF reference method",
+                    value: recipient.concatKDFAlgorithmURI,
+                    extraIcon: "ic_m3_open_in_new_48pt_wght400"
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityRemoveTraits([.isButton])
+            .accessibilityAddTraits([.isLink])
+        }
+        detailRow("Recipient certificate expiry date", value: validToDate)
+    }
+
+    @ViewBuilder
+    private func detailRow(_ titleKey: String, value: String, extraIcon: String? = nil) -> some View {
+        if !value.isEmpty {
+            SignerDetailView(
+                signatureDataItem: SignatureDataItem(
+                    title: languageSettings.localized(titleKey),
+                    value: value,
+                    extraIcon: extraIcon
+                )
+            )
+        }
     }
 }
 
@@ -173,10 +150,8 @@ struct RecipientDetailView: View {
         validTo: Date.distantFuture
     )
 
-    RecipientDetailView(
-        recipient: recipient
-    )
-    .environment(Container.shared.languageSettings())
-    .environment(Container.shared.themeSettings())
-    .environment(NavigationPathManager())
+    RecipientDetailView(recipient: recipient)
+        .environment(Container.shared.languageSettings())
+        .environment(Container.shared.themeSettings())
+        .environment(NavigationPathManager())
 }

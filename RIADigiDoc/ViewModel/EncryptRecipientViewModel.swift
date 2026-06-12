@@ -36,6 +36,8 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let openLdap: OpenLdapProtocol
+    var encryptWithPasswordAction: (URL, [URL], String, String) async throws -> any CryptoContainerProtocol =
+        CryptoContainer.encryptWithPassword
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
@@ -127,6 +129,22 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
             errorMessage = ToastMessage(key: "Failed to remove recipient", args: [])
             EncryptRecipientViewModel.logger().error("Unable to delete recipient: \(error)")
         }
+    }
+
+    func encryptWithPassword(label: String, password: String) async throws {
+        let cryptoContainer = sharedContainerViewModel.currentContainer() as? any CryptoContainerProtocol
+        guard let cryptoContainer else {
+            EncryptRecipientViewModel.logger().error("Cannot encrypt: crypto container is nil")
+            throw CryptoError.containerCreationFailed(CryptoErrorDetail(message: "Container is nil"))
+        }
+        guard let containerFile = await cryptoContainer.getRawContainerFile() else {
+            EncryptRecipientViewModel.logger().error("Cannot encrypt: container file URL is nil")
+            throw CryptoError.containerCreationFailed(CryptoErrorDetail(message: "Container file URL is nil"))
+        }
+        let dataFiles = await cryptoContainer.getDataFiles()
+        let encryptedContainer = try await encryptWithPasswordAction(containerFile, dataFiles, label, password)
+        sharedContainerViewModel.clearContainers()
+        sharedContainerViewModel.setCryptoContainer(encryptedContainer)
     }
 
     func resetErrorMessage() {

@@ -30,6 +30,7 @@ public protocol EncryptRecipientViewModelProtocol: Sendable {
     func loadRecipients() async
     func getContainerRecipientList() async -> [Addressee]
     func deleteRecipient(_ recipient: Addressee) async
+    func encryptWithPassword(label: String, password: String) async throws
     func resetErrorMessage()
     func resetSuccessMessage()
 }

@@ -100,6 +100,7 @@ struct PasswordModalButtonRow: View {
 
     let cancelLabel: String
     let confirmLabel: String
+    var isConfirmEnabled: Bool = true
     let onCancel: () -> Void
     let onConfirm: () -> Void
 
@@ -111,8 +112,9 @@ struct PasswordModalButtonRow: View {
                 .minimumScaleFactor(0.5)
             Button(confirmLabel) { onConfirm() }
                 .font(typography.labelLarge)
-                .foregroundStyle(theme.primary)
+                .foregroundStyle(isConfirmEnabled ? theme.primary : theme.onSurfaceVariant)
                 .minimumScaleFactor(0.5)
+                .disabled(!isConfirmEnabled)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.vertical, Dimensions.Padding.MSPadding)

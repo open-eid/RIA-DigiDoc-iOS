@@ -29,12 +29,23 @@ struct EncryptPasswordModalView: View {
     @State private var password: String = ""
     @State private var repeatPassword: String = ""
 
-    let onEncrypt: (String, String, String) -> Void
+    let onEncrypt: (String, String) -> Void
     let onCancel: () -> Void
 
     private var keyLabelTitle: String { languageSettings.localized("Crypto password key label") }
     private var passwordTitle: String { languageSettings.localized("Crypto password field label") }
     private var repeatTitle: String { languageSettings.localized("Crypto password repeat label") }
+
+    private var isPasswordValid: Bool {
+        let len = password.count
+        return len >= 20 && len <= 64
+            && password.contains(where: { $0.isNumber })
+            && password.contains(where: { $0.isUppercase })
+            && password.contains(where: { $0.isLowercase })
+    }
+
+    private var showPasswordError: Bool { !password.isEmpty && !isPasswordValid }
+    private var showRepeatError: Bool { !repeatPassword.isEmpty && repeatPassword != password }
 
     var body: some View {
         PasswordModalCard {
@@ -52,8 +63,9 @@ struct EncryptPasswordModalView: View {
                 PasswordModalButtonRow(
                     cancelLabel: languageSettings.localized("Cancel"),
                     confirmLabel: languageSettings.localized("Encrypt"),
+                    isConfirmEnabled: isPasswordValid && !repeatPassword.isEmpty && password == repeatPassword,
                     onCancel: onCancel,
-                    onConfirm: { onEncrypt(keyLabel, password, repeatPassword) }
+                    onConfirm: { onEncrypt(keyLabel, password) }
                 )
             }
             .frame(maxHeight: .infinity)
@@ -103,7 +115,7 @@ struct EncryptPasswordModalView: View {
         )
     }
 
-    private let requirementKeys = [
+    private static let requirementKeys = [
         "Crypto password length requirement",
         "Crypto password number requirement",
         "Crypto password uppercase requirement",
@@ -112,7 +124,7 @@ struct EncryptPasswordModalView: View {
 
     private var requirementsAccessibilityLabel: String {
         ([languageSettings.localized("Password requirements")]
-            + requirementKeys.map { languageSettings.localized($0) })
+         + EncryptPasswordModalView.requirementKeys.map { languageSettings.localized($0) })
             .joined(separator: ". ")
             .replacingOccurrences(
                 of: "–",
@@ -127,12 +139,13 @@ struct EncryptPasswordModalView: View {
                 placeholder: passwordTitle,
                 text: $password,
                 isSecure: true,
+                isError: showPasswordError,
                 submitLabel: .next,
                 identifier: "passwordInput",
                 sortPriority: 0
             )
             VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
-                ForEach(requirementKeys, id: \.self) { key in
+                ForEach(EncryptPasswordModalView.requirementKeys, id: \.self) { key in
                     requirementRow(key)
                 }
             }
@@ -149,6 +162,10 @@ struct EncryptPasswordModalView: View {
             placeholder: repeatTitle,
             text: $repeatPassword,
             isSecure: true,
+            isError: showRepeatError,
+            errorText: showRepeatError
+                ? languageSettings.localized("Crypto password repeat mismatch")
+                : "",
             submitLabel: .done,
             identifier: "repeatPasswordInput"
         )
@@ -157,14 +174,14 @@ struct EncryptPasswordModalView: View {
     private func requirementRow(_ key: String) -> some View {
         Text(verbatim: "• \(languageSettings.localized(key))")
             .font(typography.labelMedium)
-            .foregroundStyle(theme.onSecondaryContainer)
+            .foregroundStyle(showPasswordError ? theme.error : theme.onSecondaryContainer)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
 #Preview {
     EncryptPasswordModalView(
-        onEncrypt: { _, _, _ in },
+        onEncrypt: { _, _ in },
         onCancel: {}
     )
     .environment(Container.shared.languageSettings())
