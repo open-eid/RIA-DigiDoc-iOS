@@ -22,6 +22,7 @@ import Testing
 import LibdigidocLibSwift
 import CommonsLib
 import CommonsLibMocks
+import CommonsTestShared
 import LibdigidocLibSwiftMocks
 import UtilsLibMocks
 
@@ -66,18 +67,36 @@ struct SivaServiceTests {
     }
 
     @Test
-    func isSivaConfirmationNeeded_returnTrueWithValidSivaContainerMimetype() async {
-        let file = URL(fileURLWithPath: "/tmp/mockSignedContainer.asics")
+    func isSivaConfirmationNeeded_returnTrueForAsicsWrappingDdoc() async throws {
+        let wrappedDdoc = URL(fileURLWithPath: "/mock/path/wrapped.ddoc")
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: [wrappedDdoc.lastPathComponent: "Test content"],
+            containerExtension: "asics")
+        defer { try? FileManager.default.removeItem(at: mockContainer) }
 
-        mockMimetypeResolver.mimeTypeHandler = { url in
-            #expect(url == file)
-            return Constants.MimeType.Asics
+        mockMimetypeResolver.mimeTypeHandler = { _ in Constants.MimeType.Asics }
+        mockFileUtil.getFileFromZipFileHandler = { _, name in
+            name.contains(".ddoc") ? wrappedDdoc : nil
         }
 
-        let isSivaConfirmationNeeded = await service.isSivaConfirmationNeeded(files: [file])
+        let isSivaConfirmationNeeded = await service.isSivaConfirmationNeeded(files: [mockContainer])
 
         #expect(isSivaConfirmationNeeded)
-        #expect(mockMimetypeResolver.mimeTypeCallCount == 1)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnFalseForAsicsWrappingBdoc() async throws {
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: ["wrapped.bdoc": "Test content"],
+            containerExtension: "asics")
+        defer { try? FileManager.default.removeItem(at: mockContainer) }
+
+        mockMimetypeResolver.mimeTypeHandler = { _ in Constants.MimeType.Asics }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in nil }
+
+        let isSivaConfirmationNeeded = await service.isSivaConfirmationNeeded(files: [mockContainer])
+
+        #expect(!isSivaConfirmationNeeded)
     }
 
     @Test

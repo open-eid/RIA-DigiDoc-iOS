@@ -54,29 +54,30 @@ public struct CertificateUtil: CertificateUtilProtocol, Loggable {
     }
 
     public func getNotValidAfterWithExpiredLabel(cert: Data, expiredLabel: String) -> String {
+        guard let notValidAfterDate = getNotValidAfterDate(cert: cert) else { return "" }
+
+        let dateTime = DateUtil.getFormattedDateTime(date: notValidAfterDate, isUTC: false)
+
+        let calendar = Calendar.current
+        let todayStart = calendar.startOfDay(for: Date())
+        let certStart = calendar.startOfDay(for: notValidAfterDate)
+
+        if certStart < todayStart {
+            return "\(dateTime.date) (\(expiredLabel))"
+        } else {
+            return dateTime.date
+        }
+    }
+
+    public func getNotValidAfterDate(cert: Data) -> Date? {
         do {
             let certificate = try Certificate(derEncoded: cert.map { $0 })
-            let notValidAfterDate = certificate.notValidAfter
-
-            let dateTime = DateUtil.getFormattedDateTime(
-                date: notValidAfterDate,
-                isUTC: false
-            )
-
-            let calendar = Calendar.current
-            let todayStart = calendar.startOfDay(for: Date())
-            let certStart = calendar.startOfDay(for: notValidAfterDate)
-
-            if certStart < todayStart {
-                return "\(dateTime.date) (\(expiredLabel))"
-            } else {
-                return dateTime.date
-            }
+            return certificate.notValidAfter
         } catch {
             CertificateUtil.logger().error(
-                "Unable to get not valid after from certificate: \(String(reflecting: error))"
+                "Unable to get not valid after date from certificate: \(String(reflecting: error))"
             )
-            return ""
+            return nil
         }
     }
 

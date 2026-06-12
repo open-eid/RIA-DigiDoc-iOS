@@ -24,12 +24,17 @@
 #import <digidocpp/Signature.h>
 #import <digidocpp/Exception.h>
 #import <digidocpp/crypto/X509Cert.h>
+#import <digidocpp/crypto/Signer.h>
 
 #import "DigiDocContainerWrapper.h"
 #import "../Model/DigiDocContainer.h"
 #import "../Model/DigiDocDataFile.h"
 #import "../Model/DigiDocSignature.h"
 #import "Exception/Util/ExceptionUtil.h"
+
+@interface DigiDocContainerWrapper ()
++ (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
+@end
 
 struct DigiDocContainerOpenCB: public digidoc::ContainerOpenCB {
 private:
@@ -43,6 +48,50 @@ public:
         return validate;
     }
 };
+
+class TimestampSigner: public digidoc::Signer {
+public:
+    explicit TimestampSigner(const std::string &userAgent) {
+        setUserAgent(userAgent);
+    }
+
+    digidoc::X509Cert cert() const override {
+        return digidoc::X509Cert();
+    }
+
+    std::vector<unsigned char> sign(const std::string &, const std::vector<unsigned char> &) const override {
+        throw digidoc::Exception(__FILE__, __LINE__, "TimestampSigner cannot sign. It only creates timestamps.");
+    }
+};
+
+static bool isSignatureInvalid(const digidoc::Signature *signature) {
+    digidoc::Signature::Validator validator(signature);
+    return [DigiDocContainerWrapper determineSignatureStatus:validator.status()] == Invalid;
+}
+
+static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const std::string &mediaType) {
+    if (signatures.empty()) {
+        return false;
+    }
+    // An ASiC-S timestamped container is re-timestamped in place.
+    // It must not be wrapped into another ASiC-S.
+    if (mediaType == "application/vnd.etsi.asic-s+zip") {
+        return true;
+    }
+    if (mediaType != "application/vnd.etsi.asic-e+zip") {
+        return false;
+    }
+    for (const auto *signature : signatures) {
+        if (signature->profile().find("time-stamp") == std::string::npos) {
+            return false;
+        }
+        // Invalid signatures cannot be extended in place — wrap the container into an ASiC-S container instead.
+        if (isSignatureInvalid(signature)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 @implementation DigiDocContainerWrapper {}
 
@@ -86,6 +135,7 @@ public:
     return [NSData dataWithBytes:vectorData.data() length:vectorData.size()];
 }
 
+
 + (DigiDocSignatureStatus)determineSignatureStatus:(int)status {
     typedef digidoc::Signature::Validator::Status Status;
 
@@ -106,7 +156,7 @@ public:
 
     DigiDocSignature *digiDocSignature = [DigiDocSignature new];
     digiDocSignature.signingCert = [DigiDocContainerWrapper getNSDataFromVector:signingCert];
-    digiDocSignature.timestampCert = [DigiDocContainerWrapper getNSDataFromVector:ocspCert];
+    digiDocSignature.timestampCert = [DigiDocContainerWrapper getNSDataFromVector:timestampCert];
     digiDocSignature.ocspCert = [DigiDocContainerWrapper getNSDataFromVector:ocspCert];
 
     std::string givename = signingCert.subjectName("GN");
@@ -132,6 +182,16 @@ public:
     digiDocSignature.format = [NSString stringWithUTF8String:signature->profile().c_str()];
     digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
     digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];
+
+    auto archiveTimestamps = signature->ArchiveTimeStamps();
+    if (!archiveTimestamps.empty()) {
+        const auto& firstTS = archiveTimestamps.front();
+        digiDocSignature.archiveTimestampTime = [NSString stringWithUTF8String:firstTS.time.c_str()];
+        digiDocSignature.archiveTimestampCert = [DigiDocContainerWrapper getNSDataFromVector:firstTS.cert];
+    } else {
+        digiDocSignature.archiveTimestampTime = @"";
+        digiDocSignature.archiveTimestampCert = [NSData data];
+    }
 
     std::vector<std::string> signerRoles = signature->signerRoles();
     NSMutableArray* signerRolesList = [NSMutableArray arrayWithCapacity: signerRoles.size()];
@@ -356,6 +416,53 @@ public:
         container.removeDataFile((int)dataFileIndex);
         container.save(containerPath.UTF8String);
     } completion:completion];
+}
+
++ (void)extendLastSignatureToLTA:(NSString *)containerPath completion:(void (^)(NSError * _Nullable error))completion {
+    [self open:containerPath validateOnline:YES command:^(digidoc::Container &container) {
+        auto sigs = container.signatures();
+        if (!sigs.empty()) {
+            TimestampSigner signer(digidoc::userAgent());
+            signer.setProfile("time-stamp-archive");
+            sigs.back()->extendSignatureProfile(&signer);
+        }
+        container.save(containerPath.UTF8String);
+    } completion:completion];
+}
+
++ (void)extendContainerToLTA:(NSString *)containerPath
+             outputAsicsPath:(NSString *)outputAsicsPath
+                  completion:(void (^)(NSString * _Nullable savedPath, NSError * _Nullable error))completion {
+    __block NSString *savedPath = nil;
+    [self open:containerPath validateOnline:YES command:^(digidoc::Container &container) {
+        auto signatures = container.signatures();
+        const std::string mediaType = container.mediaType();
+
+        if (canExtend(signatures, mediaType)) {
+            TimestampSigner signer(digidoc::userAgent());
+            signer.setProfile("time-stamp-archive");
+            for (auto *signature : signatures) {
+                signature->extendSignatureProfile(&signer);
+            }
+            container.save(containerPath.UTF8String);
+            savedPath = containerPath;
+        } else {
+            auto asics = digidoc::Container::createPtr(outputAsicsPath.UTF8String);
+            if (!asics) {
+                throw digidoc::Exception(__FILE__, __LINE__, "Failed to create ASiC-S container");
+            }
+            TimestampSigner signer(digidoc::userAgent());
+            signer.setProfile("TimeStampToken");
+            asics->addDataFile(containerPath.UTF8String, mediaType);
+            asics->sign(&signer);
+            asics->save(outputAsicsPath.UTF8String);
+            savedPath = outputAsicsPath;
+        }
+    } completion:^(NSError * _Nullable error) {
+        if (completion) {
+            completion(error ? nil : savedPath, error);
+        }
+    }];
 }
 
 

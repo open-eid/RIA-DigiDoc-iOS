@@ -120,6 +120,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     func sign(
         country: SmartIdCountry,
         personalCode: String,
@@ -283,10 +284,18 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             )
 
             SmartIdViewModel.logger().info("Signature added successfully (Smart-ID)")
-            smartIdSuccessMessageKey = "Signature added"
             notificationUtil.removeNotification(id: notificationIdentifier)
             await endLiveActivity()
-            return updatedContainer
+            let isLTAEnabled = await dataStore.getIsDefaultLTAEnabled()
+            do {
+                let extendedContainer = try await updatedContainer.extendSignature(isLTAEnabled)
+                smartIdSuccessMessageKey = "Signature added"
+                return extendedContainer
+            } catch {
+                SmartIdViewModel.logger().error("Unable to extend signature (Smart-ID): \(error)")
+                smartIdErrorMessageKey = "Extending signatures failed"
+                return updatedContainer
+            }
         } catch {
             SmartIdViewModel.logger().error("Unable to sign container with Smart-ID: \(error)")
             handleSignatureAddingError(error)

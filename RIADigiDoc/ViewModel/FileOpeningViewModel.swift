@@ -234,10 +234,13 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
     }
 
     private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
-        let isTimestampedContainer = await sivaRepository.isTimestampedContainer(signedContainer: parentContainer)
-        let isCades = await parentContainer.isCades()
-        let isXades = await parentContainer.isXades()
-        if isTimestampedContainer && !isCades && !isXades {
+        // Only open the nested container when SiVa is actually needed (ASiC-S wrapping a DDOC).
+        // An ASiC-S containing a BDOC must stay a regular ASiC-S container.
+        let shouldOpenNested = await sivaRepository.shouldOpenNestedTimestampedContainer(parentContainer)
+        FileOpeningViewModel.logger().info(
+            "ASiC-S opened. Open nested container: \(shouldOpenNested, privacy: .public)"
+        )
+        if shouldOpenNested {
             let nestedTimestampedContainer = try await sivaRepository
                 .getTimestampedContainer(parentContainer: parentContainer)
             sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)

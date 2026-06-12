@@ -241,8 +241,10 @@ struct FileOpeningViewModelTests {
         mockFileOpeningRepository.getValidFilesHandler = { _ in
             [URL(filePath: "/mock/file.txt")]
         }
+        mockMainSignedContainer.getRawContainerFileHandler = { URL(filePath: "/mock/container.asics") }
         mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
         mockSivaRepository.isTimestampedContainerHandler = { _ in true }
+        mockSivaRepository.isSivaConfirmationNeededHandler = { _ in true }
         mockSivaRepository.getTimestampedContainerHandler = { _ in mockNestedSignedContainer }
         mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
         mockSharedContainerViewModel.currentContainerHandler = { mockNestedSignedContainer }
@@ -262,9 +264,39 @@ struct FileOpeningViewModelTests {
         await viewModel.handleSivaConfirmation()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
+        #expect(mockSivaRepository.getTimestampedContainerCallCount == 1)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
         #expect(viewModel.isSivaConfirmed)
         #expect(viewModel.isNavigatingToSigningView)
+    }
+
+    @Test
+    func handleSivaConfirmation_asicsWrappingBdocIsNotUnwrapped() async throws {
+        let mockMainSignedContainer = SignedContainerProtocolMock()
+        mockMainSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+        mockMainSignedContainer.getRawContainerFileHandler = { URL(filePath: "/mock/container.asics") }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [URL(filePath: "/mock/file.txt")] }
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in mockMainSignedContainer }
+        mockSivaRepository.isTimestampedContainerHandler = { _ in true }
+        mockSivaRepository.isSivaConfirmationNeededHandler = { _ in false }
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+        mockSharedContainerViewModel.currentContainerHandler = { mockMainSignedContainer }
+
+        guard let sharedContainerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: Constants.Identifier.Group
+        ) else {
+            Issue.record("Expected a valid shared container URL")
+            return
+        }
+        mockFileManager.containerURLHandler = { _ in sharedContainerURL }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+
+        await viewModel.handleFiles()
+        await viewModel.handleSivaConfirmation()
+
+        #expect(mockSivaRepository.getTimestampedContainerCallCount == 0)
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
     }
 
     @Test

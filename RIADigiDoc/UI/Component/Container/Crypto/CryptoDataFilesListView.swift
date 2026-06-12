@@ -41,6 +41,9 @@ struct CryptoDataFilesListView: View {
         LazyVStack {
             if #available(iOS 26.0, *) {
                 ForEach(dataFiles.enumerated(), id: \.offset) { index, dataFile in
+                    if index > 0 {
+                        Divider()
+                    }
                     CryptoDataFilesView(
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,
@@ -58,6 +61,9 @@ struct CryptoDataFilesListView: View {
                 }
             } else {
                 ForEach(Array(dataFiles.enumerated()), id: \.offset) { index, dataFile in
+                    if index > 0 {
+                        Divider()
+                    }
                     CryptoDataFilesView(
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,

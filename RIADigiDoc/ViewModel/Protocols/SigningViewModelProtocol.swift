@@ -45,4 +45,5 @@ public protocol SigningViewModelProtocol: Sendable {
     func resetErrorMessage()
     func resetSuccessMessage()
     func convertToCryptoContainer() async -> Bool
+    func extendSignatures() async
 }

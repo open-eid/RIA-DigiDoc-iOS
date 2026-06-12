@@ -42,6 +42,7 @@ struct SignatureView: View {
     let isTimestamp: Bool
     let nameUtil: NameUtilProtocol
     let signatureUtil: SignatureUtilProtocol
+    let certificateUtil: CertificateUtilProtocol
     let showSignedDate: Bool
     let showMoreOptionsButton: Bool
     let showRole: Bool
@@ -84,6 +85,7 @@ struct SignatureView: View {
         isTimestamp: Bool = false,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
         signatureUtil: SignatureUtilProtocol = Container.shared.signatureUtil(),
+        certificateUtil: CertificateUtilProtocol = Container.shared.certificateUtil(),
         showSignedDate: Bool = true,
         showMoreOptionsButton: Bool = true,
         showRole: Bool = true,
@@ -98,12 +100,21 @@ struct SignatureView: View {
         self.isTimestamp = isTimestamp
         self.nameUtil = nameUtil
         self.signatureUtil = signatureUtil
+        self.certificateUtil = certificateUtil
         self.showSignedDate = showSignedDate
         self.showMoreOptionsButton = showMoreOptionsButton
         self.showRole = showRole
         self.showRemoveSignatureButton = showRemoveSignatureButton
         self._showRemoveSignatureModal = showRemoveSignatureModal
         self.onSelect = onSelect
+    }
+
+    private var archiveTimestampInfo: (text: String, isExpired: Bool)? {
+        guard !isTimestamp && signature.isLTAExtended else { return nil }
+        guard let date = certificateUtil.getNotValidAfterDate(cert: signature.archiveTimestampCert) else { return nil }
+        let formatted = DateUtil.getFormattedDateTime(date: date, isUTC: false)
+        let text = languageSettings.localized("Archive timestamp valid until", [formatted.date])
+        return (text: text, isExpired: date < Date())
     }
 
     var body: some View {
@@ -145,9 +156,11 @@ struct SignatureView: View {
 
                     ColoredSignedStatusText(
                         text: languageSettings.localized(
-                            signatureUtil.getSignatureStatusText(status: signature.status)
+                            signatureUtil.getSignatureStatusText(status: signature.status, isTimestamp: isTimestamp)
                         ),
-                        status: signature.status
+                        status: signature.status,
+                        archiveTimestampText: archiveTimestampInfo?.text,
+                        isArchiveTimestampExpired: archiveTimestampInfo?.isExpired ?? false
                     )
                     .multilineTextAlignment(.center)
 

@@ -26,6 +26,8 @@ struct ColoredSignedStatusText: View {
 
     let text: String
     let status: SignatureStatus
+    var archiveTimestampText: String? = nil
+    var isArchiveTimestampExpired: Bool = false
 
     private var isSignatureValidOrWarning: Bool {
         status == .valid || status == .warning || status == .nonQSCD
@@ -49,12 +51,20 @@ struct ColoredSignedStatusText: View {
     }
 
     var body: some View {
-        TagBadge(
-            text: text,
-            tagBackgroundColor: tagBackgroundColor,
-            tagContentColor: tagContentColor,
-            additionalTextColor: additionalTextColor
-        )
+        if let archiveText = archiveTimestampText {
+            TagBadge(
+                text: archiveText,
+                tagBackgroundColor: isArchiveTimestampExpired ? theme.errorContainer : theme.successContainer,
+                tagContentColor: isArchiveTimestampExpired ? theme.onErrorContainer : theme.onSuccessContainer
+            )
+        } else {
+            TagBadge(
+                text: text,
+                tagBackgroundColor: tagBackgroundColor,
+                tagContentColor: tagContentColor,
+                additionalTextColor: additionalTextColor
+            )
+        }
     }
 }
 
@@ -72,5 +82,11 @@ struct ColoredSignedStatusText: View {
     ColoredSignedStatusText(
         text: "Signature is unknown",
         status: .unknown
+    )
+
+    ColoredSignedStatusText(
+        text: "Signature is valid",
+        status: .valid,
+        archiveTimestampText: "Archive timestamp"
     )
 }

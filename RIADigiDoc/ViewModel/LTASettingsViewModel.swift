@@ -17,8 +17,28 @@
  *
  */
 
-enum SigningServicesSettingsViewTab: Int, Sendable {
-    case timestampServices = 0
-    case mobileIdAndSmartId = 1
-    case lta = 2
+import Foundation
+
+@Observable
+@MainActor
+class LTASettingsViewModel: LTASettingsViewModelProtocol {
+
+    var isDefaultLTAEnabled: Bool = false
+
+    private let dataStore: DataStoreProtocol
+
+    init(dataStore: DataStoreProtocol) {
+        self.dataStore = dataStore
+        Task {
+            await loadSettings()
+        }
+    }
+
+    func loadSettings() async {
+        self.isDefaultLTAEnabled = await dataStore.getIsDefaultLTAEnabled()
+    }
+
+    func saveSettings() async {
+        await dataStore.setIsDefaultLTAEnabled(isDefaultLTAEnabled)
+    }
 }

@@ -117,6 +117,14 @@ struct SignatureDetailView: View {
         return "\(mobileTime.date) \(mobileTime.time)"
     }
 
+    var archiveTimestampTime: String {
+        let timestamp = DateUtil.getFormattedDateTime(
+            dateTimeString: signature.archiveTimestampTime,
+            isUTC: false
+        )
+        return "\(timestamp.date) \(timestamp.time)"
+    }
+
     init(
         certificateDetailViewModel: CertificateDetailViewModel = Container.shared.certificateDetailViewModel(),
         signature: SignatureWrapper,
@@ -177,7 +185,7 @@ struct SignatureDetailView: View {
                             selectedTab: $selectedTab,
                             titles: [signersRoleAndAddressTitle, signersDetailsTitle],
                             content: {
-                                VStack(alignment: .leading) {
+                                VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
                                     if selectedTab == .roleAndAddress {
                                         RoleDetailsView(signature: signature)
                                     } else {
@@ -323,9 +331,42 @@ struct SignatureDetailView: View {
                                                 value: signersMobileTime
                                             )
                                         )
+
+                                        if !isTimestamp && signature.isLTAExtended {
+                                            SignerDetailView(
+                                                signatureDataItem: SignatureDataItem(
+                                                    title: languageSettings.localized("Archive timestamp"),
+                                                    value: archiveTimestampTime
+                                                )
+                                            )
+
+                                            SignerDetailView(
+                                                signatureDataItem: SignatureDataItem(
+                                                    title: languageSettings.localized("Archive TS Certificate issuer"),
+                                                    value: viewModel.getIssuerName(cert: signature.archiveTimestampCert)
+                                                )
+                                            )
+
+                                            NavigationLink(
+                                                value: NavigationDestination
+                                                    .certificateDetailView(certificate: signature.archiveTimestampCert)
+                                            ) {
+                                                SignerDetailView(
+                                                    signatureDataItem: SignatureDataItem(
+                                                        title: languageSettings.localized("Archive TS Certificate"),
+                                                        value: viewModel.getSubjectName(
+                                                            cert: signature.archiveTimestampCert
+                                                        ),
+                                                        extraIcon: "ic_m3_expand_content_48pt_wght400",
+                                                    )
+                                                )
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
                                     }
                                 }
                                 .padding(.top, Dimensions.Padding.SPadding)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             })
                         .padding(.top, Dimensions.Padding.SPadding)
                     }

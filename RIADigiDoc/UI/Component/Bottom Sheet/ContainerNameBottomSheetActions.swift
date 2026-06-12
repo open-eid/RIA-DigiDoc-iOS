@@ -24,10 +24,12 @@ struct ContainerNameBottomSheetActions {
         isSaveButtonShown: Bool = true,
         isSignButtonShown: Bool,
         isEncryptButtonShown: Bool,
+        isExtendSignaturesButtonShown: Bool,
         onRenameContainerButtonClick: @escaping () -> Void,
         onSaveContainerButtonClick: @escaping () -> Void,
         onSignContainerButtonClick: @escaping () -> Void,
-        onEncryptContainerButtonClick: @escaping () -> Void
+        onEncryptContainerButtonClick: @escaping () -> Void,
+        onExtendSignaturesClick: @escaping () -> Void
     ) -> [BottomSheetButton] {
         [
             BottomSheetButton(
@@ -59,6 +61,14 @@ struct ContainerNameBottomSheetActions {
                 accessibilityLabel: "Sign document",
                 showExtraIcon: true,
                 onClick: onSignContainerButtonClick
+            ),
+            BottomSheetButton(
+                showButton: isExtendSignaturesButtonShown,
+                icon: "ic_m3_more_time_48pt_wght400",
+                title: "Extend signatures",
+                accessibilityLabel: "Extend signatures",
+                showExtraIcon: false,
+                onClick: onExtendSignaturesClick
             )
         ]
     }

@@ -505,6 +505,16 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(isAlwaysEnabled, forKey: Keys.isCrashlyticsAlwaysEnabled)
     }
 
+    // MARK: - LTA Settings
+
+    public func getIsDefaultLTAEnabled() async -> Bool {
+        userDefaults().bool(forKey: Keys.isDefaultLTAEnabled)
+    }
+
+    public func setIsDefaultLTAEnabled(_ isEnabled: Bool) async {
+        userDefaults().set(isEnabled, forKey: Keys.isDefaultLTAEnabled)
+    }
+
     // MARK: - Migration
     public func getIsRecentDocumentsMigrationDone() async -> Bool {
         userDefaults().bool(forKey: Keys.isRecentDocumentsMigrationDone)
@@ -581,5 +591,6 @@ public actor DataStore: DataStoreProtocol {
         static let isLogFileSaved = "isLogFileSaved"
         static let isCrashlyticsAlwaysEnabled = "isCrashlyticsAlwaysEnabled"
         static let isRecentDocumentsMigrationDone = "isRecentDocumentsMigrationDone"
+        static let isDefaultLTAEnabled = "isDefaultLTAEnabled"
     }
 }

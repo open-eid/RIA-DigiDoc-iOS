@@ -52,5 +52,8 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 @property (nonatomic, assign) DigiDocSignatureStatus status;
 @property (nonatomic, strong) NSString *diagnosticsInfo;
 
+@property (nonatomic, strong) NSString *archiveTimestampTime;
+@property (nonatomic, strong) NSData *archiveTimestampCert;
+
 @end
 

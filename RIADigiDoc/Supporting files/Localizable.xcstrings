@@ -127,6 +127,78 @@
         }
       }
     },
+    "Archive timestamp" : {
+      "comment" : "Archive timestamp label in signature details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive timestamp"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arhiivi ajatempel"
+          }
+        }
+      }
+    },
+    "Archive timestamp valid until" : {
+      "comment" : "Archive timestamp valid until badge text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive timestamp valid until: %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arhiivi ajatempel kehtib kuni: %@"
+          }
+        }
+      }
+    },
+    "Archive TS Certificate" : {
+      "comment" : "Archive TS certificate label in signature details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive TS Certificate"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arhiivi TS sertifikaat"
+          }
+        }
+      }
+    },
+    "Archive TS Certificate issuer" : {
+      "comment" : "Archive TS certificate issuer label in signature details",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive TS Certificate issuer"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arhiivi TS sertifikaadi väljaandja"
+          }
+        }
+      }
+    },
     "Authentication certificate" : {
       "comment" : "My eID PIN 1 title",
       "extractionState" : "manual",
@@ -1903,6 +1975,114 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sinu Smart-ID toiming aegus või kontot ei leitud"
+          }
+        }
+      }
+    },
+    "Extend" : {
+      "comment" : "Confirm button label in extend signatures dialog",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extend"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pikenda"
+          }
+        }
+      }
+    },
+    "Extend signatures" : {
+      "comment" : "Button label for extending signatures to LTA",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extend signatures"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pikenda allkirju"
+          }
+        }
+      }
+    },
+    "Extend signatures confirm message" : {
+      "comment" : "Confirmation dialog message shown before extending signatures to LTA",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All signatures in the container will be extended to LTA format."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kõik ümbriku allkirjad pikendatakse LTA formaati."
+          }
+        }
+      }
+    },
+    "Extending signatures failed" : {
+      "comment" : "Shown as Toast when extending signatures to LTA fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to extend signature(s)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja(de) pikendamine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Container validity cannot be extended" : {
+      "comment" : "Dialog title when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container validity cannot be extended"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konteineri kehtivust ei saa pikendada"
+          }
+        }
+      }
+    },
+    "Failed to extend signatures and wrapped to timestamped container." : {
+      "comment" : "Dialog message when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to extend signatures and wrapped to timestamped container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjade pikendamine ebaõnnestus ja konteiner pakiti ajatempliga konteinerisse."
           }
         }
       }
@@ -4362,6 +4542,42 @@
         }
       }
     },
+    "Main settings default lta disabled" : {
+      "comment" : "Main settings default lta disabled",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not use Long Term Archival (LTA) format when signing"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei kasuta allkirjastamisel arhiveerimise ajatempli (LTA) vormingut"
+          }
+        }
+      }
+    },
+    "Main settings default lta title" : {
+      "comment" : "Main settings default lta title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Long Term Archival (LTA) format when signing"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kasuta allkirjastamisel arhiveerimise ajatempli (LTA) vormingut"
+          }
+        }
+      }
+    },
     "Main settings default manual access title" : {
       "comment" : "Main settings default manual access title",
       "extractionState" : "manual",
@@ -4394,6 +4610,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Üldine"
+          }
+        }
+      }
+    },
+    "Main settings lta tab title" : {
+      "comment" : "Tab title for LTA settings in Signing services",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long Term Archival (LTA)"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arhiveerimise ajatempel (LTA)"
           }
         }
       }
@@ -7578,6 +7812,24 @@
         }
       }
     },
+    "Signatures extended" : {
+      "comment" : "Shown as Toast when extending signatures to LTA succeeds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signature(s) extended successfully"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirja(de) pikendamine õnnestus"
+          }
+        }
+      }
+    },
     "Signed at" : {
       "comment" : "Signed date and time",
       "extractionState" : "manual",
@@ -8150,6 +8402,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajatempel"
+          }
+        }
+      }
+    },
+    "Timestamp is invalid" : {
+      "comment" : "Timestamp invalid status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timestamp is invalid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempel ei ole kehtiv"
+          }
+        }
+      }
+    },
+    "Timestamp is unknown" : {
+      "comment" : "Timestamp unknown status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timestamp is unknown"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempel on teadmata"
+          }
+        }
+      }
+    },
+    "Timestamp is valid" : {
+      "comment" : "Timestamp valid status",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timestamp is valid"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajatempel on kehtiv"
           }
         }
       }

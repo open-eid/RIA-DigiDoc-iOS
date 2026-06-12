@@ -41,6 +41,7 @@ struct ContainerNameView: View {
     let isSaveButtonShown: Bool
     let isSignButtonShown: Bool
     let isEncryptButtonShown: Bool
+    let isExtendSignaturesButtonShown: Bool
     let showLeftActionButton: Bool
     let showRightActionButton: Bool
     let leftActionButtonName: String
@@ -53,6 +54,7 @@ struct ContainerNameView: View {
     let onRenameContainerButtonClick: () -> Void
     let onSignContainerButtonClick: () -> Void
     let onEncryptContainerButtonClick: () -> Void
+    let onExtendSignaturesClick: () -> Void
 
     private var bottomSheetActions: [BottomSheetButton] {
         ContainerNameBottomSheetActions.actions(
@@ -60,10 +62,12 @@ struct ContainerNameView: View {
             isSaveButtonShown: isSaveButtonShown,
             isSignButtonShown: isSignButtonShown,
             isEncryptButtonShown: isEncryptButtonShown,
+            isExtendSignaturesButtonShown: isExtendSignaturesButtonShown,
             onRenameContainerButtonClick: onRenameContainerButtonClick,
             onSaveContainerButtonClick: onSaveContainerButtonClick,
             onSignContainerButtonClick: onSignContainerButtonClick,
-            onEncryptContainerButtonClick: onEncryptContainerButtonClick
+            onEncryptContainerButtonClick: onEncryptContainerButtonClick,
+            onExtendSignaturesClick: onExtendSignaturesClick
         )
     }
 
@@ -169,6 +173,7 @@ struct ContainerNameView: View {
         isSaveButtonShown: true,
         isSignButtonShown: true,
         isEncryptButtonShown: false,
+        isExtendSignaturesButtonShown: true,
         showLeftActionButton: true,
         showRightActionButton: true,
         leftActionButtonName: "Sign",
@@ -180,7 +185,8 @@ struct ContainerNameView: View {
         onSaveContainerButtonClick: {},
         onRenameContainerButtonClick: {},
         onSignContainerButtonClick: {},
-        onEncryptContainerButtonClick: {}
+        onEncryptContainerButtonClick: {},
+        onExtendSignaturesClick: {}
     )
     .environment(Container.shared.languageSettings())
     .environment(Container.shared.themeSettings())

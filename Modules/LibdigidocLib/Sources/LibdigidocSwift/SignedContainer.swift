@@ -291,6 +291,45 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
             containerUtil: containerUtil
         )
     }
+
+    @discardableResult
+    public func extendSignature() async throws -> SignedContainerProtocol {
+        guard let containerFile else {
+            throw DigiDocError.signatureExtensionFailed(
+                ErrorDetail(message: "Cannot extend signature: container file is nil", code: 0)
+            )
+        }
+        let containerWrapper = try await container.extendSignatureToLTA(containerFile: containerFile)
+        return SignedContainer(
+            containerFile: containerFile,
+            isExistingContainer: true,
+            container: containerWrapper,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
+    }
+
+    @discardableResult
+    public func extendSignatures() async throws -> SignedContainerProtocol {
+        guard let containerFile else {
+            SignedContainer.logger().error("Cannot extend signatures: container file is nil")
+            throw DigiDocError.signatureExtensionFailed(
+                ErrorDetail(message: "Cannot extend signatures: container file is nil", code: 0)
+            )
+        }
+        SignedContainer.logger().info("Extending signatures to LTA")
+        let containerWrapper = try await container.extendSignaturesToLTA(containerFile: containerFile)
+        let extendedContainerFile = await containerWrapper.getContainerURL()
+        return SignedContainer(
+            containerFile: extendedContainerFile,
+            isExistingContainer: true,
+            container: containerWrapper,
+            timestamps: timestamps,
+            fileManager: fileManager,
+            containerUtil: containerUtil
+        )
+    }
 }
 
 extension SignedContainer {

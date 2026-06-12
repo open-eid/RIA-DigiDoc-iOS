@@ -287,49 +287,29 @@ extension URL {
         return []
     }
 
-    public func isAsicContainer(
-        fileUtil: FileUtilProtocol = fileUtil(),
-    ) async -> Bool {
-        do {
-            if try isZipFile(),
-               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "mimetype") != nil {
-                return true
-            }
-        } catch {
-            return false
-        }
-
-        return false
+    public func isAsicContainer(fileUtil: FileUtilProtocol = fileUtil()) async -> Bool {
+        await containsZipEntry(named: "mimetype", fileUtil: fileUtil)
     }
 
-    public func isCades(
-        fileUtil: FileUtilProtocol = fileUtil(),
-    ) async -> Bool {
-        do {
-            if try isZipFile(),
-               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "p7s") != nil {
-                return true
-            }
-        } catch {
-            return false
-        }
-
-        return false
+    public func isCades(fileUtil: FileUtilProtocol = fileUtil()) async -> Bool {
+        await containsZipEntry(named: "p7s", fileUtil: fileUtil)
     }
 
-    public func isXades(
-        fileUtil: FileUtilProtocol = fileUtil()
-    ) async -> Bool {
+    public func isXades(fileUtil: FileUtilProtocol = fileUtil()) async -> Bool {
+        await containsZipEntry(named: "signatures.xml", fileUtil: fileUtil)
+    }
+
+    public func containsDdoc(fileUtil: FileUtilProtocol = fileUtil()) async -> Bool {
+        await containsZipEntry(named: ".\(Constants.Extension.Ddoc)", fileUtil: fileUtil)
+    }
+
+    private func containsZipEntry(named name: String, fileUtil: FileUtilProtocol) async -> Bool {
         do {
-            if try isZipFile(),
-               try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: "signatures.xml") != nil {
-                return true
-            }
+            guard try isZipFile() else { return false }
+            return try await fileUtil.getFileFromZipFile(from: self, fileNameToFind: name) != nil
         } catch {
             return false
         }
-
-        return false
     }
 
     // Check if file is zip format

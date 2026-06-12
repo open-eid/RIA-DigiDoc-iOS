@@ -39,6 +39,9 @@ struct DataFilesListView: View {
         LazyVStack {
             if #available(iOS 26.0, *) {
                 ForEach(dataFiles.enumerated(), id: \.offset) { index, dataFile in
+                    if index > 0 {
+                        Divider()
+                    }
                     DataFilesView(
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,
@@ -54,6 +57,9 @@ struct DataFilesListView: View {
                 }
             } else {
                 ForEach(Array(dataFiles.enumerated()), id: \.offset) { index, dataFile in
+                    if index > 0 {
+                        Divider()
+                    }
                     DataFilesView(
                         fileIndex: index + 1,
                         onOpenFileButtonClick: onOpenFileButtonClick,

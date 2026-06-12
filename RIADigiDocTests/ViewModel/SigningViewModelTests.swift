@@ -1484,6 +1484,77 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
+    func extendSignatures_setsSuccessMessageWhenExtensionSucceeds() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.extendSignaturesHandler = { mockSignedContainer }
+        mockSignedContainer.getDataFilesHandler = { [] }
+        mockSignedContainer.getSignaturesHandler = { [] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        await viewModel.extendSignatures()
+
+        #expect(viewModel.successMessage == ToastMessage(key: "Signatures extended", args: []))
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func extendSignatures_setsErrorMessageWhenContainerIsNil() async {
+        await viewModel.extendSignatures()
+
+        #expect(viewModel.errorMessage == ToastMessage(key: "Extending signatures failed", args: []))
+        #expect(viewModel.successMessage == nil)
+    }
+
+    @Test
+    func extendSignatures_succeedsForDdocContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Ddoc }
+        mockSignedContainer.extendSignaturesHandler = { mockSignedContainer }
+        mockSignedContainer.getDataFilesHandler = { [] }
+        mockSignedContainer.getSignaturesHandler = { [] }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        await viewModel.extendSignatures()
+
+        #expect(viewModel.successMessage == ToastMessage(key: "Signatures extended", args: []))
+        #expect(viewModel.errorMessage == nil)
+        #expect(mockSignedContainer.extendSignaturesCallCount == 1)
+    }
+
+    @Test
+    func extendSignatures_setsErrorMessageWhenExtensionThrows() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.extendSignaturesHandler = {
+            throw DigiDocError.signatureExtensionFailed(ErrorDetail(message: "Extension failed"))
+        }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        await viewModel.extendSignatures()
+
+        #expect(viewModel.errorMessage == ToastMessage(key: "Extending signatures failed", args: []))
+        #expect(viewModel.successMessage == nil)
+    }
+
+    @Test
+    func extendSignatures_loadsContainerDataAfterSuccessfulExtension() async {
+        let extendedContainer = SignedContainerProtocolMock()
+        let signature = MockSignatureWrapper.mockSignatureWrapper(signatureId: "S-extended")
+        extendedContainer.getDataFilesHandler = { [] }
+        extendedContainer.getSignaturesHandler = { [signature] }
+
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.extendSignaturesHandler = { extendedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        await viewModel.extendSignatures()
+
+        #expect(viewModel.signatures.first?.signatureId == "S-extended")
+    }
+
+    @Test
     func convertToCryptoContainer_successWithExistingContainer() async throws {
         let mockSignedContainer = SignedContainerProtocolMock()
 

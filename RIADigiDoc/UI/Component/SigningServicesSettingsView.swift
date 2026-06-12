@@ -43,14 +43,18 @@ struct SigningServicesSettingsView: View {
                             selectedTab: $selectedTab,
                             titles: [
                                 languageSettings.localized("Main settings timestamp services title"),
-                                languageSettings.localized("Main settings mobile id and smart id title")
+                                languageSettings.localized("Main settings mobile id and smart id title"),
+                                languageSettings.localized("Main settings lta tab title")
                             ],
                             content: {
                                 if selectedTab == .timestampServices {
                                     TimeStampSettingsView()
                                         .padding(.horizontal, Dimensions.Padding.SPadding)
-                                } else {
+                                } else if selectedTab == .mobileIdAndSmartId {
                                     MobileIDSmartIDSettingsView()
+                                        .padding(.horizontal, Dimensions.Padding.SPadding)
+                                } else {
+                                    LTASettingsView()
                                         .padding(.horizontal, Dimensions.Padding.SPadding)
                                 }
                             }

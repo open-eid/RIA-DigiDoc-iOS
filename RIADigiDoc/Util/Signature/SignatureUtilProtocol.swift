@@ -22,5 +22,5 @@ import LibdigidocLibSwift
 
 /// @mockable
 public protocol SignatureUtilProtocol: Sendable {
-    func getSignatureStatusText(status: SignatureStatus) -> String
+    func getSignatureStatusText(status: SignatureStatus, isTimestamp: Bool) -> String
 }

@@ -123,6 +123,10 @@ public protocol DataStoreProtocol: Sendable {
     func getIsCrashlyticsAlwaysEnabled() async -> Bool
     func setIsCrashlyticsAlwaysEnabled(_ isEnabled: Bool) async
 
+    // MARK: - LTA Settings
+    func getIsDefaultLTAEnabled() async -> Bool
+    func setIsDefaultLTAEnabled(_ isEnabled: Bool) async
+
     // MARK: - Migration
     func getIsRecentDocumentsMigrationDone() async -> Bool
     func setIsRecentDocumentsMigrationDone(_ isDone: Bool) async

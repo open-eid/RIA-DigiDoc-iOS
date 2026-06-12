@@ -142,48 +142,6 @@ final class CertificateUtilTests {
     }
 
     @Test
-    func getNotValidAfterWithExpiredLabel_successWithExpiredCert() {
-        let pemString = """
-            -----BEGIN CERTIFICATE-----
-            MIID0jCCArqgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBgTELMAkGA1UEBhMCRUUx
-            EzARBgNVBAgMClRlc3QgU3RhdGUxEjAQBgNVBAcMCVRlc3QgQ2l0eTEaMBgGA1UE
-            CgwRVGVzdCBPcmdhbml6YXRpb24xEjAQBgNVBAsMCVRlc3QgVW5pdDEZMBcGA1UE
-            AwwQVGVzdCBDZXJ0aWZpY2F0ZTAeFw03MDAxMDEwMDAwMDBaFw03MDAxMDEyMzU5
-            NTlaMIGBMQswCQYDVQQGEwJFRTETMBEGA1UECAwKVGVzdCBTdGF0ZTESMBAGA1UE
-            BwwJVGVzdCBDaXR5MRowGAYDVQQKDBFUZXN0IE9yZ2FuaXphdGlvbjESMBAGA1UE
-            CwwJVGVzdCBVbml0MRkwFwYDVQQDDBBUZXN0IENlcnRpZmljYXRlMIIBIjANBgkq
-            hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp0tlBYafLZ4prdlTC+acvl+Z+p8oGxry
-            oRu3i/FIa8qAS/XHkL7DfmLdHkT3/N8Lclm1mQtVRtcmsMLbiPb6KiywlgZRWh4Z
-            JHS9t4WtcspxTjLjJ5DilmSPD1lepxCTq2VWECFPVSvh0Uo2Jr2WEWR0Az8MB0g6
-            2qfPz+ywNLKGjMMPOJEgEKpEylos/yU42qOja8r3Ocb2Bid7CbA8y3GzSZmIjS+X
-            GzmWqTe+4WaBTqAF3Wa5hhcVjbv9uYebgiF3puxYRGnqXR3wjxdH1Dt8VuP/cvic
-            ynDIEPltZbWIhLMkvIiJirtFQ2MWIJzyTgOg0EO1nFVzHBkn3OsUsQIDAQABo1Mw
-            UTAdBgNVHQ4EFgQUPcWKjZU/rXkRLqpssv/fUwpCkLAwHwYDVR0jBBgwFoAUPcWK
-            jZU/rXkRLqpssv/fUwpCkLAwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsF
-            AAOCAQEAQbAPahc6zJ37VxBN4xDn3xXShCxVF+3qMBw7YYJDU39NSnBfCjpCZUbG
-            QTZAXc3iMB6luO5yoBbUSjX0YT6hqwAyb5s/2Aucv5Y8nLIl/GOAYYCWpZrFVkD0
-            fmMt+rR6H5jFTtILsdsfMzmGkJ8xKWyjLUrGGALAzM1VSv1GPV+EpVjLe+bnTJ+E
-            mvPkvo7970DVF13AqjtE5929PJaMu4t7QHzUItdc74VOVkQ6OcC71nOWhPXlcVi2
-            AzZ3Zprwro1aLDmCQRSjBi1git9957oxuQfCtGvoeaP497hWZ4wJK/HRHLlGx1cu
-            HorK9eEA1jaJ/RRRefXzhjOVHLOuYw==
-            -----END CERTIFICATE-----
-            """
-        guard let pemData = pemString.data(using: .utf8) else {
-            Issue.record("Expected pemData to not be nil")
-            return
-        }
-        guard let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
-            Issue.record("Expected derData to not be nil")
-            return
-        }
-        let expiredLabel = "Expired"
-
-        let notValidAfter = certificateUtil.getNotValidAfterWithExpiredLabel(cert: derData, expiredLabel: expiredLabel)
-
-        #expect(notValidAfter.contains(expiredLabel))
-    }
-
-    @Test
     func getSubjectAttribute_success() {
         let pemString = """
             -----BEGIN CERTIFICATE-----
@@ -299,6 +257,103 @@ final class CertificateUtilTests {
             let result = try certificateUtil.getNotValidDate(certData)
             #expect(result == nil)
         }
+    }
+
+    @Test
+    func getNotValidAfterDate_returnsNonNilDateForValidCert() {
+        let pemString = """
+            -----BEGIN CERTIFICATE-----
+            MIIEDTCCAvWgAwIBAgIUSqorLsfSI1K5t/9YhPnHqf3MBc4wDQYJKoZIhvcNAQEL
+            BQAwgZUxCzAJBgNVBAYTAkVFMQ4wDAYDVQQIDAVIYXJqdTEQMA4GA1UEBwwHVGFs
+            bGlubjEOMAwGA1UECgwFTXlPcmcxDzANBgNVBAsMBk15VW5pdDESMBAGA1UEAwwJ
+            VGVzdCBDZXJ0MR8wHQYJKoZIhvcNAQkBFhB0ZXN0QGV4YW1wbGUuY29tMQ4wDAYD
+            VQQFEwUxMjM0NTAeFw0yNTEwMTYxMDMyMjJaFw0yNjEwMTYxMDMyMjJaMIGVMQsw
+            CQYDVQQGEwJFRTEOMAwGA1UECAwFSGFyanUxEDAOBgNVBAcMB1RhbGxpbm4xDjAM
+            BgNVBAoMBU15T3JnMQ8wDQYDVQQLDAZNeVVuaXQxEjAQBgNVBAMMCVRlc3QgQ2Vy
+            dDEfMB0GCSqGSIb3DQEJARYQdGVzdEBleGFtcGxlLmNvbTEOMAwGA1UEBRMFMTIz
+            NDUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCWT6mHYaf1xuNus76z
+            MpVfk3HjI/ZxmswhbPG2LvAxldY7hXaCH8I0qMKorrnUqq3PmWZqG7Wzt78Lu5x8
+            SGCJ+fGKH4Fo3cXnGqXQpU1xnwARE08N/g3GlogDH3y0MsbUD/B7Vq218BrWqlEU
+            BiYI/aO7yfal4tZjVWugBalMWYehHhEOeh0ss4bDjGvEmmPAvRa36UoVbLGrjG95
+            vcZv2xCC8YlWyj11X4ci7RZHrbpNrZ21xWr59VU7dTxKIDJ64wfgddryXkiyPHJ3
+            R5Syf89qNn0I9SeEuSS13QsF0UEmcT/+rvXf2o8JXNWpPe2AGYVzlWAPHboOKHLI
+            2FILAgMBAAGjUzBRMB0GA1UdDgQWBBRLFCXwhwHQ2dmE3xocNJOtPB0DtzAfBgNV
+            HSMEGDAWgBRLFCXwhwHQ2dmE3xocNJOtPB0DtzAPBgNVHRMBAf8EBTADAQH/MA0G
+            CSqGSIb3DQEBCwUAA4IBAQB53+FGg8nzYBIq8K/C00GUB2R0XYxUvKsfvecMOcHy
+            Sl7TKOVZRDaL7Ji3G5CqouAwLFgnXqlf7aKYn4YfWNNXoS9Zm+eFJmvvWYJ/j/C0
+            Ntz2mfcMcElrXvCGVnCNiHmkAw193jnya+3JxgbgE8rHoxYMHGwNTZUzCe7QGqw/
+            tLdAYRezgyOx5NqaCq1GsOIP3n3eU9k92bMaWM0qtYHroL3H+oIvO0Whdsi2H7Fz
+            W+L77xnqmKNZDyWwyQ8MsShy8VAJt75TOLPrR6clKou1q3H77ELDtwUAHw7hJF7W
+            HERHoea8LiuAkZCFBh6fTEd2Wetgble1vYsK/+t+0Y4J
+            -----END CERTIFICATE-----
+            """
+        guard let pemData = pemString.data(using: .utf8),
+              let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
+        }
+
+        let result = certificateUtil.getNotValidAfterDate(cert: derData)
+
+        #expect(result != nil)
+    }
+
+    @Test
+    func getNotValidAfterDate_returnsExpiredDateForExpiredCert() {
+        let pemString = """
+            -----BEGIN CERTIFICATE-----
+            MIID0jCCArqgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBgTELMAkGA1UEBhMCRUUx
+            EzARBgNVBAgMClRlc3QgU3RhdGUxEjAQBgNVBAcMCVRlc3QgQ2l0eTEaMBgGA1UE
+            CgwRVGVzdCBPcmdhbml6YXRpb24xEjAQBgNVBAsMCVRlc3QgVW5pdDEZMBcGA1UE
+            AwwQVGVzdCBDZXJ0aWZpY2F0ZTAeFw03MDAxMDEwMDAwMDBaFw03MDAxMDEyMzU5
+            NTlaMIGBMQswCQYDVQQGEwJFRTETMBEGA1UECAwKVGVzdCBTdGF0ZTESMBAGA1UE
+            BwwJVGVzdCBDaXR5MRowGAYDVQQKDBFUZXN0IE9yZ2FuaXphdGlvbjESMBAGA1UE
+            CwwJVGVzdCBVbml0MRkwFwYDVQQDDBBUZXN0IENlcnRpZmljYXRlMIIBIjANBgkq
+            hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp0tlBYafLZ4prdlTC+acvl+Z+p8oGxry
+            oRu3i/FIa8qAS/XHkL7DfmLdHkT3/N8Lclm1mQtVRtcmsMLbiPb6KiywlgZRWh4Z
+            JHS9t4WtcspxTjLjJ5DilmSPD1lepxCTq2VWECFPVSvh0Uo2Jr2WEWR0Az8MB0g6
+            2qfPz+ywNLKGjMMPOJEgEKpEylos/yU42qOja8r3Ocb2Bid7CbA8y3GzSZmIjS+X
+            GzmWqTe+4WaBTqAF3Wa5hhcVjbv9uYebgiF3puxYRGnqXR3wjxdH1Dt8VuP/cvic
+            ynDIEPltZbWIhLMkvIiJirtFQ2MWIJzyTgOg0EO1nFVzHBkn3OsUsQIDAQABo1Mw
+            UTAdBgNVHQ4EFgQUPcWKjZU/rXkRLqpssv/fUwpCkLAwHwYDVR0jBBgwFoAUPcWK
+            jZU/rXkRLqpssv/fUwpCkLAwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsF
+            AAOCAQEAQbAPahc6zJ37VxBN4xDn3xXShCxVF+3qMBw7YYJDU39NSnBfCjpCZUbG
+            QTZAXc3iMB6luO5yoBbUSjX0YT6hqwAyb5s/2Aucv5Y8nLIl/GOAYYCWpZrFVkD0
+            fmMt+rR6H5jFTtILsdsfMzmGkJ8xKWyjLUrGGALAzM1VSv1GPV+EpVjLe+bnTJ+E
+            mvPkvo7970DVF13AqjtE5929PJaMu4t7QHzUItdc74VOVkQ6OcC71nOWhPXlcVi2
+            AzZ3Zprwro1aLDmCQRSjBi1git9957oxuQfCtGvoeaP497hWZ4wJK/HRHLlGx1cu
+            HorK9eEA1jaJ/RRRefXzhjOVHLOuYw==
+            -----END CERTIFICATE-----
+            """
+        guard let pemData = pemString.data(using: .utf8),
+              let derData = certificateUtil.pemToDerData(fromPEM: pemData) else {
+            Issue.record("Expected derData to not be nil")
+            return
+        }
+
+        let result = certificateUtil.getNotValidAfterDate(cert: derData)
+
+        guard let date = result else {
+            Issue.record("Expected date to not be nil")
+            return
+        }
+        #expect(date < Date())
+    }
+
+    @Test
+    func getNotValidAfterDate_returnsNilOnInvalidDer() {
+        let invalidDer = Data([0x00, 0x01, 0x02])
+
+        let result = certificateUtil.getNotValidAfterDate(cert: invalidDer)
+
+        #expect(result == nil)
+    }
+
+    @Test
+    func getNotValidAfterDate_returnsNilOnEmptyData() {
+        let result = certificateUtil.getNotValidAfterDate(cert: Data())
+
+        #expect(result == nil)
     }
 
     @Test

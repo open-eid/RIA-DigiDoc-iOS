@@ -27,4 +27,5 @@ public protocol CertificateUtilProtocol: Sendable {
     func getSubjectAttribute(cert: Data, attribute: ASN1ObjectIdentifier) -> String
     func getNotValidAfterWithExpiredLabel(cert: Data, expiredLabel: String) -> String
     func getNotValidDate(_ certData: Data?) throws -> String?
+    func getNotValidAfterDate(cert: Data) -> Date?
 }

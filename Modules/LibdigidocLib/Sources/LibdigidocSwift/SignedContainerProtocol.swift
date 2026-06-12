@@ -52,10 +52,19 @@ public protocol SignedContainerProtocol: GeneralContainer, Sendable {
         userAgent: String
     ) async throws -> Data
     func addSignature(signature: Data, containerFile: URL) async throws -> SignedContainerProtocol
+    @discardableResult func extendSignature() async throws -> SignedContainerProtocol
+    @discardableResult func extendSignatures() async throws -> SignedContainerProtocol
 }
 
 extension SignedContainerProtocol {
     func saveDataFile(dataFile: DataFileWrapper) async throws -> URL {
         try await saveDataFile(dataFile: dataFile, to: nil)
+    }
+
+    public func extendSignature(_ enabled: Bool) async throws -> any SignedContainerProtocol {
+        guard enabled else { return self }
+        let mimetype = await getContainerMimetype()
+        guard mimetype != CommonsLib.Constants.MimeType.Ddoc else { return self }
+        return try await extendSignature()
     }
 }

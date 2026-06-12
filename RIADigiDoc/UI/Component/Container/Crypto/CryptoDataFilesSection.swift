@@ -22,7 +22,6 @@ import FactoryKit
 import LibdigidocLibSwift
 
 struct CryptoDataFilesSection: View {
-    @Environment(\.openURL) private var openURL
     @Environment(LanguageSettings.self) private var languageSettings
 
     @State private var viewModel: EncryptViewModel
@@ -60,14 +59,6 @@ struct CryptoDataFilesSection: View {
         self._navigateToNestedSignedContainerView = navigateToNestedSignedContainerView
     }
 
-    private var sivaMessage: String {
-        languageSettings.localized("Siva message")
-    }
-
-    private var sivaMessageUrl: String {
-        languageSettings.localized("Siva message url")
-    }
-
     var body: some View {
         CryptoDataFilesListView(
             dataFiles: viewModel.dataFiles,
@@ -82,7 +73,9 @@ struct CryptoDataFilesSection: View {
                 showRemoveDataFileModal = true
             }
         )
-        .alert(sivaMessage, isPresented: $showSivaMessage, actions: alertActions)
+        .sivaConfirmationAlert(isPresented: $showSivaMessage) { confirmed in
+            confirmSiva(confirmed)
+        }
         .background(fileSaverBackground)
         .filePreview(item: $viewModel.previewFile)
     }
@@ -120,22 +113,6 @@ struct CryptoDataFilesSection: View {
             },
             isFileSaved: $isFileSaved
         )
-    }
-
-    @ViewBuilder private func alertActions() -> some View {
-        Button(languageSettings.localized("OK")) {
-            confirmSiva(true)
-        }
-        Button(languageSettings.localized("Cancel")) {
-            confirmSiva(false)
-        }
-        Button(languageSettings.localized("Read more here")) {
-            if let url = URL(string: sivaMessageUrl),
-               UIApplication.shared.canOpenURL(url) {
-                openURL(url)
-            }
-            showSivaMessage = false
-        }
     }
 
     private func confirmSiva(_ confirmed: Bool) {

@@ -219,6 +219,7 @@ struct EncryptView: View {
                                     isSaveButtonShown: viewModel.isContainerEncrypted || viewModel.isContainerDecrypted,
                                     isSignButtonShown: viewModel.isSignButtonShown,
                                     isEncryptButtonShown: false,
+                                    isExtendSignaturesButtonShown: false,
                                     showLeftActionButton: false,
                                     showRightActionButton: viewModel.isEncryptButtonShown ||
                                         viewModel.isDecryptButtonShown,
@@ -276,6 +277,9 @@ struct EncryptView: View {
                                         }
                                     },
                                     onEncryptContainerButtonClick: {
+                                        // Do nothing
+                                    },
+                                    onExtendSignaturesClick: {
                                         // Do nothing
                                     }
                                 )

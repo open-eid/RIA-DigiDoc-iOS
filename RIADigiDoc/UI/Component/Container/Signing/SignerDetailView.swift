@@ -49,9 +49,9 @@ struct SignerDetailView: View {
                         Text(verbatim: signatureDataItem.value)
                             .foregroundStyle(theme.onSurface)
                             .font(typography.bodyLarge)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                     if let extraIcon = signatureDataItem.extraIcon {
                         Image(extraIcon)
@@ -69,6 +69,7 @@ struct SignerDetailView: View {
 
             Divider()
         }
+        .padding(.horizontal, Dimensions.Padding.SPadding)
     }
 }
 
