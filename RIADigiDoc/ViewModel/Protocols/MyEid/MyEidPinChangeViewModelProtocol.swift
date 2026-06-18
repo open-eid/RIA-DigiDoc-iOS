@@ -16,6 +16,7 @@ protocol MyEidPinChangeViewModelProtocol: Sendable {
 
     func submit(nfcStringsUtil: NFCSessionStringsUtil) async
     func resetErrors()
+    func clearSensitiveDataOnBackground()
 
     func verifyNewCode()
     func verifyRepeatedCode() -> Bool

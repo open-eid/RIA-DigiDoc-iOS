@@ -88,6 +88,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
             guard verifyRepeatedCode() else {
                 handleConfirmStepError()
                 clearPinCodes()
+                input = ""
                 return
             }
             guard let currentPinCode = currentCode, let newPinCode = newCode else {
@@ -116,6 +117,12 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         isBlocked = false
         resetToCurrentPinEntryStep()
         isSuccess = false
+    }
+
+    func clearSensitiveDataOnBackground() {
+        input = ""
+        clearPinCodes()
+        resetErrors()
     }
 
     func handleConfirmStepError() {
