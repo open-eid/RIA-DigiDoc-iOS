@@ -24,11 +24,6 @@ import nfclib
 
 @MainActor
 public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
-    private var codeType: CodeType?
-    private var currentPin: SecureData?
-    private var newPin: SecureData?
-    private var continuation: CheckedContinuation<Void, Error>?
-
     public func startChanging(
         canNumber: String,
         codeType: CodeType,
@@ -36,116 +31,14 @@ public class OperationChangePin: NFCOperationBase, OperationChangePinProtocol {
         newPin: SecureData,
         strings: NFCSessionStrings,
     ) async throws {
-        self.canNumber = canNumber
-        self.codeType = codeType
-        self.currentPin = currentPin
-        self.newPin = newPin
-        self.strings = strings
-
-        return try await withCheckedThrowingContinuation { continuation in
-            self.continuation = continuation
-
-            guard NFCTagReaderSession.readingAvailable else {
-                continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
-                return
-            }
-
-            session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
-            updateAlertMessage(step: 0)
-            session?.begin()
-        }
-    }
-
-    // MARK: - NFCTagReaderSessionDelegate
-
-    public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-        Task { @MainActor in
-            defer {
-                self.session = nil
-            }
-
-            guard let codeType = self.codeType,
-                  let currentPin = self.currentPin,
-                  let newPin = self.newPin else {
-                let error = ChangePinError.missingRequiredParameter
-                operationError = error
-                OperationChangePin.logger().error("NFC: \(error.localizedDescription)")
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Missing required parameters")
-                return
-            }
-
-            do {
-                updateAlertMessage(step: 1)
-                OperationChangePin.logger().info("NFC: Setting up NFC connection for PIN change...")
-                let tag = try await self.connection.setup(session, tags: tags)
-
-                updateAlertMessage(step: 2)
-                let cardCommands = try await self.connection.getCardCommands(session, tag: tag, CAN: self.canNumber)
-
-                updateAlertMessage(step: 3)
-                OperationChangePin.logger().info("NFC: Changing \(codeType.name)...")
-                try await cardCommands.changeCode(codeType, to: newPin, verifyCode: currentPin)
-                OperationChangePin.logger().info("NFC: \(codeType.name) changed successfully")
-
-                success()
-            } catch {
-                if (error as NSError).localizedDescription == "Failed to find lock for cert" {
-                    handleNoCertLockError(error: error, session: session)
-                    return
-                }
-
-                if let idCardInternalError = error as? IdCardInternalError {
-                    handleIdCardInternalError(idCardInternalError, session: session)
-                    return
-                }
-
-                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
-                    handleIdCardInternalError(nfcIdCardError, session: session)
-                    return
-                }
-
-                if let changePinError = error as? ChangePinError {
-                    operationError = changePinError
-                    OperationChangePin.logger()
-                        .error("NFC: changePinError: \(changePinError.localizedDescription)")
-                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    return
-                }
-
-                handleUnknownError(error, session: session)
-            }
-        }
-    }
-
-    public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
-        Self.logger().info("NFC: Reader session finished with error: \(error)")
-        self.session = nil
-
-        guard let continuationToResume = self.continuation else { return }
-        self.continuation = nil
-
-        if didCompleteSuccessfully {
-            continuationToResume.resume(with: .success(()))
-            return
+        defer {
+            currentPin.secureZero()
+            newPin.secureZero()
         }
 
-        if let storedError = self.operationError {
-            continuationToResume.resume(throwing: storedError)
-            return
+        try await withCardCommands(canNumber: canNumber, strings: strings) { cardCommands in
+            updateAlertMessage(step: 3)
+            try await cardCommands.changeCode(codeType, to: newPin, verifyCode: currentPin)
         }
-
-        if let nfcError = error as? NFCReaderError {
-            switch nfcError.code {
-            case .readerSessionInvalidationErrorUserCanceled:
-                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
-                return
-
-            default:
-                break
-            }
-        }
-
-        continuationToResume.resume(throwing: error)
     }
 }

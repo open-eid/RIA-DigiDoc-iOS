@@ -28,6 +28,7 @@ struct NFCView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
@@ -396,6 +397,16 @@ struct NFCView: View {
             cancelAuth()
             cancelCertificate()
             cancelSigningWebEid()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                cancelMyEid()
+                cancelDecrypt()
+                cancelSigning()
+                cancelAuth()
+                cancelCertificate()
+                cancelSigningWebEid()
+            }
         }
     }
 
