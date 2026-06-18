@@ -28,6 +28,7 @@ struct NFCView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
@@ -266,7 +267,22 @@ struct NFCView: View {
         }
         .onDisappear {
             cancelSigning()
+            cancelDecrypt()
+            cancelMyeid()
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                cancelSigning()
+                cancelDecrypt()
+                cancelMyeid()
+            }
+        }
+    }
+
+    private func resetPinState() {
+        pinNumber.removeAll()
+        isActionEnabled = viewModel
+            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
     }
 
     func saveInputData() {
@@ -317,17 +333,13 @@ struct NFCView: View {
     }
 
     private func cancelDecrypt() {
-        pinNumber.isEmpty ? () : (pinNumber.removeAll())
-        isActionEnabled = viewModel
-            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
+        resetPinState()
         taskDecrypt?.cancel()
         taskDecrypt = nil
     }
 
     private func cancelSigning() {
-        pinNumber.isEmpty ? () : (pinNumber.removeAll())
-        isActionEnabled = viewModel
-            .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
+        resetPinState()
         taskSign?.cancel()
         taskSign = nil
     }

@@ -29,15 +29,6 @@ import UtilsLib
 
 @MainActor
 public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSignProtocol {
-    private var pin2Number: SecureData = SecureData([0x00])
-    private var signedContainer: SignedContainerProtocol?
-    private var containerPath: URL?
-    private var roleData: RoleData?
-    private var userAgent: String = ""
-    private var returnData: SignedContainerProtocol?
-
-    private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
-
     // swiftlint:disable:next function_parameter_count
     public func startOperation(
         canNumber: String,
@@ -48,170 +39,41 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         userAgent: String,
         strings: NFCSessionStrings
     ) async throws -> SignedContainerProtocol {
-
-        self.canNumber = canNumber
-        self.pin2Number = pin2Number
-        self.signedContainer = signedContainer
-        self.containerPath = containerPath
-        self.roleData = roleData
-        self.userAgent = userAgent
-        self.strings = strings
-
-        return try await withCheckedThrowingContinuation { continuation in
-            self.continuation = continuation
-
-            guard NFCTagReaderSession.readingAvailable else {
-                continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
-                return
-            }
-
-            session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self)
-            updateAlertMessage(step: 0)
-            session?.begin()
-        }
-    }
-
-    // MARK: - NFCTagReaderSessionDelegate
-
-    // swiftlint:disable:next cyclomatic_complexity
-    public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-        Task { @MainActor in
-            defer {
-                self.session = nil
-            }
-
-            guard let signedContainer else {
-                let error = ReadCertAndSignError.signedContainerNil
-                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                operationError = error
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to read container data")
-                return
-            }
-            guard let roleData else {
-                let error = ReadCertAndSignError.roleDataNil
-                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                operationError = error
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to read role data")
-                return
-            }
-            guard let containerPath else {
-                let error = ReadCertAndSignError.containerPathNil
-                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                operationError = error
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to read container path")
-                return
-            }
-            if userAgent.isEmpty {
-                let error = ReadCertAndSignError.userAgentEmpty
-                OperationReadCertAndSign.logger().error("NFC: \(error.localizedDescription)")
-                operationError = error
-                session.invalidate(errorMessage: strings?.technicalErrorMessage ??
-                                   "Failed to initialize user agent")
-                return
-            }
-
-            OperationReadCertAndSign.logger().info("NFC: Checks complete starting signing")
-
-            do {
-                updateAlertMessage(step: 1)
-                let tag = try await connection.setup(session, tags: tags)
-
-                updateAlertMessage(step: 2)
-                let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
-
-                updateAlertMessage(step: 3)
-
-                let (retryCount, pinActive) = try await cardCommands.readCodeTryCounterRecord(.pin2)
-
-                if retryCount == 0 {
-                    throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
-                }
-                if !pinActive {
-                    throw IdCardInternalError.pinLocked
-                }
-
-                let cert = try await cardCommands.readSignatureCertificate()
-                let hashToSign = try await signedContainer.prepareSignature(
-                    cert: cert,
-                    containerPath: containerPath,
-                    roleData: roleData,
-                    userAgent: userAgent
-                )
-
-                let signatureValue = try await cardCommands.calculateSignature(for: hashToSign, withPin2: pin2Number)
-
-                updateAlertMessage(step: 4)
-                returnData = try await signedContainer.addSignature(
-                    signature: signatureValue,
-                    containerFile: containerPath
-                )
-
-                success()
-            } catch {
-                if (error as NSError).localizedDescription == "Failed to find lock for cert" {
-                    handleNoCertLockError(error: error, session: session)
-                    return
-                }
-
-                if let idCardInternalError = error as? IdCardInternalError {
-                    handleIdCardInternalError(idCardInternalError, session: session)
-                    return
-                }
-
-                if let nfcIdCardError = error as? nfclib.IdCardInternalError {
-                    handleIdCardInternalError(nfcIdCardError, session: session)
-                    return
-                }
-
-                if let readCertSignError = error as? ReadCertAndSignError {
-                    OperationReadCertAndSign.logger()
-                        .error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
-                    operationError = readCertSignError
-                    session.invalidate(errorMessage: strings?.technicalErrorMessage ?? "")
-                    return
-                }
-
-                if let digiDocError = error as? DigiDocError {
-                    handleDigiDocError(digiDocError, session: session)
-                    return
-                }
-
-                handleUnknownError(error, session: session)
-            }
-        }
-    }
-
-    public override func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
-        Self.logger().info("NFC: Reader session finished with error: \(error)")
-        self.session = nil
-
-        guard let continuationToResume = self.continuation else { return }
-        self.continuation = nil
-
-        if let returnData, didCompleteSuccessfully {
-            continuationToResume.resume(with: .success(returnData))
-            return
+        defer {
+            pin2Number.secureZero()
         }
 
-        if let storedError = self.operationError {
-            continuationToResume.resume(throwing: storedError)
-            return
+        guard !userAgent.isEmpty else {
+            OperationReadCertAndSign.logger().error("NFC: \(ReadCertAndSignError.userAgentEmpty.localizedDescription)")
+            throw ReadCertAndSignError.userAgentEmpty
         }
 
-        if let nfcError = error as? NFCReaderError {
-            switch nfcError.code {
-            case .readerSessionInvalidationErrorUserCanceled:
-                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
-                return
-
-            default:
-                break
+        return try await withCardCommands(canNumber: canNumber, strings: strings) { cardCommands in
+            updateAlertMessage(step: 3)
+            let (retryCount, pinActive) = try await cardCommands.readCodeTryCounterRecord(.pin2)
+            if retryCount == 0 {
+                throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
             }
-        }
+            if !pinActive {
+                throw IdCardInternalError.pinLocked
+            }
 
-        continuationToResume.resume(throwing: error)
+            let cert = try await cardCommands.readSignatureCertificate()
+            let hashToSign = try await signedContainer.prepareSignature(
+                cert: cert,
+                containerPath: containerPath,
+                roleData: roleData,
+                userAgent: userAgent
+            )
+
+            let signatureValue = try await cardCommands.calculateSignature(for: hashToSign, withPin2: pin2Number)
+            pin2Number.secureZero()
+
+            updateAlertMessage(step: 4)
+            return try await signedContainer.addSignature(
+                signature: signatureValue,
+                containerFile: containerPath
+            )
+        }
     }
 }
