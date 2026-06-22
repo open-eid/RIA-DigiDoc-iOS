@@ -17,24 +17,27 @@
  *
  */
 
-public struct NFCSessionStrings: Sendable {
-    let initialMessage: String
-    let step1Message: String
-    let step2Message: String
-    let step3Message: String
-    let step4Message: String
-    let successMessage: String
-    let canErrorMessage: String
-    let pinWrongMultipleErrorMessage: String
-    let pinWrongErrorMessage: String
-    let pinBlockedErrorMessage: String
-    let wrongCardErrorMessage: String
-    let courierCardErrorMessage: String
-    let technicalErrorMessage: String
-    let sessionErrorMessage: String
-    let ocspTimeslotErrorMessage: String
-    let certificateRevokedErrorMessage: String
-    let tooManyRequestsErrorMessage: String
-    let networkErrorMessage: String
-    let sslErrorMessage: String
+import Testing
+
+struct NFCSessionStringsUtilTests {
+
+    @Test
+    func makeForSigning_setsCourierMessageToActivateToSign() {
+        let strings = makeStringsUtil().makeForSigning(pinName: "PIN2")
+
+        #expect(strings.courierCardErrorMessage == "ID card courier must activate to sign")
+    }
+
+    @Test
+    func makeForDecrypt_setsCourierMessageToActivateToDecrypt() {
+        let strings = makeStringsUtil().makeForDecrypt(pinName: "PIN1")
+
+        #expect(strings.courierCardErrorMessage == "ID card courier must activate to decrypt")
+    }
+
+    private func makeStringsUtil() -> NFCSessionStringsUtil {
+        NFCSessionStringsUtil { key, _ in
+            return key
+        }
+    }
 }

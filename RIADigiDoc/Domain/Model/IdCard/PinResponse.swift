@@ -27,3 +27,9 @@ public struct PinResponse: Sendable, Hashable {
     let pukRetryCount: UInt8
     let pukActive: Bool
 }
+
+extension PinResponse {
+    var isCourierCard: Bool {
+        !pin1Active
+    }
+}

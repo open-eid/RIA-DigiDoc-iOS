@@ -35,7 +35,8 @@ public struct NFCSessionStringsUtil {
         customLocalizations(
             pinName: pinName,
             step4Message: localize("Decrypting in progress", []),
-            successMessage: localize("Container successfully decrypted", [])
+            successMessage: localize("Container successfully decrypted", []),
+            courierCardErrorMessage: localize("ID card courier must activate to decrypt", [])
         )
     }
 
@@ -43,7 +44,8 @@ public struct NFCSessionStringsUtil {
         customLocalizations(
             pinName: pinName,
             step4Message: localize("Signing in progress", []),
-            successMessage: localize("Signature added", [])
+            successMessage: localize("Signature added", []),
+            courierCardErrorMessage: localize("ID card courier must activate to sign", [])
         )
     }
 
@@ -77,6 +79,7 @@ public struct NFCSessionStringsUtil {
         pinWrongErrorMessage: String? = nil,
         pinBlockedErrorMessage: String? = nil,
         wrongCardErrorMessage: String? = nil,
+        courierCardErrorMessage: String? = nil,
         technicalErrorMessage: String? = nil,
         sessionErrorMessage: String? = nil,
         ocspTimeslotErrorMessage: String? = nil,
@@ -105,6 +108,7 @@ public struct NFCSessionStringsUtil {
                 [pinAction == .unblock ? CodeType.puk.name : pinName]
             ),
             wrongCardErrorMessage: wrongCardErrorMessage ?? localize("Failed to find lock for cert", []),
+            courierCardErrorMessage: courierCardErrorMessage ?? localize("ID card courier must activate to sign", []),
             technicalErrorMessage: technicalErrorMessage ?? localize("NFC technical error", []),
             sessionErrorMessage: sessionErrorMessage ?? localize("NFC session error", []),
             ocspTimeslotErrorMessage: ocspTimeslotErrorMessage ?? localize("OCSP response not in valid time slot", []),

@@ -511,6 +511,54 @@ final class NFCViewModelTests {
         }
     }
 
+    @Test
+    func sign_showsCourierAlertWhenCardNotActivated() async {
+        let mockContainer = SignedContainerProtocolMock()
+
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/test/container.asice")
+        }
+        mockDataStore.getSelectedLanguageHandler = { "et" }
+        mockUserAgentUtil.appInfoHandler = { _, _ in "TestUserAgent" }
+
+        mockOperationReadCertAndSign.startOperationHandler =
+        { _, _, _, _, _, _, _ in
+            throw IdCardInternalError.notActivated
+        }
+
+        let result = await viewModel.sign(
+            canNumber: "123456",
+            pin2: "12345",
+            roleData: RoleData(roles: [], city: "", state: "", country: "", zipCode: ""),
+            signedContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.showNfcAlertMessage)
+        #expect(viewModel.nfcAlertMessageKey == "ID card courier must activate to sign")
+        #expect(viewModel.nfcAlertMessageUrl == "ID card courier activate URL")
+    }
+
+    @Test
+    func decrypt_showsCourierAlertWhenCardNotActivated() async {
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            throw IdCardInternalError.notActivated
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: nil,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.showNfcAlertMessage)
+        #expect(viewModel.nfcAlertMessageKey == "ID card courier must activate to decrypt")
+        #expect(viewModel.nfcAlertMessageUrl == "ID card courier activate URL")
+    }
+
     // MARK: - readCardData tests
 
     @Test

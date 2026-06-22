@@ -8885,6 +8885,96 @@
           }
         }
       }
+    },
+    "ID card courier activate URL" : {
+      "comment" : "Courier (unactivated) ID-card activation URL",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.politsei.ee/en/self-service-portal/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.politsei.ee/et/iseteenindus/"
+          }
+        }
+      }
+    },
+    "ID card courier activate button" : {
+      "comment" : "Courier (unactivated) ID-card activation link text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiveeri ID-kaart"
+          }
+        }
+      }
+    },
+    "ID card courier must activate to decrypt" : {
+      "comment" : "Courier (unactivated) ID-card message shown during decryption",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The ID-card must be activated in order to decrypt."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimiseks tuleb ID-kaart aktiveerida."
+          }
+        }
+      }
+    },
+    "ID card courier must activate to sign" : {
+      "comment" : "Courier (unactivated) ID-card message shown during signing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The ID-card must be activated in order to sign."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamiseks tuleb ID-kaart aktiveerida."
+          }
+        }
+      }
+    },
+    "ID card courier warning message" : {
+      "comment" : "Courier (unactivated) ID-card warning shown in My eID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication and signing with the ID-card isn't possible yet. ID-card must be activated in the Police and Border Guard Board's self-service portal in order to use it."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaardiga isikutuvastamine ja allkirjastamine ei ole veel võimalik. ID-kaardi kasutamiseks tuleb see aktiveerida Politsei- ja Piirivalveameti iseteeninduses."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

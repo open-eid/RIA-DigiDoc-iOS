@@ -107,8 +107,11 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
                 let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
                 updateAlertMessage(step: 3)
 
-                let (retryCount, _) = try await cardCommands.readCodeTryCounterRecord(.pin1)
+                let (retryCount, pin1Active) = try await cardCommands.readCodeTryCounterRecord(.pin1)
 
+                if !pin1Active {
+                    throw IdCardInternalError.notActivated
+                }
                 if retryCount == 0 {
                     throw IdCardInternalError.remainingPinRetryCount(Int(retryCount))
                 }

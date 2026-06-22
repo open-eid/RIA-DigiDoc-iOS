@@ -124,6 +124,11 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
 
                 updateAlertMessage(step: 3)
 
+                let (_, pin1Active) = try await cardCommands.readCodeTryCounterRecord(.pin1)
+                if !pin1Active {
+                    throw IdCardInternalError.notActivated
+                }
+
                 let (retryCount, pinActive) = try await cardCommands.readCodeTryCounterRecord(.pin2)
 
                 if retryCount == 0 {

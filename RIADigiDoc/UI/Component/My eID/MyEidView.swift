@@ -48,6 +48,10 @@ struct MyEidView: View {
     private let idCardData: IdCardData
     private let actionMethod: ActionMethod
 
+    private var isCourierCard: Bool {
+        idCardData.pinResponse.isCourierCard
+    }
+
     private var myDataTitle: String {
         languageSettings.localized("My data")
     }
@@ -136,7 +140,8 @@ struct MyEidView: View {
                                         pinChangeVariant: $pinChangeVariant,
                                         authCertValidTo: idCardData.authCertNotValidDate ?? "",
                                         signCertValidTo: idCardData.signCertNotValidDate ?? "",
-                                        isPUKChangeable: idCardData.isPUKChangeable
+                                        isPUKChangeable: idCardData.isPUKChangeable,
+                                        isCourierCard: isCourierCard
                                     )
                                     .padding(.top, Dimensions.Padding.SPadding)
                                 }
