@@ -49,6 +49,7 @@ public enum IdCardInternalError: Error {
     case failedToRemovePadding
     case notSupportedAlgorithm
     case pinLocked
+    case notActivated
 
     public func getIdCardError() -> IdCardError {
         switch self {
@@ -60,6 +61,8 @@ public enum IdCardInternalError: Error {
             return .wrongPIN(triesLeft: 0)
         case .pinLocked:
             return .pinLocked
+        case .notActivated:
+            return .notActivated
         case .cancelledByUser:
             return .cancelledByUser
         case .invalidNewPin:

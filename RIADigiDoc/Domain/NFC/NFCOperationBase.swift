@@ -74,6 +74,8 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
             }
         case .sessionError:
             nfcError = strings?.sessionErrorMessage ?? ""
+        case .notActivated:
+            nfcError = strings?.courierCardErrorMessage ?? ""
         default:
             nfcError = strings?.technicalErrorMessage ?? ""
         }

@@ -275,6 +275,12 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
             showNfcAlertMessage = true
             nfcAlertMessageKey = "PIN2 locked"
             nfcAlertMessageUrl = "PIN2 locked URL"
+        case .notActivated:
+            showNfcAlertMessage = true
+            nfcAlertMessageKey = pinType == .pin2
+                ? "ID card courier must activate to sign"
+                : "ID card courier must activate to decrypt"
+            nfcAlertMessageUrl = "ID card courier activate URL"
         case .wrongCAN:
             nfcErrorKey = "Wrong CAN"
             nfcErrorExtraArguments = []
