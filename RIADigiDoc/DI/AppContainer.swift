@@ -22,9 +22,15 @@ import ConfigLib
 import FactoryKit
 import Foundation
 import UtilsLib
+import LibdigidocLibSwift
 import nfclib
 
 extension Container {
+    var userAgentUtil: Factory<UserAgentUtilProtocol> {
+        self { UserAgentUtil(libdigidocppVersion: ContainerWrapper.libdigidocppVersion()) }
+            .singleton
+    }
+
     @MainActor
     var librarySetup: Factory<LibrarySetup> {
         self { @MainActor in
@@ -238,7 +244,6 @@ extension Container {
     var diagnosticsViewModel: Factory<DiagnosticsViewModel> {
         self { @MainActor in
             DiagnosticsViewModel(
-                containerWrapper: self.containerWrapper(),
                 fileManager: self.fileManager(),
                 configurationLoader: self.configurationLoader(),
                 configurationRepository: self.configurationRepository(),

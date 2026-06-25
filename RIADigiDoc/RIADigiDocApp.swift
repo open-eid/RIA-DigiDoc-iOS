@@ -19,7 +19,6 @@
 
 import SwiftUI
 import FactoryKit
-import LibdigidocLibSwift
 import UtilsLib
 import ConfigLib
 import CommonsLib

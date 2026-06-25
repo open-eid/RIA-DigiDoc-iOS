@@ -401,7 +401,7 @@ final class NFCViewModelTests {
             "et"
         }
 
-        mockUserAgentUtil.userAgentHandler = { _, language in
+        mockUserAgentUtil.appInfoHandler = { _, language in
             #expect(language == "et")
             return "TestUserAgent"
         }
@@ -416,7 +416,7 @@ final class NFCViewModelTests {
 
         #expect(mockContainer.getRawContainerFileCallCount == 1)
         #expect(mockDataStore.getSelectedLanguageCallCount == 1)
-        #expect(mockUserAgentUtil.userAgentCallCount == 1)
+        #expect(mockUserAgentUtil.appInfoCallCount == 1)
         #expect(mockOperationReadCertAndSign.startOperationCallCount == 1)
         #expect(viewModel.nfcErrorKey == nil)
     }
@@ -441,7 +441,7 @@ final class NFCViewModelTests {
             "et"
         }
 
-        mockUserAgentUtil.userAgentHandler = { _, language in
+        mockUserAgentUtil.appInfoHandler = { _, language in
             #expect(language == "et")
             return "TestUserAgent"
         }
@@ -462,7 +462,7 @@ final class NFCViewModelTests {
 
             #expect(mockContainer.getRawContainerFileCallCount == 1)
             #expect(mockDataStore.getSelectedLanguageCallCount == 1)
-            #expect(mockUserAgentUtil.userAgentCallCount == 1)
+            #expect(mockUserAgentUtil.appInfoCallCount == 1)
             #expect(viewModel.nfcErrorKey != nil)
         }
     }
@@ -488,7 +488,7 @@ final class NFCViewModelTests {
             "en"
         }
 
-        mockUserAgentUtil.userAgentHandler = { _, _ in
+        mockUserAgentUtil.appInfoHandler = { _, _ in
             "TestUserAgent"
         }
 

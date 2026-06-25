@@ -155,6 +155,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
         SmartIdViewModel.logger().info("Smart-ID: Getting User-Agent")
         let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
+        let appInfo = userAgentUtil.appInfo(diagnostics: .none, language: appLanguage)
 
         let containerFile: URL
         do {
@@ -212,7 +213,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
                 containerFile: containerFile,
                 roleData: roleData,
                 signedContainer: signedContainer,
-                userAgent: userAgent
+                userAgent: appInfo
             )
         } catch {
             SmartIdViewModel.logger().info("Smart-ID: Unable to prepare signature for signing")

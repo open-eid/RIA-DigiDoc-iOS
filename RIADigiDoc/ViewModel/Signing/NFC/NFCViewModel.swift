@@ -399,7 +399,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         let appLanguage = await dataStore.getSelectedLanguage()
 
         NFCViewModel.logger().info("NFC: Getting User-Agent")
-        let userAgent = userAgentUtil.userAgent(diagnostics: .nfc, language: appLanguage)
+        let appInfo = userAgentUtil.appInfo(diagnostics: .nfc, language: appLanguage)
 
         do {
             NFCViewModel.logger().info("NFC: Starting signing operation")
@@ -409,7 +409,7 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 signedContainer: signedContainer,
                 containerPath: containerFile,
                 roleData: roleData,
-                userAgent: userAgent,
+                userAgent: appInfo,
                 strings: strings
             )
             NFCViewModel.logger().info("NFC: Signature added successfully")

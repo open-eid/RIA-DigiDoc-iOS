@@ -447,6 +447,11 @@ struct ContainerWrapperTests {
         }
     }
 
+    @Test
+    func libdigidocppVersion_isNonEmpty() {
+        #expect(!ContainerWrapper.libdigidocppVersion().isEmpty)
+    }
+
     @discardableResult
     private func createSampleContainer(dataFileURLs: [URL?]) async throws -> SignedContainerProtocol {
         let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }

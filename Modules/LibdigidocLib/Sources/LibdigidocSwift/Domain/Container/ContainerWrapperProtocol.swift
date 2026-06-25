@@ -22,7 +22,6 @@ import CommonsLib
 
 /// @mockable
 public protocol ContainerWrapperProtocol: Sendable {
-    func getVersion() async -> String
     func getSignatures() async -> [SignatureWrapper]
     func getDataFiles() async -> [DataFileWrapper]
     func getMimetype() async -> String
