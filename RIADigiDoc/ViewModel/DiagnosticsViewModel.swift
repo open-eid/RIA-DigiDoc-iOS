@@ -46,7 +46,6 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
 
     // MARK: - dependencies
-    private let containerWrapper: ContainerWrapperProtocol
     private let fileManager: FileManagerProtocol
     private let configurationLoader: ConfigurationLoaderProtocol
     private let configurationRepository: ConfigurationRepositoryProtocol
@@ -60,7 +59,6 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     private var configurationObservationTask: Task<Void, Never>?
 
     init(
-        containerWrapper: ContainerWrapperProtocol,
         fileManager: FileManagerProtocol,
         configurationLoader: ConfigurationLoaderProtocol,
         configurationRepository: ConfigurationRepositoryProtocol,
@@ -71,7 +69,6 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         fileUtil: FileUtilProtocol,
         cryptoSetup: CryptoSetupProtocol
     ) {
-        self.containerWrapper = containerWrapper
         self.fileManager = fileManager
         self.configurationLoader = configurationLoader
         self.configurationRepository = configurationRepository
@@ -86,8 +83,9 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
             await observeConfigurationUpdates()
         }
 
+        loadLibdigidocVersion()
+
         Task {
-            await loadLibdigidocVersion()
             await loadLoggingVariables()
         }
     }
@@ -134,10 +132,10 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         self.osSectionContent = (key: "Main diagnostics operating system ios", content: SystemUtil.getOSVersion())
     }
 
-    private func loadLibdigidocVersion() async {
-        let libdigidocVersion = await containerWrapper.getVersion()
+    private func loadLibdigidocVersion() {
+        let version = ContainerWrapper.libdigidocppVersion()
 
-        self.libdigidocVersion = "libdigidocpp \(libdigidocVersion)"
+        self.libdigidocVersion = "libdigidocpp \(version)"
     }
 
     private func loadUrlSectionContent(configuration: ConfigurationProvider?) async {

@@ -23,56 +23,89 @@ import ExternalAccessory
 
 public struct UserAgentUtil: UserAgentUtilProtocol {
 
+    private static let schemaVersion = 1
+
+    private let libdigidocppVersion: String
+
+    public init(libdigidocppVersion: String = "") {
+        self.libdigidocppVersion = libdigidocppVersion
+    }
+
     public func userAgent(
         diagnostics: UserAgentDiagnostics = .none,
         language: String
     ) -> String {
-        var components: [String] = [
-            appIdentifier(),
-            osInfo(),
-            languageInfo(language: language)
-        ]
+        let info = appInfo(diagnostics: diagnostics, language: language)
 
-        switch diagnostics {
-        case .none:
-            break
+        guard !libdigidocppVersion.isEmpty else { return "APP \(info)" }
+        return "LIB libdigidocpp/\(libdigidocppVersion) (\(architecture())) APP \(info)"
+    }
 
-        case .devices:
-            if let devicesInfo = devicesInfo() {
-                components.append(devicesInfo)
-            }
+    public func appInfo(
+        diagnostics: UserAgentDiagnostics = .none,
+        language: String
+    ) -> String {
+        let metadata = metadataFields(diagnostics: diagnostics, language: language)
+            .joined(separator: "; ")
+        return "\(appIdentifier()) (\(metadata))"
+    }
 
-        case .nfc:
-            components.append("NFC: true")
+    private func metadataFields(
+        diagnostics: UserAgentDiagnostics,
+        language: String
+    ) -> [String] {
+        let model = SystemUtil.getDeviceModelIdentifier()
+        let category = DeviceCategory(modelIdentifier: model)
+
+        let diagnosticsField: String? = switch diagnostics {
+        case .none: nil
+        case .devices: devicesInfo().map { "devices=\($0)" }
+        case .nfc: "nfc=true"
         }
 
-        return components.joined(separator: " ")
+        return [
+            "schema=\(Self.schemaVersion)",
+            "os=\(category.osName) \(SystemUtil.getOSVersion())",
+            "lang=\(sanitizeField(language))",
+            "devicetype=\(category.rawValue)/\(sanitizeField(model))",
+            diagnosticsField
+        ].compactMap { $0 }
     }
 
     private func appIdentifier() -> String {
-        "riadigidoc/\(appVersion())"
+        "riadigidoc/\(BundleUtil.getAppVersion())"
     }
 
-    private func osInfo() -> String {
-        "(iOS \(SystemUtil.getOSVersion()))"
-    }
-
-    private func languageInfo(language: String) -> String {
-        return "Lang: \(language)"
-    }
-
-    private func appVersion() -> String {
-        return BundleUtil.getAppVersion()
+    private func architecture() -> String {
+        #if arch(arm64)
+        return "arm64"
+        #elseif arch(x86_64)
+        return "x86_64"
+        #elseif arch(arm)
+        return "arm"
+        #elseif arch(i386)
+        return "i386"
+        #else
+        return "unknown"
+        #endif
     }
 
     private func devicesInfo() -> String? {
         let devices = EAAccessoryManager.shared()
             .connectedAccessories
             .map {
-                "\($0.manufacturer) \($0.name) (\($0.modelNumber))"
+                sanitizeField("\($0.manufacturer) \($0.name) \($0.modelNumber)")
             }
+            .filter { !$0.isEmpty }
 
         guard !devices.isEmpty else { return nil }
-        return "Devices: \(devices.joined(separator: ", "))"
+        return devices.joined(separator: ", ")
+    }
+
+    // Remove delimiters and line breaks so a field can't break the header structure.
+    private func sanitizeField(_ value: String) -> String {
+        let forbidden = CharacterSet(charactersIn: ";()\u{2028}\u{2029}").union(.controlCharacters)
+        let cleaned = String.UnicodeScalarView(value.unicodeScalars.filter { !forbidden.contains($0) })
+        return String(cleaned).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

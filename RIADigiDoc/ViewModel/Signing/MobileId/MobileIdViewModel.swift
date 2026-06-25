@@ -141,6 +141,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
         MobileIdViewModel.logger().info("Mobile-ID: Getting User-Agent")
         let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
+        let appInfo = userAgentUtil.appInfo(diagnostics: .none, language: appLanguage)
 
         let containerFile: URL
         do {
@@ -175,7 +176,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
                 containerFile: containerFile,
                 roleData: roleData,
                 signedContainer: signedContainer,
-                userAgent: userAgent
+                userAgent: appInfo
             )
         } catch {
             MobileIdViewModel.logger().info("Mobile-ID: Unable to prepare signature for signing")

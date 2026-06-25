@@ -48,8 +48,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         self.fileManager = fileManager
     }
 
-    @MainActor
-    public func getVersion() async -> String {
+    public static func libdigidocppVersion() -> String {
         return DigiDocContainerWrapper.libdigidocppVersion()
     }
 

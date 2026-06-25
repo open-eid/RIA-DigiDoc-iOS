@@ -28,6 +28,7 @@
 		DF4E43CB2D0BA38600967997 /* FileImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DF4E43C12D0BA38600967997 /* FileImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DF4E6D822D11DE7B00F6111A /* CommonsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D812D11DE7B00F6111A /* CommonsLib */; };
 		DF4E6D842D120CFC00F6111A /* UtilsLib in Frameworks */ = {isa = PBXBuildFile; productRef = DF4E6D832D120CFC00F6111A /* UtilsLib */; };
+		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 		DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */; };
 		DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = DF5903772ECCC42500D1A278 /* SmartIdLibMocks */; };
 		DF5C54272E82F07A006E2251 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DFA3EE5C2D14C9B7001D951B /* Alamofire */; };
@@ -53,7 +54,6 @@
 		DFB663A22F16917E00804545 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFB663A12F16917E00804545 /* SwiftUI.framework */; };
 		DFB663AF2F16918100804545 /* WidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */ = {isa = PBXBuildFile; productRef = DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */; };
-		DF54F82F2D431BD50021D05A /* X509 in Frameworks */ = {isa = PBXBuildFile; productRef = DF54F82E2D431BD50021D05A /* X509 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1704,6 +1704,14 @@
 				version = 12.12.1;
 			};
 		};
+		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-certificates.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.19.0;
+			};
+		};
 		DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hmlongco/Factory";
@@ -1726,14 +1734,6 @@
 			requirement = {
 				kind = exactVersion;
 				version = 0.63.2;
-			};
-		};
-		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-certificates.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.19.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1817,6 +1817,11 @@
 		DF4E6D832D120CFC00F6111A /* UtilsLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = UtilsLib;
+		};
+		DF54F82E2D431BD50021D05A /* X509 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
+			productName = X509;
 		};
 		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1916,11 +1921,6 @@
 		DFBD09F52CE3FBDC006AF9C2 /* LibdigidocLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LibdigidocLib;
-		};
-		DF54F82E2D431BD50021D05A /* X509 */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
-			productName = X509;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

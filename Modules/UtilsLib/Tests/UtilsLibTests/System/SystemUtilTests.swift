@@ -41,4 +41,23 @@ struct SystemUtilTests {
             #expect(match != nil)
         }
     }
+
+    @Test
+    func getDeviceModelIdentifier_isNonEmptyAndLowercased() {
+        let model = SystemUtil.getDeviceModelIdentifier()
+
+        #expect(!model.isEmpty)
+        #expect(model == model.lowercased())
+        #expect(!model.contains(" "))
+        #expect(!model.contains("\0"))
+    }
+
+    @Test
+    func getDeviceModelIdentifier_matchesSimulatorEnvironmentWhenPresent() {
+        guard let simulatorModel = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] else {
+            return
+        }
+
+        #expect(SystemUtil.getDeviceModelIdentifier() == simulatorModel.lowercased())
+    }
 }

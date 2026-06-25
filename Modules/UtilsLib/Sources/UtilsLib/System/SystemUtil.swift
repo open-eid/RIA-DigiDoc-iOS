@@ -35,4 +35,17 @@ public struct SystemUtil: Loggable {
         logger().info("Operating system version: \(versionString, privacy: .public)")
         return versionString
     }
+
+    public static func getDeviceModelIdentifier() -> String {
+        if let simulatorModel = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] {
+            return simulatorModel.lowercased()
+        }
+
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let identifier = withUnsafeBytes(of: &systemInfo.machine) { raw in
+            String(cString: raw.bindMemory(to: CChar.self).baseAddress!)
+        }
+        return identifier.lowercased()
+    }
 }

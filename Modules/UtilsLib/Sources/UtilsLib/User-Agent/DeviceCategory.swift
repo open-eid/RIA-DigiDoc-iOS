@@ -19,15 +19,18 @@
 
 import Foundation
 
-/// @mockable
-public protocol UserAgentUtilProtocol: Sendable {
-    func userAgent(
-        diagnostics: UserAgentDiagnostics,
-        language: String
-    ) -> String
+enum DeviceCategory: String {
+    case mobile
+    case tablet
 
-    func appInfo(
-        diagnostics: UserAgentDiagnostics,
-        language: String
-    ) -> String
+    init(modelIdentifier: String) {
+        self = modelIdentifier.hasPrefix("ipad") ? .tablet : .mobile
+    }
+
+    var osName: String {
+        switch self {
+        case .mobile: "iOS"
+        case .tablet: "iPadOS"
+        }
+    }
 }

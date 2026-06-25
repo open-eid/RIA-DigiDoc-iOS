@@ -77,6 +77,7 @@ actor LibrarySetup: Loggable {
             let proxyInfo = await proxyUtil.getProxyInfo()
             let appLanguage = await dataStore.getSelectedLanguage()
             let userAgent = userAgentUtil.userAgent(diagnostics: .none, language: appLanguage)
+            let appInfo = userAgentUtil.appInfo(diagnostics: .none, language: appLanguage)
 
             try DigiDocConf.observeConfigurationUpdates(
                 configurationRepository: configurationRepository
@@ -114,7 +115,7 @@ actor LibrarySetup: Loggable {
                 sivaUrl: getSiVaUrl(),
                 sivaCert: getSiVaCert(),
                 proxyInfo: proxyInfo,
-                userAgent: userAgent
+                userAgent: appInfo
             )
             LibrarySetup.logger().info("Libdigidocpp initialized successfully")
 

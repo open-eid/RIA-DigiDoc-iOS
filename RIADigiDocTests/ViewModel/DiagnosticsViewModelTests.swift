@@ -33,7 +33,6 @@ import UtilsLibMocks
 final class DiagnosticsViewModelTests {
     private let viewModel: DiagnosticsViewModel!
 
-    private let mockContainerWrapper: ContainerWrapperProtocolMock
     private let mockFileManager: FileManagerProtocolMock
     private let mockConfigurationLoader: ConfigurationLoaderProtocolMock
     private let mockConfigurationRepository: ConfigurationRepositoryProtocolMock
@@ -47,7 +46,6 @@ final class DiagnosticsViewModelTests {
     let mockConfigProvider: ConfigurationProvider?
 
     init() async throws {
-        mockContainerWrapper = ContainerWrapperProtocolMock()
         mockFileManager = FileManagerProtocolMock()
         mockConfigurationLoader = ConfigurationLoaderProtocolMock()
         mockConfigurationRepository = ConfigurationRepositoryProtocolMock()
@@ -67,7 +65,6 @@ final class DiagnosticsViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         viewModel = DiagnosticsViewModel(
-            containerWrapper: mockContainerWrapper,
             fileManager: mockFileManager,
             configurationLoader: mockConfigurationLoader,
             configurationRepository: mockConfigurationRepository,
