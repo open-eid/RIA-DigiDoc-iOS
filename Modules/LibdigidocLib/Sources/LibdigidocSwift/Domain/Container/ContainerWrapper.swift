@@ -31,6 +31,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     private let fileManager: FileManagerProtocol
 
+    @MainActor
     private let digiDocSigningWrapper: DigiDocSigningWrapper = DigiDocSigningWrapper()
 
     public init(
@@ -188,6 +189,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    @MainActor
     @discardableResult
     public func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
         do {
@@ -207,6 +209,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    @MainActor
     @discardableResult
     public func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
         do {
@@ -226,6 +229,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    @MainActor
     public func prepareSignature(
         cert: Data,
         containerPath: URL,
@@ -247,6 +251,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
             )
     }
 
+    @MainActor
     public func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol {
 
         do {

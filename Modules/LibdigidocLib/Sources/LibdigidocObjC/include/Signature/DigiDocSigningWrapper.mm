@@ -101,10 +101,12 @@
             NSLocalizedDescriptionKey: @"Did not find signature"
         }];
         if (completion) completion(NO, error);
+        return;
     }
 
     if (auto timeStampTime = _signature->TimeStampTime(); !timeStampTime.empty()) {
         if (completion) completion(YES, error);
+        return;
     }
 
     try {

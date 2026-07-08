@@ -63,6 +63,17 @@ struct SigningViewModelTests: Loggable {
             sivaRepository: mockSivaRepository,
             containerUtil: mockContainerUtil
         )
+
+        do {
+            try await DigiDocConf.initDigiDoc(userAgent: "TestUserAgent")
+        } catch let error as DigiDocError {
+            switch error {
+            case .alreadyInitialized:
+                break
+            default:
+                Issue.record("DigiDocConf initialization failed: \(error.localizedDescription)")
+            }
+        }
     }
 
     @Test
