@@ -250,8 +250,10 @@ public:
     }
 
     void updateConfiguration(DigiDocConfig *conf) {
-        DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(conf);
-        digidoc::Conf::init(newCurrentConf);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(conf);
+            digidoc::Conf::init(newCurrentConf);
+        });
     }
     
     static void setTSUrl(NSURL *tsaUrl) {

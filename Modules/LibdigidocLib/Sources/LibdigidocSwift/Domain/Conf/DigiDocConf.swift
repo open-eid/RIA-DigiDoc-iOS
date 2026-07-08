@@ -172,6 +172,8 @@ public struct DigiDocConf: DigiDocConfProtocol, Loggable {
 public actor DigiDocInitializer: Loggable {
     private var isInitialized = false
     private var initializationError: ErrorDetail?
+    private var isInitializing = false
+    private var initializationWaiters: [CheckedContinuation<Void, Error>] = []
 
     private let configurationRepository: ConfigurationRepositoryProtocol
     private let fileManager: FileManagerProtocol
@@ -195,30 +197,50 @@ public actor DigiDocInitializer: Loggable {
         userAgent: String
     ) async throws {
 
-        guard !isInitialized else {
+        if isInitialized {
             throw DigiDocError.alreadyInitialized
         }
 
+        if isInitializing {
+            try await withCheckedThrowingContinuation { continuation in
+                initializationWaiters.append(continuation)
+            }
+            throw DigiDocError.alreadyInitialized
+        }
+
+        isInitializing = true
+
         let logLevel = isLoggingEnabled ? DigiDocInitializer.libdigidocppLogLevel : 0
 
-        if let customConf = configuration {
-            try await initDigiDoc(
-                conf: toDigiDocConfig(
-                    logLevel: logLevel,
-                    logFile: overrideLogFile(),
-                    tslCache: overrideTSLCache(),
-                    configurationProvider: customConf
-                ),
-                userAgent: userAgent
-            )
-        } else {
-            digidocConf.logLevel = overrideLogLevel(logLevel: logLevel)
-            try await initDigiDoc(
-                conf: digidocConf,
-                userAgent: userAgent
-            )
+        do {
+            if let customConf = configuration {
+                try await initDigiDoc(
+                    conf: toDigiDocConfig(
+                        logLevel: logLevel,
+                        logFile: overrideLogFile(),
+                        tslCache: overrideTSLCache(),
+                        configurationProvider: customConf
+                    ),
+                    userAgent: userAgent
+                )
+            } else {
+                digidocConf.logLevel = overrideLogLevel(logLevel: logLevel)
+                digidocConf.logFile = overrideLogFile()
+                digidocConf.tslcache = overrideTSLCache()
+                try await initDigiDoc(conf: digidocConf, userAgent: userAgent)
+            }
+            isInitialized = true
+            isInitializing = false
+            let waiters = initializationWaiters
+            initializationWaiters.removeAll()
+            waiters.forEach { $0.resume() }
+        } catch {
+            isInitializing = false
+            let waiters = initializationWaiters
+            initializationWaiters.removeAll()
+            waiters.forEach { $0.resume(throwing: error) }
+            throw error
         }
-        isInitialized = true
     }
 
     func toDigiDocConfig(
