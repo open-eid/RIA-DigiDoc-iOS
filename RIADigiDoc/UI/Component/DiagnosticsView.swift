@@ -117,6 +117,7 @@ struct DiagnosticsView: View {
                                 libdigidocVersion: viewModel.libdigidocVersion,
                                 urlSectionContent: viewModel.urlSectionContent,
                                 cdoc2SectionContent: viewModel.cdoc2SectionContent,
+                                settingsSectionContent: viewModel.settingsSectionContent,
                                 tslSectionContent: viewModel.tslSectionContent,
                                 centralConfigurationSectionContent: viewModel.centralConfigurationSectionContent
                             )

@@ -29,6 +29,7 @@ struct DiagnosticsSections: View {
     var libdigidocVersion: String
     var urlSectionContent: [(key: String, content: String)]
     var cdoc2SectionContent: [String]
+    var settingsSectionContent: [String]
     var tslSectionContent: [String]
     var centralConfigurationSectionContent: [(key: String, content: String)]
 
@@ -67,6 +68,12 @@ struct DiagnosticsSections: View {
             )
 
             DiagnosticsSingleSection(
+                title: languageSettings.localized("Main diagnostics settings title"),
+                contentLines: settingsSectionContent,
+                identifier: "settings",
+            )
+
+            DiagnosticsSingleSection(
                 title: languageSettings.localized("Main diagnostics tsl cache title"),
                 contentLines: tslSectionContent,
                 identifier: "tslCache",
@@ -91,6 +98,7 @@ struct DiagnosticsSections: View {
         libdigidocVersion: "",
         urlSectionContent: [(key: "", content: "")],
         cdoc2SectionContent: [""],
+        settingsSectionContent: [""],
         tslSectionContent: [""],
         centralConfigurationSectionContent: [(key: "", content: "")]
     )
