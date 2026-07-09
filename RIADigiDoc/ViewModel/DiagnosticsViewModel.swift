@@ -41,6 +41,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     var libdigidocVersion: String = ""
     var urlSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
     var cdoc2SectionContent: [String] = [""]
+    var settingsSectionContent: [String] = [""]
     var tslSectionContent: [String] = [""]
     var centralConfigurationSectionContent: [(key: String, content: String)] = [(key: "", content: "")]
 
@@ -105,6 +106,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         loadOsSectionContent()
         await loadUrlSectionContent(configuration: configuration)
         loadCdoc2SectionContent(configuration: configuration)
+        await loadSettingsSectionContent()
         loadTslSectionContent(schemaDirectory: tslSchemaDirectory)
         loadCentralConfigurationContent(configuration: configuration)
     }
@@ -173,6 +175,24 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         ]
 
         self.cdoc2SectionContent = lines.map { "\($0.label): \($0.value)" }
+    }
+
+    private func loadSettingsSectionContent() async {
+        let proxyInfo = await proxyUtil.getProxyInfo()
+
+        let proxySetting: String
+        switch proxyInfo.option {
+        case .disabled: proxySetting = "NONE"
+        case .system: proxySetting = "SYSTEM"
+        case .manual: proxySetting = "MANUAL"
+        }
+
+        let lines: [(label: String, value: String)] = [
+            ("PROXY-SETTING", proxySetting),
+            ("PROXY-AUTH", String(!proxyInfo.username.isEmpty))
+        ]
+
+        self.settingsSectionContent = lines.map { "\($0.label): \($0.value)" }
     }
 
     private func loadTslSectionContent(schemaDirectory: URL? = nil) {
@@ -283,6 +303,10 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
 
         lines.append(languageSettings.localized("Main diagnostics cdoc2 title"))
         lines.append(contentsOf: self.cdoc2SectionContent)
+        lines.append("")
+
+        lines.append(languageSettings.localized("Main diagnostics settings title"))
+        lines.append(contentsOf: self.settingsSectionContent)
         lines.append("")
 
         lines.append(languageSettings.localized("Main diagnostics tsl cache title"))

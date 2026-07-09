@@ -3264,6 +3264,24 @@
         }
       }
     },
+    "Main diagnostics settings title" : {
+      "comment" : "Main diagnostics settings title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings:"
+          }
+        }
+      }
+    },
     "Main diagnostics central configuration title" : {
       "comment" : "Main diagnostics central configuration title",
       "extractionState" : "manual",

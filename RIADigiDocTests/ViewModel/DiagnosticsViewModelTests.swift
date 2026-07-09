@@ -113,6 +113,7 @@ final class DiagnosticsViewModelTests {
         await checkOsSection()
         await checkUrlSection()
         await checkCdoc2Section()
+        await checkSettingsSection()
         await checkTslSection()
         await checkCentralConfigurationSection()
     }
@@ -164,6 +165,13 @@ final class DiagnosticsViewModelTests {
         ])
     }
 
+    private func checkSettingsSection() async {
+        #expect(viewModel.settingsSectionContent == [
+            "PROXY-SETTING: NONE",
+            "PROXY-AUTH: false"
+        ])
+    }
+
     private func checkTslSection() async {
         #expect(viewModel.tslSectionContent == ["test1.xml (45)"])
     }
@@ -186,6 +194,34 @@ final class DiagnosticsViewModelTests {
 
         #expect(expected == configurationSectionContent)
 
+    }
+
+    @Test
+    func getConfigurationData_mapsManualProxyWithAuth() async throws {
+        mockProxyUtil.getProxyInfoHandler = {
+            ProxyInfo(option: .manual, host: "host", port: 80, username: "username", password: "password")
+        }
+
+        await viewModel.getConfigurationData(configuration: mockConfigProvider)
+
+        #expect(viewModel.settingsSectionContent == [
+            "PROXY-SETTING: MANUAL",
+            "PROXY-AUTH: true"
+        ])
+    }
+
+    @Test
+    func getConfigurationData_mapsSystemProxyWithoutAuth() async throws {
+        mockProxyUtil.getProxyInfoHandler = {
+            ProxyInfo(option: .system)
+        }
+
+        await viewModel.getConfigurationData(configuration: mockConfigProvider)
+
+        #expect(viewModel.settingsSectionContent == [
+            "PROXY-SETTING: SYSTEM",
+            "PROXY-AUTH: false"
+        ])
     }
 
     @Test

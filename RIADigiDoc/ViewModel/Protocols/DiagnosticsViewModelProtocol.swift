@@ -35,6 +35,7 @@ public protocol DiagnosticsViewModelProtocol: Sendable {
     var libdigidocVersion: String { get }
     var urlSectionContent: [(key: String, content: String)] { get }
     var cdoc2SectionContent: [String] { get }
+    var settingsSectionContent: [String] { get }
     var tslSectionContent: [String] { get }
     var centralConfigurationSectionContent: [(key: String, content: String)] { get }
 
