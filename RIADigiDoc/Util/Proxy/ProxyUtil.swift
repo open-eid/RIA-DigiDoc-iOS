@@ -23,16 +23,8 @@ import LibdigidocLibSwift
 
 public struct ProxyUtil: ProxyUtilProtocol {
 
-    private let dataStore: DataStoreProtocol
-    private let keychainStore: KeychainStoreProtocol
-
-    public init(
-        dataStore: DataStoreProtocol,
-        keychainStore: KeychainStoreProtocol
-    ) {
-        self.dataStore = dataStore
-        self.keychainStore = keychainStore
-    }
+    let dataStore: DataStoreProtocol
+    let keychainStore: KeychainStoreProtocol
 
     public func isPortValid(_ port: Int) -> Bool {
         return 1 <= port && port <= 65535

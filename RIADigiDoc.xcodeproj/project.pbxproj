@@ -124,7 +124,7 @@
 		1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphonesimulator.sh"; sourceTree = "<group>"; };
 		1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphoneos.sh"; sourceTree = "<group>"; };
 		1A438FCF2E7224CE00546B86 /* generate-mocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "generate-mocks.sh"; sourceTree = "<group>"; };
-		1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TSLXMLDownloader.py; sourceTree = "<group>"; };
+		1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = tsl_xml_downloader.py; sourceTree = "<group>"; };
 		1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-xcframeworks.sh"; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
 		1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-libcdoc-sim.sh"; sourceTree = "<group>"; };
@@ -137,6 +137,7 @@
 		DF5CDD242F2BB42C002AB47F /* run-ci-tests.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "run-ci-tests.sh"; sourceTree = "<group>"; };
 		DF64D0E12EC363C200FF73C6 /* SmartIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SmartIdLib; sourceTree = "<group>"; };
 		DF67D4F92D28531600F09EB9 /* ConfigLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ConfigLib; sourceTree = "<group>"; };
+		DF8ADFC92FF5672E0016D019 /* setup_configuration.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = setup_configuration.py; sourceTree = "<group>"; };
 		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MobileIdLib; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
@@ -578,7 +579,8 @@
 				1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */,
 				1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */,
 				1A438FCF2E7224CE00546B86 /* generate-mocks.sh */,
-				1A438FD02E7224CE00546B86 /* TSLXMLDownloader.py */,
+				DF8ADFC92FF5672E0016D019 /* setup_configuration.py */,
+				1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */,
 			);
 			path = scripts;
 			sourceTree = "<group>";
@@ -745,7 +747,6 @@
 				DFDB14772CC97B0E00153876 /* Sources */,
 				DFDB14782CC97B0E00153876 /* Frameworks */,
 				DFDB14792CC97B0E00153876 /* Resources */,
-				DFED7A602CC9A42A00D8BCA9 /* SwiftLint */,
 				DFD24C3B2CD1B718004C1D2E /* Embed Frameworks */,
 				DF4E43CC2D0BA38600967997 /* Embed Foundation Extensions */,
 				DF1D59572F3BF3F800855E2E /* Setup Firebase Crashlytics */,
@@ -753,6 +754,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				DF56ACDE2FF5E0CA007A834D /* PBXTargetDependency */,
 				DF4E43CA2D0BA38600967997 /* PBXTargetDependency */,
 				DFB663AE2F16918100804545 /* PBXTargetDependency */,
 			);
@@ -986,26 +988,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
 		};
-		DFED7A602CC9A42A00D8BCA9 /* SwiftLint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 8;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = SwiftLint;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        \"$SWIFTLINT_CMD\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint for '${CONFIGURATION}' configuration.\"\nfi\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1058,6 +1040,10 @@
 			isa = PBXTargetDependency;
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 			targetProxy = DF4E43C92D0BA38600967997 /* PBXContainerItemProxy */;
+		};
+		DF56ACDE2FF5E0CA007A834D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = DF56ACDD2FF5E0CA007A834D /* SwiftLintBuildToolPlugin */;
 		};
 		DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1701,7 +1687,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = exactVersion;
-				version = 12.12.1;
+				version = 12.17.0;
 			};
 		};
 		DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */ = {
@@ -1709,7 +1695,7 @@
 			repositoryURL = "https://github.com/apple/swift-certificates.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.19.0;
+				version = 1.19.4;
 			};
 		};
 		DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */ = {
@@ -1717,7 +1703,7 @@
 			repositoryURL = "https://github.com/hmlongco/Factory";
 			requirement = {
 				kind = exactVersion;
-				version = 2.5.3;
+				version = 3.3.2;
 			};
 		};
 		DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */ = {
@@ -1725,7 +1711,7 @@
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = exactVersion;
-				version = 5.11.2;
+				version = 5.12.0;
 			};
 		};
 		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
@@ -1733,7 +1719,7 @@
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
 			requirement = {
 				kind = exactVersion;
-				version = 0.63.2;
+				version = 0.65.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1822,6 +1808,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
 			productName = X509;
+		};
+		DF56ACDD2FF5E0CA007A834D /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;

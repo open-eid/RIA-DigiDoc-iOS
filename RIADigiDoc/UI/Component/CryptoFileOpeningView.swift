@@ -95,7 +95,10 @@ struct CryptoFileOpeningView: View {
                 }
             }
         } else {
-            let localizedMessage = languageSettings.localized(errorMessage?.key ?? "General error", errorMessage?.args ?? [])
+            let localizedMessage = languageSettings.localized(
+                errorMessage?.key ?? "General error",
+                errorMessage?.args ?? []
+            )
             Toast.show(localizedMessage)
 
             if voiceOverEnabled {

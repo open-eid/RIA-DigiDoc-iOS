@@ -18,10 +18,9 @@
  */
 
 import Testing
-import CommonsLib
-import CommonsLibMocks
+import UtilsLib
+import UtilsLibMocks
 
-@MainActor
 struct LoggableTests {
     @Test
     func logger_createsLoggerWithCorrectCategory() {

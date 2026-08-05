@@ -15,6 +15,9 @@ build-cdoc-debug/
 Packages/
 xcuserdata
 
+# Module lockfiles
+Modules/**/Package.resolved
+
 # Mockolo
 **/Mocks/**
 

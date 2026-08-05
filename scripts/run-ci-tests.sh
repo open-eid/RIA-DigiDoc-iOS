@@ -71,7 +71,7 @@ for GROUP in "${MODULE_GROUPS[@]}"; do
   echo "Running test group: $GROUP"
   echo "----------------------------------------"
 
-  TEST_XCARGS="$COMMON_XCARGS"
+  TEST_XCARGS="$COMMON_XCARGS -skipPackagePluginValidation"
   for MODULE in $GROUP; do
     TEST_XCARGS+=" -only-testing:${MODULE}"
   done

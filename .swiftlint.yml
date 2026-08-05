@@ -2,7 +2,6 @@ excluded:
   - RIADigiDocTests/Mocks/*/*.swift
   - Modules/**/Mocks/*/*.swift
   - Extensions/**/Mocks/*/*.swift
-  - SetupConfiguration/**/*.swift
   - build
   - SourcePackages
   - .build

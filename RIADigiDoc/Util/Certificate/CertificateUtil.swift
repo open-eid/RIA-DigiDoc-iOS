@@ -24,8 +24,6 @@ import X509
 import UtilsLib
 
 public struct CertificateUtil: CertificateUtilProtocol, Loggable {
-    public init() {}
-
     public func pemToDerData(fromPEM pem: Data) -> Data? {
         guard let pemString = String(data: pem, encoding: .utf8) else { return nil }
         let lines = pemString.components(separatedBy: .newlines)

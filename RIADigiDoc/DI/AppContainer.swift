@@ -176,9 +176,10 @@ extension Container {
     }
 
     public var certificateUtil: Factory<CertificateUtilProtocol> {
-        self { @MainActor in CertificateUtil() }
+        self { CertificateUtil() }
     }
 
+    @MainActor
     public var proxyUtil: Factory<ProxyUtilProtocol> {
         self { @MainActor in ProxyUtil(
             dataStore: self.dataStore(),

@@ -15,8 +15,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 20)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 11, 2)),
-        .package(path: "../CommonsLib")
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 0)),
+        .package(path: "../../CommonsLib")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

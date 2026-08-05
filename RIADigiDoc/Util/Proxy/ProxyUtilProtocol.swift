@@ -20,6 +20,7 @@
 import CommonsLib
 
 /// @mockable
+@MainActor
 public protocol ProxyUtilProtocol: Sendable {
     func isPortValid(_ port: Int) -> Bool
     func getProxyInfo() async -> ProxyInfo

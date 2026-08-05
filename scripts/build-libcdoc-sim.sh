@@ -12,7 +12,7 @@ BUILD_DIR="$(pwd)/build/libcdoc-sim"
 INSTALL_DIR="$(pwd)/output/libcdoc-sim"
 
 OPENSSL_DIR="$(pwd)/../Downloads/libdigidocppFiles_1910/libdigidocpp.iphonesimulator"
-DEPLOYMENT_TARGET="17.0"
+DEPLOYMENT_TARGET="18.0"
 
 # ====== Clone repo if missing ======
 if [ ! -d "${SOURCE_DIR}" ]; then

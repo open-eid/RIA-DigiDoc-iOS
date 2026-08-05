@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "LibdigidocLibSwiftMocks", targets: ["LibdigidocLibSwiftMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),

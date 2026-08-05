@@ -19,8 +19,10 @@
 
 import ActivityKit
 
-public struct WidgetExtensionAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
+// A Live Activity is updated by the system in the background, not on the app's main screen.
+// `nonisolated` marks this data as safe to use away from the main screen
+public nonisolated struct WidgetExtensionAttributes: ActivityAttributes {
+    public nonisolated struct ContentState: Codable, Hashable {
         var title: String
         var compactTitle: String
         var controlCode: String

@@ -489,7 +489,9 @@ struct SigningView: View {
                 viewModel.navigateToNestedCryptoContainerView.toggle()
                 Task { @MainActor in
                     let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
-                    pathManager.navigate(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
+                    pathManager.navigate(
+                        to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                    )
                 }
             }
         }
@@ -575,7 +577,9 @@ struct SigningView: View {
             )
             let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
             await MainActor.run {
-                pathManager.replaceLast(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
+                pathManager.replaceLast(
+                    to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                )
             }
         }
     }

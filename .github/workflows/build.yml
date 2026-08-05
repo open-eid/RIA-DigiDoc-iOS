@@ -9,16 +9,16 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - 26.4
+          - 26.6
         platform:
           - iOS
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         submodules: recursive
     - name: Download Libdigidocpp iOS artifact
-      uses: dawidd6/action-download-artifact@v20
+      uses: dawidd6/action-download-artifact@v21
       with:
         workflow: build.yml
         branch: master
@@ -26,7 +26,7 @@ jobs:
         path: libdigidocpp-ios
         repo: open-eid/libdigidocpp
     - name: Download Libdigidocpp iOS Simulator artifact
-      uses: dawidd6/action-download-artifact@v20
+      uses: dawidd6/action-download-artifact@v21
       with:
         workflow: build.yml
         branch: master
@@ -42,11 +42,8 @@ jobs:
           export LIBDIGIDOCPP_PATH=${{ github.workspace }}/Modules/LibdigidocLib/Sources/LibdigidocObjC/Libs/digidocpp.xcframework
           rm -rf $LIBDIGIDOCPP_PATH/ios-arm64 && mkdir $LIBDIGIDOCPP_PATH/ios-arm64 && cp -r ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64/
           rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
-    - name: Set up Homebrew
-      id: set-up-homebrew
-      uses: Homebrew/actions/setup-homebrew@main
     - name: Install dependencies
-      run: brew install swift-sh mockolo
+      run: brew install mockolo
     - name: Setup config and TSL files
       run: |
         export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
@@ -73,12 +70,12 @@ jobs:
 
         if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
           echo "Getting TSL (local LOTL)"
-          python3 scripts/TSLXMLDownloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+          python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
 
           echo "Finished downloading TSL"
         else
           echo "Getting TSL (remote LOTL)"
-          python3 scripts/TSLXMLDownloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+          python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
           echo "Finished downloading TSL"
         fi
 
@@ -100,10 +97,8 @@ jobs:
         echo APP_VERSION=$(xcodebuild -project ${{ github.workspace }}/RIADigiDoc.xcodeproj -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =') >> $GITHUB_ENV
     - name: Fetch default configuration
       run: |
-        echo "Cleaning swift-sh cache"
-        swift-sh --clean-cache
         echo "Fetching default configuration"
-        swift-sh SetupConfiguration/Sources/main.swift
+        python3 scripts/setup_configuration.py
     - name: Run tests
       run: |
         cd ${{ github.workspace }}
@@ -112,6 +107,7 @@ jobs:
 
         xcodebuild test \
           -project RIADigiDoc.xcodeproj \
+          -skipPackagePluginValidation \
           -scheme AllTests \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -resultBundlePath TestResults.xcresult \
@@ -142,6 +138,7 @@ jobs:
 
         xcodebuild clean build \
           -project RIADigiDoc.xcodeproj \
+          -skipPackagePluginValidation \
           -scheme RIADigiDoc \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -derivedDataPath "${{ github.workspace }}/build" \

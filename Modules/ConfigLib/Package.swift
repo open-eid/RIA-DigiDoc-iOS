@@ -15,9 +15,8 @@ let package = Package(
         .library(name: "ConfigLibMocks", targets: ["ConfigLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 11, 2)),
-        .package(url: "https://github.com/TakeScoop/SwiftyRSA", exact: .init(1, 8, 0)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 0)),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
         .package(path: "../Test/CommonsTestShared")
@@ -30,7 +29,6 @@ let package = Package(
             dependencies: [
                 "Alamofire",
                 "CommonsLib",
-                "SwiftyRSA",
                 "UtilsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
