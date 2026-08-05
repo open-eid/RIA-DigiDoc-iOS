@@ -62,7 +62,6 @@ final class MyEidPinChangeViewModelTests {
         #expect(viewModel.isFirstStep == true)
     }
 
-
     // MARK: - handleBackButton tests
 
     @Test

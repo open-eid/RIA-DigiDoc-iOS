@@ -33,10 +33,10 @@ class ShareViewController: UIViewController, Sendable, Loggable {
         viewModel.status = .processing
 
         let shareView = ShareView(
-            statusChanged: {
-                Task { [weak self] in
-                    guard let self else { return }
+            statusChanged: { [weak self] in
+                guard let self else { return }
 
+                Task {
                     let sharedItems = await self.extractSharedFileItems()
                     await self.viewModel.importFiles(sharedItems)
                 }
@@ -70,12 +70,7 @@ class ShareViewController: UIViewController, Sendable, Loggable {
                         )
                 } else if item != nil {
                     if let itemData = item as? Data {
-                        Task { [weak self] in
-                            guard let self = self else {
-                                continuation.resume(throwing: FileImportError.dataConversionFailed)
-                                return
-                            }
-
+                        Task {
                             do {
                                 let url = try await self.viewModel.convertNSDataToURL(data: itemData)
                                 continuation.resume(returning: url)

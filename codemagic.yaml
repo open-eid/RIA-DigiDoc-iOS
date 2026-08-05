@@ -28,7 +28,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: 26.4
+      xcode: latest
     inputs:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
@@ -69,7 +69,7 @@ workflows:
           echo Run tests?: ${{ inputs.enableTests_input }}
       - name: Setup dependencies
         script: |
-          brew install swift-sh mockolo
+          brew install mockolo
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
@@ -114,15 +114,15 @@ workflows:
             echo "Getting TSL (local LOTL)"
             # Repo.ria TSL files already in assets folder, doesn't need to download separately anymore
             if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
-              python3 scripts/TSLXMLDownloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
+              python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
             else
-              python3 scripts/TSLXMLDownloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename ${{ inputs.defaultCentralConfigurationTslUrl_input }})" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
+              python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename ${{ inputs.defaultCentralConfigurationTslUrl_input }})" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
             fi
 
             echo "Finished downloading TSL"
           else
             echo "Getting TSL (remote LOTL)"
-            python3 scripts/TSLXMLDownloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
+            python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
             echo "Finished downloading TSL"
           fi
 
@@ -134,10 +134,8 @@ workflows:
         script: |
           # Not running 'SetupConfiguration' for repo.ria as necessary files are already setup
           if [[ ! "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
-            echo "Cleaning swift-sh cache"
-            swift-sh --clean-cache
             echo "Fetching default configuration"
-            swift-sh SetupConfiguration/Sources/main.swift ${{ inputs.defaultCentralConfigurationUrl_input }} ${{ inputs.defaultCentralConfigurationUpdateInterval_input }} ${{ inputs.defaultCentralConfigurationTslUrl_input }}
+            python3 scripts/setup_configuration.py ${{ inputs.defaultCentralConfigurationUrl_input }} ${{ inputs.defaultCentralConfigurationUpdateInterval_input }} ${{ inputs.defaultCentralConfigurationTslUrl_input }}
           else
             echo "Skipping default configuration fetching for repo.ria"
           fi
@@ -168,7 +166,7 @@ workflows:
           LOGGING_FLAGS="OTHER_SWIFT_FLAGS=\"\$(inherited) -DENABLE_LOGGING\""
           
           # Add logging flag to conf flags
-          ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS $LOGGING_FLAGS"
+          ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS $LOGGING_FLAGS -skipPackagePluginValidation"
 
           xcode-project build-ipa \
             --clean \
@@ -226,11 +224,11 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: 26.4
+      xcode: latest
     scripts:
       - name: Setup dependencies
         script: |
-          brew install swift-sh mockolo
+          brew install mockolo
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
@@ -257,12 +255,12 @@ workflows:
           
           if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
             echo "Getting TSL (local LOTL)"
-            python3 scripts/TSLXMLDownloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+            python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
 
             echo "Finished downloading TSL"
           else
             echo "Getting TSL (remote LOTL)"
-            python3 scripts/TSLXMLDownloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+            python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
             echo "Finished downloading TSL"
           fi
 
@@ -271,10 +269,8 @@ workflows:
           echo "Done moving TSLs"
       - name: Fetch default configuration
         script: |
-          echo "Cleaning swift-sh cache"
-          swift-sh --clean-cache
           echo "Fetching default configuration"
-          swift-sh SetupConfiguration/Sources/main.swift "https://id.eesti.ee" 4 "https://ec.europa.eu/tools/lotl/eu-lotl.xml"
+          python3 scripts/setup_configuration.py "https://id.eesti.ee" 4 "https://ec.europa.eu/tools/lotl/eu-lotl.xml"
       - name: Set up provisioning profiles settings on Xcode project
         script: xcode-project use-profiles
       - name: Run tests
@@ -294,7 +290,8 @@ workflows:
           xcode-project build-ipa \
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
-            --scheme "$XCODE_SCHEME"
+            --scheme "$XCODE_SCHEME" \
+            --archive-xcargs="-skipPackagePluginValidation"
       - name: Rename and move IPA
         script: |
           mv -v build/ios/ipa/RIADigiDoc.ipa build/ios/ipa/"RIA_DigiDoc_release_$APP_VERSION.$LATEST_BUILD_NUMBER.ipa"

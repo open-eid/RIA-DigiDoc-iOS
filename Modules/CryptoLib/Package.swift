@@ -17,8 +17,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 0)),
-        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 23, 0)),
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(2, 5, 3)),
+        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 24, 0)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../IdCardLib"),

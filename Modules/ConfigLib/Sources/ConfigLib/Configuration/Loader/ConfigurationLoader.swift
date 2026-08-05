@@ -390,8 +390,8 @@ public actor ConfigurationLoader: ConfigurationLoaderProtocol, Loggable {
                 continuation.yield(config)
             }
 
-            continuation.onTermination = { @Sendable _ in
-                Task { [weak self] in
+            continuation.onTermination = { @Sendable [weak self] _ in
+                Task {
                     await self?.removeContinuation(token)
                 }
             }

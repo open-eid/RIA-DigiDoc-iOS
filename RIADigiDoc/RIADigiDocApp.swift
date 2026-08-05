@@ -24,7 +24,7 @@ import ConfigLib
 import CommonsLib
 
 @main
-struct RIADigiDocApp: App {
+struct RIADigiDocApp: App, Loggable {
     @State private var languageSettings: LanguageSettings
     @State private var themeSettings: ThemeSettings
     @State private var crashReportManager: CrashReportManager
@@ -72,8 +72,14 @@ struct RIADigiDocApp: App {
 
             let isRecentDocumentsMigrationDone = await dataStore.getIsRecentDocumentsMigrationDone()
             if !isRecentDocumentsMigrationDone {
-                try await documentsMigrator.migrateRecentDocuments()
-                await dataStore.setIsRecentDocumentsMigrationDone(true)
+                do {
+                    try await documentsMigrator.migrateRecentDocuments()
+                    await dataStore.setIsRecentDocumentsMigrationDone(true)
+                } catch {
+                    RIADigiDocApp.logger().error(
+                        "Unable to migrate recent documents: \(String(describing: error))"
+                    )
+                }
             }
 
             await languageSettings.loadSelectedLanguage()

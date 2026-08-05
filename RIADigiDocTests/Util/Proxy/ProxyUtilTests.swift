@@ -21,6 +21,7 @@ import CommonsLib
 import Foundation
 import Testing
 
+@MainActor
 final class ProxyUtilTests {
     private let proxyUtil: ProxyUtil
 

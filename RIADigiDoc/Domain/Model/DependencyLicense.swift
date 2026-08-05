@@ -65,16 +65,6 @@ struct DependencyLicenses {
                 url: URL(string: "https://www.openssl.org/source/license.txt")
             ),
             DependencyLicense(
-                name: "SwCrypt",
-                license: "MIT licence",
-                url: URL(string: "https://github.com/soyersoyer/SwCrypt/blob/master/LICENSE.md")
-            ),
-            DependencyLicense(
-                name: "SwiftyRSA",
-                license: "MIT licence",
-                url: URL(string: "https://github.com/TakeScoop/SwiftyRSA/blob/master/LICENSE")
-            ),
-            DependencyLicense(
                 name: "SwiftLintPlugins",
                 license: "MIT licence",
                 url: URL(string: "https://github.com/SimplyDanny/SwiftLintPlugins/blob/main/LICENSE")

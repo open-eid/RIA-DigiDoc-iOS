@@ -11,7 +11,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 23, 0))
+        .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 24, 0))
     ],
     targets: [
         .binaryTarget(

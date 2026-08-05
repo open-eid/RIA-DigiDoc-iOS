@@ -186,8 +186,8 @@ struct EncryptView: View {
         _cdocOption = State(wrappedValue: cdocOption)
         _selectedTab = State(wrappedValue: selectedTab)
         _viewModel = State(wrappedValue: Container.shared.encryptViewModel())
-        self.isWithEncryption = isWithEncryption
-        self.isWithDecryption = isWithDecryption
+        _isWithEncryption = State(wrappedValue: isWithEncryption)
+        _isWithDecryption = State(wrappedValue: isWithDecryption)
         self.nameUtil = nameUtil
         self.recipientUtil = recipientUtil
         self.fileUtil = fileUtil
@@ -246,7 +246,9 @@ struct EncryptView: View {
                                                 }
                                             }
                                         } else if viewModel.isDecryptButtonShown {
-                                            if let passwordRecipient = viewModel.recipients.first(where: { $0.certType == .passwordType }) {
+                                            if let passwordRecipient = viewModel.recipients.first(
+                                                where: { $0.certType == .passwordType }
+                                            ) {
                                                 passwordDecryptKeyLabel = passwordRecipient.identifier
                                                 showDecryptPasswordModal = true
                                             } else {
@@ -483,7 +485,7 @@ struct EncryptView: View {
             if showDecryptPasswordModal {
                 DecryptPasswordModalView(
                     keyLabel: passwordDecryptKeyLabel,
-                    onDecrypt: { password in
+                    onDecrypt: { _ in
                         // Add password decryption functionality
                     },
                     onCancel: {

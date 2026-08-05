@@ -206,7 +206,9 @@ struct RecentDocumentsView: View {
                     if newValue {
                         Task { @MainActor in
                             let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
-                            pathManager.navigate(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
+                            pathManager.navigate(
+                                to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                            )
                             isNavigatingToEncryptView = false
                         }
                     }

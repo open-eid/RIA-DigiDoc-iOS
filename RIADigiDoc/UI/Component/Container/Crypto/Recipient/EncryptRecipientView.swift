@@ -167,7 +167,9 @@ struct EncryptRecipientView: View {
                 Spacer()
                 Button(action: {
                     encryptionButtonEnabled = false
-                    pathManager.replaceLast(to: .encryptView(isWithEncryption: true, cdocOption: cdocOption, selectedTab: .files))
+                    pathManager.replaceLast(
+                        to: .encryptView(isWithEncryption: true, cdocOption: cdocOption, selectedTab: .files)
+                    )
                 }, label: {
                     HStack(spacing: Dimensions.Padding.XSPadding) {
                         Image("ic_m3_encrypted_48pt_wght400")
@@ -322,7 +324,9 @@ struct EncryptRecipientView: View {
         TopBarContainer(
             title: nil,
             onLeftClick: {
-                pathManager.replaceLast(to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files))
+                pathManager.replaceLast(
+                    to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                )
             },
             showRightIcons: !isSearchExpanded,
             content: {
@@ -440,7 +444,10 @@ struct EncryptRecipientView: View {
                 }
                 .onChange(of: viewModel.successMessage) { _, message in
                     guard let message, !message.key.isEmpty else { return }
-                    let localizedMessage = languageSettings.localized(message.key, [message.args.joined(separator: ", ")])
+                    let localizedMessage = languageSettings.localized(
+                        message.key,
+                        [message.args.joined(separator: ", ")]
+                    )
                     Toast.show(localizedMessage, type: .success)
 
                     if voiceOverEnabled {
