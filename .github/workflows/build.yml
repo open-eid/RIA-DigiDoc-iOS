@@ -1,11 +1,26 @@
 name: RIA DigiDoc iOS
-on: [push]
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 3 * * 1" # Weekly
 env:
   BUILD_NUMBER: ${{ github.run_number }}
 jobs:
   build:
     name: Build RIA DigiDoc on macOS
+    if: contains(github.repository, 'open-eid/RIA-DigiDoc-iOS')
     runs-on: macos-26
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    concurrency:
+      group: build-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     strategy:
       matrix:
         xcode:
@@ -99,6 +114,12 @@ jobs:
       run: |
         echo "Fetching default configuration"
         python3 scripts/setup_configuration.py
+    - name: Initialize CodeQL
+      if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+      uses: github/codeql-action/init@v4
+      with:
+        languages: swift,c-cpp
+        build-mode: manual
     - name: Run tests
       run: |
         cd ${{ github.workspace }}
@@ -143,6 +164,9 @@ jobs:
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -derivedDataPath "${{ github.workspace }}/build" \
           -quiet
+    - name: Perform CodeQL analysis
+      if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+      uses: github/codeql-action/analyze@v4
     - name: Rename app file
       run: |
         mv \
@@ -166,3 +190,37 @@ jobs:
         rm -rf ~/Library/Developer/Xcode/DerivedData/*
         rm -rf ${{ github.workspace }}/build
         rm -rf ${{ github.workspace }}/.build
+
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    if: >-
+      contains(github.repository, 'open-eid/RIA-DigiDoc-iOS') &&
+      (github.event_name == 'pull_request' ||
+       github.event_name == 'schedule' ||
+       github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    concurrency:
+      group: codeql-${{ matrix.language }}-${{ github.ref }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - actions
+          - python
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: ${{ matrix.language }}
+    - name: Perform CodeQL analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:${{ matrix.language }}"
