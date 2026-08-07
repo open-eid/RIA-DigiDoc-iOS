@@ -25,6 +25,7 @@ import CommonsLib
 struct MyEidPinChangeView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(LanguageSettings.self) private var languageSettings
 
     @AccessibilityFocusState private var flowTitleFocused: Bool
@@ -288,6 +289,11 @@ struct MyEidPinChangeView: View {
                 .onChange(of: viewModel.step) { _, _ in
                     DispatchQueue.main.async {
                         stepTitleFocused = true
+                    }
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .background {
+                        viewModel.clearSensitiveDataOnBackground()
                     }
                 }
             }

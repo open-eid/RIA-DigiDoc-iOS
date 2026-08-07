@@ -26,11 +26,8 @@ import UtilsLib
 @MainActor
 public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessionDelegate {
     var session: NFCTagReaderSession?
-    var isFinished = false
-    var canNumber: String = ""
     var nfcError: String = ""
     var strings: NFCSessionStrings?
-    var didCompleteSuccessfully = false
     var operationError: Error?
 
     let connection = NFCConnection()
@@ -53,7 +50,6 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
     }
 
     func success() {
-        didCompleteSuccessfully = true
         session?.alertMessage = strings?.successMessage ?? ""
         session?.invalidate()
     }
@@ -149,20 +145,115 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         session: NFCTagReaderSession
     ) {
         Self.logger().error("NFC: Unknown error type: \(type(of: error))")
-        Self.logger().error("NFC: Error details: \(error.localizedDescription)")
+        Self.logger().error("NFC: Error details: \(String(describing: error))")
         operationError = error
         session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
+    }
+
+    func handleNFCError(_ error: Error, session: NFCTagReaderSession) -> Bool {
+        if (error as NSError).localizedDescription == "Failed to find lock for cert" {
+            handleNoCertLockError(error: error, session: session)
+            return true
+        }
+        if let idCardInternalError = error as? IdCardInternalError {
+            handleIdCardInternalError(idCardInternalError, session: session)
+            return true
+        }
+        if let nfcIdCardError = error as? nfclib.IdCardInternalError {
+            handleIdCardInternalError(nfcIdCardError, session: session)
+            return true
+        }
+        return false
+    }
+
+    func handleSessionError(_ error: Error, session: NFCTagReaderSession) -> Error {
+        if let nfcError = error as? NFCReaderError,
+           nfcError.code == .readerSessionInvalidationErrorUserCanceled {
+            return IdCardInternalError.cancelledByUser
+        }
+        if handleNFCError(error, session: session) {
+            return operationError ?? error
+        }
+        if let digiDocError = error as? DigiDocError {
+            handleDigiDocError(digiDocError, session: session)
+            return digiDocError
+        }
+        handleUnknownError(error, session: session)
+        return error
+    }
+
+    private var tagContinuation: CheckedContinuation<[NFCTag], Error>?
+
+    func waitForTag() async throws -> [NFCTag] {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[NFCTag], Error>) in
+            guard NFCTagReaderSession.readingAvailable else {
+                continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
+                return
+            }
+            tagContinuation = continuation
+            session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self, queue: DispatchQueue.main)
+            updateAlertMessage(step: 0)
+            session?.begin()
+        }
+    }
+
+    func withCardCommands<T>(
+        canNumber: String,
+        strings: NFCSessionStrings,
+        _ body: (any CardCommands) async throws -> T
+    ) async throws -> T {
+        self.strings = strings
+        return try await withTaskCancellationHandler {
+            do {
+                try Task.checkCancellation()
+                let tags = try await waitForTag()
+                guard let session else {
+                    Self.logger().error("Unable to get session")
+                    throw IdCardInternalError.nfcNotSupported
+                }
+                updateAlertMessage(step: 1)
+                let tag = try await connection.setup(session, tags: tags)
+                updateAlertMessage(step: 2)
+                let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
+                let result = try await body(cardCommands)
+                success()
+                return result
+            } catch {
+                if Task.isCancelled {
+                    throw IdCardInternalError.cancelledByUser
+                }
+                Self.logger().error("Unable to complete NFC operation: \(String(describing: error))")
+                if let session {
+                    throw handleSessionError(error, session: session)
+                }
+                throw error
+            }
+        } onCancel: {
+            Task { @MainActor in
+                self.session?.invalidate()
+            }
+        }
     }
 
     // MARK: - NFCTagReaderSessionDelegate
 
     public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
 
-    public func tagReaderSession(_: NFCTagReaderSession, didDetect _: [NFCTag]) {
-        // Override in subclasses
+    public func tagReaderSession(_: NFCTagReaderSession, didDetect tags: [NFCTag]) {
+        tagContinuation?.resume(returning: tags)
+        tagContinuation = nil
     }
 
-    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError _: Error) {
-        // Override in subclasses
+    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
+        Self.logger().info("NFC: Reader session finished with error: \(String(describing: error))")
+        session = nil
+        guard let tagContinuation else { return }
+        self.tagContinuation = nil
+        if let nfcError = error as? NFCReaderError,
+           nfcError.code == .readerSessionInvalidationErrorUserCanceled {
+            tagContinuation.resume(throwing: IdCardInternalError.cancelledByUser)
+        } else {
+            tagContinuation.resume(throwing: error)
+        }
     }
 }

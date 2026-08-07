@@ -352,6 +352,7 @@ struct FloatingLabelTextField: View {
                         onDone()
                     }
                 )
+                .privacySensitive(isSecure)
                 .toolbar { keyboardToolbar }
                 .accessibilitySortPriority(sortPriority)
                 .accessibilityLabel(Text(verbatim: title))
