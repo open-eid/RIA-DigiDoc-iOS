@@ -85,7 +85,13 @@ final class DataStoreTests {
     // MARK: - Restore Default Services Settings Tests
     @Test
     func restoreDefaultServicesSettings_success() async throws {
+        await dataStore.setIsRoleAndAddressEnabled(true)
+        await dataStore.setIsDefaultLTAEnabled(true)
+
         await dataStore.restoreDefaultServicesSettings(nil)
+
+        #expect(await dataStore.getIsRoleAndAddressEnabled() == false)
+        #expect(await dataStore.getIsDefaultLTAEnabled() == false)
 
         #expect(await dataStore.getValidationServiceURL() == "")
         #expect(await dataStore.getValidationServiceOption() == .defaultSetting)
