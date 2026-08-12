@@ -70,12 +70,12 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
         var failedFileCount = 0
         let totalFileCount = filesToAdd.count
 
-        let existingDataFiles = Set(dataFiles?.compactMap { $0?.lastPathComponent } ?? [])
+        let existingDataFiles = Set(dataFiles?.compactMap { $0?.lastPathComponent.sanitized() } ?? [])
 
         var duplicateFileName: String?
 
         for fileToAdd in filesToAdd {
-            let fileName = fileToAdd.lastPathComponent
+            let fileName = fileToAdd.lastPathComponent.sanitized()
             let destinationURL = cryptoContainersDirectory.appendingPathComponent(fileName)
 
             if existingDataFiles.contains(fileName) ||
@@ -90,15 +90,22 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
                 continue
             }
 
-            do {
-                if fileManager.fileExists(atPath: destinationURL.path) {
-                    try fileManager.removeItem(at: destinationURL)
-                }
+            guard destinationURL.isWithin(directory: cryptoContainersDirectory) else {
+                CryptoContainer.logger().error(
+                    "Refusing to add file: destination escapes the container directory"
+                )
+                failedFileCount += 1
+                continue
+            }
 
-                try fileManager.copyItem(at: fileToAdd, to: destinationURL)
+            do {
+                try placeInContainerDirectory(fileToAdd, at: destinationURL)
                 movedFiles.append(destinationURL)
 
             } catch {
+                CryptoContainer.logger().error(
+                    "Unable to add '\(fileName, privacy: .public)' to container: \(error.localizedDescription)"
+                )
                 failedFileCount += 1
             }
         }
@@ -127,6 +134,25 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
                 )
             )
         }
+    }
+
+    private func placeInContainerDirectory(_ fileToAdd: URL, at destinationURL: URL) throws {
+        let isAlreadyAtDestination = fileToAdd.resolvingSymlinksInPath().resolvedPath ==
+            destinationURL.resolvingSymlinksInPath().resolvedPath
+
+        if isAlreadyAtDestination {
+            guard fileManager.fileExists(atPath: destinationURL.resolvedPath) else {
+                throw CocoaError(.fileNoSuchFile)
+            }
+
+            return
+        }
+
+        if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
+            try fileManager.removeItem(at: destinationURL)
+        }
+
+        try fileManager.copyItem(at: fileToAdd, to: destinationURL)
     }
 
     public func addRecipients(_ recipientsToAdd: [Addressee]) async {
@@ -210,31 +236,55 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
     }
 
     private func save(_ source: URL, as destination: URL) throws {
+        if fileManager.fileExists(atPath: destination.resolvedPath) {
+            try fileManager.removeItem(at: destination)
+        }
         try fileManager.copyItem(at: source, to: destination)
     }
 
     public func saveDataFile(dataFile: URL, to directory: URL?) async throws -> URL {
-        let sanitizedName = dataFile.lastPathComponent.sanitized()
         let savedFilesDirectory = try directory ?? Directories.getCacheDirectory(
             subfolders: [CommonsLib.Constants.Folder.SavedFiles],
             fileManager: fileManager
         )
-        let file = savedFilesDirectory.appending(path: sanitizedName)
         let dataFiles = await getDataFiles()
 
-        for containerDataFile in dataFiles
-        where dataFile.lastPathComponent == containerDataFile.lastPathComponent {
-                if !fileManager.fileExists(atPath: file.resolvedPath) {
-                    try save(containerDataFile, as: file)
-                }
-                return file
-        }
-        throw CryptoError.containerDataFileSavingFailed(
-            CryptoErrorDetail(
-                message: "Could not find file in container",
-                userInfo: ["fileName": dataFile.lastPathComponent]
+        guard let index = dataFiles.firstIndex(
+            where: { $0.lastPathComponent == dataFile.lastPathComponent }
+        ) else {
+            throw CryptoError.containerDataFileSavingFailed(
+                CryptoErrorDetail(
+                    message: "Could not find file in container",
+                    userInfo: ["fileName": dataFile.lastPathComponent]
+                )
             )
+        }
+
+        let file = savedFilesDirectory.appending(
+            path: savedFileName(for: index, in: dataFiles)
         )
+
+        guard file.isWithin(directory: savedFilesDirectory) else {
+            throw CryptoError.containerDataFileSavingFailed(
+                CryptoErrorDetail(
+                    message: "Failed to save file",
+                    userInfo: ["fileName": dataFile.lastPathComponent]
+                )
+            )
+        }
+
+        try save(dataFiles[index], as: file)
+        return file
+    }
+
+    private func savedFileName(for index: Int, in dataFiles: [URL]) -> String {
+        let sanitizedName = dataFiles[index].lastPathComponent.sanitized()
+
+        let hasDuplicateName = dataFiles.enumerated().contains { offset, other in
+            offset != index && other.lastPathComponent.sanitized() == sanitizedName
+        }
+
+        return hasDuplicateName ? sanitizedName.appendingIndex(index) : sanitizedName
     }
 }
 
@@ -290,21 +340,28 @@ extension CryptoContainer {
                 fileManager: fileManager
             )
 
+            let sanitizedContainerURL = cryptoContainersDirectory
+                .appending(path: containerURL.lastPathComponent.sanitized())
+
             CryptoContainer.logger().info("Getting an unique crypto container name")
             // Get unique container name file (1) if name already exists
             let uniqueContainerURL = containerUtil.getContainerFile(
-                for: containerURL,
+                for: sanitizedContainerURL,
                 in: cryptoContainersDirectory
             )
 
             CryptoContainer.logger().info("Creating a new crypto container")
-            return try await create(
+            let container = try await create(
                 containerFile: uniqueContainerURL,
-                dataFiles: dataFiles,
+                dataFiles: [],
                 recipients: [],
                 isDecrypted: false,
                 isEncrypted: false
             )
+
+            try await container.addDataFiles(dataFiles)
+
+            return container
         }
 
         CryptoContainer.logger().info("Opening existing crypto container")
@@ -379,15 +436,35 @@ extension CryptoContainer {
             subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
             fileManager: fileManager
         )
-        return try decryptedData.map { name, data in
-            let fileUrl = destinationPath.appending(path: name.sanitized(), directoryHint: .notDirectory)
-            guard fileManager.createFile(atPath: fileUrl.resolvedPath, contents: data, attributes: nil) else {
-                throw CryptoError.containerDataFileSavingFailed(
-                    CryptoErrorDetail(message: "Unable to create decrypted file", userInfo: ["fileName": name])
+        var usedNames: Set<String> = []
+        var urlDataFiles: [URL] = []
+
+        for (name, data) in decryptedData {
+            let fileName = name.sanitized().uniqueFileName(taken: &usedNames)
+            let fileUrl = destinationPath.appending(path: fileName, directoryHint: .notDirectory)
+
+            guard fileUrl.isWithin(directory: destinationPath) else {
+                throw CryptoError.containerOpeningFailed(
+                    CryptoErrorDetail(
+                        message: "Cannot open container with invalid CDOC info",
+                        userInfo: ["fileName": fileName]
+                    )
                 )
             }
-            return fileUrl
+
+            guard fileManager.createFile(atPath: fileUrl.resolvedPath, contents: data, attributes: nil) else {
+                CryptoContainer.logger().error(
+                    "Unable to create file at path: \(fileUrl.resolvedPath, privacy: .public)"
+                )
+                throw CryptoError.containerDataFileSavingFailed(
+                    CryptoErrorDetail(message: "Unable to create decrypted file", userInfo: ["fileName": fileName])
+                )
+            }
+
+            urlDataFiles.append(fileUrl)
         }
+
+        return urlDataFiles
     }
 
     @MainActor
@@ -444,10 +521,9 @@ extension CryptoContainer {
         var cryptoDataFiles: [CryptoDataFile] = []
 
         for dataFile in dataFiles {
-
             cryptoDataFiles.append(
                 CryptoDataFile(
-                    filename: dataFile.lastPathComponent,
+                    filename: dataFile.lastPathComponent.sanitized(),
                     filePath: dataFile.resolvedPath
                 )
             )
@@ -477,7 +553,8 @@ extension CryptoContainer {
         var dataFiles: [URL] = []
 
         for dataFile in cryptoDataFiles {
-            let fileUrl = URL(fileURLWithPath: dataFile.filePath ?? "").appending(path: dataFile.filename)
+            let fileUrl = URL(fileURLWithPath: dataFile.filePath ?? "")
+                .appending(path: dataFile.filename)
 
             dataFiles.append(fileUrl)
         }
