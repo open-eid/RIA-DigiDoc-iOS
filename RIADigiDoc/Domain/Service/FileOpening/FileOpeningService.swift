@@ -35,6 +35,7 @@ actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
         case .success(let urls):
             var validFiles: [URL] = []
             var firstError: Error?
+            var cachedNameSources: [String: String] = [:]
 
             for (index, url) in urls.enumerated() {
                 let accessing = url.startAccessingSecurityScopedResource()
@@ -49,7 +50,9 @@ actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
                     let validUrl = try await url.validURL(fileUtil: fileUtil)
 
                     if try await isFileSizeValid(url: validUrl) {
-                        await validFiles.append(try cacheFile(from: validUrl))
+                        let cachedFile = try await cacheFile(from: validUrl, cachedNameSources: cachedNameSources)
+                        cachedNameSources[cachedFile.lastPathComponent.sanitized()] = validUrl.resolvedPath
+                        validFiles.append(cachedFile)
                     }
                 } catch {
                     let nsError = error as NSError
@@ -85,6 +88,7 @@ actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
 
     private func cacheFile(
         from sourceURL: URL,
+        cachedNameSources: [String: String]
     ) async throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
             subfolders: [Constants.Folder.ContainerFolder],
@@ -107,7 +111,30 @@ actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
                 attributes: nil)
         }
 
-        let destinationURL = signedContainersDataFilesDirectory.appending(path: sourceURL.lastPathComponent)
+        let unavailableDestinationNames = Set(
+            cachedNameSources
+                .filter { $0.value != sourceURL.resolvedPath }
+                .keys
+                .map { $0.lowercased() }
+        )
+
+        let baseName = sourceURL.lastPathComponent.sanitized()
+        var fileName = baseName
+        var index = 1
+
+        while unavailableDestinationNames.contains(fileName.lowercased()) {
+            let suffixBytes = " (\(index))".utf8.count
+            fileName = baseName
+                .truncatedFileName(maxBytes: Constants.File.MaxNameBytes - suffixBytes)
+                .appendingIndex(index)
+            index += 1
+        }
+
+        let destinationURL = signedContainersDataFilesDirectory.appending(path: fileName)
+
+        guard destinationURL.isWithin(directory: signedContainersDataFilesDirectory) else {
+            throw FileOpeningError.noDataFiles
+        }
 
         if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
             try fileManager.removeItem(at: destinationURL)
