@@ -75,12 +75,24 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
             fileManager: fileManager
         )
 
-        let sanitizedFilename = {
-            let name = dataFile.fileName.sanitized()
-            return name.isEmpty ? CommonsLib.Constants.Container.DefaultName : name
-        }()
+        let allDataFiles = await getDataFiles()
+        let sanitizedFilename = dataFile.fileName.sanitized()
+        let index = allDataFiles.firstIndex { $0.fileId == dataFile.fileId } ?? 0
+        let hasDuplicateName = allDataFiles.enumerated().contains { offset, other in
+            offset != index && other.fileName.sanitized() == sanitizedFilename
+        }
+        let uniqueFilename = hasDuplicateName ? sanitizedFilename.appendingIndex(index) : sanitizedFilename
 
-        let tempSavedFileLocation = savedFilesDirectory.appending(path: sanitizedFilename)
+        let tempSavedFileLocation = savedFilesDirectory.appending(path: uniqueFilename)
+
+        guard tempSavedFileLocation.isWithin(directory: savedFilesDirectory) else {
+            throw DigiDocError.containerDataFileSavingFailed(
+                ErrorDetail(
+                    message: "Failed to save file",
+                    userInfo: ["fileName": uniqueFilename]
+                )
+            )
+        }
 
         do {
             try await DigiDocContainerWrapper.container(
@@ -89,7 +101,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 to: tempSavedFileLocation.resolvedPath
             )
             ContainerWrapper.logger().info(
-                "Successfully saved \(sanitizedFilename, privacy: .public) to 'Saved Files' directory"
+                "Successfully saved \(uniqueFilename, privacy: .public) to 'Saved Files' directory"
             )
             return tempSavedFileLocation
         } catch {

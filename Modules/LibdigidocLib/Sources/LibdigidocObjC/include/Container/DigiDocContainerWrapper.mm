@@ -117,6 +117,18 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     });
 }
 
++ (NSString *)stringFromStdString:(const std::string &)value {
+    NSString *utf8 = [[NSString alloc] initWithBytes:value.data()
+                                              length:value.size()
+                                            encoding:NSUTF8StringEncoding];
+    if (utf8 != nil) {
+        return utf8;
+    }
+    return [[NSString alloc] initWithBytes:value.data()
+                                    length:value.size()
+                                  encoding:NSISOLatin1StringEncoding] ?: @"";
+}
+
 + (NSString *)getSerialNumber:(NSString *)serialNumber {
     NSSet *types = [NSSet setWithObjects:@"PAS", @"IDC", @"PNO", @"TAX", @"TIN", nil];
 
@@ -269,7 +281,7 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
             for (const digidoc::DataFile *dataFile : container->dataFiles()) {
                 DigiDocDataFile *digiDocDataFile = [DigiDocDataFile new];
                 digiDocDataFile.fileId = [NSString stringWithUTF8String:dataFile->id().c_str()];
-                digiDocDataFile.fileName = [NSString stringWithUTF8String:dataFile->fileName().c_str()];
+                digiDocDataFile.fileName = [DigiDocContainerWrapper stringFromStdString:dataFile->fileName()];
                 digiDocDataFile.fileSize = dataFile->fileSize();
                 digiDocDataFile.mediaType = [NSString stringWithUTF8String:dataFile->mediaType().c_str()];
                 [datafiles addObject:digiDocDataFile];
@@ -371,11 +383,11 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion {
     [self open:containerPath validateOnline:TRUE command:^(digidoc::Container &container) {
-        const char *fileNameUTF8 = fileName.UTF8String;
         BOOL fileFound = NO;
 
         for (digidoc::DataFile *dataFile : container.dataFiles()) {
-            if (dataFile->fileName() == fileNameUTF8) {
+            NSString *entry = [DigiDocContainerWrapper stringFromStdString:dataFile->fileName()];
+            if ([fileName isEqualToString:entry]) {
                 dataFile->saveAs(path.UTF8String);
                 fileFound = YES;
                 break;

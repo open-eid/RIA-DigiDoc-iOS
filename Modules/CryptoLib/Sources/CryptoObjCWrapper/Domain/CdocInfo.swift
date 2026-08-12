@@ -103,8 +103,13 @@ class CdocParserDelegate: NSObject, XMLParserDelegate {
                 addressees.append(Addressee(cert: dataFromBase64))
             }
         case ("denc:EncryptionProperty", "orig_file"):
-            if let filename = currentData.split(separator: "|").first {
-                dataFiles.append(CryptoDataFile(filename: String(filename)))
+            let parts = currentData.components(separatedBy: "|")
+            let filename = parts.count > 3
+                ? parts.dropLast(3).joined(separator: "|")
+                : (parts.first ?? "")
+
+            if !filename.isEmpty {
+                dataFiles.append(CryptoDataFile(filename: filename))
             }
         case ("denc:EncryptionProperty", "DocumentFormat"):
             format = currentData
