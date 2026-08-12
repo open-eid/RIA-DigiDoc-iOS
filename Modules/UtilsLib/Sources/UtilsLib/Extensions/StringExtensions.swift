@@ -23,24 +23,58 @@ import CommonsLib
 extension String {
 
     public func sanitized() -> String {
-        var forbidden = CharacterSet.illegalCharacters
-            .union(.symbols)
-            .union(.extraSymbols)
-        forbidden.insert(charactersIn: "\n\r\t")
-
-        var cleanName = self
-            .components(separatedBy: forbidden)
+        let cleanName = self
+            .components(separatedBy: CharacterSet.forbiddenInFileName)
             .joined()
             .trimmingCharacters(in: .whitespacesAndNewlines)
+            .precomposedStringWithCanonicalMapping
+            .truncatedFileName(maxBytes: Constants.File.MaxNameBytes)
 
-        while cleanName.hasPrefix(".") {
-            cleanName.removeFirst()
-            if cleanName.isEmpty {
-                cleanName = "_"
-            }
+        if cleanName.isEmpty || cleanName.allSatisfy({ $0 == "." }) {
+            return Constants.Container.DefaultName
         }
 
-        return cleanName.isEmpty ? Constants.Container.DefaultName : cleanName
+        return cleanName
+    }
+
+    public func appendingIndex(_ index: Int) -> String {
+        let base = (self as NSString).deletingPathExtension
+        let ext = (self as NSString).pathExtension
+
+        return ext.isEmpty ? "\(base) (\(index))" : "\(base) (\(index)).\(ext)"
+    }
+
+    public func uniqueFileName(taken: inout Set<String>) -> String {
+        var candidate = self
+        var counter = 1
+
+        while taken.contains(candidate) {
+            candidate = appendingIndex(counter)
+            counter += 1
+        }
+
+        taken.insert(candidate)
+        return candidate
+    }
+
+    public func truncatedFileName(maxBytes: Int) -> String {
+        guard utf8.count > maxBytes else { return self }
+
+        let suffix = (self as NSString).pathExtension
+        let candidate = suffix.isEmpty ? "" : ".\(suffix)"
+        let ext = candidate.utf8.count < maxBytes ? candidate : ""
+        let base = ext.isEmpty ? self : (self as NSString).deletingPathExtension
+
+        var truncated = ""
+        var byteCount = ext.utf8.count
+        for character in base {
+            let size = String(character).utf8.count
+            if byteCount + size > maxBytes { break }
+            truncated.append(character)
+            byteCount += size
+        }
+
+        return truncated + ext
     }
 
     public func getURLFromText() -> AttributedString? {

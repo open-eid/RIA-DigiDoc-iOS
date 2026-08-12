@@ -272,7 +272,13 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
             }
             [data increaseLengthBy:16 * 1024];
         }
-        [response setObject:data forKey:[NSString stringWithStdString:name]];
+
+        NSString *fileName = [NSString stringWithStdString:name];
+        NSUInteger counter = response.count + 1;
+        while (fileName.length == 0 || response[fileName] != nil) {
+            fileName = [NSString stringWithFormat:@"datafile-%lu", (unsigned long)counter++];
+        }
+        [response setObject:data forKey:fileName];
     }
     if (reader.finishDecryption() != 0)
         return [NSError cryptoError:@"Failed to end encryption" error:error];

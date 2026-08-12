@@ -103,7 +103,12 @@ actor FileOpeningService: FileOpeningServiceProtocol {
                 attributes: nil)
         }
 
-        let destinationURL = signedContainersDataFilesDirectory.appending(path: sourceURL.lastPathComponent)
+        let fileName = sourceURL.lastPathComponent.truncatedFileName(maxBytes: Constants.File.MaxNameBytes)
+        let destinationURL = signedContainersDataFilesDirectory.appending(path: fileName)
+
+        guard destinationURL.isWithin(directory: signedContainersDataFilesDirectory) else {
+            throw FileOpeningError.noDataFiles
+        }
 
         if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
             try fileManager.removeItem(at: destinationURL)

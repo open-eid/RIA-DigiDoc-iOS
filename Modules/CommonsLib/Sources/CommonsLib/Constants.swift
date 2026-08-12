@@ -101,6 +101,9 @@ public struct Constants {
         public static let LibDigidocLog = "libdigidocpp.log"
         public static let LDAPCertsPem = "ldapCerts.pem"
         public static let nfcCANKey = "canKey.txt"
+
+        // iOS allows 255 characters in a file name, but app may add "(1)" and more to file names.
+        public static let MaxNameBytes = 240
     }
 
     public struct FileBaseName {
