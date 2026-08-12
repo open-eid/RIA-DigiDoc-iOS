@@ -156,10 +156,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                 fileManager: fileManager
             )
 
-            let filename = containerLocation.lastPathComponent.sanitized().isEmpty
-                ? CommonsLib.Constants.Container.DefaultName
-                : containerLocation.lastPathComponent.sanitized()
-
+            let filename = containerLocation.lastPathComponent.sanitized()
             let tempSavedFileLocation = savedFilesDirectory.appending(path: filename)
 
             if fileManager.fileExists(atPath: tempSavedFileLocation.resolvedPath) {
