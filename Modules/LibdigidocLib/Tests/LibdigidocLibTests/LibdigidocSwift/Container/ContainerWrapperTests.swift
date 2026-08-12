@@ -305,6 +305,33 @@ struct ContainerWrapperTests {
     }
 
     @Test
+    func saveDataFile_disambiguatesEntriesThatSanitizeToTheSameName() async throws {
+        let first = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "D0", fileName: "a<b.txt", fileSize: 1,
+            mediaType: CommonsLib.Constants.Extension.Default)
+        let second = MockDataFileWrapper.mockDataFileWrapper(
+            fileId: "D1", fileName: "a>b.txt", fileSize: 1,
+            mediaType: CommonsLib.Constants.Extension.Default)
+
+        let wrapper = ContainerWrapper(
+            containerURL: URL(fileURLWithPath: "/tmp/does-not-exist.asice"),
+            dataFiles: [first, second],
+            fileManager: mockFileManager
+        )
+
+        do {
+            _ = try await wrapper.saveDataFile(dataFile: second, to: nil)
+            Issue.record("Expected an error")
+        } catch let error as DigiDocError {
+            guard case .containerDataFileSavingFailed(let detail) = error else {
+                Issue.record("Unexpected DigiDocError: \(error)")
+                return
+            }
+            #expect(detail.userInfo["fileName"] as? String == "ab (1).txt")
+        }
+    }
+
+    @Test
     func saveDataFile_throwErrorWhenInvalidDataFile() async throws {
         let dataFile = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "",

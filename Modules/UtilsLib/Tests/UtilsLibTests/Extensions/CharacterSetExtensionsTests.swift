@@ -23,72 +23,34 @@ import Testing
 
 class CharacterSetExtensionsTests {
 
-    @Test
-    func extraSymbols_successCheckingCharacterSet() {
-        let expectedCharacters = "½@%:^?[]'\"”’{}#&`\\~«»/´"
-        let rtlChars = ["\u{200E}", "\u{200F}", "\u{202E}", "\u{202A}", "\u{202B}"]
+    @Test(arguments: ["/", "\\", "<", ">", ":", "\"", "|", "?", "*"])
+    func forbiddenInFileName_containsPathSeparatorsAndReservedCharacters(character: String) throws {
+        let scalar = try #require(character.unicodeScalars.first)
 
-        let extraSymbolsSet = CharacterSet.extraSymbols
+        #expect(CharacterSet.forbiddenInFileName.contains(scalar))
+    }
 
-        for char in expectedCharacters {
-            guard let scalar = char.unicodeScalars.first else {
-                Issue.record("Unable to get Unicode scalar for character \(char)")
-                return
-            }
-            #expect(extraSymbolsSet.contains(scalar))
-        }
+    @Test(arguments: [
+        "\u{0000}", "\u{0001}", "\u{0009}", "\u{000A}", "\u{000D}", "\u{007F}", "\u{0085}",
+        "\u{200B}", "\u{200E}", "\u{200F}", "\u{202A}", "\u{202B}", "\u{202C}", "\u{202E}",
+        "\u{2060}", "\u{2066}", "\u{FEFF}", "\u{061C}"
+    ])
+    func forbiddenInFileName_containsControlAndFormatCharacters(character: String) throws {
+        let scalar = try #require(character.unicodeScalars.first)
 
-        for rtlChar in rtlChars {
-            guard let scalar = rtlChar.unicodeScalars.first else {
-                Issue.record("Unable to get Unicode scalar for RTL character \(rtlChar)")
-                return
-            }
-            #expect(extraSymbolsSet.contains(scalar))
-        }
+        #expect(CharacterSet.forbiddenInFileName.contains(scalar))
     }
 
     @Test
-    func extraSymbols_checkCharacterSetDoesNotContainOtherCharacters() {
-        let nonExpectedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        let extraSymbolsSet = CharacterSet.extraSymbols
+    func forbiddenInFileName_allowsCharactersThatAreLegalInAFileName() {
+        let allowed = "ABCabc019 #&+@%$=~^[]{}'.,;()!-_½«»´€äöüõ😀"
 
-        for char in nonExpectedCharacters {
-            guard let scalar = char.unicodeScalars.first else {
-                Issue.record("Unable to get Unicode scalar for character \(char)")
+        for character in allowed {
+            guard let scalar = character.unicodeScalars.first else {
+                Issue.record("Unable to get Unicode scalar for character \(character)")
                 return
             }
-            #expect(!extraSymbolsSet.contains(scalar))
+            #expect(!CharacterSet.forbiddenInFileName.contains(scalar), "\(character) should be allowed")
         }
-    }
-
-    @Test
-    func extraSymbols_checkCharacterSetIncludesSpecialEdgeCases() {
-        let specialEdgeCases = ["½", "@", "”", "’", "\\", "~", "«", "»", "/"]
-        let extraSymbolsSet = CharacterSet.extraSymbols
-
-        for char in specialEdgeCases {
-            guard let scalar = char.unicodeScalars.first else {
-                Issue.record("Failed to get Unicode scalar for character \(char)")
-                return
-            }
-            #expect(extraSymbolsSet.contains(scalar))
-        }
-    }
-
-    @Test
-    func extraSymbols_checkCharacterSetContainsRTLCharacters() {
-        let rtlChars = ["\u{200E}", "\u{200F}", "\u{202E}", "\u{202A}", "\u{202B}"]
-        let extraSymbolsSet = CharacterSet.extraSymbols
-
-        #expect(rtlChars.contains { rtlChar in
-            guard let scalar = rtlChar.unicodeScalars.first else { return false }
-            return extraSymbolsSet.contains(scalar)
-        })
-    }
-
-    @Test
-    func extraSymbols_checkCharacterSetIsNotEmpty() {
-        let extraSymbolsSet = CharacterSet.extraSymbols
-        #expect(!extraSymbolsSet.isEmpty)
     }
 }
