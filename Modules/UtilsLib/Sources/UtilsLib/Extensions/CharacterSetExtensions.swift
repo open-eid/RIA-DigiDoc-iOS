@@ -6,6 +6,7 @@ import Foundation
 extension CharacterSet {
     static var forbiddenInFileName: CharacterSet {
         var forbidden = CharacterSet.controlCharacters
+            .union(.illegalCharacters)
         forbidden.insert(charactersIn: "/\\<>:\"|?*")
         forbidden.remove(charactersIn: "\u{200D}")
         return forbidden

@@ -24,9 +24,15 @@ class StringSanitizationTests {
     }
 
     @Test
+    func sanitizedOrNil_stripsUnassignedCodePointsButKeepsAssignedSymbols() {
+        #expect("\u{FFFF}\u{FFFE}\u{1F600}".sanitizedOrNil() == "\u{1F600}")
+        #expect("@%^?[]{}#&".sanitizedOrNil() == "@%^[]{}#&")
+    }
+
+    @Test
     func sanitizedOrNil_returnsNilWhenNothingUsableRemains() {
-        #expect("\u{FFFF}\u{FFFE}\u{1F600}".sanitizedOrNil() == nil)
-        #expect("@%^?[]{}#&".sanitizedOrNil() == nil)
+        #expect("\u{0000}\u{0001}\u{202E}".sanitizedOrNil() == nil)
+        #expect("/\\<>:\"|?*".sanitizedOrNil() == nil)
     }
 
     @Test
@@ -39,35 +45,87 @@ class StringSanitizationTests {
     @Test
     func sanitizedOrNil_returnsCleanedNameWhenSomethingRemains() {
         #expect("TestData".sanitizedOrNil() == "TestData")
-        #expect("Test@Data".sanitizedOrNil() == "TestData")
+        #expect("Test@Data".sanitizedOrNil() == "Test@Data")
     }
 
     @Test
     func sanitized_stillSubstitutesFallbackWhereSanitizedOrNilIsNil() {
         #expect("".sanitized() == Constants.Container.DefaultName)
-        #expect("@%^?[]{}#&".sanitized() == Constants.Container.DefaultName)
+        #expect("\u{0000}\u{202E}".sanitized() == Constants.Container.DefaultName)
     }
 
-    @Test
-    func sanitized_removesIllegalCharacters() {
-        let input = "\u{FFFF}\u{FFFE}\u{1F600}"
-        let expected = Constants.Container.DefaultName
-
+    @Test(arguments: [
+        ("O&U report #1 (100%) @2026.pdf", "O&U report #1 (100%) @2026.pdf"),
+        ("t\u{20AC}4t.pdf", "t\u{20AC}4t.pdf"),
+        ("emoji\u{1F600}.pdf", "emoji\u{1F600}.pdf"),
+        ("team\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F466}.pdf", "team\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F466}.pdf"),
+        ("a+b=c~d^e.txt", "a+b=c~d^e.txt"),
+        ("test[1]{2}.txt", "test[1]{2}.txt"),
+        ("it's a \u{00BD} share.txt", "it's a \u{00BD} share.txt"),
+        ("Test\u{2211}\u{221E}\u{00A9}\u{00AE}\u{2190}\u{2192}Data", "Test\u{2211}\u{221E}\u{00A9}\u{00AE}\u{2190}\u{2192}Data"),
+        (".test", "test"),
+        ("v1..2 test.zip", "v1..2 test.zip")
+    ])
+    func sanitized_keepsCharactersThatAreLegalInAFileName(input: String, expected: String) {
         #expect(expected == input.sanitized())
     }
 
-    @Test
-    func sanitized_removesSymbols() {
-        let symbols = "Test∑∞€©®←→Data"
-        #expect(symbols.sanitized() == "TestData")
+    @Test(arguments: [
+        ("../../etc/test", "etctest"),
+        ("..\\..\\test", "test"),
+        ("a/b.txt", "ab.txt")
+    ])
+    func sanitized_removesPathSeparatorsSoNameStaysOneComponent(input: String, expected: String) {
+        let sanitized = input.sanitized()
+
+        #expect(expected == sanitized)
+        #expect(!sanitized.contains("/"))
+        #expect(!sanitized.contains("\\"))
+    }
+
+    @Test(arguments: [".", "..", "...."])
+    func sanitized_replacesDirectoryReferencesWithAPlaceholder(input: String) {
+        #expect("_" == input.sanitized())
     }
 
     @Test
-    func sanitized_extraSymbolsAndRTLCharacters() {
-        let input = "½@%:^?[]'\"”’{}#&`\\~«»/´\u{200E}\u{200F}\u{202E}\u{202A}\u{202B}"
-        let expected = Constants.Container.DefaultName
+    func sanitized_removesControlAndFormatCharacters() {
+        let input = "a\u{0000}b\u{0001}c\u{007F}d\u{202E}e\u{200B}f\u{FEFF}g\u{2066}h"
 
-        #expect(expected == input.sanitized())
+        #expect("abcdefgh" == input.sanitized())
+    }
+
+    @Test(arguments: ["<", ">", ":", "\"", "|", "?", "*"])
+    func sanitized_removesCharactersReservedForInterchange(character: String) {
+        #expect("ab.txt" == "a\(character)b.txt".sanitized())
+    }
+
+    @Test
+    func sanitized_returnsDefaultNameWhenNothingIsLeft() {
+        #expect(Constants.Container.DefaultName == "".sanitized())
+        #expect(Constants.Container.DefaultName == "///\\\\\\".sanitized())
+    }
+
+    @Test
+    func uniqueFileName_disambiguatesWithinABatchOnly() {
+        var taken: Set<String> = []
+
+        #expect("a.txt".uniqueFileName(taken: &taken) == "a.txt")
+        #expect("a.txt".uniqueFileName(taken: &taken) == "a (1).txt")
+        #expect("a.txt".uniqueFileName(taken: &taken) == "a (2).txt")
+
+        var fresh: Set<String> = []
+        #expect("a.txt".uniqueFileName(taken: &fresh) == "a.txt")
+    }
+
+    @Test
+    func uniqueFileName_keepsTheExtensionAndHandlesNamesWithout() {
+        var taken: Set<String> = []
+
+        #expect("report".uniqueFileName(taken: &taken) == "report")
+        #expect("report".uniqueFileName(taken: &taken) == "report (1)")
+        #expect("a.tar.gz".uniqueFileName(taken: &taken) == "a.tar.gz")
+        #expect("a.tar.gz".uniqueFileName(taken: &taken) == "a.tar (1).gz")
     }
 
     @Test
@@ -76,6 +134,55 @@ class StringSanitizationTests {
         let expected = "Test   Data"
 
         #expect(expected == input.sanitized())
+    }
+
+    @Test
+    func sanitized_normalizesToPrecomposedFormSoEquivalentNamesMatch() {
+        let decomposed = "teste\u{0301}.txt"
+        let precomposed = "test\u{00E9}.txt"
+
+        #expect(precomposed == decomposed.sanitized())
+        #expect(decomposed.sanitized() == precomposed.sanitized())
+    }
+
+    @Test
+    func sanitized_truncatesLongNameKeepingExtension() {
+        let input = String(repeating: "a", count: 500) + ".pdf"
+
+        let sanitized = input.sanitized()
+
+        #expect(sanitized.utf8.count <= Constants.File.MaxNameBytes)
+        #expect(sanitized.hasSuffix(".pdf"))
+    }
+
+    @Test
+    func sanitized_truncatesOnCharacterBoundariesSoNoReplacementCharacterAppears() {
+        let input = String(repeating: "ä", count: 300) + ".pdf"
+
+        let sanitized = input.sanitized()
+
+        #expect(sanitized.utf8.count <= Constants.File.MaxNameBytes)
+        #expect(!sanitized.contains("\u{FFFD}"))
+    }
+
+    @Test
+    func sanitized_keepsALongEndingWhileItStillFitsUnderTheCap() {
+        let input = String(repeating: "a", count: 300) + "." + String(repeating: "b", count: 100)
+
+        let sanitized = input.sanitized()
+
+        #expect(sanitized.utf8.count <= Constants.File.MaxNameBytes)
+        #expect(sanitized.hasSuffix("." + String(repeating: "b", count: 100)))
+    }
+
+    @Test
+    func sanitized_dropsAnEndingTooLongToLeaveRoomForAName() {
+        let input = String(repeating: "a", count: 300) + "." + String(repeating: "b", count: 500)
+
+        let sanitized = input.sanitized()
+
+        #expect(sanitized.utf8.count <= Constants.File.MaxNameBytes)
+        #expect(!sanitized.contains("b"))
     }
 
     @Test
