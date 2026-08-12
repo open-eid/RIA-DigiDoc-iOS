@@ -107,6 +107,39 @@ struct FileOpeningServiceTests {
     }
 
     @Test
+    func getValidFiles_keepsNamesThatDifferOnlyBySpecialCharactersApart() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let first = tempURL.appending(path: "Report: Q1.pdf")
+        let second = tempURL.appending(path: "Report Q1.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0] != validFiles[1])
+    }
+
+    @Test
+    func getValidFiles_truncatesNameLongerThanTheFilesystemAllows() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let longURL = tempURL.appending(path: String(repeating: "a", count: 1000) + ".txt")
+
+        mockFileUtil.getValidPathHandler = { _ in longURL }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([longURL]))
+
+        let cachedName = try #require(validFiles.first?.lastPathComponent)
+        #expect(cachedName.utf8.count <= CommonsLib.Constants.File.MaxNameBytes)
+        #expect(cachedName.hasSuffix(".txt"))
+        #expect(cachedName.utf8.count + 11 < 255)
+    }
+
+    @Test
     func getValidFiles_successWithDuplicateFiles() async throws {
         let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
         let tempFileURL = tempURL.appending(path: "test.txt")
