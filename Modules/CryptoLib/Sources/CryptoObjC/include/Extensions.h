@@ -40,7 +40,18 @@ static const NSInteger CryptoLibWrongKeyErrorCode = -109; // libcdoc::WRONG_KEY
 
 @implementation NSString (std_string)
 + (instancetype)stringWithStdString:(const std::string&)data {
-    return data.empty() ? nil : [NSString stringWithUTF8String:data.c_str()];
+    if (data.empty()) {
+        return nil;
+    }
+    NSString *utf8 = [[NSString alloc] initWithBytes:data.data()
+                                              length:data.size()
+                                            encoding:NSUTF8StringEncoding];
+    if (utf8 != nil) {
+        return utf8;
+    }
+    return [[NSString alloc] initWithBytes:data.data()
+                                    length:data.size()
+                                  encoding:NSISOLatin1StringEncoding];
 }
 
 - (std::string)toString {
