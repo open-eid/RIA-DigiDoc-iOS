@@ -88,4 +88,20 @@ final class KeychainStoreTests {
         }
     }
 
+    @Test
+    func removeAll_removesDynamicallyNamedKeys() async throws {
+        let dynamicKey = "\(KeychainKey.signingCertKey.rawValue)_123456"
+
+        let status = await keychainStore.save(key: dynamicKey, info: Data("test-cert".utf8))
+        #expect(status == true)
+
+        let storedBeforeRemoval = await keychainStore.retrieve(key: dynamicKey)
+        #expect(storedBeforeRemoval != nil)
+
+        await keychainStore.removeAll()
+
+        let storedAfterRemoval = await keychainStore.retrieve(key: dynamicKey)
+        #expect(storedAfterRemoval == nil)
+    }
+
 }

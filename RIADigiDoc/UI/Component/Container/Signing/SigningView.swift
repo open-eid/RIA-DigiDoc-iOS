@@ -542,7 +542,11 @@ struct SigningView: View {
                 Task { @MainActor in
                     let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
                     pathManager.navigate(
-                        to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                        to: .encryptView(
+                            isWithEncryption: false,
+                            cdocOption: cdocOption,
+                            selectedTab: .files
+                        )
                     )
                 }
             }
@@ -630,7 +634,11 @@ struct SigningView: View {
             let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
             await MainActor.run {
                 pathManager.replaceLast(
-                    to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                    to: .encryptView(
+                        isWithEncryption: false,
+                        cdocOption: cdocOption,
+                        selectedTab: .files
+                    )
                 )
             }
         }

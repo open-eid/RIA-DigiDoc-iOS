@@ -22,8 +22,6 @@ import CryptoKit
 
 /// @mockable
 public protocol EncryptedDataUtilProtocol: Sendable {
-    func saveSymmetricKeyToAppSupport(fileName: String) throws -> URL
     func getSymmetricKey(fileName: String) throws -> SymmetricKey
-    func encryptSecret(_ secret: String, with key: SymmetricKey) -> Data?
     func decryptSecret(_ data: Data, with symmetricKey: SymmetricKey) -> String?
 }

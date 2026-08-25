@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
+ * Copyright 2017 - 2025 Riigi Infosüsteemi Amet
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,27 +17,23 @@
  *
  */
 
-import SwiftUI
-import FactoryKit
-import nfclib
+import Foundation
 
-struct MyEidRootView: View {
-    @Environment(\.dismiss) private var dismiss
+// MARK: - Shared JSON helpers
 
-    @Environment(NavigationPathManager.self) private var pathManager
+protocol JSONCodable: Codable {}
 
-    var body: some View {
-        NFCView(
-            actionType: .myeid,
-            actionMethods: [.idCardViaNFC],
-            onSuccess: { _ in }
-        )
+extension JSONCodable {
+    /// Decode from raw JSON Data
+    static func from(jsonData: Data, decoder: JSONDecoder = JSONDecoder()) throws -> Self {
+        try decoder.decode(Self.self, from: jsonData)
     }
-}
 
-#Preview {
-    MyEidRootView()
-        .environment(Container.shared.languageSettings())
-        .environment(Container.shared.themeSettings())
-        .environment(NavigationPathManager())
+    /// Encode to JSON Data
+    func toJSONData(pretty: Bool = false, encoder: JSONEncoder = JSONEncoder()) throws -> Data {
+        if pretty {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        }
+        return try encoder.encode(self)
+    }
 }

@@ -27,7 +27,7 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         self.bundleIdentifier = bundleIdentifier ?? BundleUtil.getBundleIdentifier()
     }
 
-    public func save(key: KeychainKey, info: Data, withPasscodeSetOnly: Bool = false) async -> Bool {
+    public func save(key: String, info: Data, withPasscodeSetOnly: Bool = false) async -> Bool {
         let query = baseQuery(key: key)
 
         let attributes: [CFString: Any] = [
@@ -48,16 +48,20 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
             let addStatus = SecItemAdd(queryWithAttributes as CFDictionary, nil)
             return addStatus == errSecSuccess
         } else {
-            KeychainStore.logger().error("Unable to save \(key.rawValue): \(status)")
+            KeychainStore.logger().error("Unable to save keychain item: \(status)")
             return false
         }
     }
 
-    public func save(key: KeychainKey, info: Data) async -> Bool {
+    public func save(key: String, info: Data) async -> Bool {
         return await save(key: key, info: info, withPasscodeSetOnly: false)
     }
 
-    public func retrieve(key: KeychainKey) async -> Data? {
+    public func save(key: KeychainKey, info: Data) async -> Bool {
+        return await save(key: key.rawValue, info: info, withPasscodeSetOnly: false)
+    }
+
+    public func retrieve(key: String) async -> Data? {
         var query = baseQuery(key: key)
         query[kSecReturnData] = true
         query[kSecMatchLimit] = kSecMatchLimitOne
@@ -72,27 +76,45 @@ public actor KeychainStore: KeychainStoreProtocol, Loggable {
         }
     }
 
-    public func remove(key: KeychainKey) async {
+    public func retrieve(key: KeychainKey) async -> Data? {
+        return await retrieve(key: key.rawValue)
+    }
+
+    public func remove(key: String) async {
         let query = baseQuery(key: key)
         let status = SecItemDelete(query as CFDictionary)
 
-        if status != errSecSuccess {
+        if status != errSecSuccess, status != errSecItemNotFound {
             KeychainStore.logger().error("Error removing key from Keychain: \(status)")
         }
     }
 
-    public func removeAll() async {
-        for key in KeychainKey.allCases {
-            await remove(key: key)
+    public func remove(key: KeychainKey) async {
+        await remove(key: key.rawValue)
+    }
+
+    @discardableResult
+    public func removeAll() async -> Bool {
+        let query: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: bundleIdentifier
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+
+        if status != errSecSuccess, status != errSecItemNotFound {
+            KeychainStore.logger().error("Error removing all keys from Keychain: \(status)")
+            return false
         }
+
+        return true
     }
 
     // MARK: - Helper Methods
-    private func baseQuery(key: KeychainKey) -> [CFString: Any] {
+    private func baseQuery(key: String) -> [CFString: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: bundleIdentifier,
-            kSecAttrAccount: "\(bundleIdentifier).\(key.rawValue)"
+            kSecAttrAccount: "\(bundleIdentifier).\(key)"
         ]
     }
 }

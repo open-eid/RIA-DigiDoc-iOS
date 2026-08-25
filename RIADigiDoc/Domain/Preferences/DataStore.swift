@@ -524,6 +524,16 @@ public actor DataStore: DataStoreProtocol {
         userDefaults().set(isDone, forKey: Keys.isRecentDocumentsMigrationDone)
     }
 
+    // MARK: - Web eID
+
+    public func getWebEidRememberMe() async -> Bool {
+        userDefaults().bool(forKey: Keys.isWebEidRememberMe)
+    }
+
+    public func setWebEidRememberMe(_ value: Bool) async {
+        userDefaults().set(value, forKey: Keys.isWebEidRememberMe)
+    }
+
     // MARK: - Constants
 
     private enum DefaultValues {
@@ -592,5 +602,6 @@ public actor DataStore: DataStoreProtocol {
         static let isCrashlyticsAlwaysEnabled = "isCrashlyticsAlwaysEnabled"
         static let isRecentDocumentsMigrationDone = "isRecentDocumentsMigrationDone"
         static let isDefaultLTAEnabled = "isDefaultLTAEnabled"
+        static let isWebEidRememberMe = "isWebEidRememberMe"
     }
 }

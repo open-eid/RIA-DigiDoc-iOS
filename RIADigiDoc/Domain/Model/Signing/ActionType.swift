@@ -19,8 +19,15 @@
 
 import Foundation
 
-public enum ActionType {
+public enum ActionType: Sendable {
     case signing
     case myeid
     case decrypt
+    case auth
+    case certificate
+    case signingWebEid
+
+    var isWebEidFlow: Bool {
+        self == .auth || self == .certificate || self == .signingWebEid
+    }
 }

@@ -25,6 +25,11 @@ public enum ReadCertAndSignError: Error {
     case roleDataNil
     case containerPathNil
     case userAgentEmpty
+    case certMismatch
+    case hashInvalid
+    case invalidCertificate
+    case missingPublicKey
+    case unsupportedAlgorithm
     case cancelled
     case unknown(Error)
 }
@@ -40,6 +45,16 @@ extension ReadCertAndSignError: LocalizedError {
             return "Container path is nil"
         case .userAgentEmpty:
             return "User agent is empty"
+        case .certMismatch:
+            return "Web eID signing certificate mismatch"
+        case .hashInvalid:
+            return "Invalid hash encoding"
+        case .invalidCertificate:
+            return "Invalid X.509 certificate"
+        case .missingPublicKey:
+            return "Certificate public key is missing"
+        case .unsupportedAlgorithm:
+            return "Unsupported algorithm"
         case .cancelled:
             return "Operation cancelled by user"
         case .unknown(let error):

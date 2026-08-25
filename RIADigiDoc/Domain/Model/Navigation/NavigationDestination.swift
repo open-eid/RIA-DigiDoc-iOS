@@ -85,4 +85,8 @@ public enum NavigationDestination: Hashable {
         personalCode: String,
         actionMethod: ActionMethod
     )
+
+    case webEidView(
+        webEidURL: URL
+    )
 }

@@ -44,7 +44,7 @@ public struct SystemUtil: Loggable {
         var systemInfo = utsname()
         uname(&systemInfo)
         let identifier = withUnsafeBytes(of: &systemInfo.machine) { raw in
-            String(cString: raw.bindMemory(to: CChar.self).baseAddress!)
+            String(bytes: raw.prefix { $0 != 0 }, encoding: .utf8) ?? ""
         }
         return identifier.lowercased()
     }

@@ -126,8 +126,8 @@ struct EncryptPasswordModalView: View {
         ([languageSettings.localized("Password requirements")]
          + EncryptPasswordModalView.requirementKeys.map { languageSettings.localized($0) })
             .joined(separator: ". ")
-            .replacingOccurrences(
-                of: "–",
+            .replacing(
+                "–",
                 with: " \(languageSettings.localized("Password range to accessibility")) "
             )
     }

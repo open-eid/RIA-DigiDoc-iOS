@@ -232,7 +232,7 @@ struct HomeView: View {
         )
         .bottomSheet(isPresented: $showHomeMenuBottomSheet, actions: homeMenuBottomSheetActions)
         .onOpenURL { url in
-            handleFiles([url])
+            handleIncoming(url: url)
         }
         .onAppear {
             focusFilesButtonWithDelay()
@@ -251,7 +251,11 @@ struct HomeView: View {
                 Task { @MainActor in
                     let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
                     navigateWithVoiceOverFocusGuard(
-                        to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                        to: .encryptView(
+                            isWithEncryption: false,
+                            cdocOption: cdocOption,
+                            selectedTab: .files
+                        )
                     )
                     isNavigatingToEncryptView = false
                 }
@@ -311,6 +315,24 @@ struct HomeView: View {
             viewModel.setFileOpeningMethod(.all)
             viewModel.setChosenFiles(.success(files))
         }
+    }
+
+    private func handleIncoming(url: URL) {
+        let webEidURL = (WebEidUriUtil.isWebEidUri(url)) ? url : nil
+
+        let externalFileURLs: [URL] = (webEidURL != nil) ? [] : getExternalFileURLs(from: url)
+        handleFiles(externalFileURLs)
+
+        if let webEidUrl = webEidURL {
+            pathManager.navigate(to: .webEidView(webEidURL: webEidUrl))
+        }
+    }
+
+    private func getExternalFileURLs(from url: URL) -> [URL] {
+        if url.isFileURL {
+            return [url]
+        }
+        return []
     }
 }
 

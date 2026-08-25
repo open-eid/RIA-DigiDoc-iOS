@@ -168,7 +168,11 @@ struct EncryptRecipientView: View {
                 Button(action: {
                     encryptionButtonEnabled = false
                     pathManager.replaceLast(
-                        to: .encryptView(isWithEncryption: true, cdocOption: cdocOption, selectedTab: .files)
+                        to: .encryptView(
+                            isWithEncryption: true,
+                            cdocOption: cdocOption,
+                            selectedTab: .files
+                        )
                     )
                 }, label: {
                     HStack(spacing: Dimensions.Padding.XSPadding) {
@@ -325,7 +329,11 @@ struct EncryptRecipientView: View {
             title: nil,
             onLeftClick: {
                 pathManager.replaceLast(
-                    to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .files)
+                    to: .encryptView(
+                        isWithEncryption: false,
+                        cdocOption: cdocOption,
+                        selectedTab: .files
+                    )
                 )
             },
             showRightIcons: !isSearchExpanded,

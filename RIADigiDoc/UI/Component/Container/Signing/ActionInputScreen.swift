@@ -26,6 +26,8 @@ struct ActionInputScreen<Content: View>: View {
 
     @Environment(LanguageSettings.self) private var languageSettings
 
+    @AccessibilityFocusState private var isHeaderFocused: Bool
+
     private let selectedActionMethod: ActionMethod
 
     @State private var actionType: ActionType
@@ -45,6 +47,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Container signing")
         case .myeid:
             languageSettings.localized("Identification title")
+        case .auth:
+            languageSettings.localized("Authentication title")
+        case .certificate:
+            languageSettings.localized("Certificate title")
+        case .signingWebEid:
+            languageSettings.localized("Container signing")
         }
     }
 
@@ -56,6 +64,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Signing method")
         case .myeid:
             languageSettings.localized("Identification method")
+        case .auth:
+            languageSettings.localized("Authentication method")
+        case .certificate:
+            languageSettings.localized("Certificate method")
+        case .signingWebEid:
+            languageSettings.localized("Signing method")
         }
     }
 
@@ -71,6 +85,12 @@ struct ActionInputScreen<Content: View>: View {
             languageSettings.localized("Sign")
         case .myeid:
             languageSettings.localized("Identify")
+        case .auth:
+            languageSettings.localized("Authenticate")
+        case .certificate:
+            languageSettings.localized("Confirm")
+        case .signingWebEid:
+            languageSettings.localized("Sign")
         }
     }
 
@@ -103,6 +123,7 @@ struct ActionInputScreen<Content: View>: View {
     var body: some View {
         TopBarContainer(
             title: nil,
+            showNavigationIcon: !actionType.isWebEidFlow,
             onLeftClick: onBackClick,
             showRightIcons: !isInProgress,
             content: {
@@ -115,6 +136,21 @@ struct ActionInputScreen<Content: View>: View {
                             .padding(.vertical, Dimensions.Padding.SPadding)
                             .accessibilityHeading(.h1)
                             .accessibilityAddTraits([.isHeader])
+                            .accessibilityFocused($isHeaderFocused)
+                            .task {
+                                guard actionType.isWebEidFlow, UIAccessibility.isVoiceOverRunning else { return }
+
+                                // Assert focus, then re-assert after the transition's screen-change
+                                // resets VoiceOver to the TopBar icons (which flips the binding back).
+                                do {
+                                    try await Task.sleep(for: .milliseconds(350))
+                                    isHeaderFocused = true
+                                    try await Task.sleep(for: .milliseconds(650))
+                                    isHeaderFocused = true
+                                } catch {
+                                    return
+                                }
+                            }
 
                         if !isInProgress {
                             VStack(alignment: .leading, spacing: Dimensions.Padding.SPadding) {
@@ -174,6 +210,18 @@ struct ActionInputScreen<Content: View>: View {
                                 currentFocus: .constant(nil)
                             )
                             .padding(.vertical, Dimensions.Padding.MPadding)
+                        }
+
+                        if actionType.isWebEidFlow {
+                            PrimaryButton(
+                                text: languageSettings.localized("Cancel"),
+                                isButtonEnabled: true,
+                                action: onBackClick,
+                                focusedField: nil,
+                                currentFocus: .constant(nil),
+                                backgroundColor: theme.error,
+                                foregroundColor: theme.onError
+                            )
                         }
                     }
                 }

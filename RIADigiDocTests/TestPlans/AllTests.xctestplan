@@ -3,14 +3,10 @@
     {
       "id" : "7E76CDC9-F140-47FA-8B69-CBE16A2F858C",
       "name" : "Configuration 1",
-      "options" : {
-
-      }
+      "options" : {}
     }
   ],
-  "defaultOptions" : {
-
-  },
+  "defaultOptions" : {},
   "testTargets" : [
     {
       "target" : {
@@ -66,6 +62,13 @@
         "containerPath" : "container:Modules\/LibdigidocLib",
         "identifier" : "LibdigidocLibTests",
         "name" : "LibdigidocLibTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Modules\/WebEidLib",
+        "identifier" : "WebEidLibTests",
+        "name" : "WebEidLibTests"
       }
     }
   ],
