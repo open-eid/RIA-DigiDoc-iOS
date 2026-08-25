@@ -51,6 +51,9 @@ struct FloatingLabelTextField: View {
     let spellOutCharacters: Bool
     let showBorder: Bool
     let accessibilityHint: String
+    let textContentType: UITextContentType?
+    let sharedFocus: FocusState<String?>.Binding?
+    let nextFocus: String?
     let onDone: (() -> Void)
 
     init(
@@ -71,6 +74,9 @@ struct FloatingLabelTextField: View {
         spellOutCharacters: Bool = false,
         showBorder: Bool = true,
         accessibilityHint: String = "",
+        textContentType: UITextContentType? = nil,
+        sharedFocus: FocusState<String?>.Binding? = nil,
+        nextFocus: String? = nil,
         onDone: @escaping (() -> Void) = {}
     ) {
         self.title = title
@@ -90,13 +96,20 @@ struct FloatingLabelTextField: View {
         self.spellOutCharacters = spellOutCharacters
         self.showBorder = showBorder
         self.accessibilityHint = accessibilityHint
+        self.textContentType = textContentType
+        self.sharedFocus = sharedFocus
+        self.nextFocus = nextFocus
         self.onDone = onDone
     }
 
     // MARK: - State
     @State private var isPasswordVisible: Bool = false
     @State private var isFocused: Bool = false
-    @FocusState private var fieldIsFocused: Bool
+    @FocusState private var privateFocus: String?
+
+    private var focus: FocusState<String?>.Binding { sharedFocus ?? $privateFocus }
+    private var focusKey: String { identifier.isEmpty ? "field" : identifier }
+    private var fieldIsFocused: Bool { focus.wrappedValue == focusKey }
 
     // MARK: - Computed properties
 
@@ -118,7 +131,10 @@ struct FloatingLabelTextField: View {
 
     // Dont show password saving options
     private var fieldContentType: UITextContentType? {
-        isSecure ? .oneTimeCode : .init(rawValue: "")
+        if let textContentType {
+            return textContentType
+        }
+        return isSecure ? .oneTimeCode : .init(rawValue: "")
     }
 
     private var isInteractionEnabled: Bool {
@@ -323,17 +339,10 @@ struct FloatingLabelTextField: View {
                     contentType: fieldContentType,
                     isAccessibilityFocused: $isAccessibilityFocused,
                     onAppear: {},
-                    onSubmit: {
-                        isFocused = false
-                        isAccessibilityFocused = true
-                        onDone()
-                    }
+                    onSubmit: submit
                 )
                 .privacySensitive()
                 .toolbar { keyboardToolbar }
-                .onChange(of: errorText, { _, newValue in
-                    AccessibilityUtil.announceMessage(newValue)
-                })
                 .accessibilitySortPriority(sortPriority)
                 .accessibilityLabel(Text(verbatim: title))
             } else {
@@ -353,11 +362,7 @@ struct FloatingLabelTextField: View {
                     onAppear: {
                         selection = TextSelection(insertionPoint: text.endIndex)
                     },
-                    onSubmit: {
-                        fieldIsFocused = false
-                        isAccessibilityFocused = true
-                        onDone()
-                    }
+                    onSubmit: submit
                 )
                 .toolbar { keyboardToolbar }
                 .accessibilitySortPriority(sortPriority)
@@ -366,8 +371,9 @@ struct FloatingLabelTextField: View {
         }
         .font(typography.bodyLarge)
         .foregroundStyle(textColor)
-        .focused($fieldIsFocused)
-        .onChange(of: fieldIsFocused) { _, newValue in
+        .focused(focus, equals: focusKey)
+        .onChange(of: focus.wrappedValue) { _, newFocus in
+            let newValue = newFocus == focusKey
             if isInteractionEnabled {
                 withAnimation(.easeInOut(duration: Dimensions.Duration.focusAnimation)) {
                     isFocused = newValue
@@ -375,6 +381,7 @@ struct FloatingLabelTextField: View {
             }
         }
         .onChange(of: errorText, { _, newValue in
+            guard !newValue.isEmpty else { return }
             AccessibilityUtil.announceMessage(newValue)
         })
         .accessibilityHint(Text(verbatim: accessibilityHint))
@@ -406,13 +413,19 @@ struct FloatingLabelTextField: View {
         )
     }
 
+    private func submit() {
+        if let nextFocus {
+            focus.wrappedValue = nextFocus
+        } else {
+            focus.wrappedValue = nil
+            isAccessibilityFocused = true
+        }
+        onDone()
+    }
+
     private var doneButton: some View {
         Button(
-            action: {
-                fieldIsFocused = false
-                isAccessibilityFocused = true
-                onDone()
-            },
+            action: submit,
             label: { Text(verbatim: languageSettings.localized("Done")) }
         )
     }

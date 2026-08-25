@@ -68,6 +68,7 @@ struct PasswordModalCard<Content: View>: View {
 }
 
 struct PasswordModalTitleView: View {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @AppTheme private var theme
     @AppTypography private var typography
 
@@ -84,11 +85,10 @@ struct PasswordModalTitleView: View {
             .accessibilityHeading(.h1)
             .accessibilityAddTraits([.isHeader])
             .accessibilityFocused($isFocused)
-            .onAppear {
-                Task {
-                    try? await Task.sleep(for: .seconds(0.3))
-                    isFocused = true
-                }
+            .task(id: voiceOverEnabled) {
+                guard voiceOverEnabled else { return }
+                try? await Task.sleep(for: .seconds(0.3))
+                isFocused = true
             }
     }
 }

@@ -22,7 +22,7 @@ import SwiftUI
 struct Toast {
     static func show(
         _ message: String,
-        duration: TimeInterval = 5.0,
+        duration: TimeInterval = 4.0,
         type: ToastType = .error
     ) {
         if message.isEmpty { return }

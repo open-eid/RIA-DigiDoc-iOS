@@ -239,10 +239,6 @@ struct EncryptView: View {
                                                     await updateAsyncLabels()
                                                     await viewModel.updateAsyncProperties()
 
-                                                    Toast.show(languageSettings.localized(
-                                                        "Container successfully encrypted"
-                                                    ), type: .success)
-
                                                     encryptionButtonEnabled = true
                                                 }
                                             }
@@ -466,9 +462,7 @@ struct EncryptView: View {
                                 await updateAsyncLabels()
                                 await viewModel.updateAsyncProperties()
 
-                                Toast.show(languageSettings.localized(
-                                    "Container successfully decrypted"
-                                ), type: .success)
+                                showMessage("Container successfully decrypted", type: .success)
                                 isWithDecryption = false
                             } else {
                                 await viewModel.loadContainerData(
@@ -579,7 +573,7 @@ struct EncryptView: View {
 
     private func handlePasswordDecrypt(_ password: String) async {
         guard let containerFile = viewModel.containerURL else {
-            Toast.show(languageSettings.localized("Decrypt general error"))
+            showMessage("Decrypt general error")
             return
         }
         do {
@@ -596,12 +590,18 @@ struct EncryptView: View {
             selectedTab = .files
             await updateAsyncLabels()
             await viewModel.updateAsyncProperties()
-            Toast.show(languageSettings.localized("Container successfully decrypted"), type: .success)
+            showMessage("Container successfully decrypted", type: .success)
         } catch CryptoError.wrongDecryptionKey {
-            Toast.show(languageSettings.localized("Decrypt wrong password error"))
+            showMessage("Decrypt wrong password error")
         } catch {
-            Toast.show(languageSettings.localized("Decrypt general error"))
+            showMessage("Decrypt general error")
         }
+    }
+
+    private func showMessage(_ key: String, type: ToastType = .error) {
+        let message = languageSettings.localized(key)
+        Toast.show(message, type: type)
+        AccessibilityUtil.announceMessage(message)
     }
 
     func updateAsyncLabels() async {
