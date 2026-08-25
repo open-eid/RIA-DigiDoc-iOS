@@ -29,6 +29,8 @@ struct PrimaryButton: View {
     private let text: String
     private let isButtonEnabled: Bool
     private let action: () -> Void
+    private let backgroundColor: Color?
+    private let foregroundColor: Color?
 
     @Binding private var currentFocus: AccessibilityField?
     @State private var focusedField: AccessibilityField?
@@ -41,12 +43,16 @@ struct PrimaryButton: View {
         action: @escaping () -> Void,
         focusedField: AccessibilityField?,
         currentFocus: Binding<AccessibilityField?>,
+        backgroundColor: Color? = nil,
+        foregroundColor: Color? = nil,
     ) {
         self.text = text
         self.isButtonEnabled = isButtonEnabled
         self.action = action
         self.focusedField = focusedField
         self._currentFocus = currentFocus
+        self.backgroundColor = backgroundColor
+        self.foregroundColor = foregroundColor
     }
 
     var body: some View {
@@ -54,7 +60,9 @@ struct PrimaryButton: View {
             action: action,
             label: {
                 Text(verbatim: text)
-                    .foregroundStyle(isButtonEnabled ? theme.onPrimary : theme.surfaceContainerHighest)
+                    .foregroundStyle(isButtonEnabled
+                                     ? (foregroundColor ?? theme.onPrimary)
+                                     : theme.surfaceContainerHighest)
                     .font(typography.labelLarge)
                     .lineLimit(nil)
                     .multilineTextAlignment(.center)
@@ -64,7 +72,7 @@ struct PrimaryButton: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         Capsule()
-                            .fill(isButtonEnabled ? theme.primary : Color.gray)
+                            .fill(isButtonEnabled ? (backgroundColor ?? theme.primary) : Color.gray)
                     )
             })
             .disabled(!isButtonEnabled)

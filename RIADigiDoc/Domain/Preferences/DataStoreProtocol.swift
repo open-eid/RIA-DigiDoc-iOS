@@ -130,4 +130,8 @@ public protocol DataStoreProtocol: Sendable {
     // MARK: - Migration
     func getIsRecentDocumentsMigrationDone() async -> Bool
     func setIsRecentDocumentsMigrationDone(_ isDone: Bool) async
+
+    // MARK: - Web eID
+    func getWebEidRememberMe() async -> Bool
+    func setWebEidRememberMe(_ value: Bool) async
 }

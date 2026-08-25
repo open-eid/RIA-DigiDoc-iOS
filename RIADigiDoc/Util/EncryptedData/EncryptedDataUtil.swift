@@ -40,27 +40,6 @@ public struct EncryptedDataUtil: EncryptedDataUtilProtocol, Loggable {
 
     // MARK: - Key Management
 
-    private func storeKey(_ key: SymmetricKey, to url: URL) throws {
-        let keyData = key.withUnsafeBytes { Data($0) }
-        try keyData.write(to: url, options: .atomic)
-    }
-
-    @discardableResult
-    public func saveSymmetricKeyToAppSupport(fileName: String) throws -> URL {
-        guard let appSupportDirectory = applicationSupportDirectory() else {
-            EncryptedDataUtil.logger().error("Unable to locate Application Support directory")
-            throw EncryptedDataError.unableToLocateAppSupportDirectory
-        }
-
-        let symmetricKeyURL = appSupportDirectory.appendingPathComponent(fileName)
-        let symmetricKey = SymmetricKey(size: .bits256)
-
-        try storeKey(symmetricKey, to: symmetricKeyURL)
-
-        EncryptedDataUtil.logger().info("Symmetric key saved to: \(symmetricKeyURL.path)")
-        return symmetricKeyURL
-    }
-
     public func getSymmetricKey(fileName: String) throws -> SymmetricKey {
         guard let appSupportDirectory = applicationSupportDirectory() else {
             EncryptedDataUtil.logger().error("Unable to locate Application Support directory")
@@ -79,21 +58,6 @@ public struct EncryptedDataUtil: EncryptedDataUtilProtocol, Loggable {
     }
 
     // MARK: - Encryption/Decryption
-
-    public func encryptSecret(_ secret: String, with key: SymmetricKey) -> Data? {
-        guard let secretData = secret.data(using: .utf8) else {
-            EncryptedDataUtil.logger().error("Unable to convert secret to data")
-            return nil
-        }
-
-        do {
-            let sealedBox = try ChaChaPoly.seal(secretData, using: key)
-            return sealedBox.combined
-        } catch {
-            EncryptedDataUtil.logger().error("Unable to encrypt secret: \(error.localizedDescription)")
-            return nil
-        }
-    }
 
     public func decryptSecret(_ data: Data, with symmetricKey: SymmetricKey) -> String? {
         do {

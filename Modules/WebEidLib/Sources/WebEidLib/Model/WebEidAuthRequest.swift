@@ -1,0 +1,46 @@
+/*
+ * Copyright 2017 - 2026 Riigi Infosüsteemi Amet
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+import Foundation
+
+public struct WebEidAuthRequest: JSONCodable, Equatable, Sendable {
+    public let challenge: String
+    public let loginUri: String
+    public let getSigningCertificate: Bool
+    public let origin: String
+
+    public init(
+        challenge: String,
+        loginUri: String,
+        getSigningCertificate: Bool,
+        origin: String
+    ) {
+        self.challenge = challenge
+        self.loginUri = loginUri
+        self.getSigningCertificate = getSigningCertificate
+        self.origin = origin
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case challenge
+        case loginUri
+        case getSigningCertificate
+        case origin
+    }
+}

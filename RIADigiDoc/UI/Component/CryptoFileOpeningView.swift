@@ -85,7 +85,8 @@ struct CryptoFileOpeningView: View {
             }
         } else {
             let localizedMessage = languageSettings.localized(
-                errorMessage?.key ?? "General error", errorMessage?.args ?? []
+                errorMessage?.key ?? "General error",
+                errorMessage?.args ?? []
             )
             Toast.show(localizedMessage)
 

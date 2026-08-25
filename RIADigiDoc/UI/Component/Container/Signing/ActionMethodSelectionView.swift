@@ -45,6 +45,8 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Choose a signing method")
         case .myeid:
             languageSettings.localized("Identification method title")
+        case .auth, .certificate, .signingWebEid:
+            "" // Web eID flows never present this view
         }
     }
 
@@ -56,6 +58,8 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Signing method")
         case .myeid:
             languageSettings.localized("Identification method")
+        case .auth, .certificate, .signingWebEid:
+            "" // Web eID flows never present this view
         }
     }
 
@@ -67,6 +71,8 @@ struct ActionMethodSelectionView: View {
             languageSettings.localized("Signing method changed")
         case .myeid:
             languageSettings.localized("Identification method changed")
+        case .auth, .certificate, .signingWebEid:
+            "" // Web eID flows never present this view
         }
     }
 
@@ -139,6 +145,8 @@ struct ActionMethodSelectionView: View {
                     selectedMethod = await viewModel.getSelectedSigningMethod()
                 case .myeid:
                     selectedMethod = await viewModel.getSelectedMyEidMethod()
+                case .auth, .certificate, .signingWebEid:
+                    selectedMethod = .idCardViaNFC // Web eID flows never present this view
                 }
             }
         }
@@ -159,6 +167,15 @@ struct ActionMethodSelectionView: View {
                 await viewModel.setSelectedSigningMethod(selectedMethod)
             case .myeid:
                 await viewModel.setSelectedMyEidMethod(selectedMethod)
+            case .auth:
+                // Do nothing
+                break
+            case .certificate:
+                // Do nothing
+                break
+            case .signingWebEid:
+                // Do nothing
+                break
             }
 
             await MainActor.run {

@@ -81,7 +81,7 @@ workflows:
           mkdir -p $TSL_FILES_DIRECTORY
 
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-          for module in CommonsLib ConfigLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
+          for module in CommonsLib ConfigLib WebEidLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
             mock_dir="Modules/${module}/Tests/Mocks/Generated"
             mkdir -p "$mock_dir"
             echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
@@ -239,7 +239,7 @@ workflows:
           mkdir -p $TSL_FILES_DIRECTORY
           
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-          for module in CommonsLib ConfigLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
+          for module in CommonsLib ConfigLib WebEidLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
             mock_dir="Modules/${module}/Tests/Mocks/Generated"
             mkdir -p "$mock_dir"
             echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
@@ -291,7 +291,9 @@ workflows:
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
             --scheme "$XCODE_SCHEME" \
-            --archive-xcargs="-skipPackagePluginValidation"
+            --archive-xcargs="-skipPackagePluginValidation" \
+            --log-stream stdout \
+            -v
       - name: Rename and move IPA
         script: |
           mv -v build/ios/ipa/RIADigiDoc.ipa build/ios/ipa/"RIA_DigiDoc_release_$APP_VERSION.$LATEST_BUILD_NUMBER.ipa"

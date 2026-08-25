@@ -56,6 +56,7 @@ struct SigningRootView: View {
                             .smartId
                         ],
                         pinType: CodeType.pin2,
+                        isWebEidAuthenticating: .constant(false),
                         signedContainer: container,
                         onSuccess: { container in
                             isSuccess = true

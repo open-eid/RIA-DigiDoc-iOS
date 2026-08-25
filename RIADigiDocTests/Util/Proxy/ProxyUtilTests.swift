@@ -61,7 +61,7 @@ final class ProxyUtilTests {
             testInfo
         }
 
-        mockKeychainStore.retrieveHandler = { _ in
+        mockKeychainStore.retrieveKeyHandler = { _ in
             Data(expectedPassword.utf8)
         }
         let result = await proxyUtil.getProxyInfo()
@@ -87,7 +87,7 @@ final class ProxyUtilTests {
             testInfo
         }
 
-        mockKeychainStore.retrieveHandler = { _ in
+        mockKeychainStore.retrieveKeyHandler = { _ in
             Data(expectedPassword.utf8)
         }
         let result = await proxyUtil.getProxyInfo()
@@ -113,7 +113,7 @@ final class ProxyUtilTests {
             testInfo
         }
 
-        mockKeychainStore.retrieveHandler = { _ in
+        mockKeychainStore.retrieveKeyHandler = { _ in
             Data(expectedPassword.utf8)
         }
         let result = await proxyUtil.getProxyInfo()
@@ -163,6 +163,6 @@ final class ProxyUtilTests {
         )
         await proxyUtil.saveSetting(proxyInfo: testInfo)
         #expect(mockDataStore.setProxyInfoCallCount == 1)
-        #expect(mockKeychainStore.saveKeyCallCount == 1)
+        #expect(mockKeychainStore.saveKeyInfoCallCount == 1)
     }
 }

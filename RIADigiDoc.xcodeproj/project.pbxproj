@@ -7,11 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		040B4A29303DC7EB00E5F598 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 040B4A28303DC7EB00E5F598 /* CryptoLib */; };
+		040B4A2B303DC7EB00E5F598 /* WebEidLib in Frameworks */ = {isa = PBXBuildFile; productRef = 040B4A2A303DC7EB00E5F598 /* WebEidLib */; };
 		1A438FD92E72CF1900546B86 /* CryptoLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A438FD82E72CF1900546B86 /* CryptoLib */; };
 		1A4A775E2EF19823001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775D2EF19823001747D8 /* ConfigLib */; };
 		1A4A77602EF1983F001747D8 /* ConfigLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A775F2EF1983F001747D8 /* ConfigLib */; };
 		1A4A77622EF1983F001747D8 /* ConfigLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1A4A77612EF1983F001747D8 /* ConfigLibMocks */; };
 		1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1A5026EC2E8BFCF400C184D7 /* IdCardLib */; };
+		1ADBD1B62F6D66E500A27C88 /* CryptoLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADBD1B52F6D66E500A27C88 /* CryptoLibMocks */; };
+		1ADBD1BE2F6D6A6D00A27C88 /* WebEidLibMocks in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */; };
+		1ADC32232F59744600D34877 /* WebEidLib in Frameworks */ = {isa = PBXBuildFile; productRef = 1ADC32222F59744600D34877 /* WebEidLib */; };
 		DF1D595A2F3BF88000855E2E /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D59592F3BF88000855E2E /* FirebaseCore */; };
 		DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */; };
 		DF21D3592E8AA98E00A8E28C /* CommonsTestShared in Frameworks */ = {isa = PBXBuildFile; productRef = DFAABD0A2E82B45700906874 /* CommonsTestShared */; };
@@ -128,6 +133,7 @@
 		1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-xcframeworks.sh"; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
 		1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-libcdoc-sim.sh"; sourceTree = "<group>"; };
+		1AD5532C2F57274C00A88151 /* WebEidLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WebEidLib; sourceTree = "<group>"; };
 		DF17B64D2CE26949009B1E17 /* UtilsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UtilsLib; sourceTree = "<group>"; };
 		DF2B1BF22F524F83008EC06F /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		DF2B1BF42F524F89008EC06F /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
@@ -201,14 +207,20 @@
 				Domain/NFC/OperationChangePin.swift,
 				Domain/NFC/OperationDecrypt.swift,
 				Domain/NFC/OperationReadCardData.swift,
+				Domain/NFC/OperationReadCert.swift,
 				Domain/NFC/OperationReadCertAndSign.swift,
 				Domain/NFC/OperationUnblockPin.swift,
+				Domain/NFC/OperationWebEidAuth.swift,
+				Domain/NFC/OperationWebEidSign.swift,
 				Domain/NFC/ProgressBar.swift,
 				Domain/NFC/Protocols/OperationChangePinProtocol.swift,
 				Domain/NFC/Protocols/OperationDecryptProtocol.swift,
 				Domain/NFC/Protocols/OperationReadCardDataProtocol.swift,
 				Domain/NFC/Protocols/OperationReadCertAndSignProtocol.swift,
+				Domain/NFC/Protocols/OperationReadCertProtocol.swift,
 				Domain/NFC/Protocols/OperationUnblockPinProtocol.swift,
+				Domain/NFC/Protocols/OperationWebEidAuthProtocol.swift,
+				Domain/NFC/Protocols/OperationWebEidSignProtocol.swift,
 				Domain/Preferences/DataStore.swift,
 				Domain/Preferences/DataStoreProtocol.swift,
 				Domain/Preferences/KeychainStore.swift,
@@ -252,6 +264,7 @@
 				Util/Signature/SignatureUtilProtocol.swift,
 				Util/Theme/ThemeSettings.swift,
 				Util/Theme/ThemeSettingsProtocol.swift,
+				Util/WebEid/WebEidUriUtil.swift,
 				ViewModel/AdvancedSettingsViewModel.swift,
 				ViewModel/CertificateDetailViewModel.swift,
 				ViewModel/Crypto/DecryptRootViewModel.swift,
@@ -299,6 +312,7 @@
 				ViewModel/Protocols/SigningViewModelProtocol.swift,
 				ViewModel/Protocols/TimeStampSettingsViewModelProtocol.swift,
 				ViewModel/Protocols/ValidationSettingsViewModelProtocol.swift,
+				ViewModel/Protocols/WebEid/WebEidViewModelProtocol.swift,
 				ViewModel/ProxySettingsViewModel.swift,
 				ViewModel/RecentDocumentsViewModel.swift,
 				ViewModel/Shared/SharedContainerViewModel.swift,
@@ -318,6 +332,7 @@
 				ViewModel/SigningViewModel.swift,
 				ViewModel/TimeStampSettingsViewModel.swift,
 				ViewModel/ValidationSettingsViewModel.swift,
+				ViewModel/WebEid/WebEidViewModel.swift,
 			);
 			target = DFDB148B2CC97B1000153876 /* RIADigiDocTests */;
 		};
@@ -528,6 +543,7 @@
 				DFB1F1312CF0217C00185A7F /* CommonsLib in Frameworks */,
 				DF9AFE922E00D30A0062C64D /* FactoryKit in Frameworks */,
 				DF3E4A7F2CE269C900137235 /* UtilsLib in Frameworks */,
+				1ADC32232F59744600D34877 /* WebEidLib in Frameworks */,
 				1A5026ED2E8BFCF400C184D7 /* IdCardLib in Frameworks */,
 				DFA23CBD2EB6DC64000403E4 /* MobileIdLib in Frameworks */,
 				DF1D595C2F3BF88000855E2E /* FirebaseCrashlytics in Frameworks */,
@@ -548,17 +564,21 @@
 				DFAABD002E82AF0900906874 /* ConfigLibMocks in Frameworks */,
 				DFBD09F62CE3FBDC006AF9C2 /* LibdigidocLib in Frameworks */,
 				DF2B1BEA2F520815008EC06F /* SmartIdLib in Frameworks */,
+				040B4A2B303DC7EB00E5F598 /* WebEidLib in Frameworks */,
 				DF477F472E1B2E9900164471 /* LibdigidocLibSwiftMocks in Frameworks */,
 				DFB1F12C2CF020C200185A7F /* CommonsLib in Frameworks */,
+				1ADBD1BE2F6D6A6D00A27C88 /* WebEidLibMocks in Frameworks */,
 				DF5903782ECCC42500D1A278 /* SmartIdLibMocks in Frameworks */,
 				DFAABD052E82B1AB00906874 /* Alamofire in Frameworks */,
 				DFAABCFC2E82AEA900906874 /* UtilsLibMocks in Frameworks */,
 				DF5903762ECCC41F00D1A278 /* MobileIdLibMocks in Frameworks */,
+				040B4A29303DC7EB00E5F598 /* CryptoLib in Frameworks */,
 				DFA23CBF2EB6DC73000403E4 /* MobileIdLib in Frameworks */,
 				DF4295B22D39D2F400415C71 /* ConfigLib in Frameworks */,
 				DFAABCFE2E82AF0900906874 /* CommonsLibMocks in Frameworks */,
 				DF9B53982CF7B01B00971F2A /* UtilsLib in Frameworks */,
 				DF2B1BF72F525021008EC06F /* IdCardLib in Frameworks */,
+				1ADBD1B62F6D66E500A27C88 /* CryptoLibMocks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -590,6 +610,7 @@
 		DFA16AFE2CD18BD00099D34F /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				1AD5532C2F57274C00A88151 /* WebEidLib */,
 				DFCF22F92E83512D0015AE6B /* Test */,
 				DF64D0E12EC363C200FF73C6 /* SmartIdLib */,
 				DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */,
@@ -778,6 +799,7 @@
 				DF1D59592F3BF88000855E2E /* FirebaseCore */,
 				DF1D595B2F3BF88000855E2E /* FirebaseCrashlytics */,
 				DF54F82E2D431BD50021D05A /* X509 */,
+				1ADC32222F59744600D34877 /* WebEidLib */,
 			);
 			productName = RIADigiDoc;
 			productReference = DFDB147B2CC97B0E00153876 /* RIADigiDoc.app */;
@@ -818,6 +840,10 @@
 				DF5903772ECCC42500D1A278 /* SmartIdLibMocks */,
 				DF2B1BE92F520815008EC06F /* SmartIdLib */,
 				DF2B1BF62F525021008EC06F /* IdCardLib */,
+				1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */,
+				1ADBD1B52F6D66E500A27C88 /* CryptoLibMocks */,
+				040B4A28303DC7EB00E5F598 /* CryptoLib */,
+				040B4A2A303DC7EB00E5F598 /* WebEidLib */,
 			);
 			productName = RIADigiDocTests;
 			productReference = DFDB148C2CC97B1000153876 /* RIADigiDocTests.xctest */;
@@ -1401,6 +1427,8 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NFCReaderUsageDescription = "This app uses NFC to scan ID-cards";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth card reader is used to read data from ID card";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth card reader is used to read data from ID card";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1459,6 +1487,8 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NFCReaderUsageDescription = "This app uses NFC to scan ID-cards";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Bluetooth card reader is used to read data from ID card";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Bluetooth card reader is used to read data from ID card";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1727,6 +1757,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		040B4A28303DC7EB00E5F598 /* CryptoLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CryptoLib;
+		};
+		040B4A2A303DC7EB00E5F598 /* WebEidLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebEidLib;
+		};
 		1A438FD82E72CF1900546B86 /* CryptoLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CryptoLib;
@@ -1746,6 +1784,18 @@
 		1A5026EC2E8BFCF400C184D7 /* IdCardLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IdCardLib;
+		};
+		1ADBD1B52F6D66E500A27C88 /* CryptoLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CryptoLibMocks;
+		};
+		1ADBD1BD2F6D6A6D00A27C88 /* WebEidLibMocks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebEidLibMocks;
+		};
+		1ADC32222F59744600D34877 /* WebEidLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebEidLib;
 		};
 		DF0B681B2D0779EF00A5457C /* CommonsTestShared */ = {
 			isa = XCSwiftPackageProductDependency;

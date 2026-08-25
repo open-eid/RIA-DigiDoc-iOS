@@ -26,7 +26,7 @@ struct ColoredSignedStatusText: View {
 
     let text: String
     let status: SignatureStatus
-    var archiveTimestampText: String? = nil
+    var archiveTimestampText: String?
     var isArchiveTimestampExpired: Bool = false
 
     private var isSignatureValidOrWarning: Bool {

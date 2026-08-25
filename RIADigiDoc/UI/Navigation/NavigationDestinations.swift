@@ -123,6 +123,8 @@ struct NavigationDestinations: ViewModifier {
                 personalCode: personalCode,
                 actionMethod: actionMethod
             )
+        case .webEidView(let webEidURL):
+            WebEidView(webEidUrl: webEidURL)
         }
     }
 }

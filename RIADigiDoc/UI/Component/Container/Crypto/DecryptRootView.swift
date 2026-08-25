@@ -47,6 +47,7 @@ struct DecryptRootView: View {
                     actionType: .decrypt,
                     actionMethods: [.idCardViaNFC],
                     pinType: CodeType.pin1,
+                    isWebEidAuthenticating: .constant(false),
                     cryptoContainer: container,
                     onSuccessDecrypt: { container in
                         sharedContainerViewModel.removeLastContainer()

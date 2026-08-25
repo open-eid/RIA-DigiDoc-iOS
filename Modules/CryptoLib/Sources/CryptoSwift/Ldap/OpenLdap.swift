@@ -83,10 +83,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         }
     }
 
-    @MainActor public func search(identityCode: String) async -> (
-        addressees: [Addressee],
-        tooManyResults: Bool
-    ) {
+    @MainActor public func search(identityCode: String) async -> OpenLdapSearchResult {
         var filePath: String?
         if let ldapCertFilePath = await self.ldapConfiguration.ldapCertsPath() {
             if fileManager.fileExists(atPath: ldapCertFilePath) {
@@ -114,7 +111,10 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
                     tooManyResults = true
                 }
             }
-            return (result, tooManyResults)
+            return OpenLdapSearchResult(
+                addressees: result,
+                tooManyResults: tooManyResults
+            )
         } else {
             if let ldapCorpURL = await self.ldapConfiguration.getLdapCorpURL() {
                 OpenLdap.logger().info("Searching with corporation keyword from LDAP")
@@ -123,9 +123,15 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
                     url: ldapCorpURL,
                     certificatePath: filePath
                 )
-                return (addresses, found >= 50)
+                return OpenLdapSearchResult(
+                    addressees: addresses,
+                    tooManyResults: found >= 50
+                )
             } else {
-                return ([], false)
+                return OpenLdapSearchResult(
+                    addressees: [],
+                    tooManyResults: false
+                )
             }
         }
     }

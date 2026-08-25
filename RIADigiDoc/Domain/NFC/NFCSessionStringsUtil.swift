@@ -27,7 +27,7 @@ public struct NFCSessionStringsUtil {
         self.localize = localize
     }
 
-    public func makeDefault(pinName: String = "") -> NFCSessionStrings {
+    public func makeDefault(pinName: String) -> NFCSessionStrings {
         customLocalizations(pinName: pinName)
     }
 
@@ -78,6 +78,7 @@ public struct NFCSessionStringsUtil {
         pinWrongMultipleErrorMessage: String? = nil,
         pinWrongErrorMessage: String? = nil,
         pinBlockedErrorMessage: String? = nil,
+        pinLockedErrorMessage: String? = nil,
         wrongCardErrorMessage: String? = nil,
         courierCardErrorMessage: String? = nil,
         technicalErrorMessage: String? = nil,
@@ -107,6 +108,13 @@ public struct NFCSessionStringsUtil {
                 "PIN blocked",
                 [pinAction == .unblock ? CodeType.puk.name : pinName]
             ),
+            pinLockedErrorMessage: pinLockedErrorMessage ?? {
+                switch pinName {
+                case CodeType.pin1.name: return localize("PIN1 locked", [])
+                case CodeType.pin2.name: return localize("PIN2 locked", [])
+                default: return localize("NFC technical error", [])
+                }
+            }(),
             wrongCardErrorMessage: wrongCardErrorMessage ?? localize("Failed to find lock for cert", []),
             courierCardErrorMessage: courierCardErrorMessage ?? localize("ID card courier must activate to sign", []),
             technicalErrorMessage: technicalErrorMessage ?? localize("NFC technical error", []),
