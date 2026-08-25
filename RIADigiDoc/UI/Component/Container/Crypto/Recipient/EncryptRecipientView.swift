@@ -513,13 +513,19 @@ struct EncryptRecipientView: View {
         do {
             try await viewModel.encryptWithPassword(label: label, password: password)
             showPasswordEncryptModal = false
+            showMessage("Container successfully encrypted", type: .success)
             pathManager.replaceLast(
                 to: .encryptView(isWithEncryption: false, cdocOption: cdocOption, selectedTab: .recipients)
             )
-            Toast.show(languageSettings.localized("Container successfully encrypted"), type: .success)
         } catch {
-            Toast.show(languageSettings.localized("Encrypt general error"))
+            showMessage("Encrypt general error")
         }
+    }
+
+    private func showMessage(_ key: String, type: ToastType = .error) {
+        let message = languageSettings.localized(key)
+        Toast.show(message, type: type)
+        AccessibilityUtil.announceMessage(message)
     }
 
     private func emptyStateView(_ text: String) -> some View {

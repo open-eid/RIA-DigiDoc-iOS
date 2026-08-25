@@ -186,7 +186,8 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
             CryptoFileOpeningViewModel.logger().error("\(dde)")
             errorMessage = createToastMessage(for: dde)
         } else {
-            errorMessage = ToastMessage(key: error.localizedDescription)
+            CryptoFileOpeningViewModel.logger().error("\(error.localizedDescription)")
+            errorMessage = ToastMessage(key: "General error")
         }
     }
 

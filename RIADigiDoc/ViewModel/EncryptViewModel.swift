@@ -53,6 +53,9 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     private let fileInspector: FileInspectorProtocol
     private let sivaRepository: SivaRepositoryProtocol
 
+    var encryptAction: (URL, [URL], [Addressee]) async throws -> any CryptoContainerProtocol =
+        CryptoContainer.encrypt
+
     private(set) var cryptoContainer: CryptoContainerProtocol?
 
     private(set) var isContainerWithoutRecipients = false
@@ -297,14 +300,16 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
     public func encryptContainer() async {
         await loadContainerData(cryptoContainer: nil)
-        guard let cryptoContainer else { return }
-        guard let containerFile = await cryptoContainer.getRawContainerFile() else { return }
+        guard let cryptoContainer else {
+            errorMessage = ToastMessage(key: "Encrypt general error", args: [])
+            return
+        }
+        guard let containerFile = await cryptoContainer.getRawContainerFile() else {
+            errorMessage = ToastMessage(key: "Encrypt general error", args: [])
+            return
+        }
         do {
-            let encryptedContainer = try await CryptoContainer.encrypt(
-                containerFile: containerFile,
-                dataFiles: dataFiles,
-                recipients: recipients
-            )
+            let encryptedContainer = try await encryptAction(containerFile, dataFiles, recipients)
             sharedContainerViewModel.clearContainers()
             sharedContainerViewModel.setCryptoContainer(encryptedContainer)
             await loadContainerData(
@@ -326,11 +331,6 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             default:
                 errorMessage = ToastMessage(key: "Encrypt general error", args: [])
             }
-            return
-        }
-
-        if let nsError = error as NSError? {
-            errorMessage = ToastMessage(key: nsError.localizedDescription, args: [])
             return
         }
 

@@ -28,6 +28,11 @@ struct EncryptPasswordModalView: View {
     @State private var keyLabel: String = ""
     @State private var password: String = ""
     @State private var repeatPassword: String = ""
+    @FocusState private var focusedField: String?
+
+    private let keyLabelFieldId = "passwordKeyLabel"
+    private let passwordFieldId = "passwordInput"
+    private let repeatPasswordFieldId = "repeatPasswordInput"
 
     let onEncrypt: (String, String) -> Void
     let onCancel: () -> Void
@@ -79,8 +84,11 @@ struct EncryptPasswordModalView: View {
                 placeholder: keyLabelTitle,
                 text: $keyLabel,
                 submitLabel: .next,
-                identifier: "passwordKeyLabel",
-                accessibilityHint: languageSettings.localized("Crypto password key label description")
+                identifier: keyLabelFieldId,
+                accessibilityHint: languageSettings.localized("Crypto password key label description"),
+                textContentType: .oneTimeCode,
+                sharedFocus: $focusedField,
+                nextFocus: passwordFieldId
             )
             Text(verbatim: languageSettings.localized("Crypto password key label description"))
                 .font(typography.labelMedium)
@@ -141,8 +149,10 @@ struct EncryptPasswordModalView: View {
                 isSecure: true,
                 isError: showPasswordError,
                 submitLabel: .next,
-                identifier: "passwordInput",
-                sortPriority: 0
+                identifier: passwordFieldId,
+                sortPriority: 0,
+                sharedFocus: $focusedField,
+                nextFocus: repeatPasswordFieldId
             )
             VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
                 ForEach(EncryptPasswordModalView.requirementKeys, id: \.self) { key in
@@ -167,7 +177,8 @@ struct EncryptPasswordModalView: View {
                 ? languageSettings.localized("Crypto password repeat mismatch")
                 : "",
             submitLabel: .done,
-            identifier: "repeatPasswordInput"
+            identifier: repeatPasswordFieldId,
+            sharedFocus: $focusedField
         )
     }
 
