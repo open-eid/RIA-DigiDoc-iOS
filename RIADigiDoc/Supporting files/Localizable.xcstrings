@@ -55,6 +55,24 @@
         }
       }
     },
+    "Added recipient" : {
+      "comment" : "Accessibility prefix for a row in the Encrypt Recipients added recipients list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisatud adressaat"
+          }
+        }
+      }
+    },
     "Added recipients" : {
       "comment" : "Encrypt Recipient Added recipients text",
       "extractionState" : "manual",
@@ -7430,6 +7448,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oled kustutamas viimast faili ümbrikus, koos sellega eemaldatakse ka ümbrik."
+          }
+        }
+      }
+    },
+    "Recipients already exist in the container" : {
+      "comment" : "Encrypt Recipients view message when every found recipient is already added",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipients already exist in the container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadid on konteineris juba olemas"
           }
         }
       }

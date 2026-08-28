@@ -66,6 +66,7 @@ enum Dimensions {
 
     enum Duration {
         static let focusAnimation: CGFloat = 0.1
+        static let rowAnimation: CGFloat = 0.25
     }
 
     enum Scaling {
