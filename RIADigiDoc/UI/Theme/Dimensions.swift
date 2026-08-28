@@ -41,6 +41,11 @@ enum Dimensions {
         static let IconSizeXXL: CGFloat = 144
     }
 
+    enum Opacity {
+        static let Disabled: Double = 0.5
+        static let ToastBackground: Double = 0.9
+    }
+
     enum Padding {
         static let ZeroPadding: CGFloat = 0
         static let XXXSPadding: CGFloat = 2

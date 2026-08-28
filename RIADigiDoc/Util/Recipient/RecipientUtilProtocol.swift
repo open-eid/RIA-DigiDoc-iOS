@@ -23,4 +23,6 @@ import CryptoObjCWrapper
 /// @mockable
 public protocol RecipientUtilProtocol: Sendable {
     func getRecipientCertTypeText(certType: CertType) -> String
+
+    func isRecipientAdded(_ recipient: Addressee, in addedRecipients: [Addressee]) -> Bool
 }

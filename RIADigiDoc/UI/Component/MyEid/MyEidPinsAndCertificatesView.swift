@@ -245,7 +245,7 @@ struct MyEidPinsAndCertificatesView: View {
     }
 
     private func getOpacityForBlockedState(isBlocked: Bool) -> Double {
-        !isBlocked ? 1 : 0.5
+        !isBlocked ? 1 : Dimensions.Opacity.Disabled
     }
 
     private var opacityForPin1BlockedState: Double {

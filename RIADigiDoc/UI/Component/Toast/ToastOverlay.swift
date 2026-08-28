@@ -65,7 +65,7 @@ struct ToastOverlay: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, Dimensions.Padding.SPadding)
                 .padding(.vertical, Dimensions.Padding.MSPadding)
-                .background(style.background.opacity(0.9))
+                .background(style.background.opacity(Dimensions.Opacity.ToastBackground))
                 .foregroundStyle(style.foreground)
                 .clipShape(RoundedRectangle(cornerRadius: Dimensions.Corner.MSCornerRadius))
                 .shadow(radius: Dimensions.Corner.XXSCornerRadius)

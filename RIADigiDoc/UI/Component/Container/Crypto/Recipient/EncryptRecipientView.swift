@@ -54,6 +54,8 @@ struct EncryptRecipientView: View {
     @State private var viewModel: EncryptRecipientViewModel
     @State private var encryptViewModel: EncryptViewModel
 
+    private let recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil()
+
     init(cdocOption: EncryptionCdocOption) {
         _cdocOption = State(wrappedValue: cdocOption)
         _viewModel = State(wrappedValue: Container.shared.encryptRecipientViewModel())
@@ -431,9 +433,11 @@ struct EncryptRecipientView: View {
 
                     if voiceOverEnabled {
                         AccessibilityUtil.announceMessage(localizedMessage)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            isTitleFocused = true
 
+                        if noRecipients {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isTitleFocused = true
+                            }
                         }
                     }
 
@@ -466,6 +470,7 @@ struct EncryptRecipientView: View {
             recipient: item,
             recipientIndex: index,
             showRemoveButton: false,
+            isAlreadyAdded: recipientUtil.isRecipientAdded(item, in: addedRecipients),
             onOpenRecipient: {
                 Task { @MainActor in
                     await viewModel.addRecipients(item)

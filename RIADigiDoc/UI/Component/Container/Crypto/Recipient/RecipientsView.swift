@@ -32,6 +32,7 @@ struct RecipientsView: View {
     let recipientIndex: Int
 
     let showRemoveButton: Bool
+    let isAlreadyAdded: Bool
 
     var onOpenRecipient: (() -> Void)?
     var onRemoveRecipient: (() -> Void)?
@@ -77,6 +78,7 @@ struct RecipientsView: View {
         recipient: Addressee,
         recipientIndex: Int,
         showRemoveButton: Bool,
+        isAlreadyAdded: Bool = false,
         onOpenRecipient: (() -> Void)? = nil,
         onRemoveRecipient: (() -> Void)? = nil,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
@@ -85,6 +87,7 @@ struct RecipientsView: View {
         self.recipient = recipient
         self.recipientIndex = recipientIndex
         self.showRemoveButton = showRemoveButton
+        self.isAlreadyAdded = isAlreadyAdded
         self.onOpenRecipient = onOpenRecipient
         self.onRemoveRecipient = onRemoveRecipient
         self.nameUtil = nameUtil
@@ -143,6 +146,7 @@ struct RecipientsView: View {
                     })
             }
         }
+        .opacity(isAlreadyAdded ? Dimensions.Opacity.Disabled : 1)
     }
 }
 

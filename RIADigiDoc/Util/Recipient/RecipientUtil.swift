@@ -41,4 +41,8 @@ struct RecipientUtil: RecipientUtilProtocol {
                 return "Password"
             }
     }
+
+    func isRecipientAdded(_ recipient: Addressee, in addedRecipients: [Addressee]) -> Bool {
+        addedRecipients.contains { $0.data == recipient.data }
+    }
 }
