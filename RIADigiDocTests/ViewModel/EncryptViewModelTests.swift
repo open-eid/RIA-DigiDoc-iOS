@@ -44,10 +44,10 @@ struct EncryptViewModelTests {
         )
     }
 
-    private func stubContainer() -> CryptoContainerProtocolMock {
+    private func stubContainer(named containerName: String = "container.cdoc2") -> CryptoContainerProtocolMock {
         let container = CryptoContainerProtocolMock()
-        container.getRawContainerFileHandler = { URL(filePath: "/mock/path/to/container.cdoc2") }
-        container.getContainerNameHandler = { "container.cdoc2" }
+        container.getRawContainerFileHandler = { URL(filePath: "/mock/path/to/\(containerName)") }
+        container.getContainerNameHandler = { containerName }
         container.getDataFilesHandler = { [URL(filePath: "/mock/path/to/text.txt")] }
         container.getRecipientsHandler = { [] }
         container.getContainerMimetypeHandler = { CommonsLib.Constants.MimeType.Cdoc }
@@ -124,5 +124,143 @@ struct EncryptViewModelTests {
         await viewModel.encryptContainer()
 
         #expect(viewModel.errorMessage == ToastMessage(key: "Encrypt general error", args: []))
+    }
+
+    @Test
+    func isCDOC2Container_isTrueForACdoc2Extension() async {
+        let container = stubContainer(named: "container.cdoc2")
+
+        #expect(await viewModel.isCDOC2Container(cryptoContainer: container) == true)
+    }
+
+    @Test
+    func isCDOC2Container_isFalseForACdocExtension() async {
+        let container = stubContainer(named: "container.cdoc")
+
+        #expect(await viewModel.isCDOC2Container(cryptoContainer: container) == false)
+    }
+
+    @Test
+    func isCDOC2Container_isFalseWhenThereIsNoContainer() async {
+        #expect(await viewModel.isCDOC2Container(cryptoContainer: nil) == false)
+    }
+
+    @Test
+    func isCDOC2Container_isTrueForAnUppercaseCdoc2Extension() async {
+        let container = stubContainer(named: "container.CDOC2")
+
+        #expect(await viewModel.isCDOC2Container(cryptoContainer: container) == true)
+    }
+
+    @Test
+    func isCDOC1Container_isTrueForACdocExtension() async {
+        let container = stubContainer(named: "container.cdoc")
+
+        #expect(await viewModel.isCDOC1Container(cryptoContainer: container) == true)
+    }
+
+    @Test
+    func isCDOC1Container_isTrueForAnUppercaseCdocExtension() async {
+        let container = stubContainer(named: "container.CDOC")
+
+        #expect(await viewModel.isCDOC1Container(cryptoContainer: container) == true)
+    }
+
+    @Test
+    func isCDOC1Container_isFalseForACdoc2Extension() async {
+        let container = stubContainer(named: "container.cdoc2")
+
+        #expect(await viewModel.isCDOC1Container(cryptoContainer: container) == false)
+    }
+
+    @Test
+    func isCDOC1Container_isFalseWhenThereIsNoContainer() async {
+        #expect(await viewModel.isCDOC1Container(cryptoContainer: nil) == false)
+    }
+
+    @Test
+    func updateAsyncProperties_recomputesIsContainerCDOC2WhenTheContainerChanges() async {
+        await viewModel.loadContainerData(cryptoContainer: stubContainer(named: "container.cdoc2"))
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerCDOC2 == true)
+
+        await viewModel.loadContainerData(cryptoContainer: stubContainer(named: "container.cdoc"))
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerCDOC2 == false)
+    }
+
+    @Test
+    func isDecryptionUnavailable_isFalseWhenAnEncryptedContainerCanStillBeDecrypted() async {
+        let container = stubContainer()
+        container.isEncryptedHandler = { true }
+        await viewModel.loadContainerData(cryptoContainer: container)
+
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isDecryptButtonShown == true)
+        #expect(viewModel.isDecryptionUnavailable == false)
+    }
+
+    @Test
+    func isDecryptionUnavailable_isTrueForANestedEncryptedContainer() async {
+        let container = stubContainer()
+        container.isEncryptedHandler = { true }
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in true }
+        await viewModel.loadContainerData(cryptoContainer: container)
+
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isDecryptButtonShown == false)
+        #expect(viewModel.isDecryptionUnavailable == true)
+    }
+
+    @Test
+    func isDecryptionUnavailable_isFalseWhenTheContainerIsNotEncrypted() async {
+        _ = stubContainer()
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in true }
+        await viewModel.loadContainerData(cryptoContainer: nil)
+
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isDecryptionUnavailable == false)
+    }
+
+    @Test
+    func isContainerEncryptedOrDecrypted_isTrueWhenTheContainerIsEncrypted() async {
+        let container = stubContainer()
+        container.isEncryptedHandler = { true }
+        await viewModel.loadContainerData(cryptoContainer: container)
+
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerEncryptedOrDecrypted == true)
+    }
+
+    @Test
+    func isContainerEncryptedOrDecrypted_isTrueWhenTheContainerIsDecrypted() async {
+        let container = stubContainer()
+        container.isDecryptedHandler = { true }
+        await viewModel.loadContainerData(cryptoContainer: container)
+
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerEncryptedOrDecrypted == true)
+    }
+
+    @Test
+    func isContainerEncryptedOrDecrypted_recomputesWhenTheContainerIsNoLongerEncrypted() async {
+        let encrypted = stubContainer()
+        encrypted.isEncryptedHandler = { true }
+        await viewModel.loadContainerData(cryptoContainer: encrypted)
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerEncryptedOrDecrypted == true)
+
+        await viewModel.loadContainerData(cryptoContainer: stubContainer())
+        await viewModel.updateAsyncProperties()
+
+        #expect(viewModel.isContainerEncryptedOrDecrypted == false)
     }
 }
