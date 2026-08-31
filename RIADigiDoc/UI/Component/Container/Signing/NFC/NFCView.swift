@@ -157,6 +157,7 @@ struct NFCView: View {
             selectedActionMethod: .idCardViaNFC,
             isActionEnabled: $isActionEnabled,
             isInProgress: $isInProgress,
+            showSubmitButton: isNFCSupported,
             onBackClick: {
                 onErrorWebEid()
                 cancelDecrypt()
@@ -287,7 +288,7 @@ struct NFCView: View {
                         )
                     }
                 }
-                if isInProgress {
+                if !isNFCSupported || isInProgress {
                     NFCActionView(
                         leftIcon: "ic_m3_phonelink_ring_48pt_wght400",
                         rightIcon: "ic_m3_id_card_48pt_wght400",
