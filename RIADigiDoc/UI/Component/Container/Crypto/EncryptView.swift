@@ -104,6 +104,10 @@ struct EncryptView: View {
         languageSettings.localized("Container files")
     }
 
+    private var containerEncryptedFilesTitle: String {
+        languageSettings.localized("Encrypted files")
+    }
+
     private var shareTitle: String {
         languageSettings.localized("Share")
     }
@@ -322,7 +326,7 @@ struct EncryptView: View {
                                     .padding(.vertical, Dimensions.Padding.MPadding)
                                 } else {
                                     TabView(selectedTab: $selectedTab, titles: [
-                                        containerFilesTitle,
+                                        containerEncryptedFilesTitle,
                                         containerRecipientsTitle
                                     ]) {
                                         if selectedTab == .files {
@@ -342,7 +346,9 @@ struct EncryptView: View {
                                                         $viewModel.navigateToNestedSignedContainerView
                                                 )
                                             } else {
-                                                CryptoDataFilesLockedSection()
+                                                CryptoDataFilesLockedSection(
+                                                    isDecryptionUnavailable: viewModel.isDecryptionUnavailable
+                                                )
                                                     .environment(languageSettings)
                                             }
                                         } else {
@@ -350,6 +356,8 @@ struct EncryptView: View {
                                                 recipients: viewModel.recipients,
                                                 selectedRecipient: $selectedRecipient,
                                                 showRemoveRecipientButton: viewModel.isRecipientRemoveButtonShown(),
+                                                isCDOC2Container: viewModel.isContainerCDOC2,
+                                                isEncryptedOrDecrypted: viewModel.isContainerEncryptedOrDecrypted,
                                                 showRemoveRecipientModal: $showRemoveRecipientModal,
                                                 nameUtil: nameUtil,
                                                 recipientUtil: recipientUtil

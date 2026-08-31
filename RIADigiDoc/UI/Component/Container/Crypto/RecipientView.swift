@@ -24,6 +24,8 @@ struct RecipientView: View {
     let recipientUtil: RecipientUtilProtocol
     let showMoreOptionsButton: Bool
     var showRemoveRecipientButton: Bool
+    let isCDOC2Container: Bool
+    let isEncryptedOrDecrypted: Bool
     @Binding var showRemoveRecipientModal: Bool
     var onSelect: (() -> Void)?
 
@@ -87,6 +89,14 @@ struct RecipientView: View {
         ).date
     }
 
+    var decryptionStatus: RecipientDecryptionStatus? {
+        RecipientDecryptionStatus.resolve(
+            validTo: recipient.validTo,
+            isCDOC2Container: isCDOC2Container,
+            isEncryptedOrDecrypted: isEncryptedOrDecrypted
+        )
+    }
+
     init(
         recipientIndex: Int,
         recipient: Addressee,
@@ -95,6 +105,8 @@ struct RecipientView: View {
         recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         showMoreOptionsButton: Bool = true,
         showRemoveRecipientButton: Bool = true,
+        isCDOC2Container: Bool = false,
+        isEncryptedOrDecrypted: Bool = false,
         showRemoveRecipientModal: Binding<Bool>,
         onSelect: (() -> Void)? = nil
     ) {
@@ -104,6 +116,8 @@ struct RecipientView: View {
         self.recipientUtil = recipientUtil
         self.showMoreOptionsButton = showMoreOptionsButton
         self.showRemoveRecipientButton = showRemoveRecipientButton
+        self.isCDOC2Container = isCDOC2Container
+        self.isEncryptedOrDecrypted = isEncryptedOrDecrypted
         self._showRemoveRecipientModal = showRemoveRecipientModal
         self.onSelect = onSelect
     }
@@ -133,7 +147,8 @@ struct RecipientView: View {
                         )
 
                     let certType = recipientUtil.getRecipientCertTypeText(certType: recipient.certType)
-                    let validPart = (validToDate.isEmpty || isPasswordRecipient)
+                    let status = decryptionStatus
+                    let validPart = (validToDate.isEmpty || isPasswordRecipient || status != nil)
                         ? ""
                         : " " + languageSettings.localized("Valid to", [validToDate])
 
@@ -142,6 +157,13 @@ struct RecipientView: View {
                         .foregroundStyle(theme.onSurfaceVariant)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
+
+                    if let status {
+                        ColoredRecipientStatusText(
+                            text: languageSettings.localized(status.localizationKey, [validToDate]),
+                            status: status
+                        )
+                    }
                 }
                 .accessibilityElement(children: .combine)
 
