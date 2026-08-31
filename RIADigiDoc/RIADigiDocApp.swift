@@ -94,63 +94,66 @@ struct RIADigiDocApp: App, Loggable {
         WindowGroup {
             let currentTheme = themeSettings.getSelectedTheme()
 
-            if isJailbroken {
-                JailbreakView()
+            Group {
+                if isJailbroken {
+                    JailbreakView()
+                        .environment(\.typography, Typography.current())
+                        .environment(themeSettings)
+                        .preferredColorScheme(currentTheme.colorScheme)
+                } else if isSetupComplete {
+                    NavigationStack(path: $pathManager.path) {
+                        if isInitialLanguageSelected {
+                            ContentView()
+                                .environment(pathManager)
+                                .appNavigation(pathManager: pathManager)
+                                .alert(
+                                    languageSettings.localized("Crash report title"),
+                                    isPresented: $crashReportManager.showCrashDialog
+                                ) {
+                                    Button(languageSettings.localized("Crash report send")) {
+                                        Task {
+                                            await crashReportManager.sendReport()
+                                        }
+                                    }
+                                    Button(languageSettings.localized("Crash report always send")) {
+                                        Task {
+                                            await crashReportManager.alwaysSendReport()
+                                        }
+                                    }
+                                    Button(languageSettings.localized("Crash report dont send"), role: .cancel) {
+                                        Task {
+                                            await crashReportManager.doNotSendReport()
+                                        }
+                                    }
+                                } message: {
+                                    Text(verbatim: languageSettings.localized("Crash report message"))
+                                }
+                        } else {
+                            InitView()
+                                .environment(pathManager)
+                                .appNavigation(pathManager: pathManager)
+                        }
+                    }
                     .environment(\.typography, Typography.current())
-                    .environment(themeSettings)
-                    .preferredColorScheme(currentTheme.colorScheme)
-            } else if isSetupComplete {
-                NavigationStack(path: $pathManager.path) {
-                    if isInitialLanguageSelected {
-                        ContentView()
-                            .environment(pathManager)
-                            .appNavigation(pathManager: pathManager)
-                            .alert(
-                                languageSettings.localized("Crash report title"),
-                                isPresented: $crashReportManager.showCrashDialog
-                            ) {
-                                Button(languageSettings.localized("Crash report send")) {
-                                    Task {
-                                        await crashReportManager.sendReport()
-                                    }
-                                }
-                                Button(languageSettings.localized("Crash report always send")) {
-                                    Task {
-                                        await crashReportManager.alwaysSendReport()
-                                    }
-                                }
-                                Button(languageSettings.localized("Crash report dont send"), role: .cancel) {
-                                    Task {
-                                        await crashReportManager.doNotSendReport()
-                                    }
-                                }
-                            } message: {
-                                Text(verbatim: languageSettings.localized("Crash report message"))
-                            }
-                    } else {
-                        InitView()
-                            .environment(pathManager)
-                            .appNavigation(pathManager: pathManager)
-                    }
-                }
-                .environment(\.typography, Typography.current())
-                .environment(languageSettings)
-                .environment(themeSettings)
-                .overlay(
-                    alignment: .center,
-                    content: {
-                        ToastOverlay()
-                            .environment(themeSettings)
-                    }
-                )
-                .preferredColorScheme(currentTheme.colorScheme)
-            } else {
-                LaunchScreenView()
-                    .onAppear { onLaunchScreenViewAppear() }
-                    .environment(themeSettings)
-                    .preferredColorScheme(.light)
                     .environment(languageSettings)
+                    .environment(themeSettings)
+                    .overlay(
+                        alignment: .center,
+                        content: {
+                            ToastOverlay()
+                                .environment(themeSettings)
+                        }
+                    )
+                    .preferredColorScheme(currentTheme.colorScheme)
+                } else {
+                    LaunchScreenView()
+                        .onAppear { onLaunchScreenViewAppear() }
+                        .environment(themeSettings)
+                        .preferredColorScheme(.light)
+                        .environment(languageSettings)
+                }
             }
+            .hideSensitiveContent()
         }
     }
 }
