@@ -61,6 +61,8 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     private(set) var isContainerWithoutRecipients = false
     private(set) var isContainerEncrypted = false
     private(set) var isContainerDecrypted = false
+    private(set) var isContainerCDOC2 = false
+    private(set) var isDecryptionUnavailable = false
     private(set) var isContainerUnlocked = false
     private(set) var isEncryptButtonShown = false
     private(set) var isDecryptButtonShown = false
@@ -71,6 +73,10 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
     var isContainerUnencrypted: Bool {
         !isContainerEncrypted && !isContainerDecrypted
+    }
+
+    var isContainerEncryptedOrDecrypted: Bool {
+        isContainerEncrypted || isContainerDecrypted
     }
 
     init(
@@ -515,7 +521,28 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     func isCDOC1Container(
         cryptoContainer: CryptoContainerProtocol?,
     ) async -> Bool {
-        return await cryptoContainer?.getRawContainerFile()?.pathExtension == Constants.Extension.Cdoc
+        guard let containerFile = await cryptoContainer?.getRawContainerFile() else {
+            return false
+        }
+        return containerFile.pathExtension.lowercased() == Constants.Extension.Cdoc
+    }
+
+    func isCDOC2Container(
+        cryptoContainer: CryptoContainerProtocol?,
+    ) async -> Bool {
+        guard let containerFile = await cryptoContainer?.getRawContainerFile() else {
+            return false
+        }
+        return containerFile.pathExtension.lowercased() == Constants.Extension.Cdoc2
+    }
+
+    func allRecipientsExpiredDate(
+        cryptoContainer: CryptoContainerProtocol?
+    ) async -> Date? {
+        return RecipientDecryptionStatus.allExpiredDate(
+            validTos: await cryptoContainer?.getRecipients().map(\.validTo) ?? [],
+            isCDOC2Container: await isCDOC2Container(cryptoContainer: cryptoContainer)
+        )
     }
 
     func shouldShowDataFiles(
@@ -575,7 +602,11 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         cryptoContainer: CryptoContainerProtocol?,
         isNestedContainer: Bool
     ) async -> Bool {
-        return await isEncryptedContainer(cryptoContainer: cryptoContainer) && !isNestedContainer
+        guard await isEncryptedContainer(cryptoContainer: cryptoContainer), !isNestedContainer else {
+            return false
+        }
+
+        return await allRecipientsExpiredDate(cryptoContainer: cryptoContainer) == nil
     }
 
     func isEncryptButtonShown(
@@ -663,6 +694,7 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
         let isContainerWithoutRecipients = await isContainerWithoutRecipients(cryptoContainer: cryptoContainer)
         let isContainerEncrypted = await isEncryptedContainer(cryptoContainer: cryptoContainer)
         let isContainerDecrypted = await isDecryptedContainer(cryptoContainer: cryptoContainer)
+        let isContainerCDOC2 = await isCDOC2Container(cryptoContainer: cryptoContainer)
         let isContainerUnlocked = await isUnlockedContainer(cryptoContainer: cryptoContainer)
         let isEncryptButtonShown = await isEncryptButtonShown(
             cryptoContainer: cryptoContainer,
@@ -682,11 +714,14 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
             isNestedContainer: isNestedContainer()
         )
         let shouldShowDatafiles = await shouldShowDataFiles(cryptoContainer: cryptoContainer)
+        let isDecryptionUnavailable = isContainerEncrypted && !isDecryptButtonShown
 
         await MainActor.run {
             self.isContainerWithoutRecipients = isContainerWithoutRecipients
             self.isContainerEncrypted = isContainerEncrypted
             self.isContainerDecrypted = isContainerDecrypted
+            self.isContainerCDOC2 = isContainerCDOC2
+            self.isDecryptionUnavailable = isDecryptionUnavailable
             self.isContainerUnlocked = isContainerUnlocked
             self.isEncryptButtonShown = isEncryptButtonShown
             self.isDecryptButtonShown = isDecryptButtonShown
