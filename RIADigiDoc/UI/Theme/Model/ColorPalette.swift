@@ -35,6 +35,7 @@ struct ColorPalette {
 
     let onPrimary: Color
     let onPrimaryContainer: Color
+    let onSecondary: Color
     let onSecondaryContainer: Color
     let onError: Color
     let onErrorContainer: Color
