@@ -105,8 +105,8 @@ struct NFCView: View {
         }
     }
 
-    private var signatureAddedMessage: String {
-        languageSettings.localized("Signature added")
+    private var containerSignedMessage: String {
+        languageSettings.localized("Container signed successfully")
     }
 
     private var extendingSignaturesFailedMessage: String {
@@ -491,9 +491,9 @@ struct NFCView: View {
                     AccessibilityUtil.announceMessage(extendingSignaturesFailedMessage)
                 }
             } else {
-                Toast.show(signatureAddedMessage, type: .success)
+                Toast.show(containerSignedMessage, type: .success)
                 if voiceOverEnabled {
-                    AccessibilityUtil.announceMessage(signatureAddedMessage)
+                    AccessibilityUtil.announceMessage(containerSignedMessage)
                 }
             }
 
