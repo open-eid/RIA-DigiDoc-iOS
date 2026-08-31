@@ -41,7 +41,8 @@ public struct MockSignatureWrapper {
         status: SignatureStatus = .valid,
         format: String = "BES/time-stamp",
         messageImprint: Data = Data(),
-        diagnosticsInfo: String = ""
+        diagnosticsInfo: String = "",
+        warnings: [SignatureWarning] = []
     ) -> SignatureWrapper {
         SignatureWrapper(
             pos: pos,
@@ -63,7 +64,8 @@ public struct MockSignatureWrapper {
             status: status,
             format: format,
             messageImprint: messageImprint,
-            diagnosticsInfo: diagnosticsInfo
+            diagnosticsInfo: diagnosticsInfo,
+            warnings: warnings
         )
     }
 }
