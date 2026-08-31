@@ -33,6 +33,7 @@ public struct Constants {
         public static let SignatureContainers = [Asice, Asics, Ddoc, Bdoc, Adoc]
         public static let SivaContainers = [Ddoc, Asics]
         public static let UnsignableContainers = [Adoc, Ddoc, Asics]
+        public static let UnencryptableContainers = [Ddoc, Asics]
 
         public static let Pdf = "application/pdf"
 
@@ -61,6 +62,7 @@ public struct Constants {
         public static let CryptoContainers = [Cdoc, Cdoc2]
 
         public static let UnsignableContainerExtensions = [Adoc, Ddoc] + AsicsContainers
+        public static let UnencryptableContainerExtensions = [Ddoc] + AsicsContainers
     }
 
     public struct Identifier {

@@ -33,7 +33,7 @@ actor SivaService: SivaServiceProtocol {
 
         guard let file = files.first else { return false }
 
-        let mimetype = await mimeTypeResolver.mimeType(url: file)
+        let mimetype = await mimeTypeResolver.mimeType(url: file).lowercased()
 
         let isCades = await file.isCades(fileUtil: fileUtil)
         let isXades = await file.isXades(fileUtil: fileUtil)
@@ -49,7 +49,8 @@ actor SivaService: SivaServiceProtocol {
 
     func isTimestampedContainer(signedContainer: SignedContainerProtocol) async -> Bool {
         let isOneDataFileInContainer = await signedContainer.getDataFiles().count == 1
-        let isAsicsMimeType = await signedContainer.getContainerMimetype() == Constants.MimeType.Asics
+        let isAsicsMimeType = await signedContainer.getContainerMimetype()
+            .lowercased() == Constants.MimeType.Asics
         let isTimeStampTokenSignatureMethod = await signedContainer.getSignatures().first?.format == "TimeStampToken"
 
         return isOneDataFileInContainer &&
