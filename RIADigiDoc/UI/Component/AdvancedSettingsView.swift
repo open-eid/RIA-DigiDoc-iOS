@@ -124,6 +124,7 @@ struct AdvancedSettingsView: View {
     private func onRestoreDefaultSettingsClick() {
         Task {
             await viewModel.restoreDefaultSettings()
+            checkedAskRoleAndAddress = await viewModel.getIsRoleAndAddressEnabled()
             let message =
                 languageSettings.localized("Main settings use default settings message")
             if voiceOverEnabled {

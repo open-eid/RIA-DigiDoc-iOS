@@ -98,6 +98,7 @@ public actor DataStore: DataStoreProtocol {
         await setTSAUrlOption(.defaultSetting)
         await setRelyingPartyUUID(relyingPartyUUID: DefaultValues.relyingPartyUUID)
         await setRelyingPartyOption(.defaultSetting)
+        await setIsRoleAndAddressEnabled(DefaultValues.isRoleAndAddressEnabled)
 
         let cdoc2Default = configuration?.cdoc2Default ?? false
         await setEncryptionCdocOption(cdoc2Default ? .cdoc2 : .cdoc1)
@@ -550,6 +551,7 @@ public actor DataStore: DataStoreProtocol {
         static let mobileIdPersonalCode = ""
         static let smartIdCountry = SmartIdCountry.estonia
         static let smartIdPersonalCode = ""
+        static let isRoleAndAddressEnabled = false
         static let roles = ""
         static let roleCity = ""
         static let roleState = ""
