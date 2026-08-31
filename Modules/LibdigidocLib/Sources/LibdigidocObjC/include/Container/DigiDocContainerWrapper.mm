@@ -34,6 +34,7 @@
 
 @interface DigiDocContainerWrapper ()
 + (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
++ (DigiDocSignatureWarning)determineSignatureWarning:(digidoc::Exception::ExceptionCode)code;
 @end
 
 struct DigiDocContainerOpenCB: public digidoc::ContainerOpenCB {
@@ -148,6 +149,25 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     }
 }
 
++ (DigiDocSignatureWarning)determineSignatureWarning:(digidoc::Exception::ExceptionCode)code {
+    switch (code) {
+        case digidoc::Exception::ReferenceDigestWeak:
+            return DigiDocSignatureWarningReferenceDigestWeak;
+        case digidoc::Exception::SignatureDigestWeak:
+            return DigiDocSignatureWarningSignatureDigestWeak;
+        case digidoc::Exception::DataFileNameSpaceWarning:
+            return DigiDocSignatureWarningDataFileNameSpace;
+        case digidoc::Exception::IssuerNameSpaceWarning:
+            return DigiDocSignatureWarningIssuerNameSpace;
+        case digidoc::Exception::ProducedATLateWarning:
+            return DigiDocSignatureWarningProducedATLate;
+        case digidoc::Exception::MimeTypeWarning:
+            return DigiDocSignatureWarningMimeType;
+        default:
+            return DigiDocSignatureWarningOther;
+    }
+}
+
 + (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos mediaType:(const std::string&)mediaType dataFileCount:(NSInteger)dataFileCount {
 
     digidoc::X509Cert signingCert = signature->signingCertificate();
@@ -209,7 +229,14 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digidoc::Signature::Validator::Status status = validator.status();
     digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
     digiDocSignature.status = [DigiDocContainerWrapper determineSignatureStatus:status];
-    digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
+
+    std::vector<digidoc::Exception::ExceptionCode> validatorWarnings = validator.warnings();
+    NSMutableArray<NSNumber *> *warnings = [NSMutableArray arrayWithCapacity:validatorWarnings.size()];
+    for (digidoc::Exception::ExceptionCode warning : validatorWarnings) {
+        [warnings addObject:@([DigiDocContainerWrapper determineSignatureWarning:warning])];
+    }
+    digiDocSignature.warnings = warnings;
+
     return digiDocSignature;
 
 }

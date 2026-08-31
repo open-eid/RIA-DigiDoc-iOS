@@ -407,6 +407,97 @@ final class SignedContainerTests {
         #expect(timestamps.first == timestamp)
     }
 
+    private func containerTimestamped(at trustedSigningTime: String) -> SignedContainer {
+        SignedContainer(
+            containerFile: URL(fileURLWithPath: "/mock/path/container.asics"),
+            isExistingContainer: true,
+            container: mockContainerWrapper,
+            timestamps: [MockSignatureWrapper.mockSignatureWrapper(trustedSigningTime: trustedSigningTime)],
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
+    }
+
+    @Test
+    func getSignatures_dropWeakDigestWarningWhenTimestampedBefore2018() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .warning, warnings: [.referenceDigestWeak])]
+        }
+
+        let signatures = await containerTimestamped(at: "2016-05-11T10:20:30Z").getSignatures()
+
+        #expect(signatures.first?.status == .valid)
+    }
+
+    @Test
+    func getSignatures_keepWeakDigestWarningWhenTimestampedAfter2018() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .warning, warnings: [.referenceDigestWeak])]
+        }
+
+        let signatures = await containerTimestamped(at: "2019-05-11T10:20:30Z").getSignatures()
+
+        #expect(signatures.first?.status == .warning)
+    }
+
+    @Test
+    func getSignatures_keepWeakDigestWarningAtExemptionTime() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .warning, warnings: [.signatureDigestWeak])]
+        }
+
+        let signatures = await containerTimestamped(at: "2018-07-01T00:00:00Z").getSignatures()
+
+        #expect(signatures.first?.status == .warning)
+    }
+
+    @Test
+    func getSignatures_keepOtherWarningsWhenTimestampedBefore2018() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(
+                status: .warning,
+                warnings: [.referenceDigestWeak, .dataFileNameSpace]
+            )]
+        }
+
+        let signatures = await containerTimestamped(at: "2016-05-11T10:20:30Z").getSignatures()
+
+        #expect(signatures.first?.status == .warning)
+    }
+
+    @Test
+    func getSignatures_keepWarningWhenValidatorReportsNoWarningCodes() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .warning, warnings: [])]
+        }
+
+        let signatures = await containerTimestamped(at: "2016-05-11T10:20:30Z").getSignatures()
+
+        #expect(signatures.first?.status == .warning)
+    }
+
+    @Test
+    func getSignatures_keepWeakDigestWarningWhenContainerIsNotTimestamped() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .warning, warnings: [.referenceDigestWeak])]
+        }
+
+        let signatures = await signedContainer.getSignatures()
+
+        #expect(signatures.first?.status == .warning)
+    }
+
+    @Test
+    func getSignatures_leaveInvalidSignatureUntouchedWhenTimestampedBefore2018() async {
+        mockContainerWrapper.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(status: .invalid, warnings: [.referenceDigestWeak])]
+        }
+
+        let signatures = await containerTimestamped(at: "2016-05-11T10:20:30Z").getSignatures()
+
+        #expect(signatures.first?.status == .invalid)
+    }
+
     @Test
     func isExistingContainer_returnTrue() async {
         let existingSignedContainer = SignedContainer(
