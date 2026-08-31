@@ -215,7 +215,7 @@ struct MobileIdViewModelTests {
 
         #expect(result != nil)
         #expect(viewModel.controlCode == "1234")
-        #expect(viewModel.mobileIdSuccessMessageKey == "Signature added")
+        #expect(viewModel.mobileIdSuccessMessageKey == "Container signed successfully")
     }
 
     @Test

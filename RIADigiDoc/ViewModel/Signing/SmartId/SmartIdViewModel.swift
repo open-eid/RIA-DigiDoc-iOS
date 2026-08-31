@@ -288,7 +288,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             let isLTAEnabled = await dataStore.getIsDefaultLTAEnabled()
             do {
                 let extendedContainer = try await updatedContainer.extendSignature(isLTAEnabled)
-                smartIdSuccessMessageKey = "Signature added"
+                smartIdSuccessMessageKey = "Container signed successfully"
                 return extendedContainer
             } catch {
                 SmartIdViewModel.logger().error("Unable to extend signature (Smart-ID): \(error)")

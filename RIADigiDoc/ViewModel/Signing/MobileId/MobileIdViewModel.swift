@@ -243,7 +243,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             let isLTAEnabled = await dataStore.getIsDefaultLTAEnabled()
             do {
                 let extendedContainer = try await updatedContainer.extendSignature(isLTAEnabled)
-                mobileIdSuccessMessageKey = "Signature added"
+                mobileIdSuccessMessageKey = "Container signed successfully"
                 return extendedContainer
             } catch {
                 MobileIdViewModel.logger().error("Unable to extend signature (Mobile-ID): \(error)")
