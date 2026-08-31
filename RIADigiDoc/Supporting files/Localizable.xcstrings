@@ -1187,6 +1187,24 @@
         }
       }
     },
+    "Container signed successfully" : {
+      "comment" : "Shown as Toast when signing succeeds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container signed successfully!"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbrik edukalt allkirjastatud!"
+          }
+        }
+      }
+    },
     "Container signing" : {
       "comment" : "Signing view container files title (unsigned)",
       "extractionState" : "manual",
@@ -7950,24 +7968,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allkiri"
-          }
-        }
-      }
-    },
-    "Signature added" : {
-      "comment" : "Shown as Toast when signing succeeds",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Signature added"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allkiri lisatud"
           }
         }
       }
