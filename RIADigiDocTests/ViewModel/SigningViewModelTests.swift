@@ -851,6 +851,60 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
+    func isSignatureRemoveButtonShown_returnTrueWithAsiceContainer() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+        viewModel.containerMimetype = Constants.MimeType.Asice
+        viewModel.containerName = "mockContainer.asice"
+
+        #expect(viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
+    func isSignatureRemoveButtonShown_returnFalseWithDdocContainer() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+        viewModel.containerMimetype = Constants.MimeType.Ddoc
+        viewModel.containerName = "mockContainer.ddoc"
+
+        #expect(!viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
+    func isSignatureRemoveButtonShown_returnFalseWithAsicsContainer() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+        viewModel.containerMimetype = Constants.MimeType.Asics
+        viewModel.containerName = "mockContainer.asics"
+
+        #expect(!viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
+    func isSignatureRemoveButtonShown_returnFalseWithAdocContainer() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+        viewModel.containerMimetype = Constants.MimeType.Adoc
+        viewModel.containerName = "mockContainer.adoc"
+
+        #expect(!viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
+    func isSignatureRemoveButtonShown_returnFalseWithUppercaseScsExtension() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+        viewModel.containerMimetype = Constants.MimeType.Container
+        viewModel.containerName = "mockContainer.SCS"
+
+        #expect(!viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
+    func isSignatureRemoveButtonShown_returnFalseWithNestedContainer() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in true }
+        viewModel.containerMimetype = Constants.MimeType.Asice
+        viewModel.containerName = "mockContainer.asice"
+
+        #expect(!viewModel.isSignatureRemoveButtonShown())
+    }
+
+    @Test
     func isEncryptButtonShown_returnTrueWithExistingContainer() async {
         let mockSignedContainer = SignedContainerProtocolMock()
         mockSignedContainer.isExistingContainerHandler = { true }
