@@ -20,10 +20,12 @@
 import Foundation
 
 public class DateUtil {
+    public static let signatureTimeFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+
     public static func getFormattedDateTime(
         dateTimeString: String,
         isUTC: Bool,
-        inputDateFormat: String = "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        inputDateFormat: String = DateUtil.signatureTimeFormat,
         dateOutputFormat: String = "dd.MM.yyyy",
         timeOutputFormat: String = "HH:mm:ss"
     ) -> (date: String, time: String) {

@@ -27,6 +27,12 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
 
     private static let signedContainerLogTag: String = "SignedContainer"
 
+    private static let weakDigestExemptionDate = DateUtil.stringToDate(
+        "2018-07-01T00:00:00Z",
+        isUTC: true,
+        dateOutputFormat: DateUtil.signatureTimeFormat
+    )
+
     private var containerFile: URL?
     private let isExistingContainer: Bool
     private let container: ContainerWrapperProtocol
@@ -55,7 +61,29 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
-        return await container.getSignatures()
+        let signatures = await container.getSignatures()
+
+        guard isExemptFromWeakDigestWarning else { return signatures }
+
+        return signatures.map { signature in
+            guard signature.status == .warning, signature.hasOnlyWeakDigestWarnings else { return signature }
+
+            var validSignature = signature
+            validSignature.status = .valid
+            return validSignature
+        }
+    }
+
+    private var isExemptFromWeakDigestWarning: Bool {
+        guard let trustedSigningTime = timestamps.first?.trustedSigningTime,
+              let signingDate = DateUtil.stringToDate(
+                  trustedSigningTime,
+                  isUTC: true,
+                  dateOutputFormat: DateUtil.signatureTimeFormat
+              ),
+              let exemptionDate = SignedContainer.weakDigestExemptionDate else { return false }
+
+        return signingDate < exemptionDate
     }
 
     public func getTimestamps() async -> [SignatureWrapper] {
