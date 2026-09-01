@@ -85,6 +85,39 @@ struct SivaServiceTests {
     }
 
     @Test
+    func isSivaConfirmationNeeded_returnTrueForUppercaseAsicsMimetypeWrappingDdoc() async throws {
+        let wrappedDdoc = URL(fileURLWithPath: "/mock/path/wrapped.ddoc")
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: [wrappedDdoc.lastPathComponent: "Test content"],
+            containerExtension: "asics")
+        defer { try? FileManager.default.removeItem(at: mockContainer) }
+
+        mockMimetypeResolver.mimeTypeHandler = { _ in Constants.MimeType.Asics.uppercased() }
+        mockFileUtil.getFileFromZipFileHandler = { _, name in
+            name.contains(".ddoc") ? wrappedDdoc : nil
+        }
+
+        let isSivaConfirmationNeeded = await service.isSivaConfirmationNeeded(files: [mockContainer])
+
+        #expect(isSivaConfirmationNeeded)
+    }
+
+    @Test
+    func isSivaConfirmationNeeded_returnTrueForUppercaseDdocMimetype() async throws {
+        let mockContainer = try TestContainerUtil.createMockContainer(
+            with: ["content.txt": "Test content"],
+            containerExtension: "ddoc")
+        defer { try? FileManager.default.removeItem(at: mockContainer) }
+
+        mockMimetypeResolver.mimeTypeHandler = { _ in Constants.MimeType.Ddoc.uppercased() }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in nil }
+
+        let isSivaConfirmationNeeded = await service.isSivaConfirmationNeeded(files: [mockContainer])
+
+        #expect(isSivaConfirmationNeeded)
+    }
+
+    @Test
     func isSivaConfirmationNeeded_returnFalseForAsicsWrappingBdoc() async throws {
         let mockContainer = try TestContainerUtil.createMockContainer(
             with: ["wrapped.bdoc": "Test content"],
@@ -128,6 +161,22 @@ struct SivaServiceTests {
         #expect(mockSignedContainer.getDataFilesCallCount == 1)
         #expect(mockSignedContainer.getContainerMimetypeCallCount == 1)
         #expect(mockSignedContainer.getSignaturesCallCount == 1)
+    }
+
+    @Test
+    func isTimestampedContainer_returnTrueWithUppercaseAsicsMimetype() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getDataFilesHandler = {[
+            MockDataFileWrapper.mockDataFileWrapper()
+        ]}
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics.uppercased() }
+        mockSignedContainer.getSignaturesHandler = {[
+            MockSignatureWrapper.mockSignatureWrapper(format: "TimeStampToken")
+        ]}
+
+        let isTimestampedContainer = await service.isTimestampedContainer(signedContainer: mockSignedContainer)
+
+        #expect(isTimestampedContainer)
     }
 
     @Test
