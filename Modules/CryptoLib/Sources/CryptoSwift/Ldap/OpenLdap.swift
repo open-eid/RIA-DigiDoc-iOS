@@ -37,6 +37,22 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         case decipherOnly = 8
     }
 
+    private static let unreachableServerCodes: Set<Int32> = [
+        LDAP_SERVER_DOWN, LDAP_CONNECT_ERROR, LDAP_TIMEOUT, LDAP_X_CONNECTING
+    ]
+
+    private struct SearchOutcome {
+        let addressees: [Addressee]
+        let totalAddressees: Int
+        let isNetworkError: Bool
+
+        init(addressees: [Addressee] = [], totalAddressees: Int = 0, isNetworkError: Bool = false) {
+            self.addressees = addressees
+            self.totalAddressees = totalAddressees
+            self.isNetworkError = isNetworkError
+        }
+    }
+
     enum SearchType {
         case personalCode(String)
         case registryCode(String)
@@ -83,33 +99,39 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             OpenLdap.logger().info("Searching with personal code from LDAP")
             var result = [Addressee]()
             var tooManyResults = false
+            var isNetworkError = false
             for url in await self.ldapConfiguration.getLdapPersonURLS() {
                 let ldapPersonUrl = url
-                let (addresses, found) = OpenLdap.search(
+                let outcome = OpenLdap.search(
                     searchType: searchType,
                     url: ldapPersonUrl,
                     certificatePath: filePath
                 )
-                result.append(contentsOf: addresses)
-                if found >= 50 {
+                result.append(contentsOf: outcome.addressees)
+                if outcome.totalAddressees >= 50 {
                     tooManyResults = true
+                }
+                if outcome.isNetworkError {
+                    isNetworkError = true
                 }
             }
             return OpenLdapSearchResult(
                 addressees: result,
-                tooManyResults: tooManyResults
+                tooManyResults: tooManyResults,
+                isNetworkError: isNetworkError
             )
         } else {
             if let ldapCorpURL = await self.ldapConfiguration.getLdapCorpURL() {
                 OpenLdap.logger().info("Searching with corporation keyword from LDAP")
-                let (addresses, found) = OpenLdap.search(
+                let outcome = OpenLdap.search(
                     searchType: searchType,
                     url: ldapCorpURL,
                     certificatePath: filePath
                 )
                 return OpenLdapSearchResult(
-                    addressees: addresses,
-                    tooManyResults: found >= 50
+                    addressees: outcome.addressees,
+                    tooManyResults: outcome.totalAddressees >= 50,
+                    isNetworkError: outcome.isNetworkError
                 )
             } else {
                 return OpenLdapSearchResult(
@@ -125,13 +147,15 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         searchType: SearchType,
         url: URL,
         certificatePath: String?
-    ) -> (addressees: [Addressee], totalAddressees: Int) {
+    ) -> SearchOutcome {
         if url.scheme?.lowercased() == "ldaps" {
             if let certificatePath = certificatePath, !certificatePath.isEmpty {
-                guard setLdapOption(option: LDAP_OPT_X_TLS_CACERTFILE, value: certificatePath) else { return ([], 0) }
+                guard setLdapOption(option: LDAP_OPT_X_TLS_CACERTFILE, value: certificatePath) else {
+                    return SearchOutcome()
+                }
             } else {
-                guard let bundlePath = Bundle(for: OpenLdap.self).resourcePath else { return ([], 0) }
-                guard setLdapOption(option: LDAP_OPT_X_TLS_CACERTDIR, value: bundlePath) else { return ([], 0) }
+                guard let bundlePath = Bundle(for: OpenLdap.self).resourcePath else { return SearchOutcome() }
+                guard setLdapOption(option: LDAP_OPT_X_TLS_CACERTDIR, value: bundlePath) else { return SearchOutcome() }
             }
             var ldapConnectionReset = 0
             let result = ldap_set_option(nil, LDAP_OPT_X_TLS_NEWCTX, &ldapConnectionReset)
@@ -139,7 +163,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
                 OpenLdap.logger().info(
                     "ldap_set_option(LDAP_OPT_X_TLS_NEWCTX) failed: \(String(cString: ldap_err2string(result)))"
                 )
-                return ([], 0)
+                return SearchOutcome()
             }
         }
 
@@ -159,7 +183,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
         }
         guard ldapReturnCode == LDAP_SUCCESS else {
             OpenLdap.logger().info("Failed to initialize LDAP: \(String(cString: ldap_err2string(ldapReturnCode)))")
-            return ([], 0)
+            return SearchOutcome()
         }
 
         var ldapVersion = LDAP_VERSION3
@@ -168,7 +192,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
             OpenLdap.logger().info(
                 "ldap_set_option(PROTOCOL_VERSION) failed: \(String(cString: ldap_err2string(ldapReturnCode)))"
             )
-            return ([], 0)
+            return SearchOutcome()
         }
 
         var distinguishedName = url.path
@@ -201,7 +225,7 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
 
         guard ldapReturnCode == LDAP_SUCCESS else {
             OpenLdap.logger().info("ldap_search_ext failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
-            return ([], 0)
+            return SearchOutcome(isNetworkError: unreachableServerCodes.contains(ldapReturnCode))
         }
 
         var result = [Addressee]()
@@ -218,18 +242,22 @@ final public class OpenLdap: OpenLdapProtocol, Loggable {
                 result.append(contentsOf: addressees)
                 totalAddressees += 1
             case Int32(LDAP_RES_SEARCH_RESULT):
-                return (addressees: result, totalAddressees: totalAddressees)
+                return SearchOutcome(addressees: result, totalAddressees: totalAddressees)
             case Int32(LDAP_SUCCESS):
                 break
             default:
                 OpenLdap.logger().info("ldap_result failed: \(String(cString: ldap_err2string(ldapReturnCode)))")
-                return (addressees: result, totalAddressees: totalAddressees)
+                return SearchOutcome(
+                    addressees: result,
+                    totalAddressees: totalAddressees,
+                    isNetworkError: unreachableServerCodes.contains(ldapReturnCode)
+                )
             }
         }
 
         ldap_abandon_ext(ldap, msgId, nil, nil)
 
-        return (addressees: result, totalAddressees: totalAddressees)
+        return SearchOutcome(addressees: result, totalAddressees: totalAddressees)
     }
 
     static private func setLdapOption(option: Int32, value: String) -> Bool {

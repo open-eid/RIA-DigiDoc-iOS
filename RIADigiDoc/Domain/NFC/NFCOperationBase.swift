@@ -5,6 +5,7 @@ import Foundation
 import CoreNFC
 import nfclib
 import LibdigidocLibSwift
+import CryptoSwift
 import UtilsLib
 
 @MainActor
@@ -171,6 +172,12 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         if let digiDocError = error as? DigiDocError {
             handleDigiDocError(digiDocError, session: session)
             return digiDocError
+        }
+        if (error as NSError).isCryptoNetworkError {
+            Self.logger().error("NFC: Unable to reach the key server")
+            operationError = error
+            session.invalidate(errorMessage: strings?.networkErrorMessage ?? "")
+            return error
         }
         handleUnknownError(error, session: session)
         return error

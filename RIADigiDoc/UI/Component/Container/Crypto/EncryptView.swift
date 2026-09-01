@@ -435,8 +435,9 @@ struct EncryptView: View {
                                         }
                                     }
 
-                                case .failure:
+                                case .failure(let error):
                                     isImportingAddedFiles = false
+                                    viewModel.handleFileImportFailure(error)
                                 }
                             }
                         }
@@ -610,7 +611,7 @@ struct EncryptView: View {
 
     private func handleRemoveRecipient() async {
         guard let recipient = selectedRecipient else {
-            Toast.show(languageSettings.localized("Failed to remove recipient from container"))
+            showMessage("Failed to remove recipient from container")
             return
         }
 
@@ -621,7 +622,7 @@ struct EncryptView: View {
 
     private func handleRemoveDataFile() async {
         guard let dataFile = selectedDataFile else {
-            Toast.show(languageSettings.localized("Failed to remove datafile from container", [""]))
+            showMessage("Failed to remove datafile from container")
             return
         }
 
@@ -639,10 +640,7 @@ struct EncryptView: View {
     private func convertToSignedContainer() async {
         let isConverted = await viewModel.convertToSignedContainer()
         if isConverted {
-            Toast.show(
-                languageSettings.localized("Converted to a signature container"),
-                type: .success
-            )
+            showMessage("Converted to a signature container", type: .success)
             await MainActor.run {
                 pathManager.replaceLast(to: .signingView)
             }

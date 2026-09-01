@@ -104,8 +104,10 @@ struct EncryptionSettingsView: View {
                     await viewModel.importCert(from: url)
                 }
                 viewModel.isImportingCert = false
-            case .failure:
+            case .failure(let error):
                 viewModel.isImportingCert = false
+                viewModel.handleFileImportFailure(error)
+                showFileImportFailureMessage()
             }
         }
     }
@@ -295,6 +297,12 @@ struct EncryptionSettingsView: View {
             }
         )
         .buttonStyle(.plain)
+    }
+
+    private func showFileImportFailureMessage() {
+        let message = languageSettings.localized("Could not load selected files")
+        Toast.show(message)
+        AccessibilityUtil.announceMessage(message)
     }
 }
 

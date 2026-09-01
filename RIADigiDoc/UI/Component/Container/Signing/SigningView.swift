@@ -384,8 +384,9 @@ struct SigningView: View {
                                         }
                                     }
 
-                                case .failure:
+                                case .failure(let error):
                                     isImportingAddedFiles = false
+                                    viewModel.handleFileImportFailure(error)
                                 }
                             }
                         }
@@ -570,9 +571,15 @@ struct SigningView: View {
         }
     }
 
+    private func showMessage(_ key: String, type: ToastType = .error) {
+        let message = languageSettings.localized(key)
+        Toast.show(message, type: type)
+        AccessibilityUtil.announceMessage(message)
+    }
+
     private func handleRemoveSignature() async {
         guard let signature = selectedSignature else {
-            Toast.show(languageSettings.localized("Failed to remove signature from container"))
+            showMessage("Failed to remove signature from container")
             return
         }
 
@@ -584,7 +591,7 @@ struct SigningView: View {
 
     private func handleRemoveDataFile() async {
         guard let dataFile = selectedDataFile else {
-            Toast.show(languageSettings.localized("Failed to remove datafile from container", [""]))
+            showMessage("Failed to remove datafile from container")
             return
         }
 
@@ -613,10 +620,7 @@ struct SigningView: View {
     private func convertToCryptoContainer() async {
         let isConverted = await viewModel.convertToCryptoContainer()
         if isConverted {
-            Toast.show(
-                languageSettings.localized("Converted to crypto container"),
-                type: .success
-            )
+            showMessage("Converted to crypto container", type: .success)
             let cdocOption = await Container.shared.dataStore().getEncryptionCdocOption(false)
             await MainActor.run {
                 pathManager.replaceLast(

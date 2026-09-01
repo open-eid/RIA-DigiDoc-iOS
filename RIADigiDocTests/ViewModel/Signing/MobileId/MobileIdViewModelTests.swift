@@ -389,7 +389,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let digidocError = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to connect")
+            ErrorDetail(message: "Failed to create connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: digidocError)
@@ -403,6 +403,25 @@ struct MobileIdViewModelTests {
 
         #expect(result == nil)
         #expect(viewModel.mobileIdErrorMessageKey == "No Internet connection")
+    }
+
+    @Test
+    func sign_setSSLMessageWhenCertificatePinningFailsInRestClient() async {
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            throw MobileIdError.invalidSslHandshake
+        }
+
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let result = await viewModel.sign(
+            phoneNumber: "37251234567",
+            personalCode: "60001019906",
+            roleData: roleData,
+            signedContainer: mockContainer()
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == "SSL handshake failed")
     }
 
     @Test
@@ -540,7 +559,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let error = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to create ssl connection with host")
+            ErrorDetail(message: "Failed to create ssl connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: error)
@@ -644,7 +663,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let error = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to authenticate with proxy")
+            ErrorDetail(message: "Failed to create proxy connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: error)

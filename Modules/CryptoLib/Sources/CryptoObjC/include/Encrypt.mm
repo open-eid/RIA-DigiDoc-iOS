@@ -148,9 +148,9 @@ protected:
             }
         }
     }
-    
-    if (writer->beginEncryption() != 0) {
-        return completion([NSError cryptoError:@"Failed to start encryption"]);
+
+    if (libcdoc::result_t result = writer->beginEncryption(); result != 0) {
+        return completion([NSError cryptoError:@"Failed to start encryption" code:result]);
     }
 
     for (CryptoDataFile *dataFile in dataFiles) {
@@ -203,8 +203,8 @@ protected:
         return completion([NSError cryptoError:@"Failed to create key"]);
     }
 
-    if (writer->beginEncryption() != 0) {
-        return completion([NSError cryptoError:@"Failed to start encryption"]);
+    if (libcdoc::result_t result = writer->beginEncryption(); result != 0) {
+        return completion([NSError cryptoError:@"Failed to start encryption" code:result]);
     }
 
     for (CryptoDataFile *dataFile in dataFiles) {
