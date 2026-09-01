@@ -1167,24 +1167,25 @@ struct SmartIdViewModelTests {
     @Test(
         "sign_setExpectedMessagesWhenSignatureAddingFailedErrorsThrown",
         arguments: [
-            ("Failed to create ssl connection with host", "SSL handshake failed", false, []),
-            ("Too Many Requests", "Too many requests", true, ["Smart-ID"]),
-            ("OCSP response not in valid time slot", "OCSP response not in valid time slot", true, []),
-            ("Certificate status: revoked", "Certificate status revoked", false, []),
-            ("CONNECT: 403", "No Internet connection", false, []),
-            ("Failed to connect", "No Internet connection", false, []),
-            ("Failed to authenticate with proxy", "Invalid proxy settings", false, []),
-            ("Random error message", "Signing technical error", false, ["Smart-ID"])
+            ("Failed to create ssl connection with host: 'siva.eesti.ee'", 20, "SSL handshake failed", false, []),
+            ("Too Many Requests", 18, "Too many requests", true, ["Smart-ID"]),
+            ("OCSP response not in valid time slot", 7, "OCSP response not in valid time slot", true, []),
+            ("Certificate status: revoked", 5, "Certificate status revoked", false, []),
+            ("Failed to create proxy connection with host: 'ocsp.sk.ee'", 20, "Invalid proxy settings", false, []),
+            ("Failed to create connection with host: 'ocsp.sk.ee'", 20, "No Internet connection", false, []),
+            ("Failed to create connection with host timeout: 'ocsp.sk.ee'", 20, "No Internet connection", false, []),
+            ("Random error message", 0, "Signing technical error", false, ["Smart-ID"])
         ]
     )
     func sign_setExpectedMessagesWhenSignatureAddingFailedErrorsThrown(
         errorMessage: String,
+        errorCode: Int,
         expectedMessage: String,
         expectsAlert: Bool,
         extraArg: [String]
     ) async {
         let digidocError = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: errorMessage)
+            ErrorDetail(message: errorMessage, code: errorCode)
         )
         let mockContainer = mockContainer(
             addSignatureError: digidocError

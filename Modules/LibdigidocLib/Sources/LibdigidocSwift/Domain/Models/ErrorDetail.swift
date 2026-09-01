@@ -21,6 +21,8 @@ import Foundation
 import LibdigidocLibObjC
 
 public struct ErrorDetail: Sendable {
+    private static let networkErrorCode = 20
+
     public let message: String
     public let code: Int
     public let userInfo: [String: Sendable]
@@ -42,6 +44,11 @@ public struct ErrorDetail: Sendable {
         self.code = nsError.code
         self.userInfo = ErrorDetail.extractInfo(from: nsError)
             .merging(extraInfo) { (_, combined) in combined }
+    }
+
+    // libdigidocpp reports connection failures as Exception::NetworkError (20)
+    public var isNetworkError: Bool {
+        return code == ErrorDetail.networkErrorCode
     }
 
     public var description: String {

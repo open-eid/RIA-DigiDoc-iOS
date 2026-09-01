@@ -199,8 +199,10 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
             return completion(nil, [NSError cryptoError:@"Failed to find lock for cert"]);
         }
         std::vector<uint8_t> fmk;
-        if(reader->getFMK(fmk, unsigned(idx)) != 0 || fmk.empty()) {
-            return completion(nil, token.lastError() ?: [NSError cryptoError:@"Failed to get FMK"]);
+        libcdoc::result_t fmkResult = reader->getFMK(fmk, unsigned(idx));
+        if(fmkResult != 0 || fmk.empty()) {
+            return completion(nil, token.lastError() ?: [NSError cryptoError:@"Failed to get FMK"
+                                                                         code:fmkResult != 0 ? fmkResult : 1000]);
         }
         NSError *error = nil;
         completion([self decryptReader:*reader withFMK:fmk error:&error], error);
@@ -246,7 +248,7 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
 + (NSDictionary<NSString*,NSData*> *)decryptReader:(libcdoc::CDocReader&)reader withFMK:(const std::vector<uint8_t>&)fmk error:(NSError**)error {
 
     if(reader.beginDecryption(fmk) != 0) {
-        return [NSError cryptoError:@"Failed to start encryption" error:error];
+        return [NSError cryptoError:@"Failed to start decryption" error:error];
     }
 
     NSMutableDictionary<NSString*,NSData*> *response = [NSMutableDictionary new];
@@ -275,7 +277,7 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
         [response setObject:data forKey:[NSString stringWithStdString:name]];
     }
     if (reader.finishDecryption() != 0)
-        return [NSError cryptoError:@"Failed to end encryption" error:error];
+        return [NSError cryptoError:@"Failed to end decryption" error:error];
     return response;
 }
 

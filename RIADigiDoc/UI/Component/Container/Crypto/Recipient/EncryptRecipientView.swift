@@ -41,8 +41,6 @@ struct EncryptRecipientView: View {
 
     @State private var encryptionButtonEnabled = true
 
-    @State private var showNoRecipientsFoundMessage = false
-
     @State private var selectedRecipient: Addressee?
     @State private var showRemoveRecipientModal = false
     @State private var showPasswordEncryptModal = false
@@ -78,10 +76,6 @@ struct EncryptRecipientView: View {
 
     var nextLabel: String {
         languageSettings.localized("Next")
-    }
-
-    var noSearchResultsMessage: String {
-        languageSettings.localized("Person or company does not own a valid certificate")
     }
 
     private var recipientTabTitle: String {
@@ -286,12 +280,8 @@ struct EncryptRecipientView: View {
                 .listStyle(.plain)
                 .scrollDisabled(true)
                 .scrollContentBackground(.hidden)
-            } else if showNoRecipientsFoundMessage {
-                emptyStateView(
-                    languageSettings.localized(
-                        "Person or company does not own a valid certificate"
-                    )
-                )
+            } else if let emptyStateMessageKey = viewModel.emptyStateMessageKey {
+                emptyStateView(languageSettings.localized(emptyStateMessageKey))
             } else {
                 filteredRecipientsSection
             }
@@ -394,7 +384,7 @@ struct EncryptRecipientView: View {
                             message: languageSettings.localized("Remove recipient from container"),
                             onConfirm: {
                                 guard let recipient = selectedRecipient else {
-                                    Toast.show(languageSettings.localized("Failed to remove recipient"))
+                                    showMessage("Failed to remove recipient")
                                     return
                                 }
                                 Task {
@@ -417,9 +407,6 @@ struct EncryptRecipientView: View {
                         await viewModel.loadRecipients()
                         addedRecipients = await viewModel.filteredAddedRecipients()
                     }
-                }
-                .onChange(of: viewModel.searchText) { _, _ in
-                    showNoRecipientsFoundMessage = false
                 }
                 .onChange(of: viewModel.errorMessage) { _, error in
                     guard let error, !error.key.isEmpty else { return }

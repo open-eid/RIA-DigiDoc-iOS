@@ -513,9 +513,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             let tooManyRequestsError = "Too Many Requests"
             let ocspError = "OCSP response not in valid time slot"
             let revokedCertError = "Certificate status: revoked"
-            let connectError = "CONNECT: 403"
-            let failedToConnectError = "Failed to connect"
-            let proxyError = "Failed to authenticate with proxy"
+            let proxyError = "Failed to create proxy connection with host"
 
             switch true {
             case message.contains(sslError):
@@ -535,11 +533,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             case message.contains(revokedCertError):
                 mobileIdErrorMessageKey = "Certificate status revoked"
 
-            case message.contains(connectError), message.contains(failedToConnectError):
-                mobileIdErrorMessageKey = "No Internet connection"
-
             case message.contains(proxyError):
                 mobileIdErrorMessageKey = "Invalid proxy settings"
+
+            case errorDetail.isNetworkError:
+                mobileIdErrorMessageKey = "No Internet connection"
 
             default:
                 mobileIdErrorMessageKey = "Signing technical error"

@@ -351,6 +351,79 @@ struct FileOpeningViewModelTests {
     }
 
     @Test
+    func handleSivaConfirmation_showNoInternetConnectionWhenSivaRequestFailsWithNetworkError() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Ddoc],
+            containerExtension: Constants.Extension.Ddoc
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Failed to create connection with host: 'siva.eesti.ee'",
+                    code: 20
+                )
+            )
+        }
+
+        await viewModel.handleFiles()
+        await viewModel.handleSivaConfirmation()
+
+        #expect(viewModel.errorMessage?.key == "No Internet connection")
+        #expect(viewModel.errorMessage?.args.isEmpty == true)
+        #expect(!viewModel.isNavigatingToSigningView)
+    }
+
+    @Test
+    func handleSivaConfirmation_showFailedToOpenContainerWhenErrorIsNotNetworkRelated() async {
+        let mockContainer = try? TestContainerUtil.createMockContainer(
+            with: ["mimetype": Constants.MimeType.Ddoc],
+            containerExtension: Constants.Extension.Ddoc
+        )
+
+        guard let container = mockContainer else {
+            Issue.record("Expected a valid container URL")
+            return
+        }
+
+        mockFileOpeningRepository.getValidFilesHandler = { _ in [container] }
+        mockFileUtil.removeSharedFilesHandler = { _ in }
+        mockFileManager.containerURLHandler = { _ in URL(fileURLWithPath: "/mock/appGroup/") }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileUtil.getFileFromZipFileHandler = { _, _ in URL(fileURLWithPath: "mimetype") }
+        mockSharedContainerViewModel.getFileOpeningMethodHandler = { .signing }
+
+        mockFileOpeningRepository.openOrCreateContainerHandler = { _, _ in
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    message: "Cannot create or open container",
+                    code: 0,
+                    userInfo: ["fileName": "test.ddoc"]
+                )
+            )
+        }
+
+        await viewModel.handleFiles()
+        await viewModel.handleSivaConfirmation()
+
+        #expect(viewModel.errorMessage?.key == "Failed to open container")
+        #expect(viewModel.errorMessage?.args == ["test.ddoc"])
+        #expect(!viewModel.isNavigatingToSigningView)
+    }
+
+    @Test
     func handleSivaCancellation_handleDdocCancelling() async {
         let mockContainer = try? TestContainerUtil.createMockContainer(
             with: ["mimetype": Constants.MimeType.Ddoc],

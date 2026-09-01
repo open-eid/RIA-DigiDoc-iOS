@@ -96,4 +96,11 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
             return []
         }
     }
+
+    func handleFileImportFailure(_ error: Error) {
+        let nsError = error as NSError
+        HomeViewModel.logger().error(
+            "File import failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)"
+        )
+    }
 }

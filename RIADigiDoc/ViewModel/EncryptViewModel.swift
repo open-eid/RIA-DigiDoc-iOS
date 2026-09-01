@@ -324,6 +324,11 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
     }
 
     private func handleEncryptionError(_ error: Error) {
+        if (error as NSError).isCryptoNetworkError {
+            errorMessage = ToastMessage(key: "No Internet connection", args: [])
+            return
+        }
+
         if let cryptoError = error as? CryptoError {
             switch cryptoError {
             case .containerCreationFailed(let detail):
@@ -417,7 +422,10 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
                     SigningViewModel.logger().error(
                         "Failed to open nested signed container: \(String(reflecting: error))"
                     )
-                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.lastPathComponent])
+                    errorMessage = ToastMessage.containerOpeningFailed(
+                        fileName: dataFile.lastPathComponent,
+                        error: error
+                    )
                     return
                 }
             } else {
@@ -784,5 +792,13 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
         return try await sivaRepository
             .getTimestampedContainer(parentContainer: parentContainer)
+    }
+
+    func handleFileImportFailure(_ error: Error) {
+        let nsError = error as NSError
+        EncryptViewModel.logger().error(
+            "File import failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)"
+        )
+        errorMessage = ToastMessage(key: "Could not load selected files", args: [])
     }
 }

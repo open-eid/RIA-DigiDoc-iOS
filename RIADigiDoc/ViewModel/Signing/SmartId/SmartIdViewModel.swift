@@ -614,9 +614,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             let tooManyRequestsError = "Too Many Requests"
             let ocspError = "OCSP response not in valid time slot"
             let revokedCertError = "Certificate status: revoked"
-            let connectError = "CONNECT: 403"
-            let failedToConnectError = "Failed to connect"
-            let proxyError = "Failed to authenticate with proxy"
+            let proxyError = "Failed to create proxy connection with host"
 
             switch true {
             case message.contains(sslError):
@@ -636,11 +634,11 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             case message.contains(revokedCertError):
                 smartIdErrorMessageKey = "Certificate status revoked"
 
-            case message.contains(connectError), message.contains(failedToConnectError):
-                smartIdErrorMessageKey = "No Internet connection"
-
             case message.contains(proxyError):
                 smartIdErrorMessageKey = "Invalid proxy settings"
+
+            case errorDetail.isNetworkError:
+                smartIdErrorMessageKey = "No Internet connection"
 
             default:
                 smartIdErrorMessageKey = "Signing technical error"
