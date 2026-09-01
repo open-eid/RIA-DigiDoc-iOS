@@ -26,6 +26,14 @@ struct CryptoDataFilesLockedSection: View {
     @AppTheme private var theme
     @AppTypography private var typography
 
+    var isDecryptionUnavailable = false
+
+    private var message: String {
+        isDecryptionUnavailable
+            ? languageSettings.localized("Crypto container must be decrypted")
+            : languageSettings.localized("Crypto files encrypted")
+    }
+
     var body: some View {
         VStack {
             HStack {
@@ -37,7 +45,7 @@ struct CryptoDataFilesLockedSection: View {
                     .padding(.trailing, Dimensions.Padding.SPadding)
                     .accessibilityHidden(true)
 
-                Text(verbatim: languageSettings.localized("Crypto files encrypted"))
+                Text(verbatim: message)
                     .font(typography.bodyMedium)
                     .fixedSize(horizontal: false, vertical: true)
                     .lineLimit(nil)
@@ -45,7 +53,7 @@ struct CryptoDataFilesLockedSection: View {
                     .multilineTextAlignment(TextAlignment.leading)
                     .accessibilityLabel(
                         Text(
-                            verbatim: languageSettings.localized("Crypto files encrypted").lowercased()
+                            verbatim: message.lowercased()
                         )
                     )
 

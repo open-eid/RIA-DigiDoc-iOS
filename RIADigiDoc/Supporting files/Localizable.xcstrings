@@ -1493,6 +1493,24 @@
         }
       }
     },
+    "Crypto container must be decrypted" : {
+      "comment" : "Crypto container files placeholder when contents cannot be listed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The container must be decrypted in order to see the contents of an encrypted container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeritud ümbriku sisu nägemiseks tuleb ümbrik dekrüpteerida."
+          }
+        }
+      }
+    },
     "Crypto files encrypted" : {
       "comment" : "Crypto container files names locked",
       "extractionState" : "manual",
@@ -1817,6 +1835,42 @@
         }
       }
     },
+    "Decryption expired" : {
+      "comment" : "CDOC2 recipient decryption expired badge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption expired %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimise võimalus aegus %@"
+          }
+        }
+      }
+    },
+    "Decryption until" : {
+      "comment" : "CDOC2 recipient decryption valid until badge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption until %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimine võimalik kuni %@"
+          }
+        }
+      }
+    },
     "Decryption method" : {
       "comment" : "Title for signing method in container decrypt view",
       "extractionState" : "manual",
@@ -2011,6 +2065,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbrikule on lisatud tühi fail. Allkirjastamiseks eemalda ümbrikust tühi fail."
+          }
+        }
+      }
+    },
+    "Encrypted files" : {
+      "comment" : "Crypto container files tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encrypted files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeritud failid"
           }
         }
       }
@@ -2245,6 +2317,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sinu Smart-ID toiming aegus või kontot ei leitud"
+          }
+        }
+      }
+    },
+    "Expired on" : {
+      "comment" : "CDOC2 recipient certificate expired badge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired on %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aegus %@"
+          }
+        }
+      }
+    },
+    "Expires on" : {
+      "comment" : "CDOC2 recipient certificate expiry badge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expires on %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aegub %@"
           }
         }
       }
