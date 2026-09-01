@@ -317,9 +317,9 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         case .containerCreationFailed(let errorDetail),
                 .containerOpeningFailed(let errorDetail),
                 .containerSavingFailed(let errorDetail):
-            return ToastMessage(
-                key: "Failed to open container",
-                args: [errorDetail.userInfo["fileName"] as? String ?? ""]
+            return ToastMessage.containerOpeningFailed(
+                fileName: errorDetail.userInfo["fileName"] as? String ?? "",
+                error: error
             )
         case .addingFilesToContainerFailed(let errorDetail):
             return ToastMessage(
