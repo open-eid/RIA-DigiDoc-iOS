@@ -404,7 +404,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let digidocError = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to connect")
+            ErrorDetail(message: "Failed to create connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: digidocError)
@@ -555,7 +555,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let error = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to create ssl connection with host")
+            ErrorDetail(message: "Failed to create ssl connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: error)
@@ -659,7 +659,7 @@ struct MobileIdViewModelTests {
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
         let error = DigiDocError.signatureAddingFailed(
-            ErrorDetail(message: "Failed to authenticate with proxy")
+            ErrorDetail(message: "Failed to create proxy connection with host: 'ocsp.sk.ee'", code: 20)
         )
 
         let container = mockContainer(addSignatureError: error)
