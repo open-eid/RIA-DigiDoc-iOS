@@ -205,4 +205,11 @@ class EncryptionSettingsViewModel: EncryptionSettingsViewModelProtocol, Loggable
             certificateBaseName: CommonsLib.Constants.FileBaseName.EncryptionKeyTransferCert
         )
     }
+
+    func handleFileImportFailure(_ error: Error) {
+        let nsError = error as NSError
+        EncryptionSettingsViewModel.logger().error(
+            "File import failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)"
+        )
+    }
 }

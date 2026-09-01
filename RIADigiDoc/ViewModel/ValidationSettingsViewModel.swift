@@ -131,4 +131,11 @@ class ValidationSettingsViewModel: ValidationSettingsViewModelProtocol, Loggable
             certificateBaseName: CommonsLib.Constants.FileBaseName.SiVaCert
         )
     }
+
+    func handleFileImportFailure(_ error: Error) {
+        let nsError = error as NSError
+        ValidationSettingsViewModel.logger().error(
+            "File import failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)"
+        )
+    }
 }

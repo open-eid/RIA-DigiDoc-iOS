@@ -1289,6 +1289,36 @@ final class NFCViewModelTests {
     }
 
     @Test
+    func decrypt_showsNoInternetConnectionWhenKeyServerIsUnreachable() async {
+        let mockContainer = CryptoContainerProtocolMock()
+
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/tmp/test.cdoc")
+        }
+        mockContainer.getRecipientsHandler = {
+            []
+        }
+        mockKeychainStore.removeHandler = { _ in }
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            throw NSError(
+                domain: "ee.ria.digidoc.CryptoLib",
+                code: -300,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to get FMK"]
+            )
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.nfcErrorKey == "No Internet connection")
+    }
+
+    @Test
     func decrypt_handlesDecryptCancelledWithoutErrorKey() async {
         let mockContainer = CryptoContainerProtocolMock()
 
