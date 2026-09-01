@@ -44,6 +44,15 @@ extension URL {
         URL(fileURLWithPath: (path as NSString).standardizingPath)
     }
 
+    public func isWithin(directory: URL) -> Bool {
+        let filePath = FilePath(resolvedPath).lexicallyNormalized()
+        let directoryPath = FilePath(directory.resolvedPath).lexicallyNormalized()
+
+        guard filePath.components.count > directoryPath.components.count else { return false }
+
+        return filePath.components.starts(with: directoryPath.components)
+    }
+
     public var resolvedPath: String {
         let path = isFileURL
         ? standardizedFileURL.path(percentEncoded: false)

@@ -59,6 +59,8 @@ public final class LanguageSettings: LanguageSettingsProtocol {
         let bundle = localizedBundle ??
         Bundle.main.path(forResource: selectedLanguage, ofType: "lproj").flatMap(Bundle.init) ?? Bundle.main
         let format = bundle.localizedString(forKey: key, value: nil, table: nil)
+        guard format != key else { return key }
+
         return args.isEmpty ? format : String.localizedStringWithFormat(format, args)
     }
 

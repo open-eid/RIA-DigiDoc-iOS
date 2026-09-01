@@ -30,13 +30,28 @@ struct LanguageSettingsTests {
         languageSettings = await LanguageSettings(dataStore: mockDataStore)
     }
 
-    // MARK: - Tests
-
     @Test
     func getSelectedLanguage_success() async throws {
         let allowedLanguageCodes: [String] = ["en", "et"]
         let selectedLanguage: String = await languageSettings.getSelectedLanguage()
         #expect(allowedLanguageCodes.contains(selectedLanguage))
+    }
+
+    @Test
+    func localized_doesNotTreatAnUnknownKeyAsAFormatString() async throws {
+        let key = "Document with same file name report %@ %d.pdf already exists"
+
+        let result = await languageSettings.localized(key, ["ignored"])
+
+        #expect(result == key)
+    }
+
+    @Test
+    func localized_stillFormatsAKnownKey() async throws {
+        let result = await languageSettings.localized("Could not add files", ["3"])
+
+        #expect(result != "Could not add files")
+        #expect(result.contains("3"))
     }
 
     @Test
