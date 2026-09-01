@@ -45,6 +45,10 @@ struct ResponseHandler: ResponseHandlerProtocol {
     }
 
     func handleNetworkError(_ error: AFError, statusCode: Int?, responseType: Any.Type) throws {
+        if error.isServerTrustEvaluationError {
+            throw SmartIdError.invalidSslHandshake
+        }
+
         if let underlyingError = error.underlyingError as? URLError {
             try handleURLError(underlyingError)
         } else {
