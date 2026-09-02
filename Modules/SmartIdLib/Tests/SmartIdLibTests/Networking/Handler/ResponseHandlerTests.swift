@@ -169,12 +169,25 @@ struct ResponseHandlerTests {
         }
     }
 
-    @Test
-    func handleNetworkError_throwsTimeoutWhenSessionTaskFailedErrorWithTimeout() {
-        let urlError = URLError(.timedOut)
-        let afError = AFError.sessionTaskFailed(error: urlError)
+    @Test(
+        "handleNetworkError_throwsRequestInterruptedWhenNoAnswerReachedTheApp",
+        arguments: [URLError.Code.timedOut, .networkConnectionLost]
+    )
+    func handleNetworkError_throwsRequestInterruptedWhenNoAnswerReachedTheApp(
+        code: URLError.Code
+    ) {
+        let afError = AFError.sessionTaskFailed(error: URLError(code))
 
-        #expect(throws: SmartIdError.timeout) {
+        #expect(throws: SmartIdError.requestInterrupted) {
+            try handler.handleNetworkError(afError, statusCode: nil)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsRequestInterruptedWhenNoUrlErrorAndNoStatusCode() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "host.test"))
+
+        #expect(throws: SmartIdError.requestInterrupted) {
             try handler.handleNetworkError(afError, statusCode: nil)
         }
     }
@@ -195,6 +208,26 @@ struct ResponseHandlerTests {
         #expect(throws: SmartIdError.incorrectParameters) {
             try handler.handleNetworkError(afError, statusCode: 400)
         }
+    }
+
+    @Test
+    func handleSessionResult_throwsTechnicalErrorWhenEndResultIsUnknown() {
+        #expect(throws: SmartIdError.technicalError) {
+            try handler.handleSessionResult(.unknown)
+        }
+    }
+
+    @Test
+    func decodingSessionResponse_mapsUnlistedEndResultToUnknown() throws {
+        let json = Data(
+            """
+            {"state":"COMPLETE","result":{"endResult":"SERVER_ERROR"}}
+            """.utf8
+        )
+
+        let response = try JSONDecoder().decode(SmartIdSessionResponse.self, from: json)
+
+        #expect(response.result?.endResult == .unknown)
     }
 
     @Test
