@@ -360,6 +360,13 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 return nil
             }
 
+            if (error as NSError).isCryptoNetworkError {
+                NFCViewModel.logger().error("NFC: Unable to reach the key server")
+                nfcErrorKey = "No Internet connection"
+                nfcErrorExtraArguments = []
+                return nil
+            }
+
             NFCViewModel.logger().error("NFC: Unexpected error type: \(type(of: error))")
             NFCViewModel.logger().error("NFC: Error details: \(error)")
             nfcErrorKey = "NFC session error"

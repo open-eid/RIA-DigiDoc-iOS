@@ -41,6 +41,66 @@ struct EncryptRecipientViewModelTests {
     }
 
     @Test
+    func loadRecipients_showNoInternetConnectionWhenLdapServerIsUnreachable() async {
+        mockOpenLdap.searchHandler = { _ in
+            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        }
+
+        viewModel.searchText = "60001019906"
+        await viewModel.loadRecipients()
+
+        #expect(viewModel.recipients.isEmpty)
+        #expect(viewModel.errorMessage?.key == "No Internet connection")
+        #expect(viewModel.emptyStateMessageKey == "No Internet connection")
+    }
+
+    @Test
+    func loadRecipients_showNoValidCertificateWhenSearchCompletesWithNoResults() async {
+        mockOpenLdap.searchHandler = { _ in
+            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: false)
+        }
+
+        viewModel.searchText = "60001019906"
+        await viewModel.loadRecipients()
+
+        #expect(viewModel.recipients.isEmpty)
+        #expect(viewModel.errorMessage?.key == "Person or company does not own a valid certificate")
+        #expect(viewModel.emptyStateMessageKey == "Person or company does not own a valid certificate")
+    }
+
+    @Test
+    func loadRecipients_showRecipientsWhenServerWasUnreachableButAnotherReturnedResults() async {
+        let addressee = Addressee(data: Data([0x01]), cnVal: "TESTNUMBER,SEITSMES,60001019906")
+
+        mockOpenLdap.searchHandler = { _ in
+            OpenLdapSearchResult(addressees: [addressee], tooManyResults: false, isNetworkError: true)
+        }
+
+        viewModel.searchText = "60001019906"
+        await viewModel.loadRecipients()
+
+        #expect(viewModel.recipients.count == 1)
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.emptyStateMessageKey == nil)
+    }
+
+    @Test
+    func handleSearchTextChange_clearsEmptyStateFromThePreviousSearch() async {
+        mockOpenLdap.searchHandler = { _ in
+            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        }
+
+        viewModel.searchText = "60001019906"
+        await viewModel.loadRecipients()
+        #expect(viewModel.emptyStateMessageKey == "No Internet connection")
+
+        viewModel.handleSearchTextChange()
+
+        #expect(viewModel.emptyStateMessageKey == nil)
+        #expect(viewModel.recipients.isEmpty)
+    }
+
+    @Test
     func encryptWithPassword_successClearsAndSetsNewContainer() async throws {
         let mockContainer = CryptoContainerProtocolMock()
         let containerFile = URL(fileURLWithPath: "/tmp/test.cdoc")

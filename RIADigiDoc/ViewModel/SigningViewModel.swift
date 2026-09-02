@@ -401,8 +401,6 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                     }
                     try await openNestedContainer(fileURL: fileURL, isSivaConfirmed: isSivaConfirmed)
                 } catch {
-                    SigningViewModel.logger().error("Failed to open nested container: \(error)")
-                    errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
                     if error.localizedDescription.contains("Online validation disabled") {
                         SigningViewModel.logger().error(
                             "Unable to open container '\([dataFile.fileName])'. Sending to SiVa not allowed."
@@ -410,7 +408,10 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                         errorMessage = nil
                     } else {
                         SigningViewModel.logger().error("Failed to open nested container: \(error)")
-                        errorMessage = ToastMessage(key: "Failed to open container", args: [dataFile.fileName])
+                        errorMessage = ToastMessage.containerOpeningFailed(
+                            fileName: dataFile.fileName,
+                            error: error
+                        )
                     }
                 }
             } else if isCryptoContainer {
@@ -724,5 +725,13 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         )
 
         sharedContainerViewModel.setCryptoContainer(container)
+    }
+
+    func handleFileImportFailure(_ error: Error) {
+        let nsError = error as NSError
+        SigningViewModel.logger().error(
+            "File import failed: \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)"
+        )
+        errorMessage = ToastMessage(key: "Could not load selected files", args: [])
     }
 }

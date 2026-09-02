@@ -98,10 +98,18 @@ struct TimeStampSettingsView: View {
                     await viewModel.importTSACert(from: url)
                 }
                 viewModel.isImportingTSACert = false
-            case .failure:
+            case .failure(let error):
                 viewModel.isImportingTSACert = false
+                viewModel.handleFileImportFailure(error)
+                showFileImportFailureMessage()
             }
         }
+    }
+
+    private func showFileImportFailureMessage() {
+        let message = languageSettings.localized("Could not load selected files")
+        Toast.show(message)
+        AccessibilityUtil.announceMessage(message)
     }
 }
 
