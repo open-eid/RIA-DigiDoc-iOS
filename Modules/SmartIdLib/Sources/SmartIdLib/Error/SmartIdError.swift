@@ -43,4 +43,5 @@ public enum SmartIdError: Error {
     case noResponse
     case invalidSslHandshake
     case technicalError
+    case requestInterrupted
 }
