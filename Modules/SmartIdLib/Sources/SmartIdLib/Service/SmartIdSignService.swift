@@ -108,16 +108,42 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
         userAgent: String
     ) async throws -> SmartIdSessionResponse {
         let pollingTimeoutMs = pollingTimeout * 1000
+        var retriedPolls = 0
+        var hasPolledSuccessfully = false
 
         while true {
-            let sessionResponse: SmartIdSessionResponse? = try await requestPerformer.performRequest(
-                url: "\(url)/\(sessionId)",
-                method: .get,
-                parameters: ["timeoutMs": pollingTimeoutMs],
-                trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo,
-                userAgent: userAgent
-            )
+            try Task.checkCancellation()
+
+            let sessionResponse: SmartIdSessionResponse?
+
+            do {
+                sessionResponse = try await requestPerformer.performRequest(
+                    url: "\(url)/\(sessionId)",
+                    method: .get,
+                    parameters: ["timeoutMs": pollingTimeoutMs],
+                    trustedCertificates: trustedCertificates,
+                    proxyInfo: proxyInfo,
+                    userAgent: userAgent
+                )
+            } catch let error as SmartIdError where Self.isRetryablePollError(error) {
+                retriedPolls += 1
+
+                guard retriedPolls <= Constants.Signing.MaxPollRetries else {
+                    guard hasPolledSuccessfully, error == .underMaintenance else {
+                        throw error
+                    }
+
+                    throw SmartIdError.timeout
+                }
+
+                if error == .underMaintenance, !hasPolledSuccessfully {
+                    try await Task.sleep(for: .seconds(Double(pollingTimeout)))
+                }
+                continue
+            }
+
+            retriedPolls = 0
+            hasPolledSuccessfully = true
 
             if let response = sessionResponse,
                response.state == .complete {
@@ -126,6 +152,10 @@ public actor SmartIdSignService: SmartIdSignServiceProtocol, Loggable {
 
             try await Task.sleep(for: .seconds(Double(pollingTimeout)))
         }
+    }
+
+    private static func isRetryablePollError(_ error: SmartIdError) -> Bool {
+        error == .requestInterrupted || error == .underMaintenance
     }
 
     public func getVerificationCode(digest: Data) async -> String {

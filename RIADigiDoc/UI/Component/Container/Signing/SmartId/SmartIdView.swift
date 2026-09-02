@@ -222,6 +222,8 @@ struct SmartIdView: View {
                 signedContainer: signedContainer,
                 liveActivityTexts: liveActivityTexts
             )
+            guard !Task.isCancelled else { return }
+
             guard let container = updatedContainer else {
                 cancelSigning()
                 isSigning = false

@@ -834,7 +834,8 @@ struct SmartIdViewModelTests {
         "sign_setNoInternetMessageWhenNoInternetConnectionErrorsThrown",
         arguments: [
             SmartIdError.noInternetConnection,
-            .noResponse
+            .noResponse,
+            .requestInterrupted
         ]
     )
     func sign_setNoInternetMessageWhenNoInternetConnectionErrorsThrown(
@@ -864,6 +865,43 @@ struct SmartIdViewModelTests {
 
         #expect(result == nil)
         #expect(viewModel.smartIdErrorMessageKey == "No Internet connection")
+    }
+
+    @Test
+    func sign_doesNotSetErrorMessageWhenAttemptWasAlreadyCancelled() async {
+        mockConfigurationRepository.getConfigurationHandler = {
+            try? TestConfigurationProvider.mockConfigurationProvider()
+        }
+
+        mockSmartIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            throw SmartIdError.timeout
+        }
+
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let viewModel = self.viewModel
+        let roleData = self.roleData
+        let container = mockContainer()
+
+        let task = Task { @MainActor in
+            await viewModel.sign(
+                country: .estonia,
+                personalCode: "60001019906",
+                roleData: roleData,
+                signedContainer: container,
+                liveActivityTexts: SmartIdLiveActivityTexts(
+                    initialMessage: "Initial message",
+                    controlCodeTitle: "Control code",
+                    compactTitle: "Code"
+                )
+            )
+        }
+        task.cancel()
+
+        let result = await task.value
+
+        #expect(result == nil)
+        #expect(viewModel.smartIdErrorMessageKey == nil)
     }
 
     @Test
