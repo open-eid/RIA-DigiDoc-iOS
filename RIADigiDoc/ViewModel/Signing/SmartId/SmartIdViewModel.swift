@@ -515,6 +515,10 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             return
         }
 
+        if Task.isCancelled {
+            return
+        }
+
         guard let smartIdError = error as? SmartIdError else {
             smartIdErrorMessageKey = "General error"
             return
@@ -529,7 +533,7 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
             SmartIdViewModel.logger().info("Smart-ID signing manually cancelled")
             smartIdErrorMessageKey = nil
 
-        case .noInternetConnection, .noResponse:
+        case .noInternetConnection, .noResponse, .requestInterrupted:
             smartIdErrorMessageKey = "No Internet connection"
 
         case .incorrectParameters:

@@ -124,6 +124,222 @@ struct SmartIdSignServiceTests {
     }
 
     @Test
+    func getSessionRequest_returnsResponseWhenLaterPollCompletes() async throws {
+        let running = SmartIdSessionResponse(state: .running, result: nil, signature: nil, cert: nil)
+        let complete = SmartIdSessionResponse(state: .complete, result: nil, signature: nil, cert: nil)
+
+        requestPerformer.performRequestHandler = { [requestPerformer] _, _, _, _, _, _ in
+            requestPerformer.performRequestCallCount == 1 ? running : complete
+        }
+
+        let result = try await service.getSessionRequest(
+            url: url,
+            sessionId: "SESSION",
+            pollingTimeout: 1,
+            trustedCertificates: certificates,
+            proxyInfo: proxy,
+            userAgent: "TestUserAgent"
+        )
+
+        #expect(result.state == .complete)
+        #expect(requestPerformer.performRequestCallCount == 2)
+    }
+
+    @Test
+    func getSessionRequest_retriesImmediatelyOnMaintenanceOnceSessionHasAnswered() async throws {
+        requestPerformer.performRequestHandler = { [requestPerformer] _, _, _, _, _, _ in
+            if requestPerformer.performRequestCallCount == 1 {
+                return SmartIdSessionResponse(state: .running, result: nil, signature: nil, cert: nil)
+            }
+            throw SmartIdError.underMaintenance
+        }
+
+        let elapsed = try await ContinuousClock().measure {
+            await #expect(throws: SmartIdError.timeout) {
+                try await service.getSessionRequest(
+                    url: url,
+                    sessionId: "SESSION",
+                    pollingTimeout: 2,
+                    trustedCertificates: certificates,
+                    proxyInfo: proxy,
+                    userAgent: "TestUserAgent"
+                )
+            }
+        }
+
+        #expect(elapsed < .seconds(5))
+    }
+
+    @Test
+    func getSessionRequest_waitsBetweenMaintenanceRetriesWhenNoPollHasAnswered() async throws {
+        requestPerformer.performRequestHandler = { _, _, _, _, _, _ in
+            throw SmartIdError.underMaintenance
+        }
+
+        let elapsed = try await ContinuousClock().measure {
+            await #expect(throws: SmartIdError.underMaintenance) {
+                try await service.getSessionRequest(
+                    url: url,
+                    sessionId: "SESSION",
+                    pollingTimeout: 1,
+                    trustedCertificates: certificates,
+                    proxyInfo: proxy,
+                    userAgent: "TestUserAgent"
+                )
+            }
+        }
+
+        #expect(elapsed > .seconds(2))
+    }
+
+    @Test
+    func getSessionRequest_stopsPollingWhenAttemptIsCancelled() async {
+        requestPerformer.performRequestHandler = { _, _, _, _, _, _ in
+            SmartIdSessionResponse(state: .running, result: nil, signature: nil, cert: nil)
+        }
+
+        let service = self.service
+        let url = self.url
+        let certificates = self.certificates
+        let proxy = self.proxy
+
+        let task = Task {
+            try await service.getSessionRequest(
+                url: url,
+                sessionId: "SESSION",
+                pollingTimeout: 1,
+                trustedCertificates: certificates,
+                proxyInfo: proxy,
+                userAgent: "TestUserAgent"
+            )
+        }
+        task.cancel()
+
+        await #expect(throws: CancellationError.self) {
+            try await task.value
+        }
+    }
+
+    @Test
+    func getSessionRequest_asksAgainWhenPollIsInterrupted() async throws {
+        let expected = SmartIdSessionResponse(
+            state: .complete,
+            result: nil,
+            signature: nil,
+            cert: nil
+        )
+
+        requestPerformer.performRequestHandler = { [requestPerformer] _, _, _, _, _, _ in
+            if requestPerformer.performRequestCallCount == 1 {
+                throw SmartIdError.requestInterrupted
+            }
+            return expected
+        }
+
+        let result = try await service.getSessionRequest(
+            url: url,
+            sessionId: "SESSION",
+            pollingTimeout: 1,
+            trustedCertificates: certificates,
+            proxyInfo: proxy,
+            userAgent: "TestUserAgent"
+        )
+
+        #expect(result.state == .complete)
+        #expect(requestPerformer.performRequestCallCount == 2)
+    }
+
+    @Test
+    func getSessionRequest_throwRequestInterruptedWhenEveryRetryIsInterrupted() async {
+        requestPerformer.performRequestHandler = { _, _, _, _, _, _ in
+            throw SmartIdError.requestInterrupted
+        }
+
+        await #expect(throws: SmartIdError.requestInterrupted) {
+            try await service.getSessionRequest(
+                url: url,
+                sessionId: "SESSION",
+                pollingTimeout: 1,
+                trustedCertificates: certificates,
+                proxyInfo: proxy,
+                userAgent: "TestUserAgent"
+            )
+        }
+
+        #expect(requestPerformer.performRequestCallCount == Constants.Signing.MaxPollRetries + 1)
+    }
+
+    @Test
+    func getSessionRequest_asksAgainWhenServerReportsMaintenance() async throws {
+        let expected = SmartIdSessionResponse(
+            state: .complete,
+            result: nil,
+            signature: nil,
+            cert: nil
+        )
+
+        requestPerformer.performRequestHandler = { [requestPerformer] _, _, _, _, _, _ in
+            if requestPerformer.performRequestCallCount == 1 {
+                throw SmartIdError.underMaintenance
+            }
+            return expected
+        }
+
+        let result = try await service.getSessionRequest(
+            url: url,
+            sessionId: "SESSION",
+            pollingTimeout: 1,
+            trustedCertificates: certificates,
+            proxyInfo: proxy,
+            userAgent: "TestUserAgent"
+        )
+
+        #expect(result.state == .complete)
+        #expect(requestPerformer.performRequestCallCount == 2)
+    }
+
+    @Test
+    func getSessionRequest_reportsExpiryWhenMaintenancePersistsAfterSessionAnswered() async {
+        requestPerformer.performRequestHandler = { [requestPerformer] _, _, _, _, _, _ in
+            if requestPerformer.performRequestCallCount == 1 {
+                return SmartIdSessionResponse(state: .running, result: nil, signature: nil, cert: nil)
+            }
+            throw SmartIdError.underMaintenance
+        }
+
+        await #expect(throws: SmartIdError.timeout) {
+            try await service.getSessionRequest(
+                url: url,
+                sessionId: "SESSION",
+                pollingTimeout: 1,
+                trustedCertificates: certificates,
+                proxyInfo: proxy,
+                userAgent: "TestUserAgent"
+            )
+        }
+    }
+
+    @Test
+    func getSessionRequest_throwUnderMaintenanceWhenEveryRetryReportsMaintenance() async {
+        requestPerformer.performRequestHandler = { _, _, _, _, _, _ in
+            throw SmartIdError.underMaintenance
+        }
+
+        await #expect(throws: SmartIdError.underMaintenance) {
+            try await service.getSessionRequest(
+                url: url,
+                sessionId: "SESSION",
+                pollingTimeout: 1,
+                trustedCertificates: certificates,
+                proxyInfo: proxy,
+                userAgent: "TestUserAgent"
+            )
+        }
+
+        #expect(requestPerformer.performRequestCallCount == Constants.Signing.MaxPollRetries + 1)
+    }
+
+    @Test
     func getSessionRequest_throwGeneralErrorWhenErrorThrownDuringRequest() async {
         requestPerformer.performRequestHandler = { _, _, _, _, _, _ in
             throw SmartIdError.generalError

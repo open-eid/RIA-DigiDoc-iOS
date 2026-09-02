@@ -137,4 +137,10 @@ public enum SmartIdSessionStatusResponseCode: String, Sendable, Decodable {
     case timeout = "TIMEOUT"
     case documentUnusable = "DOCUMENT_UNUSABLE"
     case wrongVc = "WRONG_VC"
+    case unknown = "UNKNOWN"
+
+    public init(from decoder: any Decoder) throws {
+        let rawValue = try decoder.singleValueContainer().decode(String.self)
+        self = SmartIdSessionStatusResponseCode(rawValue: rawValue) ?? .unknown
+    }
 }
