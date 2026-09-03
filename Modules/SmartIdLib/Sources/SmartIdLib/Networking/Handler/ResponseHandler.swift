@@ -44,6 +44,7 @@ struct ResponseHandler: ResponseHandlerProtocol {
         case .wrongVc: throw SmartIdError.wrongVC
         case .documentUnusable: throw SmartIdError.documentUnusable
         case .requiredInteractionNotSupportedByApp: throw SmartIdError.oldApi
+        case .unknown: throw SmartIdError.technicalError
         default: break
         }
     }
@@ -69,17 +70,21 @@ struct ResponseHandler: ResponseHandlerProtocol {
 
     func handleURLError(_ error: URLError) throws {
         switch error.code {
-        case .notConnectedToInternet, .networkConnectionLost:
+        case .notConnectedToInternet:
             throw SmartIdError.noInternetConnection
-        case .timedOut:
-            throw SmartIdError.timeout
+        case .networkConnectionLost, .timedOut:
+            throw SmartIdError.requestInterrupted
         default:
             throw SmartIdError.noInternetConnection
         }
     }
 
     func handleStatusCodeError(_ statusCode: Int?) throws {
-        switch statusCode ?? -1 {
+        guard let statusCode else {
+            throw SmartIdError.requestInterrupted
+        }
+
+        switch statusCode {
         case 400:
             throw SmartIdError.incorrectParameters
         case 401:

@@ -152,6 +152,7 @@ public struct Constants {
         public static let HashType = "SHA256"
         public static let Timeout = 120 // Seconds
         public static let DefaultTimeout = 5 // Seconds
+        public static let MaxPollRetries = 3
     }
 
     public struct CryptoDefaultValues {

@@ -89,11 +89,6 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
                     }
 
                 } catch {
-                    Task { @MainActor in
-                        continuation.resume(throwing: SmartIdError.timeout)
-                        return
-                    }
-
                     continuation.resume(with: Result {
                         try responseHandler.handleCancellationError(error)
                         guard let smartIdError = error as? SmartIdError else {
