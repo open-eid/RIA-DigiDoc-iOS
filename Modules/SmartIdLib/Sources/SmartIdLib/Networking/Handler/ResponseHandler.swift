@@ -82,7 +82,7 @@ struct ResponseHandler: ResponseHandlerProtocol {
         switch statusCode ?? -1 {
         case 400:
             throw SmartIdError.incorrectParameters
-        case 401:
+        case 401, 403:
             throw SmartIdError.invalidAccessRights
         case 404:
             throw SmartIdError.accountNotFound
