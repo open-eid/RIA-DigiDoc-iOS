@@ -60,11 +60,11 @@ struct ResponseHandler: ResponseHandlerProtocol {
         }
     }
 
-    func handleNetworkError(_ error: AFError, statusCode: Int?) throws {
+    func handleNetworkError(_ error: AFError, statusCode: Int?, responseType: Any.Type) throws {
         if let underlyingError = error.underlyingError as? URLError {
             try handleURLError(underlyingError)
         } else {
-            try handleStatusCodeError(statusCode)
+            try handleStatusCodeError(statusCode, responseType: responseType)
         }
     }
 
@@ -79,7 +79,7 @@ struct ResponseHandler: ResponseHandlerProtocol {
         }
     }
 
-    func handleStatusCodeError(_ statusCode: Int?) throws {
+    func handleStatusCodeError(_ statusCode: Int?, responseType: Any.Type) throws {
         guard let statusCode else {
             throw SmartIdError.requestInterrupted
         }
@@ -90,11 +90,15 @@ struct ResponseHandler: ResponseHandlerProtocol {
         case 401:
             throw SmartIdError.invalidAccessRights
         case 404:
-            throw SmartIdError.accountNotFound
+            throw responseType == SmartIdSessionResponse.self ?
+                SmartIdError.sessionNotFound :
+                SmartIdError.accountNotFound
         case 409:
             throw SmartIdError.exceededUnsuccessfulRequests
         case 429:
             throw SmartIdError.tooManyRequests
+        case 471:
+            throw SmartIdError.notQualified
         case 480:
             throw SmartIdError.oldApi
         case 580:
