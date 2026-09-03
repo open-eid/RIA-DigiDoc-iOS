@@ -165,7 +165,7 @@ struct ResponseHandlerTests {
         let afError = AFError.sessionTaskFailed(error: urlError)
 
         #expect(throws: SmartIdError.noInternetConnection) {
-            try handler.handleNetworkError(afError, statusCode: nil)
+            try handler.handleNetworkError(afError, statusCode: nil, responseType: SmartIdSessionIdResponse.self)
         }
     }
 
@@ -175,7 +175,7 @@ struct ResponseHandlerTests {
         let afError = AFError.sessionTaskFailed(error: urlError)
 
         #expect(throws: SmartIdError.timeout) {
-            try handler.handleNetworkError(afError, statusCode: nil)
+            try handler.handleNetworkError(afError, statusCode: nil, responseType: SmartIdSessionIdResponse.self)
         }
     }
 
@@ -184,7 +184,7 @@ struct ResponseHandlerTests {
         let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
 
         #expect(throws: SmartIdError.invalidAccessRights) {
-            try handler.handleNetworkError(afError, statusCode: 401)
+            try handler.handleNetworkError(afError, statusCode: 401, responseType: SmartIdSessionIdResponse.self)
         }
     }
 
@@ -193,7 +193,34 @@ struct ResponseHandlerTests {
         let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 400))
 
         #expect(throws: SmartIdError.incorrectParameters) {
-            try handler.handleNetworkError(afError, statusCode: 400)
+            try handler.handleNetworkError(afError, statusCode: 400, responseType: SmartIdSessionIdResponse.self)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsNotQualifiedWhenUnacceptableStatusCode471Returned() {
+        let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 471))
+
+        #expect(throws: SmartIdError.notQualified) {
+            try handler.handleNetworkError(afError, statusCode: 471, responseType: SmartIdSessionIdResponse.self)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsAccountNotFoundWhenStatusCode404ReturnedForSignatureRequest() {
+        let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 404))
+
+        #expect(throws: SmartIdError.accountNotFound) {
+            try handler.handleNetworkError(afError, statusCode: 404, responseType: SmartIdSessionIdResponse.self)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsSessionNotFoundWhenStatusCode404ReturnedForSessionStatusRequest() {
+        let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 404))
+
+        #expect(throws: SmartIdError.sessionNotFound) {
+            try handler.handleNetworkError(afError, statusCode: 404, responseType: SmartIdSessionResponse.self)
         }
     }
 
@@ -202,7 +229,7 @@ struct ResponseHandlerTests {
         let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 999))
 
         #expect(throws: SmartIdError.technicalError) {
-            try handler.handleNetworkError(afError, statusCode: 999)
+            try handler.handleNetworkError(afError, statusCode: 999, responseType: SmartIdSessionIdResponse.self)
         }
     }
 }
