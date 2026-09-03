@@ -81,7 +81,11 @@ struct RequestPerformer: RequestPerfomerProtocol, Loggable {
                     case .failure(let afError):
                         continuation.resume(with: Result {
                             try responseHandler.handleCancellationError(afError)
-                            try responseHandler.handleNetworkError(afError, statusCode: response.response?.statusCode)
+                            try responseHandler.handleNetworkError(
+                                afError,
+                                statusCode: response.response?.statusCode,
+                                responseType: T.self
+                            )
 
                             throw SmartIdError.generalError
                         })
