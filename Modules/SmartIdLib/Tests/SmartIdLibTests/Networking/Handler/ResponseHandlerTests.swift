@@ -189,6 +189,15 @@ struct ResponseHandlerTests {
     }
 
     @Test
+    func handleNetworkError_throwsInvalidAccessRightsWhenUnacceptableStatusCode403Returned() {
+        let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 403))
+
+        #expect(throws: SmartIdError.invalidAccessRights) {
+            try handler.handleNetworkError(afError, statusCode: 403)
+        }
+    }
+
+    @Test
     func handleNetworkError_throwsIncorrectParametersWhenUnacceptableStatusCode400Returned() {
         let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 400))
 
