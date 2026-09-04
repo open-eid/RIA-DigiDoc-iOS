@@ -137,24 +137,6 @@ jobs:
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"
-    # TEMP(code-ql-fix): experiment 1 — CodeQL's Swift extractor has historically
-    # lagged Xcode releases (Xcode 26 support only landed in CodeQL 2.23.5, months
-    # late), and the docs claim Swift 5.4-6.3 while 26.6 ships a newer patch level.
-    # Trace the build under 26.4 instead. Placed before resolution so resolution and
-    # the traced build share one toolchain; tests above still run under the matrix
-    # Xcode. Remove this step once the outcome is known.
-    - name: Select Xcode 26.4 for the traced build
-      if: >-
-        github.event_name != 'push' ||
-        github.ref == 'refs/heads/main' ||
-        github.ref == 'refs/heads/code-ql-fix'
-      run: |
-        echo "Xcode versions available on this runner:"
-        ls -d /Applications/Xcode_*.app
-
-        sudo xcode-select -s /Applications/Xcode_26.4.app
-        xcodebuild -version
-        swift --version
     # Wiping state and resolving packages spawns many git subprocesses and produces
     # nothing for the CodeQL database, so it stays outside the traced region.
     - name: Resolve package dependencies
@@ -167,43 +149,6 @@ jobs:
         rm -rf ${{ github.workspace }}/.build
 
         xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
-    # TEMP(code-ql-fix): the traced build wedges at
-    #   Compile plug-in "SwiftLintBuildToolPlugin" in package "swiftlintplugins"
-    # so detach that build-tool plugin from the RIADigiDoc target before tracing.
-    # Lint coverage is unaffected: the untraced 'Run tests' step above still builds
-    # with the plugin attached. Only the app target's own dependency edge is removed;
-    # no local Package.swift references SwiftLint.
-    - name: Detach SwiftLint build-tool plugin for the traced build
-      if: >-
-        github.event_name != 'push' ||
-        github.ref == 'refs/heads/main' ||
-        github.ref == 'refs/heads/code-ql-fix'
-      run: |
-        python3 - <<'PY'
-        import re
-        from pathlib import Path
-
-        p = Path("RIADigiDoc.xcodeproj/project.pbxproj")
-        text = p.read_text(encoding="utf-8")
-
-        # Resolve the PBXTargetDependency UUID from the plugin name rather than
-        # hardcoding it, so a project regeneration does not silently no-op this.
-        m = re.search(
-            r"([0-9A-F]{24}) /\* PBXTargetDependency \*/ = \{\s*"
-            r"isa = PBXTargetDependency;\s*"
-            r"productRef = [0-9A-F]{24} /\* SwiftLintBuildToolPlugin \*/;",
-            text,
-        )
-        if not m:
-            raise SystemExit("FAIL: no PBXTargetDependency found for SwiftLintBuildToolPlugin")
-
-        ref = f"\t\t\t\t{m.group(1)} /* PBXTargetDependency */,\n"
-        if text.count(ref) != 1:
-            raise SystemExit(f"FAIL: expected 1 reference to {m.group(1)}, found {text.count(ref)}")
-
-        p.write_text(text.replace(ref, "", 1), encoding="utf-8")
-        print(f"Detached SwiftLintBuildToolPlugin ({m.group(1)}) from its target.")
-        PY
     - name: Initialize CodeQL
       # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
       if: >-

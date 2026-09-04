@@ -777,7 +777,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DF56ACDE2FF5E0CA007A834D /* PBXTargetDependency */,
 				DF4E43CA2D0BA38600967997 /* PBXTargetDependency */,
 				DFB663AE2F16918100804545 /* PBXTargetDependency */,
 			);
@@ -917,7 +916,6 @@
 			mainGroup = DFDB14722CC97B0E00153876;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				DFA3EE592D14C4C2001D951B /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DF9AFE902E00D30A0062C64D /* XCRemoteSwiftPackageReference "Factory" */,
 				1A7CC1C52E71CAAB0002CEA3 /* XCRemoteSwiftPackageReference "ASN1Decoder" */,
@@ -1069,11 +1067,7 @@
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 			targetProxy = DF4E43C92D0BA38600967997 /* PBXContainerItemProxy */;
 		};
-		DF56ACDE2FF5E0CA007A834D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = DF56ACDD2FF5E0CA007A834D /* SwiftLintBuildToolPlugin */;
-		};
-		DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
+				DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DFB6639D2F16917D00804545 /* WidgetExtensionExtension */;
 			targetProxy = DFB663AD2F16918100804545 /* PBXContainerItemProxy */;
@@ -1746,14 +1740,6 @@
 				version = 5.12.0;
 			};
 		};
-		DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
-			requirement = {
-				kind = exactVersion;
-				version = 0.65.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1861,12 +1847,7 @@
 			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
 			productName = X509;
 		};
-		DF56ACDD2FF5E0CA007A834D /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DFED7A5F2CC9A3B200D8BCA9 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
-		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
+				DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MobileIdLibMocks;
 		};
