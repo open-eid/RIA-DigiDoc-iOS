@@ -177,6 +177,10 @@ jobs:
       with:
         languages: swift,c-cpp
         build-mode: manual
+        # TEMP(code-ql-fix): uploads a debug artifact with the extractor and tracer
+        # logs, which is the only way to see where the traced build wedges. Remove
+        # once diagnosed — it slows the run and publishes the database.
+        debug: true
     - name: Build
       run: |
         cd ${{ github.workspace }}
