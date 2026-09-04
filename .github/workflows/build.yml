@@ -157,7 +157,17 @@ jobs:
         github.ref == 'refs/heads/code-ql-fix'
       uses: github/codeql-action/init@v4
       with:
-        languages: swift,c-cpp
+        # swift only. c-cpp was dropped 2026-09-04: the traced build populated the
+        # Swift database fine (25.71 MiB of relations) but `database finalize` for
+        # cpp failed with "detected code written in C/C++ but this run didn't build
+        # any of it", exit 32, which is fatal and discards the whole analysis --
+        # including the good Swift results. The 13 ObjC++ wrapper files are compiled
+        # (SwiftPM lists them as sources despite living under publicHeadersPath), so
+        # the cause is on the extractor side and still undiagnosed. Re-add c-cpp once
+        # the debug artifact's cpp extractor log explains it; the wrappers are thin
+        # bridging code and CodeQL cannot follow dataflow into the digidocpp
+        # xcframework anyway, so little is lost meanwhile.
+        languages: swift
         build-mode: manual
         # TEMP(code-ql-fix): uploads a debug artifact with the extractor and tracer
         # logs, which is the only way to see where the traced build wedges. Remove
