@@ -44,10 +44,12 @@ jobs:
         cd ${{ github.workspace }}
 
         rm -rf ~/Library/Developer/Xcode/DerivedData/*
-        rm -rf ${{ github.workspace }}/build
+        rm -rf "${{ runner.temp }}/codeql-build"
         rm -rf ${{ github.workspace }}/.build
 
-        xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
+        xcodebuild -resolvePackageDependencies \
+          -project RIADigiDoc.xcodeproj \
+          -derivedDataPath "${{ runner.temp }}/codeql-build"
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
@@ -62,7 +64,7 @@ jobs:
           -skipPackagePluginValidation \
           -scheme RIADigiDoc \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
-          -derivedDataPath "${{ github.workspace }}/build" \
+          -derivedDataPath "${{ runner.temp }}/codeql-build" \
           COMPILATION_CACHE_ENABLE_CACHING=NO \
           SWIFT_ENABLE_COMPILE_CACHE=NO \
           SWIFT_USE_INTEGRATED_DRIVER=NO \
@@ -73,7 +75,7 @@ jobs:
       if: ${{ always() }}
       run: |
         rm -rf ~/Library/Developer/Xcode/DerivedData/*
-        rm -rf ${{ github.workspace }}/build
+        rm -rf "${{ runner.temp }}/codeql-build"
         rm -rf ${{ github.workspace }}/.build
 
   scripts:
