@@ -18,11 +18,6 @@ jobs:
       contents: read
       actions: read
       security-events: write
-    concurrency:
-      group: build-${{ github.ref }}
-      # TEMP(code-ql-fix): the code-ql-fix clause stops a second push from killing
-      # a long traced build mid-run; drop it before merging to main
-      cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/code-ql-fix' }}
     strategy:
       matrix:
         xcode:
@@ -142,6 +137,18 @@ jobs:
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"
+    # Wiping state and resolving packages spawns many git subprocesses and produces
+    # nothing for the CodeQL database, so it stays outside the traced region.
+    - name: Resolve package dependencies
+      run: |
+        cd ${{ github.workspace }}
+
+        # Clean old data
+        rm -rf ~/Library/Developer/Xcode/DerivedData/*
+        rm -rf ${{ github.workspace }}/build
+        rm -rf ${{ github.workspace }}/.build
+
+        xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
     - name: Initialize CodeQL
       # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
       if: >-
@@ -156,20 +163,17 @@ jobs:
       run: |
         cd ${{ github.workspace }}
 
-        # Clean old data
-        rm -rf ~/Library/Developer/Xcode/DerivedData/*
-        rm -rf ${{ github.workspace }}/build
-        rm -rf ${{ github.workspace }}/.build
-
-        xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
-
+        # No `clean` and no rm here: the previous step already wiped DerivedData, and
+        # cleaning would discard the resolved SourcePackages and re-resolve under the
+        # tracer, which is exactly what this split exists to avoid.
+        #
         # The last three settings mirror what CodeQL's own Swift autobuild passes.
         # The tracer observes process invocations, so the integrated driver (frontend
         # jobs run in-process) and compile caching (compiles skipped entirely) both
         # hide source from the extractor.
         # TEMP(code-ql-fix): -quiet removed so a traced build shows progress; restore
         # it once the tracing cost is understood
-        xcodebuild clean build \
+        xcodebuild build \
           -project RIADigiDoc.xcodeproj \
           -skipPackagePluginValidation \
           -scheme RIADigiDoc \
