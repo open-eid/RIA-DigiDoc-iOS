@@ -1,0 +1,111 @@
+name: Set up RIA DigiDoc build environment
+description: Prepares a macOS runner to build RIA DigiDoc iOS.
+
+inputs:
+  xcode:
+    description: Xcode version to select, e.g. "26.6"
+    required: true
+  google-services-plist:
+    description: Base64-encoded GoogleService-Info.plist
+    required: true
+
+outputs:
+  app-version:
+    description: MARKETING_VERSION from the project, also exported as APP_VERSION
+    value: ${{ steps.app-version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Download Libdigidocpp iOS artifact
+      uses: dawidd6/action-download-artifact@v21
+      with:
+        workflow: build.yml
+        branch: master
+        name: iphoneos
+        path: libdigidocpp-ios
+        repo: open-eid/libdigidocpp
+    - name: Download Libdigidocpp iOS Simulator artifact
+      uses: dawidd6/action-download-artifact@v21
+      with:
+        workflow: build.yml
+        branch: master
+        name: iphonesimulator
+        path: libdigidocpp-ios-simulator
+        repo: open-eid/libdigidocpp
+    - name: Extract libdigidocpp artifacts
+      shell: bash
+      run: |
+        unzip -o libdigidocpp-ios/libdigidocpp.iphoneos.zip -d libdigidocpp.iphoneos
+        unzip -o libdigidocpp-ios-simulator/libdigidocpp.iphonesimulator.zip -d libdigidocpp.iphonesimulator
+    - name: Update libdigidocpp in project
+      shell: bash
+      run: |
+        export LIBDIGIDOCPP_PATH=${{ github.workspace }}/Modules/LibdigidocLib/Sources/LibdigidocObjC/Libs/digidocpp.xcframework
+        rm -rf $LIBDIGIDOCPP_PATH/ios-arm64 && mkdir $LIBDIGIDOCPP_PATH/ios-arm64 && cp -r ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64/
+        rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
+    - name: Install dependencies
+      shell: bash
+      run: brew install mockolo
+    - name: Setup config and TSL files
+      shell: bash
+      run: |
+        export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
+        export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
+        export TSL_FILES_DIRECTORY="$RESOURCES_DIRECTORY/tslFiles"
+
+        # Create TSL folder and mock folders for each module
+        mkdir -p $TSL_FILES_DIRECTORY
+
+        # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
+        for module in CommonsLib ConfigLib WebEidLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
+          mock_dir="Modules/${module}/Tests/Mocks/Generated"
+          mkdir -p "$mock_dir"
+          echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
+        done
+
+        # Remove current files in tslFiles.bundle
+        echo "Removing current TSL files"
+        find $TSL_FILES_DIRECTORY -mindepth 1 ! -name ".keep" -delete
+
+        # Download latest 'eu-lotl.xml' file"
+        echo "Downloading latest 'eu-lotl.xml' file"
+        wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
+
+        if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
+          echo "Getting TSL (local LOTL)"
+          python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+
+          echo "Finished downloading TSL"
+        else
+          echo "Getting TSL (remote LOTL)"
+          python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
+          echo "Finished downloading TSL"
+        fi
+
+        echo "Moving TSLs to app's TSL files directory"
+        mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
+        echo "Done moving TSLs"
+    - name: Setup environment
+      shell: bash
+      env:
+        GOOGLE_SERVICES_PLIST: ${{ inputs.google-services-plist }}
+      run: |
+        export LANG=en_US.UTF-8
+
+        sudo xcode-select -s /Applications/Xcode_${{ inputs.xcode }}.app
+
+        # Setup Google Services
+        echo $GOOGLE_SERVICES_PLIST | base64 --decode > "${{ github.workspace }}/RIADigiDoc/Supporting files/GoogleService-Info.plist"
+    - name: Read app version
+      id: app-version
+      shell: bash
+      run: |
+        VERSION=$(xcodebuild -project ${{ github.workspace }}/RIADigiDoc.xcodeproj -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =')
+        echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Fetch default configuration
+      shell: bash
+      run: |
+        echo "Fetching default configuration"
+        python3 scripts/setup_configuration.py

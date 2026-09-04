@@ -1,23 +1,11 @@
 name: RIA DigiDoc iOS
-on:
-  push:
-  pull_request:
-    branches:
-      - main
-  schedule:
-    - cron: "0 3 * * 1" # Weekly
+on: [push]
 env:
   BUILD_NUMBER: ${{ github.run_number }}
 jobs:
   build:
     name: Build RIA DigiDoc on macOS
-    if: contains(github.repository, 'open-eid/RIA-DigiDoc-iOS')
     runs-on: macos-26
-    timeout-minutes: 120
-    permissions:
-      contents: read
-      actions: read
-      security-events: write
     strategy:
       matrix:
         xcode:
@@ -29,88 +17,11 @@ jobs:
       uses: actions/checkout@v7
       with:
         submodules: recursive
-    - name: Download Libdigidocpp iOS artifact
-      uses: dawidd6/action-download-artifact@v21
+    - name: Set up build environment
+      uses: ./.github/actions/setup-build-env
       with:
-        workflow: build.yml
-        branch: master
-        name: iphoneos
-        path: libdigidocpp-ios
-        repo: open-eid/libdigidocpp
-    - name: Download Libdigidocpp iOS Simulator artifact
-      uses: dawidd6/action-download-artifact@v21
-      with:
-        workflow: build.yml
-        branch: master
-        name: iphonesimulator
-        path: libdigidocpp-ios-simulator
-        repo: open-eid/libdigidocpp
-    - name: Extract libdigidocpp artifacts
-      run: |
-        unzip -o libdigidocpp-ios/libdigidocpp.iphoneos.zip -d libdigidocpp.iphoneos
-        unzip -o libdigidocpp-ios-simulator/libdigidocpp.iphonesimulator.zip -d libdigidocpp.iphonesimulator
-    - name: Update libdigidocpp in project
-      run: |
-          export LIBDIGIDOCPP_PATH=${{ github.workspace }}/Modules/LibdigidocLib/Sources/LibdigidocObjC/Libs/digidocpp.xcframework
-          rm -rf $LIBDIGIDOCPP_PATH/ios-arm64 && mkdir $LIBDIGIDOCPP_PATH/ios-arm64 && cp -r ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64/
-          rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
-    - name: Install dependencies
-      run: brew install mockolo
-    - name: Setup config and TSL files
-      run: |
-        export RESOURCES_DIRECTORY="Modules/ConfigLib/Sources/ConfigLib/Resources"
-        export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
-        export TSL_FILES_DIRECTORY="$RESOURCES_DIRECTORY/tslFiles"
-
-        # Create TSL folder and mock folders for each module
-        mkdir -p $TSL_FILES_DIRECTORY
-
-        # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
-        for module in CommonsLib ConfigLib WebEidLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
-          mock_dir="Modules/${module}/Tests/Mocks/Generated"
-          mkdir -p "$mock_dir"
-          echo "// Placeholder for generated mocks" > "${mock_dir}/__placeholder.swift"
-        done
-
-        # Remove current files in tslFiles.bundle
-        echo "Removing current TSL files"
-        find $TSL_FILES_DIRECTORY -mindepth 1 ! -name ".keep" -delete
-
-        # Download latest 'eu-lotl.xml' file"
-        echo "Downloading latest 'eu-lotl.xml' file"
-        wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
-
-        if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
-          echo "Getting TSL (local LOTL)"
-          python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-
-          echo "Finished downloading TSL"
-        else
-          echo "Getting TSL (remote LOTL)"
-          python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-          echo "Finished downloading TSL"
-        fi
-
-        echo "Moving TSLs to app's TSL files directory"
-        mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
-        echo "Done moving TSLs"
-    - name: Setup environment
-      env:
-        GOOGLE_SERVICES_PLIST: ${{ secrets.GOOGLE_SERVICES_PLIST }}
-      run: |
-        export LANG=en_US.UTF-8
-        
-        sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
-
-        # Setup Google Services
-        echo $GOOGLE_SERVICES_PLIST | base64 --decode > "${{ github.workspace }}/RIADigiDoc/Supporting files/GoogleService-Info.plist"
-
-        # Setup app version
-        echo APP_VERSION=$(xcodebuild -project ${{ github.workspace }}/RIADigiDoc.xcodeproj -showBuildSettings | grep MARKETING_VERSION | tr -d 'MARKETING_VERSION =') >> $GITHUB_ENV
-    - name: Fetch default configuration
-      run: |
-        echo "Fetching default configuration"
-        python3 scripts/setup_configuration.py
+        xcode: ${{ matrix.xcode }}
+        google-services-plist: ${{ secrets.GOOGLE_SERVICES_PLIST }}
     - name: Run tests
       run: |
         cd ${{ github.workspace }}
@@ -137,9 +48,7 @@ jobs:
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"
-    # Wiping state and resolving packages spawns many git subprocesses and produces
-    # nothing for the CodeQL database, so it stays outside the traced region.
-    - name: Resolve package dependencies
+    - name: Build
       run: |
         cd ${{ github.workspace }}
 
@@ -149,60 +58,14 @@ jobs:
         rm -rf ${{ github.workspace }}/.build
 
         xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
-    - name: Initialize CodeQL
-      # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
-      if: >-
-        github.event_name != 'push' ||
-        github.ref == 'refs/heads/main' ||
-        github.ref == 'refs/heads/code-ql-fix'
-      uses: github/codeql-action/init@v4
-      with:
-        # swift only. c-cpp was dropped 2026-09-04: the traced build populated the
-        # Swift database fine (25.71 MiB of relations) but `database finalize` for
-        # cpp failed with "detected code written in C/C++ but this run didn't build
-        # any of it", exit 32, which is fatal and discards the whole analysis --
-        # including the good Swift results. The 13 ObjC++ wrapper files are compiled
-        # (SwiftPM lists them as sources despite living under publicHeadersPath), so
-        # the cause is on the extractor side and still undiagnosed. Re-add c-cpp once
-        # the debug artifact's cpp extractor log explains it; the wrappers are thin
-        # bridging code and CodeQL cannot follow dataflow into the digidocpp
-        # xcframework anyway, so little is lost meanwhile.
-        languages: swift
-        build-mode: manual
-        # TEMP(code-ql-fix): uploads a debug artifact with the extractor and tracer
-        # logs, which is the only way to see where the traced build wedges. Remove
-        # once diagnosed — it slows the run and publishes the database.
-        debug: true
-    - name: Build
-      run: |
-        cd ${{ github.workspace }}
 
-        # No `clean` and no rm here: the previous step already wiped DerivedData, and
-        # cleaning would discard the resolved SourcePackages and re-resolve under the
-        # tracer, which is exactly what this split exists to avoid.
-        #
-        # The last three settings mirror what CodeQL's own Swift autobuild passes.
-        # The tracer observes process invocations, so the integrated driver (frontend
-        # jobs run in-process) and compile caching (compiles skipped entirely) both
-        # hide source from the extractor.
-        # TEMP(code-ql-fix): -quiet removed so a traced build shows progress; restore
-        # it once the tracing cost is understood
-        xcodebuild build \
+        xcodebuild clean build \
           -project RIADigiDoc.xcodeproj \
           -skipPackagePluginValidation \
           -scheme RIADigiDoc \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -derivedDataPath "${{ github.workspace }}/build" \
-          COMPILATION_CACHE_ENABLE_CACHING=NO \
-          SWIFT_ENABLE_COMPILE_CACHE=NO \
-          SWIFT_USE_INTEGRATED_DRIVER=NO
-    - name: Perform CodeQL analysis
-      # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
-      if: >-
-        github.event_name != 'push' ||
-        github.ref == 'refs/heads/main' ||
-        github.ref == 'refs/heads/code-ql-fix'
-      uses: github/codeql-action/analyze@v4
+          -quiet
     - name: Rename app file
       run: |
         mv \
@@ -226,39 +89,3 @@ jobs:
         rm -rf ~/Library/Developer/Xcode/DerivedData/*
         rm -rf ${{ github.workspace }}/build
         rm -rf ${{ github.workspace }}/.build
-
-  codeql:
-    name: CodeQL (${{ matrix.language }})
-    # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
-    if: >-
-      contains(github.repository, 'open-eid/RIA-DigiDoc-iOS') &&
-      (github.event_name == 'pull_request' ||
-       github.event_name == 'schedule' ||
-       github.ref == 'refs/heads/main' ||
-       github.ref == 'refs/heads/code-ql-fix')
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      actions: read
-      security-events: write
-    concurrency:
-      group: codeql-${{ matrix.language }}-${{ github.ref }}
-      cancel-in-progress: true
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-          - actions
-          - python
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
-      with:
-        languages: ${{ matrix.language }}
-    - name: Perform CodeQL analysis
-      uses: github/codeql-action/analyze@v4
-      with:
-        category: "/language:${{ matrix.language }}"
