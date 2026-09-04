@@ -163,13 +163,21 @@ jobs:
 
         xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
 
+        # The last three settings mirror what CodeQL's own Swift autobuild passes.
+        # The tracer observes process invocations, so the integrated driver (frontend
+        # jobs run in-process) and compile caching (compiles skipped entirely) both
+        # hide source from the extractor.
+        # TEMP(code-ql-fix): -quiet removed so a traced build shows progress; restore
+        # it once the tracing cost is understood
         xcodebuild clean build \
           -project RIADigiDoc.xcodeproj \
           -skipPackagePluginValidation \
           -scheme RIADigiDoc \
           -destination 'platform=iOS Simulator,name=iPhone 17' \
           -derivedDataPath "${{ github.workspace }}/build" \
-          -quiet
+          COMPILATION_CACHE_ENABLE_CACHING=NO \
+          SWIFT_ENABLE_COMPILE_CACHE=NO \
+          SWIFT_USE_INTEGRATED_DRIVER=NO
     - name: Perform CodeQL analysis
       # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
       if: >-
