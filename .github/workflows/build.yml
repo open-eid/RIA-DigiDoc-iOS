@@ -137,6 +137,24 @@ jobs:
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"
+    # TEMP(code-ql-fix): experiment 1 — CodeQL's Swift extractor has historically
+    # lagged Xcode releases (Xcode 26 support only landed in CodeQL 2.23.5, months
+    # late), and the docs claim Swift 5.4-6.3 while 26.6 ships a newer patch level.
+    # Trace the build under 26.4 instead. Placed before resolution so resolution and
+    # the traced build share one toolchain; tests above still run under the matrix
+    # Xcode. Remove this step once the outcome is known.
+    - name: Select Xcode 26.4 for the traced build
+      if: >-
+        github.event_name != 'push' ||
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/code-ql-fix'
+      run: |
+        echo "Xcode versions available on this runner:"
+        ls -d /Applications/Xcode_*.app
+
+        sudo xcode-select -s /Applications/Xcode_26.4.app
+        xcodebuild -version
+        swift --version
     # Wiping state and resolving packages spawns many git subprocesses and produces
     # nothing for the CodeQL database, so it stays outside the traced region.
     - name: Resolve package dependencies
