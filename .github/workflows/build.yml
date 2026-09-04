@@ -114,12 +114,6 @@ jobs:
       run: |
         echo "Fetching default configuration"
         python3 scripts/setup_configuration.py
-    - name: Initialize CodeQL
-      if: github.event_name != 'push' || github.ref == 'refs/heads/main'
-      uses: github/codeql-action/init@v4
-      with:
-        languages: swift,c-cpp
-        build-mode: manual
     - name: Run tests
       run: |
         cd ${{ github.workspace }}
@@ -146,6 +140,12 @@ jobs:
     - name: Increment build number
       run: |
         agvtool new-version -all "${{ env.BUILD_NUMBER }}"
+    - name: Initialize CodeQL
+      if: github.event_name != 'push' || github.ref == 'refs/heads/main'
+      uses: github/codeql-action/init@v4
+      with:
+        languages: swift,c-cpp
+        build-mode: manual
     - name: Build
       run: |
         cd ${{ github.workspace }}
