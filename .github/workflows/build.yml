@@ -167,6 +167,43 @@ jobs:
         rm -rf ${{ github.workspace }}/.build
 
         xcodebuild -resolvePackageDependencies -project RIADigiDoc.xcodeproj
+    # TEMP(code-ql-fix): the traced build wedges at
+    #   Compile plug-in "SwiftLintBuildToolPlugin" in package "swiftlintplugins"
+    # so detach that build-tool plugin from the RIADigiDoc target before tracing.
+    # Lint coverage is unaffected: the untraced 'Run tests' step above still builds
+    # with the plugin attached. Only the app target's own dependency edge is removed;
+    # no local Package.swift references SwiftLint.
+    - name: Detach SwiftLint build-tool plugin for the traced build
+      if: >-
+        github.event_name != 'push' ||
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/code-ql-fix'
+      run: |
+        python3 - <<'PY'
+        import re
+        from pathlib import Path
+
+        p = Path("RIADigiDoc.xcodeproj/project.pbxproj")
+        text = p.read_text(encoding="utf-8")
+
+        # Resolve the PBXTargetDependency UUID from the plugin name rather than
+        # hardcoding it, so a project regeneration does not silently no-op this.
+        m = re.search(
+            r"([0-9A-F]{24}) /\* PBXTargetDependency \*/ = \{\s*"
+            r"isa = PBXTargetDependency;\s*"
+            r"productRef = [0-9A-F]{24} /\* SwiftLintBuildToolPlugin \*/;",
+            text,
+        )
+        if not m:
+            raise SystemExit("FAIL: no PBXTargetDependency found for SwiftLintBuildToolPlugin")
+
+        ref = f"\t\t\t\t{m.group(1)} /* PBXTargetDependency */,\n"
+        if text.count(ref) != 1:
+            raise SystemExit(f"FAIL: expected 1 reference to {m.group(1)}, found {text.count(ref)}")
+
+        p.write_text(text.replace(ref, "", 1), encoding="utf-8")
+        print(f"Detached SwiftLintBuildToolPlugin ({m.group(1)}) from its target.")
+        PY
     - name: Initialize CodeQL
       # TEMP(code-ql-fix): drop the code-ql-fix clause before merging to main
       if: >-
