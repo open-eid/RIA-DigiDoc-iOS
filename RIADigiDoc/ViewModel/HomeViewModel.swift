@@ -63,6 +63,12 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
         sharedContainerViewModel.setFileOpeningMethod(method)
     }
 
+    func closeOpenContainers() {
+        sharedContainerViewModel.setSignedContainer(nil)
+        sharedContainerViewModel.setCryptoContainer(nil)
+        sharedContainerViewModel.clearContainers()
+    }
+
     func getRecentDocumentsFolder() -> URL? {
         do {
             return try Directories.getCacheDirectory(fileManager: fileManager)

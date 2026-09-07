@@ -17,16 +17,19 @@
  *
  */
 
-import Foundation
-import UtilsLib
+import UIKit
 
-/// @mockable
-@MainActor
-public protocol HomeViewModelProtocol: Sendable {
-    func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool
-    func setChosenFiles(_ chosenFiles: Result<[URL], Error>)
-    func getRecentDocumentsFolder() -> URL?
-    func getSharedFiles() async -> [URL]
-    func setFileOpeningMethod(_ method: FileOpeningMethod)
-    func closeOpenContainers()
+class ModalPresentationUtil {
+
+    @MainActor
+    public static func dismissPresentedModals() {
+        let rootViewControllers = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .compactMap { $0.rootViewController }
+
+        for rootViewController in rootViewControllers where rootViewController.presentedViewController != nil {
+            rootViewController.dismiss(animated: false)
+        }
+    }
 }
