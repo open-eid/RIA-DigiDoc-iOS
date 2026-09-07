@@ -79,6 +79,22 @@ struct ResponseHandlerTests {
     }
 
     @Test
+    func handleNetworkError_throwsRequestInterruptedWhenNoUrlErrorAndNoStatusCode() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "host.test"))
+
+        #expect(throws: MobileIdError.requestInterrupted) {
+            try handler.handleNetworkError(afError, statusCode: nil)
+        }
+    }
+
+    @Test
+    func handleStatusCodeError_throwsRequestInterruptedWhenStatusCodeIsMissing() {
+        #expect(throws: MobileIdError.requestInterrupted) {
+            try handler.handleStatusCodeError(nil)
+        }
+    }
+
+    @Test
     func handleStatusCodeError_throwsStatusCodeErrors() {
         #expect(throws: MobileIdError.incorrectParameters) { try handler.handleStatusCodeError(400) }
         #expect(throws: MobileIdError.invalidAccessRights) { try handler.handleStatusCodeError(401) }

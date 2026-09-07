@@ -90,7 +90,11 @@ struct ResponseHandler: ResponseHandlerProtocol {
     }
 
     func handleStatusCodeError(_ statusCode: Int?) throws {
-        switch statusCode ?? -1 {
+        guard let statusCode else {
+            throw MobileIdError.requestInterrupted
+        }
+
+        switch statusCode {
         case 400:
             throw MobileIdError.incorrectParameters
         case 401:

@@ -584,6 +584,11 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     private func handleSignatureAddingError(_ error: Error) {
         SmartIdViewModel.logger().error("Unable to sign container with Smart-ID: \(error)")
 
+        guard !Task.isCancelled else {
+            SmartIdViewModel.logger().info("Smart-ID signing cancelled. Not showing the error")
+            return
+        }
+
         if let cancellationError = error as? CancellationError {
             SmartIdViewModel.logger().error("Smart-ID signing manually cancelled: \(cancellationError)")
             return

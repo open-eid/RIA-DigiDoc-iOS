@@ -96,16 +96,33 @@ actor MobileIdSignService: MobileIdSignServiceProtocol, Loggable {
         userAgent: String
     ) async throws -> MobileIdSessionResponse {
         let pollingTimeoutMs = pollingTimeout * 1000
+        var retriedPolls = 0
 
         while true {
-            let sessionResponse: MobileIdSessionResponse? = try await requestPerformer.performRequest(
-                url: "\(url)/\(sessionId)",
-                method: .get,
-                parameters: ["timeoutMs": pollingTimeoutMs],
-                trustedCertificates: trustedCertificates,
-                proxyInfo: proxyInfo,
-                userAgent: userAgent
-            )
+            try Task.checkCancellation()
+
+            let sessionResponse: MobileIdSessionResponse?
+
+            do {
+                sessionResponse = try await requestPerformer.performRequest(
+                    url: "\(url)/\(sessionId)",
+                    method: .get,
+                    parameters: ["timeoutMs": pollingTimeoutMs],
+                    trustedCertificates: trustedCertificates,
+                    proxyInfo: proxyInfo,
+                    userAgent: userAgent
+                )
+            } catch MobileIdError.requestInterrupted {
+                retriedPolls += 1
+
+                guard retriedPolls <= Constants.Signing.MaxPollRetries else {
+                    throw MobileIdError.requestInterrupted
+                }
+
+                continue
+            }
+
+            retriedPolls = 0
 
             if let response = sessionResponse,
                response.state == .complete {

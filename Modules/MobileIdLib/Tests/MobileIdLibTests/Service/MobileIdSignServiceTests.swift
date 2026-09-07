@@ -140,4 +140,133 @@ struct MobileIdSignServiceTests {
 
         #expect(code == nil)
     }
+
+    @Test
+    func getSessionRequest_retriesPollWhenRequestIsInterrupted() async throws {
+        let completedResponse = MobileIdSessionResponse(
+            state: .complete,
+            result: .ok,
+            signature: MobileIdSessionSignatureResponse(
+                value: Data([0xAA, 0xBB]),
+                algorithm: "TestAlgorithm"
+            ),
+            cert: "TestCert",
+            time: Date.now.formatted(),
+            traceId: "TestTraceId"
+        )
+
+        mockRequestPerfomer.performRequestHandler = { [mockRequestPerfomer] _, _, _, _, _, _ in
+            if mockRequestPerfomer.performRequestCallCount == 1 {
+                throw MobileIdError.requestInterrupted
+            }
+            return completedResponse
+        }
+
+        let response = try await service.getSessionRequest(
+            url: "https://url.test/session",
+            sessionId: "abc",
+            pollingTimeout: 1,
+            trustedCertificates: [],
+            proxyInfo: ProxyInfo(),
+            userAgent: "MobileIdSignServiceTestsUserAgent"
+        )
+
+        #expect(response.state == .complete)
+        #expect(mockRequestPerfomer.performRequestCallCount == 2)
+    }
+
+    @Test
+    func getSessionRequest_throwsRequestInterruptedWhenEveryRetryIsInterrupted() async {
+        mockRequestPerfomer.performRequestHandler = { _, _, _, _, _, _ in
+            throw MobileIdError.requestInterrupted
+        }
+
+        await #expect(throws: MobileIdError.requestInterrupted) {
+            try await service.getSessionRequest(
+                url: "https://url.test/session",
+                sessionId: "abc",
+                pollingTimeout: 1,
+                trustedCertificates: [],
+                proxyInfo: ProxyInfo(),
+                userAgent: "MobileIdSignServiceTestsUserAgent"
+            )
+        }
+
+        #expect(mockRequestPerfomer.performRequestCallCount == Constants.Signing.MaxPollRetries + 1)
+    }
+
+    @Test
+    func getSessionRequest_resetsRetryCountAfterASuccessfulPoll() async throws {
+        let runningResponse = MobileIdSessionResponse(
+            state: .running,
+            result: nil,
+            signature: nil,
+            cert: nil,
+            time: Date.now.formatted(),
+            traceId: "TestTraceId"
+        )
+        let completedResponse = MobileIdSessionResponse(
+            state: .complete,
+            result: .ok,
+            signature: MobileIdSessionSignatureResponse(
+                value: Data([0xAA, 0xBB]),
+                algorithm: "TestAlgorithm"
+            ),
+            cert: "TestCert",
+            time: Date.now.formatted(),
+            traceId: "TestTraceId"
+        )
+
+        // Interrupt, recover, interrupt again: the second run of interruptions must get a full
+        // retry budget, so the poll still completes instead of giving up.
+        mockRequestPerfomer.performRequestHandler = { [mockRequestPerfomer] _, _, _, _, _, _ in
+            switch mockRequestPerfomer.performRequestCallCount {
+            case 1, 2, 3, 5, 6, 7:
+                throw MobileIdError.requestInterrupted
+            case 4:
+                return runningResponse
+            default:
+                return completedResponse
+            }
+        }
+
+        let response = try await service.getSessionRequest(
+            url: "https://url.test/session",
+            sessionId: "abc",
+            pollingTimeout: 1,
+            trustedCertificates: [],
+            proxyInfo: ProxyInfo(),
+            userAgent: "MobileIdSignServiceTestsUserAgent"
+        )
+
+        #expect(response.state == .complete)
+        #expect(mockRequestPerfomer.performRequestCallCount == 8)
+    }
+
+    @Test
+    func getSessionRequest_endsWithCancellationErrorWhenTaskIsCancelled() async {
+        // Tearing the signing screen down (for example when a container opened from another app
+        // replaces the one being signed) cancels the task mid-poll. That must surface as a
+        // CancellationError, which the view model swallows, and never as a MobileIdError that
+        // would show the user an error about the container they just left.
+        mockRequestPerfomer.performRequestHandler = { _, _, _, _, _, _ in
+            throw MobileIdError.requestInterrupted
+        }
+
+        let task = Task { [service] in
+            try await service.getSessionRequest(
+                url: "https://url.test/session",
+                sessionId: "abc",
+                pollingTimeout: 1,
+                trustedCertificates: [],
+                proxyInfo: ProxyInfo(),
+                userAgent: "MobileIdSignServiceTestsUserAgent"
+            )
+        }
+        task.cancel()
+
+        await #expect(throws: CancellationError.self) {
+            _ = try await task.value
+        }
+    }
 }

@@ -21,4 +21,5 @@ public enum MobileIdError: Error {
     case invalidAccessRights
     case invalidSslHandshake
     case technicalError
+    case requestInterrupted
 }
