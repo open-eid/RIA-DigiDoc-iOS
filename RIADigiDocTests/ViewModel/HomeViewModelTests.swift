@@ -23,18 +23,21 @@ import CommonsLib
 import CommonsLibMocks
 import UtilsLib
 import UtilsLibMocks
+import LibdigidocLibSwift
 
 @MainActor
 struct HomeViewModelTests {
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
     private let mockFileManager: FileManagerProtocolMock
     private let mockFileUtil: FileUtilProtocolMock
+    private let mockContainerUtil: ContainerUtilProtocolMock
     private let viewModel: HomeViewModel
 
     init() async throws {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
         mockFileManager = FileManagerProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
+        mockContainerUtil = ContainerUtilProtocolMock()
         viewModel = HomeViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileManager: mockFileManager,
@@ -133,5 +136,69 @@ struct HomeViewModelTests {
             Issue.record("Expected to have matching failure errors")
             return
         }
+    }
+
+    @Test
+    func closeOpenContainers_clearsTheOpenContainer() async {
+        let sharedContainerViewModel = SharedContainerViewModel()
+        let viewModel = makeViewModel(sharedContainerViewModel: sharedContainerViewModel)
+        sharedContainerViewModel.setSignedContainer(makeSignedContainer())
+
+        viewModel.closeOpenContainers()
+
+        #expect(sharedContainerViewModel.containers().isEmpty)
+        #expect(sharedContainerViewModel.currentContainer() == nil)
+    }
+
+    @Test
+    func closeOpenContainers_clearsEveryNestedContainer() async {
+        let sharedContainerViewModel = SharedContainerViewModel()
+        let viewModel = makeViewModel(sharedContainerViewModel: sharedContainerViewModel)
+        sharedContainerViewModel.setSignedContainer(makeSignedContainer())
+        sharedContainerViewModel.setSignedContainer(makeSignedContainer())
+
+        #expect(sharedContainerViewModel.containers().count == 2)
+
+        viewModel.closeOpenContainers()
+
+        #expect(sharedContainerViewModel.containers().isEmpty)
+        #expect(sharedContainerViewModel.currentContainer() == nil)
+    }
+
+    @Test
+    func closeOpenContainers_doesNothingWhenNoContainerIsOpen() async {
+        let sharedContainerViewModel = SharedContainerViewModel()
+        let viewModel = makeViewModel(sharedContainerViewModel: sharedContainerViewModel)
+
+        viewModel.closeOpenContainers()
+
+        #expect(sharedContainerViewModel.containers().isEmpty)
+        #expect(sharedContainerViewModel.currentContainer() == nil)
+    }
+
+    @Test
+    func closeOpenContainers_releasesSignedAndCryptoContainerReferences() async {
+        viewModel.closeOpenContainers()
+
+        #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.setSignedContainerArgValues.allSatisfy { $0 == nil })
+        #expect(mockSharedContainerViewModel.setCryptoContainerCallCount == 1)
+        #expect(mockSharedContainerViewModel.setCryptoContainerArgValues.allSatisfy { $0 == nil })
+        #expect(mockSharedContainerViewModel.clearContainersCallCount == 1)
+    }
+
+    private func makeViewModel(sharedContainerViewModel: SharedContainerViewModelProtocol) -> HomeViewModel {
+        HomeViewModel(
+            sharedContainerViewModel: sharedContainerViewModel,
+            fileManager: mockFileManager,
+            fileUtil: mockFileUtil
+        )
+    }
+
+    private func makeSignedContainer() -> SignedContainer {
+        SignedContainer(
+            fileManager: mockFileManager,
+            containerUtil: mockContainerUtil
+        )
     }
 }
