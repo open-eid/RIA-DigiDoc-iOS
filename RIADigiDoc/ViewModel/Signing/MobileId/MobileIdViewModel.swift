@@ -406,6 +406,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     private func handleSigningError(_ error: Error) {
         MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
 
+        guard !Task.isCancelled else {
+            MobileIdViewModel.logger().info("Mobile-ID signing cancelled. Not showing the error")
+            return
+        }
+
         if let cancellationError = error as? CancellationError {
             MobileIdViewModel.logger().error("Mobile-ID signing manually cancelled: \(cancellationError)")
             // Do not throw an error if user cancelled signing with back button
@@ -451,7 +456,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
         case .simError:
             mobileIdErrorMessageKey = "SIM error"
 
-        case .noInternetConnection:
+        case .noInternetConnection, .requestInterrupted:
             mobileIdErrorMessageKey = "No Internet connection"
 
         case .tooManyRequests:
@@ -481,6 +486,11 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     // swiftlint:disable:next cyclomatic_complexity
     private func handleSignatureAddingError(_ error: Error) {
         MobileIdViewModel.logger().error("Unable to sign container with Mobile-ID: \(error)")
+
+        guard !Task.isCancelled else {
+            MobileIdViewModel.logger().info("Mobile-ID signing cancelled. Not showing the error")
+            return
+        }
 
         if let cancellationError = error as? CancellationError {
             MobileIdViewModel.logger().error("Mobile-ID signing manually cancelled: \(cancellationError)")

@@ -44,9 +44,7 @@ struct SigningRootView: View {
                         signedContainer: container,
                         onSuccess: { container in
                             isSuccess = true
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setSignedContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
+                            viewModel.applySignedContainer(container, replacing: signedContainer)
                         }
                     )
                 }
@@ -55,9 +53,7 @@ struct SigningRootView: View {
                     MobileIdView(
                         signedContainer: container,
                         onSuccess: { container in
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setSignedContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
+                            viewModel.applySignedContainer(container, replacing: signedContainer)
                         }
                     )
                 }
@@ -66,9 +62,7 @@ struct SigningRootView: View {
                     SmartIdView(
                         signedContainer: container,
                         onSuccess: { container in
-                            sharedContainerViewModel.removeLastContainer()
-                            sharedContainerViewModel.setSignedContainer(container)
-                            sharedContainerViewModel.setIsSignatureAdded(true)
+                            viewModel.applySignedContainer(container, replacing: signedContainer)
                         }
                     )
                 }

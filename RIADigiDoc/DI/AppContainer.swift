@@ -465,7 +465,8 @@ extension Container {
     var signingRootViewModel: Factory<SigningRootViewModel> {
         self { @MainActor in
             SigningRootViewModel(
-                dataStore: self.dataStore()
+                dataStore: self.dataStore(),
+                sharedContainerViewModel: self.sharedContainerViewModel()
             )
         }
     }

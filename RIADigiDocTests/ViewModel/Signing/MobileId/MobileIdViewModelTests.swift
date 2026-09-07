@@ -938,6 +938,38 @@ struct MobileIdViewModelTests {
             traceId: traceId
         )
     }
+
+    @Test
+    func sign_doesNotSetErrorMessageWhenSigningIsCancelledWhileRequestingCertificate() async {
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            var spins = 0
+            while !Task.isCancelled && spins < 10_000 {
+                await Task.yield()
+                spins += 1
+            }
+
+            throw MobileIdError.requestInterrupted
+        }
+
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let container = mockContainer()
+        let task = Task { [viewModel, roleData] in
+            await viewModel.sign(
+                phoneNumber: "37251234567",
+                personalCode: "60001019906",
+                roleData: roleData,
+                signedContainer: container
+            )
+        }
+        task.cancel()
+
+        let result = await task.value
+
+        #expect(result == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == nil)
+        #expect(viewModel.mobileIdAlertMessageKey == nil)
+    }
 }
 
 extension MobileIdViewModelTests {
