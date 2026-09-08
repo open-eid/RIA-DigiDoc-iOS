@@ -498,9 +498,13 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         let isEmptyFileInContainer = await signedContainer?.isEmptyFileInContainer() ?? false
 
         return signedContainer != nil &&
-        (!Constants.MimeType.UnsignableContainers.contains(mimetype)) &&
-        (!Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension)) &&
+        !isUnsignableContainer(mimetype: mimetype, name: name) &&
         !isNestedContainer && !isEmptyFileInContainer && !isCadesContainer && !isXadesContainer
+    }
+
+    private func isUnsignableContainer(mimetype: String, name: String) -> Bool {
+        return Constants.MimeType.UnsignableContainers.contains(mimetype.lowercased()) ||
+        Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension.lowercased())
     }
 
     func isEncryptButtonShown(
@@ -513,7 +517,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func isSignatureRemoveButtonShown() -> Bool {
-        return !isNestedContainer() && !isCadesContainer && !isXadesContainer
+        return !isNestedContainer() && !isCadesContainer && !isXadesContainer &&
+        !isUnsignableContainer(mimetype: containerMimetype, name: containerName)
     }
 
     func isTimestampedContainer() async -> Bool {
