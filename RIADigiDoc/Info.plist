@@ -237,10 +237,6 @@
 	<true/>
 	<key>NFCReaderUsageDescription</key>
 	<string>This app uses NFC to scan ID-cards</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Bluetooth card reader is used to read data from ID card</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth card reader is used to read data from ID card</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Roboto_Condensed-Bold.ttf</string>
@@ -253,10 +249,6 @@
 		<string>Roboto-Medium.ttf</string>
 		<string>Roboto-Regular.ttf</string>
 		<string>Roboto-SemiBold.ttf</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>external-accessory</string>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
