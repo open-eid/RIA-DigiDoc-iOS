@@ -9,6 +9,7 @@ struct FileSaverHandler: View {
     let languageSettings: LanguageSettings
     let onComplete: (() -> Void)?
     @Binding var isFileSaved: Bool
+    var showsFileNameOnFailure: Bool = true
 
     var body: some View {
         Group {
@@ -38,7 +39,9 @@ struct FileSaverHandler: View {
         case .failure:
             isFileSaved = false
             toastType = .error
-            resultMessage = languageSettings.localized("Failed to save file", [fileURL.lastPathComponent])
+            resultMessage = showsFileNameOnFailure
+                ? languageSettings.localized("Failed to save file", [fileURL.lastPathComponent])
+                : languageSettings.localized("Failed to save file message")
         }
 
         Toast.show(resultMessage, type: toastType)

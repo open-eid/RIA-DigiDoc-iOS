@@ -10,7 +10,6 @@ struct DiagnosticsView: View {
     @AppTypography private var typography
 
     @Environment(LanguageSettings.self) private var languageSettings
-    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) var openURL
 
@@ -22,6 +21,8 @@ struct DiagnosticsView: View {
     }
 
     @State private var activeExportType: ExportType?
+    @State private var exportTask: Task<Void, Never>?
+    @State private var generatingExportType: ExportType?
     @State private var tempFileURL: URL?
     @State private var isShowingFileSaver: Bool = false
     @State private var isFileSaved: Bool = false
@@ -55,28 +56,31 @@ struct DiagnosticsView: View {
                             DiagnosticsHeaderButtons(
                                 onCheckUpdateClick: onCheckUpdateClick,
                                 onSaveDiagnosticsClick: {
-                                    Task {
-                                        tempFileURL = await viewModel.createDiagnosticsFile(
+                                    startExport(type: .diagnosticsFile) {
+                                        await viewModel.createDiagnosticsFile(
                                             languageSettings: languageSettings
                                         )
-                                        triggerFileSaver(type: .diagnosticsFile)
                                     }
-                                }
+                                },
+                                isSavingDiagnostics: generatingExportType == .diagnosticsFile,
+                                isSaveDiagnosticsEnabled: generatingExportType != .logFile
                             )
 
                             ToggleSection(
                                 isOn: $viewModel.enableOneTimeLogGeneration,
                                 label: languageSettings.localized("Main diagnostics logging switch")
                             )
+                            .disabled(generatingExportType != nil)
 
                             if viewModel.showSaveLogButton {
                                 PrimaryOutlinedButton(
                                     text: languageSettings.localized("Main diagnostics save log"),
                                     assetImageName: "ic_m3_download_48pt_wght400",
+                                    isButtonEnabled: generatingExportType != .diagnosticsFile,
+                                    isLoading: generatingExportType == .logFile,
                                     action: {
-                                        Task {
-                                            tempFileURL = await viewModel.createLogFile()
-                                            triggerFileSaver(type: .logFile)
+                                        startExport(type: .logFile) {
+                                            await viewModel.createLogFile()
                                         }
                                     },
                                     focusedField: nil,
@@ -118,7 +122,8 @@ struct DiagnosticsView: View {
                                     await handleFileSaverCompletion()
                                 }
                             },
-                            isFileSaved: $isFileSaved
+                            isFileSaved: $isFileSaved,
+                            showsFileNameOnFailure: false
                         )
                     )
                     .alert(
@@ -148,6 +153,7 @@ struct DiagnosticsView: View {
                         }
                     }
                     .onDisappear {
+                        exportTask?.cancel()
                         Task {
                             await viewModel.removeObservers()
                         }
@@ -169,11 +175,7 @@ struct DiagnosticsView: View {
 
             Toast.show(updateMessage, type: isUpdated ? .success : .error)
 
-            if voiceOverEnabled {
-                var saveButtonAccessibilityAnnouncement = AttributedString(updateMessage)
-                saveButtonAccessibilityAnnouncement.accessibilitySpeechAnnouncementPriority = .high
-                AccessibilityNotification.Announcement(saveButtonAccessibilityAnnouncement).post()
-            }
+            AccessibilityUtil.announceMessage(updateMessage)
         }
     }
 
@@ -189,24 +191,50 @@ struct DiagnosticsView: View {
         }
     }
 
-    private func triggerFileSaver(type: ExportType) {
-        self.activeExportType = type
-        if fileUtil.fileExists(fileLocation: tempFileURL) {
-            isShowingFileSaver = true
+    private func startExport(type: ExportType, generate: @escaping () async -> URL?) {
+        guard generatingExportType == nil else { return }
+
+        generatingExportType = type
+        AccessibilityUtil.announceMessage(languageSettings.localized("Loading"))
+
+        exportTask = Task {
+            let fileURL = await generate()
+
+            generatingExportType = nil
+            guard !Task.isCancelled else { return }
+
+            triggerFileSaver(type: type, fileURL: fileURL)
         }
+    }
+
+    private func triggerFileSaver(type: ExportType, fileURL: URL?) {
+        guard fileUtil.fileExists(fileLocation: fileURL) else {
+            showExportFailure()
+            return
+        }
+
+        tempFileURL = fileURL
+        activeExportType = type
+        isShowingFileSaver = true
+    }
+
+    private func showExportFailure() {
+        let message = languageSettings.localized("Failed to save file message")
+        Toast.show(message, type: .error)
+        AccessibilityUtil.announceMessage(message)
     }
 
     private func handleFileSaverCompletion() async {
         guard let type = activeExportType else { return }
+        activeExportType = nil
 
         switch type {
         case .diagnosticsFile:
             viewModel.onDiagnosticsFileSavingComplete()
         case .logFile:
+            guard isFileSaved else { return }
             await viewModel.onLogFileSavingComplete()
         }
-
-        activeExportType = nil
     }
 }
 
