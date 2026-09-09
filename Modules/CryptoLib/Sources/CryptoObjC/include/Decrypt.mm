@@ -53,7 +53,9 @@ static CertType certTypeFromLabel(NSString * _Nullable type) {
     NSDate *validTo = nil;
     if (info.contains("server_exp")) {
         long long epochTime = [[NSString stringWithStdString:info["server_exp"]] longLongValue];
-        validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
+        if (epochTime > 0) {
+            validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
+        }
     }
 
     if (self = [self initWithCnVal:cn serialNumber:serial certType:certTypeFromLabel(type) validTo:validTo data:pub concatKDFAlgorithmURI:concatKDFAlgorithmURI lockLabel:@"" lockType:@""]) {
