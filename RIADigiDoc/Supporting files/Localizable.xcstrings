@@ -1241,6 +1241,24 @@
         }
       }
     },
+    "Container validity cannot be extended" : {
+      "comment" : "Dialog title when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container validity cannot be extended"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konteineri kehtivust ei saa pikendada"
+          }
+        }
+      }
+    },
     "Continue" : {
       "comment" : "My eID PIN change or unblock view step button",
       "extractionState" : "manual",
@@ -1799,6 +1817,42 @@
         }
       }
     },
+    "Decrypt general error" : {
+      "comment" : "CryptoContainer password decrypt error message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container decryption was unsuccessful"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ümbriku dekrüpteerimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Decrypt wrong password error" : {
+      "comment" : "CryptoContainer password decrypt — wrong password error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wrong password"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vale parool"
+          }
+        }
+      }
+    },
     "Decrypting in progress" : {
       "comment" : "NFC decrypt alert message step 4",
       "extractionState" : "manual",
@@ -2069,42 +2123,6 @@
         }
       }
     },
-    "Decrypt general error" : {
-      "comment" : "CryptoContainer password decrypt error message",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Container decryption was unsuccessful"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ümbriku dekrüpteerimine ebaõnnestus"
-          }
-        }
-      }
-    },
-    "Decrypt wrong password error" : {
-      "comment" : "CryptoContainer password decrypt — wrong password error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wrong password"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vale parool"
-          }
-        }
-      }
-    },
     "Encrypt general error" : {
       "comment" : "CryptoContainer encrypt error message",
       "extractionState" : "manual",
@@ -2321,42 +2339,6 @@
         }
       }
     },
-    "Container validity cannot be extended" : {
-      "comment" : "Dialog title when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Container validity cannot be extended"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konteineri kehtivust ei saa pikendada"
-          }
-        }
-      }
-    },
-    "Failed to extend signatures and wrapped to timestamped container." : {
-      "comment" : "Dialog message when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to extend signatures and wrapped to timestamped container."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allkirjade pikendamine ebaõnnestus ja konteiner pakiti ajatempliga konteinerisse."
-          }
-        }
-      }
-    },
     "Failed mobile-ID transaction" : {
       "comment" : "Mobile-ID error for signatureHashMismatch",
       "extractionState" : "manual",
@@ -2389,6 +2371,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sinu Smart-ID toiming ebaõnnestus. Palun kontrolli Smart-ID rakendust või võta ühendust Smart-ID klienditoega"
+          }
+        }
+      }
+    },
+    "Failed to extend signatures and wrapped to timestamped container." : {
+      "comment" : "Dialog message when a BDOC/DDOC could not be extended and was wrapped into a timestamped ASiC-S",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to extend signatures and wrapped to timestamped container."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjade pikendamine ebaõnnestus ja konteiner pakiti ajatempliga konteinerisse."
           }
         }
       }
@@ -2569,6 +2569,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Faili %@ salvestamine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Failed to save file message" : {
+      "comment" : "Error message when unable to save file, without naming the file",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save file"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faili salvestamine ebaõnnestus"
           }
         }
       }
@@ -2785,6 +2803,96 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ühenda kaardilugeja nutiseadmega ja sisesta ID-kaart lugejasse."
+          }
+        }
+      }
+    },
+    "ID card courier activate button" : {
+      "comment" : "Courier (unactivated) ID-card activation link text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activate ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiveeri ID-kaart"
+          }
+        }
+      }
+    },
+    "ID card courier activate URL" : {
+      "comment" : "Courier (unactivated) ID-card activation URL",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.politsei.ee/en/self-service-portal/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.politsei.ee/et/iseteenindus/"
+          }
+        }
+      }
+    },
+    "ID card courier must activate to decrypt" : {
+      "comment" : "Courier (unactivated) ID-card message shown during decryption",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The ID-card must be activated in order to decrypt."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimiseks tuleb ID-kaart aktiveerida."
+          }
+        }
+      }
+    },
+    "ID card courier must activate to sign" : {
+      "comment" : "Courier (unactivated) ID-card message shown during signing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The ID-card must be activated in order to sign."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allkirjastamiseks tuleb ID-kaart aktiveerida."
+          }
+        }
+      }
+    },
+    "ID card courier warning message" : {
+      "comment" : "Courier (unactivated) ID-card warning shown in My eID",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication and signing with the ID-card isn't possible yet. ID-card must be activated in the Police and Border Guard Board's self-service portal in order to use it."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID-kaardiga isikutuvastamine ja allkirjastamine ei ole veel võimalik. ID-kaardi kasutamiseks tuleb see aktiveerida Politsei- ja Piirivalveameti iseteeninduses."
           }
         }
       }
@@ -3350,6 +3458,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laen"
+          }
+        }
+      }
+    },
+    "Lock type" : {
+      "comment" : "Recipient detail view — lock type label for password recipients",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lock type"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luku tüüp"
           }
         }
       }
@@ -3966,24 +4092,6 @@
         }
       }
     },
-    "Main diagnostics settings title" : {
-      "comment" : "Main diagnostics settings title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings:"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings:"
-          }
-        }
-      }
-    },
     "Main diagnostics central configuration title" : {
       "comment" : "Main diagnostics central configuration title",
       "extractionState" : "manual",
@@ -4268,6 +4376,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvesta logifail"
+          }
+        }
+      }
+    },
+    "Main diagnostics settings title" : {
+      "comment" : "Main diagnostics settings title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings:"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings:"
           }
         }
       }
@@ -7110,24 +7236,6 @@
         }
       }
     },
-    "Lock type" : {
-      "comment" : "Recipient detail view — lock type label for password recipients",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock type"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Luku tüüp"
-          }
-        }
-      }
-    },
     "Recipient" : {
       "comment" : "Home title, signer details title, accessibility recipient prefix",
       "extractionState" : "manual",
@@ -9276,96 +9384,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postikood"
-          }
-        }
-      }
-    },
-    "ID card courier activate URL" : {
-      "comment" : "Courier (unactivated) ID-card activation URL",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://www.politsei.ee/en/self-service-portal/"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://www.politsei.ee/et/iseteenindus/"
-          }
-        }
-      }
-    },
-    "ID card courier activate button" : {
-      "comment" : "Courier (unactivated) ID-card activation link text",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activate ID-card"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktiveeri ID-kaart"
-          }
-        }
-      }
-    },
-    "ID card courier must activate to decrypt" : {
-      "comment" : "Courier (unactivated) ID-card message shown during decryption",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The ID-card must be activated in order to decrypt."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dekrüpteerimiseks tuleb ID-kaart aktiveerida."
-          }
-        }
-      }
-    },
-    "ID card courier must activate to sign" : {
-      "comment" : "Courier (unactivated) ID-card message shown during signing",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The ID-card must be activated in order to sign."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allkirjastamiseks tuleb ID-kaart aktiveerida."
-          }
-        }
-      }
-    },
-    "ID card courier warning message" : {
-      "comment" : "Courier (unactivated) ID-card warning shown in My eID",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentication and signing with the ID-card isn't possible yet. ID-card must be activated in the Police and Border Guard Board's self-service portal in order to use it."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID-kaardiga isikutuvastamine ja allkirjastamine ei ole veel võimalik. ID-kaardi kasutamiseks tuleb see aktiveerida Politsei- ja Piirivalveameti iseteeninduses."
           }
         }
       }

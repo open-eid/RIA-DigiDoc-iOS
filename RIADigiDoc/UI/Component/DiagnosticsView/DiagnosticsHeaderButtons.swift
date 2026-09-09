@@ -25,6 +25,8 @@ struct DiagnosticsHeaderButtons: View {
 
     let onCheckUpdateClick: () -> Void
     let onSaveDiagnosticsClick: () -> Void
+    var isSavingDiagnostics: Bool = false
+    var isSaveDiagnosticsEnabled: Bool = true
 
     var body: some View {
         VStack(spacing: Dimensions.Padding.XSPadding) {
@@ -40,6 +42,8 @@ struct DiagnosticsHeaderButtons: View {
                 text: languageSettings.localized(
                     "Main diagnostics configuration save diagnostics button"),
                 assetImageName: "ic_m3_download_48pt_wght400",
+                isButtonEnabled: isSaveDiagnosticsEnabled,
+                isLoading: isSavingDiagnostics,
                 action: onSaveDiagnosticsClick,
                 focusedField: nil,
                 currentFocus: .constant(nil)
