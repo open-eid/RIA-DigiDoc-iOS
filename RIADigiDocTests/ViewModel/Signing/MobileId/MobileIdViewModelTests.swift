@@ -935,3 +935,74 @@ struct MobileIdViewModelTests {
         )
     }
 }
+
+// MARK: - Temporary reproduction scaffolding (signature missing from container UI)
+
+extension MobileIdViewModelTests {
+
+    private final class Flag: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = false
+        var isSet: Bool { lock.withLock { value } }
+        func set() { lock.withLock { value = true } }
+    }
+
+    // Models libdigidocpp save() + reopen: native work that is not cancellation-aware.
+    private static func nonCancellableWork(milliseconds: Int) async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
+                continuation.resume()
+            }
+        }
+    }
+
+    @Test
+    func sign_writesSignatureAfterTaskCancelledDuringAddSignature() async {
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            await mockMobileIdCertificateResponse()
+        }
+        mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
+            await mockSuccessSignature()
+        }
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
+            await mockSuccessSession()
+        }
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let started = Flag()
+        let finished = Flag()
+
+        let container = SignedContainerProtocolMock()
+        container.getRawContainerFileHandler = { URL(fileURLWithPath: "/tmp/test.asice") }
+        container.prepareSignatureHandler = { _, _, _, _ in Data([0x01]) }
+        container.addSignatureHandler = { _, _ in
+            started.set()
+            await Self.nonCancellableWork(milliseconds: 200)
+            finished.set()
+            return container
+        }
+
+        let signingTask = Task { @MainActor in
+            await viewModel.sign(
+                phoneNumber: "37251234567",
+                personalCode: "60001019906",
+                roleData: roleData,
+                signedContainer: container
+            )
+        }
+
+        while !started.isSet {
+            await Task.yield()
+        }
+
+        // MobileIdView.onDisappear -> cancelSigning() when the user presses Back
+        signingTask.cancel()
+
+        let result = await signingTask.value
+
+        #expect(finished.isSet, "addSignature ran to completion despite the task being cancelled")
+        #expect(result != nil, "sign() still returned a signed container after the view was dismissed")
+        #expect(container.addSignatureCallCount == 1)
+    }
+}

@@ -91,6 +91,12 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
+    // Signing publishes its finished container here, sometimes after SigningView has already
+    // reappeared, so the view observes this identity to reload instead of keeping its first snapshot.
+    var currentContainerID: ObjectIdentifier? {
+        sharedContainerViewModel.currentContainer().map { ObjectIdentifier($0) }
+    }
+
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)

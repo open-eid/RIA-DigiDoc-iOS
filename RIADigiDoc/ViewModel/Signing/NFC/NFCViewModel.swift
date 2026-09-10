@@ -46,6 +46,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcAlertMessageUrl: String?
 
     var signatureExtensionFailed = false
+
+    // The container write cannot be interrupted once it starts.
+    private(set) var isWritingContainer = false
+
     var certMismatch: Bool = false
 
     private let nfcCANKeyFilename = Constants.File.nfcCANKey
@@ -397,6 +401,10 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
 
         do {
             NFCViewModel.logger().info("NFC: Starting signing operation")
+
+            isWritingContainer = true
+            defer { isWritingContainer = false }
+
             let result = try await operationReadCertAndSign.startOperation(
                 canNumber: canNumber,
                 pin2Number: SecureData(pin2Data),
