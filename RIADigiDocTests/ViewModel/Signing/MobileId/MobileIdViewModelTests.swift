@@ -936,22 +936,32 @@ struct MobileIdViewModelTests {
     }
 }
 
-// MARK: - Temporary reproduction scaffolding (signature missing from container UI)
-
 extension MobileIdViewModelTests {
 
-    private final class Flag: @unchecked Sendable {
+    private final class Gate: @unchecked Sendable {
         private let lock = NSLock()
-        private var value = false
-        var isSet: Bool { lock.withLock { value } }
-        func set() { lock.withLock { value = true } }
-    }
+        private var waiter: CheckedContinuation<Void, Never>?
+        private var isOpen = false
 
-    // Models libdigidocpp save() + reopen: native work that is not cancellation-aware.
-    private static func nonCancellableWork(milliseconds: Int) async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(milliseconds)) {
-                continuation.resume()
+        func open() {
+            lock.lock()
+            let waiter = self.waiter
+            self.waiter = nil
+            isOpen = true
+            lock.unlock()
+            waiter?.resume()
+        }
+
+        func wait() async {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                lock.lock()
+                if isOpen {
+                    lock.unlock()
+                    continuation.resume()
+                    return
+                }
+                waiter = continuation
+                lock.unlock()
             }
         }
     }
@@ -970,17 +980,17 @@ extension MobileIdViewModelTests {
         }
         mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
 
-        let started = Flag()
-        let finished = Flag()
+        let writeStarted = Gate()
+        let releaseWrite = Gate()
 
+        let updatedContainer = SignedContainerProtocolMock()
         let container = SignedContainerProtocolMock()
         container.getRawContainerFileHandler = { URL(fileURLWithPath: "/tmp/test.asice") }
         container.prepareSignatureHandler = { _, _, _, _ in Data([0x01]) }
         container.addSignatureHandler = { _, _ in
-            started.set()
-            await Self.nonCancellableWork(milliseconds: 200)
-            finished.set()
-            return container
+            writeStarted.open()
+            await releaseWrite.wait()
+            return updatedContainer
         }
 
         let signingTask = Task { @MainActor in
@@ -992,17 +1002,14 @@ extension MobileIdViewModelTests {
             )
         }
 
-        while !started.isSet {
-            await Task.yield()
-        }
+        await writeStarted.wait()
 
-        // MobileIdView.onDisappear -> cancelSigning() when the user presses Back
         signingTask.cancel()
+        releaseWrite.open()
 
         let result = await signingTask.value
 
-        #expect(finished.isSet, "addSignature ran to completion despite the task being cancelled")
-        #expect(result != nil, "sign() still returned a signed container after the view was dismissed")
+        #expect(result === updatedContainer, "the container written after cancellation is returned")
         #expect(container.addSignatureCallCount == 1)
     }
 }

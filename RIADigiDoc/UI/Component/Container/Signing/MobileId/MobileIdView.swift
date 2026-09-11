@@ -235,7 +235,6 @@ struct MobileIdView: View {
     }
 
     private func cancelSigning() {
-        guard !viewModel.isWritingContainer else { return }
         task?.cancel()
         task = nil
     }

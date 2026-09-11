@@ -42,9 +42,6 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     var controlCode: String = "- - - -"
     var infoMessage: String = "Smart-ID signing info message"
 
-    // The container write cannot be interrupted once it starts.
-    private(set) var isWritingContainer = false
-
     var personalCodeErrorKey: String?
 
     var smartIdSuccessMessageKey: String?
@@ -279,9 +276,6 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
 
         do {
             try Task.checkCancellation()
-
-            isWritingContainer = true
-            defer { isWritingContainer = false }
 
             let updatedContainer = try await signedContainer.addSignature(
                 signature: signatureData,

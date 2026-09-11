@@ -36,9 +36,6 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     var controlCode: String = "- - - -"
     var infoMessage: String = "Mobile-ID signing info message"
 
-    // The container write cannot be interrupted once it starts.
-    private(set) var isWritingContainer = false
-
     var countryCodeAndPhoneErrorKey: String?
     var personalCodeErrorKey: String?
 
@@ -236,9 +233,6 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
 
         do {
             try Task.checkCancellation()
-
-            isWritingContainer = true
-            defer { isWritingContainer = false }
 
             let updatedContainer = try await signedContainer.addSignature(
                 signature: signatureData,

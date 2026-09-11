@@ -39,6 +39,7 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
     // While signing runs it owns the outcome; the session can be invalidated by a timeout or by
     // the user long before the container write finishes.
     private var isOperationRunning = false
+    private var pendingCancellation: Error?
 
     private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
 
@@ -65,6 +66,8 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         operationError = nil
         didCompleteSuccessfully = false
         nfcError = ""
+        isOperationRunning = false
+        pendingCancellation = nil
 
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
@@ -86,7 +89,15 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
             return
         }
 
-        resume(with: .failure(operationError ?? IdCardInternalError.sessionInvalidated))
+        resume(with: .failure(pendingCancellation ?? operationError ?? IdCardInternalError.sessionInvalidated))
+    }
+
+    private static func userCancellation(from error: Error) -> Error? {
+        guard let nfcError = error as? NFCReaderError,
+              nfcError.code == .readerSessionInvalidationErrorUserCanceled else {
+            return nil
+        }
+        return IdCardInternalError.cancelledByUser
     }
 
     private func resume(with result: Result<SignedContainerProtocol, Error>) {
@@ -223,7 +234,10 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
 
         // Signing is still in flight, so it delivers its own result: the signature being written
         // must not be discarded just because the session ended first.
-        guard !isOperationRunning else { return }
+        guard !isOperationRunning else {
+            pendingCancellation = Self.userCancellation(from: error)
+            return
+        }
 
         if let storedError = self.operationError {
             resume(with: .failure(storedError))

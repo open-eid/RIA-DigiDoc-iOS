@@ -701,7 +701,6 @@ struct NFCView: View {
         pinNumber.isEmpty ? () : (pinNumber.removeAll())
         isActionEnabled = viewModel
             .isActionEnabled(canNumber: canNumber, pinNumber: pinNumber, pinType: pinType)
-        guard !viewModel.isWritingContainer else { return }
         taskSign?.cancel()
         taskSign = nil
     }
