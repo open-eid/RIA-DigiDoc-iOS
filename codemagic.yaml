@@ -33,9 +33,9 @@ workflows:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
         type: choice
-        default: http://10.1.24.31/config/mobile
+        default: http://ria.test/config/mobile
         options:
-          - http://10.1.24.31/config/mobile
+          - http://ria.test/config/mobile
           - https://id.eesti.ee
           - https://id-test.eesti.ee
           - https://id.test.eesti.ee
@@ -46,9 +46,9 @@ workflows:
       defaultCentralConfigurationTslUrl_input:
         description: Default Central Configuration TSL URL
         type: choice
-        default: http://10.1.24.31/tsl/trusted-test-mp.xml
+        default: http://ria.test/tsl/trusted-test-mp.xml
         options:
-          - http://10.1.24.31/tsl/trusted-test-mp.xml
+          - http://ria.test/tsl/trusted-test-mp.xml
           - https://ec.europa.eu/tools/lotl/eu-lotl.xml
           - https://open-eid.github.io/test-TL/tl-mp-test-EE.xml
       memberTsl_input:
@@ -73,12 +73,20 @@ workflows:
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
+          set -e -o pipefail
+
+          TSL_URL='${{ inputs.defaultCentralConfigurationTslUrl_input }}'
+          MEMBER_TSLS='${{ inputs.memberTsl_input }}'
+
           export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
           export TSL_FILES_DIRECTORY="$RESOURCES_DIRECTORY/tslFiles"
+          export TSL_BASE_DIRECTORY="$CM_BUILD_DIR/tslBaseFiles"
+          export CONFIGURED_TSL="$(basename "$TSL_URL")"
 
           # Create config, TSL folders and mock folders for each module
           mkdir -p $CONFIG_DIRECTORY
           mkdir -p $TSL_FILES_DIRECTORY
+          mkdir -p $TSL_BASE_DIRECTORY
 
           # SPM packages must exist and need at least 1 file. Mock files are generated in 'Run tests' step
           for module in CommonsLib ConfigLib WebEidLib CryptoLib IdCardLib LibdigidocLib MobileIdLib SmartIdLib UtilsLib; do
@@ -93,47 +101,107 @@ workflows:
 
           # Download latest 'eu-lotl.xml' file"
           echo "Downloading latest 'eu-lotl.xml' file"
-          wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
+          wget -q "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -O "$TSL_BASE_DIRECTORY/eu-lotl.xml"
 
           # Get repo.ria values from environmental variables, as CodeMagic doesn't have access to repo.ria domain
-          if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
+          if [[ "$TSL_URL" == *"ria.test"* ]]; then
             echo "Using repo.ria configuration"
             echo $REPO_RIA_DEFAULT_PROPERTIES | base64 --decode > $CONFIG_DIRECTORY/configuration.properties
             echo $REPO_RIA_CONFIG | base64 --decode > $CONFIG_DIRECTORY/default-config.json
             echo $REPO_RIA_PUB_KEY | base64 --decode > $CONFIG_DIRECTORY/default-config.ecpub
             echo $REPO_RIA_ECC | base64 --decode > $CONFIG_DIRECTORY/default-config.ecc
-            echo $REPO_RIA_TRUSTED_TEST_MP | base64 --decode > $TSL_FILES_DIRECTORY/trusted-test-mp.xml
-            echo $REPO_RIA_TL_MP_TEST_EE | base64 --decode > $TSL_FILES_DIRECTORY/tl-mp-test-EE.xml
-            # EE_T.xml is too large to use in environmental variable. Using compressed variant
-            echo $REPO_RIA_EE_T_TSL | base64 --decode | gunzip > $TSL_FILES_DIRECTORY/EE_T.xml
+            echo $REPO_RIA_TRUSTED_TEST_MP | base64 --decode > "$TSL_BASE_DIRECTORY/trusted-test-mp.xml"
+
+            for configFile in "$CONFIG_DIRECTORY/configuration.properties" "$CONFIG_DIRECTORY/default-config.json" \
+              "$CONFIG_DIRECTORY/default-config.ecpub" "$CONFIG_DIRECTORY/default-config.ecc" \
+              "$TSL_BASE_DIRECTORY/trusted-test-mp.xml"; do
+              if [ ! -s "$configFile" ]; then
+                echo "ERROR: $configFile is missing or empty"
+                exit 1
+              fi
+            done
           else
             echo "Not using repo.ria configuration"
+
+            if [ ! -f "$TSL_BASE_DIRECTORY/$CONFIGURED_TSL" ]; then
+              echo "Downloading '$CONFIGURED_TSL' file"
+              wget -q "$TSL_URL" -O "$TSL_BASE_DIRECTORY/$CONFIGURED_TSL"
+            fi
           fi
 
-          if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
-            echo "Getting TSL (local LOTL)"
-            # Repo.ria TSL files already in assets folder, doesn't need to download separately anymore
-            if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
-              python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
-            else
-              python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename ${{ inputs.defaultCentralConfigurationTslUrl_input }})" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
+          echo "Writing requested test member TSLs from environment variables"
+          MEMBERS_TO_DOWNLOAD=""
+          for member in $(echo "$MEMBER_TSLS" | tr ';' ' '); do
+            if [[ ! "$member" =~ ^[A-Za-z0-9_]+$ ]]; then
+              echo "Invalid TSL member code: '$member'"
+              exit 1
             fi
 
-            echo "Finished downloading TSL"
+            if [[ "$member" != *_T ]]; then
+              echo "Member '$member' is downloaded from a base file"
+              MEMBERS_TO_DOWNLOAD="$MEMBERS_TO_DOWNLOAD;$member"
+              continue
+            fi
+
+            variable_name="REPO_RIA_${member}_TSL"
+            variable_value="$(printenv "$variable_name" || true)"
+
+            if [ -z "$variable_value" ]; then
+              echo "Test member '$member' was requested but $variable_name is not set"
+              exit 1
+            fi
+
+            echo "Writing $member.xml from $variable_name"
+            member_file="$TSL_FILES_DIRECTORY/$member.xml"
+            printf '%s' "$variable_value" | base64 --decode > "$member_file.raw"
+            if gzip -t "$member_file.raw" 2> /dev/null; then
+              gunzip -c "$member_file.raw" > "$member_file"
+            else
+              cp "$member_file.raw" "$member_file"
+            fi
+            rm -f "$member_file.raw"
+
+            if [ ! -s "$member_file" ]; then
+              echo "ERROR: $member_file is missing or empty"
+              exit 1
+            fi
+          done
+          MEMBERS_TO_DOWNLOAD="${MEMBERS_TO_DOWNLOAD#;}"
+
+          echo "Getting TSL"
+          python3 scripts/tsl_xml_downloader.py \
+            --tslFile="$TSL_BASE_DIRECTORY/eu-lotl.xml" \
+            --tslFile="$TSL_BASE_DIRECTORY/trusted-test-mp.xml" \
+            --members="$MEMBERS_TO_DOWNLOAD"
+          echo "Finished downloading TSL"
+
+          if [ -n "$(ls -A scripts/TSL 2> /dev/null)" ]; then
+            echo "Moving TSLs to app's TSL files directory"
+            mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
+            echo "Done moving TSLs"
           else
-            echo "Getting TSL (remote LOTL)"
-            python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="${{ inputs.memberTsl_input }}" --isDevBuild="True"
-            echo "Finished downloading TSL"
+            echo "No downloaded TSLs to move"
           fi
 
-          echo "Moving TSLs to app's TSL files directory"
-          mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
-          echo "Done moving TSLs"
+          if [[ "$TSL_URL" == *"ria.test"* ]]; then
+            echo "Adding repo.ria TSL to app's TSL files directory"
+            cp -v "$TSL_BASE_DIRECTORY/trusted-test-mp.xml" "$TSL_FILES_DIRECTORY/"
+          else
+            echo "Adding eu-lotl.xml to app's TSL files directory"
+            cp -v "$TSL_BASE_DIRECTORY/eu-lotl.xml" "$TSL_FILES_DIRECTORY/"
+
+            if [ "$CONFIGURED_TSL" != "eu-lotl.xml" ]; then
+              echo "Adding $CONFIGURED_TSL to app's TSL files directory"
+              cp -v "$TSL_BASE_DIRECTORY/$CONFIGURED_TSL" "$TSL_FILES_DIRECTORY/"
+            fi
+          fi
+
+          echo "TSL files bundled in resources: $(ls "$TSL_FILES_DIRECTORY" | tr '\n' ' ')"
       - *get_app_version
       - name: Fetch default configuration
         script: |
           # Not running 'SetupConfiguration' for repo.ria as necessary files are already setup
-          if [[ ! "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
+          if [[ ! "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"ria.test"* ]]; then
             echo "Fetching default configuration"
             python3 scripts/setup_configuration.py ${{ inputs.defaultCentralConfigurationUrl_input }} ${{ inputs.defaultCentralConfigurationUpdateInterval_input }} ${{ inputs.defaultCentralConfigurationTslUrl_input }}
           else
@@ -158,7 +226,7 @@ workflows:
         script: |          
           # Skip fetching configuration for repo.ria as necessary files are already setup
           REPO_RIA_CONF_FLAGS=""
-          if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"10.1.24.31"* ]]; then
+          if [[ "${{ inputs.defaultCentralConfigurationTslUrl_input }}" == *"ria.test"* ]]; then
             REPO_RIA_CONF_FLAGS="DEFAULT_CENTRAL_CONFIGURATION_URL='' DEFAULT_CENTRAL_CONFIGURATION_UPDATE_INTERVAL=4 DEFAULT_CENTRAL_CONFIGURATION_TSL_URL=''"
           fi
           
@@ -232,6 +300,8 @@ workflows:
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
+          set -e -o pipefail
+
           export CONFIG_DIRECTORY="$RESOURCES_DIRECTORY/config"
           export TSL_FILES_DIRECTORY="$CONFIG_DIRECTORY/tslFiles.bundle"
 
@@ -251,22 +321,19 @@ workflows:
 
           # Download latest 'eu-lotl.xml' file"
           echo "Downloading latest 'eu-lotl.xml' file"
-          wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
+          wget -q "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -O "$TSL_FILES_DIRECTORY/eu-lotl.xml"
           
-          if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
-            echo "Getting TSL (local LOTL)"
-            python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-
-            echo "Finished downloading TSL"
-          else
-            echo "Getting TSL (remote LOTL)"
-            python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-            echo "Finished downloading TSL"
-          fi
+          echo "Getting TSL"
+          python3 scripts/tsl_xml_downloader.py \
+            --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" \
+            --members="EE"
+          echo "Finished downloading TSL"
 
           echo "Moving TSLs to app's TSL files directory"
           mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
           echo "Done moving TSLs"
+
+          echo "TSL files bundled in resources: $(ls "$TSL_FILES_DIRECTORY" | tr '\n' ' ')"
       - name: Fetch default configuration
         script: |
           echo "Fetching default configuration"
