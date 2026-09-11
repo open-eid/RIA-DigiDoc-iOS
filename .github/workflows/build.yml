@@ -83,16 +83,11 @@ jobs:
         echo "Downloading latest 'eu-lotl.xml' file"
         wget "https://ec.europa.eu/tools/lotl/eu-lotl.xml" -P $TSL_FILES_DIRECTORY
 
-        if [ -f "$TSL_FILES_DIRECTORY/eu-lotl.xml" ]; then
-          echo "Getting TSL (local LOTL)"
-          python3 scripts/tsl_xml_downloader.py --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-
-          echo "Finished downloading TSL"
-        else
-          echo "Getting TSL (remote LOTL)"
-          python3 scripts/tsl_xml_downloader.py --tslTestFile="$TSL_FILES_DIRECTORY/$(basename 'https://ec.europa.eu/tools/lotl/eu-lotl.xml')" --countries="EE" --isDevBuild="False"
-          echo "Finished downloading TSL"
-        fi
+        echo "Getting TSL"
+        python3 scripts/tsl_xml_downloader.py \
+          --tslFile="$TSL_FILES_DIRECTORY/eu-lotl.xml" \
+          --members="EE"
+        echo "Finished downloading TSL"
 
         echo "Moving TSLs to app's TSL files directory"
         mv -v scripts/TSL/* $TSL_FILES_DIRECTORY
