@@ -166,6 +166,7 @@
 				DI/AppContainer.swift,
 				Domain/Model/BottomSheetButton.swift,
 				Domain/Model/CertificateExtensionData.swift,
+				Domain/Model/Crypto/RecipientDecryptionStatus.swift,
 				Domain/Model/DependencyLicense.swift,
 				Domain/Model/EncryptionCdocOption.swift,
 				Domain/Model/EncryptionServerInfo.swift,
