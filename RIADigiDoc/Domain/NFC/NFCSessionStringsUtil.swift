@@ -44,7 +44,7 @@ public struct NFCSessionStringsUtil {
         customLocalizations(
             pinName: pinName,
             step4Message: localize("Signing in progress", []),
-            successMessage: localize("Signature added", []),
+            successMessage: localize("Container signed successfully", []),
             courierCardErrorMessage: localize("ID card courier must activate to sign", [])
         )
     }
