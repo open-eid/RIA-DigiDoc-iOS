@@ -28,6 +28,7 @@ struct NFCView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(LanguageSettings.self) private var languageSettings
     @Environment(NavigationPathManager.self) private var pathManager
 
@@ -137,11 +138,11 @@ struct NFCView: View {
     ) {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
         _webEidViewModel = State(wrappedValue: webEidViewModel)
-        self.actionType = actionType
-        self.pinType = pinType
-        self._isWebEidAuthenticating = isWebEidAuthenticating
-        self.rememberMe = rememberMe
-        self.actionMethods = actionMethods
+        _isWebEidAuthenticating = isWebEidAuthenticating
+        _actionType = State(wrappedValue: actionType)
+        _actionMethods = State(wrappedValue: actionMethods)
+        _pinType = State(wrappedValue: pinType)
+        _rememberMe = State(wrappedValue: rememberMe)
         self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
         self.onSuccess = onSuccess
@@ -395,6 +396,16 @@ struct NFCView: View {
             cancelAuth()
             cancelCertificate()
             cancelSigningWebEid()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                cancelMyEid()
+                cancelDecrypt()
+                cancelSigning()
+                cancelAuth()
+                cancelCertificate()
+                cancelSigningWebEid()
+            }
         }
     }
 

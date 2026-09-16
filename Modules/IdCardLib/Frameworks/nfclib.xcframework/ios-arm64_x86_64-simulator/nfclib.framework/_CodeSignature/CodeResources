@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/nfclib-Swift.h</key>
 		<data>
-		YHgWlLirMJ0qs40frz2fMufOoLg=
+		IXV9srChFCWo/vCKtpssQusvC6Q=
 		</data>
 		<key>Headers/nfclib.h</key>
 		<data>
@@ -14,7 +14,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		E7ErYb3LyBuUsMMMQIdp3Q0TqnM=
+		MI0MrcZCZJ7eA2u7m0daIrXHxcA=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -22,51 +22,51 @@
 		</data>
 		<key>Modules/nfclib.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo</key>
 		<data>
-		tzwUKrxbURrZ8sCoqqNqsTO9mag=
+		RmAlJkz37VwUpClcy7wsiwWiFXg=
 		</data>
 		<key>Modules/nfclib.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo</key>
 		<data>
-		YzRBvWh7qKZTSV2XDPlSzjx5MRU=
+		MIYf/OJBnKY+1sukG4BtTV/YfuY=
 		</data>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
-		SVi7UZ2v57aLOqN0EsOUGIg51qE=
+		4OiBWpz5UxEzdl57JsICEQ4F9NA=
 		</data>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		UdHDRUVwCzXqzcR3MqxDUJuijWI=
+		73Idnm7vMpJ9njlA0xdTMNYJn84=
 		</data>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		8hdf3kejetjOA1ubeNn7rFco+Ko=
+		XJgNsAxxH/tCuwrMuy/RtNycMQM=
 		</data>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		UdHDRUVwCzXqzcR3MqxDUJuijWI=
+		73Idnm7vMpJ9njlA0xdTMNYJn84=
 		</data>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		bioBzv/L1hggfBG1w22tCD9q/No=
+		UjQ3UoY0VjWMRnXDDFVj7jFijW4=
 		</data>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		SVi7UZ2v57aLOqN0EsOUGIg51qE=
+		4OiBWpz5UxEzdl57JsICEQ4F9NA=
 		</data>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		s7LptY2DTH4xvpRJsrwFTmuokL0=
+		xRjOCysMJsSPY+9eTrqRtdFe3KE=
 		</data>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		j2CTp6UO57OG+IQvs+GPT6asaAA=
+		4P/4cIlB/Nh8WZzPDTIGyhAPGlo=
 		</data>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		s7LptY2DTH4xvpRJsrwFTmuokL0=
+		xRjOCysMJsSPY+9eTrqRtdFe3KE=
 		</data>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		IdehuCjZJqgNcUwz4vbI3PCeBsA=
+		5HQFgj7fC7m06eXo5Ytu21+oIY0=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -75,7 +75,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			cewgIJYdcMNLPD7bdMZxGYYtZ20NfrYHLQ+DFATDQ9I=
+			LSoEIkNY27EfDHwcW7wdwbYH8ONhZ/fSxNT9uVfagVw=
 			</data>
 		</dict>
 		<key>Headers/nfclib.h</key>
@@ -96,84 +96,84 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			YL0Bw2Szbru+hh1qFjHJwZQgHQmdKQc1e8o7T2Lju2Q=
+			P/nC9yTAlkhdiWxnQQENi7tKCcPyLgvutCzIYjGlRQ0=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			hWjiBaK39jgXtxpLgpWEmjKl11k7XVqpf1NJ753iVIE=
+			jiYnn+OEOc3oBzTnm5T1orTALg+93cpYy0hZIxDnZMI=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cgNI2c7PGM8dGxxlPaZKX4jX8rjsdrQB1MxV97NPVCM=
+			pjR8TuN+Hj+jWNyWbOm0qGMtirjnK1E1SPaHOrA5s48=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			duZg0qCiBc6d0VJt+NL5JhvEXuN0hy0KlhNPjJs4UAM=
+			NX3+172lBD/L5Zi2zJlKYi3U9mfH3WWAxM9yyN4+uL4=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			IKZMoRH9zaa8wA9zIeES3+rQSJ9hsMXP390PSGeSYzo=
+			Fj+VBLpM9fD70s/q06gXlboKB6NMB1R9Rfmdt4/be28=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			duZg0qCiBc6d0VJt+NL5JhvEXuN0hy0KlhNPjJs4UAM=
+			NX3+172lBD/L5Zi2zJlKYi3U9mfH3WWAxM9yyN4+uL4=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			2knMe3LTneK4JopSXB94pZJCoa8Chc3P4NeLWYZU+/k=
+			jtLvbe9Pry6hKxL5ThAaY9hQ5Y3Ym7d72x+r/gCih0U=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			cgNI2c7PGM8dGxxlPaZKX4jX8rjsdrQB1MxV97NPVCM=
+			pjR8TuN+Hj+jWNyWbOm0qGMtirjnK1E1SPaHOrA5s48=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			hIvRFBxS/xTSAmkA6Fh8mB9f0HVh1iXZqg+uFNAgsKQ=
+			enXs0QlOxyTXA/ehBE8/xDMwZsRQUiYXIHR6u5vxSwg=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			us8vNP5SHYIVJqOh0vTZKJuQv133Og0sqdzNK48Gryk=
+			GtizmZtdTOysZFMGAj536JSdklStYq1VsvEjdTO4jF8=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			hIvRFBxS/xTSAmkA6Fh8mB9f0HVh1iXZqg+uFNAgsKQ=
+			enXs0QlOxyTXA/ehBE8/xDMwZsRQUiYXIHR6u5vxSwg=
 			</data>
 		</dict>
 		<key>Modules/nfclib.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			wmB5wN3fsEFIsHK+NvgFamfx/aNYAv0ogaj9M5Yigkw=
+			BsrnVKUvlDfE8KLipciyI6jfMIfCFMVm3Xj8haGs7Lg=
 			</data>
 		</dict>
 	</dict>
