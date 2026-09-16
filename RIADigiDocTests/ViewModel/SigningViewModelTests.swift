@@ -827,6 +827,20 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
+    func isSignButtonShown_returnFalseWithUppercaseUnsignableExtension() async {
+        let container = SignedContainerProtocolMock()
+        container.getContainerMimetypeHandler = { Constants.MimeType.Container }
+        container.getContainerNameHandler = { "mockContainer.ASICS" }
+
+        let isSignButtonShown = await viewModel.isSignButtonShown(
+            signedContainer: container,
+            isNestedContainer: false
+        )
+
+        #expect(!isSignButtonShown)
+    }
+
+    @Test
     func isSignButtonShown_returnFalseWithNestedContainer() async {
         let container = SignedContainerProtocolMock()
         container.getContainerMimetypeHandler = { Constants.MimeType.Asics }
@@ -851,92 +865,204 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
-    func isEncryptButtonShown_returnTrueWithExistingContainer() async {
+    func isEncryptableContainer_returnTrueWithAsiceContainer() async {
         let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { true }
 
         mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asice" }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
-            signedContainer: mockSignedContainer,
-            isNestedContainer: false
-        )
-
-        #expect(isEncryptButtonShown)
+        #expect(viewModel.isEncryptableContainer)
     }
 
     @Test
-    func isEncryptButtonShown_returnTrueWithSignedContainer() async {
+    func isEncryptableContainer_returnTrueWithAdocContainer() async {
         let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { false }
 
-        mockSignedContainer.getSignaturesHandler = {
-            [MockSignatureWrapper.mockSignatureWrapper()]
-        }
-
-        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
-
-        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
-            signedContainer: mockSignedContainer,
-            isNestedContainer: false
-        )
-
-        #expect(isEncryptButtonShown)
-    }
-
-    @Test
-    func isEncryptButtonShown_notSignedOrExisting_returnFalseWhenContainerIsNotSignedOrExisting() async {
-        let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { false }
         mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Adoc }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.adoc" }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
-            signedContainer: mockSignedContainer,
-            isNestedContainer: false
-        )
-
-        #expect(!isEncryptButtonShown)
+        #expect(viewModel.isEncryptableContainer)
     }
 
     @Test
-    func isEncryptButtonShown_returnFalseWithNestedContainer() async {
+    func isEncryptableContainer_returnFalseWithDdocContainer() async {
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSignedContainer.isExistingContainerHandler = { true }
-        mockSignedContainer.getSignaturesHandler = {
-            [MockSignatureWrapper.mockSignatureWrapper()]
-        }
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Ddoc }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.ddoc" }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
-            signedContainer: mockSignedContainer,
-            isNestedContainer: true
-        )
-
-        #expect(!isEncryptButtonShown)
+        #expect(!viewModel.isEncryptableContainer)
     }
 
     @Test
-    func isEncryptButtonShown_returnFalseIfContainerNil() async {
+    func isEncryptableContainer_returnFalseWithAsicsContainer() async {
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSignedContainer.getSignaturesHandler = {
-            [MockSignatureWrapper.mockSignatureWrapper()]
-        }
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asics" }
 
         await viewModel.loadContainerData(signedContainer: mockSignedContainer)
 
-        let isEncryptButtonShown = await viewModel.isEncryptButtonShown(
-            signedContainer: nil,
-            isNestedContainer: false
-        )
+        #expect(!viewModel.isEncryptableContainer)
+    }
 
-        #expect(!isEncryptButtonShown)
+    @Test
+    func isEncryptableContainer_returnFalseWithScsContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Container }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.scs" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnFalseWithUppercaseDdocExtension() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Container }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.DDOC" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnTrueWithBdocContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Bdoc }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.bdoc" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnFalseWhenOnlyMimetypeIsUnencryptable() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asics }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asice" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnFalseForTimestampedAsicsReportingInnerMimetype() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asics" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnFalseBeforeContainerIsLoaded() {
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_returnFalseWithUppercaseUnencryptableMimetype() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Ddoc.uppercased() }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func isEncryptableContainer_reflectsContainerNameChangedAfterLoad() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asice" }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+        #expect(viewModel.isEncryptableContainer)
+
+        viewModel.containerName = "mockContainer.ddoc"
+
+        #expect(!viewModel.isEncryptableContainer)
+    }
+
+    @Test
+    func canEncrypt_returnFalseWithNestedContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asice" }
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(viewModel.isEncryptableContainer)
+        #expect(!viewModel.canEncrypt)
+    }
+
+    @Test
+    func canEncrypt_returnTrueWithNonNestedEncryptableContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Asice }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.asice" }
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(viewModel.canEncrypt)
+    }
+
+    @Test
+    func canEncrypt_returnFalseWithUnencryptableNonNestedContainer() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+
+        mockSignedContainer.getSignaturesHandler = { [] }
+        mockSignedContainer.getContainerMimetypeHandler = { Constants.MimeType.Ddoc }
+        mockSignedContainer.getContainerNameHandler = { "mockContainer.ddoc" }
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(!viewModel.canEncrypt)
+    }
+
+    @Test
+    func canEncrypt_returnFalseBeforeContainerIsLoaded() {
+        mockSharedContainerViewModel.isNestedContainerHandler = { _ in false }
+
+        #expect(!viewModel.canEncrypt)
     }
 
     @Test
