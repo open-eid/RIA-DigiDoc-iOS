@@ -303,7 +303,7 @@ final class DiagnosticsViewModelTests {
         let mockLanguageSettings = LanguageSettingsProtocolMock()
         await viewModel.getConfigurationData(configuration: mockConfigProvider)
 
-        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true)
 
         mockFileManager.urlHandler = { _, _, _, _ in tempDirectoryURL }
@@ -314,12 +314,14 @@ final class DiagnosticsViewModelTests {
             try? FileManager.default.removeItem(at: tempDirectoryURL)
         }
 
-        if let logFileUrl = await viewModel.createDiagnosticsFile(
+        let diagnosticsFileUrl = await viewModel.createDiagnosticsFile(
             languageSettings: mockLanguageSettings,
             directory: tempDirectoryURL
-        ) {
-            #expect(!logFileUrl.resolvedPath.isEmpty)
-        }
+        )
+
+        let fileUrl = try #require(diagnosticsFileUrl)
+        #expect(!fileUrl.resolvedPath.isEmpty)
+        #expect(FileManager.default.fileExists(atPath: fileUrl.resolvedPath))
     }
 
     @Test
@@ -455,7 +457,7 @@ final class DiagnosticsViewModelTests {
 
     @Test
     func createLogFile_success() async throws {
-        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles")
+        let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(subfolder: "logfiles-\(UUID().uuidString)")
 
         mockFileManager.urlHandler = { _, _, _, _ in tempDirectoryURL }
         mockFileManager.fileExistsHandler = { _ in true }
@@ -465,12 +467,16 @@ final class DiagnosticsViewModelTests {
             try? FileManager.default.removeItem(at: tempDirectoryURL)
         }
 
-        if let logFileUrl = await viewModel.createLogFile(
+        let logFileUrl = await viewModel.createLogFile(
             directory: tempDirectoryURL
-        ) {
-            #expect(!logFileUrl.resolvedPath.isEmpty)
-        }
+        )
 
+        let fileUrl = try #require(logFileUrl)
+        #expect(!fileUrl.resolvedPath.isEmpty)
+
+        let contents = try String(contentsOf: fileUrl, encoding: .utf8)
+        #expect(contents.contains("===== File: \(CommonsLib.Constants.File.LibDigidocLog) ====="))
+        #expect(contents.contains("===== File: \(CommonsLib.Constants.File.AppLog) ====="))
     }
 
     @Test
