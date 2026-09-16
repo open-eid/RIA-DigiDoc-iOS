@@ -151,6 +151,13 @@ public class OperationDecrypt: NFCOperationBase, OperationDecryptProtocol {
                     return
                 }
 
+                if (error as NSError).isCryptoNetworkError {
+                    OperationDecrypt.logger().error("NFC: Unable to reach the key server")
+                    operationError = error
+                    session.invalidate(errorMessage: strings?.networkErrorMessage ?? "")
+                    return
+                }
+
                 handleUnknownError(error, session: session)
             }
         }

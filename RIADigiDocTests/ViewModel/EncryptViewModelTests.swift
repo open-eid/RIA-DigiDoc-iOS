@@ -117,6 +117,23 @@ struct EncryptViewModelTests {
     }
 
     @Test
+    func encryptContainer_showsNoInternetConnectionWhenKeyServerIsUnreachable() async {
+        _ = stubContainer()
+        viewModel.encryptAction = { _, _, _ in
+            throw NSError(
+                domain: "ee.ria.digidoc.CryptoLib",
+                code: -300,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to start encryption"]
+            )
+        }
+
+        await viewModel.encryptContainer()
+
+        #expect(viewModel.errorMessage == ToastMessage(key: "No Internet connection", args: []))
+        #expect(viewModel.successMessage == nil)
+    }
+
+    @Test
     func encryptContainer_usesGeneralKeyForOtherCryptoErrors() async {
         _ = stubContainer()
         viewModel.encryptAction = { _, _, _ in throw CryptoError.wrongDecryptionKey }
