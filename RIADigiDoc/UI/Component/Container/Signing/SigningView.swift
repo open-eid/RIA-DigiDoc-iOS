@@ -397,13 +397,14 @@ struct SigningView: View {
                             }
                         }
 
-                        containerLoadingTask = Task {
-                            await viewModel.loadContainerData(
-                                signedContainer: viewModel.signedContainer
-                            )
-
-                            await updateSignButtonVisibility()
+                        loadContainer(signedContainer: viewModel.signedContainer)
+                    }
+                    .onChange(of: viewModel.currentContainerID) { _, newContainerID in
+                        guard newContainerID != nil else { return }
+                        if viewModel.isSignatureAdded() {
+                            selectedTab = .signatures
                         }
+                        loadContainer(signedContainer: nil)
                     }
                     .onDisappear {
                         containerLoadingTask?.cancel()
@@ -545,6 +546,15 @@ struct SigningView: View {
             DispatchQueue.main.async {
                 focusedSignatureIndex = lastSignature
             }
+        }
+    }
+
+    private func loadContainer(signedContainer: SignedContainerProtocol?) {
+        let previousLoad = containerLoadingTask
+        containerLoadingTask = Task {
+            _ = await previousLoad?.value
+            await viewModel.loadContainerData(signedContainer: signedContainer)
+            await updateSignButtonVisibility()
         }
     }
 

@@ -7,7 +7,6 @@ import CryptoSwift
 import Foundation
 import Testing
 
-
 @MainActor
 struct EncryptRecipientViewModelTests {
 

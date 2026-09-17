@@ -30,6 +30,8 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     var nfcAlertMessageUrl: String?
 
     var signatureExtensionFailed = false
+
+    private(set) var actionMessageKey: String = "NFC hold card"
     var certMismatch: Bool = false
 
     private let nfcCANKeyFilename = Constants.File.nfcCANKey
@@ -312,6 +314,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         let recipients = await cryptoContainer?.getRecipients() ?? []
         let pinSecureData = SecureData(Array(pin1.utf8))
         await clearTempCAN()
+        actionMessageKey = "NFC hold card"
+        operationDecrypt.onStepChange = { [weak self] step in
+            self?.actionMessageKey = step >= 4 ? "Decrypting in progress" : "NFC hold card"
+        }
+
         do {
             NFCViewModel.logger().info("NFC: Starting decryption operation")
             let container = try await operationDecrypt.processDecrypt(
@@ -378,6 +385,11 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
         NFCViewModel.logger().info("NFC: Getting User-Agent")
         let appInfo = userAgentUtil.appInfo(diagnostics: .nfc, language: appLanguage)
         await clearTempCAN()
+
+        actionMessageKey = "NFC hold card"
+        operationReadCertAndSign.onStepChange = { [weak self] step in
+            self?.actionMessageKey = step >= 4 ? "Signing in progress" : "NFC hold card"
+        }
 
         do {
             NFCViewModel.logger().info("NFC: Starting signing operation")
