@@ -17,24 +17,25 @@
  *
  */
 
-import CommonsLib
 import Foundation
-import nfclib
-import LibdigidocLibSwift
 
-/// @mockable
-@MainActor
-public protocol OperationReadCertAndSignProtocol: AnyObject {
-    var onStepChange: (@MainActor (Int) -> Void)? { get set }
+public actor AwaitableCondition {
+    private var waiter: CheckedContinuation<Void, Never>?
+    private var isFulfilled = false
 
-    // swiftlint:disable:next function_parameter_count
-    func startOperation(
-        canNumber: String,
-        pin2Number: SecureData,
-        signedContainer: SignedContainerProtocol,
-        containerPath: URL,
-        roleData: RoleData,
-        userAgent: String,
-        strings: NFCSessionStrings
-    ) async throws -> SignedContainerProtocol
+    public init() {}
+
+    public func fulfill() {
+        isFulfilled = true
+        let waiter = self.waiter
+        self.waiter = nil
+        waiter?.resume()
+    }
+
+    public func wait() async {
+        if isFulfilled { return }
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            waiter = continuation
+        }
+    }
 }
