@@ -362,6 +362,9 @@ struct NFCView: View {
 
             viewModel.resetErrors()
         }
+        .onChange(of: viewModel.actionMessageKey) { _, newMessageKey in
+            nfcActionMessage = newMessageKey
+        }
         .onChange(of: viewModel.certMismatch) { _, mismatch in
             if mismatch {
                 canNumber = ""

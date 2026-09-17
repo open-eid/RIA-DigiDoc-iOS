@@ -8,7 +8,9 @@ import LibdigidocLibSwift
 
 /// @mockable
 @MainActor
-public protocol OperationReadCertAndSignProtocol {
+public protocol OperationReadCertAndSignProtocol: AnyObject {
+    var onStepChange: (@MainActor (Int) -> Void)? { get set }
+
     // swiftlint:disable:next function_parameter_count
     func startOperation(
         canNumber: String,
