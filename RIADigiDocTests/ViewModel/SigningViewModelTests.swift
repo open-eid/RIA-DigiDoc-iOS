@@ -1638,4 +1638,38 @@ struct SigningViewModelTests: Loggable {
         #expect(mockSharedContainerViewModel.setCryptoContainerCallCount == 0)
         #expect(mockContainerUtil.getContainerDataFilesDirCallCount == 0)
     }
+
+    @Test
+    func currentContainerID_changesWhenSharedContainerIsReplaced() async {
+        let firstContainer = SignedContainerProtocolMock()
+        let secondContainer = SignedContainerProtocolMock()
+
+        mockSharedContainerViewModel.currentContainerHandler = { firstContainer }
+        let firstID = viewModel.currentContainerID
+
+        mockSharedContainerViewModel.currentContainerHandler = { secondContainer }
+        let secondID = viewModel.currentContainerID
+
+        mockSharedContainerViewModel.currentContainerHandler = { nil }
+
+        #expect(firstID == ObjectIdentifier(firstContainer))
+        #expect(secondID == ObjectIdentifier(secondContainer))
+        #expect(firstID != secondID)
+        #expect(viewModel.currentContainerID == nil)
+    }
+
+    @Test
+    func loadContainerData_readsSharedContainerWhenNoContainerGiven() async {
+        let publishedContainer = SignedContainerProtocolMock()
+        publishedContainer.getSignaturesHandler = {
+            [MockSignatureWrapper.mockSignatureWrapper(signatureId: "S-published")]
+        }
+
+        mockSharedContainerViewModel.currentContainerHandler = { publishedContainer }
+
+        await viewModel.loadContainerData(signedContainer: nil)
+
+        #expect(viewModel.signatures.count == 1)
+        #expect(viewModel.signatures.first?.signatureId == "S-published")
+    }
 }
