@@ -26,6 +26,7 @@ import UtilsLibMocks
 import CommonsLib
 import LibdigidocLibSwift
 import LibdigidocLibSwiftMocks
+import CommonsTestShared
 
 @MainActor
 struct SmartIdViewModelTests {
@@ -1267,6 +1268,64 @@ struct SmartIdViewModelTests {
         }
 
         return container
+    }
+
+    @Test
+    func sign_writesSignatureAfterTaskCancelledDuringAddSignature() async {
+        mockConfigurationRepository.getConfigurationHandler = {
+            try? TestConfigurationProvider.mockConfigurationProvider()
+        }
+
+        mockSmartIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            await mockSuccessSignature()
+        }
+        mockSmartIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _ in
+            await mockSuccessSignature()
+        }
+        mockSmartIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
+            await mockSuccessSession()
+        }
+        mockSmartIdSignService.getVerificationCodeHandler = { _ in "1234" }
+        mockNotificationUtil.requestAuthorizationHandler = { true }
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+        mockDataStore.getIsDefaultLTAEnabledHandler = { false }
+
+        let writeStarted = AwaitableCondition()
+        let writeMayFinish = AwaitableCondition()
+
+        let updatedContainer = SignedContainerProtocolMock()
+        let container = SignedContainerProtocolMock()
+        container.getRawContainerFileHandler = { URL(fileURLWithPath: "/tmp/test.asice") }
+        container.prepareSignatureHandler = { _, _, _, _ in Data([0x01]) }
+        container.addSignatureHandler = { _, _ in
+            await writeStarted.fulfill()
+            await writeMayFinish.wait()
+            return updatedContainer
+        }
+
+        let signingTask = Task { @MainActor in
+            await viewModel.sign(
+                country: .estonia,
+                personalCode: "60001019906",
+                roleData: roleData,
+                signedContainer: container,
+                liveActivityTexts: SmartIdLiveActivityTexts(
+                    initialMessage: "Initial message",
+                    controlCodeTitle: "Control code",
+                    compactTitle: "Code"
+                )
+            )
+        }
+
+        await writeStarted.wait()
+
+        signingTask.cancel()
+        await writeMayFinish.fulfill()
+
+        let result = await signingTask.value
+
+        #expect(result === updatedContainer, "the container written after cancellation is returned")
+        #expect(container.addSignatureCallCount == 1)
     }
 
     private func mockSuccessSignature(

@@ -91,6 +91,10 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
+    var currentContainerID: ObjectIdentifier? {
+        sharedContainerViewModel.currentContainer().map { ObjectIdentifier($0) }
+    }
+
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
