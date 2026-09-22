@@ -17,16 +17,11 @@
  *
  */
 
-import CryptoObjCWrapper
+import Foundation
 
-public struct OpenLdapSearchResult: Sendable {
-    public var addressees: [Addressee]
-    public var tooManyResults: Bool
-    public var isNetworkError: Bool
-
-    public init(addressees: [Addressee], tooManyResults: Bool, isNetworkError: Bool = false) {
-        self.addressees = addressees
-        self.tooManyResults = tooManyResults
-        self.isNetworkError = isNetworkError
+public extension NSError {
+    // libcdoc NetworkBackend::NETWORK_ERROR
+    var isCryptoNetworkError: Bool {
+        return domain == "ee.ria.digidoc.CryptoLib" && code == -300
     }
 }

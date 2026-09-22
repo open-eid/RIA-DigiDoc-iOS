@@ -60,6 +60,20 @@ final class DigiDocErrorTests {
     }
 
     @Test
+    func isNetworkError_trueWhenCodeIsLibdigidocppNetworkError() {
+        let errorDetail = ErrorDetail(message: "Failed to create connection with host", code: 20)
+
+        #expect(errorDetail.isNetworkError)
+    }
+
+    @Test
+    func isNetworkError_falseWhenCodeIsGeneral() {
+        let errorDetail = ErrorDetail(message: "Failed to send request to SiVa", code: 0)
+
+        #expect(!errorDetail.isNetworkError)
+    }
+
+    @Test
     func errorDetailDescription_successWithContainerOpeningFailedError() {
         let errorDetail = ErrorDetail(message: "An error occurred", code: 123, userInfo: ["reason": "test case"])
         let error = DigiDocError.containerOpeningFailed(errorDetail)

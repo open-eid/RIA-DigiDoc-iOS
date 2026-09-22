@@ -113,10 +113,18 @@ struct ValidationSettingsView: View {
                     await viewModel.importSiVaCert(from: url)
                 }
                 viewModel.isImportingCert = false
-            case .failure:
+            case .failure(let error):
                 viewModel.isImportingCert = false
+                viewModel.handleFileImportFailure(error)
+                showFileImportFailureMessage()
             }
         }
+    }
+
+    private func showFileImportFailureMessage() {
+        let message = languageSettings.localized("Could not load selected files")
+        Toast.show(message)
+        AccessibilityUtil.announceMessage(message)
     }
 }
 

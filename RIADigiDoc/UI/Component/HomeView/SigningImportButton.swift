@@ -21,6 +21,8 @@ import SwiftUI
 import FactoryKit
 
 struct SigningImportButton: View {
+    @Environment(LanguageSettings.self) private var languageSettings
+
     let title: String
     let titleAccessibility: String
     let description: String
@@ -90,8 +92,10 @@ struct SigningImportButton: View {
                     url.stopAccessingSecurityScopedResource()
                 }
 
-            case .failure:
+            case .failure(let error):
                 isImporting = false
+                viewModel.handleFileImportFailure(error)
+                showFileImportFailureMessage()
             }
         }
         .fullScreenCover(isPresented: $isFileOpeningLoading) {
@@ -101,5 +105,11 @@ struct SigningImportButton: View {
                 isNavigatingToEncryptView: $isNavigatingToEncryptView
             )
         }
+    }
+
+    private func showFileImportFailureMessage() {
+        let message = languageSettings.localized("Could not load selected files")
+        Toast.show(message)
+        AccessibilityUtil.announceMessage(message)
     }
 }
