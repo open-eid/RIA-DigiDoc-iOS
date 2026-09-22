@@ -372,6 +372,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Default
 
@@ -486,6 +487,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Default
 
@@ -620,6 +622,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.ddoc")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Ddoc
 
@@ -655,6 +658,7 @@ struct SigningViewModelTests: Loggable {
     @Test
     func handleSaveFile_success() async throws {
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        try Data("test".utf8).write(to: testFile)
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
@@ -676,6 +680,7 @@ struct SigningViewModelTests: Loggable {
     @Test
     func handleSaveFile_throwErrorWhenSavingDataFile() async throws {
         let testFile = URL(fileURLWithPath: "/tmp/test.txt")
+        try Data("test".utf8).write(to: testFile)
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testDataFile = MockDataFileWrapper.mockDataFileWrapper(
@@ -712,6 +717,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asics")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Asics
 
@@ -742,6 +748,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asice")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Asice
 
@@ -772,6 +779,7 @@ struct SigningViewModelTests: Loggable {
         let mockSignedContainer = SignedContainerProtocolMock()
 
         let testFile = URL(fileURLWithPath: "/tmp/mockSignedContainer.asice")
+        try Data("test".utf8).write(to: testFile)
 
         let mimeType = CommonsLib.Constants.MimeType.Asice
 

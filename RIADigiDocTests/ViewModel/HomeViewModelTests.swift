@@ -171,6 +171,65 @@ struct HomeViewModelTests {
         #expect(mockSharedContainerViewModel.clearContainersCallCount == 1)
     }
 
+    @Test
+    func getSharedFiles_returnsDotNamedFilesSoTheyAreNotSilentlyDropped() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let sharedFolder = root.appending(path: "Temp")
+        try FileManager.default.createDirectory(at: sharedFolder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let dotNamed = sharedFolder.appending(path: ".txt")
+        let regular = sharedFolder.appending(path: "report.txt")
+        try Data("shared".utf8).write(to: dotNamed)
+        try Data("shared".utf8).write(to: regular)
+
+        mockFileManager.containerURLHandler = { _ in root }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.contentsOfDirectoryAtHandler = { url, keys, mask in
+            try FileManager.default.contentsOfDirectory(
+                at: url,
+                includingPropertiesForKeys: keys,
+                options: mask
+            )
+        }
+
+        let shared = await viewModel.getSharedFiles()
+
+        #expect(shared.map(\.lastPathComponent).sorted() == [".txt", "report.txt"])
+    }
+
+    @Test
+    func getSharedFiles_listsEverythingThatRemoveSharedFilesWouldDelete() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let sharedFolder = root.appending(path: "Temp")
+        try FileManager.default.createDirectory(at: sharedFolder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        try Data("shared".utf8).write(to: sharedFolder.appending(path: ".txt"))
+
+        mockFileManager.containerURLHandler = { _ in root }
+        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.contentsOfDirectoryAtHandler = { url, keys, mask in
+            try FileManager.default.contentsOfDirectory(
+                at: url,
+                includingPropertiesForKeys: keys,
+                options: mask
+            )
+        }
+
+        let shared = await viewModel.getSharedFiles()
+
+        let deletable = try FileManager.default.contentsOfDirectory(
+            at: sharedFolder,
+            includingPropertiesForKeys: nil,
+            options: []
+        )
+
+        #expect(shared.count == deletable.count)
+    }
+
     private func makeViewModel(sharedContainerViewModel: SharedContainerViewModelProtocol) -> HomeViewModel {
         HomeViewModel(
             sharedContainerViewModel: sharedContainerViewModel,

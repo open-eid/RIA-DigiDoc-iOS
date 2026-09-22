@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 import SwiftUI
+import UIKit
 
 struct TextFilePreview: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -15,30 +16,7 @@ struct TextFilePreview: View {
     @State private var showError: Bool = false
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            Group {
-                if showError {
-                    ContentUnavailableView {
-                        Text(
-                            verbatim: languageSettings.localized(
-                                "Failed to open file", [url.lastPathComponent]
-                            )
-                        )
-                    }
-                    .listRowSeparator(.hidden)
-                } else {
-                    ScrollView {
-                        Text(verbatim: text)
-                            .font(typography.bodyMedium)
-                            .foregroundStyle(theme.onSurfaceVariant)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, Dimensions.Padding.SPadding)
-                            .padding(.vertical, Dimensions.Padding.XXLPadding)
-                            .textSelection(.enabled)
-                    }
-                }
-            }
-
+        VStack(spacing: 0) {
             ZStack {
                 Text(verbatim: url.lastPathComponent)
                     .font(typography.bodyMedium)
@@ -66,6 +44,30 @@ struct TextFilePreview: View {
                     .padding(Dimensions.Padding.XSPadding)
                 }
             }
+
+            if showError {
+                ContentUnavailableView {
+                    Text(
+                        verbatim: languageSettings.localized(
+                            "Failed to open file", [url.lastPathComponent]
+                        )
+                    )
+                }
+                .listRowSeparator(.hidden)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                SelectableTextView(
+                    text: text,
+                    font: FontTypography.uiFont(for: .bodyMedium),
+                    textColor: UIColor(theme.onSurfaceVariant),
+                    insets: UIEdgeInsets(
+                        top: Dimensions.Padding.SPadding,
+                        left: Dimensions.Padding.SPadding,
+                        bottom: Dimensions.Padding.XXLPadding,
+                        right: Dimensions.Padding.SPadding
+                    )
+                )
+            }
         }
         .task {
             do {
@@ -75,5 +77,33 @@ struct TextFilePreview: View {
                 self.showError = true
             }
         }
+    }
+}
+
+private struct SelectableTextView: UIViewRepresentable {
+    let text: String
+    let font: UIFont
+    let textColor: UIColor
+    let insets: UIEdgeInsets
+
+    func makeUIView(context _: Context) -> UITextView {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.backgroundColor = .clear
+        textView.alwaysBounceVertical = true
+        textView.adjustsFontForContentSizeCategory = true
+        textView.textContainerInset = insets
+        textView.textContainer.lineFragmentPadding = 0
+        return textView
+    }
+
+    func updateUIView(_ uiView: UITextView, context _: Context) {
+        if uiView.text != text {
+            uiView.text = text
+        }
+        uiView.font = font
+        uiView.textColor = textColor
+        uiView.textContainerInset = insets
     }
 }

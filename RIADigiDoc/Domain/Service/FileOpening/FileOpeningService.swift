@@ -8,7 +8,7 @@ import CommonsLib
 import UtilsLib
 import CryptoSwift
 
-actor FileOpeningService: FileOpeningServiceProtocol {
+actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
 
     private let fileUtil: FileUtilProtocol
     private let fileInspector: FileInspectorProtocol
@@ -34,19 +34,39 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         switch result {
         case .success(let urls):
             var validFiles: [URL] = []
+            var firstError: Error?
 
-            for url in urls {
-                _ = url.startAccessingSecurityScopedResource()
-
-                let validUrl = try await url.validURL(fileUtil: fileUtil)
+            for (index, url) in urls.enumerated() {
+                let accessing = url.startAccessingSecurityScopedResource()
 
                 defer {
-                    url.stopAccessingSecurityScopedResource()
+                    if accessing {
+                        url.stopAccessingSecurityScopedResource()
+                    }
                 }
 
-                if try await isFileSizeValid(url: validUrl) {
-                    await validFiles.append(try cacheFile(from: validUrl))
+                do {
+                    let validUrl = try await url.validURL(fileUtil: fileUtil)
+
+                    if try await isFileSizeValid(url: validUrl) {
+                        await validFiles.append(try cacheFile(from: validUrl))
+                    }
+                } catch {
+                    let nsError = error as NSError
+                    FileOpeningService.logger().error(
+                        """
+                        Skipping file \(index + 1, privacy: .public) of \(urls.count, privacy: .public): \
+                        \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)
+                        """
+                    )
+                    if firstError == nil {
+                        firstError = error
+                    }
                 }
+            }
+
+            if validFiles.isEmpty, let firstError {
+                throw firstError
             }
 
             return validFiles
