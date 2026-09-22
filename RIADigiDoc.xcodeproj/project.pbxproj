@@ -378,6 +378,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DI/FileImportShareExtensionContainer.swift,
+				Diagnostics/ShareExtensionLogging.swift,
 				Error/FileImportError.swift,
 				Model/ImportedFileItem.swift,
 				Model/Status.swift,

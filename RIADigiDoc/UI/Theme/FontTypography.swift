@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 import SwiftUI
+import UIKit
 
 enum AppTextStyle {
     case displayLarge, displayMedium, displaySmall
@@ -54,6 +55,18 @@ struct FontTypography {
         return .custom(fontName, size: config.size, relativeTo: config.textStyle)
     }
 
+    static func uiFont(for style: AppTextStyle) -> UIFont {
+        let config = fontConfig(for: style)
+        let fontName = fontName(forCondensed: config.isCondensed, weight: config.weight)
+
+        guard let font = UIFont(name: fontName, size: config.size) else {
+            return UIFontMetrics(forTextStyle: config.textStyle.uiTextStyle)
+                .scaledFont(for: .systemFont(ofSize: config.size))
+        }
+
+        return UIFontMetrics(forTextStyle: config.textStyle.uiTextStyle).scaledFont(for: font)
+    }
+
     private static func fontConfig(for style: AppTextStyle) -> FontConfig {
         return fontConfigs[style] ?? FontConfig(size: 14, weight: .regular, isCondensed: false, textStyle: .body)
     }
@@ -70,6 +83,25 @@ struct FontTypography {
             }
         }()
         return forCondensed ? "RobotoCondensed-\(weightName)" : "Roboto-\(weightName)"
+    }
+}
+
+extension Font.TextStyle {
+    var uiTextStyle: UIFont.TextStyle {
+        switch self {
+        case .largeTitle: return .largeTitle
+        case .title: return .title1
+        case .title2: return .title2
+        case .title3: return .title3
+        case .headline: return .headline
+        case .subheadline: return .subheadline
+        case .body: return .body
+        case .callout: return .callout
+        case .footnote: return .footnote
+        case .caption: return .caption1
+        case .caption2: return .caption2
+        @unknown default: return .body
+        }
     }
 }
 

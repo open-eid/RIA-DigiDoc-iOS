@@ -89,11 +89,15 @@ actor AdvancedSettingsRepository: AdvancedSettingsRepositoryProtocol, Loggable {
                 "\(certificateBaseName).\(extensionToUse)"
             )
 
-            _ = url.startAccessingSecurityScopedResource()
+            let accessing = url.startAccessingSecurityScopedResource()
+
+            defer {
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
 
             try fileManager.copyItem(at: url, to: destinationURL)
-
-            url.stopAccessingSecurityScopedResource()
 
             return try await getCertificateContent(certFileURL: destinationURL)
         } catch {
