@@ -24,7 +24,7 @@ import CommonsLib
 import UtilsLib
 import CryptoSwift
 
-actor FileOpeningService: FileOpeningServiceProtocol {
+actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
 
     private let fileUtil: FileUtilProtocol
     private let fileInspector: FileInspectorProtocol
@@ -50,19 +50,51 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         switch result {
         case .success(let urls):
             var validFiles: [URL] = []
+            var firstError: Error?
 
-            for url in urls {
+            for (index, url) in urls.enumerated() {
                 _ = url.startAccessingSecurityScopedResource()
 
-                let validUrl = try await url.validURL(fileUtil: fileUtil)
+                do {
+                    let validUrl = try await url.validURL(fileUtil: fileUtil)
 
-                defer {
-                    url.stopAccessingSecurityScopedResource()
-                }
+                    defer {
+                        url.stopAccessingSecurityScopedResource()
+                    }
 
-                if try await isFileSizeValid(url: validUrl) {
-                    await validFiles.append(try cacheFile(from: validUrl))
+                    let sizeOk = try await isFileSizeValid(url: validUrl)
+                    FileOpeningService.logger().info(
+                        """
+                        phase=app.validate idx=\(index, privacy: .public) \
+                        of=\(urls.count, privacy: .public) \
+                        ext=\(validUrl.pathExtension.lowercased(), privacy: .public) \
+                        dotLead=\(validUrl.lastPathComponent.hasPrefix("."), privacy: .public) \
+                        sizeOk=\(sizeOk, privacy: .public)
+                        """
+                    )
+
+                    if sizeOk {
+                        await validFiles.append(try cacheFile(from: validUrl))
+                    }
+                } catch {
+                    let nsError = error as NSError
+                    FileOpeningService.logger().error(
+                        """
+                        phase=app.validateFailed idx=\(index, privacy: .public) \
+                        of=\(urls.count, privacy: .public) \
+                        errDomain=\(nsError.domain, privacy: .public) \
+                        errCode=\(nsError.code, privacy: .public) \
+                        userInfoKeys=\(nsError.userInfo.keys.sorted().joined(separator: ","), privacy: .public)
+                        """
+                    )
+                    if firstError == nil {
+                        firstError = error
+                    }
                 }
+            }
+
+            if validFiles.isEmpty, let firstError {
+                throw firstError
             }
 
             return validFiles

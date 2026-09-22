@@ -43,6 +43,9 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
     @discardableResult
     func importFiles(_ items: [ImportedFileItem]) async -> Bool {
         ShareViewModel.logger().info("Importing files...")
+        ShareExtensionLogging.emit(
+            "phase=import.begin count=\(items.count) memMB=\(ShareExtensionLogging.availableMemoryMB)"
+        )
         guard !items.isEmpty else {
             await MainActor.run { [weak self] in
                 self?.status = .failed
@@ -54,6 +57,10 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
                 itemIndex: 0,
                 providerIndex: 0,
                 items: items
+            )
+
+            ShareExtensionLogging.emit(
+                "phase=import.end ok=\(isImported) memMB=\(ShareExtensionLogging.availableMemoryMB)"
             )
 
             if isImported {
@@ -88,6 +95,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
         let item = items[itemIndex]
         let imported = try await cacheFileForProvider(fileItem: item)
+        ShareExtensionLogging.emit("phase=item.result idx=\(itemIndex) of=\(items.count) ok=\(imported)")
         if imported {
             return try await cacheItem(itemIndex: itemIndex + 1, providerIndex: providerIndex + 1, items: items)
         }
@@ -97,6 +105,12 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
     func cacheFileForProvider(fileItem: ImportedFileItem) async throws -> Bool {
         let typeIdentifiers = [UTType.fileURL, UTType.url, UTType.data]
+
+        ShareExtensionLogging.emit(
+            "phase=cache.dispatch typeId=\(fileItem.typeIdentifier.identifier) "
+                + "matched=\(typeIdentifiers.contains(fileItem.typeIdentifier)) "
+                + "scheme=\(fileItem.fileUrl.scheme ?? "nil")"
+        )
 
         if typeIdentifiers.contains(fileItem.typeIdentifier) {
             return await cacheFileOnUrl(fileItem.fileUrl)
@@ -117,64 +131,76 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
         _ itemUrl: URL,
     ) async -> Bool {
         if itemUrl.scheme == "file" {
+            let accessing = itemUrl.startAccessingSecurityScopedResource()
+            defer {
+                if accessing {
+                    itemUrl.stopAccessingSecurityScopedResource()
+                }
+            }
+
             do {
-                if try !resourceChecker.checkResourceIsReachable(itemUrl) {
+                let isReachable = try resourceChecker.checkResourceIsReachable(itemUrl)
+                ShareExtensionLogging.emit(
+                    "phase=cache.reachable ok=\(isReachable) "
+                        + "readable=\(fileManager.isReadableFile(atPath: itemUrl.resolvedPath)) "
+                        + "src=[\(ShareExtensionLogging.nameAttributes(itemUrl.lastPathComponent))]"
+                )
+
+                guard isReachable else {
                     throw URLError(.cannotOpenFile)
                 }
 
-                let groupTempFolderUrl = try Directories.getSharedFolder(fileManager: fileManager)
-
-                let filePath = groupTempFolderUrl.appending(path: itemUrl.lastPathComponent)
-
-                let inputStream = InputStream(url: itemUrl)
-                let outputStream = OutputStream(url: filePath, append: false)
-
-                inputStream?.open()
-                outputStream?.open()
-
-                let bufferSize = 4096
-                var dataBuffer = Data(count: bufferSize)
-
-                while inputStream?.hasBytesAvailable == true {
-                    let bytesRead: Int? = dataBuffer
-                        .withUnsafeMutableBytes { (rawBufferPointer: UnsafeMutableRawBufferPointer) in
-                            guard let inputStream = inputStream else {
-                                return nil
-                            }
-
-                            return rawBufferPointer
-                                .bindMemory(to: UInt8.self)
-                                .baseAddress
-                                .map { baseAddress in
-                                    inputStream.read(baseAddress, maxLength: bufferSize)
-                                }
-                        }
-
-                    if let bytesRead = bytesRead, bytesRead > 0 {
-                        dataBuffer.count = bytesRead
-                        dataBuffer.withUnsafeBytes { (bufferPointer: UnsafeRawBufferPointer) in
-                            guard let outputStream = outputStream,
-                                  let baseAddress = bufferPointer.bindMemory(to: UInt8.self).baseAddress else {
-                                return
-                            }
-
-                            outputStream.write(baseAddress, maxLength: bytesRead)
-                        }
-                    }
+                let sourceSize = try fileSize(of: itemUrl)
+                guard sourceSize > 0 else {
+                    throw URLError(.zeroByteResource)
                 }
 
-                inputStream?.close()
-                outputStream?.close()
+                let groupTempFolderUrl = try Directories.getSharedFolder(fileManager: fileManager)
+                let filePath = groupTempFolderUrl.appending(path: itemUrl.lastPathComponent)
+
+                ShareExtensionLogging.emit(
+                    "phase=cache.dest dest=[\(ShareExtensionLogging.nameAttributes(filePath.lastPathComponent))] "
+                        + "destExists=\(fileManager.fileExists(atPath: filePath.resolvedPath))"
+                )
+
+                if fileManager.fileExists(atPath: filePath.resolvedPath) {
+                    try fileManager.removeItem(at: filePath)
+                }
+
+                try fileManager.copyItem(at: itemUrl, to: filePath)
+
+                let copiedSize = try fileSize(of: filePath)
+                guard copiedSize == sourceSize else {
+                    try? fileManager.removeItem(at: filePath)
+                    throw URLError(.cannotWriteToFile)
+                }
+
+                ShareExtensionLogging.emit("phase=cache.done srcSize=\(sourceSize) destSize=\(copiedSize)")
 
                 return true
             } catch {
+                let nsError = error as NSError
+                ShareExtensionLogging.emit(
+                    "phase=cache.error errDomain=\(nsError.domain) errCode=\(nsError.code) "
+                        + "userInfoKeys=\(nsError.userInfo.keys.sorted().joined(separator: ","))"
+                )
                 ShareViewModel.logger().error("Unable to cache file: \(error.localizedDescription)")
             }
         } else if itemUrl.isValidURL() {
             return await downloadFileFromUrl(itemUrl)
         }
 
+        ShareExtensionLogging.emit("phase=cache.returningFalse scheme=\(itemUrl.scheme ?? "nil")")
+
         return false
+    }
+
+    private func fileSize(of url: URL) throws -> Int {
+        let attributes = try fileManager.attributesOfItem(atPath: url.resolvedPath)
+        guard let size = (attributes[.size] as? NSNumber)?.intValue else {
+            throw URLError(.cannotOpenFile)
+        }
+        return size
     }
 
     func downloadFileFromUrl(_ itemUrl: URL) async -> Bool {
