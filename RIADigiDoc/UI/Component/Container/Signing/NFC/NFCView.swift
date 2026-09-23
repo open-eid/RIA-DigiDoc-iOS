@@ -140,8 +140,8 @@ struct NFCView: View {
         self.actionType = actionType
         self.pinType = pinType
         self._isWebEidAuthenticating = isWebEidAuthenticating
-        self.rememberMe = rememberMe
-        self.actionMethods = actionMethods
+        self._rememberMe = State(wrappedValue: rememberMe)
+        self._actionMethods = State(wrappedValue: actionMethods)
         self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
         self.onSuccess = onSuccess
