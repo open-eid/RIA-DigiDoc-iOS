@@ -80,7 +80,7 @@ struct MyEidPinChangeView: View {
     private var flowDescription: String {
         let pinLengthRequirement = languageSettings.localized(
             "PIN length requirement",
-            [codeType.name, String(codeType.minimumLength), String(Constants.Validation.PinMaximumLength)]
+            [codeType.name, String(codeType.minimumLength), String(codeType.maximumLength)]
         )
 
         let newPinDifferenceRequirement = languageSettings.localized(
@@ -89,8 +89,8 @@ struct MyEidPinChangeView: View {
 
         let pukLengthRequirement = languageSettings.localized(
             "PIN length requirement",
-            [CodeType.puk.name, String(Constants.Validation.PukMinimumLength),
-             String(Constants.Validation.PinMaximumLength)]
+            [CodeType.puk.name, String(CodeType.puk.minimumLength),
+             String(CodeType.puk.maximumLength)]
         )
 
         let pukCodeInfo = languageSettings.localized("PUK code info", [])

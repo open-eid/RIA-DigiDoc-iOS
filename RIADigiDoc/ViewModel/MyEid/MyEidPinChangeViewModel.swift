@@ -139,13 +139,7 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
     }
 
     func isPINLengthValid(for codeType: CodeType, pin: [UInt8]) -> Bool {
-        guard codeType.validLength.contains(pin.count) else {
-            return false
-        }
-
-        return pin.allSatisfy {
-            return Character(UnicodeScalar($0)).isNumber
-        }
+        return codeType.validateFormat(pin) == nil
     }
 
     func verifyNewCode() {
@@ -308,6 +302,10 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
                     isBlocked: true
                 )
             }
+        case .invalidNewPIN:
+            errorMessage = "PIN too easy"
+            errorMessageExtraArguments = [pinType.name]
+            resetToCurrentPinEntryStep()
         case .sessionError:
             errorMessage = "General error"
             errorMessageExtraArguments = []
@@ -412,30 +410,6 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         }
 
         return false
-    }
-}
-
-extension CodeType {
-    var minimumLength: Int {
-        switch self {
-        case .pin1:
-            return Constants.Validation.Pin1MinimumLength
-        case .pin2:
-            return Constants.Validation.Pin2MinimumLength
-        case .puk:
-            return Constants.Validation.PukMinimumLength
-        @unknown default:
-            return 0
-        }
-    }
-
-    var validLength: ClosedRange<Int> {
-        switch self {
-        case .pin1, .pin2, .puk:
-            return minimumLength...Constants.Validation.PinMaximumLength
-        @unknown default:
-            return 0...0
-        }
     }
 }
 
