@@ -3131,24 +3131,6 @@
         }
       }
     },
-    "Invalid Mobile-ID access rights url" : {
-      "comment" : "URL that user can open in browser to read more about signing large quantities of documents",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://www.id.ee/en/article/for-organisations-that-sign-large-quantities-of-documents-using-digidoc4-client/"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://www.id.ee/artikkel/asutustele-kus-allkirjastatakse-digidoc4-kliendi-kaudu-suuremates-kogustes-dokumente/"
-          }
-        }
-      }
-    },
     "Invalid personal code" : {
       "comment" : "Shown in signing view when personal code is not correct",
       "extractionState" : "manual",
@@ -3259,6 +3241,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku allkirjastamine ebaõnnestus. Kontrolli %@ teenuse ligipääsu seadeid"
+          }
+        }
+      }
+    },
+    "Invalid signing access rights url" : {
+      "comment" : "URL that user can open in browser to read more about signing large quantities of documents",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/en/article/for-organisations-that-sign-large-quantities-of-documents-using-digidoc4-client/"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://www.id.ee/artikkel/asutustele-kus-allkirjastatakse-digidoc4-kliendi-kaudu-suuremates-kogustes-dokumente/"
           }
         }
       }
