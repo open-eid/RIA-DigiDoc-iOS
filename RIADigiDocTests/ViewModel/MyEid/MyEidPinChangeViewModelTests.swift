@@ -457,4 +457,52 @@ final class MyEidPinChangeViewModelTests {
 
         #expect(mockOperationUnblockPin.startReadingCallCount == 1)
     }
+
+    @Test
+    func isPINLengthValid_pin1TooLong() async throws {
+        let viewModel = MyEidPinChangeViewModel(
+            pinAction: .change,
+            codeType: .pin1,
+            personalCode: "39001010000",
+            actionMethod: .idCardViaNFC,
+            sharedMyEidSession: mockSharedMyEidSession,
+            operationChangePin: mockOperationChangePin,
+            operationUnblockPin: mockOperationUnblockPin
+        )
+
+        let result = viewModel.isPINLengthValid(for: .pin1, pin: Array("1234567890123".utf8))
+
+        #expect(result == false)
+    }
+
+    @Test
+    func submit_cardRejectingNewPinReportsRejectionRatherThanGeneralError() async throws {
+        mockOperationChangePin.startChangingHandler = { _, _, _, _, _ in
+            throw IdCardInternalError.invalidNewPin
+        }
+
+        let viewModel = MyEidPinChangeViewModel(
+            pinAction: .change,
+            codeType: .pin1,
+            personalCode: "39001010000",
+            actionMethod: .idCardViaNFC,
+            sharedMyEidSession: mockSharedMyEidSession,
+            operationChangePin: mockOperationChangePin,
+            operationUnblockPin: mockOperationUnblockPin
+        )
+
+        viewModel.input = "4862"
+        await viewModel.submit(nfcStringsUtil: makeNFCStringsUtil())
+
+        viewModel.input = "8261"
+        await viewModel.submit(nfcStringsUtil: makeNFCStringsUtil())
+
+        viewModel.input = "8261"
+        await viewModel.submit(nfcStringsUtil: makeNFCStringsUtil())
+
+        #expect(viewModel.errorMessage == "PIN too easy")
+        #expect(viewModel.errorMessageExtraArguments == [CodeType.pin1.name])
+        #expect(viewModel.step == .current)
+        #expect(viewModel.isSuccess == false)
+    }
 }

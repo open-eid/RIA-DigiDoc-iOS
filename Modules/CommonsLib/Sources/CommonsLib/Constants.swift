@@ -140,10 +140,6 @@ public struct Constants {
         public static let MinimumPhoneNumberLength = 10
         public static let AllowedPhoneNumberCountryCodes = ["370", "372"]
         public static let CANNumberLength = 6
-        public static let Pin1MinimumLength = 4
-        public static let Pin2MinimumLength = 5
-        public static let PukMinimumLength = 8
-        public static let PinMaximumLength = 12
     }
 
     public struct Signing {

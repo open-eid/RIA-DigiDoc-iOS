@@ -1005,7 +1005,7 @@ final class NFCViewModelTests {
 
         mockOperationWebEidAuth.startOperationHandler =
         { _, _, _, _, _, _ in
-            throw nfclib.IdCardInternalError.remainingPinRetryCount(2)
+            throw nfclib.IdCardInternalError.remainingPinRetryCount(codeType: .pin1, count: 2)
         }
 
         _ = await viewModel.auth(
@@ -1082,7 +1082,7 @@ final class NFCViewModelTests {
     func certificate_showsPinRetryCountWhenNfclibReportsRemainingRetries() async {
         mockOperationReadCert.startReadingHandler =
         { _, _ in
-            throw nfclib.IdCardInternalError.remainingPinRetryCount(1)
+            throw nfclib.IdCardInternalError.remainingPinRetryCount(codeType: .pin2, count: 1)
         }
 
         _ = await viewModel.certificate(
@@ -1183,7 +1183,7 @@ final class NFCViewModelTests {
 
         mockOperationWebEidSign.startOperationHandler =
         { _, _, _, _, _, _, _ in
-            throw nfclib.IdCardInternalError.pinVerificationFailed
+            throw nfclib.IdCardInternalError.pinVerificationFailed(codeType: .pin2)
         }
 
         _ = await viewModel.signWebEid(
@@ -1440,5 +1440,77 @@ final class NFCViewModelTests {
         #expect(viewModel.showNfcAlertMessage)
         #expect(viewModel.nfcAlertMessageKey == "ID card courier must activate to decrypt")
         #expect(viewModel.nfcAlertMessageUrl == "ID card courier activate URL")
+    }
+
+    @Test
+    func sign_showsCourierAlertWhenNfclibReportsCardNotActivated() async {
+        let mockContainer = SignedContainerProtocolMock()
+        mockContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/test/container.asice")
+        }
+        mockDataStore.getSelectedLanguageHandler = { "et" }
+        mockUserAgentUtil.appInfoHandler = { _, _ in "TestUserAgent" }
+
+        mockOperationReadCertAndSign.startOperationHandler =
+        { _, _, _, _, _, _, _ in
+            throw nfclib.IdCardInternalError.notActivated
+        }
+
+        let result = await viewModel.sign(
+            canNumber: "123456",
+            pin2: "12345",
+            roleData: RoleData(roles: [], city: "", state: "", country: "", zipCode: ""),
+            signedContainer: mockContainer,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.showNfcAlertMessage)
+        #expect(viewModel.nfcAlertMessageKey == "ID card courier must activate to sign")
+        #expect(viewModel.nfcAlertMessageUrl == "ID card courier activate URL")
+    }
+
+    @Test
+    func decrypt_keepsTriesLeftWhenNfclibReportsWrongPinCarryingCodeType() async {
+        mockOperationDecrypt.processDecryptHandler = { _, _, _, _, _ in
+            throw nfclib.IdCardInternalError.remainingPinRetryCount(codeType: .pin1, count: 2)
+        }
+
+        let result = await viewModel.decrypt(
+            CAN: "123456",
+            pin1: "1234",
+            cryptoContainer: nil,
+            strings: mockNFCSessionStrings
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.nfcErrorKey == "PIN verification error multiple")
+        #expect(viewModel.nfcErrorExtraArguments == [CodeType.pin1.name, "2"])
+    }
+
+    @Test
+    func isActionEnabled_rejectsPinLongerThanMaximum() {
+        let result = viewModel.isActionEnabled(
+            canNumber: "123456",
+            pinNumber: "1234567890123",
+            pinType: .pin1,
+            actionType: .decrypt
+        )
+
+        #expect(!result)
+        #expect(viewModel.pinNumberErrorKey == "PIN length requirement")
+    }
+
+    @Test
+    func isActionEnabled_leavesErrorKeyEmptyForUntouchedPinField() {
+        let result = viewModel.isActionEnabled(
+            canNumber: "123456",
+            pinNumber: "",
+            pinType: .pin1,
+            actionType: .decrypt
+        )
+
+        #expect(!result)
+        #expect(viewModel.pinNumberErrorKey == "")
     }
 }
