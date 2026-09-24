@@ -62,29 +62,15 @@ actor FileOpeningService: FileOpeningServiceProtocol, Loggable {
                         url.stopAccessingSecurityScopedResource()
                     }
 
-                    let sizeOk = try await isFileSizeValid(url: validUrl)
-                    FileOpeningService.logger().info(
-                        """
-                        phase=app.validate idx=\(index, privacy: .public) \
-                        of=\(urls.count, privacy: .public) \
-                        ext=\(validUrl.pathExtension.lowercased(), privacy: .public) \
-                        dotLead=\(validUrl.lastPathComponent.hasPrefix("."), privacy: .public) \
-                        sizeOk=\(sizeOk, privacy: .public)
-                        """
-                    )
-
-                    if sizeOk {
+                    if try await isFileSizeValid(url: validUrl) {
                         await validFiles.append(try cacheFile(from: validUrl))
                     }
                 } catch {
                     let nsError = error as NSError
                     FileOpeningService.logger().error(
                         """
-                        phase=app.validateFailed idx=\(index, privacy: .public) \
-                        of=\(urls.count, privacy: .public) \
-                        errDomain=\(nsError.domain, privacy: .public) \
-                        errCode=\(nsError.code, privacy: .public) \
-                        userInfoKeys=\(nsError.userInfo.keys.sorted().joined(separator: ","), privacy: .public)
+                        Skipping file \(index + 1, privacy: .public) of \(urls.count, privacy: .public): \
+                        \(nsError.domain, privacy: .public) \(nsError.code, privacy: .public)
                         """
                     )
                     if firstError == nil {

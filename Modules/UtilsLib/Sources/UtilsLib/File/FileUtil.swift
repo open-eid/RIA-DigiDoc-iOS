@@ -125,7 +125,11 @@ public struct FileUtil: FileUtilProtocol, Loggable {
                             options: .withoutChanges,
                             error: &error
                         ) { coordURL in
-                            continuation.resume(returning: coordURL)
+                            do {
+                                continuation.resume(returning: try copyCoordinatedFile(from: coordURL))
+                            } catch let copyError {
+                                continuation.resume(throwing: copyError)
+                            }
                         }
 
                         if let error {
@@ -145,6 +149,24 @@ public struct FileUtil: FileUtilProtocol, Loggable {
 
         FileUtil.logger().info("File is NOT from iCloud")
         return nil
+    }
+
+    func copyCoordinatedFile(from coordinatedURL: URL) throws -> URL {
+        let destinationDirectory = try Directories.getTempDirectory(
+            subfolder: CommonsLib.Constants.Folder.Temp,
+            fileManager: fileManager
+        ).appending(path: UUID().uuidString, directoryHint: .isDirectory)
+
+        try fileManager.createDirectory(
+            at: destinationDirectory,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+
+        let destination = destinationDirectory.appending(path: coordinatedURL.lastPathComponent)
+        try fileManager.copyItem(at: coordinatedURL, to: destination)
+
+        return destination
     }
 
     public func getFileUrlFromAppGroup(_ url: URL, appGroupIdentifier: String) -> URL? {

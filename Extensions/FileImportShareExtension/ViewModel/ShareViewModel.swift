@@ -42,10 +42,6 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
     @discardableResult
     func importFiles(_ items: [ImportedFileItem]) async -> Bool {
-        ShareViewModel.logger().info("Importing files...")
-        ShareExtensionLogging.emit(
-            "phase=import.begin count=\(items.count) memMB=\(ShareExtensionLogging.availableMemoryMB)"
-        )
         guard !items.isEmpty else {
             await MainActor.run { [weak self] in
                 self?.status = .failed
@@ -59,14 +55,10 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
                 items: items
             )
 
-            ShareExtensionLogging.emit(
-                "phase=import.end ok=\(isImported) memMB=\(ShareExtensionLogging.availableMemoryMB)"
-            )
-
             if isImported {
-                ShareViewModel.logger().info("Files imported successfully")
+                ShareExtensionLogging.info("Imported \(items.count) shared file(s)")
             } else {
-                ShareViewModel.logger().error("Could not import files")
+                ShareExtensionLogging.error("Unable to import all \(items.count) shared file(s)")
             }
 
             await MainActor.run { [weak self] in
@@ -75,7 +67,9 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
             return isImported
         } catch {
-            ShareViewModel.logger().error("Unable to import files: \(error.localizedDescription)")
+            ShareExtensionLogging.error(
+                "Unable to import shared files: \((error as NSError).domain) \((error as NSError).code)"
+            )
             await MainActor.run { [weak self] in
                 self?.status = .failed
             }
@@ -95,7 +89,6 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
         let item = items[itemIndex]
         let imported = try await cacheFileForProvider(fileItem: item)
-        ShareExtensionLogging.emit("phase=item.result idx=\(itemIndex) of=\(items.count) ok=\(imported)")
         if imported {
             return try await cacheItem(itemIndex: itemIndex + 1, providerIndex: providerIndex + 1, items: items)
         }
@@ -105,12 +98,6 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
     func cacheFileForProvider(fileItem: ImportedFileItem) async throws -> Bool {
         let typeIdentifiers = [UTType.fileURL, UTType.url, UTType.data]
-
-        ShareExtensionLogging.emit(
-            "phase=cache.dispatch typeId=\(fileItem.typeIdentifier.identifier) "
-                + "matched=\(typeIdentifiers.contains(fileItem.typeIdentifier)) "
-                + "scheme=\(fileItem.fileUrl.scheme ?? "nil")"
-        )
 
         if typeIdentifiers.contains(fileItem.typeIdentifier) {
             return await cacheFileOnUrl(fileItem.fileUrl)
@@ -140,12 +127,6 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
             do {
                 let isReachable = try resourceChecker.checkResourceIsReachable(itemUrl)
-                ShareExtensionLogging.emit(
-                    "phase=cache.reachable ok=\(isReachable) "
-                        + "readable=\(fileManager.isReadableFile(atPath: itemUrl.resolvedPath)) "
-                        + "src=[\(ShareExtensionLogging.nameAttributes(itemUrl.lastPathComponent))]"
-                )
-
                 guard isReachable else {
                     throw URLError(.cannotOpenFile)
                 }
@@ -157,11 +138,6 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
                 let groupTempFolderUrl = try Directories.getSharedFolder(fileManager: fileManager)
                 let filePath = groupTempFolderUrl.appending(path: itemUrl.lastPathComponent)
-
-                ShareExtensionLogging.emit(
-                    "phase=cache.dest dest=[\(ShareExtensionLogging.nameAttributes(filePath.lastPathComponent))] "
-                        + "destExists=\(fileManager.fileExists(atPath: filePath.resolvedPath))"
-                )
 
                 if fileManager.fileExists(atPath: filePath.resolvedPath) {
                     try fileManager.removeItem(at: filePath)
@@ -175,22 +151,18 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
                     throw URLError(.cannotWriteToFile)
                 }
 
-                ShareExtensionLogging.emit("phase=cache.done srcSize=\(sourceSize) destSize=\(copiedSize)")
-
                 return true
             } catch {
                 let nsError = error as NSError
-                ShareExtensionLogging.emit(
-                    "phase=cache.error errDomain=\(nsError.domain) errCode=\(nsError.code) "
-                        + "userInfoKeys=\(nsError.userInfo.keys.sorted().joined(separator: ","))"
+                ShareExtensionLogging.error(
+                    "Unable to copy shared file: \(nsError.domain) \(nsError.code)"
                 )
-                ShareViewModel.logger().error("Unable to cache file: \(error.localizedDescription)")
             }
         } else if itemUrl.isValidURL() {
             return await downloadFileFromUrl(itemUrl)
+        } else {
+            ShareExtensionLogging.error("Shared item has an unsupported scheme: \(itemUrl.scheme ?? "none")")
         }
-
-        ShareExtensionLogging.emit("phase=cache.returningFalse scheme=\(itemUrl.scheme ?? "nil")")
 
         return false
     }
@@ -204,7 +176,7 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
     }
 
     func downloadFileFromUrl(_ itemUrl: URL) async -> Bool {
-        ShareViewModel.logger().info("Downloading file from \(itemUrl.absoluteString)")
+        ShareExtensionLogging.info("Downloading shared file")
 
         do {
             let destinationURL = try Directories.getTempDirectory(
@@ -220,25 +192,13 @@ class ShareViewModel: ShareViewModelProtocol, Loggable {
 
             let request = AF.download(itemUrl, to: destination)
 
-            Task {
-                for await progress in request.downloadProgress() {
-                    let fileName = itemUrl.lastPathComponent
-                    let downloadProgress = progress.fractionCompleted * 100
-                    ShareViewModel.logger().info(
-                        "\(String(format: "Download progress for file '%@': %.2f%%", fileName, downloadProgress))"
-                    )
-                }
-            }
-
             let downloadTask = request.serializingDownloadedFileURL()
 
             let fileURL = try await downloadTask.value
             return await cacheFileOnUrl(fileURL)
         } catch let error {
-            let errorDescription = error.localizedDescription
-            ShareViewModel.logger().error(
-                "\(String(format: "Unable to download file %@: %@", itemUrl.absoluteString, errorDescription))"
-            )
+            let nsError = error as NSError
+            ShareExtensionLogging.error("Unable to download shared file: \(nsError.domain) \(nsError.code)")
             return false
         }
     }

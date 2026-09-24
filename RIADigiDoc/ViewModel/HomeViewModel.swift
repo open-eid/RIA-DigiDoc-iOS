@@ -84,29 +84,6 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
                 includingPropertiesForKeys: nil,
                 options: [])
 
-            let allContents = (try? fileManager.contentsOfDirectory(
-                at: sharedFolderURL,
-                includingPropertiesForKeys: nil,
-                options: [])) ?? []
-            HomeViewModel.logger().info(
-                """
-                phase=app.sharedFiles visible=\(contents.count, privacy: .public) \
-                all=\(allContents.count, privacy: .public) \
-                hidden=\(allContents.count - contents.count, privacy: .public)
-                """
-            )
-            for url in allContents {
-                let name = url.lastPathComponent
-                HomeViewModel.logger().info(
-                    """
-                    phase=app.sharedFile nameLen=\(name.count, privacy: .public) \
-                    ext=\(url.pathExtension.lowercased(), privacy: .public) \
-                    dotLead=\(name.hasPrefix("."), privacy: .public) \
-                    size=\((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? -1, privacy: .public)
-                    """
-                )
-            }
-
             if contents.isEmpty {
                 HomeViewModel.logger().info("Shared files folder is empty")
             } else {
