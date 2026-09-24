@@ -659,8 +659,8 @@ struct EncryptView: View {
 
     private func handleFileRename(to newContainerName: String) async {
         showRenameModal = false
+        guard !newContainerName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let sanitizedContainerName = newContainerName.sanitized()
-        guard !sanitizedContainerName.isEmpty else { return }
         let containerNameWithExtension =
             containerExtension.isEmpty
             ? sanitizedContainerName

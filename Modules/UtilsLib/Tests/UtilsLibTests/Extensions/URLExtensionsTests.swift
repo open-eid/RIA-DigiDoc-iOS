@@ -361,6 +361,37 @@ struct URLExtensionsTests {
     }
 
     @Test
+    func isWithin_successWhenFileIsInsideDirectory() {
+        let directory = URL(fileURLWithPath: "/tmp/containers")
+
+        #expect(directory.appending(path: "a#b.txt").isWithin(directory: directory))
+        #expect(directory.appending(path: "nested/a.txt").isWithin(directory: directory))
+    }
+
+    @Test
+    func isWithin_failsWhenNameTraversesOutOfDirectory() {
+        let directory = URL(fileURLWithPath: "/tmp/containers")
+
+        #expect(!directory.appending(path: "../escaped.txt").isWithin(directory: directory))
+        #expect(!directory.appending(path: "../../etc/passwd").isWithin(directory: directory))
+    }
+
+    @Test
+    func isWithin_failsForSiblingDirectorySharingANamePrefix() {
+        let directory = URL(fileURLWithPath: "/tmp/containers")
+        let sibling = URL(fileURLWithPath: "/tmp/containers-evil/a.txt")
+
+        #expect(!sibling.isWithin(directory: directory))
+    }
+
+    @Test
+    func isWithin_failsForTheDirectoryItself() {
+        let directory = URL(fileURLWithPath: "/tmp/containers")
+
+        #expect(!directory.isWithin(directory: directory))
+    }
+
+    @Test
     func standardizedPathURL_success() {
         let url = URL(fileURLWithPath: "/tmp/folder/file.txt")
         let standardized = url.resolvedPath
