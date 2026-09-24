@@ -1,4 +1,7 @@
 // swift-tools-version: 6.3
+// SPDX-FileCopyrightText: Estonian Information System Authority
+// SPDX-License-Identifier: LGPL-2.1-or-later
+
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription

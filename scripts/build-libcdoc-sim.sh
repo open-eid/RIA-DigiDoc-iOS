@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: Estonian Information System Authority
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
 set -e  # stop on any unhandled error
 
 # Move to project folder root
