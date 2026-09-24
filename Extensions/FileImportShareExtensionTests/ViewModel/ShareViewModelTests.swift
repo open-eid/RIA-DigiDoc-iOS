@@ -285,8 +285,8 @@ struct ShareViewModelTests {
         mockFileManager.attributesOfItemHandler = { path in
             try FileManager.default.attributesOfItem(atPath: path)
         }
-        mockFileManager.copyItemHandler = { from, to in
-            try FileManager.default.copyItem(at: from, to: to)
+        mockFileManager.copyItemHandler = { source, destination in
+            try FileManager.default.copyItem(at: source, to: destination)
         }
         mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
 
