@@ -24,7 +24,9 @@ import nfclib
 
 /// @mockable
 @MainActor
-public protocol OperationDecryptProtocol {
+public protocol OperationDecryptProtocol: AnyObject {
+    var onStepChange: (@MainActor (Int) -> Void)? { get set }
+
     func processDecrypt(
         canNumber: String,
         pin1Number: SecureData,

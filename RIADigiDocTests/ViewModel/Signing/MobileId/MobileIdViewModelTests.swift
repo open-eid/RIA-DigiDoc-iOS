@@ -26,6 +26,7 @@ import MobileIdLibMocks
 import CommonsLib
 import LibdigidocLibSwift
 import LibdigidocLibSwiftMocks
+import CommonsTestShared
 import UtilsLibMocks
 
 @MainActor
@@ -933,5 +934,55 @@ struct MobileIdViewModelTests {
             time: time,
             traceId: traceId
         )
+    }
+}
+
+extension MobileIdViewModelTests {
+
+    @Test
+    func sign_writesSignatureAfterTaskCancelledDuringAddSignature() async {
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            await mockMobileIdCertificateResponse()
+        }
+        mockMobileIdSignService.getVerificationCodeHandler = { _ in "1234" }
+        mockMobileIdSignService.getSignatureRequestHandler = { _, _, _, _, _, _, _, _, _, _, _, _, _ in
+            await mockSuccessSignature()
+        }
+        mockMobileIdSignService.getSessionRequestHandler = { _, _, _, _, _, _ in
+            await mockSuccessSession()
+        }
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let writeStarted = AwaitableCondition()
+        let writeMayFinish = AwaitableCondition()
+
+        let updatedContainer = SignedContainerProtocolMock()
+        let container = SignedContainerProtocolMock()
+        container.getRawContainerFileHandler = { URL(fileURLWithPath: "/tmp/test.asice") }
+        container.prepareSignatureHandler = { _, _, _, _ in Data([0x01]) }
+        container.addSignatureHandler = { _, _ in
+            await writeStarted.fulfill()
+            await writeMayFinish.wait()
+            return updatedContainer
+        }
+
+        let signingTask = Task { @MainActor in
+            await viewModel.sign(
+                phoneNumber: "37251234567",
+                personalCode: "60001019906",
+                roleData: roleData,
+                signedContainer: container
+            )
+        }
+
+        await writeStarted.wait()
+
+        signingTask.cancel()
+        await writeMayFinish.fulfill()
+
+        let result = await signingTask.value
+
+        #expect(result === updatedContainer, "the container written after cancellation is returned")
+        #expect(container.addSignatureCallCount == 1)
     }
 }

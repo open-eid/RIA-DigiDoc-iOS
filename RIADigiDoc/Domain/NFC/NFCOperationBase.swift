@@ -35,6 +35,8 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
 
     let connection = NFCConnection()
 
+    public var onStepChange: (@MainActor (Int) -> Void)?
+
     func updateAlertMessage(step: Int) {
         let stepMessages = [
             strings?.initialMessage ?? "",
@@ -50,6 +52,7 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         Self.logger().info("NFC: Updating alert message to: \(message)")
         message += "\n\n\(progressBar.generate())"
         session?.alertMessage = message
+        onStepChange?(step)
     }
 
     func success() {
