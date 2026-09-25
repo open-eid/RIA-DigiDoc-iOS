@@ -67,7 +67,9 @@ struct ShareViewModelTests {
         )
 
         mockFileManager.containerURLHandler = { _ in fileUrl }
-        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.fileExistsHandler = { _ in false }
+        mockFileManager.attributesOfItemHandler = { _ in [.size: NSNumber(value: 100)] }
+        mockFileManager.copyItemHandler = { _, _ in }
         mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
 
         let result = await viewModel.importFiles([fileItem, fileItem2])
@@ -134,7 +136,9 @@ struct ShareViewModelTests {
         )
 
         mockFileManager.containerURLHandler = { _ in fileUrl }
-        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.fileExistsHandler = { _ in false }
+        mockFileManager.attributesOfItemHandler = { _ in [.size: NSNumber(value: 100)] }
+        mockFileManager.copyItemHandler = { _, _ in }
         mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
 
         let result = try await viewModel.cacheItem(
@@ -178,7 +182,9 @@ struct ShareViewModelTests {
         )
 
         mockFileManager.containerURLHandler = { _ in fileItem.fileUrl }
-        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.fileExistsHandler = { _ in false }
+        mockFileManager.attributesOfItemHandler = { _ in [.size: NSNumber(value: 100)] }
+        mockFileManager.copyItemHandler = { _, _ in }
         mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
 
         let result = try await viewModel.cacheFileForProvider(fileItem: fileItem)
@@ -196,12 +202,15 @@ struct ShareViewModelTests {
         )
 
         mockFileManager.containerURLHandler = { _ in fileItem.fileUrl }
-        mockFileManager.fileExistsHandler = { _ in true }
+        mockFileManager.fileExistsHandler = { _ in false }
+        mockFileManager.attributesOfItemHandler = { _ in [.size: NSNumber(value: 100)] }
+        mockFileManager.copyItemHandler = { _, _ in }
         mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
 
         let result = await viewModel.cacheFileOnUrl(fileItem.fileUrl)
 
         #expect(result)
+        #expect(mockFileManager.copyItemCallCount == 1)
     }
 
     @Test(.enabled(if: isLiveWebsiteTestsEnabled))
@@ -276,5 +285,36 @@ struct ShareViewModelTests {
         let provider = NSItemProvider(contentsOf: fileURL)
         extensionItem.attachments = [provider].compactMap { $0 }
         return extensionItem
+    }
+
+    @Test
+    func cacheFileOnUrl_returnsFalseWhenNoBytesWereCopied() async throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        let sharedFolder = root.appending(path: "Temp")
+        try FileManager.default.createDirectory(at: sharedFolder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let missingSource = root.appending(path: "vanished.txt")
+
+        mockFileManager.containerURLHandler = { _ in root }
+        mockFileManager.fileExistsHandler = { path in FileManager.default.fileExists(atPath: path) }
+        mockFileManager.attributesOfItemHandler = { path in
+            try FileManager.default.attributesOfItem(atPath: path)
+        }
+        mockFileManager.copyItemHandler = { from, to in
+            try FileManager.default.copyItem(at: from, to: to)
+        }
+        mockUrlResourceChecker.checkResourceIsReachableHandler = { _ in true }
+
+        let result = await viewModel.cacheFileOnUrl(missingSource)
+
+        #expect(!result)
+
+        let written = try? FileManager.default.contentsOfDirectory(
+            at: sharedFolder,
+            includingPropertiesForKeys: nil,
+            options: []
+        )
+        #expect(written?.isEmpty ?? true)
     }
 }

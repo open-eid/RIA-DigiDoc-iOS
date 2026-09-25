@@ -23,6 +23,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import FactoryKit
 import UtilsLib
+import os
 
 class ShareViewController: UIViewController, Sendable, Loggable {
     let viewModel = Container.shared.shareViewModel()
@@ -63,7 +64,16 @@ class ShareViewController: UIViewController, Sendable, Loggable {
     func loadItem(for provider: NSItemProvider, typeIdentifier: String) async throws -> URL {
         return try await withCheckedThrowingContinuation { continuation in
             provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { item, error in
+                let log = Logger(subsystem: "ee.ria.digidoc.shareext.logging", category: "import")
+
                 if let error = error {
+                    let nsError = error as NSError
+                    log.error(
+                        """
+                        Unable to load shared item: \(nsError.domain, privacy: .public) \
+                        \(nsError.code, privacy: .public)
+                        """
+                    )
                     continuation
                         .resume(
                             throwing: FileImportError.loadError(description: error.localizedDescription)
@@ -75,6 +85,7 @@ class ShareViewController: UIViewController, Sendable, Loggable {
                                 let url = try await self.viewModel.convertNSDataToURL(data: itemData)
                                 continuation.resume(returning: url)
                             } catch {
+                                log.error("Unable to write shared item data to a temporary file")
                                 continuation.resume(throwing: FileImportError.dataConversionFailed)
                             }
                         }
@@ -82,10 +93,17 @@ class ShareViewController: UIViewController, Sendable, Loggable {
                         continuation.resume(returning: itemUrl)
                         return
                     } else {
+                        log.error(
+                            """
+                            Shared item is not a file or data: \
+                            \(String(describing: type(of: item!)), privacy: .public)
+                            """
+                        )
                         continuation.resume(throwing: FileImportError.invalidItemData)
                         return
                     }
                 } else {
+                    log.error("Shared item is empty")
                     continuation.resume(throwing: FileImportError.invalidItemData)
                     return
                 }
@@ -95,22 +113,36 @@ class ShareViewController: UIViewController, Sendable, Loggable {
 
     private func extractSharedFileItems() async -> [ImportedFileItem] {
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
+            ShareExtensionLogging.error("Share extension received no input items")
             return []
         }
 
         let typeIdentifier = UTType.data
 
         var result: [ImportedFileItem] = []
+        let totalProviders = inputItems.reduce(0) { $0 + ($1.attachments?.count ?? 0) }
+
+        ShareExtensionLogging.info("Importing \(totalProviders) shared item(s)")
 
         for item in inputItems {
             if let attachments = item.attachments {
-                for provider in attachments where
-                provider.hasItemConformingToTypeIdentifier(typeIdentifier.identifier) {
+                for provider in attachments {
+                    guard provider.hasItemConformingToTypeIdentifier(typeIdentifier.identifier) else {
+                        ShareExtensionLogging.error(
+                            """
+                            Skipping shared item of unsupported type: \
+                            \(provider.registeredTypeIdentifiers.joined(separator: ","))
+                            """
+                        )
+                        continue
+                    }
+
                     do {
                         let url = try await loadItem(
                             for: provider,
                             typeIdentifier: typeIdentifier.identifier
                         )
+
                         if let fileData = try? Data(contentsOf: url) {
                             result.append(ImportedFileItem(
                                 fileUrl: url,
@@ -118,12 +150,20 @@ class ShareViewController: UIViewController, Sendable, Loggable {
                                 data: fileData,
                                 typeIdentifier: typeIdentifier
                             ))
+                        } else {
+                            ShareExtensionLogging.error("Unable to read the loaded shared item")
                         }
                     } catch let error {
-                        ShareViewController.logger().error("Unable to load item: \(error.localizedDescription)")
+                        ShareExtensionLogging.error(
+                            "Unable to load shared item: \(String(describing: type(of: error)))"
+                        )
                     }
                 }
             }
+        }
+
+        if result.count != totalProviders {
+            ShareExtensionLogging.error("Prepared \(result.count) of \(totalProviders) shared item(s)")
         }
 
         return result

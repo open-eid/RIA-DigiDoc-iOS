@@ -192,4 +192,27 @@ struct FileOpeningServiceTests {
             }
         }
     }
+
+    @Test
+    func getValidFiles_keepsRemainingFilesWhenOneFileIsEmpty() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let emptyFileURL = tempURL.appending(path: "empty.txt")
+        let goodFileURL = tempURL.appending(path: "good.txt")
+
+        let result: Result<[URL], Error> = .success([emptyFileURL, goodFileURL])
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileManager.contentsOfDirectoryAtHandler = { _, _, _ in [emptyFileURL, goodFileURL] }
+        mockFileInspector.fileSizeHandler = { url in
+            if url.lastPathComponent == "empty.txt" {
+                throw FileOpeningError.invalidFileSize
+            }
+            return 100
+        }
+
+        let validFiles = try await service.getValidFiles(result)
+
+        #expect(validFiles.map(\.lastPathComponent) == ["good.txt"])
+    }
 }

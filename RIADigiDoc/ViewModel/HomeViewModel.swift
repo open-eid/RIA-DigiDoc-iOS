@@ -82,7 +82,7 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
             let contents = try fileManager.contentsOfDirectory(
                 at: sharedFolderURL,
                 includingPropertiesForKeys: nil,
-                options: .skipsHiddenFiles)
+                options: [])
 
             if contents.isEmpty {
                 HomeViewModel.logger().info("Shared files folder is empty")

@@ -374,6 +374,24 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                 )
             }
 
+            let extractedSize = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? -1
+
+            guard extractedSize > 0 else {
+                SigningViewModel.logger().error(
+                    """
+                    Extracted data file is empty, container reported \
+                    \(dataFile.fileSize, privacy: .public) bytes
+                    """
+                )
+                throw DigiDocError.containerDataFileSavingFailed(
+                    ErrorDetail(
+                        message: "Extracted datafile is empty",
+                        code: 0,
+                        userInfo: ["fileName": fileURL.lastPathComponent]
+                    )
+                )
+            }
+
             return .success(fileURL)
         } catch {
             return .failure(error)

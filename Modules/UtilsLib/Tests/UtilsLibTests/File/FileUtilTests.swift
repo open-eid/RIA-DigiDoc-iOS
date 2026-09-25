@@ -365,4 +365,36 @@ struct FileUtilTests {
 
         #expect(mockFileManager.removeItemCallCount == 1)
     }
+
+    @Test
+    func copyCoordinatedFile_returnsLocalCopyWithIdenticalContents() async throws {
+        let realFileManager = FileManager.default
+        let sandbox = realFileManager.temporaryDirectory.appending(path: UUID().uuidString)
+        try realFileManager.createDirectory(at: sandbox, withIntermediateDirectories: true)
+        defer { try? realFileManager.removeItem(at: sandbox) }
+
+        let source = sandbox.appending(path: "notes.txt")
+        let contents = Data("coordinated contents".utf8)
+        try contents.write(to: source)
+
+        mockFileManager.temporaryDirectory = sandbox
+        mockFileManager.fileExistsHandler = { FileManager.default.fileExists(atPath: $0) }
+        mockFileManager.createDirectoryHandler = { url, intermediates, attributes in
+            try FileManager.default.createDirectory(
+                at: url,
+                withIntermediateDirectories: intermediates,
+                attributes: attributes
+            )
+        }
+        mockFileManager.copyItemHandler = { from, to in
+            try FileManager.default.copyItem(at: from, to: to)
+        }
+
+        let concreteFileUtil = FileUtil(fileManager: mockFileManager)
+        let copied = try concreteFileUtil.copyCoordinatedFile(from: source)
+
+        #expect(copied != source)
+        #expect(copied.lastPathComponent == "notes.txt")
+        #expect(try Data(contentsOf: copied) == contents)
+    }
 }
