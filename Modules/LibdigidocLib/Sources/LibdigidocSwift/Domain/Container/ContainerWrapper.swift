@@ -353,6 +353,25 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    private static func signatureWarningToDigiDocWarning(_ warning: DigiDocSignatureWarning) -> SignatureWarning {
+        switch warning {
+        case .referenceDigestWeak:
+            return .referenceDigestWeak
+        case .signatureDigestWeak:
+            return .signatureDigestWeak
+        case .dataFileNameSpace:
+            return .dataFileNameSpace
+        case .issuerNameSpace:
+            return .issuerNameSpace
+        case .producedATLate:
+            return .producedATLate
+        case .mimeType:
+            return .mimeType
+        default:
+            return .other
+        }
+    }
+
     @discardableResult
     private func updateContainer(
         datafiles: [DataFileWrapper],
@@ -414,7 +433,12 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 messageImprint: signature.messageImprint,
                 diagnosticsInfo: signature.diagnosticsInfo,
                 archiveTimestampTime: signature.archiveTimestampTime,
-                archiveTimestampCert: signature.archiveTimestampCert
+                archiveTimestampCert: signature.archiveTimestampCert,
+                warnings: signature.warnings?.map { warning in
+                    signatureWarningToDigiDocWarning(
+                        DigiDocSignatureWarning(rawValue: warning.int32Value) ?? .other
+                    )
+                } ?? []
             )
         }
     }

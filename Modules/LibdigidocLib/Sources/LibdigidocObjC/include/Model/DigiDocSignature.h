@@ -19,6 +19,16 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(int, DigiDocSignatureWarning) {
+    DigiDocSignatureWarningReferenceDigestWeak,
+    DigiDocSignatureWarningSignatureDigestWeak,
+    DigiDocSignatureWarningDataFileNameSpace,
+    DigiDocSignatureWarningIssuerNameSpace,
+    DigiDocSignatureWarningProducedATLate,
+    DigiDocSignatureWarningMimeType,
+    DigiDocSignatureWarningOther
+};
+
 typedef NS_ENUM(int, DigiDocSignatureStatus) {
     Valid,
     Warning,
@@ -51,6 +61,7 @@ typedef NS_ENUM(int, DigiDocSignatureStatus) {
 
 @property (nonatomic, assign) DigiDocSignatureStatus status;
 @property (nonatomic, strong) NSString *diagnosticsInfo;
+@property (nonatomic, strong) NSArray<NSNumber *> *warnings;
 
 @property (nonatomic, strong) NSString *archiveTimestampTime;
 @property (nonatomic, strong) NSData *archiveTimestampCert;

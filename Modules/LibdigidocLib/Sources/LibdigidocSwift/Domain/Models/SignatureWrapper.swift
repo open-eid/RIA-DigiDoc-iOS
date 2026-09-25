@@ -19,6 +19,16 @@
 
 import Foundation
 
+public enum SignatureWarning: Sendable, Hashable {
+    case referenceDigestWeak
+    case signatureDigestWeak
+    case dataFileNameSpace
+    case issuerNameSpace
+    case producedATLate
+    case mimeType
+    case other
+}
+
 public enum SignatureStatus: String, Sendable {
     case valid
     case warning
@@ -55,6 +65,17 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var archiveTimestampTime: String
     public var archiveTimestampCert: Data
 
+    private static let weakDigestWarnings: Set<SignatureWarning> = [
+        .referenceDigestWeak,
+        .signatureDigestWeak
+    ]
+
+    public var warnings: [SignatureWarning]
+
+    public var hasOnlyWeakDigestWarnings: Bool {
+        !warnings.isEmpty && warnings.allSatisfy { SignatureWrapper.weakDigestWarnings.contains($0) }
+    }
+
     public var isLTAExtended: Bool {
         !archiveTimestampCert.isEmpty
     }
@@ -80,7 +101,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 messageImprint: Data,
                 diagnosticsInfo: String,
                 archiveTimestampTime: String = "",
-                archiveTimestampCert: Data = Data()) {
+                archiveTimestampCert: Data = Data(),
+                warnings: [SignatureWarning] = []) {
         self.pos = pos
         self.signingCert = signingCert
         self.timestampCert = timestampCert
@@ -103,5 +125,6 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.diagnosticsInfo = diagnosticsInfo
         self.archiveTimestampTime = archiveTimestampTime
         self.archiveTimestampCert = archiveTimestampCert
+        self.warnings = warnings
     }
 }
