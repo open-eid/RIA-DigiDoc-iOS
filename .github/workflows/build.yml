@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Estonian Information System Authority
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
 name: RIA DigiDoc iOS
 on: [push]
 env:
@@ -89,3 +92,9 @@ jobs:
         rm -rf ~/Library/Developer/Xcode/DerivedData/*
         rm -rf ${{ github.workspace }}/build
         rm -rf ${{ github.workspace }}/.build
+  copyright:
+    name: Check copyright headers
+    uses: open-eid/.github/.github/workflows/copyright.yml@b2d87c7447ebcc01beb54c84f3978a81c1d64877 # master
+    with:
+      # Vendored frameworks keep their own upstream notices. Config and TSL data are generated
+      exclude: \.xcframework/|^Modules/ConfigLib/Sources/ConfigLib/Resources/(config|tslFiles)/
