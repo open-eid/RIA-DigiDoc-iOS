@@ -70,6 +70,8 @@ struct SigningViewModelTests: Loggable {
             switch error {
             case .alreadyInitialized:
                 break
+            case .initializationFailed:
+                break
             default:
                 Issue.record("DigiDocConf initialization failed: \(error.localizedDescription)")
             }

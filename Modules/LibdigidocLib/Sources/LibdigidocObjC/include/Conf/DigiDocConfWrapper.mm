@@ -26,6 +26,17 @@
 #import "../Model/DigiDocConfig.h"
 #import "Exception/Util/ExceptionUtil.h"
 
+static constexpr int kTSLTimeOutSeconds = 5;
+
+static dispatch_queue_t libdigidocppQueue(void) {
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("ee.ria.digidoc.libdigidocpp", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
+
 struct DigiDocConfCurrent final : public digidoc::ConfCurrent {
 private:
     DigiDocConfig *currentConf;
@@ -95,6 +106,10 @@ public:
         }
 
         return digidoc::ConfCurrent::TSLCerts();
+    }
+
+    int TSLTimeOut() const final {
+        return kTSLTimeOutSeconds;
     }
 
     std::vector<digidoc::X509Cert> TSCerts() const override {
@@ -226,7 +241,7 @@ private:
     
 public:
     static void initConf(DigiDocConfig *conf, NSString *userAgent, void (^completion)(NSError * _Nullable error)) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(libdigidocppQueue(), ^{
             NSError *error = nil;
             try {
                 std::string userAgentInfo = userAgent.UTF8String;
@@ -318,31 +333,10 @@ public:
 }
 
 - (void)initWithConf:(DigiDocConfig *)conf userAgent:(NSString *)userAgent completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error = nil;
-        try {
-            DigiDocConfWrapperImpl::initConf(conf, userAgent, ^(NSError *error) {
-                if (error) {
-                    error = [NSError errorWithDomain:@"LibdigidocLib"
-                                                code:1
-                                            userInfo:@{@"message": @"Unable to init configuration: %@"}];
-                }
-            });
-        } catch (const digidoc::Exception &e) {
-            std::vector<digidoc::Exception> causes = e.causes();
-            NSDictionary *userInfo = @{
-                NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
-                @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
-            };
-
-            error = [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
+    DigiDocConfWrapperImpl::initConf(conf, userAgent, ^(NSError * _Nullable error) {
+        if (completion) {
+            completion(error == nil, error);
         }
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) {
-                completion(error == nil, error);
-            }
-        });
     });
 }
 

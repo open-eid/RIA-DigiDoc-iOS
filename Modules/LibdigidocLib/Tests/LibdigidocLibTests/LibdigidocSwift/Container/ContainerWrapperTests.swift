@@ -68,6 +68,8 @@ struct ContainerWrapperTests {
             switch error {
             case .alreadyInitialized:
                 #expect(true)
+            case .initializationFailed:
+                break
             default:
                 Issue.record("Unexpected error: \(error.localizedDescription)")
                 return
