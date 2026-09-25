@@ -32,7 +32,13 @@ public enum WebEidOperation: String, CaseIterable, Sendable {
 
 public enum WebEidUriUtil {
     private static let customScheme = "web-eid-mobile"
-    private static let appLinksHost = "id.eesti.ee"
+
+    // ENABLE_WEB_EID_TEST_HOST is set by the Codemagic debug workflow. Release builds accept only production.
+    #if DEBUG || ENABLE_WEB_EID_TEST_HOST
+    private static let appLinksHosts: Set<String> = ["id.eesti.ee", "id-test.eesti.ee"]
+    #else
+    private static let appLinksHosts: Set<String> = ["id.eesti.ee"]
+    #endif
 
     public static func isWebEidUri(_ url: URL) -> Bool {
         getOperation(from: url) != WebEidOperation.unknown
@@ -46,7 +52,7 @@ public enum WebEidUriUtil {
 
         if scheme == customScheme {
             operation = host
-        } else if scheme == "https", host == appLinksHost {
+        } else if scheme == "https", let host, appLinksHosts.contains(host) {
             operation = url.pathComponents.dropFirst().first
         } else {
             operation = WebEidOperation.unknown.rawValue
