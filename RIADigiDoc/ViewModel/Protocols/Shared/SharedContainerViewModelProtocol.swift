@@ -43,4 +43,10 @@ public protocol SharedContainerViewModelProtocol: Sendable {
 
     func setFileOpeningMethod(_ method: FileOpeningMethod)
     func getFileOpeningMethod() -> FileOpeningMethod
+
+    // A container open started by the file-opening screen and handed to the signing screen to
+    // await, so the screen can appear before the native open (and its per-signature validation)
+    // has finished.
+    func setPendingOpenTask(_ task: Task<Void, Error>?)
+    func takePendingOpenTask() -> Task<Void, Error>?
 }

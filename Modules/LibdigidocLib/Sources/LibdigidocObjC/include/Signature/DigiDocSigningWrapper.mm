@@ -32,6 +32,7 @@
 #import "../Model/DigiDocDataFile.h"
 #import "../Model/DigiDocSignature.h"
 #import "../Model/DigiDocRoleData.h"
+#import "../Container/DigiDocContainerWrapper.h"
 #import "Exception/Util/ExceptionUtil.h"
 
 @implementation DigiDocSigningWrapper {
@@ -53,6 +54,9 @@
 - (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSError *error = nil;
     try {
+        // Container opens now run off the main thread, so signing has to take the same
+        // libdigidocpp monitor to stay mutually exclusive with them.
+        @synchronized ([DigiDocContainerWrapper class]) {
         _signer = std::make_unique<WebSigner>(digidoc::X509Cert(reinterpret_cast<const unsigned char *>(cert.bytes), cert.length));
         _signature = NULL;
 
@@ -81,6 +85,7 @@
         _signature = _docContainer->prepareSignature(_signer.get());
         NSData *data = [DigiDocSigningWrapper getNSDataFromVector:_signature->dataToSign()];
         if (completion) completion(data, nil);
+        }
     } catch(const digidoc::Exception &e) {
         std::vector<digidoc::Exception> causes = e.causes();
         NSDictionary *userInfo = @{
@@ -110,11 +115,13 @@
     }
 
     try {
-        auto *bytes = reinterpret_cast<const unsigned char*>(data.bytes);
-        _signature->setSignatureValue({bytes, bytes + data.length});
-        _signature->extendSignatureProfile(_signer.get());
-        _signature->validate();
-        _docContainer->save();
+        @synchronized ([DigiDocContainerWrapper class]) {
+            auto *bytes = reinterpret_cast<const unsigned char*>(data.bytes);
+            _signature->setSignatureValue({bytes, bytes + data.length});
+            _signature->extendSignatureProfile(_signer.get());
+            _signature->validate();
+            _docContainer->save();
+        }
         if (completion) completion(YES, error);
     } catch(const digidoc::Exception &e) {
         std::vector<digidoc::Exception> causes = e.causes();

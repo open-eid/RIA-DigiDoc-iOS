@@ -95,12 +95,26 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
 
 @implementation DigiDocContainerWrapper {}
 
+// libdigidocpp is not safe to call concurrently: two threads race a non-thread-safe libxml2
+// schema-type init. It has no main-thread affinity of its own, so a dedicated serial queue
+// enforces the same exclusivity the main queue used to, without blocking the UI.
++ (dispatch_queue_t)libraryQueue {
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("ee.ria.digidoc.libdigidocpp", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
+
 + (void)dispatch:(void (^)(void))command completion:(void (^)(NSError *error))completion {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async([self libraryQueue], ^{
         NSError *error = nil;
 
         try {
-            command();
+            @synchronized ([DigiDocContainerWrapper class]) {
+                command();
+            }
         } catch (const digidoc::Exception &e) {
             std::vector<digidoc::Exception> causes = e.causes();
             NSDictionary *userInfo = @{
@@ -148,7 +162,7 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     }
 }
 
-+ (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos mediaType:(const std::string&)mediaType dataFileCount:(NSInteger)dataFileCount {
++ (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos {
 
     digidoc::X509Cert signingCert = signature->signingCertificate();
     digidoc::X509Cert ocspCert = signature->OCSPCertificate();
@@ -180,7 +194,8 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digiDocSignature.timeStampTime = [NSString stringWithUTF8String:signature->TimeStampTime().c_str()];
     digiDocSignature.signedBy = [NSString stringWithUTF8String:name.c_str()];
     digiDocSignature.format = [NSString stringWithUTF8String:signature->profile().c_str()];
-    digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
+    auto messageImprint = signature->messageImprint();
+    digiDocSignature.messageImprint = [NSData dataWithBytes:messageImprint.data() length:messageImprint.size()];
     digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];
 
     auto archiveTimestamps = signature->ArchiveTimeStamps();
@@ -209,7 +224,6 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digidoc::Signature::Validator::Status status = validator.status();
     digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
     digiDocSignature.status = [DigiDocContainerWrapper determineSignatureStatus:status];
-    digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
     return digiDocSignature;
 
 }
@@ -280,7 +294,7 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
             NSMutableArray *signatures = [NSMutableArray array];
             int pos = 0;
             for (digidoc::Signature *signature: container->signatures()) {
-                [signatures addObject:[DigiDocContainerWrapper getSignature:signature pos:pos++ mediaType:container->mediaType() dataFileCount:container->dataFiles().size()]];
+                [signatures addObject:[DigiDocContainerWrapper getSignature:signature pos:pos++]];
             }
 
             NSString *mediatype = [NSString stringWithUTF8String:container->mediaType().c_str()];
@@ -303,6 +317,19 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
             return nil;
         }
     }
+}
+
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion {
+    dispatch_async([self libraryQueue], ^{
+        NSError *error = nil;
+        DigiDocContainer *container = [self open:containerPath validateOnline:validateOnline error:&error];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(container, error);
+        });
+    });
 }
 
 + (NSString *)libdigidocppVersion {

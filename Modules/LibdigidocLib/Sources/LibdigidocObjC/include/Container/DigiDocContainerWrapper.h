@@ -28,6 +28,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable DigiDocContainer *)open:(NSString *)containerPath validateOnline:(BOOL)validateOnline error:(NSError **)error;
 
+// Asynchronous variant of the call above. Runs the whole native open - including the
+// per-signature validation, which costs signatureCount x datafileBytes - on the dedicated
+// libdigidocpp serial queue, so the main thread stays responsive and the iOS watchdog
+// cannot kill the app while a large container is being opened.
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion;
+
 + (void)addDataFilesToContainerWithPath:(NSString *)containerPath withDataFilePaths:(NSArray<NSString*> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion;
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion;

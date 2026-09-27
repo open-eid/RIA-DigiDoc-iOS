@@ -105,21 +105,42 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             files[0] = firstFileUrl
 
-            let container = try await openOrCreateContainer(withUrls: files)
-            if let signedContainer = container as? SignedContainerProtocol {
-                if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
-                    try await handleAsicsSivaConfirmation(parentContainer: signedContainer)
-                } else {
-                    sharedContainerViewModel.setSignedContainer(signedContainer)
+            if await isOpeningCryptoContainer(urls: files) {
+                let container = try await openOrCreateContainer(withUrls: files)
+                if let cryptoContainer = container as? CryptoContainerProtocol {
+                    sharedContainerViewModel.setCryptoContainer(cryptoContainer)
+                    try await cryptoContainer.getRawContainerFile()?.markAsOpened()
                 }
 
-                try await signedContainer.getRawContainerFile()?.markAsOpened()
-            } else if let cryptoContainer = container as? CryptoContainerProtocol {
-                sharedContainerViewModel.setCryptoContainer(cryptoContainer)
-                try await cryptoContainer.getRawContainerFile()?.markAsOpened()
+                handleLoadingSuccess(isSivaConfirmed: true)
+                return
             }
 
-            handleLoadingSuccess(isSivaConfirmed: true)
+            // Opening a signed container costs signatureCount x datafileBytes, because
+            // libdigidocpp re-hashes every data file once per signature. Start it here but let
+            // the signing screen await it, so the screen appears immediately and shows its own
+            // per-section loading state instead of holding a blank full-screen spinner.
+            let urls = files
+            sharedContainerViewModel.setPendingOpenTask(
+                Task { [sharedContainerViewModel] in
+                    let container = try await self.openOrCreateContainer(withUrls: urls)
+                    guard let signedContainer = container as? SignedContainerProtocol else {
+                        throw FileOpeningError.noDataFiles
+                    }
+
+                    if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
+                        try await self.handleAsicsSivaConfirmation(parentContainer: signedContainer)
+                    } else {
+                        sharedContainerViewModel.setSignedContainer(signedContainer)
+                    }
+
+                    try await signedContainer.getRawContainerFile()?.markAsOpened()
+                }
+            )
+
+            isSivaConfirmed = true
+            isFileOpeningLoading = false
+            isNavigatingToSigningView = true
         } catch {
             FileOpeningViewModel.logger().error(
                 "Unable to handle container confirmation. \(String(reflecting: error), privacy: .public)"
@@ -292,6 +313,20 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
             FileOpeningViewModel.logger().error(
                 "Unable to remove unsuccessful container: \(String(reflecting: error))"
             )
+        }
+    }
+
+    // Mirrors openOrCreateContainer's routing, but without opening anything: the signed path
+    // defers its open, so the destination has to be known before the container exists.
+    private func isOpeningCryptoContainer(urls: [URL]) async -> Bool {
+        switch sharedContainerViewModel.getFileOpeningMethod() {
+        case .crypto:
+            return true
+        case .signing:
+            return false
+        case .all:
+            guard let firstFile = urls.first else { return false }
+            return await firstFile.isCryptoContainer() && urls.count == 1
         }
     }
 

@@ -122,6 +122,8 @@ struct SignatureView: View {
             dateTimeString: signature.trustedSigningTime,
             isUTC: false
         )
+        // Read once: this parses the archive timestamp certificate, and body used it twice.
+        let archiveTimestamp = archiveTimestampInfo
         VStack {
             HStack {
                 Image(isTimestamp ? "ic_m3_approval_48dp_wght400" : "ic_m3_stylus_note_48pt_wght400")
@@ -159,8 +161,8 @@ struct SignatureView: View {
                             signatureUtil.getSignatureStatusText(status: signature.status, isTimestamp: isTimestamp)
                         ),
                         status: signature.status,
-                        archiveTimestampText: archiveTimestampInfo?.text,
-                        isArchiveTimestampExpired: archiveTimestampInfo?.isExpired ?? false
+                        archiveTimestampText: archiveTimestamp?.text,
+                        isArchiveTimestampExpired: archiveTimestamp?.isExpired ?? false
                     )
                     .multilineTextAlignment(.center)
 

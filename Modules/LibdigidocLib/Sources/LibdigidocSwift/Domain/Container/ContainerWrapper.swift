@@ -112,26 +112,59 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+
+    /// Everything the Swift layer needs out of a native open, as value types.
+    struct ParsedContainer: Sendable {
+        let filePath: String
+        let dataFiles: [DataFileWrapper]
+        let signatures: [SignatureWrapper]
+        let mediatype: String
+    }
+
+    /// Runs the native open on the libdigidocpp serial queue and maps the result to value types
+    /// before it crosses back, so the calling thread is never blocked by the per-signature
+    /// validation that dominates the cost of opening a many-signature container.
+    private static func openNatively(
+        path: String,
+        validateOnline: Bool
+    ) async throws -> ParsedContainer {
+        try await withCheckedThrowingContinuation { continuation in
+            DigiDocContainerWrapper.open(path, validateOnline: validateOnline) { container, error in
+                if let container {
+                    continuation.resume(returning: ParsedContainer(
+                        filePath: container.filePath,
+                        dataFiles: ContainerWrapper.getDataFiles(from: container),
+                        signatures: ContainerWrapper.getSignatures(from: container),
+                        mediatype: container.mediatype
+                    ))
+                } else {
+                    continuation.resume(
+                        throwing: error ?? NSError(
+                            domain: "ContainerWrapper - cannot open container",
+                            code: 3
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
         ContainerWrapper.logger().info("Opening container file '\(containerFile.lastPathComponent, privacy: .public)'")
 
         do {
-            let container = try DigiDocContainerWrapper.open(
-                containerFile.resolvedPath,
+            let parsed = try await ContainerWrapper.openNatively(
+                path: containerFile.resolvedPath,
                 validateOnline: isSivaConfirmed
             )
 
-            await setContainerURL(URL(fileURLWithPath: container.filePath))
-
-            let datafiles = ContainerWrapper.getDataFiles(from: container)
-            let signatures = ContainerWrapper.getSignatures(from: container)
-            let mediatype = container.mediatype
+            await setContainerURL(URL(fileURLWithPath: parsed.filePath))
 
             return await self.updateContainer(
-                datafiles: datafiles,
-                signatures: signatures,
-                mediaType: mediatype
+                datafiles: parsed.dataFiles,
+                signatures: parsed.signatures,
+                mediaType: parsed.mediatype
             )
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)

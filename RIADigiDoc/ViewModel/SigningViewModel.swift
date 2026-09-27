@@ -49,6 +49,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
+    // True while the container's native open is still running behind the signing screen.
+    var isLoading = false
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
     var showCannotExtendContainerDialog = false
@@ -94,26 +96,57 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
+
+        // The file-opening screen hands over an open that is still running, so that this screen
+        // can appear first. Everything below needs it to have finished.
+        if let pendingOpen = sharedContainerViewModel.takePendingOpenTask() {
+            isLoading = true
+            do {
+                try await pendingOpen.value
+            } catch {
+                isLoading = false
+                SigningViewModel.logger().error(
+                    "Unable to open container. \(String(reflecting: error), privacy: .public)"
+                )
+                handleFileValidationError(error)
+                return
+            }
+        }
+
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
+            isLoading = false
             SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
         self.signedContainer = openedContainer
 
-        self.containerName = await openedContainer.getContainerName()
-        self.dataFiles = await openedContainer.getDataFiles()
-        self.signatures = await openedContainer.getSignatures()
-        self.timestamps = await openedContainer.getTimestamps()
-        self.containerMimetype = await openedContainer.getContainerMimetype()
-        self.containerURL = await openedContainer.getRawContainerFile()
-        self.isTimestampedContainer = await isTimestampedContainer()
-        self.isCadesContainer = await openedContainer.isCades()
-        self.isXadesContainer = await openedContainer.isXades()
+        // Read everything before publishing any of it. Each assignment is a separate observation
+        // tick, and with a large signature list every tick re-renders the whole list.
+        let loadedContainerName = await openedContainer.getContainerName()
+        let loadedDataFiles = await openedContainer.getDataFiles()
+        let loadedSignatures = await openedContainer.getSignatures()
+        let loadedTimestamps = await openedContainer.getTimestamps()
+        let loadedMimetype = await openedContainer.getContainerMimetype()
+        let loadedContainerURL = await openedContainer.getRawContainerFile()
+        let loadedIsTimestamped = await isTimestampedContainer()
+        let loadedIsCades = await openedContainer.isCades()
+        let loadedIsXades = await openedContainer.isXades()
+        let loadedNotifications = await getContainerNotifications(container: openedContainer)
 
-        self.containerNotifications = await getContainerNotifications(container: openedContainer)
+        self.containerName = loadedContainerName
+        self.dataFiles = loadedDataFiles
+        self.signatures = loadedSignatures
+        self.timestamps = loadedTimestamps
+        self.containerMimetype = loadedMimetype
+        self.containerURL = loadedContainerURL
+        self.isTimestampedContainer = loadedIsTimestamped
+        self.isCadesContainer = loadedIsCades
+        self.isXadesContainer = loadedIsXades
+        self.containerNotifications = loadedNotifications
+        self.isLoading = false
 
         SigningViewModel.logger().info("Signed container data loaded")
     }
