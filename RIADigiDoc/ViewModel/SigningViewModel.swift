@@ -49,6 +49,16 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
+    // True while the container's native open is still running behind the signing screen.
+    var isLoading = false
+    // How many signatures have a validity verdict so far. Verdicts stream in after the
+    // container is already on screen.
+    private(set) var validatedSignatureCount = 0
+    private var validationTask: Task<Void, Never>?
+
+    var isValidatingSignatures: Bool {
+        !signatures.isEmpty && validatedSignatureCount < signatures.count
+    }
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
     var showCannotExtendContainerDialog = false
@@ -94,28 +104,112 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
+
+        // The file-opening screen hands over an open that is still running, so that this screen
+        // can appear first. Everything below needs it to have finished.
+        if let pendingOpen = sharedContainerViewModel.takePendingOpenTask() {
+            isLoading = true
+            do {
+                try await pendingOpen.value
+            } catch {
+                isLoading = false
+                SigningViewModel.logger().error(
+                    "Unable to open container. \(String(reflecting: error), privacy: .public)"
+                )
+                handleFileValidationError(error)
+                return
+            }
+        }
+
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
+            isLoading = false
             SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
         self.signedContainer = openedContainer
 
-        self.containerName = await openedContainer.getContainerName()
-        self.dataFiles = await openedContainer.getDataFiles()
-        self.signatures = await openedContainer.getSignatures()
-        self.timestamps = await openedContainer.getTimestamps()
-        self.containerMimetype = await openedContainer.getContainerMimetype()
-        self.containerURL = await openedContainer.getRawContainerFile()
-        self.isTimestampedContainer = await isTimestampedContainer()
-        self.isCadesContainer = await openedContainer.isCades()
-        self.isXadesContainer = await openedContainer.isXades()
+        // Read everything before publishing any of it. Each assignment is a separate observation
+        // tick, and with a large signature list every tick re-renders the whole list.
+        let loadedContainerName = await openedContainer.getContainerName()
+        let loadedDataFiles = await openedContainer.getDataFiles()
+        let loadedSignatures = await openedContainer.getSignatures()
+        let loadedTimestamps = await openedContainer.getTimestamps()
+        let loadedMimetype = await openedContainer.getContainerMimetype()
+        let loadedContainerURL = await openedContainer.getRawContainerFile()
+        let loadedIsTimestamped = await isTimestampedContainer()
+        let loadedIsCades = await openedContainer.isCades()
+        let loadedIsXades = await openedContainer.isXades()
+        let loadedNotifications = await getContainerNotifications(container: openedContainer)
 
-        self.containerNotifications = await getContainerNotifications(container: openedContainer)
+        self.containerName = loadedContainerName
+        self.dataFiles = loadedDataFiles
+        self.signatures = loadedSignatures
+        self.timestamps = loadedTimestamps
+        self.containerMimetype = loadedMimetype
+        self.containerURL = loadedContainerURL
+        self.isTimestampedContainer = loadedIsTimestamped
+        self.isCadesContainer = loadedIsCades
+        self.isXadesContainer = loadedIsXades
+        self.containerNotifications = loadedNotifications
+        self.isLoading = false
+
+        startConsumingValidations(for: openedContainer)
 
         SigningViewModel.logger().info("Signed container data loaded")
+    }
+
+    // Signature verdicts arrive one at a time from the native layer. They are applied in batches
+    // because assigning `signatures` is an observation tick, and with a large list every tick
+    // re-renders the whole thing.
+    private func startConsumingValidations(for container: SignedContainerProtocol) {
+        validationTask?.cancel()
+        validatedSignatureCount = signatures.filter { !$0.isValidationPending }.count
+
+        validationTask = Task { [weak self] in
+            guard let stream = await container.signatureValidations() else { return }
+
+            var buffered: [Int: SignatureWrapper] = [:]
+            var lastFlush = Date()
+
+            for await update in stream {
+                if Task.isCancelled { break }
+                buffered[update.index] = update.signature
+
+                if buffered.count >= 50 || Date().timeIntervalSince(lastFlush) >= 0.25 {
+                    self?.applyValidations(buffered)
+                    buffered.removeAll(keepingCapacity: true)
+                    lastFlush = Date()
+                }
+            }
+
+            if !buffered.isEmpty {
+                self?.applyValidations(buffered)
+            }
+        }
+    }
+
+    private func applyValidations(_ updates: [Int: SignatureWrapper]) {
+        guard !updates.isEmpty else { return }
+
+        var updated = signatures
+        var applied = 0
+        for (index, signature) in updates where updated.indices.contains(index) {
+            updated[index] = signature
+            applied += 1
+        }
+
+        signatures = updated
+        validatedSignatureCount += applied
+    }
+
+    func cancelValidation() {
+        validationTask?.cancel()
+        validationTask = nil
+        let container = signedContainer
+        Task { await container?.cancelValidation() }
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {

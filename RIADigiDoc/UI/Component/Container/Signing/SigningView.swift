@@ -58,7 +58,7 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
-    @State private var scrollPosition: Int?
+    @State private var scrollPosition: String?
     @State private var focusedSignatureIndex: Int?
 
     private var containerTitle: String {
@@ -85,6 +85,10 @@ struct SigningView: View {
 
     private var shareAccessibilityTitle: String {
         languageSettings.localized("Share container")
+    }
+
+    private var validationProgressText: String {
+        "\(viewModel.validatedSignatureCount) / \(viewModel.signatures.count)"
     }
 
     private var isSignedContainer: Bool {
@@ -271,7 +275,23 @@ struct SigningView: View {
                                     }
                                 }
 
-                                if isSignedContainer {
+                                if viewModel.isLoading {
+                                    // The container is still being opened. Show the tab shell so
+                                    // the screen is stable, with the spinner in whichever section
+                                    // is selected, rather than briefly rendering an empty
+                                    // container as if it had no signatures.
+                                    TabView(selectedTab: $selectedTab, titles: [
+                                        containerFilesTitle,
+                                        containerSignaturesTitle
+                                    ]) {
+                                        LoadingView(
+                                            size: Dimensions.Icon.IconSizeXS,
+                                            isFullScreen: false
+                                        )
+                                        .padding(.vertical, Dimensions.Padding.XLPadding)
+                                    }
+                                    .padding(.top, Dimensions.Padding.LPadding)
+                                } else if isSignedContainer {
                                     TabView(selectedTab: $selectedTab, titles: [
                                         containerFilesTitle,
                                         containerSignaturesTitle
@@ -289,6 +309,14 @@ struct SigningView: View {
                                                     $viewModel.navigateToNestedCryptoContainerView
                                             )
                                         } else {
+                                            if viewModel.isValidatingSignatures {
+                                                Text(verbatim: validationProgressText)
+                                                    .font(typography.labelLarge)
+                                                    .foregroundStyle(theme.onSurfaceVariant)
+                                                    .frame(maxWidth: .infinity)
+                                                    .padding(.bottom, Dimensions.Padding.XSPadding)
+                                            }
+
                                             SignaturesListView(
                                                 signatures: viewModel.isTimestampedContainer ?
                                                 [] : viewModel.signatures,
@@ -424,6 +452,7 @@ struct SigningView: View {
                     }
                     .onDisappear {
                         containerLoadingTask?.cancel()
+                        viewModel.cancelValidation()
                     }
                 }
             )
@@ -555,12 +584,12 @@ struct SigningView: View {
 
     private func scrollToBottom() {
         DispatchQueue.main.async {
-            guard let lastSignature = viewModel.signatures.indices.last else { return }
+            guard let lastIndex = viewModel.signatures.indices.last else { return }
 
-            scrollPosition = lastSignature
+            scrollPosition = viewModel.signatures[lastIndex].signatureId
 
             DispatchQueue.main.async {
-                focusedSignatureIndex = lastSignature
+                focusedSignatureIndex = lastIndex
             }
         }
     }

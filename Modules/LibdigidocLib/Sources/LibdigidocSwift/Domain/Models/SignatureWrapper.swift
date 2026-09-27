@@ -52,6 +52,10 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
     public var status: SignatureStatus
     public var diagnosticsInfo: String
 
+    // True while this signature's validity has not been determined yet. `status` carries no
+    // meaning until it flips to false.
+    public var isValidationPending: Bool = false
+
     public var archiveTimestampTime: String
     public var archiveTimestampCert: Data
 
@@ -80,7 +84,8 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
                 messageImprint: Data,
                 diagnosticsInfo: String,
                 archiveTimestampTime: String = "",
-                archiveTimestampCert: Data = Data()) {
+                archiveTimestampCert: Data = Data(),
+                isValidationPending: Bool = false) {
         self.pos = pos
         self.signingCert = signingCert
         self.timestampCert = timestampCert
@@ -103,5 +108,6 @@ public struct SignatureWrapper: Sendable, Identifiable, Hashable {
         self.diagnosticsInfo = diagnosticsInfo
         self.archiveTimestampTime = archiveTimestampTime
         self.archiveTimestampCert = archiveTimestampCert
+        self.isValidationPending = isValidationPending
     }
 }

@@ -137,11 +137,11 @@ struct NFCView: View {
     ) {
         _viewModel = State(wrappedValue: Container.shared.nfcViewModel())
         _webEidViewModel = State(wrappedValue: webEidViewModel)
-        self.actionType = actionType
-        self.pinType = pinType
-        self._isWebEidAuthenticating = isWebEidAuthenticating
-        self.rememberMe = rememberMe
-        self.actionMethods = actionMethods
+        _actionType = State(wrappedValue: actionType)
+        _actionMethods = State(wrappedValue: actionMethods)
+        _pinType = State(wrappedValue: pinType)
+        _rememberMe = State(wrappedValue: rememberMe)
+        _isWebEidAuthenticating = isWebEidAuthenticating
         self.cryptoContainer = cryptoContainer
         self.signedContainer = signedContainer
         self.onSuccess = onSuccess
