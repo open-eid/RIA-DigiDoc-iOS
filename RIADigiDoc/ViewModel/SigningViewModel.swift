@@ -100,6 +100,23 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
+    // The name to show while an existing container is still being opened. `getContainerFile`
+    // reuses the picked file's name unless it collides with an existing one, so this matches the
+    // final name except in the duplicate case, where stage one corrects it. Returns nil when a new
+    // container is being created from data files - there the placeholder is the correct name.
+    private func provisionalContainerName() -> String? {
+        guard case .success(let urls)? = sharedContainerViewModel.getFileOpeningResult(),
+              urls.count == 1,
+              let url = urls.first,
+              CommonsLib.Constants.Container.ContainerExtensions
+                  .contains(url.pathExtension.lowercased())
+        else {
+            return nil
+        }
+
+        return url.lastPathComponent
+    }
+
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
@@ -108,6 +125,11 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         // can appear first. Everything below needs it to have finished.
         if let pendingOpen = sharedContainerViewModel.takePendingOpenTask() {
             isLoading = true
+            // Otherwise the header shows the new-container placeholder ("newFile") over a file the
+            // user just picked, for as long as the open takes.
+            if let provisionalName = provisionalContainerName() {
+                containerName = provisionalName
+            }
             do {
                 try await pendingOpen.value
             } catch {
