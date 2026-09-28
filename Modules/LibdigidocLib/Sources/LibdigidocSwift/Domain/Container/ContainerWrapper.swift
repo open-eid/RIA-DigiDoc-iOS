@@ -213,6 +213,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         )
 
         let cancellation = ValidationCancellation()
+        // Must be @Sendable: this function is @MainActor, so a plain closure literal would inherit
+        // MainActor isolation, and the native validation loop calls this one directly on the
+        // libdigidocpp queue - which trips Swift's executor assertion and traps. The other three
+        // callbacks are invoked via dispatch_async to the main queue, so they are unaffected.
+        let isCancelledCheck: @Sendable () -> Bool = { cancellation.isCancelled }
         var continuation: AsyncStream<SignatureValidation>.Continuation?
         let stream = AsyncStream<SignatureValidation> { continuation = $0 }
         guard let continuation else {
@@ -233,7 +238,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 DigiDocContainerWrapper.openProgressively(
                     containerFile.resolvedPath,
                     validateOnline: isSivaConfirmed,
-                    isCancelled: { cancellation.isCancelled },
+                    isCancelled: isCancelledCheck,
                     metadata: { container in
                         guard resumed.claim() else { return }
                         metadataContinuation.resume(returning: ParsedContainer(

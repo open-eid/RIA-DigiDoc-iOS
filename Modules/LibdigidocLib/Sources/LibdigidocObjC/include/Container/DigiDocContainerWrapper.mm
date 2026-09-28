@@ -348,7 +348,7 @@ validateOnline:(BOOL)validateOnline
 
 + (void)openProgressively:(NSString *)containerPath
            validateOnline:(BOOL)validateOnline
-              isCancelled:(BOOL (^)(void))isCancelled
+              isCancelled:(BOOL (^NS_SWIFT_SENDABLE)(void))isCancelled
                  metadata:(void (^)(DigiDocContainer *container))metadata
                 validated:(void (^)(NSUInteger index, DigiDocSignature *signature))validated
                completion:(void (^)(NSError * _Nullable error))completion {
