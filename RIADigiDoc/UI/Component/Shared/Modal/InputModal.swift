@@ -18,6 +18,7 @@
  */
 
 import SwiftUI
+import UtilsLib
 
 struct InputModal: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -30,10 +31,18 @@ struct InputModal: View {
     var onConfirm: () -> Void
     var onCancel: () -> Void
 
+    // Anything that sanitizes away to nothing - empty, whitespace, only forbidden characters -
+    // would be replaced by `sanitized()`'s fallback name, silently renaming the container to
+    // something the user never typed. Disabling the button says so immediately instead.
+    private var isNameEntered: Bool {
+        text.sanitizedOrNil() != nil
+    }
+
     var body: some View {
         ModalContainer(
             icon: icon,
             title: title,
+            isConfirmButtonEnabled: isNameEntered,
             onConfirm: onConfirm,
             onCancel: onCancel
         ) {

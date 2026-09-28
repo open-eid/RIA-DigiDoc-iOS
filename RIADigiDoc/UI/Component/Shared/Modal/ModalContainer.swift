@@ -29,6 +29,7 @@ struct ModalContainer<Content: View>: View {
     var icon: String?
     var title: String
     var isConfirmButtonVisible: Bool = true
+    var isConfirmButtonEnabled: Bool = true
     var confirmButtonTitle: String = "OK"
     var cancelButtonTitle: String = "Cancel"
     var confirmButtonAccessibility: String?
@@ -99,7 +100,8 @@ struct ModalContainer<Content: View>: View {
                 if isConfirmButtonVisible {
                     Button(languageSettings.localized(confirmButtonTitle)) { onConfirm() }
                         .font(typography.labelLarge)
-                        .foregroundStyle(theme.primary)
+                        .foregroundStyle(isConfirmButtonEnabled ? theme.primary : theme.onSurfaceVariant)
+                        .disabled(!isConfirmButtonEnabled)
                         .minimumScaleFactor(0.5)
                         .accessibilityLabel(
                             confirmButtonAccessibility ??

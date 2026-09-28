@@ -639,8 +639,10 @@ struct SigningView: View {
 
     private func handleFileRename(to newContainerName: String) async {
         showRenameModal = false
-        let sanitizedContainerName = newContainerName.sanitized()
-        guard !sanitizedContainerName.isEmpty else { return }
+        // Keep the existing name rather than letting `sanitized()`'s fallback rename the container
+        // to something the user never typed. The OK button is already disabled in this case; this
+        // is the backstop.
+        guard let sanitizedContainerName = newContainerName.sanitizedOrNil() else { return }
         let containerNameWithExtension =
             containerExtension.isEmpty
             ? sanitizedContainerName
