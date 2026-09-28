@@ -100,21 +100,29 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
-    // The name to show while an existing container is still being opened. `getContainerFile`
-    // reuses the picked file's name unless it collides with an existing one, so this matches the
-    // final name except in the duplicate case, where stage one corrects it. Returns nil when a new
-    // container is being created from data files - there the placeholder is the correct name.
+    // The name to show while the container is still being opened or created. Mirrors the naming
+    // in SignedContainer.openOrCreate: an existing container keeps its own name, anything else
+    // becomes the first data file's name with the container extension. `getContainerFile` reuses
+    // that name unless it collides, so this matches the final name except in the duplicate case,
+    // which stage one corrects. Showing the new-container placeholder instead would name the
+    // container something it is never going to be called.
     private func provisionalContainerName() -> String? {
         guard case .success(let urls)? = sharedContainerViewModel.getFileOpeningResult(),
-              urls.count == 1,
-              let url = urls.first,
-              CommonsLib.Constants.Container.ContainerExtensions
-                  .contains(url.pathExtension.lowercased())
-        else {
+              let firstFile = urls.first else {
             return nil
         }
 
-        return url.lastPathComponent
+        let isExistingContainer = urls.count == 1 && CommonsLib.Constants.Container.ContainerExtensions
+            .contains(firstFile.pathExtension.lowercased())
+
+        if isExistingContainer {
+            return firstFile.lastPathComponent
+        }
+
+        return firstFile
+            .deletingPathExtension()
+            .appendingPathExtension(CommonsLib.Constants.Extension.Default)
+            .lastPathComponent
     }
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
