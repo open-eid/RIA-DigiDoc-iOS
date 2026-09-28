@@ -244,10 +244,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                         ))
                     },
                     validated: { index, signature in
-                        continuation.yield(SignatureValidation(
-                            index: Int(index),
-                            signature: ContainerWrapper.makeSignature(from: signature)
-                        ))
+                        let validated = ContainerWrapper.makeSignature(from: signature)
+                        // Keep the actor's own array authoritative: anything reading
+                        // getSignatures() later must see the verdict, not the pending placeholder.
+                        Task { await self.updateSignature(at: Int(index), with: validated) }
+                        continuation.yield(SignatureValidation(index: Int(index), signature: validated))
                     },
                     completion: { error in
                         continuation.finish()
@@ -277,6 +278,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 ErrorDetail(nsError: nsError, extraInfo: ["fileName": containerFile.lastPathComponent])
             )
         }
+    }
+
+    private func updateSignature(at index: Int, with signature: SignatureWrapper) {
+        guard signatures.indices.contains(index) else { return }
+        signatures[index] = signature
     }
 
     private func setValidationState(

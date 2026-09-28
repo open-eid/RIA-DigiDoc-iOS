@@ -142,7 +142,13 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         let loadedIsTimestamped = await isTimestampedContainer()
         let loadedIsCades = await openedContainer.isCades()
         let loadedIsXades = await openedContainer.isXades()
-        let loadedNotifications = await getContainerNotifications(container: openedContainer)
+        // Notifications are derived from signature statuses. While validation is still pending
+        // every status is .unknown, which would raise a misleading banner, so they are computed
+        // once the verdicts are in instead.
+        let hasPendingValidation = loadedSignatures.contains { $0.isValidationPending }
+        let loadedNotifications = hasPendingValidation
+            ? []
+            : await getContainerNotifications(container: openedContainer)
 
         self.containerName = loadedContainerName
         self.dataFiles = loadedDataFiles
@@ -203,6 +209,19 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         signatures = updated
         validatedSignatureCount += applied
+
+        if validatedSignatureCount >= signatures.count {
+            refreshContainerNotifications()
+        }
+    }
+
+    private func refreshContainerNotifications() {
+        guard let container = signedContainer else { return }
+        Task { [weak self] in
+            let notifications = await self?.getContainerNotifications(container: container)
+            guard let notifications else { return }
+            self?.containerNotifications = notifications
+        }
     }
 
     func cancelValidation() {

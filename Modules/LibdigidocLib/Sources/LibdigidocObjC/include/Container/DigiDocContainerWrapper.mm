@@ -223,6 +223,12 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digiDocSignature.country = [NSString stringWithUTF8String:signature->countryName().c_str()];
     digiDocSignature.zipCode = [NSString stringWithUTF8String:signature->postalCode().c_str()];
 
+    // No verdict has been reached yet. `status` must not be left at its zero value, which is
+    // Valid - callers such as the container-notification counts read it directly, and defaulting
+    // to Valid would report an unchecked container as valid.
+    digiDocSignature.status = UnknownStatus;
+    digiDocSignature.diagnosticsInfo = @"";
+
     return digiDocSignature;
 }
 
