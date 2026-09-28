@@ -58,6 +58,14 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
         return await container.getSignatures()
     }
 
+    public func signatureValidations() async -> AsyncStream<SignatureValidation>? {
+        return await container.signatureValidations()
+    }
+
+    public func cancelValidation() async {
+        await container.cancelValidation()
+    }
+
     public func getTimestamps() async -> [SignatureWrapper] {
         return timestamps
     }
@@ -409,9 +417,10 @@ extension SignedContainer {
             try fileManager.moveItem(at: file, to: renamedContainerFile)
         }
 
+        // Staged: returns once the contents are known, with signature validation still running.
         let container = try await ContainerWrapper(
             fileManager: fileManager
-        ).open(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
+        ).openStaged(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
 
         return SignedContainer(
             containerFile: renamedContainerFile,

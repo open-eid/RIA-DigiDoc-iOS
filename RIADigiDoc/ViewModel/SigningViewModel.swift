@@ -49,8 +49,15 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
-    // True while the container's native open is still running behind the signing screen.
+    // True until the container's contents (name, data files, media type) are known.
     var isLoading = false
+
+    // True while signature validation is still running. The rest of the screen is already usable.
+    var areSignaturesLoading = false
+
+    // How many signatures the container has. Known from the parse, before any of them is
+    // validated, so the screen can show the right layout while verdicts are still pending.
+    private(set) var expectedSignatureCount = 0
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
     var showCannotExtendContainerDialog = false
@@ -105,6 +112,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
                 try await pendingOpen.value
             } catch {
                 isLoading = false
+                areSignaturesLoading = false
                 SigningViewModel.logger().error(
                     "Unable to open container. \(String(reflecting: error), privacy: .public)"
                 )
@@ -117,38 +125,63 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             as? any SignedContainerProtocol
         guard let openedContainer else {
             isLoading = false
+            areSignaturesLoading = false
             SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
         self.signedContainer = openedContainer
 
-        // Read everything before publishing any of it. Each assignment is a separate observation
-        // tick, and with a large signature list every tick re-renders the whole list.
+        // Stage one: everything that is known as soon as the container has been parsed. Read it
+        // all before publishing any of it, because each assignment is a separate observation tick.
         let loadedContainerName = await openedContainer.getContainerName()
         let loadedDataFiles = await openedContainer.getDataFiles()
-        let loadedSignatures = await openedContainer.getSignatures()
-        let loadedTimestamps = await openedContainer.getTimestamps()
         let loadedMimetype = await openedContainer.getContainerMimetype()
         let loadedContainerURL = await openedContainer.getRawContainerFile()
-        let loadedIsTimestamped = await isTimestampedContainer()
-        let loadedIsCades = await openedContainer.isCades()
-        let loadedIsXades = await openedContainer.isXades()
-        let loadedNotifications = await getContainerNotifications(container: openedContainer)
+        let signatureCount = await openedContainer.getSignatures().count
 
         self.containerName = loadedContainerName
         self.dataFiles = loadedDataFiles
-        self.signatures = loadedSignatures
-        self.timestamps = loadedTimestamps
         self.containerMimetype = loadedMimetype
         self.containerURL = loadedContainerURL
+        self.expectedSignatureCount = signatureCount
+        self.isLoading = false
+        self.areSignaturesLoading = signatureCount > 0
+
+        SigningViewModel.logger().info("Container contents loaded; awaiting signature validation")
+
+        await loadSignatureData(for: openedContainer)
+    }
+
+    // Stage two: everything derived from signature validity. Validation re-hashes every data file
+    // once per signature, so this can take minutes on a large container - the rest of the screen
+    // is already interactive by the time this runs.
+    private func loadSignatureData(for container: SignedContainerProtocol) async {
+        // Present only after a staged open; a plain re-open (after signing, removing a file, ...)
+        // has already validated everything, so there is nothing to wait for.
+        if let validations = await container.signatureValidations() {
+            for await _ in validations {
+                // Verdicts are written back into the container itself; this only waits for the end.
+            }
+        }
+
+        let loadedSignatures = await container.getSignatures()
+        let loadedTimestamps = await container.getTimestamps()
+        let loadedIsTimestamped = await isTimestampedContainer()
+        let loadedIsCades = await container.isCades()
+        let loadedIsXades = await container.isXades()
+        let loadedNotifications = await getContainerNotifications(container: container)
+
+        self.signatures = loadedSignatures
+        self.timestamps = loadedTimestamps
         self.isTimestampedContainer = loadedIsTimestamped
         self.isCadesContainer = loadedIsCades
         self.isXadesContainer = loadedIsXades
         self.containerNotifications = loadedNotifications
-        self.isLoading = false
+        self.expectedSignatureCount = loadedSignatures.count
+        self.areSignaturesLoading = false
 
-        SigningViewModel.logger().info("Signed container data loaded")
+        SigningViewModel.logger().info("Signature data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {

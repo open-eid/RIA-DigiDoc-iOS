@@ -88,7 +88,9 @@ struct SigningView: View {
     }
 
     private var isSignedContainer: Bool {
-        viewModel.signatures.count > 0
+        // expectedSignatureCount is known from the parse, before the signatures themselves have
+        // been validated, so the right layout shows while verdicts are still pending.
+        viewModel.signatures.count > 0 || viewModel.expectedSignatureCount > 0
     }
 
     private var closeIcon: String {
@@ -304,6 +306,12 @@ struct SigningView: View {
                                                 navigateToNestedCryptoContainerView:
                                                     $viewModel.navigateToNestedCryptoContainerView
                                             )
+                                        } else if viewModel.areSignaturesLoading {
+                                            LoadingView(
+                                                size: Dimensions.Icon.IconSizeXS,
+                                                isFullScreen: false
+                                            )
+                                            .padding(.vertical, Dimensions.Padding.XLPadding)
                                         } else {
                                             SignaturesListView(
                                                 signatures: viewModel.isTimestampedContainer ?

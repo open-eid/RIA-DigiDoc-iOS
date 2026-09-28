@@ -28,6 +28,9 @@ public protocol ContainerWrapperProtocol: Sendable {
     func getContainerURL() async -> URL
     func create(file: URL, dataFiles: [String]) async throws
     func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
+    func openStaged(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper
+    func signatureValidations() async -> AsyncStream<SignatureValidation>?
+    func cancelValidation() async
     @discardableResult func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol
     func saveDataFile(dataFile: DataFileWrapper, to directory: URL?) async throws -> URL
     @discardableResult func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol

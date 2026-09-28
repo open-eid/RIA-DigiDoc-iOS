@@ -36,6 +36,18 @@ NS_ASSUME_NONNULL_BEGIN
 validateOnline:(BOOL)validateOnline
   completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion;
 
+// Opens the container and reports its contents in two phases over one native container instance.
+// `metadata` fires as soon as parsing is done, with every signature's details but no validity
+// verdict. `validated` then fires once per signature as its validation completes - that step costs
+// a full re-hash of every data file per signature, so on a large container it dominates. Returning
+// YES from `isCancelled` stops the loop between signatures.
++ (void)openProgressively:(NSString *)containerPath
+           validateOnline:(BOOL)validateOnline
+              isCancelled:(BOOL (^NS_SWIFT_SENDABLE)(void))isCancelled
+                 metadata:(void (^)(DigiDocContainer *container))metadata
+                validated:(void (^)(NSUInteger index, DigiDocSignature *signature))validated
+               completion:(void (^)(NSError * _Nullable error))completion;
+
 + (void)addDataFilesToContainerWithPath:(NSString *)containerPath withDataFilePaths:(NSArray<NSString*> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion;
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion;

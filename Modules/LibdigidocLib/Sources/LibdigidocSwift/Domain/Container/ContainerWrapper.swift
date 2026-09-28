@@ -22,12 +22,54 @@ import LibdigidocLibObjC
 import CommonsLib
 import UtilsLib
 
+/// One signature's validity, produced after the container's contents are already on screen.
+public struct SignatureValidation: Sendable {
+    public let index: Int
+    public let signature: SignatureWrapper
+}
+
+/// Guards a checked continuation that two different callbacks could otherwise both resume.
+private final class ResumeOnce: @unchecked Sendable {
+    private let lock = NSLock()
+    private var claimed = false
+
+    func claim() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        if claimed { return false }
+        claimed = true
+        return true
+    }
+}
+
+/// Polled by the native validation loop between signatures so a long validation can be abandoned.
+public final class ValidationCancellation: @unchecked Sendable {
+    private let lock = NSLock()
+    private var cancelled = false
+
+    public init() {}
+
+    public var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return cancelled
+    }
+
+    public func cancel() {
+        lock.lock()
+        cancelled = true
+        lock.unlock()
+    }
+}
+
 public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     private var containerURL: URL
     private var dataFiles: [DataFileWrapper]
     private var signatures: [SignatureWrapper]
     private var mediatype: String
+    private var validationStream: AsyncStream<SignatureValidation>?
+    private var validationCancellation: ValidationCancellation?
 
     private let fileManager: FileManagerProtocol
 
@@ -50,6 +92,18 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     public static func libdigidocppVersion() -> String {
         return DigiDocContainerWrapper.libdigidocppVersion()
+    }
+
+    /// Signals validation progress for a staged open. Consumed once.
+    public func signatureValidations() -> AsyncStream<SignatureValidation>? {
+        defer { validationStream = nil }
+        return validationStream
+    }
+
+    /// Abandons an in-flight validation sweep. Safe to call when none is running.
+    public func cancelValidation() {
+        validationCancellation?.cancel()
+        validationCancellation = nil
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
@@ -112,7 +166,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
-
     /// Everything the Swift layer needs out of a native open, as value types.
     struct ParsedContainer: Sendable {
         let filePath: String
@@ -147,6 +200,103 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 }
             }
         }
+    }
+
+    /// Opens the container in two stages. Returns as soon as the contents (data files, media type,
+    /// how many signatures there are) are known, without waiting for those signatures to be
+    /// validated - validation re-hashes every data file once per signature, so on a container with
+    /// many signatures it dominates the open. Validation then runs in the background and its
+    /// completion is observable through `signatureValidations()`.
+    @MainActor
+    public func openStaged(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
+        ContainerWrapper.logger().info(
+            "Opening container file '\(containerFile.lastPathComponent, privacy: .public)' in stages"
+        )
+
+        let cancellation = ValidationCancellation()
+        // Must be @Sendable: this function is @MainActor, so a plain closure literal would inherit
+        // MainActor isolation, and the native loop calls this one directly on the libdigidocpp
+        // queue - which trips Swift's executor assertion and traps.
+        let isCancelledCheck: @Sendable () -> Bool = { cancellation.isCancelled }
+
+        var continuation: AsyncStream<SignatureValidation>.Continuation?
+        let stream = AsyncStream<SignatureValidation> { continuation = $0 }
+        guard let continuation else {
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(
+                    nsError: NSError(domain: "ContainerWrapper - cannot open container", code: 3),
+                    extraInfo: ["fileName": containerFile.lastPathComponent]
+                )
+            )
+        }
+
+        await self.setValidationState(stream: stream, cancellation: cancellation)
+
+        do {
+            let parsed: ParsedContainer = try await withCheckedThrowingContinuation { metadataContinuation in
+                let resumed = ResumeOnce()
+
+                DigiDocContainerWrapper.openProgressively(
+                    containerFile.resolvedPath,
+                    validateOnline: isSivaConfirmed,
+                    isCancelled: isCancelledCheck,
+                    metadata: { container in
+                        guard resumed.claim() else { return }
+                        metadataContinuation.resume(returning: ParsedContainer(
+                            filePath: container.filePath,
+                            dataFiles: ContainerWrapper.getDataFiles(from: container),
+                            signatures: ContainerWrapper.getSignatures(from: container),
+                            mediatype: container.mediatype
+                        ))
+                    },
+                    validated: { index, signature in
+                        let validated = ContainerWrapper.makeSignature(from: signature)
+                        // Keep the actor's own array authoritative: the view model re-reads it once
+                        // validation finishes rather than assembling the results itself.
+                        Task { await self.updateSignature(at: Int(index), with: validated) }
+                        continuation.yield(SignatureValidation(index: Int(index), signature: validated))
+                    },
+                    completion: { error in
+                        continuation.finish()
+                        // Only reached before metadata if the open itself failed.
+                        guard resumed.claim() else { return }
+                        metadataContinuation.resume(
+                            throwing: error ?? NSError(
+                                domain: "ContainerWrapper - cannot open container",
+                                code: 3
+                            )
+                        )
+                    }
+                )
+            }
+
+            await setContainerURL(URL(fileURLWithPath: parsed.filePath))
+
+            return await self.updateContainer(
+                datafiles: parsed.dataFiles,
+                signatures: parsed.signatures,
+                mediaType: parsed.mediatype
+            )
+        } catch {
+            continuation.finish()
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(nsError: nsError, extraInfo: ["fileName": containerFile.lastPathComponent])
+            )
+        }
+    }
+
+    private func updateSignature(at index: Int, with signature: SignatureWrapper) {
+        guard signatures.indices.contains(index) else { return }
+        signatures[index] = signature
+    }
+
+    private func setValidationState(
+        stream: AsyncStream<SignatureValidation>,
+        cancellation: ValidationCancellation
+    ) {
+        self.validationStream = stream
+        self.validationCancellation = cancellation
     }
 
     @MainActor
@@ -425,7 +575,12 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     private static func getSignatures(from container: DigiDocContainer) -> [SignatureWrapper] {
         return container.signatures.compactMap { signature in
-            SignatureWrapper(
+            makeSignature(from: signature)
+        }
+    }
+
+    static func makeSignature(from signature: DigiDocSignature) -> SignatureWrapper {
+        return SignatureWrapper(
                 pos: Int(signature.pos),
                 signingCert: signature.signingCert,
                 timestampCert: signature.timestampCert,
@@ -449,6 +604,5 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                 archiveTimestampTime: signature.archiveTimestampTime,
                 archiveTimestampCert: signature.archiveTimestampCert
             )
-        }
     }
 }
