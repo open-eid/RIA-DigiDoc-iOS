@@ -112,11 +112,18 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             return nil
         }
 
-        let isExistingContainer = urls.count == 1 && CommonsLib.Constants.Container.ContainerExtensions
-            .contains(firstFile.pathExtension.lowercased())
+        let fileExtension = firstFile.pathExtension.lowercased()
 
-        if isExistingContainer {
+        if urls.count == 1 && CommonsLib.Constants.Container.ContainerExtensions.contains(fileExtension) {
             return firstFile.lastPathComponent
+        }
+
+        // A PDF is the one case the extension cannot settle: a signed one opens as a container and
+        // keeps its own name, an unsigned one becomes a new .asice. Telling them apart means
+        // reading the file, which is not worth putting on the open path for a label, so no name is
+        // offered and the header stays blank until stage one.
+        if urls.count == 1 && fileExtension == CommonsLib.Constants.Extension.Pdf {
+            return nil
         }
 
         return firstFile
@@ -133,11 +140,9 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         // can appear first. Everything below needs it to have finished.
         if let pendingOpen = sharedContainerViewModel.takePendingOpenTask() {
             isLoading = true
-            // Otherwise the header shows the new-container placeholder ("newFile") over a file the
-            // user just picked, for as long as the open takes.
-            if let provisionalName = provisionalContainerName() {
-                containerName = provisionalName
-            }
+            // Blank rather than the new-container placeholder ("newFile"), which would name the
+            // container something it is never going to be called. Stage one fills it in.
+            containerName = provisionalContainerName() ?? ""
             do {
                 try await pendingOpen.value
             } catch {
