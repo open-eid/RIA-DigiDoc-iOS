@@ -25,7 +25,7 @@ let package = Package(
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
-        .package(path: "../IdCardLib"),
+        .package(url: "https://github.com/open-eid/nfc-iOS-lib.git", revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"),
         .package(path: "../UtilsLib")
     ],
     targets: [
@@ -44,7 +44,7 @@ let package = Package(
                 "ASN1Decoder",
                 "CommonsLib",
                 "ConfigLib",
-                "IdCardLib",
+                .product(name: "IdCardLib", package: "nfc-iOS-lib"),
                 "UtilsLib",
                 .product(name: "FactoryKit", package: "Factory")
             ],
