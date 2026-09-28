@@ -88,8 +88,6 @@ struct SigningView: View {
     }
 
     private var isSignedContainer: Bool {
-        // expectedSignatureCount is known from the parse, before the signatures themselves have
-        // been validated, so the right layout shows while verdicts are still pending.
         viewModel.signatures.count > 0 || viewModel.expectedSignatureCount > 0
     }
 
@@ -274,10 +272,6 @@ struct SigningView: View {
                                 }
 
                                 if viewModel.isLoading {
-                                    // The container is still being opened. Show the tab shell so
-                                    // the screen is stable, with the spinner in whichever section
-                                    // is selected, rather than briefly rendering an empty
-                                    // container as if it had no signatures.
                                     TabView(selectedTab: $selectedTab, titles: [
                                         containerFilesTitle,
                                         containerSignaturesTitle
@@ -639,9 +633,6 @@ struct SigningView: View {
 
     private func handleFileRename(to newContainerName: String) async {
         showRenameModal = false
-        // Keep the existing name rather than letting `sanitized()`'s fallback rename the container
-        // to something the user never typed. The OK button is already disabled in this case; this
-        // is the backstop.
         guard let sanitizedContainerName = newContainerName.sanitizedOrNil() else { return }
         let containerNameWithExtension =
             containerExtension.isEmpty

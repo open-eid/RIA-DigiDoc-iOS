@@ -69,17 +69,12 @@ public class DateUtil {
         return formatter.date(from: dateString)
     }
 
-    // DateFormatter construction is expensive and this is called several times per signature
-    // row per render. Formatters are only configured once and never mutated afterwards, and
-    // DateFormatter is documented as thread-safe for formatting on iOS 7+, so they are shared.
     private final class FormatterCache: @unchecked Sendable {
         private let lock = NSLock()
         private var formatters: [String: DateFormatter] = [:]
 
         func formatter(format: String, isUTC: Bool) -> DateFormatter {
             let timeZone = isUTC ? (TimeZone(abbreviation: "UTC") ?? .gmt) : TimeZone.current
-            // The time zone is part of the key so a system time-zone change is picked up
-            // instead of being masked by a stale cached formatter.
             let key = "\(format)|\(timeZone.identifier)"
 
             lock.lock()

@@ -72,7 +72,6 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol {
         self.pendingOpenTask = task
     }
 
-    // Consumed exactly once: the signing screen awaits it, later loads reuse the opened container.
     func takePendingOpenTask() -> Task<Void, Error>? {
         defer { pendingOpenTask = nil }
         return pendingOpenTask

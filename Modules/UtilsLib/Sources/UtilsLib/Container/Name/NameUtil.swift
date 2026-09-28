@@ -62,7 +62,6 @@ public struct NameUtil: NameUtilProtocol {
         return components.joined(separator: ", ")
     }
 
-    // Compiling this per call showed up as real cost when a container has many signatures.
     private static let capitalizationRegex = try? NSRegularExpression(
         pattern: #"([\p{L}\d])([\p{L}\d]*)"#,
         options: [.useUnicodeWordBoundaries]

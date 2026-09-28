@@ -98,9 +98,6 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
 
 @implementation DigiDocContainerWrapper {}
 
-// libdigidocpp is not safe to call concurrently: two threads race a non-thread-safe libxml2
-// schema-type init. It has no main-thread affinity of its own, so a dedicated serial queue
-// enforces the same exclusivity the main queue used to, without blocking the UI.
 + (dispatch_queue_t)libraryQueue {
     static dispatch_queue_t queue;
     static dispatch_once_t onceToken;
@@ -223,16 +220,12 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digiDocSignature.country = [NSString stringWithUTF8String:signature->countryName().c_str()];
     digiDocSignature.zipCode = [NSString stringWithUTF8String:signature->postalCode().c_str()];
 
-    // No verdict has been reached yet. `status` must not be left at its zero value, which is
-    // Valid - callers such as the container-notification counts read it directly, and defaulting
-    // to Valid would report an unchecked container as valid.
     digiDocSignature.status = UnknownStatus;
     digiDocSignature.diagnosticsInfo = @"";
 
     return digiDocSignature;
 }
 
-// Constructing the Validator is what runs the actual validation.
 + (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos {
     DigiDocSignature *digiDocSignature = [DigiDocContainerWrapper getSignatureMetadata:signature pos:pos];
 
@@ -376,7 +369,6 @@ validateOnline:(BOOL)validateOnline
                         [datafiles addObject:digiDocDataFile];
                     }
 
-                    // Phase 1: everything except the validity verdict.
                     std::vector<digidoc::Signature *> nativeSignatures = container->signatures();
                     NSMutableArray *signatures = [NSMutableArray arrayWithCapacity:nativeSignatures.size()];
                     int pos = 0;
@@ -395,7 +387,6 @@ validateOnline:(BOOL)validateOnline
                         metadata(parsed);
                     });
 
-                    // Phase 2: validate one signature at a time, reporting each as it lands.
                     for (NSUInteger index = 0; index < nativeSignatures.size(); index++) {
                         if (isCancelled && isCancelled()) {
                             break;

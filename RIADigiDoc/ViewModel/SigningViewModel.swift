@@ -49,14 +49,10 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
-    // True until the container's contents (name, data files, media type) are known.
     var isLoading = false
 
-    // True while signature validation is still running. The rest of the screen is already usable.
     var areSignaturesLoading = false
 
-    // How many signatures the container has. Known from the parse, before any of them is
-    // validated, so the screen can show the right layout while verdicts are still pending.
     private(set) var expectedSignatureCount = 0
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
@@ -100,12 +96,6 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
-    // The name to show while the container is still being opened or created. Mirrors the naming
-    // in SignedContainer.openOrCreate: an existing container keeps its own name, anything else
-    // becomes the first data file's name with the container extension. `getContainerFile` reuses
-    // that name unless it collides, so this matches the final name except in the duplicate case,
-    // which stage one corrects. Showing the new-container placeholder instead would name the
-    // container something it is never going to be called.
     private func provisionalContainerName() -> String? {
         guard case .success(let urls)? = sharedContainerViewModel.getFileOpeningResult(),
               let firstFile = urls.first else {
@@ -118,10 +108,6 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             return firstFile.lastPathComponent
         }
 
-        // A PDF is the one case the extension cannot settle: a signed one opens as a container and
-        // keeps its own name, an unsigned one becomes a new .asice. Telling them apart means
-        // reading the file, which is not worth putting on the open path for a label, so no name is
-        // offered and the header stays blank until stage one.
         if urls.count == 1 && fileExtension == CommonsLib.Constants.Extension.Pdf {
             return nil
         }
@@ -136,12 +122,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         SigningViewModel.logger().info("Loading signed container data")
         sharedContainerViewModel.setIsSignatureAdded(false)
 
-        // The file-opening screen hands over an open that is still running, so that this screen
-        // can appear first. Everything below needs it to have finished.
         if let pendingOpen = sharedContainerViewModel.takePendingOpenTask() {
             isLoading = true
-            // Blank rather than the new-container placeholder ("newFile"), which would name the
-            // container something it is never going to be called. Stage one fills it in.
             containerName = provisionalContainerName() ?? ""
             do {
                 try await pendingOpen.value
@@ -167,8 +149,6 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         self.signedContainer = openedContainer
 
-        // Stage one: everything that is known as soon as the container has been parsed. Read it
-        // all before publishing any of it, because each assignment is a separate observation tick.
         let loadedContainerName = await openedContainer.getContainerName()
         let loadedDataFiles = await openedContainer.getDataFiles()
         let loadedMimetype = await openedContainer.getContainerMimetype()
@@ -188,15 +168,9 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         await loadSignatureData(for: openedContainer)
     }
 
-    // Stage two: everything derived from signature validity. Validation re-hashes every data file
-    // once per signature, so this can take minutes on a large container - the rest of the screen
-    // is already interactive by the time this runs.
     private func loadSignatureData(for container: SignedContainerProtocol) async {
-        // Present only after a staged open; a plain re-open (after signing, removing a file, ...)
-        // has already validated everything, so there is nothing to wait for.
         if let validations = await container.signatureValidations() {
             for await _ in validations {
-                // Verdicts are written back into the container itself; this only waits for the end.
             }
         }
 

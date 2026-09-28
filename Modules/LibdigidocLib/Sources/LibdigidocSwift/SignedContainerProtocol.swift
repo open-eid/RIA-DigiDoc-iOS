@@ -25,7 +25,6 @@ public protocol SignedContainerProtocol: GeneralContainer, Sendable {
     func getDataFiles() async -> [DataFileWrapper]
     func getSignatures() async -> [SignatureWrapper]
 
-    // Observes the background validation sweep that follows a staged open.
     func signatureValidations() async -> AsyncStream<SignatureValidation>?
     func cancelValidation() async
     func getTimestamps() async -> [SignatureWrapper]

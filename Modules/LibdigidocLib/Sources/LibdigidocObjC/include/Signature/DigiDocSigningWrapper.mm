@@ -54,8 +54,6 @@
 - (void)prepareSignature:(NSData *)cert containerPath:(NSString *)containerPath roleData:(DigiDocRoleData *)roleData userAgent:(NSString *)userAgent completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
     NSError *error = nil;
     try {
-        // Container opens now run off the main thread, so signing has to take the same
-        // libdigidocpp monitor to stay mutually exclusive with them.
         @synchronized ([DigiDocContainerWrapper class]) {
         _signer = std::make_unique<WebSigner>(digidoc::X509Cert(reinterpret_cast<const unsigned char *>(cert.bytes), cert.length));
         _signature = NULL;

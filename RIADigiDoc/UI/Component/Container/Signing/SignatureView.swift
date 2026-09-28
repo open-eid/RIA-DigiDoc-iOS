@@ -122,7 +122,6 @@ struct SignatureView: View {
             dateTimeString: signature.trustedSigningTime,
             isUTC: false
         )
-        // Read once: this parses the archive timestamp certificate, and body used it twice.
         let archiveTimestamp = archiveTimestampInfo
         VStack {
             HStack {

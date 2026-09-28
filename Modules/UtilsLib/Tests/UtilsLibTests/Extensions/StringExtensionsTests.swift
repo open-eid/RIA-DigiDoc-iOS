@@ -25,6 +25,21 @@ import CommonsLib
 class StringSanitizationTests {
 
     @Test
+    func sanitizedOrNil_stripsLeadingEllipsisLikeLeadingDots() {
+        #expect("\u{2026}".sanitizedOrNil() == "_")
+        #expect("\u{2026}\u{2026}".sanitizedOrNil() == "_")
+        #expect("\u{2026}report".sanitizedOrNil() == "report")
+        #expect("...".sanitizedOrNil() == "_")
+        #expect(".\u{2026}.".sanitizedOrNil() == "_")
+    }
+
+    @Test
+    func sanitizedOrNil_keepsEllipsisThatIsNotLeading() {
+        #expect("report\u{2026}".sanitizedOrNil() == "report\u{2026}")
+        #expect("a\u{2026}b".sanitizedOrNil() == "a\u{2026}b")
+    }
+
+    @Test
     func sanitizedOrNil_returnsNilWhenNothingUsableRemains() {
         #expect("\u{FFFF}\u{FFFE}\u{1F600}".sanitizedOrNil() == nil)
         #expect("@%^?[]{}#&".sanitizedOrNil() == nil)

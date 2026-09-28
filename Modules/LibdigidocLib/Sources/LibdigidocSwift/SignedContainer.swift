@@ -417,7 +417,6 @@ extension SignedContainer {
             try fileManager.moveItem(at: file, to: renamedContainerFile)
         }
 
-        // Staged: returns once the contents are known, with signature validation still running.
         let container = try await ContainerWrapper(
             fileManager: fileManager
         ).openStaged(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)

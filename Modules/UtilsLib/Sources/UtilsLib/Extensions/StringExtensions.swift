@@ -22,14 +22,12 @@ import CommonsLib
 
 extension String {
 
-    /// Substitutes a fallback name when nothing usable remains, which is what a file being
-    /// written needs. For a name the user typed, use `sanitizedOrNil()` instead so the caller can
-    /// tell the difference between a cleaned-up name and one that sanitized away to nothing.
+    private static let leadingDotCharacters: Set<Character> = [".", "\u{2026}"]
+
     public func sanitized() -> String {
         return sanitizedOrNil() ?? Constants.Container.DefaultName
     }
 
-    /// The sanitized name, or nil when nothing usable is left of it.
     public func sanitizedOrNil() -> String? {
         var forbidden = CharacterSet.illegalCharacters
             .union(.symbols)
@@ -41,7 +39,7 @@ extension String {
             .joined()
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        while cleanName.hasPrefix(".") {
+        while let first = cleanName.first, String.leadingDotCharacters.contains(first) {
             cleanName.removeFirst()
             if cleanName.isEmpty {
                 cleanName = "_"

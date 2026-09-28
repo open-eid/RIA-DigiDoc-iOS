@@ -22,13 +22,11 @@ import LibdigidocLibObjC
 import CommonsLib
 import UtilsLib
 
-/// One signature's validity, produced after the container's contents are already on screen.
 public struct SignatureValidation: Sendable {
     public let index: Int
     public let signature: SignatureWrapper
 }
 
-/// Guards a checked continuation that two different callbacks could otherwise both resume.
 private final class ResumeOnce: @unchecked Sendable {
     private let lock = NSLock()
     private var claimed = false
@@ -42,7 +40,6 @@ private final class ResumeOnce: @unchecked Sendable {
     }
 }
 
-/// Polled by the native validation loop between signatures so a long validation can be abandoned.
 public final class ValidationCancellation: @unchecked Sendable {
     private let lock = NSLock()
     private var cancelled = false
@@ -94,13 +91,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         return DigiDocContainerWrapper.libdigidocppVersion()
     }
 
-    /// Signals validation progress for a staged open. Consumed once.
     public func signatureValidations() -> AsyncStream<SignatureValidation>? {
         defer { validationStream = nil }
         return validationStream
     }
 
-    /// Abandons an in-flight validation sweep. Safe to call when none is running.
     public func cancelValidation() {
         validationCancellation?.cancel()
         validationCancellation = nil
@@ -166,7 +161,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
-    /// Everything the Swift layer needs out of a native open, as value types.
     struct ParsedContainer: Sendable {
         let filePath: String
         let dataFiles: [DataFileWrapper]
@@ -174,9 +168,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         let mediatype: String
     }
 
-    /// Runs the native open on the libdigidocpp serial queue and maps the result to value types
-    /// before it crosses back, so the calling thread is never blocked by the per-signature
-    /// validation that dominates the cost of opening a many-signature container.
     private static func openNatively(
         path: String,
         validateOnline: Bool
@@ -202,11 +193,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
-    /// Opens the container in two stages. Returns as soon as the contents (data files, media type,
-    /// how many signatures there are) are known, without waiting for those signatures to be
-    /// validated - validation re-hashes every data file once per signature, so on a container with
-    /// many signatures it dominates the open. Validation then runs in the background and its
-    /// completion is observable through `signatureValidations()`.
     @MainActor
     public func openStaged(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
         ContainerWrapper.logger().info(
@@ -214,9 +200,6 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         )
 
         let cancellation = ValidationCancellation()
-        // Must be @Sendable: this function is @MainActor, so a plain closure literal would inherit
-        // MainActor isolation, and the native loop calls this one directly on the libdigidocpp
-        // queue - which trips Swift's executor assertion and traps.
         let isCancelledCheck: @Sendable () -> Bool = { cancellation.isCancelled }
 
         var continuation: AsyncStream<SignatureValidation>.Continuation?
@@ -251,14 +234,11 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                     },
                     validated: { index, signature in
                         let validated = ContainerWrapper.makeSignature(from: signature)
-                        // Keep the actor's own array authoritative: the view model re-reads it once
-                        // validation finishes rather than assembling the results itself.
                         Task { await self.updateSignature(at: Int(index), with: validated) }
                         continuation.yield(SignatureValidation(index: Int(index), signature: validated))
                     },
                     completion: { error in
                         continuation.finish()
-                        // Only reached before metadata if the open itself failed.
                         guard resumed.claim() else { return }
                         metadataContinuation.resume(
                             throwing: error ?? NSError(

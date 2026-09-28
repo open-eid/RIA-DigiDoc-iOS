@@ -28,19 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable DigiDocContainer *)open:(NSString *)containerPath validateOnline:(BOOL)validateOnline error:(NSError **)error;
 
-// Asynchronous variant of the call above. Runs the whole native open - including the
-// per-signature validation, which costs signatureCount x datafileBytes - on the dedicated
-// libdigidocpp serial queue, so the main thread stays responsive and the iOS watchdog
-// cannot kill the app while a large container is being opened.
 + (void)open:(NSString *)containerPath
 validateOnline:(BOOL)validateOnline
   completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion;
 
-// Opens the container and reports its contents in two phases over one native container instance.
-// `metadata` fires as soon as parsing is done, with every signature's details but no validity
-// verdict. `validated` then fires once per signature as its validation completes - that step costs
-// a full re-hash of every data file per signature, so on a large container it dominates. Returning
-// YES from `isCancelled` stops the loop between signatures.
 + (void)openProgressively:(NSString *)containerPath
            validateOnline:(BOOL)validateOnline
               isCancelled:(BOOL (^NS_SWIFT_SENDABLE)(void))isCancelled

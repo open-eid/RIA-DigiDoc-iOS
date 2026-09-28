@@ -116,10 +116,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
                 return
             }
 
-            // Opening a signed container costs signatureCount x datafileBytes, because
-            // libdigidocpp re-hashes every data file once per signature. Start it here but let
-            // the signing screen await it, so the screen appears immediately and shows its own
-            // per-section loading state instead of holding a blank full-screen spinner.
             let urls = files
             sharedContainerViewModel.setPendingOpenTask(
                 Task { [sharedContainerViewModel] in
@@ -316,8 +312,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         }
     }
 
-    // Mirrors openOrCreateContainer's routing, but without opening anything: the signed path
-    // defers its open, so the destination has to be known before the container exists.
     private func isOpeningCryptoContainer(urls: [URL]) async -> Bool {
         switch sharedContainerViewModel.getFileOpeningMethod() {
         case .crypto:

@@ -23,7 +23,6 @@ import FactoryKit
 struct LoadingView: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
-    // Defaults keep the existing full-screen behaviour for current call sites.
     var size: CGFloat = Dimensions.Icon.IconSizeSpinner
     var isFullScreen: Bool = true
 
