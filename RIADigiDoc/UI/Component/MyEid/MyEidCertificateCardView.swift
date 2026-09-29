@@ -30,7 +30,6 @@ struct MyEidCertificateCardView: View {
     let changePinText: String
     let isPinBlocked: Bool
     let isPukBlocked: Bool
-    let isCourierCard: Bool
     let showForgotPin: Bool
     let onForgotPinClick: (() -> Void)?
     let onChangePinClick: (() -> Void)?
@@ -46,7 +45,6 @@ struct MyEidCertificateCardView: View {
         changePinText: String = "",
         isPinBlocked: Bool = false,
         isPukBlocked: Bool = false,
-        isCourierCard: Bool = false,
         showForgotPin: Bool = true,
         onForgotPinClick: (() -> Void)? = nil,
         onChangePinClick: (() -> Void)? = nil,
@@ -60,7 +58,6 @@ struct MyEidCertificateCardView: View {
         self.changePinText = changePinText
         self.isPinBlocked = isPinBlocked
         self.isPukBlocked = isPukBlocked
-        self.isCourierCard = isCourierCard
         self.showForgotPin = showForgotPin
         self.onForgotPinClick = onForgotPinClick
         self.onChangePinClick = onChangePinClick
@@ -110,7 +107,7 @@ struct MyEidCertificateCardView: View {
                     PrimaryOutlinedButton(
                         text: forgotPinText,
                         assetImageName: nil,
-                        isButtonEnabled: !isPukBlocked && !isCourierCard,
+                        isButtonEnabled: !isPukBlocked,
                         action: onForgotPinClick ?? {},
                         focusedField: forgotPinAccessibilityField,
                         currentFocus: $lastFocused
@@ -119,7 +116,7 @@ struct MyEidCertificateCardView: View {
 
                     PrimaryButton(
                         text: changePinText,
-                        isButtonEnabled: !isPinBlocked && !isCourierCard,
+                        isButtonEnabled: !isPinBlocked,
                         action: onChangePinClick ?? {},
                         focusedField: changePinAccessibilityField,
                         currentFocus: $lastFocused

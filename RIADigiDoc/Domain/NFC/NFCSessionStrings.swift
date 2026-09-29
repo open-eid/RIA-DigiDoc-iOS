@@ -30,7 +30,6 @@ public struct NFCSessionStrings: Sendable {
     let pinBlockedErrorMessage: String
     let pinLockedErrorMessage: String
     let wrongCardErrorMessage: String
-    let courierCardErrorMessage: String
     let technicalErrorMessage: String
     let sessionErrorMessage: String
     let ocspTimeslotErrorMessage: String
