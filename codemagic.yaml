@@ -139,6 +139,9 @@ workflows:
           else
             echo "Skipping default configuration fetching for repo.ria"
           fi
+      - name: Enable Web eID test host entitlements
+        script: |
+          cp -v RIADigiDoc/RIADigiDoc-Debug.entitlements RIADigiDoc/RIADigiDoc.entitlements
       - name: Set up provisioning profiles settings on Xcode project
         script: xcode-project use-profiles
       - name: Run tests
@@ -163,8 +166,8 @@ workflows:
           fi
           
           # Enable logging flag
-          LOGGING_FLAGS="OTHER_SWIFT_FLAGS=\"\$(inherited) -DENABLE_LOGGING\""
-          
+          LOGGING_FLAGS="OTHER_SWIFT_FLAGS=\"\$(inherited) -DENABLE_LOGGING -DENABLE_WEB_EID_TEST_HOST\""
+
           # Add logging flag to conf flags
           ARCHIVE_FLAGS="$REPO_RIA_CONF_FLAGS $LOGGING_FLAGS -skipPackagePluginValidation"
 
@@ -172,7 +175,9 @@ workflows:
             --clean \
             --project "$CM_BUILD_DIR/RIADigiDoc.xcodeproj" \
             --scheme "$XCODE_SCHEME" \
-            --archive-xcargs "$ARCHIVE_FLAGS"
+            --archive-xcargs "$ARCHIVE_FLAGS" \
+            --archive-flags="-quiet" \
+            --log-stream stdout
       - name: Rename and move IPA
         script: |
           mv -v build/ios/ipa/RIADigiDoc.ipa build/ios/ipa/"RIA_DigiDoc_dev_$APP_VERSION.$LATEST_BUILD_NUMBER.ipa"
