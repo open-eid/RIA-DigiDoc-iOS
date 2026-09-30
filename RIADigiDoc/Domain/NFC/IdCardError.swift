@@ -26,7 +26,6 @@ public enum IdCardError: Error {
     case invalidNewPIN
     case sessionError
     case pinLocked
-    case notActivated
 }
 
 extension IdCardError {

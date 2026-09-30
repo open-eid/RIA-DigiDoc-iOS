@@ -34,7 +34,6 @@ struct MyEidPinsAndCertificatesView: View {
     var authCertValidTo: String
     var signCertValidTo: String
     var isPUKChangeable: Bool
-    var isCourierCard: Bool
 
     @AccessibilityFocusState private var accessibilityFocus: AccessibilityField?
     @State private var lastFocused: AccessibilityField?
@@ -98,8 +97,7 @@ struct MyEidPinsAndCertificatesView: View {
         pinChangeVariant: Binding<PinChangeVariant?> = .constant(nil),
         authCertValidTo: String,
         signCertValidTo: String,
-        isPUKChangeable: Bool,
-        isCourierCard: Bool = false
+        isPUKChangeable: Bool
     ) {
         self._isPin1Blocked = isPin1Blocked
         self._isPin2Blocked = isPin2Blocked
@@ -109,7 +107,6 @@ struct MyEidPinsAndCertificatesView: View {
         self.authCertValidTo = authCertValidTo
         self.signCertValidTo = signCertValidTo
         self.isPUKChangeable = isPUKChangeable
-        self.isCourierCard = isCourierCard
     }
 
     var body: some View {
@@ -125,7 +122,6 @@ struct MyEidPinsAndCertificatesView: View {
                     .localized("Change PIN", [CodeType.pin1.name]),
                 isPinBlocked: isPin1Blocked,
                 isPukBlocked: isPukBlocked,
-                isCourierCard: isCourierCard,
                 onForgotPinClick: {
                     lastFocused = .myEid(.unblockPin1Button)
                     pinChangeVariant = .pin1Unblock
@@ -146,10 +142,6 @@ struct MyEidPinsAndCertificatesView: View {
                     .foregroundStyle(theme.error)
                     .padding(.vertical, Dimensions.Padding.XSPadding)
             }
-
-            if isCourierCard {
-                courierCardWarning()
-            }
         }
         .padding(.vertical, Dimensions.Padding.SPadding)
 
@@ -169,7 +161,6 @@ struct MyEidPinsAndCertificatesView: View {
                     .localized("Change PIN", [CodeType.pin2.name]),
                 isPinBlocked: isPin2Blocked,
                 isPukBlocked: isPukBlocked,
-                isCourierCard: isCourierCard,
                 onForgotPinClick: {
                     lastFocused = .myEid(.unblockPin2Button)
                     pinChangeVariant = .pin2Unblock
@@ -191,9 +182,7 @@ struct MyEidPinsAndCertificatesView: View {
                     .padding(.vertical, Dimensions.Padding.XSPadding)
             }
 
-            if isCourierCard {
-                courierCardWarning()
-            } else if !isPin2Activated {
+            if !isPin2Activated {
                 Text(verbatim: pin2LockedMessage)
                     .font(typography.bodySmall)
                     .foregroundStyle(theme.error)
@@ -249,11 +238,11 @@ struct MyEidPinsAndCertificatesView: View {
     }
 
     private var opacityForPin1BlockedState: Double {
-        getOpacityForBlockedState(isBlocked: (isPin1Blocked && isPukBlocked) || isCourierCard)
+        getOpacityForBlockedState(isBlocked: isPin1Blocked && isPukBlocked)
     }
 
     private var opacityForPin2BlockedState: Double {
-        getOpacityForBlockedState(isBlocked: (isPin2Blocked && isPukBlocked) || isCourierCard)
+        getOpacityForBlockedState(isBlocked: isPin2Blocked && isPukBlocked)
     }
 
     private var opacityForPukBlockedState: Double {
@@ -302,32 +291,5 @@ struct MyEidPinsAndCertificatesView: View {
         .underline()
         .font(typography.bodySmall)
         .foregroundStyle(.link)
-    }
-
-    private var courierWarningMessage: String {
-        languageSettings.localized("ID card courier warning message")
-    }
-
-    private var courierActivateUrl: String {
-        languageSettings.localized("ID card courier activate URL")
-    }
-
-    @ViewBuilder
-    private func courierCardWarning() -> some View {
-        Text(verbatim: courierWarningMessage)
-            .font(typography.bodySmall)
-            .foregroundStyle(theme.error)
-            .padding(.vertical, Dimensions.Padding.XSPadding)
-
-        if let url = URL(string: courierActivateUrl) {
-            Link(
-                languageSettings.localized("ID card courier activate button"),
-                destination: url
-            )
-            .underline()
-            .font(typography.bodySmall)
-            .foregroundStyle(.link)
-            .padding(.vertical, Dimensions.Padding.XSPadding)
-        }
     }
 }
