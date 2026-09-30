@@ -50,6 +50,33 @@ struct ResponseHandlerTests {
     }
 
     @Test
+    func handleNetworkError_throwsSslHandshakeErrorWhenCertificatePinningFails() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noCertificatesFound)
+
+        #expect(throws: MobileIdError.invalidSslHandshake) {
+            try handler.handleNetworkError(afError, statusCode: nil)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsSslHandshakeErrorForAnyTrustEvaluationReason() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "sid.demo.sk.ee"))
+
+        #expect(throws: MobileIdError.invalidSslHandshake) {
+            try handler.handleNetworkError(afError, statusCode: nil)
+        }
+    }
+
+    @Test
+    func handleNetworkError_stillMapsStatusCodesWhenTrustEvaluationSucceeded() {
+        let afError = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 400))
+
+        #expect(throws: MobileIdError.incorrectParameters) {
+            try handler.handleNetworkError(afError, statusCode: 400)
+        }
+    }
+
+    @Test
     func handleNetworkError_throwsNoInternetError() {
         let afError = AFError.sessionTaskFailed(error: URLError(.notConnectedToInternet))
 

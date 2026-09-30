@@ -485,6 +485,9 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
             mobileIdAlertMessageUrl = "Invalid signing access rights url"
             mobileIdAlertMessageExtraArguments = ["Mobile-ID"]
 
+        case .invalidSslHandshake:
+            mobileIdErrorMessageKey = "SSL handshake failed"
+
         case .technicalError:
             mobileIdErrorMessageKey = "Signing technical error"
             mobileIdAlertMessageExtraArguments = ["Mobile-ID"]

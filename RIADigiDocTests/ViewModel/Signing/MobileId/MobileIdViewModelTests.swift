@@ -421,6 +421,25 @@ struct MobileIdViewModelTests {
     }
 
     @Test
+    func sign_setSSLMessageWhenCertificatePinningFailsInRestClient() async {
+        mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
+            throw MobileIdError.invalidSslHandshake
+        }
+
+        mockProxyUtil.getProxyInfoHandler = { ProxyInfo() }
+
+        let result = await viewModel.sign(
+            phoneNumber: "37251234567",
+            personalCode: "60001019906",
+            roleData: roleData,
+            signedContainer: mockContainer()
+        )
+
+        #expect(result == nil)
+        #expect(viewModel.mobileIdErrorMessageKey == "SSL handshake failed")
+    }
+
+    @Test
     func sign_setNotClientMessageWhenNotMidClientErrorThrown() async {
         mockMobileIdSignService.getCertificateRequestHandler = { _, _, _, _, _, _, _, _ in
             throw MobileIdError.notMidClient
