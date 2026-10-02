@@ -103,16 +103,18 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
         self.signedContainer = openedContainer
 
-        self.containerName = await openedContainer.getContainerName()
+        let name = await openedContainer.getContainerName()
+        let mimetype = await openedContainer.getContainerMimetype()
+
+        self.containerName = name
         self.dataFiles = await openedContainer.getDataFiles()
         self.signatures = await openedContainer.getSignatures()
         self.timestamps = await openedContainer.getTimestamps()
-        self.containerMimetype = await openedContainer.getContainerMimetype()
+        self.containerMimetype = mimetype
         self.containerURL = await openedContainer.getRawContainerFile()
         self.isTimestampedContainer = await isTimestampedContainer()
         self.isCadesContainer = await openedContainer.isCades()
         self.isXadesContainer = await openedContainer.isXades()
-
         self.containerNotifications = await getContainerNotifications(container: openedContainer)
 
         SigningViewModel.logger().info("Signed container data loaded")
@@ -466,6 +468,17 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         }
     }
 
+    var isEncryptableContainer: Bool {
+        guard signedContainer != nil else { return false }
+        return !Constants.MimeType.UnencryptableContainers.contains(containerMimetype.lowercased()) &&
+        !Constants.Extension.UnencryptableContainerExtensions
+            .contains((containerName as NSString).pathExtension.lowercased())
+    }
+
+    var canEncrypt: Bool {
+        !isNestedContainer() && isEncryptableContainer
+    }
+
     func isNestedContainer() -> Bool {
         return sharedContainerViewModel.isNestedContainer(
             sharedContainerViewModel.currentContainer()
@@ -505,15 +518,6 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     private func isUnsignableContainer(mimetype: String, name: String) -> Bool {
         return Constants.MimeType.UnsignableContainers.contains(mimetype.lowercased()) ||
         Constants.Extension.UnsignableContainerExtensions.contains((name as NSString).pathExtension.lowercased())
-    }
-
-    func isEncryptButtonShown(
-        signedContainer: SignedContainerProtocol?,
-        isNestedContainer: Bool,
-    ) async -> Bool {
-        guard let container = signedContainer else { return false }
-        let isExistingContainer = await container.isExistingContainer()
-        return (isExistingContainer || isSigned()) && !isNestedContainer
     }
 
     func isSignatureRemoveButtonShown() -> Bool {
