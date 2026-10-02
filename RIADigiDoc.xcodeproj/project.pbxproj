@@ -144,7 +144,6 @@
 		DF64D0E12EC363C200FF73C6 /* SmartIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SmartIdLib; sourceTree = "<group>"; };
 		DF67D4F92D28531600F09EB9 /* ConfigLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ConfigLib; sourceTree = "<group>"; };
 		DF8ADFC92FF5672E0016D019 /* setup_configuration.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = setup_configuration.py; sourceTree = "<group>"; };
-		DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = libdigidoclib.xcodeproj; sourceTree = "<group>"; };
 		DFA23CBB2EB6CBF7000403E4 /* MobileIdLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = MobileIdLib; sourceTree = "<group>"; };
 		DFA3EE432D14962C001D951B /* FileImportShareExtension */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FileImportShareExtension; path = Extensions/FileImportShareExtension; sourceTree = "<group>"; };
 		DFB6639E2F16917D00804545 /* WidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -624,13 +623,6 @@
 			path = Modules;
 			sourceTree = "<group>";
 		};
-		DFA16B4A2CD18C7C0099D34F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		DFCF22F92E83512D0015AE6B /* Test */ = {
 			isa = PBXGroup;
 			children = (
@@ -926,12 +918,6 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DFDB147C2CC97B0E00153876 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = DFA16B4A2CD18C7C0099D34F /* Products */;
-					ProjectRef = DFA16B492CD18C7C0099D34F /* libdigidoclib.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				DFDB147A2CC97B0E00153876 /* RIADigiDoc */,
@@ -1067,7 +1053,7 @@
 			target = DF4E43C02D0BA38600967997 /* FileImportShareExtension */;
 			targetProxy = DF4E43C92D0BA38600967997 /* PBXContainerItemProxy */;
 		};
-				DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
+		DFB663AE2F16918100804545 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DFB6639D2F16917D00804545 /* WidgetExtensionExtension */;
 			targetProxy = DFB663AD2F16918100804545 /* PBXContainerItemProxy */;
@@ -1400,7 +1386,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = RIADigiDoc/RIADigiDoc.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "RIADigiDoc/RIADigiDoc-Debug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1843,7 +1829,7 @@
 			package = DF54F82D2D431BD50021D05A /* XCRemoteSwiftPackageReference "swift-certificates" */;
 			productName = X509;
 		};
-				DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
+		DF5903752ECCC41F00D1A278 /* MobileIdLibMocks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MobileIdLibMocks;
 		};
