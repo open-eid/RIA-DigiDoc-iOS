@@ -28,7 +28,7 @@ struct ColoredRecipientStatusText: View {
     private var tagBackgroundColor: Color {
         switch status {
         case .notEncrypted: return theme.surfaceVariant
-        case .notEncryptedExpired, .expired: return theme.errorContainer
+        case .notEncryptedExpired, .expired, .expiredWithoutDate: return theme.errorContainer
         case .valid: return theme.successContainer
         }
     }
@@ -36,7 +36,7 @@ struct ColoredRecipientStatusText: View {
     private var tagContentColor: Color {
         switch status {
         case .notEncrypted: return theme.onSurface
-        case .notEncryptedExpired, .expired: return theme.onErrorContainer
+        case .notEncryptedExpired, .expired, .expiredWithoutDate: return theme.onErrorContainer
         case .valid: return theme.onSuccessContainer
         }
     }

@@ -27,6 +27,8 @@
 #include <cdoc/CdocReader.h>
 #include <cdoc/Lock.h>
 
+#include <charconv>
+
 static CertType certTypeFromLabel(NSString * _Nullable type) {
     if (type == nil)                                 return CertTypeESealType;
     if ([type isEqualToString:@"ID-card"] ||
@@ -52,8 +54,10 @@ static CertType certTypeFromLabel(NSString * _Nullable type) {
 
     NSDate *validTo = nil;
     if (info.contains("server_exp")) {
-        long long epochTime = [[NSString stringWithStdString:info["server_exp"]] longLongValue];
-        if (epochTime > 0) {
+        const std::string &serverExp = info["server_exp"];
+        long long epochTime = 0;
+        auto [end, ec] = std::from_chars(serverExp.data(), serverExp.data() + serverExp.size(), epochTime);
+        if (ec == std::errc{} && end == serverExp.data() + serverExp.size()) {
             validTo = [NSDate dateWithTimeIntervalSince1970:epochTime];
         }
     }

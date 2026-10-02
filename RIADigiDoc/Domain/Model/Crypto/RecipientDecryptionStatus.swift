@@ -23,6 +23,7 @@ public enum RecipientDecryptionStatus: Sendable {
     case notEncrypted
     case notEncryptedExpired
     case expired
+    case expiredWithoutDate
     case valid
 
     public static func resolve(
@@ -32,6 +33,10 @@ public enum RecipientDecryptionStatus: Sendable {
         now: Date = Date()
     ) -> RecipientDecryptionStatus? {
         guard isCDOC2Container, let validTo else { return nil }
+
+        if validTo.timeIntervalSince1970 <= 0 {
+            return .expiredWithoutDate
+        }
 
         let isExpired = validTo < now
 
@@ -65,6 +70,7 @@ public enum RecipientDecryptionStatus: Sendable {
         case .notEncrypted: return "Expires on"
         case .notEncryptedExpired: return "Expired on"
         case .expired: return "Decryption expired"
+        case .expiredWithoutDate: return "Decryption expired without date"
         case .valid: return "Decryption until"
         }
     }

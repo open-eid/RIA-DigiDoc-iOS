@@ -177,10 +177,60 @@ struct RecipientDecryptionStatusTests {
     }
 
     @Test
+    func allExpiredDate_treatsAZeroServerExpiryAsExpired() {
+        let zeroExpiry = Date(timeIntervalSince1970: 0)
+
+        let expiry = RecipientDecryptionStatus.allExpiredDate(
+            validTos: [zeroExpiry],
+            isCDOC2Container: true,
+            now: now
+        )
+
+        #expect(expiry == zeroExpiry)
+    }
+
+    @Test
+    func resolve_returnsExpiredWithoutDateForAZeroServerExpiry() {
+        let status = RecipientDecryptionStatus.resolve(
+            validTo: Date(timeIntervalSince1970: 0),
+            isCDOC2Container: true,
+            isEncryptedOrDecrypted: true,
+            now: now
+        )
+
+        #expect(status == .expiredWithoutDate)
+    }
+
+    @Test
+    func resolve_returnsExpiredWithoutDateForAZeroServerExpiryBeforeEncryption() {
+        let status = RecipientDecryptionStatus.resolve(
+            validTo: Date(timeIntervalSince1970: 0),
+            isCDOC2Container: true,
+            isEncryptedOrDecrypted: false,
+            now: now
+        )
+
+        #expect(status == .expiredWithoutDate)
+    }
+
+    @Test
+    func resolve_keepsTheDatedExpiredStatusForAnyRealPastDate() {
+        let status = RecipientDecryptionStatus.resolve(
+            validTo: Date(timeIntervalSince1970: 1),
+            isCDOC2Container: true,
+            isEncryptedOrDecrypted: true,
+            now: now
+        )
+
+        #expect(status == .expired)
+    }
+
+    @Test
     func localizationKey_mapsEachStatusToItsOwnKey() {
         #expect(RecipientDecryptionStatus.notEncrypted.localizationKey == "Expires on")
         #expect(RecipientDecryptionStatus.notEncryptedExpired.localizationKey == "Expired on")
         #expect(RecipientDecryptionStatus.valid.localizationKey == "Decryption until")
         #expect(RecipientDecryptionStatus.expired.localizationKey == "Decryption expired")
+        #expect(RecipientDecryptionStatus.expiredWithoutDate.localizationKey == "Decryption expired without date")
     }
 }

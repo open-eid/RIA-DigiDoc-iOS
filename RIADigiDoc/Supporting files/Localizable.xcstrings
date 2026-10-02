@@ -1853,6 +1853,24 @@
         }
       }
     },
+    "Decryption expired without date" : {
+      "comment" : "CDOC2 recipient decryption expired badge when the expiry date is unknown",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption expired"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimise võimalus aegunud"
+          }
+        }
+      }
+    },
     "Decryption expired" : {
       "comment" : "CDOC2 recipient decryption expired badge",
       "extractionState" : "manual",
