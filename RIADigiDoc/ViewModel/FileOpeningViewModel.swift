@@ -105,54 +105,21 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
 
             files[0] = firstFileUrl
 
-            if await isOpeningCryptoContainer(urls: files) {
-                let container = try await openOrCreateContainer(withUrls: files)
-                if let cryptoContainer = container as? CryptoContainerProtocol {
-                    sharedContainerViewModel.setCryptoContainer(cryptoContainer)
-                    try await cryptoContainer.getRawContainerFile()?.markAsOpened()
+            let container = try await openOrCreateContainer(withUrls: files)
+            if let signedContainer = container as? SignedContainerProtocol {
+                if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
+                    try await handleAsicsSivaConfirmation(parentContainer: signedContainer)
+                } else {
+                    sharedContainerViewModel.setSignedContainer(signedContainer)
                 }
 
-                handleLoadingSuccess(isSivaConfirmed: true)
-                return
+                try await signedContainer.getRawContainerFile()?.markAsOpened()
+            } else if let cryptoContainer = container as? CryptoContainerProtocol {
+                sharedContainerViewModel.setCryptoContainer(cryptoContainer)
+                try await cryptoContainer.getRawContainerFile()?.markAsOpened()
             }
 
-            let urls = files
-            sharedContainerViewModel.setPendingOpenTask(
-                Task { [sharedContainerViewModel] in
-                    do {
-                        let container = try await self.openOrCreateContainer(withUrls: urls)
-                        guard let signedContainer = container as? SignedContainerProtocol else {
-                            throw FileOpeningError.noDataFiles
-                        }
-
-                        var openedContainer = signedContainer
-                        if await signedContainer.getContainerMimetype() == Constants.MimeType.Asics {
-                            openedContainer = try await self.asicsSivaConfirmedContainer(
-                                parentContainer: signedContainer
-                            )
-                        }
-
-                        guard !Task.isCancelled else {
-                            await signedContainer.cancelValidation()
-                            await openedContainer.cancelValidation()
-                            throw CancellationError()
-                        }
-
-                        sharedContainerViewModel.setSignedContainer(openedContainer)
-
-                        try await signedContainer.getRawContainerFile()?.markAsOpened()
-                    } catch is CancellationError {
-                        throw CancellationError()
-                    } catch {
-                        self.removeUnsuccessfulContainerIfNeeded(for: error)
-                        throw PendingOpenFailure(message: self.toastMessage(for: error))
-                    }
-                }
-            )
-
-            isSivaConfirmed = true
-            isFileOpeningLoading = false
-            isNavigatingToSigningView = true
+            handleLoadingSuccess(isSivaConfirmed: true)
         } catch {
             FileOpeningViewModel.logger().error(
                 "Unable to handle container confirmation. \(String(reflecting: error), privacy: .public)"
@@ -227,6 +194,16 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         }
     }
 
+    func showFileAddedMessage() async -> Bool {
+        let container = sharedContainerViewModel.currentContainer() as? any SignedContainerProtocol
+
+        return await !(container?.isExistingContainer() ?? true)
+    }
+
+    func addedFilesCount() -> Int {
+        return sharedContainerViewModel.getAddedFilesCount()
+    }
+
     func handleError() {
         errorMessage = nil
         isFileOpeningLoading = false
@@ -256,17 +233,20 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         return movedFileLocation
     }
 
-    private func asicsSivaConfirmedContainer(
-        parentContainer: SignedContainerProtocol
-    ) async throws -> SignedContainerProtocol {
+    private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
         // Only open the nested container when SiVa is actually needed (ASiC-S wrapping a DDOC).
         // An ASiC-S containing a BDOC must stay a regular ASiC-S container.
         let shouldOpenNested = await sivaRepository.shouldOpenNestedTimestampedContainer(parentContainer)
         FileOpeningViewModel.logger().info(
             "ASiC-S opened. Open nested container: \(shouldOpenNested, privacy: .public)"
         )
-        guard shouldOpenNested else { return parentContainer }
-        return try await sivaRepository.getTimestampedContainer(parentContainer: parentContainer)
+        if shouldOpenNested {
+            let nestedTimestampedContainer = try await sivaRepository
+                .getTimestampedContainer(parentContainer: parentContainer)
+            sharedContainerViewModel.setSignedContainer(nestedTimestampedContainer)
+        } else {
+            sharedContainerViewModel.setSignedContainer(parentContainer)
+        }
     }
 
     private func handleLoadingSuccess(isSivaConfirmed: Bool) {
@@ -299,27 +279,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         }
     }
 
-    private func toastMessage(for error: Error) -> ToastMessage {
-        switch error {
-        case let digiDocError as DigiDocError:
-            return createToastMessage(for: digiDocError)
-        case let fileOpeningError as FileOpeningError:
-            return createToastMessage(for: fileOpeningError)
-        default:
-            return ToastMessage(key: "General error")
-        }
-    }
-
-    private func removeUnsuccessfulContainerIfNeeded(for error: Error) {
-        guard let digiDocError = error as? DigiDocError,
-              let fileName = digiDocError.errorDetail.userInfo["fileName"] as? String else {
-            return
-        }
-
-        FileOpeningViewModel.logger().error("\(String(reflecting: digiDocError), privacy: .public)")
-        removeUnsuccessfulContainer(fileName: fileName)
-    }
-
     private func removeUnsuccessfulContainer(fileName: String) {
         do {
             let containerUrl = try Directories.getCacheDirectory(
@@ -336,29 +295,18 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         }
     }
 
-    private func isOpeningCryptoContainer(urls: [URL]) async -> Bool {
-        switch sharedContainerViewModel.getFileOpeningMethod() {
-        case .crypto:
-            return true
-        case .signing:
-            return false
-        case .all:
-            guard let firstFile = urls.first else { return false }
-            return await firstFile.isCryptoContainer() && urls.count == 1
-        }
-    }
-
     private func openOrCreateContainer(withUrls urls: [URL]) async throws -> GeneralContainer {
         let fileOpeningMethod = sharedContainerViewModel.getFileOpeningMethod()
         switch fileOpeningMethod {
         case .all:
-            guard !urls.isEmpty else { throw FileOpeningError.noDataFiles }
-            if await isOpeningCryptoContainer(urls: urls) {
+            guard let firstFile = urls.first else { throw FileOpeningError.noDataFiles }
+            let isCryptoContainer = await firstFile.isCryptoContainer()
+            if isCryptoContainer && urls.count == 1 {
                 return try await fileOpeningRepository.openOrCreateCryptoContainer(urls: urls)
             }
-            return try await fileOpeningRepository.openOrCreateContainer(urls: urls, isSivaConfirmed: true)
+            return try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
         case .signing:
-            return try await fileOpeningRepository.openOrCreateContainer(urls: urls, isSivaConfirmed: true)
+            return try await fileOpeningRepository.openOrCreateContainer(urls: files, isSivaConfirmed: true)
         case .crypto:
             return try await fileOpeningRepository.openOrCreateCryptoContainer(urls: urls)
         }

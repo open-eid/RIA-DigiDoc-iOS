@@ -162,68 +162,6 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
-    func loadContainerData_showsFilesAddedMessageWhenPendingOpenCreatedNewContainer() async {
-        let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { false }
-        mockSharedContainerViewModel.takePendingOpenTaskHandler = { Task {} }
-        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
-        mockSharedContainerViewModel.getAddedFilesCountHandler = { 2 }
-
-        await viewModel.loadContainerData(signedContainer: nil)
-
-        #expect(viewModel.successMessage == ToastMessage(key: "Files successfully added", args: []))
-    }
-
-    @Test
-    func loadContainerData_showsNoFilesAddedMessageWhenPendingOpenOpenedExistingContainer() async {
-        let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { true }
-        mockSharedContainerViewModel.takePendingOpenTaskHandler = { Task {} }
-        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
-
-        await viewModel.loadContainerData(signedContainer: nil)
-
-        #expect(viewModel.successMessage == nil)
-    }
-
-    @Test
-    func loadContainerData_showsNoFilesAddedMessageWithoutPendingOpen() async {
-        let mockSignedContainer = SignedContainerProtocolMock()
-        mockSignedContainer.isExistingContainerHandler = { false }
-
-        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
-
-        #expect(viewModel.successMessage == nil)
-    }
-
-    @Test
-    func loadContainerData_dismissesWithFailureMessageWhenPendingOpenFails() async {
-        let failureMessage = ToastMessage(key: "Failed to open container", args: ["container.asice"])
-        mockSharedContainerViewModel.takePendingOpenTaskHandler = {
-            Task { throw PendingOpenFailure(message: failureMessage) }
-        }
-
-        await viewModel.loadContainerData(signedContainer: nil)
-
-        #expect(viewModel.errorMessage == failureMessage)
-        #expect(viewModel.shouldDismiss)
-        #expect(!viewModel.isLoading)
-    }
-
-    @Test
-    func loadContainerData_staysSilentWhenPendingOpenIsCancelled() async {
-        mockSharedContainerViewModel.takePendingOpenTaskHandler = {
-            Task { throw CancellationError() }
-        }
-
-        await viewModel.loadContainerData(signedContainer: nil)
-
-        #expect(viewModel.errorMessage == nil)
-        #expect(!viewModel.shouldDismiss)
-        #expect(mockSharedContainerViewModel.currentContainerCallCount == 0)
-    }
-
-    @Test
     func loadContainerData_includesCadesNotificationOnFirstLoad() async {
         let mockSignedContainer = SignedContainerProtocolMock()
         mockSignedContainer.isCadesHandler = { true }
@@ -237,15 +175,14 @@ struct SigningViewModelTests: Loggable {
     func loadContainerData_ignoresLoadSupersededByBackNavigation() async {
         let mockSignedContainer = SignedContainerProtocolMock()
         let staleDataFile = MockDataFileWrapper.mockDataFileWrapper(fileName: "stale.txt")
-        mockSignedContainer.getDataFilesHandler = { [staleDataFile] }
-        mockSharedContainerViewModel.takePendingOpenTaskHandler = {
-            Task { try? await Task.sleep(for: .milliseconds(200)) }
+        mockSignedContainer.getDataFilesHandler = {
+            try? await Task.sleep(for: .milliseconds(200))
+            return [staleDataFile]
         }
-        mockSharedContainerViewModel.currentContainerHandler = { mockSignedContainer }
         mockSharedContainerViewModel.containersHandler = { [] }
 
-        let load = Task { await viewModel.loadContainerData(signedContainer: nil) }
-        while mockSharedContainerViewModel.takePendingOpenTaskCallCount == 0 {
+        let load = Task { await viewModel.loadContainerData(signedContainer: mockSignedContainer) }
+        while mockSignedContainer.getDataFilesCallCount == 0 {
             await Task.yield()
         }
         _ = await viewModel.handleBackButton()

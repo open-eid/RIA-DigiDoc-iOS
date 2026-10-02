@@ -88,7 +88,7 @@ struct SigningView: View {
     }
 
     private var areContainerActionsEnabled: Bool {
-        !viewModel.isLoading && !viewModel.areSignaturesLoading
+        !viewModel.areSignaturesLoading
     }
 
     private var isSignedContainer: Bool {
@@ -280,19 +280,7 @@ struct SigningView: View {
                                     }
                                 }
 
-                                if viewModel.isLoading {
-                                    TabView(selectedTab: $selectedTab, titles: [
-                                        containerFilesTitle,
-                                        containerSignaturesTitle
-                                    ]) {
-                                        LoadingView(
-                                            size: Dimensions.Icon.IconSizeXS,
-                                            isFullScreen: false
-                                        )
-                                        .padding(.vertical, Dimensions.Padding.XLPadding)
-                                    }
-                                    .padding(.top, Dimensions.Padding.LPadding)
-                                } else if isSignedContainer {
+                                if isSignedContainer {
                                     TabView(selectedTab: $selectedTab, titles: [
                                         containerFilesTitle,
                                         containerSignaturesTitle
@@ -448,10 +436,6 @@ struct SigningView: View {
 
                             await updateSignAndEncryptButtonVisibility()
                         }
-                    }
-                    .onChange(of: viewModel.shouldDismiss) { _, shouldDismiss in
-                        guard shouldDismiss else { return }
-                        dismiss()
                     }
                     .onDisappear {
                         containerLoadingTask?.cancel()

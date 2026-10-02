@@ -104,6 +104,21 @@ struct FileOpeningView: View {
             isFileOpeningLoading = viewModel.isFileOpeningLoading
             isNavigatingToSigningView = viewModel.isNavigatingToSigningView
             isNavigatingToEncryptView = viewModel.isNavigatingToEncryptView
+
+            let isSivaConfirmed = viewModel.isSivaConfirmed
+            let showFileAddedMessage = await viewModel.showFileAddedMessage()
+
+            if isSivaConfirmed && showFileAddedMessage {
+                let message = viewModel.addedFilesCount() > 1
+                ? languageSettings.localized("Files successfully added")
+                : languageSettings.localized("File successfully added")
+
+                Toast.show(message, type: .success)
+
+                if voiceOverEnabled {
+                    AccessibilityUtil.announceMessage(message)
+                }
+            }
         } else {
             let localizedMessage = languageSettings.localized(
                 errorMessage?.key ?? "General error",
