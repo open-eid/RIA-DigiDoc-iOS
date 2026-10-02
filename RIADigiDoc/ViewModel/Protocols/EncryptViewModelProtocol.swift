@@ -41,6 +41,7 @@ public protocol EncryptViewModelProtocol: Sendable {
     func handleBackButton() async -> Bool
     func isDataFilesInContainer(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func isCDOC1Container(cryptoContainer: CryptoContainerProtocol?) async -> Bool
+    func isCDOC2Container(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func shouldShowDataFiles(cryptoContainer: CryptoContainerProtocol?) async -> Bool
     func isInitialCryptoContainer(cryptoContainer: CryptoContainerProtocol?, isNestedContainer: Bool) async -> Bool
     func isUnlockedContainer(cryptoContainer: CryptoContainerProtocol?) async -> Bool

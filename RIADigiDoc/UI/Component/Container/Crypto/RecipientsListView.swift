@@ -29,6 +29,8 @@ struct RecipientsListView: View {
     let recipients: [Addressee]
     @Binding var selectedRecipient: Addressee?
     var showRemoveRecipientButton: Bool
+    var isCDOC2Container: Bool = false
+    var isEncryptedOrDecrypted: Bool = false
     @Binding var showRemoveRecipientModal: Bool
 
     let nameUtil: NameUtilProtocol
@@ -44,6 +46,8 @@ struct RecipientsListView: View {
                         nameUtil: nameUtil,
                         recipientUtil: recipientUtil,
                         showRemoveRecipientButton: showRemoveRecipientButton,
+                        isCDOC2Container: isCDOC2Container,
+                        isEncryptedOrDecrypted: isEncryptedOrDecrypted,
                         showRemoveRecipientModal: $showRemoveRecipientModal,
                         onSelect: {
                             selectedRecipient = recipient
@@ -59,6 +63,8 @@ struct RecipientsListView: View {
                         nameUtil: nameUtil,
                         recipientUtil: recipientUtil,
                         showRemoveRecipientButton: showRemoveRecipientButton,
+                        isCDOC2Container: isCDOC2Container,
+                        isEncryptedOrDecrypted: isEncryptedOrDecrypted,
                         showRemoveRecipientModal: $showRemoveRecipientModal,
                         onSelect: {
                             selectedRecipient = recipient
