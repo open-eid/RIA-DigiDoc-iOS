@@ -1,131 +1,121 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
-import urllib.request
-import ssl
 import argparse
-import os
+import urllib.request
+from pathlib import Path
 from xml.dom import minidom
 
-class TSLDownloader:
-    def __init__(self):
-        self.mimetypeFound = False
+TSL_MIME_TYPE = 'application/vnd.etsi.tsl+xml'
+DOWNLOAD_TIMEOUT_SECONDS = 60
+DOWNLOAD_DIRECTORY = Path(__file__).resolve().parent / 'TSL'
 
-    def parse_arguments(self):
-        """Parse command-line arguments."""
-        parser = argparse.ArgumentParser(description='TSL XML Downloader')
-        parser.add_argument('--tslFile', default='eu-lotl.xml', type=str, help='TSL file location')
-        parser.add_argument('--tslTestFile', type=str, help='Test TSL file location')
-        parser.add_argument('--countries', required=True, type=str, help='Countries, e.g., "EE;EE_T"')
-        parser.add_argument('--isDevBuild', required=True, type=str, help='Indicates if build is dev version, e.g., "True"')
-        return parser.parse_args()
 
-    def load_xml(self, tsl_file_location, tsl_test_file_location, is_test_file):
-        """Load the appropriate XML file based on country and test file presence."""
-        if is_test_file:
-            if tsl_test_file_location is None or tsl_test_file_location == tsl_file_location:
-                return None
-            return minidom.parse(tsl_test_file_location)
-        
-        if os.path.isfile(tsl_file_location):
-            return minidom.parse(tsl_file_location)
-        return minidom.parse(tsl_test_file_location)
+def parse_arguments():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(description='TSL XML Downloader')
+    parser.add_argument('--tslFile', action='append', default=[], type=Path, metavar='PATH',
+                        help='Base file (LOTL) to look members up in. Repeatable, searched in order')
+    parser.add_argument('--members', required=True, type=str,
+                        help='Scheme territories to download, e.g. "EE;EE_T;SE_TESTING"')
+    return parser.parse_args()
 
-    def download_tsl(self, tsl_url, country_code, is_dev_build, processed_urls):
-        """Download TSL data from the given URL and save it."""
-        # Check if the URL has already been processed
-        if tsl_url in processed_urls:
-            print(f"Skipping already processed URL: {tsl_url}")
-            return
-        
-        print(f"{country_code} TSL-URL: {tsl_url}")
-        
-        # Get data from TSL-URL
-        response = urllib.request.urlopen(tsl_url).read()
-        
-        # Decode the response from bytes to string
-        response_str = response.decode('utf-8')
-        
-        # Get the directory of the current script
-        script_directory = os.path.dirname(os.path.abspath(__file__))
-        
-        # Define the TSL subfolder path
-        tsl_folder_path = os.path.join(script_directory, "TSL")
-        
-        # Create the TSL subfolder if it doesn't exist
-        if not os.path.exists(tsl_folder_path):
-            os.makedirs(tsl_folder_path)
-        
-        # Save data to a file in the TSL subfolder
-        filename = f"{country_code}.xml"
-        file_path = os.path.join(tsl_folder_path, filename)
-        
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(response_str)
-        
-        # Mark this URL as processed
-        processed_urls.add(tsl_url)
 
-    def process_country(self, input_country, xmldoc, is_dev_build, processed_urls):
-        """Process XML data for a specific country and download TSL if applicable."""
-        pointers_to_other_tsl = xmldoc.getElementsByTagName('PointersToOtherTSL')
-        
-        for pointer in pointers_to_other_tsl:
-            other_tsl_pointers = pointer.getElementsByTagName('OtherTSLPointer')
-            
-            for pointer_data in other_tsl_pointers:
-                tsl_locations = pointer_data.getElementsByTagName('TSLLocation')
-                additional_info = pointer_data.getElementsByTagName('AdditionalInformation')
-                
-                for info in additional_info:
-                    other_info = info.getElementsByTagName('OtherInformation')
-                    
-                    for other_data in other_info:
-                        scheme_territory = other_data.getElementsByTagName('SchemeTerritory')
-                        mime_type = other_data.getElementsByTagName('ns3:MimeType') or other_data.getElementsByTagName('ns4:MimeType')
-                        test_mime_type = other_data.getElementsByTagName('tslx:MimeType')
-                        
-                        for territory in scheme_territory:
-                            pass
+def child_elements(parent, local_name):
+    """Direct child elements with this local name, whatever XML namespace prefix the file uses."""
+    return [
+        node
+        for node in parent.childNodes
+        if node.nodeType == node.ELEMENT_NODE and node.localName == local_name
+    ]
 
-                        if "_T" in input_country:
-                            for test_type in test_mime_type:
-                                if territory.firstChild.nodeValue == input_country and test_type.firstChild.nodeValue == 'application/vnd.etsi.tsl+xml':
-                                    tsl_url = pointer_data.getElementsByTagName('TSLLocation')[0].firstChild.nodeValue
-                                    self.download_tsl(tsl_url, territory.firstChild.nodeValue, is_dev_build, processed_urls)
-                                    break
-                        else:
-                            for mime in mime_type:
-                                if territory.firstChild.nodeValue == input_country and mime.firstChild.nodeValue == 'application/vnd.etsi.tsl+xml':
-                                    self.mimetypeFound = True
-                                    tsl_url = pointer_data.getElementsByTagName('TSLLocation')[0].firstChild.nodeValue
-                                    self.download_tsl(tsl_url, territory.firstChild.nodeValue, is_dev_build, processed_urls)
-                                    break
 
-    def main(self):
-        """Main function to execute the TSL downloader."""
-        # Parse arguments
-        args = self.parse_arguments()
+def text_of(element):
+    """Text content of an element, or None when it is empty."""
+    return element.firstChild.nodeValue if element.firstChild is not None else None
 
-        input_countries = args.countries.split(';') if ';' in args.countries else [args.countries]
-        is_dev_build = args.isDevBuild.lower() == "true"
-        
-        # Processed TSL URLs
-        processed_urls = set()
 
-        for input_country in input_countries:
-            xmldoc = self.load_xml(args.tslFile, args.tslTestFile, "_T" in input_country)
+def other_information(pointer, local_name):
+    """Values of AdditionalInformation/OtherInformation/<local_name> for one pointer."""
+    return [
+        text_of(element)
+        for additional_information in child_elements(pointer, 'AdditionalInformation')
+        for information in child_elements(additional_information, 'OtherInformation')
+        for element in child_elements(information, local_name)
+    ]
 
-            if xmldoc is None:
+
+def find_tsl_url(member, lotl):
+    """The TSL location the base file points at for this member, or None."""
+    for pointers in lotl.getElementsByTagName('PointersToOtherTSL'):
+        for pointer in child_elements(pointers, 'OtherTSLPointer'):
+            if member not in other_information(pointer, 'SchemeTerritory'):
                 continue
-            
-            # Process country-specific data
-            self.process_country(input_country, xmldoc, is_dev_build, processed_urls)
+            if TSL_MIME_TYPE not in other_information(pointer, 'MimeType'):
+                continue
 
-        # Validate country and mime type
-        if len(input_country) == 2 and not self.mimetypeFound:
-            raise Exception(f"Could not find mimetype for '{input_country}'. Verify input country code and check if the MimeType tag name has changed (nsx:MimeType) in TSL file.")
+            locations = child_elements(pointer, 'TSLLocation')
+
+            if locations:
+                return text_of(locations[0])
+
+    return None
+
+
+def existing_base_files(paths):
+    """The given base files that exist, in the order given, reporting the ones that do not."""
+    existing = []
+
+    for path in paths:
+        if path.is_file():
+            existing.append(path)
+        else:
+            print(f"Skipping missing base file '{path}'")
+
+    return existing
+
+
+def resolve_member(member, base_files):
+    """Look the member up in each base file in turn. Returns the first TSL location found."""
+    for base_file in base_files:
+        tsl_url = find_tsl_url(member, minidom.parse(str(base_file)))
+
+        if tsl_url is not None:
+            print(f"Found '{member}' in '{base_file}'")
+            return tsl_url
+
+        print(f"No '{member}' pointer in '{base_file}'")
+
+    return None
+
+
+def download_tsl(tsl_url, destination_path):
+    """Download a TSL and save it."""
+    print(f"Downloading {tsl_url} to {destination_path}")
+
+    with urllib.request.urlopen(tsl_url, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response:
+        destination_path.write_bytes(response.read())
+
+
+def main():
+    """Main function to execute the TSL downloader."""
+    args = parse_arguments()
+    members = [member for member in args.members.split(';') if member]
+    base_files = existing_base_files(args.tslFile)
+
+    DOWNLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
+
+    for member in members:
+        tsl_url = resolve_member(member, base_files)
+
+        if tsl_url is None:
+            searched = ', '.join(str(base_file) for base_file in base_files) or 'none'
+            raise SystemExit(
+                f"Could not find a TSL pointer for '{member}'. Base files searched: {searched}. "
+                f"Either the member code is wrong, or the base file listing it was not given."
+            )
+
+        download_tsl(tsl_url, DOWNLOAD_DIRECTORY / f"{member}.xml")
 
 
 if __name__ == "__main__":
-    downloader = TSLDownloader()
-    downloader.main()
+    main()
