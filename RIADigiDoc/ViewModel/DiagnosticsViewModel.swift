@@ -248,7 +248,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
 
     func createDiagnosticsFile(languageSettings: LanguageSettingsProtocol, directory: URL? = nil) async -> URL? {
         let diagnosticsText = buildDiagnosticsText(languageSettings: languageSettings)
-        let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
+        let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.txt"
         return writeToTempFile(
             content: diagnosticsText,
             fileName: diagnosticsFileName,
@@ -365,7 +365,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
         let appLogEntries = await readAppLogEntries()
         let libdigidocLogEntries = await readLibDigidocLogEntries()
         let mergedLines = mergeLogEntries(appLogEntries, libdigidocLogEntries)
-        let logFileName = "ria_digidoc_\(self.versionSectionContent).log"
+        let logFileName = "ria_digidoc_\(self.versionSectionContent).txt"
         return writeToTempFile(
             content: mergedLines,
             fileName: logFileName,
@@ -498,7 +498,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
 
         allEntries.append("")
         allEntries.append("")
-        allEntries.append("===== File: ria_digidoc.log =====")
+        allEntries.append("===== File: ria_digidoc.txt =====")
         allEntries.append("")
         if let appLogEntries = appLogEntries {
             allEntries.append(contentsOf: appLogEntries)

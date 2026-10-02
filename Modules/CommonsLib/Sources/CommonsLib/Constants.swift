@@ -82,7 +82,7 @@ public struct Constants {
     }
 
     public struct File {
-        public static let LibDigidocLog = "libdigidocpp.log"
+        public static let LibDigidocLog = "libdigidocpp.txt"
         public static let LDAPCertsPem = "ldapCerts.pem"
         public static let nfcCANKey = "canKey.txt"
     }

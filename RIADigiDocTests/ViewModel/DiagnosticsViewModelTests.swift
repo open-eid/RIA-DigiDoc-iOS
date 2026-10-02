@@ -303,6 +303,7 @@ final class DiagnosticsViewModelTests {
             directory: tempDirectoryURL
         ) {
             #expect(!logFileUrl.resolvedPath.isEmpty)
+            #expect(logFileUrl.pathExtension == "txt")
         }
     }
 
@@ -453,6 +454,7 @@ final class DiagnosticsViewModelTests {
             directory: tempDirectoryURL
         ) {
             #expect(!logFileUrl.resolvedPath.isEmpty)
+            #expect(logFileUrl.pathExtension == "txt")
         }
 
     }
