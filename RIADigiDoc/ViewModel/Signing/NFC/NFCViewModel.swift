@@ -820,23 +820,15 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
     }
 
     private func checkPINNumberValidity(pinNumber: String, pinType: CodeType?) {
-        let minLen = if pinType == .pin1 {
-            Constants.Validation.Pin1MinimumLength
-        } else if pinType == .pin2 {
-            Constants.Validation.Pin2MinimumLength
-        } else {
-            Constants.Validation.PukMinimumLength
-        }
+        let codeType = pinType ?? .puk
 
-        let maxLen = Constants.Validation.PinMaximumLength
-
-        guard pinNumber.isEmpty || (
-            pinNumber.count >= minLen &&
-            pinNumber.count <= maxLen &&
-            pinNumber.allSatisfy { $0.isNumber }
-        ) else {
+        guard pinNumber.isEmpty || codeType.validateFormat(Array(pinNumber.utf8)) == nil else {
             pinNumberErrorKey = "PIN length requirement"
-            pinNumberErrorExtraArguments = [pinType?.name ?? "", String(minLen), String(maxLen)]
+            pinNumberErrorExtraArguments = [
+                pinType?.name ?? "",
+                String(codeType.minimumLength),
+                String(codeType.maximumLength)
+            ]
             return
         }
         pinNumberErrorKey = ""

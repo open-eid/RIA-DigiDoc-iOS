@@ -33,9 +33,10 @@ extension IdCardError {
     public init(_ nfcError: nfclib.IdCardError) {
         switch nfcError {
         case .wrongCAN: self = .wrongCAN
-        case .wrongPIN(let tries): self = .wrongPIN(triesLeft: tries)
+        case .wrongPIN(_, let tries): self = .wrongPIN(triesLeft: tries)
         case .invalidNewPIN: self = .invalidNewPIN
         case .sessionError: self = .sessionError
+        case .notActivated: self = .notActivated
         @unknown default: self = .sessionError
         }
     }
