@@ -49,10 +49,21 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
+    var isLoading = false
+
+    var areSignaturesLoading = false
+
+    private(set) var expectedSignatureCount = 0
+
+    private(set) var didAddSignature = false
+
+    private(set) var shouldDismiss = false
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
     var showCannotExtendContainerDialog = false
     private var pendingExtendedContainer: PendingExtendedContainer?
+    private var pendingOpenTask: Task<Void, Error>?
+    private var loadGeneration = 0
     private(set) var containerNotifications: [ContainerNotificationType] = []
     private(set) var errorMessage: ToastMessage?
     private(set) var successMessage: ToastMessage?
@@ -91,31 +102,132 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         self.containerUtil = containerUtil
     }
 
+    private func provisionalContainerName() -> String? {
+        guard case .success(let urls)? = sharedContainerViewModel.getFileOpeningResult(),
+              let firstFile = urls.first else {
+            return nil
+        }
+
+        let fileExtension = firstFile.pathExtension.lowercased()
+
+        if urls.count == 1 && CommonsLib.Constants.Container.ContainerExtensions.contains(fileExtension) {
+            return firstFile.lastPathComponent
+        }
+
+        if urls.count == 1 && fileExtension == CommonsLib.Constants.Extension.Pdf {
+            return nil
+        }
+
+        return firstFile
+            .deletingPathExtension()
+            .appendingPathExtension(CommonsLib.Constants.Extension.Default)
+            .lastPathComponent
+    }
+
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
+        loadGeneration += 1
+        let generation = loadGeneration
+        didAddSignature = sharedContainerViewModel.getIsSignatureAdded()
         sharedContainerViewModel.setIsSignatureAdded(false)
+
+        let pendingOpen = sharedContainerViewModel.takePendingOpenTask()
+        if let pendingOpen {
+            guard await finishPendingOpen(pendingOpen), generation == loadGeneration else { return }
+        }
+
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
+            isLoading = false
+            areSignaturesLoading = false
             SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
         self.signedContainer = openedContainer
 
-        self.containerName = await openedContainer.getContainerName()
-        self.dataFiles = await openedContainer.getDataFiles()
-        self.signatures = await openedContainer.getSignatures()
-        self.timestamps = await openedContainer.getTimestamps()
-        self.containerMimetype = await openedContainer.getContainerMimetype()
-        self.containerURL = await openedContainer.getRawContainerFile()
-        self.isTimestampedContainer = await isTimestampedContainer()
-        self.isCadesContainer = await openedContainer.isCades()
-        self.isXadesContainer = await openedContainer.isXades()
+        let loadedContainerName = await openedContainer.getContainerName()
+        let loadedDataFiles = await openedContainer.getDataFiles()
+        let loadedMimetype = await openedContainer.getContainerMimetype()
+        let loadedContainerURL = await openedContainer.getRawContainerFile()
+        let signatureCount = await openedContainer.getSignatures().count
+        let isNewContainer = await !openedContainer.isExistingContainer()
 
-        self.containerNotifications = await getContainerNotifications(container: openedContainer)
+        guard generation == loadGeneration else { return }
 
-        SigningViewModel.logger().info("Signed container data loaded")
+        self.containerName = loadedContainerName
+        self.dataFiles = loadedDataFiles
+        self.containerMimetype = loadedMimetype
+        self.containerURL = loadedContainerURL
+        self.expectedSignatureCount = signatureCount
+        self.isLoading = false
+        self.areSignaturesLoading = signatureCount > 0
+
+        if pendingOpen != nil && isNewContainer {
+            successMessage = ToastMessage(
+                key: sharedContainerViewModel.getAddedFilesCount() > 1
+                    ? "Files successfully added"
+                    : "File successfully added",
+                args: []
+            )
+        }
+
+        SigningViewModel.logger().info("Container contents loaded; awaiting signature validation")
+
+        await loadSignatureData(for: openedContainer, generation: generation)
+    }
+
+    private func finishPendingOpen(_ pendingOpen: Task<Void, Error>) async -> Bool {
+        pendingOpenTask = pendingOpen
+        defer { pendingOpenTask = nil }
+        isLoading = true
+        containerName = provisionalContainerName() ?? ""
+
+        do {
+            try await pendingOpen.value
+            return true
+        } catch is CancellationError {
+            SigningViewModel.logger().info("Container opening cancelled")
+            return false
+        } catch {
+            isLoading = false
+            areSignaturesLoading = false
+            SigningViewModel.logger().error(
+                "Unable to open container. \(String(reflecting: error), privacy: .public)"
+            )
+            errorMessage = (error as? PendingOpenFailure)?.message ?? ToastMessage(key: "General error", args: [])
+            shouldDismiss = true
+            return false
+        }
+    }
+
+    private func loadSignatureData(for container: SignedContainerProtocol, generation: Int) async {
+        await container.awaitValidation()
+
+        let loadedSignatures = await container.getSignatures()
+        let loadedTimestamps = await container.getTimestamps()
+        let loadedIsTimestamped = await isTimestampedContainer()
+        let loadedIsCades = await container.isCades()
+        let loadedIsXades = await container.isXades()
+
+        guard generation == loadGeneration else { return }
+
+        self.isCadesContainer = loadedIsCades
+        self.isXadesContainer = loadedIsXades
+
+        let loadedNotifications = await getContainerNotifications(container: container)
+
+        guard generation == loadGeneration else { return }
+
+        self.signatures = loadedSignatures
+        self.timestamps = loadedTimestamps
+        self.isTimestampedContainer = loadedIsTimestamped
+        self.containerNotifications = loadedNotifications
+        self.expectedSignatureCount = loadedSignatures.count
+        self.areSignaturesLoading = false
+
+        SigningViewModel.logger().info("Signature data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
@@ -141,7 +253,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func isSigned() -> Bool {
-        return !signatures.isEmpty
+        return !signatures.isEmpty || expectedSignatureCount > 0
     }
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
@@ -209,6 +321,13 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         } catch {
             await handleAddFilesError(error, container: container)
         }
+    }
+
+    private func cancelPendingWork() {
+        loadGeneration += 1
+        pendingOpenTask?.cancel()
+        let container = signedContainer
+        Task { await container?.cancelValidation() }
     }
 
     public func isSignatureAdded() -> Bool {
@@ -473,6 +592,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func handleBackButton() async -> Bool {
+        cancelPendingWork()
         await MainActor.run {
             navigateToNestedCryptoContainerView = false
         }
@@ -559,6 +679,12 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             SigningViewModel.logger().error(
                 "Unable to remove file from container. File not found in container"
             )
+            errorMessage = ToastMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
+            return
+        }
+
+        guard !isSigned() else {
+            SigningViewModel.logger().error("Refusing to remove a data file from a signed container")
             errorMessage = ToastMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
             return
         }

@@ -18,6 +18,7 @@
  */
 
 import SwiftUI
+import UtilsLib
 
 struct InputModal: View {
     @Environment(LanguageSettings.self) private var languageSettings
@@ -30,10 +31,15 @@ struct InputModal: View {
     var onConfirm: () -> Void
     var onCancel: () -> Void
 
+    private var isNameEntered: Bool {
+        text.sanitizedOrNil() != nil
+    }
+
     var body: some View {
         ModalContainer(
             icon: icon,
             title: title,
+            isConfirmButtonEnabled: isNameEntered,
             onConfirm: onConfirm,
             onCancel: onCancel
         ) {

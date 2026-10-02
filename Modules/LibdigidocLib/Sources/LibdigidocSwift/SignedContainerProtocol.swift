@@ -24,6 +24,9 @@ import CommonsLib
 public protocol SignedContainerProtocol: GeneralContainer, Sendable {
     func getDataFiles() async -> [DataFileWrapper]
     func getSignatures() async -> [SignatureWrapper]
+
+    func awaitValidation() async
+    func cancelValidation() async
     func getTimestamps() async -> [SignatureWrapper]
     func getContainerName() async -> String
     func getContainerMimetype() async -> String

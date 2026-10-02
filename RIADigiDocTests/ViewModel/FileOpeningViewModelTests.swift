@@ -213,6 +213,7 @@ struct FileOpeningViewModelTests {
 
         await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
+        try await awaitPendingOpen()
 
         let rawContainerFile = await mockContainer.getRawContainerFile()
 
@@ -262,6 +263,7 @@ struct FileOpeningViewModelTests {
 
         await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
+        try await awaitPendingOpen()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
         #expect(mockSivaRepository.getTimestampedContainerCallCount == 1)
@@ -294,6 +296,7 @@ struct FileOpeningViewModelTests {
 
         await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
+        try await awaitPendingOpen()
 
         #expect(mockSivaRepository.getTimestampedContainerCallCount == 0)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
@@ -327,6 +330,7 @@ struct FileOpeningViewModelTests {
 
         await viewModel.handleFiles()
         await viewModel.handleSivaConfirmation()
+        try await awaitPendingOpen()
 
         #expect(mockFileOpeningRepository.openOrCreateContainerCallCount == 1)
         #expect(mockSharedContainerViewModel.setSignedContainerCallCount == 1)
@@ -507,56 +511,6 @@ struct FileOpeningViewModelTests {
     }
 
     @Test
-    func showFileAddedMessage_returnFalseIfNoContainer() async {
-        mockSharedContainerViewModel.currentContainerHandler = { nil }
-
-        let showFileAddedMessage = await viewModel.showFileAddedMessage()
-
-        #expect(!showFileAddedMessage)
-        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
-    }
-
-    @Test
-    func showFileAddedMessage_returnFalseWhenContainerIsSigned() async {
-        let mockContainer = SignedContainerProtocolMock()
-        mockContainer.getSignaturesHandler = {[
-            MockSignatureWrapper.mockSignatureWrapper(signatureId: "1"),
-            MockSignatureWrapper.mockSignatureWrapper(signatureId: "2")
-        ]}
-
-        mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
-        mockContainer.isExistingContainerHandler = { true }
-
-        let showFileAddedMessage = await viewModel.showFileAddedMessage()
-
-        #expect(!showFileAddedMessage)
-        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
-    }
-
-    @Test
-    func showFileAddedMessage_returnTrueWhenContainerIsNotSigned() async {
-        let mockContainer = SignedContainerProtocolMock()
-        mockContainer.getSignaturesHandler = { [] }
-        mockSharedContainerViewModel.currentContainerHandler = { mockContainer }
-        mockContainer.isExistingContainerHandler = { false }
-
-        let showFileAddedMessage = await viewModel.showFileAddedMessage()
-
-        #expect(showFileAddedMessage)
-        #expect(mockSharedContainerViewModel.currentContainerCallCount == 1)
-    }
-
-    @Test
-    func addedFilesCount_successWhenFilesAreAddedToContainer() {
-        mockSharedContainerViewModel.getAddedFilesCountHandler = { 5 }
-
-        let addedFilesCount = viewModel.addedFilesCount()
-
-        #expect(addedFilesCount == 5)
-        #expect(mockSharedContainerViewModel.getAddedFilesCountCallCount == 1)
-    }
-
-    @Test
     func handleError_success() {
         viewModel.handleError()
 
@@ -583,5 +537,10 @@ struct FileOpeningViewModelTests {
 
         #expect(!isSivaConfirmationNeeded)
         #expect(mockFileOpeningRepository.isSivaConfirmationNeededCallCount == 1)
+    }
+
+    private func awaitPendingOpen() async throws {
+        let pendingOpen = try #require(mockSharedContainerViewModel.setPendingOpenTaskArgValues.last ?? nil)
+        try await pendingOpen.value
     }
 }

@@ -87,8 +87,12 @@ struct SigningView: View {
         languageSettings.localized("Share container")
     }
 
+    private var areContainerActionsEnabled: Bool {
+        !viewModel.isLoading && !viewModel.areSignaturesLoading
+    }
+
     private var isSignedContainer: Bool {
-        viewModel.signatures.count > 0
+        viewModel.signatures.count > 0 || viewModel.expectedSignatureCount > 0
     }
 
     private var closeIcon: String {
@@ -205,13 +209,18 @@ struct SigningView: View {
                                     icon: containerIcon,
                                     containerNameTitle: containerNameTitle,
                                     name: $viewModel.containerName,
-                                    isEditContainerButtonShown: !isContainerSigned && !isNestedContainer,
-                                    isSaveButtonShown: true,
+                                    isEditContainerButtonShown: areContainerActionsEnabled
+                                        && !isContainerSigned && !isNestedContainer,
+                                    isSaveButtonShown: areContainerActionsEnabled,
                                     isSignButtonShown: false,
-                                    isEncryptButtonShown: !isContainerSigned && !isNestedContainer,
-                                    isExtendSignaturesButtonShown: isExtendSignaturesButtonShown,
-                                    showLeftActionButton: isContainerSigned && isSignButtonShown,
-                                    showRightActionButton: isContainerSigned && !isNestedContainer,
+                                    isEncryptButtonShown: areContainerActionsEnabled
+                                        && !isContainerSigned && !isNestedContainer,
+                                    isExtendSignaturesButtonShown: areContainerActionsEnabled
+                                        && isExtendSignaturesButtonShown,
+                                    showLeftActionButton: areContainerActionsEnabled
+                                        && isContainerSigned && isSignButtonShown,
+                                    showRightActionButton: areContainerActionsEnabled
+                                        && isContainerSigned && !isNestedContainer,
                                     leftActionButtonName: languageSettings.localized("Add signature"),
                                     rightActionButtonName: encryptLabel,
                                     leftActionButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
@@ -271,7 +280,19 @@ struct SigningView: View {
                                     }
                                 }
 
-                                if isSignedContainer {
+                                if viewModel.isLoading {
+                                    TabView(selectedTab: $selectedTab, titles: [
+                                        containerFilesTitle,
+                                        containerSignaturesTitle
+                                    ]) {
+                                        LoadingView(
+                                            size: Dimensions.Icon.IconSizeXS,
+                                            isFullScreen: false
+                                        )
+                                        .padding(.vertical, Dimensions.Padding.XLPadding)
+                                    }
+                                    .padding(.top, Dimensions.Padding.LPadding)
+                                } else if isSignedContainer {
                                     TabView(selectedTab: $selectedTab, titles: [
                                         containerFilesTitle,
                                         containerSignaturesTitle
@@ -288,6 +309,12 @@ struct SigningView: View {
                                                 navigateToNestedCryptoContainerView:
                                                     $viewModel.navigateToNestedCryptoContainerView
                                             )
+                                        } else if viewModel.areSignaturesLoading {
+                                            LoadingView(
+                                                size: Dimensions.Icon.IconSizeXS,
+                                                isFullScreen: false
+                                            )
+                                            .padding(.vertical, Dimensions.Padding.XLPadding)
                                         } else {
                                             SignaturesListView(
                                                 signatures: viewModel.isTimestampedContainer ?
@@ -348,7 +375,7 @@ struct SigningView: View {
                         .padding(Dimensions.Padding.SPadding)
                         .scrollPosition(id: $scrollPosition, anchor: .bottom)
                         .onChange(of: viewModel.signatures.count) { previousCount, newCount in
-                            guard newCount > previousCount else { return }
+                            guard viewModel.didAddSignature, newCount > previousCount else { return }
                             scrollToBottom()
                         }
 
@@ -363,7 +390,7 @@ struct SigningView: View {
                             }
                         } else {
                             UnsignedBottomBarView(
-                                showLeftButton: true,
+                                showLeftButton: areContainerActionsEnabled,
                                 leftButtonIconName: "ic_m3_add_48pt_wght400",
                                 leftButtonLabel: addMoreFilesLabel,
                                 leftButtonAccessibilityLabel: addMoreFilesLabel.lowercased(),
@@ -371,7 +398,7 @@ struct SigningView: View {
                                     isImportingAddedFiles = true
                                 },
 
-                                rightButtonEnabled: true,
+                                rightButtonEnabled: areContainerActionsEnabled,
                                 rightButtonIconName: "ic_m3_stylus_note_48pt_wght400",
                                 rightButtonLabel: signLabel,
                                 rightButtonAccessibilityLabel: signAccessibilityLabel.lowercased(),
@@ -421,6 +448,10 @@ struct SigningView: View {
 
                             await updateSignAndEncryptButtonVisibility()
                         }
+                    }
+                    .onChange(of: viewModel.shouldDismiss) { _, shouldDismiss in
+                        guard shouldDismiss else { return }
+                        dismiss()
                     }
                     .onDisappear {
                         containerLoadingTask?.cancel()
@@ -555,12 +586,12 @@ struct SigningView: View {
 
     private func scrollToBottom() {
         DispatchQueue.main.async {
-            guard let lastSignature = viewModel.signatures.indices.last else { return }
+            guard let lastIndex = viewModel.signatures.indices.last else { return }
 
-            scrollPosition = lastSignature
+            scrollPosition = viewModel.signatures[lastIndex].pos
 
             DispatchQueue.main.async {
-                focusedSignatureIndex = lastSignature
+                focusedSignatureIndex = lastIndex
             }
         }
     }
@@ -615,8 +646,7 @@ struct SigningView: View {
 
     private func handleFileRename(to newContainerName: String) async {
         showRenameModal = false
-        let sanitizedContainerName = newContainerName.sanitized()
-        guard !sanitizedContainerName.isEmpty else { return }
+        guard let sanitizedContainerName = newContainerName.sanitizedOrNil() else { return }
         let containerNameWithExtension =
             containerExtension.isEmpty
             ? sanitizedContainerName

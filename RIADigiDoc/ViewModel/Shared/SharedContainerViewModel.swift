@@ -32,6 +32,7 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol {
     private var nestedContainers: [GeneralContainer] = []
     private var isSignatureAdded: Bool = false
     private var fileOpeningMethod: FileOpeningMethod = .all
+    private var pendingOpenTask: Task<Void, Error>?
 
     func setSignedContainer(_ signedContainer: SignedContainerProtocol?) {
         self.signedContainer = signedContainer
@@ -65,6 +66,15 @@ class SharedContainerViewModel: SharedContainerViewModelProtocol {
 
     func getFileOpeningMethod() -> FileOpeningMethod {
         return fileOpeningMethod
+    }
+
+    func setPendingOpenTask(_ task: Task<Void, Error>?) {
+        self.pendingOpenTask = task
+    }
+
+    func takePendingOpenTask() -> Task<Void, Error>? {
+        defer { pendingOpenTask = nil }
+        return pendingOpenTask
     }
 
     private func addNestedContainer(_ container: GeneralContainer?) {

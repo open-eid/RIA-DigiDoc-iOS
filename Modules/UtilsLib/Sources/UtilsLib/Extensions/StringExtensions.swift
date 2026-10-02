@@ -22,7 +22,13 @@ import CommonsLib
 
 extension String {
 
+    private static let leadingDotCharacters: Set<Character> = [".", "\u{2026}"]
+
     public func sanitized() -> String {
+        return sanitizedOrNil() ?? Constants.Container.DefaultName
+    }
+
+    public func sanitizedOrNil() -> String? {
         var forbidden = CharacterSet.illegalCharacters
             .union(.symbols)
             .union(.extraSymbols)
@@ -33,14 +39,14 @@ extension String {
             .joined()
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        while cleanName.hasPrefix(".") {
+        while let first = cleanName.first, String.leadingDotCharacters.contains(first) {
             cleanName.removeFirst()
             if cleanName.isEmpty {
                 cleanName = "_"
             }
         }
 
-        return cleanName.isEmpty ? Constants.Container.DefaultName : cleanName
+        return cleanName.isEmpty ? nil : cleanName
     }
 
     public func getURLFromText() -> AttributedString? {

@@ -58,6 +58,14 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
         return await container.getSignatures()
     }
 
+    public func awaitValidation() async {
+        await container.awaitValidation()
+    }
+
+    public func cancelValidation() async {
+        await container.cancelValidation()
+    }
+
     public func getTimestamps() async -> [SignatureWrapper] {
         return timestamps
     }
@@ -221,6 +229,7 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
             fileManager: fileManager
         ).open(containerFile: nestedTimestampedFile, isSivaConfirmed: true)
 
+        await container.awaitValidation()
         let timestamps = await container.getSignatures()
 
         return SignedContainer(
@@ -411,7 +420,7 @@ extension SignedContainer {
 
         let container = try await ContainerWrapper(
             fileManager: fileManager
-        ).open(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
+        ).openStaged(containerFile: renamedContainerFile, isSivaConfirmed: isSivaConfirmed)
 
         return SignedContainer(
             containerFile: renamedContainerFile,

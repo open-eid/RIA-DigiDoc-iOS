@@ -43,4 +43,7 @@ public protocol SharedContainerViewModelProtocol: Sendable {
 
     func setFileOpeningMethod(_ method: FileOpeningMethod)
     func getFileOpeningMethod() -> FileOpeningMethod
+
+    func setPendingOpenTask(_ task: Task<Void, Error>?)
+    func takePendingOpenTask() -> Task<Void, Error>?
 }

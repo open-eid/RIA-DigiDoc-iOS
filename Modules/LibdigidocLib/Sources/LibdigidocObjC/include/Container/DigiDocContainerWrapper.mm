@@ -34,6 +34,10 @@
 
 @interface DigiDocContainerWrapper ()
 + (DigiDocSignatureStatus)determineSignatureStatus:(int)status;
++ (dispatch_queue_t)libraryQueue;
++ (NSError *)errorFromException:(const digidoc::Exception &)e;
++ (DigiDocSignature *)getSignatureMetadata:(digidoc::Signature *)signature pos:(int)pos;
++ (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos;
 @end
 
 struct DigiDocContainerOpenCB: public digidoc::ContainerOpenCB {
@@ -95,12 +99,23 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
 
 @implementation DigiDocContainerWrapper {}
 
++ (dispatch_queue_t)libraryQueue {
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("ee.ria.digidoc.libdigidocpp", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
+
 + (void)dispatch:(void (^)(void))command completion:(void (^)(NSError *error))completion {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async([self libraryQueue], ^{
         NSError *error = nil;
 
         try {
-            command();
+            @synchronized ([DigiDocContainerWrapper class]) {
+                command();
+            }
         } catch (const digidoc::Exception &e) {
             std::vector<digidoc::Exception> causes = e.causes();
             NSDictionary *userInfo = @{
@@ -148,7 +163,7 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     }
 }
 
-+ (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos mediaType:(const std::string&)mediaType dataFileCount:(NSInteger)dataFileCount {
++ (DigiDocSignature *)getSignatureMetadata:(digidoc::Signature *)signature pos:(int)pos {
 
     digidoc::X509Cert signingCert = signature->signingCertificate();
     digidoc::X509Cert ocspCert = signature->OCSPCertificate();
@@ -180,7 +195,8 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digiDocSignature.timeStampTime = [NSString stringWithUTF8String:signature->TimeStampTime().c_str()];
     digiDocSignature.signedBy = [NSString stringWithUTF8String:name.c_str()];
     digiDocSignature.format = [NSString stringWithUTF8String:signature->profile().c_str()];
-    digiDocSignature.messageImprint = [NSData dataWithBytes:signature->messageImprint().data() length:signature->messageImprint().size()];
+    auto messageImprint = signature->messageImprint();
+    digiDocSignature.messageImprint = [NSData dataWithBytes:messageImprint.data() length:messageImprint.size()];
     digiDocSignature.trustedSigningTime = [NSString stringWithUTF8String:signature->trustedSigningTime().c_str()];
 
     auto archiveTimestamps = signature->ArchiveTimeStamps();
@@ -205,13 +221,19 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     digiDocSignature.country = [NSString stringWithUTF8String:signature->countryName().c_str()];
     digiDocSignature.zipCode = [NSString stringWithUTF8String:signature->postalCode().c_str()];
 
-    digidoc::Signature::Validator validator(signature);
-    digidoc::Signature::Validator::Status status = validator.status();
-    digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
-    digiDocSignature.status = [DigiDocContainerWrapper determineSignatureStatus:status];
-    digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
-    return digiDocSignature;
+    digiDocSignature.status = UnknownStatus;
+    digiDocSignature.diagnosticsInfo = @"";
 
+    return digiDocSignature;
+}
+
++ (DigiDocSignature *)getSignature:(digidoc::Signature *)signature pos:(int)pos {
+    DigiDocSignature *digiDocSignature = [DigiDocContainerWrapper getSignatureMetadata:signature pos:pos];
+
+    digidoc::Signature::Validator validator(signature);
+    digiDocSignature.diagnosticsInfo = [NSString stringWithUTF8String:validator.diagnostics().c_str()];
+    digiDocSignature.status = [DigiDocContainerWrapper determineSignatureStatus:validator.status()];
+    return digiDocSignature;
 }
 
 + (void)create:(NSString *)containerPath withDataFilePaths:(NSArray<NSString *> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion {
@@ -280,7 +302,7 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
             NSMutableArray *signatures = [NSMutableArray array];
             int pos = 0;
             for (digidoc::Signature *signature: container->signatures()) {
-                [signatures addObject:[DigiDocContainerWrapper getSignature:signature pos:pos++ mediaType:container->mediaType() dataFileCount:container->dataFiles().size()]];
+                [signatures addObject:[DigiDocContainerWrapper getSignature:signature pos:pos++]];
             }
 
             NSString *mediatype = [NSString stringWithUTF8String:container->mediaType().c_str()];
@@ -303,6 +325,28 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
             return nil;
         }
     }
+}
+
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion {
+    dispatch_async([self libraryQueue], ^{
+        NSError *error = nil;
+        DigiDocContainer *container = [self open:containerPath validateOnline:validateOnline error:&error];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(container, error);
+        });
+    });
+}
+
++ (NSError *)errorFromException:(const digidoc::Exception &)e {
+    std::vector<digidoc::Exception> causes = e.causes();
+    NSDictionary *userInfo = @{
+        NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.msg().c_str()],
+        @"causes": [ExceptionUtil exceptionCauses:static_cast<void *>(&causes)]
+    };
+    return [NSError errorWithDomain:@"LibdigidocLib" code:e.code() userInfo:userInfo];
 }
 
 + (NSString *)libdigidocppVersion {
@@ -465,5 +509,136 @@ static bool canExtend(const std::vector<digidoc::Signature *> &signatures, const
     }];
 }
 
+
+@end
+
+@interface DigiDocValidationSession ()
+- (instancetype)initWithContainer:(std::unique_ptr<digidoc::Container> &&)container;
+@end
+
+@implementation DigiDocValidationSession {
+    std::unique_ptr<digidoc::Container> _container;
+    std::vector<digidoc::Signature *> _signatures;
+}
+
+- (instancetype)initWithContainer:(std::unique_ptr<digidoc::Container> &&)container {
+    self = [super init];
+    if (self) {
+        _container = std::move(container);
+        _signatures = _container->signatures();
+        _signatureCount = _signatures.size();
+    }
+    return self;
+}
+
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^NS_SWIFT_SENDABLE)(DigiDocValidationSession * _Nullable session,
+                                        DigiDocContainer * _Nullable container,
+                                        NSError * _Nullable error))completion {
+    dispatch_async([DigiDocContainerWrapper libraryQueue], ^{
+        NSError *error = nil;
+        DigiDocValidationSession *session = nil;
+        DigiDocContainer *parsed = nil;
+
+        @synchronized ([DigiDocContainerWrapper class]) {
+            try {
+                DigiDocContainerOpenCB cb(validateOnline);
+                std::unique_ptr<digidoc::Container> container =
+                    digidoc::Container::openPtr(containerPath.UTF8String, &cb);
+
+                if (!container) {
+                    error = [NSError errorWithDomain:@"LibdigidocLib" code:3 userInfo:@{
+                        NSLocalizedDescriptionKey: @"Unable to open container"
+                    }];
+                } else {
+                    NSMutableArray *datafiles = [NSMutableArray array];
+                    for (const digidoc::DataFile *dataFile : container->dataFiles()) {
+                        DigiDocDataFile *digiDocDataFile = [DigiDocDataFile new];
+                        digiDocDataFile.fileId = [NSString stringWithUTF8String:dataFile->id().c_str()];
+                        digiDocDataFile.fileName = [NSString stringWithUTF8String:dataFile->fileName().c_str()];
+                        digiDocDataFile.fileSize = dataFile->fileSize();
+                        digiDocDataFile.mediaType = [NSString stringWithUTF8String:dataFile->mediaType().c_str()];
+                        [datafiles addObject:digiDocDataFile];
+                    }
+
+                    NSMutableArray *signatures = [NSMutableArray array];
+                    int pos = 0;
+                    for (digidoc::Signature *signature: container->signatures()) {
+                        [signatures addObject:[DigiDocContainerWrapper getSignatureMetadata:signature pos:pos++]];
+                    }
+
+                    parsed = [[DigiDocContainer alloc]
+                              initWithFileName:containerPath.lastPathComponent
+                              filePath:containerPath
+                              dataFiles:datafiles
+                              signatures:signatures
+                              mediatype:[NSString stringWithUTF8String:container->mediaType().c_str()]];
+
+                    session = [[DigiDocValidationSession alloc] initWithContainer:std::move(container)];
+                }
+            } catch(const digidoc::Exception &e) {
+                error = [DigiDocContainerWrapper errorFromException:e];
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(session, parsed, error);
+        });
+    });
+}
+
+- (void)validateSignatureAtIndex:(NSUInteger)index
+                      completion:(void (^NS_SWIFT_SENDABLE)(DigiDocSignature * _Nullable signature,
+                                                            NSError * _Nullable error))completion {
+    dispatch_async([DigiDocContainerWrapper libraryQueue], ^{
+        DigiDocSignature *signature = nil;
+        NSError *error = nil;
+
+        @synchronized ([DigiDocContainerWrapper class]) {
+            if (!self->_container || index >= self->_signatures.size()) {
+                error = [NSError errorWithDomain:@"LibdigidocLib" code:4 userInfo:@{
+                    NSLocalizedDescriptionKey: @"Validation session is closed or the index is out of range"
+                }];
+            } else {
+                try {
+                    signature = [DigiDocContainerWrapper getSignature:self->_signatures[index] pos:(int)index];
+                } catch(const digidoc::Exception &e) {
+                    error = [DigiDocContainerWrapper errorFromException:e];
+                }
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(signature, error);
+        });
+    });
+}
+
+- (void)closeWithCompletion:(void (^NS_SWIFT_SENDABLE)(void))completion {
+    dispatch_async([DigiDocContainerWrapper libraryQueue], ^{
+        @synchronized ([DigiDocContainerWrapper class]) {
+            self->_signatures.clear();
+            self->_container.reset();
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion();
+        });
+    });
+}
+
+- (void)dealloc {
+    digidoc::Container *container = _container.release();
+    if (!container) {
+        return;
+    }
+
+    dispatch_async([DigiDocContainerWrapper libraryQueue], ^{
+        @synchronized ([DigiDocContainerWrapper class]) {
+            delete container;
+        }
+    });
+}
 
 @end

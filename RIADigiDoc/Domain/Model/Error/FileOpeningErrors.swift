@@ -25,3 +25,7 @@ public enum FileOpeningError: Error {
     case emptyFile
     case noDataFiles
 }
+
+struct PendingOpenFailure: Error {
+    let message: ToastMessage
+}

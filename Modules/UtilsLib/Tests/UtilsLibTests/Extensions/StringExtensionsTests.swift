@@ -25,6 +25,46 @@ import CommonsLib
 class StringSanitizationTests {
 
     @Test
+    func sanitizedOrNil_stripsLeadingEllipsisLikeLeadingDots() {
+        #expect("\u{2026}".sanitizedOrNil() == "_")
+        #expect("\u{2026}\u{2026}".sanitizedOrNil() == "_")
+        #expect("\u{2026}report".sanitizedOrNil() == "report")
+        #expect("...".sanitizedOrNil() == "_")
+        #expect(".\u{2026}.".sanitizedOrNil() == "_")
+    }
+
+    @Test
+    func sanitizedOrNil_keepsEllipsisThatIsNotLeading() {
+        #expect("report\u{2026}".sanitizedOrNil() == "report\u{2026}")
+        #expect("a\u{2026}b".sanitizedOrNil() == "a\u{2026}b")
+    }
+
+    @Test
+    func sanitizedOrNil_returnsNilWhenNothingUsableRemains() {
+        #expect("\u{FFFF}\u{FFFE}\u{1F600}".sanitizedOrNil() == nil)
+        #expect("@%^?[]{}#&".sanitizedOrNil() == nil)
+    }
+
+    @Test
+    func sanitizedOrNil_returnsNilForEmptyOrWhitespaceOnlyInput() {
+        #expect("".sanitizedOrNil() == nil)
+        #expect("   ".sanitizedOrNil() == nil)
+        #expect(" \n\t ".sanitizedOrNil() == nil)
+    }
+
+    @Test
+    func sanitizedOrNil_returnsCleanedNameWhenSomethingRemains() {
+        #expect("TestData".sanitizedOrNil() == "TestData")
+        #expect("Test@Data".sanitizedOrNil() == "TestData")
+    }
+
+    @Test
+    func sanitized_stillSubstitutesFallbackWhereSanitizedOrNilIsNil() {
+        #expect("".sanitized() == Constants.Container.DefaultName)
+        #expect("@%^?[]{}#&".sanitized() == Constants.Container.DefaultName)
+    }
+
+    @Test
     func sanitized_removesIllegalCharacters() {
         let input = "\u{FFFF}\u{FFFE}\u{1F600}"
         let expected = Constants.Container.DefaultName

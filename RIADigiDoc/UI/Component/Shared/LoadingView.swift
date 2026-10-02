@@ -23,14 +23,25 @@ import FactoryKit
 struct LoadingView: View {
     @Environment(LanguageSettings.self) private var languageSettings
 
+    var size: CGFloat = Dimensions.Icon.IconSizeSpinner
+    var isFullScreen: Bool = true
+
     @State private var isLoading: Bool = false
     @State private var rotationAngle: Double = 0
 
     var body: some View {
+        if isFullScreen {
+            spinner.navigationBarBackButtonHidden(true)
+        } else {
+            spinner
+        }
+    }
+
+    private var spinner: some View {
         ZStack {
             Image("Spinner")
                 .resizable()
-                .frame(width: 100, height: 100)
+                .frame(width: size, height: size)
                 .rotationEffect(.degrees(rotationAngle))
                 .accessibilityLabel(languageSettings.localized("Loading"))
                 .onChange(of: isLoading) {
@@ -42,8 +53,7 @@ struct LoadingView: View {
                     isLoading = true
                 }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationBarBackButtonHidden(true)
+        .frame(maxWidth: .infinity, maxHeight: isFullScreen ? .infinity : nil)
     }
 }
 

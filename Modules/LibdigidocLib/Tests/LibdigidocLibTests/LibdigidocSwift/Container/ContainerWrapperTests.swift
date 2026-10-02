@@ -209,6 +209,66 @@ struct ContainerWrapperTests {
     }
 
     @Test
+    func openStaged_deliversTheSameResultsAsEagerOpenOnceValidationFinishes() async throws {
+        let containerFile = try copyExampleContainer()
+        defer { try? FileManager.default.removeItem(at: containerFile.deletingLastPathComponent()) }
+
+        let expected = try await ContainerWrapper(fileManager: mockFileManager)
+            .open(containerFile: containerFile, isSivaConfirmed: true)
+            .getSignatures()
+        try #require(!expected.isEmpty)
+        try #require(
+            expected.contains { !$0.diagnosticsInfo.isEmpty || $0.status != .unknown },
+            "The fixture's results must differ from the unvalidated placeholders, or this test proves nothing"
+        )
+
+        let staged = try await ContainerWrapper(fileManager: mockFileManager)
+            .openStaged(containerFile: containerFile, isSivaConfirmed: true)
+        #expect(await staged.getSignatures().count == expected.count)
+
+        await staged.awaitValidation()
+        let validated = await staged.getSignatures()
+
+        #expect(validated.map(\.signatureId) == expected.map(\.signatureId))
+        #expect(validated.map(\.status) == expected.map(\.status))
+        #expect(validated.map(\.diagnosticsInfo) == expected.map(\.diagnosticsInfo))
+
+        await staged.awaitValidation()
+        #expect(await staged.getSignatures().map(\.diagnosticsInfo) == expected.map(\.diagnosticsInfo))
+    }
+
+    @Test
+    func cancelValidation_letsAwaitValidationReturn() async throws {
+        let containerFile = try copyExampleContainer()
+        defer { try? FileManager.default.removeItem(at: containerFile.deletingLastPathComponent()) }
+
+        let staged = try await ContainerWrapper(fileManager: mockFileManager)
+            .openStaged(containerFile: containerFile, isSivaConfirmed: true)
+
+        await staged.cancelValidation()
+        await staged.awaitValidation()
+
+        #expect(await !staged.getSignatures().isEmpty)
+    }
+
+    @Test
+    func awaitValidation_returnsImmediatelyWhenNothingIsValidating() async {
+        await containerWrapper.awaitValidation()
+
+        #expect(await containerWrapper.getSignatures().isEmpty)
+    }
+
+    private func copyExampleContainer() throws -> URL {
+        let example = try #require(TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
+        let directory = try TestFileUtil.getTemporaryDirectory(
+            subfolder: "ContainerWrapperTests/\(UUID().uuidString)"
+        )
+        let copy = directory.appending(path: "example.asice")
+        try FileManager.default.copyItem(at: example, to: copy)
+        return copy
+    }
+
+    @Test
     func open_success() async throws {
         let dataFilesUrls: [URL] = dataFileURLs.compactMap { $0 }
         let signedContainer = try await SignedContainer.openOrCreate(
