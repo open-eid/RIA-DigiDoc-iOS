@@ -309,12 +309,29 @@ struct HomeView: View {
     }
 
     private func handleFiles(_ files: [URL]) {
-        if !files.isEmpty {
+        guard !files.isEmpty else { return }
+
+        dismissHomeModals()
+        ModalPresentationUtil.dismissPresentedModals()
+
+        DispatchQueue.main.async {
+            pathManager.popToRoot()
+            viewModel.closeOpenContainers()
             isFileOpeningLoading = true
             viewModel.isImporting = false
             viewModel.setFileOpeningMethod(.all)
             viewModel.setChosenFiles(.success(files))
         }
+    }
+
+    private func dismissHomeModals() {
+        showFilesBottomSheet = false
+        showSignatureBottomSheet = false
+        showCryptoBottomSheet = false
+        showHomeMenuBottomSheet = false
+        isAllFilesImporting = false
+        isSigningImporting = false
+        isCryptoImporting = false
     }
 
     private func handleIncoming(url: URL) {
