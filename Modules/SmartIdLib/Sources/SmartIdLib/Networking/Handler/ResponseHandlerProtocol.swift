@@ -25,7 +25,7 @@ public protocol ResponseHandlerProtocol: Sendable {
     func handleSessionResponse(_ responseValue: Any) throws
     func handleSessionResult(_ response: SmartIdSessionStatusResponseCode) throws
     func handleCancellationError(_ error: Error) throws
-    func handleNetworkError(_ error: AFError, statusCode: Int?) throws
+    func handleNetworkError(_ error: AFError, statusCode: Int?, responseType: Any.Type) throws
     func handleURLError(_ error: URLError) throws
-    func handleStatusCodeError(_ statusCode: Int?) throws
+    func handleStatusCodeError(_ statusCode: Int?, responseType: Any.Type) throws
 }
