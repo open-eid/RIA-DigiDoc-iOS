@@ -36,6 +36,9 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
     private var userAgent: String = ""
     private var returnData: SignedContainerProtocol?
 
+    private var isOperationRunning = false
+    private var pendingCancellation: Error?
+
     private var continuation: CheckedContinuation<SignedContainerProtocol, Error>?
 
     // swiftlint:disable:next function_parameter_count
@@ -57,11 +60,18 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         self.userAgent = userAgent
         self.strings = strings
 
+        returnData = nil
+        operationError = nil
+        didCompleteSuccessfully = false
+        nfcError = ""
+        isOperationRunning = false
+        pendingCancellation = nil
+
         return try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
             guard NFCTagReaderSession.readingAvailable else {
-                continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
+                resume(with: .failure(IdCardInternalError.nfcNotSupported))
                 return
             }
 
@@ -71,13 +81,40 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         }
     }
 
+    private func finishOperation() {
+        if let returnData {
+            resume(with: .success(returnData))
+            return
+        }
+
+        resume(with: .failure(pendingCancellation ?? operationError ?? IdCardInternalError.sessionInvalidated))
+    }
+
+    private static func userCancellation(from error: Error) -> Error? {
+        guard let nfcError = error as? NFCReaderError,
+              nfcError.code == .readerSessionInvalidationErrorUserCanceled else {
+            return nil
+        }
+        return IdCardInternalError.cancelledByUser
+    }
+
+    private func resume(with result: Result<SignedContainerProtocol, Error>) {
+        guard let continuation else { return }
+        self.continuation = nil
+        continuation.resume(with: result)
+    }
+
     // MARK: - NFCTagReaderSessionDelegate
 
     // swiftlint:disable:next cyclomatic_complexity
     public override func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         Task { @MainActor in
+            isOperationRunning = true
+
             defer {
                 self.session = nil
+                isOperationRunning = false
+                finishOperation()
             }
 
             guard let signedContainer else {
@@ -193,30 +230,22 @@ public class OperationReadCertAndSign: NFCOperationBase, OperationReadCertAndSig
         Self.logger().info("NFC: Reader session finished with error: \(error)")
         self.session = nil
 
-        guard let continuationToResume = self.continuation else { return }
-        self.continuation = nil
-
-        if let returnData, didCompleteSuccessfully {
-            continuationToResume.resume(with: .success(returnData))
+        guard !isOperationRunning else {
+            pendingCancellation = Self.userCancellation(from: error)
             return
         }
 
         if let storedError = self.operationError {
-            continuationToResume.resume(throwing: storedError)
+            resume(with: .failure(storedError))
             return
         }
 
-        if let nfcError = error as? NFCReaderError {
-            switch nfcError.code {
-            case .readerSessionInvalidationErrorUserCanceled:
-                continuationToResume.resume(throwing: IdCardInternalError.cancelledByUser)
-                return
-
-            default:
-                break
-            }
+        if let nfcError = error as? NFCReaderError,
+           nfcError.code == .readerSessionInvalidationErrorUserCanceled {
+            resume(with: .failure(IdCardInternalError.cancelledByUser))
+            return
         }
 
-        continuationToResume.resume(throwing: error)
+        resume(with: .failure(error))
     }
 }
