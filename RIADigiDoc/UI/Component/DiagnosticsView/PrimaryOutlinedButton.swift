@@ -27,6 +27,7 @@ struct PrimaryOutlinedButton: View {
     private let text: String
     private let assetImageName: String?
     private let isButtonEnabled: Bool
+    private let isLoading: Bool
     private let action: () -> Void
 
     @Binding private var currentFocus: AccessibilityField?
@@ -38,6 +39,7 @@ struct PrimaryOutlinedButton: View {
         text: String,
         assetImageName: String?,
         isButtonEnabled: Bool = true,
+        isLoading: Bool = false,
         action: @escaping () -> Void,
         focusedField: AccessibilityField?,
         currentFocus: Binding<AccessibilityField?>,
@@ -45,6 +47,7 @@ struct PrimaryOutlinedButton: View {
         self.text = text
         self.assetImageName = assetImageName
         self.isButtonEnabled = isButtonEnabled
+        self.isLoading = isLoading
         self.action = action
         self.focusedField = focusedField
         self._currentFocus = currentFocus
@@ -55,7 +58,13 @@ struct PrimaryOutlinedButton: View {
             action: action,
             label: {
                 HStack {
-                    if let image = assetImageName {
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(theme.primary)
+                            .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                            .accessibilityHidden(true)
+                    } else if let image = assetImageName {
                         Image(image)
                             .resizable()
                             .scaledToFit()
@@ -81,7 +90,7 @@ struct PrimaryOutlinedButton: View {
                         .stroke(theme.outline, lineWidth: Dimensions.Height.XSBorder)
                 )
             })
-            .disabled(!isButtonEnabled)
+            .disabled(!isButtonEnabled || isLoading)
             .accessibilityFocused($isFocused)
             .onAppear {
                 Task {
