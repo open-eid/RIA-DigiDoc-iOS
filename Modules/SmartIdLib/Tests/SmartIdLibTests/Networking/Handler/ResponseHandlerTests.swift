@@ -185,7 +185,7 @@ struct ResponseHandlerTests {
 
     @Test
     func handleNetworkError_throwsRequestInterruptedWhenNoUrlErrorAndNoStatusCode() {
-        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "host.test"))
+        let afError = AFError.explicitlyCancelled
 
         #expect(throws: SmartIdError.requestInterrupted) {
             try handler.handleNetworkError(afError, statusCode: nil)
@@ -198,6 +198,24 @@ struct ResponseHandlerTests {
 
         #expect(throws: SmartIdError.invalidAccessRights) {
             try handler.handleNetworkError(afError, statusCode: 401)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsSslHandshakeErrorWhenCertificatePinningFails() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noCertificatesFound)
+
+        #expect(throws: SmartIdError.invalidSslHandshake) {
+            try handler.handleNetworkError(afError, statusCode: nil)
+        }
+    }
+
+    @Test
+    func handleNetworkError_throwsSslHandshakeErrorForAnyTrustEvaluationReason() {
+        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "sid.demo.sk.ee"))
+
+        #expect(throws: SmartIdError.invalidSslHandshake) {
+            try handler.handleNetworkError(afError, statusCode: nil)
         }
     }
 

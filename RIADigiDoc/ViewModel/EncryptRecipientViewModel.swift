@@ -33,6 +33,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     var searchText: String = ""
     private(set) var successMessage: ToastMessage?
     private(set) var errorMessage: ToastMessage?
+    private(set) var emptyStateMessageKey: String?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let openLdap: OpenLdapProtocol
@@ -79,27 +80,42 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     }
 
     func loadRecipients() async {
-        if !searchText.isEmpty {
-            let result = await openLdap.search(identityCode: searchText)
-
-            if result.tooManyResults {
-                recipients = []
-                errorMessage = ToastMessage(key: "Too many results", args: [])
-                EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
-            } else if result.addressees.isEmpty {
-                recipients = []
-                errorMessage = ToastMessage(key: "Person or company does not own a valid certificate", args: [])
-                EncryptRecipientViewModel.logger().error("No recipients found for \(self.searchText)")
-            } else {
-                recipients = result.addressees
-            }
-        } else {
+        guard !searchText.isEmpty else {
             recipients = []
+            emptyStateMessageKey = nil
+            return
+        }
+
+        let result = await openLdap.search(identityCode: searchText)
+
+        if result.tooManyResults {
+            recipients = []
+            emptyStateMessageKey = nil
+            errorMessage = ToastMessage(key: "Too many results", args: [])
+            EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
+        } else if result.addressees.isEmpty {
+            let messageKey = result.isNetworkError
+                ? "No Internet connection"
+                : "Person or company does not own a valid certificate"
+
+            if result.isNetworkError {
+                EncryptRecipientViewModel.logger().error("Unable to reach the LDAP server")
+            } else {
+                EncryptRecipientViewModel.logger().error("No recipients found for \(self.searchText)")
+            }
+
+            recipients = []
+            emptyStateMessageKey = messageKey
+            errorMessage = ToastMessage(key: messageKey, args: [])
+        } else {
+            recipients = result.addressees
+            emptyStateMessageKey = nil
         }
     }
 
     func handleSearchTextChange() {
         recipients = []
+        emptyStateMessageKey = nil
     }
 
     func getContainerRecipientList() async -> [Addressee] {

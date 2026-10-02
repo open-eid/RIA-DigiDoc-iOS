@@ -35,5 +35,6 @@ public enum MobileIdError: Error {
     case tooManyRequests
     case exceededUnsuccessfulRequests
     case invalidAccessRights
+    case invalidSslHandshake
     case technicalError
 }
