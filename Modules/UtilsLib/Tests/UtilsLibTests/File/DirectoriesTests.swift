@@ -238,7 +238,7 @@ struct DirectoriesTests {
 
         #expect(logFilePath != nil)
         #expect(trimmedExpectedDirectoryPath == trimmedLogFilePath)
-        #expect("libdigidocpp.log" == logFilePath?.lastPathComponent)
+        #expect("libdigidocpp.txt" == logFilePath?.lastPathComponent)
     }
 
     @Test
@@ -249,7 +249,7 @@ struct DirectoriesTests {
         let logFilePath = try Directories.getLibdigidocLogFile(from: nil, fileManager: mockFileManager)
 
         #expect(logFilePath != nil)
-        #expect("libdigidocpp.log" == logFilePath?.lastPathComponent)
+        #expect("libdigidocpp.txt" == logFilePath?.lastPathComponent)
     }
 
     @Test
