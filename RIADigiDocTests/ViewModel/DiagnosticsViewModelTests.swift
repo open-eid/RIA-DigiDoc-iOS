@@ -305,6 +305,7 @@ final class DiagnosticsViewModelTests {
 
         let fileUrl = try #require(diagnosticsFileUrl)
         #expect(!fileUrl.resolvedPath.isEmpty)
+        #expect(fileUrl.pathExtension == "txt")
         #expect(FileManager.default.fileExists(atPath: fileUrl.resolvedPath))
     }
 
@@ -457,6 +458,7 @@ final class DiagnosticsViewModelTests {
 
         let fileUrl = try #require(logFileUrl)
         #expect(!fileUrl.resolvedPath.isEmpty)
+        #expect(fileUrl.pathExtension == "txt")
 
         let contents = try String(contentsOf: fileUrl, encoding: .utf8)
         #expect(contents.contains("===== File: \(CommonsLib.Constants.File.LibDigidocLog) ====="))

@@ -250,7 +250,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
 
     func createDiagnosticsFile(languageSettings: LanguageSettingsProtocol, directory: URL? = nil) async -> URL? {
         let diagnosticsText = buildDiagnosticsText(languageSettings: languageSettings)
-        let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.log"
+        let diagnosticsFileName = "ria_digidoc_\(self.versionSectionContent)_diagnostics.txt"
 
         return await writeTempFile(fileName: diagnosticsFileName, directory: directory) { fileURL in
             try await logCollector.write(diagnosticsText, to: fileURL)
@@ -363,7 +363,7 @@ class DiagnosticsViewModel: DiagnosticsViewModelProtocol, Loggable {
     }
 
     public func createLogFile(directory: URL? = nil) async -> URL? {
-        let logFileName = "ria_digidoc_\(self.versionSectionContent).log"
+        let logFileName = "ria_digidoc_\(self.versionSectionContent).txt"
 
         return await writeTempFile(fileName: logFileName, directory: directory) { fileURL in
             try await logCollector.writeLogFile(
