@@ -46,11 +46,15 @@ public struct NameUtil: NameUtilProtocol {
         return components.joined(separator: ", ")
     }
 
+    private static let capitalizationRegex = try? NSRegularExpression(
+        pattern: #"([\p{L}\d])([\p{L}\d]*)"#,
+        options: [.useUnicodeWordBoundaries]
+    )
+
     private func capitalizeName(_ name: String) -> String {
         let lowercaseName = name.lowercased()
-        let pattern = #"([\p{L}\d])([\p{L}\d]*)"#
 
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.useUnicodeWordBoundaries]) else {
+        guard let regex = NameUtil.capitalizationRegex else {
             return lowercaseName
         }
 

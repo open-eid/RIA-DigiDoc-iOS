@@ -12,6 +12,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     private var dataFiles: [DataFileWrapper]
     private var signatures: [SignatureWrapper]
     private var mediatype: String
+    private var validationTask: Task<Void, Never>?
 
     private let fileManager: FileManagerProtocol
 
@@ -34,6 +35,21 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     public static func libdigidocppVersion() -> String {
         return DigiDocContainerWrapper.libdigidocppVersion()
+    }
+
+    public func awaitValidation() async {
+        await validationTask?.value
+    }
+
+    public func cancelValidation() {
+        validationTask?.cancel()
+    }
+
+    private func stopValidation() async {
+        guard let task = validationTask else { return }
+        task.cancel()
+        await task.value
+        validationTask = nil
     }
 
     public func getSignatures() async -> [SignatureWrapper] {
@@ -96,26 +112,177 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         }
     }
 
+    struct ParsedContainer: Sendable {
+        let filePath: String
+        let dataFiles: [DataFileWrapper]
+        let signatures: [SignatureWrapper]
+        let mediatype: String
+    }
+
+    private static func openNatively(
+        path: String,
+        validateOnline: Bool
+    ) async throws -> ParsedContainer {
+        try await withCheckedThrowingContinuation { continuation in
+            DigiDocContainerWrapper.open(path, validateOnline: validateOnline) { container, error in
+                if let container {
+                    continuation.resume(returning: ParsedContainer(
+                        filePath: container.filePath,
+                        dataFiles: ContainerWrapper.getDataFiles(from: container),
+                        signatures: ContainerWrapper.getSignatures(from: container),
+                        mediatype: container.mediatype
+                    ))
+                } else {
+                    continuation.resume(
+                        throwing: error ?? NSError(
+                            domain: "ContainerWrapper - cannot open container",
+                            code: 3
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    @MainActor
+    public func openStaged(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
+        ContainerWrapper.logger().info(
+            "Opening container file '\(containerFile.lastPathComponent, privacy: .public)' in stages"
+        )
+
+        do {
+            let opened = try await ContainerWrapper.openValidationSession(
+                path: containerFile.resolvedPath,
+                validateOnline: isSivaConfirmed
+            )
+
+            await setContainerURL(URL(fileURLWithPath: opened.parsed.filePath))
+
+            let wrapper = await self.updateContainer(
+                datafiles: opened.parsed.dataFiles,
+                signatures: opened.parsed.signatures,
+                mediaType: opened.parsed.mediatype
+            )
+
+            let session = opened.session
+            let task = Task { [weak self] in
+                let validated = await ContainerWrapper.validateAll(in: session)
+                await ContainerWrapper.close(session)
+                guard !Task.isCancelled else { return }
+                await self?.setValidatedSignatures(validated)
+            }
+            await self.setValidationTask(task)
+
+            return wrapper
+        } catch {
+            let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)
+            throw DigiDocError.containerOpeningFailed(
+                ErrorDetail(nsError: nsError, extraInfo: ["fileName": containerFile.lastPathComponent])
+            )
+        }
+    }
+
+    private struct OpenedSession: Sendable {
+        let session: DigiDocValidationSession
+        let parsed: ParsedContainer
+    }
+
+    private static func openValidationSession(path: String, validateOnline: Bool) async throws -> OpenedSession {
+        try await withCheckedThrowingContinuation { continuation in
+            DigiDocValidationSession.open(path, validateOnline: validateOnline) { session, container, error in
+                guard let session, let container else {
+                    continuation.resume(
+                        throwing: error ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)
+                    )
+                    return
+                }
+
+                continuation.resume(returning: OpenedSession(
+                    session: session,
+                    parsed: ParsedContainer(
+                        filePath: container.filePath,
+                        dataFiles: ContainerWrapper.getDataFiles(from: container),
+                        signatures: ContainerWrapper.getSignatures(from: container),
+                        mediatype: container.mediatype
+                    )
+                ))
+            }
+        }
+    }
+
+    @concurrent
+    private static func validateAll(in session: DigiDocValidationSession) async -> [SignatureWrapper] {
+        var validated: [SignatureWrapper] = []
+        validated.reserveCapacity(Int(session.signatureCount))
+
+        for index in 0..<Int(session.signatureCount) {
+            if Task.isCancelled {
+                return validated
+            }
+
+            do {
+                validated.append(try await validateSignature(at: index, in: session))
+            } catch {
+                ContainerWrapper.logger().error(
+                    "Unable to validate signature \(index, privacy: .public): \(error.localizedDescription)"
+                )
+                return validated
+            }
+        }
+
+        return validated
+    }
+
+    private static func validateSignature(
+        at index: Int,
+        in session: DigiDocValidationSession
+    ) async throws -> SignatureWrapper {
+        try await withCheckedThrowingContinuation { continuation in
+            session.validateSignature(at: UInt(index)) { signature, error in
+                guard let signature else {
+                    continuation.resume(
+                        throwing: error ?? NSError(domain: "ContainerWrapper - cannot validate signature", code: 4)
+                    )
+                    return
+                }
+
+                continuation.resume(returning: ContainerWrapper.makeSignature(from: signature))
+            }
+        }
+    }
+
+    private static func close(_ session: DigiDocValidationSession) async {
+        await withCheckedContinuation { continuation in
+            session.close { continuation.resume() }
+        }
+    }
+
+    private func setValidationTask(_ task: Task<Void, Never>) {
+        validationTask?.cancel()
+        validationTask = task
+    }
+
+    private func setValidatedSignatures(_ validated: [SignatureWrapper]) {
+        guard validated.count <= signatures.count else { return }
+        signatures = validated + signatures.dropFirst(validated.count)
+    }
+
     @MainActor
     public func open(containerFile: URL, isSivaConfirmed: Bool) async throws -> ContainerWrapper {
         ContainerWrapper.logger().info("Opening container file '\(containerFile.lastPathComponent, privacy: .public)'")
 
         do {
-            let container = try DigiDocContainerWrapper.open(
-                containerFile.resolvedPath,
+            let parsed = try await ContainerWrapper.openNatively(
+                path: containerFile.resolvedPath,
                 validateOnline: isSivaConfirmed
             )
 
-            await setContainerURL(URL(fileURLWithPath: container.filePath))
-
-            let datafiles = ContainerWrapper.getDataFiles(from: container)
-            let signatures = ContainerWrapper.getSignatures(from: container)
-            let mediatype = container.mediatype
+            await setContainerURL(URL(fileURLWithPath: parsed.filePath))
 
             return await self.updateContainer(
-                datafiles: datafiles,
-                signatures: signatures,
-                mediaType: mediatype
+                datafiles: parsed.dataFiles,
+                signatures: parsed.signatures,
+                mediaType: parsed.mediatype
             )
         } catch {
             let nsError = (error as NSError?) ?? NSError(domain: "ContainerWrapper - cannot open container", code: 3)
@@ -130,6 +297,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     @discardableResult
     @MainActor
     public func addDataFiles(containerFile: URL, dataFiles: [URL]) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
         let dataFilesPaths = dataFiles.compactMap { $0.resolvedPath }
         do {
             try await DigiDocContainerWrapper.addDataFilesToContainer(
@@ -179,6 +347,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     @MainActor
     @discardableResult
     public func removeSignature(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
         do {
             try await DigiDocContainerWrapper.removeSignature(
                 UInt(index),
@@ -199,6 +368,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
     @MainActor
     @discardableResult
     public func removeDataFile(index: Int, containerFile: URL) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
         do {
             try await DigiDocContainerWrapper.removeDataFileFromContainer(
                 withPath: containerFile.resolvedPath,
@@ -223,6 +393,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         roleData: RoleData?,
         userAgent: String
     ) async throws -> Data {
+        await stopValidation()
         return try await digiDocSigningWrapper
             .prepareSignature(
                 cert,
@@ -240,6 +411,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     @MainActor
     public func addSignature(signature: Data, containerFile: URL) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
 
         do {
             try await digiDocSigningWrapper.addSignature(signature)
@@ -257,6 +429,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     @discardableResult
     public func extendSignatureToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
         do {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 DigiDocContainerWrapper.extendLastSignature(toLTA: containerFile.resolvedPath) { error in
@@ -277,6 +450,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     @discardableResult
     public func extendSignaturesToLTA(containerFile: URL) async throws -> ContainerWrapperProtocol {
+        await stopValidation()
         do {
             ContainerWrapper.logger().info("Extending signatures to LTA")
             let outputURL = containerFile
@@ -381,7 +555,7 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
         return dataFiles.compactMap { item in
             guard let dataFile = item as? DigiDocDataFile else {
                 ContainerWrapper.logger().error("Unexpected type: \(type(of: item), privacy: .public)")
-                return DataFileWrapper(fileId: "", fileName: "", fileSize: 0, mediaType: "")
+                return nil
             }
 
             return DataFileWrapper(
@@ -395,7 +569,12 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
 
     private static func getSignatures(from container: DigiDocContainer) -> [SignatureWrapper] {
         return container.signatures.compactMap { signature in
-            SignatureWrapper(
+            makeSignature(from: signature)
+        }
+    }
+
+    static func makeSignature(from signature: DigiDocSignature) -> SignatureWrapper {
+        return SignatureWrapper(
                 pos: Int(signature.pos),
                 signingCert: signature.signingCert,
                 timestampCert: signature.timestampCert,
@@ -424,6 +603,5 @@ public actor ContainerWrapper: ContainerWrapperProtocol, Loggable {
                     )
                 } ?? []
             )
-        }
     }
 }

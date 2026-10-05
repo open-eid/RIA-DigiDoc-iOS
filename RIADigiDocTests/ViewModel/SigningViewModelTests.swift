@@ -148,6 +148,36 @@ struct SigningViewModelTests: Loggable {
     }
 
     @Test
+    func loadContainerData_includesCadesNotificationOnFirstLoad() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.isCadesHandler = { true }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        #expect(viewModel.containerNotifications.contains(.cadesFile))
+    }
+
+    @Test
+    func loadContainerData_ignoresLoadSupersededByBackNavigation() async {
+        let mockSignedContainer = SignedContainerProtocolMock()
+        let staleDataFile = MockDataFileWrapper.mockDataFileWrapper(fileName: "stale.txt")
+        mockSignedContainer.getDataFilesHandler = {
+            try? await Task.sleep(for: .milliseconds(200))
+            return [staleDataFile]
+        }
+        mockSharedContainerViewModel.containersHandler = { [] }
+
+        let load = Task { await viewModel.loadContainerData(signedContainer: mockSignedContainer) }
+        while mockSignedContainer.getDataFilesCallCount == 0 {
+            await Task.yield()
+        }
+        _ = await viewModel.handleBackButton()
+        await load.value
+
+        #expect(viewModel.dataFiles.isEmpty)
+    }
+
+    @Test
     func createCopyOfContainerForSaving_success() async throws {
         let tempFolderURL = URL(fileURLWithPath: "/tmp")
 
@@ -1308,6 +1338,30 @@ struct SigningViewModelTests: Loggable {
         #expect(viewModel.errorMessage == nil)
         #expect(mockFileManager.removeItemCallCount == 1)
         #expect(viewModel.isLastDataFileRemoved)
+    }
+
+    @Test
+    func removeDataFile_refusesWhenContainerIsSigned() async {
+        let mockDataFile = MockDataFileWrapper.mockDataFileWrapper()
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = { URL(fileURLWithPath: "/mock/path/mockContainer.asice") }
+        mockSignedContainer.getDataFilesHandler = { [mockDataFile] }
+        mockSignedContainer.getSignaturesHandler = { [MockSignatureWrapper.mockSignatureWrapper()] }
+        mockSignedContainer.removeDataFileHandler = { _, _ in mockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        await viewModel.removeDataFile(mockDataFile)
+
+        #expect(
+            viewModel.errorMessage == ToastMessage(
+                key: "Failed to remove file from container",
+                args: [mockDataFile.fileName]
+            )
+        )
+        #expect(mockFileManager.removeItemCallCount == 0)
+        #expect(mockSignedContainer.removeDataFileCallCount == 0)
+        #expect(!viewModel.isLastDataFileRemoved)
     }
 
     @Test

@@ -25,9 +25,9 @@ struct SignaturesListView: View {
     @AccessibilityFocusState private var focusedSignatureIndex: Int?
 
     var body: some View {
-        VStack {
+        LazyVStack {
             if #available(iOS 26.0, *) {
-                ForEach(timestamps.enumerated(), id: \.offset) { index, timestamp in
+                ForEach(timestamps.enumerated(), id: \.element.pos) { index, timestamp in
                     SignatureView(
                         signatureIndex: index + 1,
                         containerMimetype: containerMimetype,
@@ -45,7 +45,7 @@ struct SignaturesListView: View {
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             } else {
-                ForEach(Array(timestamps.enumerated()), id: \.offset) { index, timestamp in
+                ForEach(Array(timestamps.enumerated()), id: \.element.pos) { index, timestamp in
                     SignatureView(
                         signatureIndex: index + 1,
                         containerMimetype: containerMimetype,
@@ -65,7 +65,7 @@ struct SignaturesListView: View {
             }
 
             if #available(iOS 26.0, *) {
-                ForEach(signatures.enumerated(), id: \.offset) { index, signature in
+                ForEach(signatures.enumerated(), id: \.element.pos) { index, signature in
                     SignatureView(
                         signatureIndex: index + 1,
                         containerMimetype: containerMimetype,
@@ -79,7 +79,7 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
-                    .id(index)
+                    .id(signature.pos)
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
                 .onChange(of: focusedIndex) { _, newValue in
@@ -88,7 +88,7 @@ struct SignaturesListView: View {
                     }
                 }
             } else {
-                ForEach(Array(signatures.enumerated()), id: \.offset) { index, signature in
+                ForEach(Array(signatures.enumerated()), id: \.element.pos) { index, signature in
                     SignatureView(
                         signatureIndex: index + 1,
                         containerMimetype: containerMimetype,
@@ -102,6 +102,7 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
+                    .id(signature.pos)
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             }
