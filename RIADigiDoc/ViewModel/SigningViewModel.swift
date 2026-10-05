@@ -33,10 +33,18 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     var isCadesContainer = false
     var isXadesContainer = false
     var isLastDataFileRemoved = false
+
+    var areSignaturesLoading = false
+
+    private(set) var expectedSignatureCount = 0
+
+    private(set) var didAddSignature = false
+
     var navigateToNestedCryptoContainerView = false
     var showExtendSivaConfirmation = false
     var showCannotExtendContainerDialog = false
     private var pendingExtendedContainer: PendingExtendedContainer?
+    private var loadGeneration = 0
     private(set) var containerNotifications: [ContainerNotificationType] = []
     private(set) var errorMessage: ToastMessage?
     private(set) var successMessage: ToastMessage?
@@ -81,31 +89,66 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
 
     func loadContainerData(signedContainer: SignedContainerProtocol?) async {
         SigningViewModel.logger().info("Loading signed container data")
+        loadGeneration += 1
+        let generation = loadGeneration
+        didAddSignature = sharedContainerViewModel.getIsSignatureAdded()
         sharedContainerViewModel.setIsSignatureAdded(false)
+
         let openedContainer = (signedContainer ?? sharedContainerViewModel.currentContainer())
             as? any SignedContainerProtocol
         guard let openedContainer else {
+            areSignaturesLoading = false
             SigningViewModel.logger().error("Cannot load signed container data. Signed container is nil.")
             return
         }
 
+        let loadedContainerName = await openedContainer.getContainerName()
+        let loadedDataFiles = await openedContainer.getDataFiles()
+        let loadedMimetype = await openedContainer.getContainerMimetype()
+        let loadedContainerURL = await openedContainer.getRawContainerFile()
+        let signatureCount = await openedContainer.getSignatures().count
+
+        guard generation == loadGeneration else { return }
+
         self.signedContainer = openedContainer
+        self.containerName = loadedContainerName
+        self.dataFiles = loadedDataFiles
+        self.containerMimetype = loadedMimetype
+        self.containerURL = loadedContainerURL
+        self.expectedSignatureCount = signatureCount
+        self.areSignaturesLoading = signatureCount > 0
 
-        let name = await openedContainer.getContainerName()
-        let mimetype = await openedContainer.getContainerMimetype()
+        SigningViewModel.logger().info("Container contents loaded; awaiting signature validation")
 
-        self.containerName = name
-        self.dataFiles = await openedContainer.getDataFiles()
-        self.signatures = await openedContainer.getSignatures()
-        self.timestamps = await openedContainer.getTimestamps()
-        self.containerMimetype = mimetype
-        self.containerURL = await openedContainer.getRawContainerFile()
-        self.isTimestampedContainer = await isTimestampedContainer()
-        self.isCadesContainer = await openedContainer.isCades()
-        self.isXadesContainer = await openedContainer.isXades()
-        self.containerNotifications = await getContainerNotifications(container: openedContainer)
+        await loadSignatureData(for: openedContainer, generation: generation)
+    }
 
-        SigningViewModel.logger().info("Signed container data loaded")
+    private func loadSignatureData(for container: SignedContainerProtocol, generation: Int) async {
+        await container.awaitValidation()
+
+        let loadedSignatures = await container.getSignatures()
+        let loadedTimestamps = await container.getTimestamps()
+        let loadedIsTimestamped = await isTimestampedContainer()
+        let loadedIsCades = await container.isCades()
+        let loadedIsXades = await container.isXades()
+
+        guard generation == loadGeneration else { return }
+
+        self.isCadesContainer = loadedIsCades
+        self.isXadesContainer = loadedIsXades
+
+        let loadedNotifications = await getContainerNotifications(container: container)
+
+        guard generation == loadGeneration else { return }
+
+        self.signatures = loadedSignatures
+        self.timestamps = loadedTimestamps
+        self.isTimestampedContainer = loadedIsTimestamped
+        self.containerNotifications = loadedNotifications
+        self.expectedSignatureCount = loadedSignatures.count
+        self.areSignaturesLoading = false
+
+        SigningViewModel.logger().info("Signature data loaded")
     }
 
     func getContainerNotifications(container: SignedContainerProtocol) async -> [ContainerNotificationType] {
@@ -131,7 +174,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func isSigned() -> Bool {
-        return !signatures.isEmpty
+        return !signatures.isEmpty || expectedSignatureCount > 0
     }
 
     func createCopyOfContainerForSaving(containerURL: URL?) -> URL? {
@@ -199,6 +242,12 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         } catch {
             await handleAddFilesError(error, container: container)
         }
+    }
+
+    private func cancelLoading() {
+        loadGeneration += 1
+        let container = signedContainer
+        Task { await container?.cancelValidation() }
     }
 
     public func isSignatureAdded() -> Bool {
@@ -475,6 +524,7 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
     }
 
     func handleBackButton() async -> Bool {
+        cancelLoading()
         await MainActor.run {
             navigateToNestedCryptoContainerView = false
         }
@@ -557,6 +607,12 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
             SigningViewModel.logger().error(
                 "Unable to remove file from container. File not found in container"
             )
+            errorMessage = ToastMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
+            return
+        }
+
+        guard !isSigned() else {
+            SigningViewModel.logger().error("Refusing to remove a data file from a signed container")
             errorMessage = ToastMessage(key: "Failed to remove file from container", args: [dataFile.fileName])
             return
         }
