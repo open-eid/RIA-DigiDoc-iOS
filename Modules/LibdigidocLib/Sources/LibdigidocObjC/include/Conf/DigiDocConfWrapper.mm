@@ -8,6 +8,7 @@
 #import "digidocpp/Exception.h"
 #import "DigiDocConfWrapper.h"
 #import "../Model/DigiDocConfig.h"
+#import "../Container/DigiDocContainerWrapper.h"
 #import "Exception/Util/ExceptionUtil.h"
 
 static constexpr int kTSLTimeOutSeconds = 5;
@@ -215,11 +216,13 @@ class DigiDocConfWrapperImpl {
 private:
     template<typename Func>
     static void withCurrentConf(Func&& fn) {
-        digidoc::Conf *conf = DigiDocConfCurrent::instance();
-        if (!conf) return;
-        DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
-        if (currentConf) {
-            fn(currentConf);
+        @synchronized ([DigiDocContainerWrapper class]) {
+            digidoc::Conf *conf = DigiDocConfCurrent::instance();
+            if (!conf) return;
+            DigiDocConfCurrent *currentConf = dynamic_cast<DigiDocConfCurrent*>(conf);
+            if (currentConf) {
+                fn(currentConf);
+            }
         }
     }
     
@@ -229,9 +232,11 @@ public:
             NSError *error = nil;
             try {
                 std::string userAgentInfo = userAgent.UTF8String;
-                DigiDocConfCurrent *currentConf = new DigiDocConfCurrent(conf);
-                digidoc::Conf::init(currentConf);
-                digidoc::initialize(userAgentInfo, userAgentInfo);
+                @synchronized ([DigiDocContainerWrapper class]) {
+                    DigiDocConfCurrent *currentConf = new DigiDocConfCurrent(conf);
+                    digidoc::Conf::init(currentConf);
+                    digidoc::initialize(userAgentInfo, userAgentInfo);
+                }
             } catch (const digidoc::Exception &e) {
                 std::vector<digidoc::Exception> causes = e.causes();
                 NSDictionary *userInfo = @{
@@ -250,8 +255,10 @@ public:
 
     void updateConfiguration(DigiDocConfig *conf) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(conf);
-            digidoc::Conf::init(newCurrentConf);
+            @synchronized ([DigiDocContainerWrapper class]) {
+                DigiDocConfCurrent *newCurrentConf = new DigiDocConfCurrent(conf);
+                digidoc::Conf::init(newCurrentConf);
+            }
         });
     }
     

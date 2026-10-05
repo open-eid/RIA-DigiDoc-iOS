@@ -23,6 +23,7 @@ enum Dimensions {
         static let IconSizeXS: CGFloat = 48
         static let IconSizeM: CGFloat = 72
         static let IconSizeXXL: CGFloat = 144
+        static let IconSizeSpinner: CGFloat = 100
     }
 
     enum Padding {

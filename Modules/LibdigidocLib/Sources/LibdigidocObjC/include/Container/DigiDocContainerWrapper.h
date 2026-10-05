@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable DigiDocContainer *)open:(NSString *)containerPath validateOnline:(BOOL)validateOnline error:(NSError **)error;
 
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^)(DigiDocContainer * _Nullable container, NSError * _Nullable error))completion;
+
 + (void)addDataFilesToContainerWithPath:(NSString *)containerPath withDataFilePaths:(NSArray<NSString*> *)dataFilePaths completion:(void (^)(NSError * _Nullable error))completion;
 
 + (void)container:(NSString *)containerPath saveDataFile:(NSString *)fileName to:(NSString *)path completion:(void (^)(NSError * _Nullable error))completion;
@@ -31,6 +35,30 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)extendContainerToLTA:(NSString *)containerPath
              outputAsicsPath:(NSString *)outputAsicsPath
                   completion:(void (^)(NSString * _Nullable savedPath, NSError * _Nullable error))completion;
+
+@end
+
+NS_SWIFT_SENDABLE
+@interface DigiDocValidationSession : NSObject
+
+@property (nonatomic, readonly) NSUInteger signatureCount;
+
++ (void)open:(NSString *)containerPath
+validateOnline:(BOOL)validateOnline
+  completion:(void (^NS_SWIFT_SENDABLE)(DigiDocValidationSession * _Nullable session,
+                                        DigiDocContainer * _Nullable container,
+                                        NSError * _Nullable error))completion
+    NS_SWIFT_NAME(open(_:validateOnline:completion:));
+
+- (void)validateSignatureAtIndex:(NSUInteger)index
+                      completion:(void (^NS_SWIFT_SENDABLE)(DigiDocSignature * _Nullable signature,
+                                                            NSError * _Nullable error))completion
+    NS_SWIFT_NAME(validateSignature(at:completion:));
+
+- (void)closeWithCompletion:(void (^NS_SWIFT_SENDABLE)(void))completion
+    NS_SWIFT_NAME(close(completion:));
+
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
