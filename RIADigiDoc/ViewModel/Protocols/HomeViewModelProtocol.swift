@@ -12,4 +12,5 @@ public protocol HomeViewModelProtocol: Sendable {
     func getRecentDocumentsFolder() -> URL?
     func getSharedFiles() async -> [URL]
     func setFileOpeningMethod(_ method: FileOpeningMethod)
+    func closeOpenContainers()
 }
