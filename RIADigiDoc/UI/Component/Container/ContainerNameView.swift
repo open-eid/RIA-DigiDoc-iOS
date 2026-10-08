@@ -55,6 +55,10 @@ struct ContainerNameView: View {
         )
     }
 
+    private var hasVisibleActions: Bool {
+        bottomSheetActions.contains { $0.showButton }
+    }
+
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: Dimensions.Padding.XSPadding) {
@@ -87,28 +91,30 @@ struct ContainerNameView: View {
 
                     Spacer()
 
-                    Button(action: accessibleAction(
-                        voiceOverEnabled: voiceOverEnabled,
-                        focusedField: $focusedField
-                    ) {
-                        showBottomSheetFromButton = true
-                    }, label: {
-                        Image("ic_m3_more_vert_48pt_wght400")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(
-                                width: Dimensions.Icon.IconSizeXXS,
-                                height: Dimensions.Icon.IconSizeXXS
-                            )
-                            .foregroundStyle(theme.onSurfaceVariant)
-                    })
-                    .accessibilityFocusRestore(
-                        focusedField: $focusedField,
-                        field: .container(.openContainerOptionsButton),
-                        when: showBottomSheetFromButton
-                    )
-                    .accessibilityLabel(languageSettings.localized("More options"))
-                    .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                    if hasVisibleActions {
+                        Button(action: accessibleAction(
+                            voiceOverEnabled: voiceOverEnabled,
+                            focusedField: $focusedField
+                        ) {
+                            showBottomSheetFromButton = true
+                        }, label: {
+                            Image("ic_m3_more_vert_48pt_wght400")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(
+                                    width: Dimensions.Icon.IconSizeXXS,
+                                    height: Dimensions.Icon.IconSizeXXS
+                                )
+                                .foregroundStyle(theme.onSurfaceVariant)
+                        })
+                        .accessibilityFocusRestore(
+                            focusedField: $focusedField,
+                            field: .container(.openContainerOptionsButton),
+                            when: showBottomSheetFromButton
+                        )
+                        .accessibilityLabel(languageSettings.localized("More options"))
+                        .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
+                    }
                 }
 
                 if showLeftActionButton || showRightActionButton {
