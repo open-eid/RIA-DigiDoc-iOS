@@ -29,6 +29,14 @@ public final class LanguageSettings: LanguageSettingsProtocol {
         localizedBundle = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj").flatMap(Bundle.init)
     }
 
+    public func loadDeviceLanguage(preferredLocalizations: [String] = Bundle.main.preferredLocalizations) {
+        let supportedCodes = supportedLanguages.map(\.code)
+        let deviceLanguage = preferredLocalizations.first { supportedCodes.contains($0) } ?? DefaultValues.language
+
+        selectedLanguage = deviceLanguage
+        localizedBundle = Bundle.main.path(forResource: deviceLanguage, ofType: "lproj").flatMap(Bundle.init)
+    }
+
     public func getSelectedLanguage() -> String {
         return selectedLanguage
     }

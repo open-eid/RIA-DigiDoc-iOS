@@ -7,7 +7,7 @@ import Testing
 struct LanguageSettingsTests {
     private let mockDataStore: DataStoreProtocolMock
 
-    private let languageSettings: LanguageSettingsProtocol
+    private let languageSettings: LanguageSettings
 
     init() async {
         mockDataStore = DataStoreProtocolMock()
@@ -62,5 +62,45 @@ struct LanguageSettingsTests {
             let url = try #require(URL(string: localizedUrl), "'\(key)' is not a URL in \(languageCode)")
             #expect(url.scheme == "https", "'\(key)' is not an https URL in \(languageCode)")
         }
+    }
+
+    @Test(arguments: [
+        (["et", "en"], "et"),
+        (["en", "et"], "en"),
+        (["et"], "et")
+    ])
+    func loadDeviceLanguage_usesFirstSupportedPreferredLocalization(
+        preferredLocalizations: [String],
+        expectedLanguage: String
+    ) async {
+        await languageSettings.loadDeviceLanguage(preferredLocalizations: preferredLocalizations)
+
+        #expect(await languageSettings.getSelectedLanguage() == expectedLanguage)
+    }
+
+    @Test(arguments: [
+        ["Base", "et"],
+        ["lv", "et"]
+    ])
+    func loadDeviceLanguage_skipsUnsupportedLocalizations(preferredLocalizations: [String]) async {
+        await languageSettings.loadDeviceLanguage(preferredLocalizations: preferredLocalizations)
+
+        #expect(await languageSettings.getSelectedLanguage() == "et")
+    }
+
+    @Test(arguments: [[], ["lv"], ["de", "fi"]])
+    func loadDeviceLanguage_fallsBackToEnglishWhenNoSupportedLocalization(
+        preferredLocalizations: [String]
+    ) async {
+        await languageSettings.loadDeviceLanguage(preferredLocalizations: preferredLocalizations)
+
+        #expect(await languageSettings.getSelectedLanguage() == "en")
+    }
+
+    @Test
+    func loadDeviceLanguage_doesNotPersistSelection() async {
+        await languageSettings.loadDeviceLanguage(preferredLocalizations: ["et"])
+
+        #expect(mockDataStore.setSelectedLanguageCallCount == 0)
     }
 }

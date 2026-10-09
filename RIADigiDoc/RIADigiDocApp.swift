@@ -15,6 +15,7 @@ struct RIADigiDocApp: App, Loggable {
 
     @State private var isSetupComplete = false
     @State private var isJailbroken: Bool = false
+    @State private var isAppVersionUnsupported: Bool = false
     @State private var isInitialLanguageSelected: Bool = false
 
     @State private var pathManager = NavigationPathManager()
@@ -41,9 +42,18 @@ struct RIADigiDocApp: App, Loggable {
         self.documentsMigrator = Container.shared.documentsMigrator()
     }
 
+    private func loadBlockingScreenLanguage() async {
+        if await dataStore.getIsInitialLanguageSelected() {
+            await languageSettings.loadSelectedLanguage()
+        } else {
+            languageSettings.loadDeviceLanguage()
+        }
+    }
+
     private func onLaunchScreenViewAppear() {
         Task {
             if await JailbreakDetection.isDeviceJailbroken(fileManager: fileManager) {
+                await loadBlockingScreenLanguage()
                 await MainActor.run {
                     self.isJailbroken = true
                 }
@@ -51,6 +61,17 @@ struct RIADigiDocApp: App, Loggable {
             }
 
             await librarySetup.setupLibraries()
+
+            if await configurationLoader.getConfiguration()?
+                .isAppVersionUnsupported(BundleUtil.getAppVersion()) == true {
+                RIADigiDocApp.logger().error("App version \(BundleUtil.getAppVersion()) is unsupported")
+                await loadBlockingScreenLanguage()
+                await MainActor.run {
+                    self.isAppVersionUnsupported = true
+                }
+                return
+            }
+
             await crashReportManager.evaluateCrashReporting()
             fileUtil.removeSavedFilesDirectory(savedFilesDirectory: nil)
 
@@ -82,6 +103,13 @@ struct RIADigiDocApp: App, Loggable {
                 if isJailbroken {
                     JailbreakView()
                         .environment(\.typography, Typography.current())
+                        .environment(languageSettings)
+                        .environment(themeSettings)
+                        .preferredColorScheme(currentTheme.colorScheme)
+                } else if isAppVersionUnsupported {
+                    UnsupportedVersionView()
+                        .environment(\.typography, Typography.current())
+                        .environment(languageSettings)
                         .environment(themeSettings)
                         .preferredColorScheme(currentTheme.colorScheme)
                 } else if isSetupComplete {
