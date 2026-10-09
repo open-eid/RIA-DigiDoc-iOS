@@ -20,7 +20,7 @@ struct WebEidAuthServiceTests {
     // swiftlint:enable line_length
 
     init() async throws {
-        service = WebEidAuthService()
+        service = WebEidAuthService(appVersion: "3.2.0")
     }
 
     @Test
@@ -29,7 +29,8 @@ struct WebEidAuthServiceTests {
         let signature = Data(base64Encoded: testSignature) ?? Data()
         let token: [String: Any] = [
             "unverifiedCertificate": testAuthCert,
-            "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0",
+            "issuerApp": "https://id.eesti.ee/releases/v3.2.0",
+            "appVersion": "https://id.eesti.ee/releases/v3.2.0",
             "algorithm": "ES384",
             "format": "web-eid:1.0",
             "signature": testSignature]
@@ -53,7 +54,8 @@ struct WebEidAuthServiceTests {
         let signCert = Data(base64Encoded: testSignCert) ?? Data()
         let signature = Data(base64Encoded: testSignature) ?? Data()
         let token: [String: Any] = [
-            "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0",
+            "issuerApp": "https://id.eesti.ee/releases/v3.2.0",
+            "appVersion": "https://id.eesti.ee/releases/v3.2.0",
             "format": "web-eid:1.1",
             "algorithm": "ES384",
             "unverifiedCertificate": testAuthCert,
@@ -86,6 +88,24 @@ struct WebEidAuthServiceTests {
         )
 
         #expect(result.count == expected.count)
+    }
+
+    @Test
+    func buildAuthToken_setsIssuerAppAndAppVersionToIdEestiEeReleaseUrl() async throws {
+        let authCert = Data(base64Encoded: testAuthCert) ?? Data()
+        let signature = Data(base64Encoded: testSignature) ?? Data()
+
+        let data = try await service.buildAuthToken(
+            authCert: authCert,
+            signingCert: nil,
+            signature: signature
+        )
+
+        let token = try #require(
+            try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        )
+        #expect(token["issuerApp"] as? String == "https://id.eesti.ee/releases/v3.2.0")
+        #expect(token["appVersion"] as? String == "https://id.eesti.ee/releases/v3.2.0")
     }
 
     @Test
