@@ -153,7 +153,7 @@ final class SignedContainerTests {
         let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let newFileName = "renamed.asice"
         let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(
-            subfolder: "SignedContainerTests"
+            subfolder: "SignedContainerTests-\(UUID().uuidString)"
         )
         let uniqueFileURL = tempDirectoryURL.appending(path: "renamed_unique.asice")
 
@@ -236,7 +236,7 @@ final class SignedContainerTests {
         let exampleContainer = try #require( TestFileUtil.pathForResourceFile(fileName: "example", ext: "asice"))
         let emptyNewName = ""
         let tempDirectoryURL = try TestFileUtil.getTemporaryDirectory(
-            subfolder: "SignedContainerTests"
+            subfolder: "SignedContainerTests-\(UUID().uuidString)"
         )
         let defaultFileName = CommonsLib.Constants.Container.DefaultName
         let uniqueFileURL = tempDirectoryURL.appending(path: "\(defaultFileName)_unique.asice")

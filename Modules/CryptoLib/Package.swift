@@ -26,7 +26,8 @@ let package = Package(
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../IdCardLib"),
-        .package(path: "../UtilsLib")
+        .package(path: "../UtilsLib"),
+        .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
         .binaryTarget(
@@ -101,12 +102,14 @@ let package = Package(
             name: "CryptoSwiftTests",
             dependencies: [
                 "ConfigLib",
-                "CryptoLibMocks",
+                "CryptoSwift",
                 "CryptoObjCWrapper",
+                "CryptoLibMocks",
                 "CommonsLib",
                 "UtilsLib",
-                .product(name: "FactoryTesting", package: "Factory"),
-                .product(name: "CommonsLibMocks", package: "commonslib")
+                "CommonsTestShared",
+                .product(name: "CommonsLibMocks", package: "commonslib"),
+                .product(name: "FactoryTesting", package: "Factory")
             ]
         )
     ]
