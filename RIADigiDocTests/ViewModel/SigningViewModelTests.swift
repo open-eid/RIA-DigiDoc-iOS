@@ -41,6 +41,16 @@ struct SigningViewModelTests: Loggable {
     private let mockMimeTypeDecoder: MimeTypeDecoderProtocolMock
     private let mockSivaRepository: SivaRepositoryProtocolMock
 
+    private func makeTemporaryFile(named name: String) throws -> URL {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appending(path: "SigningViewModelTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+
+        let file = directory.appending(path: name)
+        try Data("content".utf8).write(to: file)
+        return file
+    }
+
     init() async throws {
         mockFileManager = FileManagerProtocolMock()
         mockFileInspector = FileInspectorProtocolMock()
@@ -1614,9 +1624,10 @@ struct SigningViewModelTests: Loggable {
     func convertToCryptoContainer_successWithExistingContainer() async throws {
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSignedContainer.getRawContainerFileHandler = {
-            URL(filePath: "/mock/path/to/container.asice")
-        }
+        let containerFile = try makeTemporaryFile(named: "container.asice")
+
+        mockMimeTypeDecoder.parseHandler = { _ in .asice }
+        mockSignedContainer.getRawContainerFileHandler = { containerFile }
 
         let dataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",
@@ -1646,17 +1657,17 @@ struct SigningViewModelTests: Loggable {
     func convertToCryptoContainer_successWithUnsignedContainer() async throws {
         let mockSignedContainer = SignedContainerProtocolMock()
 
-        mockSignedContainer.getRawContainerFileHandler = {
-            URL(filePath: "/mock/path/to/container.asice")
-        }
+        let containerFile = try makeTemporaryFile(named: "container.asice")
+        let savedDataFile = try makeTemporaryFile(named: "text.txt")
+
+        mockMimeTypeDecoder.parseHandler = { _ in .asice }
+        mockSignedContainer.getRawContainerFileHandler = { containerFile }
 
         mockContainerUtil.getContainerDataFilesDirHandler = { _ in
-            URL(filePath: "/mock/path/to/container.asice/datafiles")
+            savedDataFile.deletingLastPathComponent()
         }
 
-        mockSignedContainer.saveDataFileHandler = { _, _ in
-            URL(filePath: "/mock/path/to/container.asice/datafiles/text.txt")
-        }
+        mockSignedContainer.saveDataFileHandler = { _, _ in savedDataFile }
 
         let dataFileWrapper = MockDataFileWrapper.mockDataFileWrapper(
             fileId: "1",

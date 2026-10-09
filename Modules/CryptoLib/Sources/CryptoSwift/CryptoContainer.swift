@@ -341,21 +341,28 @@ extension CryptoContainer {
                 fileManager: fileManager
             )
 
+            let sanitizedContainerURL = cryptoContainersDirectory
+                .appending(path: containerURL.lastPathComponent.sanitized())
+
             CryptoContainer.logger().info("Getting an unique crypto container name")
             // Get unique container name file (1) if name already exists
             let uniqueContainerURL = containerUtil.getContainerFile(
-                for: containerURL,
+                for: sanitizedContainerURL,
                 in: cryptoContainersDirectory
             )
 
             CryptoContainer.logger().info("Creating a new crypto container")
-            return try await create(
+            let container = try await create(
                 containerFile: uniqueContainerURL,
-                dataFiles: dataFiles,
+                dataFiles: [],
                 recipients: [],
                 isDecrypted: false,
                 isEncrypted: false
             )
+
+            try await container.addDataFiles(dataFiles)
+
+            return container
         }
 
         CryptoContainer.logger().info("Opening existing crypto container")

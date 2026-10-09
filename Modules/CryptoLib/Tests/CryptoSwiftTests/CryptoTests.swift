@@ -89,6 +89,34 @@ struct CryptoContainerDataFileTests {
     }
 
     @Test
+    func openOrCreate_sanitizesContainerNameAndFirstDataFile() async throws {
+        let suffix = UUID().uuidString
+        let source = try makeSourceFile(named: "a\\b-\(suffix).txt", contents: "a")
+
+        let container = try await CryptoContainer.openOrCreate(dataFiles: [source])
+
+        let containerName = await container.getContainerName()
+        let names = await container.getDataFiles().map(\.lastPathComponent)
+
+        #expect(!containerName.contains("\\"))
+        #expect(names == ["ab-\(suffix).txt"])
+    }
+
+    @Test
+    func openOrCreate_firstAndSecondFileGetTheSameTreatment() async throws {
+        let suffix = UUID().uuidString
+        let first = try makeSourceFile(named: "e\\f-\(suffix).txt", contents: "first")
+        let second = try makeSourceFile(named: "g\\h-\(suffix).txt", contents: "second")
+
+        let container = try await CryptoContainer.openOrCreate(dataFiles: [first])
+        try await container.addDataFiles([second])
+
+        let names = await container.getDataFiles().map(\.lastPathComponent)
+
+        #expect(names == ["ef-\(suffix).txt", "gh-\(suffix).txt"])
+    }
+
+    @Test
     func saveDataFile_returnsItsOwnBytesWhenTwoNamesSanitizeToTheSameName() async throws {
         let first = try makeSourceFile(named: "a<b.txt", contents: "first")
         let second = try makeSourceFile(named: "a>b.txt", contents: "second")
