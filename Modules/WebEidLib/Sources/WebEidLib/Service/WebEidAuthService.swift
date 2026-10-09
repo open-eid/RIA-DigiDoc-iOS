@@ -7,7 +7,11 @@ import UtilsLib
 
 public actor WebEidAuthService: WebEidAuthServiceProtocol, Loggable {
 
-    init() {}
+    private let appVersionUrl: String
+
+    init(appVersion: String = BundleUtil.getBundleShortVersionString()) {
+        appVersionUrl = "https://id.eesti.ee/releases/v\(appVersion)"
+    }
 
     public func buildAuthToken(
         authCert: Data,
@@ -26,8 +30,8 @@ public actor WebEidAuthService: WebEidAuthServiceProtocol, Loggable {
         var token: [String: Any] = [
             "algorithm": algorithm,
             "unverifiedCertificate": authCert.base64EncodedString(),
-            // TODO: hardcoded? NB! clarify with RIA
-            "issuerApp": "https://web-eid.eu/web-eid-mobile-app/releases/v1.0.0",
+            "issuerApp": appVersionUrl,
+            "appVersion": appVersionUrl,
             "signature": signature.base64EncodedString()
         ]
 
