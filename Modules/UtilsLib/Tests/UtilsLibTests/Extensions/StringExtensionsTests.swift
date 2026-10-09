@@ -56,13 +56,13 @@ class StringSanitizationTests {
 
     @Test(arguments: [
         ("O&U report #1 (100%) @2026.pdf", "O&U report #1 (100%) @2026.pdf"),
-        ("t\u{20AC}4t.pdf", "t\u{20AC}4t.pdf"),
-        ("emoji\u{1F600}.pdf", "emoji\u{1F600}.pdf"),
+        ("t€4t.pdf", "t€4t.pdf"),
+        ("emoji😀.pdf", "emoji😀.pdf"),
         ("team\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F466}.pdf", "team\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F466}.pdf"),
         ("a+b=c~d^e.txt", "a+b=c~d^e.txt"),
         ("test[1]{2}.txt", "test[1]{2}.txt"),
-        ("it's a \u{00BD} share.txt", "it's a \u{00BD} share.txt"),
-        ("Test\u{2211}\u{221E}\u{00A9}\u{00AE}\u{2190}\u{2192}Data", "Test\u{2211}\u{221E}\u{00A9}\u{00AE}\u{2190}\u{2192}Data"),
+        ("it's a ½ share.txt", "it's a ½ share.txt"),
+        ("Test∑∞©®←→Data", "Test∑∞©®←→Data"),
         (".test", "test"),
         ("v1..2 test.zip", "v1..2 test.zip")
     ])
