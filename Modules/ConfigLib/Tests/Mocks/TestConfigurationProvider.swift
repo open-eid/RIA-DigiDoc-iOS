@@ -43,7 +43,8 @@ public class TestConfigurationProvider {
         cdoc2ConfUUID: String = "00000000-0000-0000-0000-000000000000",
         cdoc2ConfName: String = "RIA",
         cdoc2ConfPostUrl: String = "https://cdoc2.example.ee:8443",
-        cdoc2ConfFetchUrl: String = "https://cdoc2.example.ee:8444"
+        cdoc2ConfFetchUrl: String = "https://cdoc2.example.ee:8444",
+        unsupportedAppVersion: String? = nil
     ) throws -> ConfigurationProvider {
         let metaInf = ConfigurationProvider.MetaInf(
             url: metaInfUrl,
@@ -98,7 +99,8 @@ public class TestConfigurationProvider {
             cdoc2Default: cdoc2Default,
             cdoc2DefaultKeyserver: cdoc2DefaultKeyserver,
             cdoc2UseKeyserver: cdoc2UseKeyserver,
-            cdoc2Conf: cdoc2Conf
+            cdoc2Conf: cdoc2Conf,
+            unsupportedAppVersion: unsupportedAppVersion
         )
     }
 
