@@ -21,7 +21,7 @@ extension Dictionary where Key == String, Value == ConfigurationProvider.CDOC2Co
     }
 }
 
-public struct ConfigurationProvider: Codable, Sendable, Equatable {
+public struct ConfigurationProvider: Codable, Sendable, Equatable, Loggable {
     public struct MetaInf: Codable, Sendable, Equatable {
         public let url: String
         public let date: String
@@ -95,6 +95,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
     public let cdoc2DefaultKeyserver: String
     public let cdoc2UseKeyserver: Bool
     public let cdoc2Conf: [String: CDOC2Conf]
+    public let unsupportedAppVersion: String?
 
     private enum CodingKeys: String, CodingKey {
         case metaInf = "META-INF"
@@ -117,6 +118,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         case cdoc2DefaultKeyserver = "CDOC2-DEFAULT-KEYSERVER"
         case cdoc2UseKeyserver = "CDOC2-USE-KEYSERVER"
         case cdoc2Conf = "CDOC2-CONF"
+        case unsupportedAppVersion = "RIADD-UNSUPPORTED"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -147,6 +149,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         try container.encode(cdoc2DefaultKeyserver, forKey: .cdoc2DefaultKeyserver)
         try container.encode(cdoc2UseKeyserver, forKey: .cdoc2UseKeyserver)
         try container.encode(cdoc2Conf, forKey: .cdoc2Conf)
+        try container.encodeIfPresent(unsupportedAppVersion, forKey: .unsupportedAppVersion)
     }
 
     public init(from decoder: Decoder) throws {
@@ -170,6 +173,14 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         cdoc2DefaultKeyserver = try container.decode(String.self, forKey: .cdoc2DefaultKeyserver)
         cdoc2UseKeyserver = try container.decode(Bool.self, forKey: .cdoc2UseKeyserver)
         cdoc2Conf = try container.decode([String: CDOC2Conf].self, forKey: .cdoc2Conf)
+        do {
+            unsupportedAppVersion = try container.decodeIfPresent(String.self, forKey: .unsupportedAppVersion)
+        } catch {
+            ConfigurationProvider.logger().error(
+                "Unable to decode unsupported app version: \(String(reflecting: error), privacy: .public)"
+            )
+            unsupportedAppVersion = nil
+        }
 
         let lastUpdateCheckString = try container.decodeIfPresent(
             String.self,
@@ -202,6 +213,7 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         cdoc2DefaultKeyserver: String,
         cdoc2UseKeyserver: Bool,
         cdoc2Conf: [String: CDOC2Conf],
+        unsupportedAppVersion: String? = nil
     ) {
         self.metaInf = metaInf
         self.sivaUrl = sivaUrl
@@ -223,5 +235,11 @@ public struct ConfigurationProvider: Codable, Sendable, Equatable {
         self.cdoc2DefaultKeyserver = cdoc2DefaultKeyserver
         self.cdoc2UseKeyserver = cdoc2UseKeyserver
         self.cdoc2Conf = cdoc2Conf
+        self.unsupportedAppVersion = unsupportedAppVersion
+    }
+
+    public func isAppVersionUnsupported(_ appVersion: String) -> Bool {
+        guard let unsupportedAppVersion else { return false }
+        return ConfigurationUtil.isVersion(appVersion, lowerThan: unsupportedAppVersion)
     }
 }
