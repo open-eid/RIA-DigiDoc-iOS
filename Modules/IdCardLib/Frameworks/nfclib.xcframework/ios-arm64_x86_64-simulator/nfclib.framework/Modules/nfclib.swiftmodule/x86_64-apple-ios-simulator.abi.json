@@ -22,44 +22,6 @@
         "moduleName": "nfclib"
       },
       {
-        "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoKit",
-        "printedName": "CryptoKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
         "kind": "TypeDecl",
         "name": "OperationSignHash",
         "printedName": "OperationSignHash",
@@ -449,14 +411,14 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
+                "name": "WebEidSignatureAlgorithm",
+                "printedName": "nfclib.WebEidSignatureAlgorithm",
+                "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
               }
             ],
             "declKind": "Var",
-            "usr": "s:6nfclib10WebEidDataC9algorithmSSvp",
-            "mangledName": "$s6nfclib10WebEidDataC9algorithmSSvp",
+            "usr": "s:6nfclib10WebEidDataC9algorithmAA0bC18SignatureAlgorithmOvp",
+            "mangledName": "$s6nfclib10WebEidDataC9algorithmAA0bC18SignatureAlgorithmOvp",
             "moduleName": "nfclib",
             "declAttributes": [
               "Final",
@@ -473,14 +435,14 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
+                    "name": "WebEidSignatureAlgorithm",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm",
+                    "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:6nfclib10WebEidDataC9algorithmSSvg",
-                "mangledName": "$s6nfclib10WebEidDataC9algorithmSSvg",
+                "usr": "s:6nfclib10WebEidDataC9algorithmAA0bC18SignatureAlgorithmOvg",
+                "mangledName": "$s6nfclib10WebEidDataC9algorithmAA0bC18SignatureAlgorithmOvg",
                 "moduleName": "nfclib",
                 "implicit": true,
                 "declAttributes": [
@@ -632,6 +594,257 @@
         "declAttributes": [
           "RawDocComment"
         ]
+      },
+      {
+        "kind": "Import",
+        "name": "Security",
+        "printedName": "Security",
+        "declKind": "Import",
+        "moduleName": "nfclib"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "WebEidSignatureAlgorithm",
+        "printedName": "WebEidSignatureAlgorithm",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "es256",
+            "printedName": "es256",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.WebEidSignatureAlgorithm.Type) -> nfclib.WebEidSignatureAlgorithm",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "WebEidSignatureAlgorithm",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm",
+                    "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "WebEidSignatureAlgorithm",
+                        "printedName": "nfclib.WebEidSignatureAlgorithm",
+                        "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib24WebEidSignatureAlgorithmO5es256yA2CmF",
+            "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO5es256yA2CmF",
+            "moduleName": "nfclib"
+          },
+          {
+            "kind": "Var",
+            "name": "es384",
+            "printedName": "es384",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.WebEidSignatureAlgorithm.Type) -> nfclib.WebEidSignatureAlgorithm",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "WebEidSignatureAlgorithm",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm",
+                    "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "WebEidSignatureAlgorithm",
+                        "printedName": "nfclib.WebEidSignatureAlgorithm",
+                        "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib24WebEidSignatureAlgorithmO5es384yA2CmF",
+            "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO5es384yA2CmF",
+            "moduleName": "nfclib"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(rawValue:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "nfclib.WebEidSignatureAlgorithm?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "WebEidSignatureAlgorithm",
+                    "printedName": "nfclib.WebEidSignatureAlgorithm",
+                    "usr": "s:6nfclib24WebEidSignatureAlgorithmO"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:6nfclib24WebEidSignatureAlgorithmO8rawValueACSgSS_tcfc",
+            "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO8rawValueACSgSS_tcfc",
+            "moduleName": "nfclib",
+            "implicit": true,
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Var",
+            "name": "rawValue",
+            "printedName": "rawValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib24WebEidSignatureAlgorithmO8rawValueSSvp",
+            "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO8rawValueSSvp",
+            "moduleName": "nfclib",
+            "implicit": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib24WebEidSignatureAlgorithmO8rawValueSSvg",
+                "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO8rawValueSSvg",
+                "moduleName": "nfclib",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:6nfclib24WebEidSignatureAlgorithmO",
+        "mangledName": "$s6nfclib24WebEidSignatureAlgorithmO",
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "enumRawTypeName": "String",
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "RawRepresentable",
+            "printedName": "RawRepresentable",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "RawValue",
+                "printedName": "RawValue",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:SY",
+            "mangledName": "$sSY"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "RawDocComment"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Synchronization",
+        "printedName": "Synchronization",
+        "declKind": "Import",
+        "moduleName": "nfclib"
       },
       {
         "kind": "Import",
@@ -826,169 +1039,10 @@
       },
       {
         "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
+        "name": "Security",
+        "printedName": "Security",
         "declKind": "Import",
         "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CoreNFC",
-        "printedName": "CoreNFC",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Var",
-        "name": "rsaAlgorithmName",
-        "printedName": "rsaAlgorithmName",
-        "children": [
-          {
-            "kind": "TypeNominal",
-            "name": "String",
-            "printedName": "Swift.String",
-            "usr": "s:SS"
-          }
-        ],
-        "declKind": "Var",
-        "usr": "s:6nfclib16rsaAlgorithmNameSSvp",
-        "mangledName": "$s6nfclib16rsaAlgorithmNameSSvp",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "HasInitialValue",
-          "HasStorage",
-          "AccessControl"
-        ],
-        "isLet": true,
-        "hasStorage": true,
-        "accessors": [
-          {
-            "kind": "Accessor",
-            "name": "Get",
-            "printedName": "Get()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              }
-            ],
-            "declKind": "Accessor",
-            "usr": "s:6nfclib16rsaAlgorithmNameSSvg",
-            "mangledName": "$s6nfclib16rsaAlgorithmNameSSvg",
-            "moduleName": "nfclib",
-            "implicit": true,
-            "accessorKind": "get"
-          }
-        ]
-      },
-      {
-        "kind": "Var",
-        "name": "ecAlgorithmName",
-        "printedName": "ecAlgorithmName",
-        "children": [
-          {
-            "kind": "TypeNominal",
-            "name": "String",
-            "printedName": "Swift.String",
-            "usr": "s:SS"
-          }
-        ],
-        "declKind": "Var",
-        "usr": "s:6nfclib15ecAlgorithmNameSSvp",
-        "mangledName": "$s6nfclib15ecAlgorithmNameSSvp",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "HasInitialValue",
-          "HasStorage",
-          "AccessControl"
-        ],
-        "isLet": true,
-        "hasStorage": true,
-        "accessors": [
-          {
-            "kind": "Accessor",
-            "name": "Get",
-            "printedName": "Get()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              }
-            ],
-            "declKind": "Accessor",
-            "usr": "s:6nfclib15ecAlgorithmNameSSvg",
-            "mangledName": "$s6nfclib15ecAlgorithmNameSSvg",
-            "moduleName": "nfclib",
-            "implicit": true,
-            "accessorKind": "get"
-          }
-        ]
-      },
-      {
-        "kind": "Var",
-        "name": "unknownAlgorithmName",
-        "printedName": "unknownAlgorithmName",
-        "children": [
-          {
-            "kind": "TypeNominal",
-            "name": "String",
-            "printedName": "Swift.String",
-            "usr": "s:SS"
-          }
-        ],
-        "declKind": "Var",
-        "usr": "s:6nfclib20unknownAlgorithmNameSSvp",
-        "mangledName": "$s6nfclib20unknownAlgorithmNameSSvp",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "HasInitialValue",
-          "HasStorage",
-          "AccessControl"
-        ],
-        "isLet": true,
-        "hasStorage": true,
-        "accessors": [
-          {
-            "kind": "Accessor",
-            "name": "Get",
-            "printedName": "Get()",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              }
-            ],
-            "declKind": "Accessor",
-            "usr": "s:6nfclib20unknownAlgorithmNameSSvg",
-            "mangledName": "$s6nfclib20unknownAlgorithmNameSSvg",
-            "moduleName": "nfclib",
-            "implicit": true,
-            "accessorKind": "get"
-          }
-        ]
       },
       {
         "kind": "Import",
@@ -1009,51 +1063,10 @@
       },
       {
         "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
         "name": "Security",
         "printedName": "Security",
         "declKind": "Import",
         "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "X509",
-        "printedName": "X509",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
       },
       {
         "kind": "TypeDecl",
@@ -1132,43 +1145,6 @@
             "declKind": "EnumElement",
             "usr": "s:6nfclib27AuthenticateWithWebEidErrorO26failedToDetermineAlgorithmyA2CmF",
             "mangledName": "$s6nfclib27AuthenticateWithWebEidErrorO26failedToDetermineAlgorithmyA2CmF",
-            "moduleName": "nfclib"
-          },
-          {
-            "kind": "Var",
-            "name": "failedToHashData",
-            "printedName": "failedToHashData",
-            "children": [
-              {
-                "kind": "TypeFunc",
-                "name": "Function",
-                "printedName": "(nfclib.AuthenticateWithWebEidError.Type) -> nfclib.AuthenticateWithWebEidError",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "AuthenticateWithWebEidError",
-                    "printedName": "nfclib.AuthenticateWithWebEidError",
-                    "usr": "s:6nfclib27AuthenticateWithWebEidErrorO"
-                  },
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Metatype",
-                    "printedName": "nfclib.AuthenticateWithWebEidError.Type",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "AuthenticateWithWebEidError",
-                        "printedName": "nfclib.AuthenticateWithWebEidError",
-                        "usr": "s:6nfclib27AuthenticateWithWebEidErrorO"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ],
-            "declKind": "EnumElement",
-            "usr": "s:6nfclib27AuthenticateWithWebEidErrorO16failedToHashDatayA2CmF",
-            "mangledName": "$s6nfclib27AuthenticateWithWebEidErrorO16failedToHashDatayA2CmF",
             "moduleName": "nfclib"
           },
           {
@@ -1583,56 +1559,6 @@
           },
           {
             "kind": "Function",
-            "name": "getAlgorithmNameTypeAndLength",
-            "printedName": "getAlgorithmNameTypeAndLength(from:)",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "(algorithm: Swift.String, keyLength: Swift.Int)?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Tuple",
-                    "printedName": "(algorithm: Swift.String, keyLength: Swift.Int)",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "String",
-                        "printedName": "Swift.String",
-                        "usr": "s:SS"
-                      },
-                      {
-                        "kind": "TypeNominal",
-                        "name": "Int",
-                        "printedName": "Swift.Int",
-                        "usr": "s:Si"
-                      }
-                    ]
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "SecKey",
-                "printedName": "Security.SecKey",
-                "usr": "c:@T@SecKeyRef"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:6nfclib31OperationAuthenticateWithWebEIDC29getAlgorithmNameTypeAndLength4fromSS9algorithm_Si03keyL0tSgSo9SecKeyRefa_tF",
-            "mangledName": "$s6nfclib31OperationAuthenticateWithWebEIDC29getAlgorithmNameTypeAndLength4fromSS9algorithm_Si03keyL0tSgSo9SecKeyRefa_tF",
-            "moduleName": "nfclib",
-            "declAttributes": [
-              "Custom",
-              "AccessControl"
-            ],
-            "isFromExtension": true,
-            "funcSelfKind": "NonMutating"
-          },
-          {
-            "kind": "Function",
             "name": "tagReaderSessionDidBecomeActive",
             "printedName": "tagReaderSessionDidBecomeActive(_:)",
             "children": [
@@ -1685,49 +1611,6 @@
             "declKind": "Func",
             "usr": "s:6nfclib31OperationAuthenticateWithWebEIDC16tagReaderSession_013didInvalidateD5ErrorySo06NFCTaghI0C_s0L0_ptF",
             "mangledName": "$s6nfclib31OperationAuthenticateWithWebEIDC16tagReaderSession_013didInvalidateD5ErrorySo06NFCTaghI0C_s0L0_ptF",
-            "moduleName": "nfclib",
-            "declAttributes": [
-              "Custom",
-              "AccessControl"
-            ],
-            "isFromExtension": true,
-            "funcSelfKind": "NonMutating"
-          },
-          {
-            "kind": "Function",
-            "name": "mapToAlgorithm",
-            "printedName": "mapToAlgorithm(algorithm:bitLength:)",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "Optional",
-                "printedName": "Swift.String?",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "String",
-                    "printedName": "Swift.String",
-                    "usr": "s:SS"
-                  }
-                ],
-                "usr": "s:Sq"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "String",
-                "printedName": "Swift.String",
-                "usr": "s:SS"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "Int",
-                "printedName": "Swift.Int",
-                "usr": "s:Si"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:6nfclib31OperationAuthenticateWithWebEIDC14mapToAlgorithm9algorithm9bitLengthSSSgSS_SitF",
-            "mangledName": "$s6nfclib31OperationAuthenticateWithWebEIDC14mapToAlgorithm9algorithm9bitLengthSSSgSS_SitF",
             "moduleName": "nfclib",
             "declAttributes": [
               "Custom",
@@ -1831,34 +1714,6 @@
         ]
       },
       {
-        "kind": "TypeDecl",
-        "name": "SignatureAlgorithmInfo",
-        "printedName": "SignatureAlgorithmInfo",
-        "declKind": "Struct",
-        "usr": "s:6nfclib22SignatureAlgorithmInfoV",
-        "mangledName": "$s6nfclib22SignatureAlgorithmInfoV",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ],
-        "conformances": [
-          {
-            "kind": "Conformance",
-            "name": "Copyable",
-            "printedName": "Copyable",
-            "usr": "s:s8CopyableP",
-            "mangledName": "$ss8CopyableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Escapable",
-            "printedName": "Escapable",
-            "usr": "s:s9EscapableP",
-            "mangledName": "$ss9EscapableP"
-          }
-        ]
-      },
-      {
         "kind": "Import",
         "name": "CryptoTokenKit",
         "printedName": "CryptoTokenKit",
@@ -1924,7 +1779,10 @@
         "name": "BigInt",
         "printedName": "BigInt",
         "declKind": "Import",
-        "moduleName": "nfclib"
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "AccessControl"
+        ]
       },
       {
         "kind": "Import",
@@ -1960,37 +1818,6 @@
         "kind": "Import",
         "name": "CoreNFC",
         "printedName": "CoreNFC",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
         "declKind": "Import",
         "moduleName": "nfclib"
       },
@@ -2756,20 +2583,13 @@
       },
       {
         "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
+        "name": "Foundation",
+        "printedName": "Foundation",
         "declKind": "Import",
         "moduleName": "nfclib",
         "declAttributes": [
           "RawDocComment"
         ]
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
       },
       {
         "kind": "Import",
@@ -2783,8 +2603,8 @@
       },
       {
         "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
+        "name": "Foundation",
+        "printedName": "Foundation",
         "declKind": "Import",
         "moduleName": "nfclib",
         "declAttributes": [
@@ -2836,44 +2656,6 @@
         "moduleName": "nfclib"
       },
       {
-        "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "Security",
-        "printedName": "Security",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
         "kind": "TypeDecl",
         "name": "UnblockPINError",
         "printedName": "UnblockPINError",
@@ -2913,43 +2695,6 @@
             "declKind": "EnumElement",
             "usr": "s:6nfclib15UnblockPINErrorO24missingRequiredParameteryA2CmF",
             "mangledName": "$s6nfclib15UnblockPINErrorO24missingRequiredParameteryA2CmF",
-            "moduleName": "nfclib"
-          },
-          {
-            "kind": "Var",
-            "name": "failed",
-            "printedName": "failed",
-            "children": [
-              {
-                "kind": "TypeFunc",
-                "name": "Function",
-                "printedName": "(nfclib.UnblockPINError.Type) -> nfclib.UnblockPINError",
-                "children": [
-                  {
-                    "kind": "TypeNominal",
-                    "name": "UnblockPINError",
-                    "printedName": "nfclib.UnblockPINError",
-                    "usr": "s:6nfclib15UnblockPINErrorO"
-                  },
-                  {
-                    "kind": "TypeNominal",
-                    "name": "Metatype",
-                    "printedName": "nfclib.UnblockPINError.Type",
-                    "children": [
-                      {
-                        "kind": "TypeNominal",
-                        "name": "UnblockPINError",
-                        "printedName": "nfclib.UnblockPINError",
-                        "usr": "s:6nfclib15UnblockPINErrorO"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ],
-            "declKind": "EnumElement",
-            "usr": "s:6nfclib15UnblockPINErrorO6failedyA2CmF",
-            "mangledName": "$s6nfclib15UnblockPINErrorO6failedyA2CmF",
             "moduleName": "nfclib"
           },
           {
@@ -3443,20 +3188,6 @@
         ]
       },
       {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
         "kind": "TypeDecl",
         "name": "NFCConnection",
         "printedName": "NFCConnection",
@@ -3619,16 +3350,6 @@
       },
       {
         "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
         "name": "Foundation",
         "printedName": "Foundation",
         "declKind": "Import",
@@ -3643,6 +3364,16 @@
         "printedName": "CommonCrypto",
         "declKind": "Import",
         "moduleName": "nfclib"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreNFC",
+        "printedName": "CoreNFC",
+        "declKind": "Import",
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "RawDocComment"
+        ]
       },
       {
         "kind": "TypeDecl",
@@ -3694,12 +3425,12 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(nfclib.IdCardError.Type) -> (Swift.Int) -> nfclib.IdCardError",
+                "printedName": "(nfclib.IdCardError.Type) -> (nfclib.CodeType, Swift.Int) -> nfclib.IdCardError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.Int) -> nfclib.IdCardError",
+                    "printedName": "(nfclib.CodeType, Swift.Int) -> nfclib.IdCardError",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -3710,8 +3441,14 @@
                       {
                         "kind": "TypeNominal",
                         "name": "Tuple",
-                        "printedName": "(triesLeft: Swift.Int)",
+                        "printedName": "(codeType: nfclib.CodeType, triesLeft: Swift.Int)",
                         "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "CodeType",
+                            "printedName": "nfclib.CodeType",
+                            "usr": "s:6nfclib8CodeTypeO"
+                          },
                           {
                             "kind": "TypeNominal",
                             "name": "Int",
@@ -3739,8 +3476,8 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:6nfclib11IdCardErrorO8wrongPINyACSi_tcACmF",
-            "mangledName": "$s6nfclib11IdCardErrorO8wrongPINyACSi_tcACmF",
+            "usr": "s:6nfclib11IdCardErrorO8wrongPINyAcA8CodeTypeO_SitcACmF",
+            "mangledName": "$s6nfclib11IdCardErrorO8wrongPINyAcA8CodeTypeO_SitcACmF",
             "moduleName": "nfclib"
           },
           {
@@ -3816,6 +3553,43 @@
             "usr": "s:6nfclib11IdCardErrorO07sessionD0yA2CmF",
             "mangledName": "$s6nfclib11IdCardErrorO07sessionD0yA2CmF",
             "moduleName": "nfclib"
+          },
+          {
+            "kind": "Var",
+            "name": "notActivated",
+            "printedName": "notActivated",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.IdCardError.Type) -> nfclib.IdCardError",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "IdCardError",
+                    "printedName": "nfclib.IdCardError",
+                    "usr": "s:6nfclib11IdCardErrorO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.IdCardError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "IdCardError",
+                        "printedName": "nfclib.IdCardError",
+                        "usr": "s:6nfclib11IdCardErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib11IdCardErrorO12notActivatedyA2CmF",
+            "mangledName": "$s6nfclib11IdCardErrorO12notActivatedyA2CmF",
+            "moduleName": "nfclib"
           }
         ],
         "declKind": "Enum",
@@ -3823,8 +3597,7 @@
         "mangledName": "$s6nfclib11IdCardErrorO",
         "moduleName": "nfclib",
         "declAttributes": [
-          "AccessControl",
-          "RawDocComment"
+          "AccessControl"
         ],
         "conformances": [
           {
@@ -4276,13 +4049,33 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(nfclib.IdCardInternalError.Type) -> nfclib.IdCardInternalError",
+                "printedName": "(nfclib.IdCardInternalError.Type) -> (nfclib.CodeType) -> nfclib.IdCardInternalError",
                 "children": [
                   {
-                    "kind": "TypeNominal",
-                    "name": "IdCardInternalError",
-                    "printedName": "nfclib.IdCardInternalError",
-                    "usr": "s:6nfclib19IdCardInternalErrorO"
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(nfclib.CodeType) -> nfclib.IdCardInternalError",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "IdCardInternalError",
+                        "printedName": "nfclib.IdCardInternalError",
+                        "usr": "s:6nfclib19IdCardInternalErrorO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Tuple",
+                        "printedName": "(codeType: nfclib.CodeType)",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "CodeType",
+                            "printedName": "nfclib.CodeType",
+                            "usr": "s:6nfclib8CodeTypeO"
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
                     "kind": "TypeNominal",
@@ -4301,8 +4094,8 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:6nfclib19IdCardInternalErrorO21pinVerificationFailedyA2CmF",
-            "mangledName": "$s6nfclib19IdCardInternalErrorO21pinVerificationFailedyA2CmF",
+            "usr": "s:6nfclib19IdCardInternalErrorO21pinVerificationFailedyAcA8CodeTypeO_tcACmF",
+            "mangledName": "$s6nfclib19IdCardInternalErrorO21pinVerificationFailedyAcA8CodeTypeO_tcACmF",
             "moduleName": "nfclib"
           },
           {
@@ -4313,12 +4106,12 @@
               {
                 "kind": "TypeFunc",
                 "name": "Function",
-                "printedName": "(nfclib.IdCardInternalError.Type) -> (Swift.Int) -> nfclib.IdCardInternalError",
+                "printedName": "(nfclib.IdCardInternalError.Type) -> (nfclib.CodeType, Swift.Int) -> nfclib.IdCardInternalError",
                 "children": [
                   {
                     "kind": "TypeFunc",
                     "name": "Function",
-                    "printedName": "(Swift.Int) -> nfclib.IdCardInternalError",
+                    "printedName": "(nfclib.CodeType, Swift.Int) -> nfclib.IdCardInternalError",
                     "children": [
                       {
                         "kind": "TypeNominal",
@@ -4328,9 +4121,22 @@
                       },
                       {
                         "kind": "TypeNominal",
-                        "name": "Int",
-                        "printedName": "Swift.Int",
-                        "usr": "s:Si"
+                        "name": "Tuple",
+                        "printedName": "(codeType: nfclib.CodeType, count: Swift.Int)",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "CodeType",
+                            "printedName": "nfclib.CodeType",
+                            "usr": "s:6nfclib8CodeTypeO"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Int",
+                            "printedName": "Swift.Int",
+                            "usr": "s:Si"
+                          }
+                        ]
                       }
                     ]
                   },
@@ -4351,8 +4157,8 @@
               }
             ],
             "declKind": "EnumElement",
-            "usr": "s:6nfclib19IdCardInternalErrorO22remainingPinRetryCountyACSicACmF",
-            "mangledName": "$s6nfclib19IdCardInternalErrorO22remainingPinRetryCountyACSicACmF",
+            "usr": "s:6nfclib19IdCardInternalErrorO22remainingPinRetryCountyAcA8CodeTypeO_SitcACmF",
+            "mangledName": "$s6nfclib19IdCardInternalErrorO22remainingPinRetryCountyAcA8CodeTypeO_SitcACmF",
             "moduleName": "nfclib"
           },
           {
@@ -4985,6 +4791,80 @@
             "moduleName": "nfclib"
           },
           {
+            "kind": "Var",
+            "name": "operationInProgress",
+            "printedName": "operationInProgress",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.IdCardInternalError.Type) -> nfclib.IdCardInternalError",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "IdCardInternalError",
+                    "printedName": "nfclib.IdCardInternalError",
+                    "usr": "s:6nfclib19IdCardInternalErrorO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.IdCardInternalError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "IdCardInternalError",
+                        "printedName": "nfclib.IdCardInternalError",
+                        "usr": "s:6nfclib19IdCardInternalErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib19IdCardInternalErrorO19operationInProgressyA2CmF",
+            "mangledName": "$s6nfclib19IdCardInternalErrorO19operationInProgressyA2CmF",
+            "moduleName": "nfclib"
+          },
+          {
+            "kind": "Var",
+            "name": "notActivated",
+            "printedName": "notActivated",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.IdCardInternalError.Type) -> nfclib.IdCardInternalError",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "IdCardInternalError",
+                    "printedName": "nfclib.IdCardInternalError",
+                    "usr": "s:6nfclib19IdCardInternalErrorO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.IdCardInternalError.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "IdCardInternalError",
+                        "printedName": "nfclib.IdCardInternalError",
+                        "usr": "s:6nfclib19IdCardInternalErrorO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib19IdCardInternalErrorO12notActivatedyA2CmF",
+            "mangledName": "$s6nfclib19IdCardInternalErrorO12notActivatedyA2CmF",
+            "moduleName": "nfclib"
+          },
+          {
             "kind": "Function",
             "name": "getIdCardError",
             "printedName": "getIdCardError()",
@@ -5009,55 +4889,6 @@
         "declKind": "Enum",
         "usr": "s:6nfclib19IdCardInternalErrorO",
         "mangledName": "$s6nfclib19IdCardInternalErrorO",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ],
-        "conformances": [
-          {
-            "kind": "Conformance",
-            "name": "Copyable",
-            "printedName": "Copyable",
-            "usr": "s:s8CopyableP",
-            "mangledName": "$ss8CopyableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Error",
-            "printedName": "Error",
-            "usr": "s:s5ErrorP",
-            "mangledName": "$ss5ErrorP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Escapable",
-            "printedName": "Escapable",
-            "usr": "s:s9EscapableP",
-            "mangledName": "$ss9EscapableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Sendable",
-            "printedName": "Sendable",
-            "usr": "s:s8SendableP",
-            "mangledName": "$ss8SendableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "SendableMetatype",
-            "printedName": "SendableMetatype",
-            "usr": "s:s16SendableMetatypeP",
-            "mangledName": "$ss16SendableMetatypeP"
-          }
-        ]
-      },
-      {
-        "kind": "TypeDecl",
-        "name": "PinError",
-        "printedName": "PinError",
-        "declKind": "Struct",
-        "usr": "s:6nfclib8PinErrorV",
-        "mangledName": "$s6nfclib8PinErrorV",
         "moduleName": "nfclib",
         "declAttributes": [
           "AccessControl"
@@ -5223,6 +5054,16 @@
             "usr": "s:s9EscapableP",
             "mangledName": "$ss9EscapableP"
           }
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "RawDocComment"
         ]
       },
       {
@@ -5741,9 +5582,94 @@
             ]
           },
           {
+            "kind": "Var",
+            "name": "dateAndPlaceOfBirth",
+            "printedName": "dateAndPlaceOfBirth",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib8CardInfoV19dateAndPlaceOfBirthSSvp",
+            "mangledName": "$s6nfclib8CardInfoV19dateAndPlaceOfBirthSSvp",
+            "moduleName": "nfclib",
+            "declAttributes": [
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CardInfoV19dateAndPlaceOfBirthSSvg",
+                "mangledName": "$s6nfclib8CardInfoV19dateAndPlaceOfBirthSSvg",
+                "moduleName": "nfclib",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CardInfoV19dateAndPlaceOfBirthSSvs",
+                "mangledName": "$s6nfclib8CardInfoV19dateAndPlaceOfBirthSSvs",
+                "moduleName": "nfclib",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CardInfoV19dateAndPlaceOfBirthSSvM",
+                "mangledName": "$s6nfclib8CardInfoV19dateAndPlaceOfBirthSSvM",
+                "moduleName": "nfclib",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
             "kind": "Constructor",
             "name": "init",
-            "printedName": "init(givenName:surname:personalCode:citizenship:documentNumber:dateOfExpiry:)",
+            "printedName": "init(givenName:surname:personalCode:citizenship:documentNumber:dateOfExpiry:dateAndPlaceOfBirth:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -5792,16 +5718,115 @@
                 "printedName": "Swift.String",
                 "hasDefaultArg": true,
                 "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "hasDefaultArg": true,
+                "usr": "s:SS"
               }
             ],
             "declKind": "Constructor",
-            "usr": "s:6nfclib8CardInfoV9givenName7surname12personalCode11citizenship14documentNumber12dateOfExpiryACSS_S5Stcfc",
-            "mangledName": "$s6nfclib8CardInfoV9givenName7surname12personalCode11citizenship14documentNumber12dateOfExpiryACSS_S5Stcfc",
+            "usr": "s:6nfclib8CardInfoV9givenName7surname12personalCode11citizenship14documentNumber12dateOfExpiry0l8AndPlaceM5BirthACSS_S6Stcfc",
+            "mangledName": "$s6nfclib8CardInfoV9givenName7surname12personalCode11citizenship14documentNumber12dateOfExpiry0l8AndPlaceM5BirthACSS_S6Stcfc",
             "moduleName": "nfclib",
             "declAttributes": [
               "AccessControl"
             ],
             "init_kind": "Designated"
+          },
+          {
+            "kind": "Var",
+            "name": "dateOfBirth",
+            "printedName": "dateOfBirth",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Foundation.Date?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Date",
+                    "printedName": "Foundation.Date",
+                    "usr": "s:10Foundation4DateV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib8CardInfoV11dateOfBirth10Foundation4DateVSgvp",
+            "mangledName": "$s6nfclib8CardInfoV11dateOfBirth10Foundation4DateVSgvp",
+            "moduleName": "nfclib",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Foundation.Date?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Date",
+                        "printedName": "Foundation.Date",
+                        "usr": "s:10Foundation4DateV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CardInfoV11dateOfBirth10Foundation4DateVSgvg",
+                "mangledName": "$s6nfclib8CardInfoV11dateOfBirth10Foundation4DateVSgvg",
+                "moduleName": "nfclib",
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "dateOfBirth",
+            "printedName": "dateOfBirth(fromPersonalCode:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Foundation.Date?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Date",
+                    "printedName": "Foundation.Date",
+                    "usr": "s:10Foundation4DateV"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:6nfclib8CardInfoV11dateOfBirth16fromPersonalCode10Foundation4DateVSgSS_tFZ",
+            "mangledName": "$s6nfclib8CardInfoV11dateOfBirth16fromPersonalCode10Foundation4DateVSgSS_tFZ",
+            "moduleName": "nfclib",
+            "static": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
           },
           {
             "kind": "Var",
@@ -5945,8 +5970,7 @@
         "mangledName": "$s6nfclib8CardInfoV",
         "moduleName": "nfclib",
         "declAttributes": [
-          "AccessControl",
-          "RawDocComment"
+          "AccessControl"
         ],
         "conformances": [
           {
@@ -6456,37 +6480,6 @@
         "kind": "Import",
         "name": "CoreNFC",
         "printedName": "CoreNFC",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CommonCrypto",
-        "printedName": "CommonCrypto",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "CryptoTokenKit",
-        "printedName": "CryptoTokenKit",
-        "declKind": "Import",
-        "moduleName": "nfclib"
-      },
-      {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "Import",
-        "name": "BigInt",
-        "printedName": "BigInt",
         "declKind": "Import",
         "moduleName": "nfclib"
       },
@@ -7002,6 +6995,180 @@
                 "accessorKind": "get"
               }
             ]
+          },
+          {
+            "kind": "Var",
+            "name": "minimumLength",
+            "printedName": "minimumLength",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib8CodeTypeO13minimumLengthSivp",
+            "mangledName": "$s6nfclib8CodeTypeO13minimumLengthSivp",
+            "moduleName": "nfclib",
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CodeTypeO13minimumLengthSivg",
+                "mangledName": "$s6nfclib8CodeTypeO13minimumLengthSivg",
+                "moduleName": "nfclib",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "maximumLength",
+            "printedName": "maximumLength",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib8CodeTypeO13maximumLengthSivp",
+            "mangledName": "$s6nfclib8CodeTypeO13maximumLengthSivp",
+            "moduleName": "nfclib",
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CodeTypeO13maximumLengthSivg",
+                "mangledName": "$s6nfclib8CodeTypeO13maximumLengthSivg",
+                "moduleName": "nfclib",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "validLength",
+            "printedName": "validLength",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "ClosedRange",
+                "printedName": "Swift.ClosedRange<Swift.Int>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "usr": "s:SN"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:6nfclib8CodeTypeO11validLengthSNySiGvp",
+            "mangledName": "$s6nfclib8CodeTypeO11validLengthSNySiGvp",
+            "moduleName": "nfclib",
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ClosedRange",
+                    "printedName": "Swift.ClosedRange<Swift.Int>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:SN"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:6nfclib8CodeTypeO11validLengthSNySiGvg",
+                "mangledName": "$s6nfclib8CodeTypeO11validLengthSNySiGvg",
+                "moduleName": "nfclib",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "validateFormat",
+            "printedName": "validateFormat(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "nfclib.CodeValidationFailure?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CodeValidationFailure",
+                    "printedName": "nfclib.CodeValidationFailure",
+                    "usr": "s:6nfclib21CodeValidationFailureO"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[Swift.UInt8]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ],
+                "usr": "s:Sa"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:6nfclib8CodeTypeO14validateFormatyAA0B17ValidationFailureOSgSays5UInt8VGF",
+            "mangledName": "$s6nfclib8CodeTypeO14validateFormatyAA0B17ValidationFailureOSgSays5UInt8VGF",
+            "moduleName": "nfclib",
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
           }
         ],
         "declKind": "Enum",
@@ -7069,6 +7236,196 @@
             "printedName": "Sendable",
             "usr": "s:s8SendableP",
             "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "CodeValidationFailure",
+        "printedName": "CodeValidationFailure",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "wrongLength",
+            "printedName": "wrongLength",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.CodeValidationFailure.Type) -> (Swift.Int, Swift.Int) -> nfclib.CodeValidationFailure",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "(Swift.Int, Swift.Int) -> nfclib.CodeValidationFailure",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CodeValidationFailure",
+                        "printedName": "nfclib.CodeValidationFailure",
+                        "usr": "s:6nfclib21CodeValidationFailureO"
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Tuple",
+                        "printedName": "(minimum: Swift.Int, maximum: Swift.Int)",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Int",
+                            "printedName": "Swift.Int",
+                            "usr": "s:Si"
+                          },
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Int",
+                            "printedName": "Swift.Int",
+                            "usr": "s:Si"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.CodeValidationFailure.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CodeValidationFailure",
+                        "printedName": "nfclib.CodeValidationFailure",
+                        "usr": "s:6nfclib21CodeValidationFailureO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib21CodeValidationFailureO11wrongLengthyACSi_SitcACmF",
+            "mangledName": "$s6nfclib21CodeValidationFailureO11wrongLengthyACSi_SitcACmF",
+            "moduleName": "nfclib"
+          },
+          {
+            "kind": "Var",
+            "name": "notNumeric",
+            "printedName": "notNumeric",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(nfclib.CodeValidationFailure.Type) -> nfclib.CodeValidationFailure",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CodeValidationFailure",
+                    "printedName": "nfclib.CodeValidationFailure",
+                    "usr": "s:6nfclib21CodeValidationFailureO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "nfclib.CodeValidationFailure.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CodeValidationFailure",
+                        "printedName": "nfclib.CodeValidationFailure",
+                        "usr": "s:6nfclib21CodeValidationFailureO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:6nfclib21CodeValidationFailureO10notNumericyA2CmF",
+            "mangledName": "$s6nfclib21CodeValidationFailureO10notNumericyA2CmF",
+            "moduleName": "nfclib"
+          },
+          {
+            "kind": "Function",
+            "name": "==",
+            "printedName": "==(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CodeValidationFailure",
+                "printedName": "nfclib.CodeValidationFailure",
+                "usr": "s:6nfclib21CodeValidationFailureO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CodeValidationFailure",
+                "printedName": "nfclib.CodeValidationFailure",
+                "usr": "s:6nfclib21CodeValidationFailureO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:6nfclib21CodeValidationFailureO2eeoiySbAC_ACtFZ",
+            "mangledName": "$s6nfclib21CodeValidationFailureO2eeoiySbAC_ACtFZ",
+            "moduleName": "nfclib",
+            "static": true,
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:6nfclib21CodeValidationFailureO",
+        "mangledName": "$s6nfclib21CodeValidationFailureO",
+        "moduleName": "nfclib",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Error",
+            "printedName": "Error",
+            "usr": "s:s5ErrorP",
+            "mangledName": "$ss5ErrorP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
           },
           {
             "kind": "Conformance",
@@ -7539,118 +7896,6 @@
         ]
       },
       {
-        "kind": "Import",
-        "name": "SwiftECC",
-        "printedName": "SwiftECC",
-        "declKind": "Import",
-        "moduleName": "nfclib",
-        "declAttributes": [
-          "AccessControl"
-        ]
-      },
-      {
-        "kind": "TypeDecl",
-        "name": "DataProtocol",
-        "printedName": "DataProtocol",
-        "children": [
-          {
-            "kind": "Function",
-            "name": "^",
-            "printedName": "^(_:_:)",
-            "children": [
-              {
-                "kind": "TypeNominal",
-                "name": "GenericTypeParam",
-                "printedName": "τ_0_0"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "GenericTypeParam",
-                "printedName": "τ_0_0"
-              },
-              {
-                "kind": "TypeNominal",
-                "name": "GenericTypeParam",
-                "printedName": "τ_0_0"
-              }
-            ],
-            "declKind": "Func",
-            "usr": "s:10Foundation12DataProtocolP6nfclibAA07MutablebC0RzSi5IndexRtzrlE1xoiyxx_xtFZ",
-            "mangledName": "$s10Foundation12DataProtocolP6nfclibAA07MutablebC0RzSi5IndexRtzrlE1xoiyxx_xtFZ",
-            "moduleName": "nfclib",
-            "genericSig": "<τ_0_0 where τ_0_0 : Foundation.MutableDataProtocol, τ_0_0.Index == Swift.Int>",
-            "sugared_genericSig": "<Self where Self : Foundation.MutableDataProtocol, Self.Index == Swift.Int>",
-            "static": true,
-            "declAttributes": [
-              "AccessControl"
-            ],
-            "isFromExtension": true,
-            "funcSelfKind": "NonMutating"
-          }
-        ],
-        "declKind": "Protocol",
-        "usr": "s:10Foundation12DataProtocolP",
-        "mangledName": "$s10Foundation12DataProtocolP",
-        "moduleName": "Foundation",
-        "genericSig": "<τ_0_0 : Swift.RandomAccessCollection, τ_0_0.Element == Swift.UInt8, τ_0_0.Regions : Swift.BidirectionalCollection, τ_0_0.SubSequence : Foundation.DataProtocol, τ_0_0.Regions.Element : Foundation.ContiguousBytes, τ_0_0.Regions.Element : Foundation.DataProtocol, τ_0_0.Regions.Element.SubSequence : Foundation.ContiguousBytes>",
-        "sugared_genericSig": "<Self : Swift.RandomAccessCollection, Self.Element == Swift.UInt8, Self.Regions : Swift.BidirectionalCollection, Self.SubSequence : Foundation.DataProtocol, Self.Regions.Element : Foundation.ContiguousBytes, Self.Regions.Element : Foundation.DataProtocol, Self.Regions.Element.SubSequence : Foundation.ContiguousBytes>",
-        "intro_Macosx": "10.10",
-        "intro_iOS": "8.0",
-        "intro_tvOS": "9.0",
-        "intro_watchOS": "2.0",
-        "declAttributes": [
-          "Available",
-          "Available",
-          "Available",
-          "Available"
-        ],
-        "isExternal": true,
-        "conformances": [
-          {
-            "kind": "Conformance",
-            "name": "Escapable",
-            "printedName": "Escapable",
-            "usr": "s:s9EscapableP",
-            "mangledName": "$ss9EscapableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Copyable",
-            "printedName": "Copyable",
-            "usr": "s:s8CopyableP",
-            "mangledName": "$ss8CopyableP"
-          },
-          {
-            "kind": "Conformance",
-            "name": "RandomAccessCollection",
-            "printedName": "RandomAccessCollection",
-            "usr": "s:Sk",
-            "mangledName": "$sSk"
-          },
-          {
-            "kind": "Conformance",
-            "name": "BidirectionalCollection",
-            "printedName": "BidirectionalCollection",
-            "usr": "s:SK",
-            "mangledName": "$sSK"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Collection",
-            "printedName": "Collection",
-            "usr": "s:Sl",
-            "mangledName": "$sSl"
-          },
-          {
-            "kind": "Conformance",
-            "name": "Sequence",
-            "printedName": "Sequence",
-            "usr": "s:ST",
-            "mangledName": "$sST"
-          }
-        ]
-      },
-      {
         "kind": "TypeDecl",
         "name": "NFCTagReaderSession",
         "printedName": "NFCTagReaderSession",
@@ -7796,512 +8041,593 @@
             "mangledName": "$ss16SendableMetatypeP"
           }
         ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "DataProtocol",
+        "printedName": "DataProtocol",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "^",
+            "printedName": "^(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "τ_0_0"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "τ_0_0"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "τ_0_0"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:10Foundation12DataProtocolP6nfclibAA07MutablebC0RzSi5IndexRtzrlE1xoiyxx_xtFZ",
+            "mangledName": "$s10Foundation12DataProtocolP6nfclibAA07MutablebC0RzSi5IndexRtzrlE1xoiyxx_xtFZ",
+            "moduleName": "nfclib",
+            "genericSig": "<τ_0_0 where τ_0_0 : Foundation.MutableDataProtocol, τ_0_0.Index == Swift.Int>",
+            "sugared_genericSig": "<Self where Self : Foundation.MutableDataProtocol, Self.Index == Swift.Int>",
+            "static": true,
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:10Foundation12DataProtocolP",
+        "mangledName": "$s10Foundation12DataProtocolP",
+        "moduleName": "Foundation",
+        "genericSig": "<τ_0_0 : Swift.RandomAccessCollection, τ_0_0.Element == Swift.UInt8, τ_0_0.Regions : Swift.BidirectionalCollection, τ_0_0.SubSequence : Foundation.DataProtocol, τ_0_0.Regions.Element : Foundation.ContiguousBytes, τ_0_0.Regions.Element : Foundation.DataProtocol, τ_0_0.Regions.Element.SubSequence : Foundation.ContiguousBytes>",
+        "sugared_genericSig": "<Self : Swift.RandomAccessCollection, Self.Element == Swift.UInt8, Self.Regions : Swift.BidirectionalCollection, Self.SubSequence : Foundation.DataProtocol, Self.Regions.Element : Foundation.ContiguousBytes, Self.Regions.Element : Foundation.DataProtocol, Self.Regions.Element.SubSequence : Foundation.ContiguousBytes>",
+        "intro_Macosx": "10.10",
+        "intro_iOS": "8.0",
+        "intro_tvOS": "9.0",
+        "intro_watchOS": "2.0",
+        "declAttributes": [
+          "Available",
+          "Available",
+          "Available",
+          "Available"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "RandomAccessCollection",
+            "printedName": "RandomAccessCollection",
+            "usr": "s:Sk",
+            "mangledName": "$sSk"
+          },
+          {
+            "kind": "Conformance",
+            "name": "BidirectionalCollection",
+            "printedName": "BidirectionalCollection",
+            "usr": "s:SK",
+            "mangledName": "$sSK"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Collection",
+            "printedName": "Collection",
+            "usr": "s:Sl",
+            "mangledName": "$sSl"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          }
+        ]
       }
     ],
     "json_format_version": 8
   },
   "ConstValues": [
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
       "kind": "StringLiteral",
-      "offset": 1066,
+      "offset": 276,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
       "kind": "Array",
-      "offset": 1114,
+      "offset": 324,
       "length": 6,
       "value": "[0x00]"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationSignHash.swift",
       "kind": "StringLiteral",
-      "offset": 1193,
+      "offset": 403,
       "length": 52,
       "value": "\"Please place your ID card against the smart device\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/Utilities.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/WebEID\/WebEidSignatureAlgorithm.swift",
       "kind": "StringLiteral",
-      "offset": 927,
-      "length": 5,
-      "value": "\"RSA\""
+      "offset": 221,
+      "length": 7,
+      "value": "\"ES256\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/Utilities.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/WebEID\/WebEidSignatureAlgorithm.swift",
       "kind": "StringLiteral",
-      "offset": 962,
-      "length": 4,
-      "value": "\"EC\""
+      "offset": 246,
+      "length": 7,
+      "value": "\"ES384\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/Utilities.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "StringLiteral",
-      "offset": 1001,
-      "length": 9,
-      "value": "\"Unknown\""
-    },
-    {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
-      "kind": "StringLiteral",
-      "offset": 1019,
+      "offset": 326,
       "length": 20,
       "value": "\"ee.ria.nfc-iOS-lib\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "StringLiteral",
-      "offset": 1051,
+      "offset": 358,
       "length": 15,
       "value": "\"CardReaderNFC\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1175,
+      "offset": 482,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1238,
+      "offset": 545,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "StringLiteral",
-      "offset": 1555,
+      "offset": 862,
       "length": 22,
       "value": "\"04007f00070202040204\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "StringLiteral",
-      "offset": 1653,
+      "offset": 960,
       "length": 22,
       "value": "\"04007f00070202040404\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1935,
+      "offset": 1242,
       "length": 2,
       "value": "12"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1961,
+      "offset": 1268,
       "length": 2,
       "value": "13"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 1987,
+      "offset": 1294,
       "length": 2,
       "value": "15"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 2013,
+      "offset": 1320,
       "length": 2,
       "value": "16"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 2039,
+      "offset": 1346,
       "length": 2,
       "value": "17"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReaderNFC.swift",
       "kind": "IntegerLiteral",
-      "offset": 2065,
+      "offset": 1372,
       "length": 2,
       "value": "18"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "StringLiteral",
-      "offset": 852,
+      "offset": 160,
       "length": 67,
       "value": "\"3B DB 96 00 80 B1 FE 45 1F 83 00 12 23 3F 53 65 49 44 0F 90 00 F1\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "StringLiteral",
-      "offset": 952,
+      "offset": 260,
       "length": 70,
       "value": "\"3B DC 96 00 80 B1 FE 45 1F 83 00 12 23 3F 54 65 49 44 32 0F 90 00 C3\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "StringLiteral",
-      "offset": 1054,
+      "offset": 362,
       "length": 49,
       "value": "\"A0 00 00 00 77 01 08 00 07 00 00 FE 00 00 01 00\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "StringLiteral",
-      "offset": 1139,
+      "offset": 447,
       "length": 49,
       "value": "\"51 53 43 44 20 41 70 70 6C 69 63 61 74 69 6F 6E\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "StringLiteral",
-      "offset": 1228,
+      "offset": 536,
       "length": 40,
       "value": "\"E8 28 BD 08 0F F2 50 4F 54 20 41 57 50\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "IntegerLiteral",
-      "offset": 1299,
+      "offset": 607,
       "length": 4,
       "value": "0x81"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "IntegerLiteral",
-      "offset": 1333,
+      "offset": 641,
       "length": 4,
       "value": "0x9F"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "BooleanLiteral",
-      "offset": 1774,
+      "offset": 1082,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Idemia.swift",
       "kind": "IntegerLiteral",
-      "offset": 1832,
+      "offset": 1140,
       "length": 4,
       "value": "0xFF"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommandsInternal.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommandsInternal.swift",
       "kind": "IntegerLiteral",
-      "offset": 1216,
+      "offset": 524,
       "length": 4,
       "value": "0x04"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommandsInternal.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommandsInternal.swift",
       "kind": "IntegerLiteral",
-      "offset": 1238,
+      "offset": 546,
       "length": 4,
       "value": "0x0C"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadCertificate.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadCertificate.swift",
       "kind": "StringLiteral",
-      "offset": 1489,
+      "offset": 717,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadCertificate.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadCertificate.swift",
       "kind": "StringLiteral",
-      "offset": 1574,
+      "offset": 802,
       "length": 52,
       "value": "\"Please place your ID card against the smart device\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "StringLiteral",
-      "offset": 1103,
+      "offset": 407,
       "length": 76,
       "value": "\"3B FF 96 00 00 80 31 FE 43 80 31 B8 53 65 49 44 64 B0 85 05 10 12 23 3F 1D\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "StringLiteral",
-      "offset": 1222,
+      "offset": 526,
       "length": 37,
       "value": "\"A0 00 00 00 63 50 4B 43 53 2D 31 35\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "StringLiteral",
-      "offset": 1308,
+      "offset": 612,
       "length": 49,
       "value": "\"A0 00 00 00 18 10 02 03 00 00 00 00 00 00 00 01\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "IntegerLiteral",
-      "offset": 1399,
+      "offset": 703,
       "length": 4,
       "value": "0x01"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "IntegerLiteral",
-      "offset": 1444,
+      "offset": 748,
       "length": 4,
       "value": "0x05"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "BooleanLiteral",
-      "offset": 1479,
+      "offset": 783,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/Thales.swift",
       "kind": "IntegerLiteral",
-      "offset": 1538,
+      "offset": 842,
       "length": 4,
       "value": "0x00"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/NFCISO7816Tag+Extensions.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/NFCISO7816Tag+Extensions.swift",
       "kind": "IntegerLiteral",
-      "offset": 1169,
+      "offset": 439,
       "length": 2,
       "value": "-1"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/NFCISO7816Tag+Extensions.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/NFCISO7816Tag+Extensions.swift",
       "kind": "IntegerLiteral",
-      "offset": 2281,
+      "offset": 1902,
       "length": 2,
       "value": "-1"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationUnblockPin.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationUnblockPin.swift",
       "kind": "StringLiteral",
-      "offset": 1174,
+      "offset": 369,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationUnblockPin.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationUnblockPin.swift",
       "kind": "StringLiteral",
-      "offset": 1319,
+      "offset": 514,
       "length": 52,
       "value": "\"Please place your ID card against the smart device\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/ProgressBar.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/ProgressBar.swift",
       "kind": "IntegerLiteral",
-      "offset": 936,
+      "offset": 244,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
       "kind": "IntegerLiteral",
-      "offset": 1026,
+      "offset": 309,
       "length": 4,
       "value": "0x00"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
       "kind": "Array",
-      "offset": 2744,
+      "offset": 2027,
       "length": 298,
       "value": "[0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x87]"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Utilities\/AES.swift",
       "kind": "IntegerLiteral",
-      "offset": 3562,
+      "offset": 2845,
       "length": 1,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/WebEID\/WebEIDHash.swift",
-      "kind": "IntegerLiteral",
-      "offset": 885,
-      "length": 3,
-      "value": "256"
-    },
-    {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/WebEID\/WebEIDHash.swift",
-      "kind": "IntegerLiteral",
-      "offset": 908,
-      "length": 3,
-      "value": "384"
-    },
-    {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/WebEID\/WebEIDHash.swift",
-      "kind": "IntegerLiteral",
-      "offset": 931,
-      "length": 3,
-      "value": "512"
-    },
-    {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/Logger+Extensions.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Extensions\/Logger+Extensions.swift",
       "kind": "BooleanLiteral",
       "offset": 912,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1104,
+      "offset": 474,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1134,
+      "offset": 504,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1169,
+      "offset": 539,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1203,
+      "offset": 573,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1240,
+      "offset": 610,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "StringLiteral",
-      "offset": 1275,
+      "offset": 645,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "kind": "StringLiteral",
+      "offset": 687,
+      "length": 2,
+      "value": "\"\""
+    },
+    {
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1858,
+      "offset": 2609,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1870,
+      "offset": 2621,
       "length": 9,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1890,
+      "offset": 2641,
       "length": 3,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1904,
+      "offset": 2655,
       "length": 11,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1926,
+      "offset": 2677,
       "length": 19,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1956,
+      "offset": 2707,
       "length": 12,
       "value": "6"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 1979,
+      "offset": 2730,
       "length": 10,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardInfo.swift",
       "kind": "IntegerLiteral",
-      "offset": 2000,
+      "offset": 2751,
       "length": 12,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadPublicData.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadPublicData.swift",
       "kind": "StringLiteral",
-      "offset": 1061,
+      "offset": 288,
       "length": 2,
       "value": "\"\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadPublicData.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/Operations\/OperationReadPublicData.swift",
       "kind": "StringLiteral",
-      "offset": 1101,
+      "offset": 328,
       "length": 52,
       "value": "\"Please place your ID card against the smart device\""
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
       "kind": "IntegerLiteral",
-      "offset": 2950,
+      "offset": 2258,
       "length": 4,
       "value": "0x00"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
       "kind": "IntegerLiteral",
-      "offset": 2984,
+      "offset": 2292,
       "length": 4,
       "value": "0x00"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardReader.swift",
       "kind": "IntegerLiteral",
-      "offset": 3006,
+      "offset": 2314,
       "length": 4,
       "value": "0x00"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
       "kind": "IntegerLiteral",
-      "offset": 877,
+      "offset": 185,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
       "kind": "IntegerLiteral",
-      "offset": 895,
+      "offset": 203,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/martenr\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
+      "filePath": "\/Users\/mac\/Documents\/Github\/MOPP\/Official\/nfc-iOS-lib\/nfc-lib\/nfc-lib\/nfclib\/CardActions\/CardCommands.swift",
       "kind": "IntegerLiteral",
-      "offset": 913,
+      "offset": 221,
       "length": 1,
       "value": "2"
     }
