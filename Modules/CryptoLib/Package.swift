@@ -27,7 +27,7 @@ let package = Package(
         .package(path: "../CommonsLib"),
         .package(
             url: "https://github.com/open-eid/nfc-iOS-lib.git",
-            revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"
+            revision: "9289d3fe42a55ab27bb5bcc68c390f43d784b609"
         ),
         .package(path: "../UtilsLib"),
         .package(path: "../Test/CommonsTestShared")
@@ -86,6 +86,7 @@ let package = Package(
                 "UtilsLib",
                 "ASN1Decoder",
                 "BigInt",
+                .product(name: "IdCardLib", package: "nfc-iOS-lib"),
                 .product(name: "FactoryKit", package: "Factory")
             ],
             path: "Sources/CryptoSwift",

@@ -19,9 +19,24 @@ struct DependencyLicenses {
                 url: URL(string: "https://github.com/Alamofire/Alamofire/blob/master/LICENSE")
             ),
             DependencyLicense(
+                name: "ASN1",
+                license: "MIT licence",
+                url: URL(string: "https://github.com/leif-ibsen/ASN1/blob/master/LICENSE")
+            ),
+            DependencyLicense(
                 name: "ASN1Decoder",
                 license: "MIT licence",
                 url: URL(string: "https://github.com/filom/ASN1Decoder/blob/master/LICENSE")
+            ),
+            DependencyLicense(
+                name: "BigInt",
+                license: "MIT licence",
+                url: URL(string: "https://github.com/leif-ibsen/BigInt/blob/master/LICENSE")
+            ),
+            DependencyLicense(
+                name: "Digest",
+                license: "MIT licence",
+                url: URL(string: "https://github.com/leif-ibsen/Digest/blob/master/LICENSE")
             ),
             DependencyLicense(
                 name: "Factory",
@@ -77,6 +92,11 @@ struct DependencyLicenses {
                 name: "swift-crypto",
                 license: "Apache License version 2.0",
                 url: URL(string: "https://github.com/apple/swift-crypto/blob/main/LICENSE.txt")
+            ),
+            DependencyLicense(
+                name: "SwiftECC",
+                license: "MIT licence",
+                url: URL(string: "https://github.com/leif-ibsen/SwiftECC/blob/master/LICENSE")
             ),
             DependencyLicense(
                 name: "ZipFoundation",

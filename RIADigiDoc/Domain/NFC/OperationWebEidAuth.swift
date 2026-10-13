@@ -120,7 +120,7 @@ public class OperationWebEidAuth: NFCOperationBase, OperationWebEidAuthProtocol 
                 updateAlertMessage(step: 4)
 
                 guard let hashAlgorithm = try resolveHashAlgorithm(from: publicKey) else {
-                    let error = ReadCertAndSignError.missingPublicKey
+                    let error = ReadCertAndSignError.unsupportedAlgorithm
                     Self.logger().error("NFC: \(error.localizedDescription)")
                     operationError = error
                     session.invalidate(errorMessage: strings?.technicalErrorMessage ??
