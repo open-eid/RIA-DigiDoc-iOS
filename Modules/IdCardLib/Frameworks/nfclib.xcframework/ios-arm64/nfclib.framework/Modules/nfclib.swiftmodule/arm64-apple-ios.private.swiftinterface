@@ -29,21 +29,12 @@ extension nfclib::OperationSignHash : @_Concurrency::MainActor CoreNFC::NFCTagRe
 @_hasMissingDesignatedInitializers final public class WebEidData : Swift::Sendable {
   final public let unverifiedCertificate: Swift::String
   final public let signingCertificate: Swift::String
-  final public let algorithm: nfclib::WebEidSignatureAlgorithm
+  final public let algorithm: Swift::String
   final public let signature: Swift::String
   final public var formattedDescription: Swift::String {
     get
   }
   @objc deinit
-}
-public enum WebEidSignatureAlgorithm : Swift::String, Swift::Sendable {
-  case es256
-  case es384
-  public init?(rawValue: Swift::String)
-  public typealias RawValue = Swift::String
-  public var rawValue: Swift::String {
-    get
-  }
 }
 final public class SecureData : Swift::Sendable {
   public init(_ bytes: [Swift::UInt8])
@@ -54,9 +45,13 @@ final public class SecureData : Swift::Sendable {
   }
   final public func secureZero()
 }
+public let rsaAlgorithmName: Swift::String
+public let ecAlgorithmName: Swift::String
+public let unknownAlgorithmName: Swift::String
 public enum AuthenticateWithWebEidError : Swift::Error {
   case failedToReadPublicKey
   case failedToDetermineAlgorithm
+  case failedToHashData
   case failedToMapAlgorithm
   case failedCertificateExpired
   case failedCertificateNotYetValid
@@ -73,6 +68,7 @@ public enum AuthenticateWithWebEidError : Swift::Error {
 }
 extension nfclib::OperationAuthenticateWithWebEID : @_Concurrency::MainActor CoreNFC::NFCTagReaderSessionDelegate {
   @_Concurrency::MainActor public func tagReaderSession(_ session: CoreNFC::NFCTagReaderSession, didDetect tags: [CoreNFC::NFCTag])
+  @_Concurrency::MainActor public func getAlgorithmNameTypeAndLength(from key: Security::SecKey) -> (algorithm: Swift::String, keyLength: Swift::Int)?
   @_Concurrency::MainActor public func tagReaderSessionDidBecomeActive(_: CoreNFC::NFCTagReaderSession)
   @_Concurrency::MainActor public func tagReaderSession(_ session: CoreNFC::NFCTagReaderSession, didInvalidateWithError error: any Swift::Error)
 }
@@ -234,9 +230,6 @@ extension Foundation::DataProtocol where Self : Foundation::MutableDataProtocol,
   public static func ^ (xVal: Self, yVal: Self) -> Self
 }
 extension nfclib::OperationSignHash : Swift::Sendable {}
-extension nfclib::WebEidSignatureAlgorithm : Swift::Equatable {}
-extension nfclib::WebEidSignatureAlgorithm : Swift::Hashable {}
-extension nfclib::WebEidSignatureAlgorithm : Swift::RawRepresentable {}
 extension nfclib::AuthenticateWithWebEidError : Swift::Equatable {}
 extension nfclib::AuthenticateWithWebEidError : Swift::Hashable {}
 extension nfclib::OperationAuthenticateWithWebEID : Swift::Sendable {}
