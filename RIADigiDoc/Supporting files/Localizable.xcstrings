@@ -127,6 +127,24 @@
         }
       }
     },
+    "App version unsupported message" : {
+      "comment" : "Full-screen message when central configuration marks this app version unsupported",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This version of ID-software on your computer is unsupported. RIA DigiDoc cannot be used until you update ID-software. Install new ID-software from [www.id.ee](https://www.id.ee/en/article/install-id-software/)."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu nutiseadmes olev ID-tarkvara ei ole toetatud. RIA Digidoc kasutamiseks pead ID-tarkvara uuendama. Paigalda uus ID-tarkvara veebilehelt [www.id.ee](https://www.id.ee/artikkel/paigalda-id-tarkvara/)."
+          }
+        }
+      }
+    },
     "Archive timestamp" : {
       "comment" : "Archive timestamp label in signature details",
       "extractionState" : "manual",
