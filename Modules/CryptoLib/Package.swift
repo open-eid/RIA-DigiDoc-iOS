@@ -25,7 +25,7 @@ let package = Package(
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
-        .package(url: "https://github.com/open-eid/nfc-iOS-lib.git", revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"),
+        .package(url: "https://github.com/open-eid/nfc-iOS-lib.git", revision: "d935df04827d89e84b952f8e68c2c8e81b310f75"),
         .package(path: "../UtilsLib")
     ],
     targets: [

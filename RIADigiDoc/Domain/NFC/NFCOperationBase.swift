@@ -2,26 +2,24 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 import Foundation
-import CoreNFC
 import nfclib
 import LibdigidocLibSwift
 import CryptoSwift
 import UtilsLib
 
 @MainActor
-public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessionDelegate {
-    var session: NFCTagReaderSession?
-    var canNumber: String = ""
-    var nfcError: String = ""
+public class NFCOperationBase: NSObject, Loggable {
     var strings: NFCSessionStrings?
-    var didCompleteSuccessfully = false
-    var operationError: Error?
-
-    let connection = NFCConnection()
+    private var connection: NFCConnection?
 
     public var onStepChange: (@MainActor (Int) -> Void)?
 
     func updateAlertMessage(step: Int) {
+        connection?.message(alertMessage(step: step))
+        onStepChange?(step)
+    }
+
+    private func alertMessage(step: Int) -> String {
         let stepMessages = [
             strings?.initialMessage ?? "",
             strings?.step1Message ?? "",
@@ -32,170 +30,8 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
 
         let stepMessage = stepMessages[min(step, stepMessages.count - 1)]
         let progressBar = ProgressBar(currentStep: step)
-        var message = stepMessage
-        Self.logger().info("NFC: Updating alert message to: \(message)")
-        message += "\n\n\(progressBar.generate())"
-        session?.alertMessage = message
-        onStepChange?(step)
-    }
-
-    func success() {
-        didCompleteSuccessfully = true
-        session?.alertMessage = strings?.successMessage ?? ""
-        session?.invalidate()
-    }
-
-    func handleIdCardError(_ error: IdCardError) {
-        Self.logger().error("NFC: Handling IdCardError: \(error)")
-
-        switch error {
-        case .wrongCAN:
-            nfcError = strings?.canErrorMessage ?? ""
-        case .wrongPIN(let triesLeft):
-            if triesLeft > 1 {
-                nfcError = strings?.pinWrongMultipleErrorMessage ?? ""
-            } else if triesLeft == 1 {
-                nfcError = strings?.pinWrongErrorMessage ?? ""
-            } else {
-                nfcError = strings?.pinBlockedErrorMessage ?? ""
-            }
-        case .sessionError:
-            nfcError = strings?.sessionErrorMessage ?? ""
-        case .notActivated:
-            nfcError = strings?.courierCardErrorMessage ?? ""
-        case .pinLocked:
-            nfcError = strings?.pinLockedErrorMessage ?? ""
-        default:
-            nfcError = strings?.technicalErrorMessage ?? ""
-        }
-    }
-
-    func handleNoCertLockError(
-        error: Error,
-        session: NFCTagReaderSession
-    ) {
-        Self.logger().error("NFC: Failed to find lock for cert, error: \(error)")
-        nfcError = strings?.wrongCardErrorMessage ?? ""
-        operationError = DecryptError.noCertLock
-        session.invalidate(errorMessage: nfcError)
-    }
-
-    func handleIdCardInternalError(
-        _ error: IdCardInternalError,
-        session: NFCTagReaderSession
-    ) {
-        let idCardError = error.getIdCardError()
-        Self.logger().error("NFC: IdCardError detected: \(idCardError)")
-        operationError = error
-        handleIdCardError(idCardError)
-        session.invalidate(errorMessage: nfcError)
-    }
-
-    func handleIdCardInternalError(
-        _ error: nfclib.IdCardInternalError,
-        session: NFCTagReaderSession
-    ) {
-        let idCardError = IdCardError(error.getIdCardError())
-        Self.logger().error("NFC: IdCardError detected: \(idCardError)")
-        operationError = error
-        handleIdCardError(idCardError)
-        session.invalidate(errorMessage: nfcError)
-    }
-
-    func handleDigiDocError(
-        _ error: DigiDocError,
-        session: NFCTagReaderSession
-    ) {
-        Self.logger().error("NFC: Handling DigiDocError: \(error)")
-
-        switch error {
-        case .signatureAddingFailed(let underlying):
-            handleDigiDocSignError(errorDetail: underlying)
-        default:
-            nfcError = strings?.technicalErrorMessage ?? ""
-        }
-        operationError = error
-        session.invalidate(errorMessage: nfcError)
-    }
-
-    private func handleDigiDocSignError(errorDetail: ErrorDetail) {
-        switch errorDetail.code {
-        case 5, 6:
-            nfcError = strings?.certificateRevokedErrorMessage ?? ""
-        case 7:
-            nfcError = strings?.ocspTimeslotErrorMessage ?? ""
-        case 18:
-            nfcError = strings?.tooManyRequestsErrorMessage ?? ""
-        case 20:
-            nfcError = strings?.networkErrorMessage ?? ""
-        case 101, 102:
-            nfcError = strings?.sslErrorMessage ?? ""
-        default:
-            nfcError = strings?.technicalErrorMessage ?? ""
-        }
-    }
-
-    func handleUnknownError(
-        _ error: Error,
-        session: NFCTagReaderSession
-    ) {
-        Self.logger().error("NFC: Unknown error type: \(type(of: error))")
-        Self.logger().error("NFC: Error details: \(String(describing: error))")
-        operationError = error
-        session.invalidate(errorMessage: strings?.sessionErrorMessage ?? "")
-    }
-
-    func handleNFCError(_ error: Error, session: NFCTagReaderSession) -> Bool {
-        if (error as NSError).localizedDescription == "Failed to find lock for cert" {
-            handleNoCertLockError(error: error, session: session)
-            return true
-        }
-        if let idCardInternalError = error as? IdCardInternalError {
-            handleIdCardInternalError(idCardInternalError, session: session)
-            return true
-        }
-        if let nfcIdCardError = error as? nfclib.IdCardInternalError {
-            handleIdCardInternalError(nfcIdCardError, session: session)
-            return true
-        }
-        return false
-    }
-
-    func handleSessionError(_ error: Error, session: NFCTagReaderSession) -> Error {
-        if let nfcError = error as? NFCReaderError,
-           nfcError.code == .readerSessionInvalidationErrorUserCanceled {
-            return IdCardInternalError.cancelledByUser
-        }
-        if handleNFCError(error, session: session) {
-            return operationError ?? error
-        }
-        if let digiDocError = error as? DigiDocError {
-            handleDigiDocError(digiDocError, session: session)
-            return digiDocError
-        }
-        if (error as NSError).isCryptoNetworkError {
-            Self.logger().error("NFC: Unable to reach the key server")
-            operationError = error
-            session.invalidate(errorMessage: strings?.networkErrorMessage ?? "")
-            return error
-        }
-        handleUnknownError(error, session: session)
-        return error
-    }
-
-    private var tagContinuation: CheckedContinuation<[NFCTag], Error>?
-
-    func waitForTag() async throws -> [NFCTag] {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<[NFCTag], Error>) in
-            guard NFCTagReaderSession.readingAvailable else {
-                continuation.resume(throwing: IdCardInternalError.nfcNotSupported)
-                return
-            }
-            tagContinuation = continuation
-            session = NFCTagReaderSession(pollingOption: .iso14443, delegate: self, queue: DispatchQueue.main)
-            updateAlertMessage(step: 0)
-            session?.begin()
-        }
+        Self.logger().info("NFC: Updating alert message to: \(stepMessage)")
+        return stepMessage + "\n\n\(progressBar.generate())"
     }
 
     func withCardCommands<T>(
@@ -204,57 +40,97 @@ public class NFCOperationBase: NSObject, Loggable, @MainActor NFCTagReaderSessio
         _ body: (any CardCommands) async throws -> T
     ) async throws -> T {
         self.strings = strings
-        return try await withTaskCancellationHandler {
-            do {
-                try Task.checkCancellation()
-                let tags = try await waitForTag()
-                guard let session else {
-                    Self.logger().error("Unable to get session")
-                    throw IdCardInternalError.nfcNotSupported
-                }
-                updateAlertMessage(step: 1)
-                let tag = try await connection.setup(session, tags: tags)
-                updateAlertMessage(step: 2)
-                let cardCommands = try await connection.getCardCommands(session, tag: tag, CAN: canNumber)
-                let result = try await body(cardCommands)
-                success()
-                return result
-            } catch {
-                if Task.isCancelled {
-                    throw IdCardInternalError.cancelledByUser
-                }
-                Self.logger().error("Unable to complete NFC operation: \(String(describing: error))")
-                if let session {
-                    throw handleSessionError(error, session: session)
-                }
-                throw error
-            }
-        } onCancel: {
-            Task { @MainActor in
-                self.session?.invalidate()
-            }
+        return try await NFCConnection.run(successMessage: strings.successMessage, onError: { error in
+            Self.logger().error("Unable to complete NFC operation: \(String(describing: error))")
+            return failure(for: error, strings: strings)
+        }) { connection in
+            self.connection = connection
+            defer { self.connection = nil }
+            try Task.checkCancellation()
+            onStepChange?(0)
+            let cardCommands = try await connection.connect(
+                CAN: canNumber,
+                message: alertMessage(step: 0),
+                detectedMessage: alertMessage(step: 2)
+            )
+            return try await body(cardCommands)
         }
     }
 
-    // MARK: - NFCTagReaderSessionDelegate
+    // MARK: - Error handling
 
-    public func tagReaderSessionDidBecomeActive(_: NFCTagReaderSession) { }
-
-    public func tagReaderSession(_: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-        tagContinuation?.resume(returning: tags)
-        tagContinuation = nil
+    /// The error to throw to the caller and the text to show in the NFC sheet.
+    private func failure(for error: Error, strings: NFCSessionStrings) -> (error: Error, message: String) {
+        switch error {
+        case nfclib.IdCardInternalError.cancelledByUser:
+            return (IdCardInternalError.cancelledByUser, strings.sessionErrorMessage)
+        case let nsError as NSError where nsError.localizedDescription == "Failed to find lock for cert":
+            Self.logger().error("NFC: Failed to find lock for cert, error: \(error)")
+            return (DecryptError.noCertLock, strings.wrongCardErrorMessage)
+        case let idCardInternalError as IdCardInternalError:
+            let idCardError = idCardInternalError.getIdCardError()
+            Self.logger().error("NFC: IdCardError detected: \(idCardError)")
+            return (idCardInternalError, idCardErrorMessage(idCardError, strings: strings))
+        case let nfcIdCardError as nfclib.IdCardInternalError:
+            let idCardError = IdCardError(nfcIdCardError.getIdCardError())
+            Self.logger().error("NFC: IdCardError detected: \(idCardError)")
+            return (nfcIdCardError, idCardErrorMessage(idCardError, strings: strings))
+        case let readCertSignError as ReadCertAndSignError:
+            Self.logger().error("NFC: ReadCertAndSignError: \(readCertSignError.localizedDescription)")
+            return (readCertSignError, strings.technicalErrorMessage)
+        case let digiDocError as DigiDocError:
+            Self.logger().error("NFC: Handling DigiDocError: \(digiDocError)")
+            return (digiDocError, digiDocErrorMessage(digiDocError, strings: strings))
+        case let nsError as NSError where nsError.isCryptoNetworkError:
+            Self.logger().error("NFC: Unable to reach the key server")
+            return (error, strings.networkErrorMessage)
+        default:
+            Self.logger().error("NFC: Unknown error type: \(type(of: error))")
+            Self.logger().error("NFC: Error details: \(String(describing: error))")
+            return (error, strings.sessionErrorMessage)
+        }
     }
 
-    public func tagReaderSession(_: NFCTagReaderSession, didInvalidateWithError error: Error) {
-        Self.logger().info("NFC: Reader session finished with error: \(String(describing: error))")
-        session = nil
-        guard let tagContinuation else { return }
-        self.tagContinuation = nil
-        if let nfcError = error as? NFCReaderError,
-           nfcError.code == .readerSessionInvalidationErrorUserCanceled {
-            tagContinuation.resume(throwing: IdCardInternalError.cancelledByUser)
-        } else {
-            tagContinuation.resume(throwing: error)
+    private func idCardErrorMessage(_ error: IdCardError, strings: NFCSessionStrings) -> String {
+        Self.logger().error("NFC: Handling IdCardError: \(error)")
+
+        return switch error {
+        case .wrongCAN:
+            strings.canErrorMessage
+        case .wrongPIN(let triesLeft) where triesLeft > 1:
+            strings.pinWrongMultipleErrorMessage
+        case .wrongPIN(1):
+            strings.pinWrongErrorMessage
+        case .wrongPIN:
+            strings.pinBlockedErrorMessage
+        case .sessionError:
+            strings.sessionErrorMessage
+        case .notActivated:
+            strings.courierCardErrorMessage
+        case .pinLocked:
+            strings.pinLockedErrorMessage
+        default:
+            strings.technicalErrorMessage
+        }
+    }
+
+    private func digiDocErrorMessage(_ error: DigiDocError, strings: NFCSessionStrings) -> String {
+        guard case .signatureAddingFailed(let errorDetail) = error else {
+            return strings.technicalErrorMessage
+        }
+        return switch errorDetail.code {
+        case 5, 6:
+            strings.certificateRevokedErrorMessage
+        case 7:
+            strings.ocspTimeslotErrorMessage
+        case 18:
+            strings.tooManyRequestsErrorMessage
+        case 20:
+            strings.networkErrorMessage
+        case 101, 102:
+            strings.sslErrorMessage
+        default:
+            strings.technicalErrorMessage
         }
     }
 }

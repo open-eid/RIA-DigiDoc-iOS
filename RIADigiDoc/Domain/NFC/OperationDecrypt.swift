@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 import Foundation
-import CoreNFC
 import CommonCrypto
 import CryptoTokenKit
 import CryptoKit
