@@ -27,6 +27,8 @@ extension String {
             }
         }
 
+        cleanName = cleanName.trimmingCharacters(in: .whitespacesAndNewlines)
+
         return cleanName.isEmpty ? nil : cleanName
     }
 

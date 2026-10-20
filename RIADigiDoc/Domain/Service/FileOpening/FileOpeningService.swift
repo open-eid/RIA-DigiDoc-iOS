@@ -34,6 +34,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
         switch result {
         case .success(let urls):
             var validFiles: [URL] = []
+            var cachedNameSources: [String: String] = [:]
 
             for url in urls {
                 _ = url.startAccessingSecurityScopedResource()
@@ -45,7 +46,9 @@ actor FileOpeningService: FileOpeningServiceProtocol {
                 }
 
                 if try await isFileSizeValid(url: validUrl) {
-                    await validFiles.append(try cacheFile(from: validUrl))
+                    let cachedFile = try await cacheFile(from: validUrl, cachedNameSources: cachedNameSources)
+                    cachedNameSources[cachedFile.lastPathComponent.sanitized()] = validUrl.resolvedPath
+                    validFiles.append(cachedFile)
                 }
             }
 
@@ -65,6 +68,7 @@ actor FileOpeningService: FileOpeningServiceProtocol {
 
     private func cacheFile(
         from sourceURL: URL,
+        cachedNameSources: [String: String]
     ) async throws -> URL {
         let signedContainersDirectory = try Directories.getCacheDirectory(
             subfolders: [Constants.Folder.ContainerFolder],
@@ -87,7 +91,25 @@ actor FileOpeningService: FileOpeningServiceProtocol {
                 attributes: nil)
         }
 
-        let fileName = sourceURL.lastPathComponent.truncatedFileName(maxBytes: Constants.File.MaxNameBytes)
+        let unavailableDestinationNames = Set(
+            cachedNameSources
+                .filter { $0.value != sourceURL.resolvedPath }
+                .keys
+                .map { $0.lowercased() }
+        )
+
+        let baseName = sourceURL.lastPathComponent.sanitized()
+        var fileName = baseName
+        var index = 1
+
+        while unavailableDestinationNames.contains(fileName.lowercased()) {
+            let suffixBytes = " (\(index))".utf8.count
+            fileName = baseName
+                .truncatedFileName(maxBytes: Constants.File.MaxNameBytes - suffixBytes)
+                .appendingIndex(index)
+            index += 1
+        }
+
         let destinationURL = signedContainersDataFilesDirectory.appending(path: fileName)
 
         guard destinationURL.isWithin(directory: signedContainersDataFilesDirectory) else {

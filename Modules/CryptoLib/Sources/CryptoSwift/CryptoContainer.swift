@@ -99,11 +99,7 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
             }
 
             do {
-                if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
-                    try fileManager.removeItem(at: destinationURL)
-                }
-
-                try fileManager.copyItem(at: fileToAdd, to: destinationURL)
+                try placeInContainerDirectory(fileToAdd, at: destinationURL)
                 movedFiles.append(destinationURL)
 
             } catch {
@@ -138,6 +134,25 @@ public actor CryptoContainer: CryptoContainerProtocol, Loggable {
                 )
             )
         }
+    }
+
+    private func placeInContainerDirectory(_ fileToAdd: URL, at destinationURL: URL) throws {
+        let isAlreadyAtDestination = fileToAdd.resolvingSymlinksInPath().resolvedPath ==
+            destinationURL.resolvingSymlinksInPath().resolvedPath
+
+        if isAlreadyAtDestination {
+            guard fileManager.fileExists(atPath: destinationURL.resolvedPath) else {
+                throw CocoaError(.fileNoSuchFile)
+            }
+
+            return
+        }
+
+        if fileManager.fileExists(atPath: destinationURL.resolvedPath) {
+            try fileManager.removeItem(at: destinationURL)
+        }
+
+        try fileManager.copyItem(at: fileToAdd, to: destinationURL)
     }
 
     public func addRecipients(_ recipientsToAdd: [Addressee]) async {

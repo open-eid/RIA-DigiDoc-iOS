@@ -89,6 +89,47 @@ struct CryptoContainerDataFileTests {
     }
 
     @Test
+    func addDataFiles_succeedsWhenTheFileIsAlreadyInTheContainerDirectory() async throws {
+        let cacheDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+            fileManager: fileManager
+        )
+        let source = cacheDirectory.appending(path: "Screenshot_\(UUID().uuidString).jpg")
+        try Data("a".utf8).write(to: source)
+
+        defer {
+            try? FileManager.default.removeItem(at: source)
+        }
+
+        let container = makeContainer()
+
+        try await container.addDataFiles([source])
+
+        let names = await container.getDataFiles().map(\.lastPathComponent)
+
+        #expect(names == [source.lastPathComponent])
+        #expect(try String(contentsOf: source, encoding: .utf8) == "a")
+    }
+
+    @Test
+    func addDataFiles_reportsAFailureWhenTheFileInTheContainerDirectoryIsMissing() async throws {
+        let cacheDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+            fileManager: fileManager
+        )
+        let missing = cacheDirectory.appending(path: "Screenshot_\(UUID().uuidString).jpg")
+        let container = makeContainer()
+
+        await #expect(throws: CryptoError.self) {
+            try await container.addDataFiles([missing])
+        }
+
+        let names = await container.getDataFiles().map(\.lastPathComponent)
+
+        #expect(names.isEmpty)
+    }
+
+    @Test
     func openOrCreate_sanitizesContainerNameAndFirstDataFile() async throws {
         let suffix = UUID().uuidString
         let source = try makeSourceFile(named: "a\\b-\(suffix).txt", contents: "a")
@@ -100,6 +141,34 @@ struct CryptoContainerDataFileTests {
 
         #expect(!containerName.contains("\\"))
         #expect(names == ["ab-\(suffix).txt"])
+    }
+
+    @Test
+    func openOrCreate_succeedsWhenTheFileNameNeedsNoSanitizing() async throws {
+        let cacheDirectory = try Directories.getCacheDirectory(
+            subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+            fileManager: fileManager
+        )
+        let source = cacheDirectory.appending(path: "Screenshot_\(UUID().uuidString).jpg")
+        try Data("a".utf8).write(to: source)
+
+        defer {
+            try? FileManager.default.removeItem(at: source)
+        }
+
+        let container = try await CryptoContainer.openOrCreate(dataFiles: [source])
+        let containerFile = await container.getRawContainerFile()
+
+        defer {
+            if let containerFile {
+                try? FileManager.default.removeItem(at: containerFile)
+            }
+        }
+
+        let names = await container.getDataFiles().map(\.lastPathComponent)
+
+        #expect(names == [source.lastPathComponent])
+        #expect(try String(contentsOf: source, encoding: .utf8) == "a")
     }
 
     @Test

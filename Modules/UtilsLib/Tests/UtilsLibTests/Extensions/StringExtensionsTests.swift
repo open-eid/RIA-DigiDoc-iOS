@@ -165,6 +165,19 @@ class StringSanitizationTests {
         #expect(!sanitized.contains("\u{FFFD}"))
     }
 
+    @Test(arguments: [
+        "\u{2026} report.pdf",
+        ". report.pdf",
+        "?. report.pdf",
+        "\u{2026}\u{2026}  report.pdf"
+    ])
+    func sanitized_isStableWhenAppliedTwice(input: String) {
+        let once = input.sanitized()
+
+        #expect(once == once.sanitized())
+        #expect(once == "report.pdf")
+    }
+
     @Test
     func sanitized_keepsALongEndingWhileItStillFitsUnderTheCap() {
         let input = String(repeating: "a", count: 300) + "." + String(repeating: "b", count: 100)
