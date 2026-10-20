@@ -91,6 +91,145 @@ struct FileOpeningServiceTests {
     }
 
     @Test
+    func getValidFiles_keepsNamesThatDifferOnlyBySpecialCharactersApart() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let first = tempURL.appending(path: "Report: Q1.pdf")
+        let second = tempURL.appending(path: "Report Q1.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0] != validFiles[1])
+    }
+
+    @Test
+    func getValidFiles_sanitizesTheCachedFileName() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let source = tempURL.appending(path: "Invoice?2026\\Q1*.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([source]))
+
+        let cachedName = try #require(validFiles.first?.lastPathComponent)
+
+        #expect(cachedName == "Invoice2026Q1.pdf")
+    }
+
+    @Test
+    func getValidFiles_keepsSameNamedFilesFromDifferentFoldersApart() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let first = tempURL.appending(path: "folderA").appending(path: "report.pdf")
+        let second = tempURL.appending(path: "folderB").appending(path: "report.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0].lastPathComponent == "report.pdf")
+        #expect(validFiles[1].lastPathComponent == "report (1).pdf")
+    }
+
+    @Test
+    func getValidFiles_keepsNamesThatDifferOnlyByCaseApart() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let first = tempURL.appending(path: "folderA").appending(path: "report.pdf")
+        let second = tempURL.appending(path: "folderB").appending(path: "Report.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0].lastPathComponent == "report.pdf")
+        #expect(validFiles[1].lastPathComponent == "Report (1).pdf")
+    }
+
+    @Test
+    func getValidFiles_keepsNamesApartWhenOneOnlyLosesAPrefixWhenSanitized() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let first = tempURL.appending(path: "\u{2026} report.pdf")
+        let second = tempURL.appending(path: "report.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        let names = validFiles.map(\.lastPathComponent)
+
+        #expect(names.count == 2)
+        #expect(names[0] != names[1])
+        #expect(names.map { $0.sanitized() } == names)
+    }
+
+    @Test
+    func getValidFiles_keepsTheIndexSuffixWithinTheNameByteLimit() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let longName = String(repeating: "a", count: 1000) + ".txt"
+        let first = tempURL.appending(path: "folderA").appending(path: longName)
+        let second = tempURL.appending(path: "folderB").appending(path: longName)
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([first, second]))
+
+        let secondName = try #require(validFiles.last?.lastPathComponent)
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0].lastPathComponent != secondName)
+        #expect(secondName.utf8.count <= CommonsLib.Constants.File.MaxNameBytes)
+        #expect(secondName.hasSuffix(" (1).txt"))
+    }
+
+    @Test
+    func getValidFiles_cachesTheSameSourceFileToOneName() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let file = tempURL.appending(path: "report.pdf")
+
+        mockFileUtil.getValidPathHandler = { url in url }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([file, file]))
+
+        #expect(validFiles.count == 2)
+        #expect(validFiles[0] == validFiles[1])
+        #expect(validFiles[0].lastPathComponent == "report.pdf")
+    }
+
+    @Test
+    func getValidFiles_truncatesNameLongerThanTheFilesystemAllows() async throws {
+        let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
+        let longURL = tempURL.appending(path: String(repeating: "a", count: 1000) + ".txt")
+
+        mockFileUtil.getValidPathHandler = { _ in longURL }
+        mockFileManager.urlsHandler = { _, _ in [tempURL] }
+        mockFileInspector.fileSizeHandler = { _ in 100 }
+
+        let validFiles = try await service.getValidFiles(.success([longURL]))
+
+        let cachedName = try #require(validFiles.first?.lastPathComponent)
+        #expect(cachedName.utf8.count <= CommonsLib.Constants.File.MaxNameBytes)
+        #expect(cachedName.hasSuffix(".txt"))
+        #expect(cachedName.utf8.count + 11 < 255)
+    }
+
+    @Test
     func getValidFiles_successWithDuplicateFiles() async throws {
         let tempURL = URL(fileURLWithPath: mockFileManager.temporaryDirectory.appending(path: "tmp").resolvedPath)
         let tempFileURL = tempURL.appending(path: "test.txt")
