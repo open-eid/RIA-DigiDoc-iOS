@@ -7,9 +7,10 @@ import FactoryKit
 struct InitView: View {
     @AppTypography private var typography
     @Environment(LanguageSettings.self) private var languageSettings
-    @Environment(NavigationPathManager.self) private var pathManager
 
     @State private var viewModel: InitViewModel
+
+    private let onLanguageSelected: () -> Void
 
     private var appName: String {
         languageSettings.localized("App name")
@@ -18,7 +19,8 @@ struct InitView: View {
         languageSettings.localized("Init footer RIA")
     }
 
-    init() {
+    init(onLanguageSelected: @escaping () -> Void) {
+        self.onLanguageSelected = onLanguageSelected
         _viewModel = State(wrappedValue: Container.shared.initViewModel())
     }
 
@@ -49,8 +51,7 @@ struct InitView: View {
                             onTap: { languageOption in
                                 Task {
                                     await viewModel.selectLanguage(code: languageOption.code)
-                                    pathManager.popToRoot()
-                                    pathManager.navigate(to: .contentView)
+                                    onLanguageSelected()
                                 }
                             },
                             accessibilityLabel: { languageOption in
@@ -110,6 +111,6 @@ struct InitView: View {
 
 // MARK: - Preview
 #Preview {
-    InitView()
+    InitView(onLanguageSelected: {})
         .environment(Container.shared.languageSettings())
 }
