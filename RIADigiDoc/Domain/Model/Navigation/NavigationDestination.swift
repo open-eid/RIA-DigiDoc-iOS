@@ -7,8 +7,6 @@ import LibdigidocLibSwift
 import nfclib
 
 public enum NavigationDestination: Hashable {
-    case contentView
-
     case recentDocumentsView(
         folderURL: URL?,
         extensions: [String]

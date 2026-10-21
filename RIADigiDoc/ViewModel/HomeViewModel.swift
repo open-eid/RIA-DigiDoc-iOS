@@ -48,9 +48,17 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
     }
 
     func closeOpenContainers() {
+        let openContainers = sharedContainerViewModel.containers()
+
         sharedContainerViewModel.setSignedContainer(nil)
         sharedContainerViewModel.setCryptoContainer(nil)
         sharedContainerViewModel.clearContainers()
+
+        Task {
+            for container in openContainers {
+                await (container as? any SignedContainerProtocol)?.cancelValidation()
+            }
+        }
     }
 
     func getRecentDocumentsFolder() -> URL? {
