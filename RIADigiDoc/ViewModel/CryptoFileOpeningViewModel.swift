@@ -69,49 +69,9 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
         sharedContainerViewModel.setAddedFilesCount(addedFiles: files.count)
 
         do {
-            guard let firstFile = files.first else {
+            guard !files.isEmpty else {
                 throw FileOpeningError.noDataFiles
             }
-
-            let cryptoContainersDirectory = try Directories.getCacheDirectory(
-                subfolders: [Constants.Folder.ContainerFolder],
-                fileManager: fileManager
-            )
-
-            let savedContainersDirectory = try Directories.getCacheDirectory(
-                subfolders: [Constants.Folder.SavedFiles],
-                fileManager: fileManager
-            )
-
-            // Do not rename when nested container opened
-            let isFileInSavedContainersDirectory = firstFile.absoluteString.hasPrefix(
-                savedContainersDirectory.absoluteString
-            )
-
-            let sameFileNameAlreadyExists = fileManager.fileExists(
-                atPath: cryptoContainersDirectory.appending(
-                    path: firstFile.path(percentEncoded: false),
-                    directoryHint: .notDirectory
-                )
-                .path(percentEncoded: false)
-            )
-
-            let shouldRenameContainer = sameFileNameAlreadyExists && !isFileInSavedContainersDirectory
-
-            var renamedContainerFile = firstFile
-
-            if shouldRenameContainer {
-                renamedContainerFile = Container.shared.containerUtil().getContainerFile(
-                    for: firstFile,
-                    in: cryptoContainersDirectory
-                )
-            }
-
-            if firstFile.path != renamedContainerFile.path {
-                try fileManager.moveItem(at: firstFile, to: renamedContainerFile)
-            }
-
-            files[0] = renamedContainerFile
 
             let container = try await fileOpeningRepository.openOrCreateCryptoContainer(urls: files)
             sharedContainerViewModel.setCryptoContainer(container)
@@ -137,24 +97,6 @@ class CryptoFileOpeningViewModel: CryptoFileOpeningViewModelProtocol, Loggable {
         errorMessage = nil
         isFileOpeningLoading = false
         isNavigatingToNextView = false
-    }
-
-    private func getFirstFileLocation(file: URL) async throws -> URL {
-        let cryptoContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.ContainerFolder],
-            fileManager: fileManager
-        )
-
-        let movedFileLocation = cryptoContainersDirectory.appending(path: file.lastPathComponent)
-
-        if await file.isContainer() &&
-            fileManager.fileExists(atPath: movedFileLocation.path(percentEncoded: false)) {
-            try fileManager.removeItem(at: file)
-        }
-
-        try fileManager.moveItem(at: file, to: movedFileLocation)
-
-        return movedFileLocation
     }
 
     private func handleLoadingSuccess() {

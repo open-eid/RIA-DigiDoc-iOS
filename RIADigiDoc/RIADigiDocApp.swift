@@ -141,7 +141,7 @@ struct RIADigiDocApp: App, Loggable {
                                     Text(verbatim: languageSettings.localized("Crash report message"))
                                 }
                         } else {
-                            InitView()
+                            InitView(onLanguageSelected: { isInitialLanguageSelected = true })
                                 .environment(pathManager)
                                 .appNavigation(pathManager: pathManager)
                         }
