@@ -18,7 +18,7 @@ let package = Package(
         .library(name: "CommonsLibMocks", targets: ["CommonsLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2))
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 1))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
