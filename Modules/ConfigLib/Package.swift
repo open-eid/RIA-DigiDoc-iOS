@@ -18,8 +18,8 @@ let package = Package(
         .library(name: "ConfigLibMocks", targets: ["ConfigLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 0)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 1)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 2)),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
         .package(path: "../Test/CommonsTestShared")
@@ -62,7 +62,6 @@ let package = Package(
                 "CommonsLib",
                 "UtilsLib",
                 "CommonsTestShared",
-                .product(name: "FactoryTesting", package: "Factory"),
                 .product(name: "CommonsLibMocks", package: "commonslib")
             ]
         )

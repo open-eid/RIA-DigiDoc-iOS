@@ -8,7 +8,7 @@ set -e  # stop on any unhandled error
 cd "$(dirname "$0")/.."
 
 # ====== Configurable parameters ======
-: ${OPENLDAP:=openldap-2.6.13}
+: ${OPENLDAP:=openldap-2.7.1}
 : ${IPHONEOS_DEPLOYMENT_TARGET:="18.0"}
 : ${PLATFORM_NAME:="iphoneos"}
 
@@ -29,13 +29,18 @@ cd "${SOURCE_DIR}"
 
 # ====== Download tarball if needed ======
 if [ ! -f ${OPENLDAP}.tgz ]; then
-  curl -O -L http://mirror.eu.oneandone.net/software/openldap/openldap-release/${OPENLDAP}.tgz
+  OPENLDAP_TAG="OPENLDAP_REL_ENG_$(echo "${OPENLDAP#openldap-}" | tr '.' '_')"
+  curl -fsSL -o ${OPENLDAP}.tgz \
+    "https://github.com/openldap/openldap/archive/refs/tags/${OPENLDAP_TAG}.tar.gz"
 fi
 
 # ====== Extract sources once into pristine copy ======
 mkdir -p "${SRC_DIR}"
 if [ ! -d "${SRC_DIR}/${OPENLDAP}" ]; then
   tar xf ${OPENLDAP}.tgz -C "${SRC_DIR}"
+  if [ ! -d "${SRC_DIR}/${OPENLDAP}" ]; then
+    mv "${SRC_DIR}"/openldap-OPENLDAP_REL_ENG_* "${SRC_DIR}/${OPENLDAP}"
+  fi
 fi
 
 # ====== Build function ======

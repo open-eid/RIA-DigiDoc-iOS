@@ -17,8 +17,8 @@ let package = Package(
         .library(name: "SmartIdLibMocks", targets: ["SmartIdLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 0)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 1)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 2)),
         .package(path: "../UtilsLib"),
         .package(path: "../CommonsLib")
     ],
@@ -51,8 +51,7 @@ let package = Package(
                 "UtilsLib",
                 "CommonsLib",
                 .product(name: "UtilsLibMocks", package: "utilslib"),
-                .product(name: "CommonsLibMocks", package: "commonslib"),
-                .product(name: "FactoryTesting", package: "Factory")
+                .product(name: "CommonsLibMocks", package: "commonslib")
             ]
         )
     ]

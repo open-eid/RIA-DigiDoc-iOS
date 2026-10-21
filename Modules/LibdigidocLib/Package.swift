@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "LibdigidocLibSwiftMocks", targets: ["LibdigidocLibSwiftMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 1)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
         .package(path: "../UtilsLib"),
@@ -69,8 +69,7 @@ let package = Package(
                 "CommonsTestShared",
                 .product(name: "UtilsLibMocks", package: "utilslib"),
                 .product(name: "ConfigLibMocks", package: "configlib"),
-                .product(name: "CommonsLibMocks", package: "commonslib"),
-                .product(name: "FactoryTesting", package: "Factory")
+                .product(name: "CommonsLibMocks", package: "commonslib")
             ]
         )
     ]

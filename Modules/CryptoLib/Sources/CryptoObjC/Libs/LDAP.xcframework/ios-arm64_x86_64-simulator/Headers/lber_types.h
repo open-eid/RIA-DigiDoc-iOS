@@ -2,7 +2,7 @@
 /* $OpenLDAP$ */
 /* This work is part of OpenLDAP Software <http://www.openldap.org/>.
  *
- * Copyright 1998-2024 The OpenLDAP Foundation.
+ * Copyright 1998-2026 The OpenLDAP Foundation.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -21,7 +21,7 @@
 #ifndef _LBER_TYPES_H
 #define _LBER_TYPES_H
 
-#include "ldap_cdefs.h"
+#include <ldap_cdefs.h>
 
 LDAP_BEGIN_DECL
 

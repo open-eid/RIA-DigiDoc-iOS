@@ -21,7 +21,7 @@ runs:
   using: composite
   steps:
     - name: Download Libdigidocpp iOS artifact
-      uses: dawidd6/action-download-artifact@v21
+      uses: dawidd6/action-download-artifact@v27
       with:
         workflow: build.yml
         branch: master
@@ -29,7 +29,7 @@ runs:
         path: libdigidocpp-ios
         repo: open-eid/libdigidocpp
     - name: Download Libdigidocpp iOS Simulator artifact
-      uses: dawidd6/action-download-artifact@v21
+      uses: dawidd6/action-download-artifact@v27
       with:
         workflow: build.yml
         branch: master
