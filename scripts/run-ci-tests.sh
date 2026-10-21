@@ -9,7 +9,7 @@ set -e
 # -----------------------------
 PROJECT="RIADigiDoc.xcodeproj"
 SCHEME="AllTests"
-DEVICE="iPhone 17"
+DEVICE="iPhone 18 Pro"
 
 COMMON_ARGS=(
   --project "$PROJECT"
@@ -41,13 +41,14 @@ reset_simulator() {
   sleep 5
 
   # Boot the simulator and wait for it to be ready
-  UDID=$(xcrun simctl list devices available | grep "$DEVICE" | head -1 | grep -E -o '[0-9A-F-]{36}')
+  UDID=$(xcrun simctl list devices available \
+    | sed -nE "s/^[[:space:]]*${DEVICE} \(([0-9A-F-]{36})\).*/\1/p" | head -1)
   if [ -z "$UDID" ]; then
     echo "ERROR: Could not find simulator UDID for '$DEVICE'"
     exit 1
   fi
 
-  echo -n "Booting $DEVICE ($UDID)..."
+  printf 'Booting %s (%s)...' "$DEVICE" "$UDID"
   xcrun simctl boot "$UDID" 2>/dev/null || true
   until xcrun simctl list devices | grep "$UDID" | grep -q "Booted"; do
     printf '.'
@@ -56,9 +57,14 @@ reset_simulator() {
   echo " ready!"
 
   # Shutting down any stale simulator processes
-  pkill -9 -f "Simulator" 2>/dev/null || true
+  pkill -x Simulator 2>/dev/null || true
+  pkill -x DeviceHub 2>/dev/null || true
   sleep 5
-  open -a Simulator --args -CurrentDeviceUDID "$UDID"
+  # Xcode 27 replaced Simulator.app with DeviceHub.app; the GUI is not required
+  # for headless runs, so a missing app must not fail the build.
+  open -a Simulator --args -CurrentDeviceUDID "$UDID" 2>/dev/null \
+    || open -a "$(xcode-select -p)/../Applications/DeviceHub.app" 2>/dev/null \
+    || true
   sleep 5
 }
 
@@ -79,22 +85,10 @@ for GROUP in "${MODULE_GROUPS[@]}"; do
     TEST_XCARGS+=" -only-testing:${MODULE}"
   done
 
-  # Retry once on failure before giving up
-  SUCCESS=false
-  for ATTEMPT in 1 2; do
-    if xcode-project run-tests \
-        "${COMMON_ARGS[@]}" \
-        --test-xcargs "$TEST_XCARGS"; then
-      SUCCESS=true
-      break
-    else
-      echo "Attempt $ATTEMPT failed for $GROUP — resetting simulator and retrying..."
-      reset_simulator
-    fi
-  done
-
-  if [ "$SUCCESS" = false ]; then
-    echo "ERROR: $GROUP failed after 2 attempts"
+  if ! xcode-project run-tests \
+      "${COMMON_ARGS[@]}" \
+      --test-xcargs "$TEST_XCARGS"; then
+    echo "ERROR: $GROUP failed"
     FAILED_GROUPS+=("$GROUP")
   fi
 

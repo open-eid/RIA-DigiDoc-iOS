@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 // SPDX-FileCopyrightText: Estonian Information System Authority
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -20,12 +20,15 @@ let package = Package(
         .library(name: "CryptoLibMocks", targets: ["CryptoLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 0)),
+        .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 1)),
         .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 24, 0)),
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 0)),
         .package(path: "../ConfigLib"),
         .package(path: "../CommonsLib"),
-        .package(url: "https://github.com/open-eid/nfc-iOS-lib.git", revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"),
+        .package(
+            url: "https://github.com/open-eid/nfc-iOS-lib.git",
+            revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"
+        ),
         .package(path: "../UtilsLib")
     ],
     targets: [
@@ -105,7 +108,6 @@ let package = Package(
                 "CryptoObjCWrapper",
                 "CommonsLib",
                 "UtilsLib",
-                .product(name: "FactoryTesting", package: "Factory"),
                 .product(name: "CommonsLibMocks", package: "commonslib")
             ]
         )

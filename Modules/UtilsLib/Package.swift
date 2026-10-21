@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 // SPDX-FileCopyrightText: Estonian Information System Authority
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -18,8 +18,8 @@ let package = Package(
         .library(name: "UtilsLibMocks", targets: ["UtilsLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2)),
-        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 0)),
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 0)),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", exact: .init(5, 12, 2)),
         .package(url: "https://github.com/weichsel/ZIPFoundation", exact: .init(0, 9, 20)),
         .package(path: "../CommonsLib"),
         .package(path: "../ConfigLib"),

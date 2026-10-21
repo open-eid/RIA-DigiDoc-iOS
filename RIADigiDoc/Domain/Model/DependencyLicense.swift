@@ -29,14 +29,29 @@ struct DependencyLicenses {
                 url: URL(string: "https://github.com/hmlongco/Factory/blob/main/LICENSE")
             ),
             DependencyLicense(
+                name: "Firebase",
+                license: "Apache License version 2.0",
+                url: URL(string: "https://github.com/firebase/firebase-ios-sdk/blob/main/LICENSE")
+            ),
+            DependencyLicense(
                 name: "libcdoc",
-                license: "AGNU Lesser General Public License v2.1",
+                license: "GNU Lesser General Public License v2.1",
                 url: URL(string: "https://github.com/open-eid/libcdoc/blob/master/LICENSE.LGPL")
+            ),
+            DependencyLicense(
+                name: "libdigidocpp",
+                license: "GNU Lesser General Public License v2.1",
+                url: URL(string: "https://github.com/open-eid/libdigidocpp/blob/master/LICENSE.LGPL")
             ),
             DependencyLicense(
                 name: "mockolo",
                 license: "Apache License version 2.0",
                 url: URL(string: "https://github.com/uber/mockolo/blob/master/LICENSE.txt")
+            ),
+            DependencyLicense(
+                name: "nfclib",
+                license: "GNU Lesser General Public License v2.1 or later",
+                url: URL(string: "https://github.com/open-eid/nfc-iOS-lib")
             ),
             DependencyLicense(
                 name: "OpenLDAP",
@@ -49,14 +64,19 @@ struct DependencyLicenses {
                 url: URL(string: "https://www.openssl.org/source/license.txt")
             ),
             DependencyLicense(
-                name: "SwiftLintPlugins",
-                license: "MIT licence",
-                url: URL(string: "https://github.com/SimplyDanny/SwiftLintPlugins/blob/main/LICENSE")
+                name: "swift-asn1",
+                license: "Apache License version 2.0",
+                url: URL(string: "https://github.com/apple/swift-asn1/blob/main/LICENSE.txt")
             ),
             DependencyLicense(
                 name: "swift-certificates",
                 license: "Apache License version 2.0",
                 url: URL(string: "https://github.com/apple/swift-certificates/blob/main/LICENSE.txt")
+            ),
+            DependencyLicense(
+                name: "swift-crypto",
+                license: "Apache License version 2.0",
+                url: URL(string: "https://github.com/apple/swift-crypto/blob/main/LICENSE.txt")
             ),
             DependencyLicense(
                 name: "ZipFoundation",
