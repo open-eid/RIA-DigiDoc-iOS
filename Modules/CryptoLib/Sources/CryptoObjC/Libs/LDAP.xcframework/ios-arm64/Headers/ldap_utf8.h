@@ -1,7 +1,7 @@
 /* $OpenLDAP$ */
 /* This work is part of OpenLDAP Software <http://www.openldap.org/>.
  *
- * Copyright 1998-2024 The OpenLDAP Foundation.
+ * Copyright 1998-2026 The OpenLDAP Foundation.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
 #ifndef _LDAP_UTF8_H
 #define _LDAP_UTF8_H
 
-#include "lber_types.h"	/* get ber_*_t */
+#include <lber_types.h>	/* get ber_*_t */
 
 /*
  * UTF-8 Utility Routines

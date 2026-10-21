@@ -12,21 +12,22 @@
  */
 
 #ifndef OPENSSL_CONFIGURATION_H
-# define OPENSSL_CONFIGURATION_H
-# pragma once
+#define OPENSSL_CONFIGURATION_H
+#pragma once
 
-# ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
-# ifdef OPENSSL_ALGORITHM_DEFINES
-#  error OPENSSL_ALGORITHM_DEFINES no longer supported
-# endif
+#ifdef OPENSSL_ALGORITHM_DEFINES
+#error OPENSSL_ALGORITHM_DEFINES no longer supported
+#endif
 
 /*
  * OpenSSL was configured with the following options:
  */
 
+/* clang-format off */
 # ifndef OPENSSL_SYS_iOS
 #  define OPENSSL_SYS_iOS 1
 # endif
@@ -43,9 +44,6 @@ extern "C" {
 # ifndef OPENSSL_NO_AFALGENG
 #  define OPENSSL_NO_AFALGENG
 # endif
-# ifndef OPENSSL_NO_APPS
-#  define OPENSSL_NO_APPS
-# endif
 # ifndef OPENSSL_NO_ASAN
 #  define OPENSSL_NO_ASAN
 # endif
@@ -57,9 +55,6 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_BROTLI_DYNAMIC
 #  define OPENSSL_NO_BROTLI_DYNAMIC
-# endif
-# ifndef OPENSSL_NO_CAPIENG
-#  define OPENSSL_NO_CAPIENG
 # endif
 # ifndef OPENSSL_NO_CRYPTO_MDEBUG
 #  define OPENSSL_NO_CRYPTO_MDEBUG
@@ -73,14 +68,14 @@ extern "C" {
 # ifndef OPENSSL_NO_DEVCRYPTOENG
 #  define OPENSSL_NO_DEVCRYPTOENG
 # endif
-# ifndef OPENSSL_NO_DSO
-#  define OPENSSL_NO_DSO
+# ifndef OPENSSL_NO_DOCS
+#  define OPENSSL_NO_DOCS
+# endif
+# ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
+#  define OPENSSL_NO_EC_NISTP_64_GCC_128
 # endif
 # ifndef OPENSSL_NO_EGD
 #  define OPENSSL_NO_EGD
-# endif
-# ifndef OPENSSL_NO_ENGINE
-#  define OPENSSL_NO_ENGINE
 # endif
 # ifndef OPENSSL_NO_EXTERNAL_TESTS
 #  define OPENSSL_NO_EXTERNAL_TESTS
@@ -121,9 +116,6 @@ extern "C" {
 # ifndef OPENSSL_NO_MSAN
 #  define OPENSSL_NO_MSAN
 # endif
-# ifndef OPENSSL_NO_PADLOCKENG
-#  define OPENSSL_NO_PADLOCKENG
-# endif
 # ifndef OPENSSL_NO_PIE
 #  define OPENSSL_NO_PIE
 # endif
@@ -154,9 +146,6 @@ extern "C" {
 # ifndef OPENSSL_NO_UBSAN
 #  define OPENSSL_NO_UBSAN
 # endif
-# ifndef OPENSSL_NO_UI_CONSOLE
-#  define OPENSSL_NO_UI_CONSOLE
-# endif
 # ifndef OPENSSL_NO_UNIT_TEST
 #  define OPENSSL_NO_UNIT_TEST
 # endif
@@ -185,31 +174,44 @@ extern "C" {
 #  define OPENSSL_NO_DYNAMIC_ENGINE
 # endif
 
+/* clang-format on */
 
 /* Generate 80386 code? */
+/* clang-format off */
 # undef I386_ONLY
+/* clang-format on */
 
 /*
  * The following are cipher-specific, but are part of the public API.
  */
-# if !defined(OPENSSL_SYS_UEFI)
+#if !defined(OPENSSL_SYS_UEFI)
+    /* clang-format off */
 #  undef BN_LLONG
-/* Only one for the following should be defined */
+    /* clang-format on */
+    /* Only one for the following should be defined */
+    /* clang-format off */
 #  define SIXTY_FOUR_BIT_LONG
+    /* clang-format on */
+    /* clang-format off */
 #  undef SIXTY_FOUR_BIT
+    /* clang-format on */
+    /* clang-format off */
 #  undef THIRTY_TWO_BIT
-# endif
+/* clang-format on */
+#endif
 
+/* clang-format off */
 # define RC4_INT unsigned char
+/* clang-format on */
 
-# if defined(OPENSSL_NO_COMP) || (defined(OPENSSL_NO_BROTLI) && defined(OPENSSL_NO_ZSTD) && defined(OPENSSL_NO_ZLIB))
-#  define OPENSSL_NO_COMP_ALG
-# else
-#  undef  OPENSSL_NO_COMP_ALG
-# endif
+#if defined(OPENSSL_NO_COMP) || (defined(OPENSSL_NO_BROTLI) && defined(OPENSSL_NO_ZSTD) && defined(OPENSSL_NO_ZLIB))
+#define OPENSSL_NO_COMP_ALG
+#else
+#undef OPENSSL_NO_COMP_ALG
+#endif
 
-# ifdef  __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
-#endif                          /* OPENSSL_CONFIGURATION_H */
+#endif /* OPENSSL_CONFIGURATION_H */

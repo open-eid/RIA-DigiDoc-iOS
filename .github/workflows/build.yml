@@ -8,11 +8,11 @@ env:
 jobs:
   build:
     name: Build RIA DigiDoc on macOS
-    runs-on: macos-26
+    runs-on: xcode-27
     strategy:
       matrix:
         xcode:
-          - 26.6
+          - 27.1
         platform:
           - iOS
     steps:

@@ -16,7 +16,7 @@ jobs:
   swift:
     name: CodeQL (swift)
     if: contains(github.repository, 'open-eid/RIA-DigiDoc-iOS')
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 120
     permissions:
       contents: read
@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         xcode:
-          - 26.6
+          - 27.1
         platform:
           - iOS
     steps:

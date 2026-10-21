@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 // SPDX-FileCopyrightText: Estonian Information System Authority
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -18,7 +18,7 @@ let package = Package(
         .library(name: "CommonsLibMocks", targets: ["CommonsLibMocks"])
     ],
     dependencies: [
-        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 3, 2))
+        .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 0))
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

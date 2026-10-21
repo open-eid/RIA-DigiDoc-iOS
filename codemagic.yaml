@@ -14,7 +14,7 @@ scripts:
 workflows:
   debug:
     name: RIA DigiDoc debug
-    max_build_duration: 30
+    max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
       app_store_connect: Codemagic MOPP
@@ -31,7 +31,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 27.1
     inputs:
       defaultCentralConfigurationUrl_input:
         description: Default Central Configuration URL
@@ -113,7 +113,10 @@ workflows:
             echo $REPO_RIA_CONFIG | base64 --decode > $CONFIG_DIRECTORY/default-config.json
             echo $REPO_RIA_PUB_KEY | base64 --decode > $CONFIG_DIRECTORY/default-config.ecpub
             echo $REPO_RIA_ECC | base64 --decode > $CONFIG_DIRECTORY/default-config.ecc
-            echo $REPO_RIA_TRUSTED_TEST_MP | base64 --decode > "$TSL_BASE_DIRECTORY/trusted-test-mp.xml"
+            if ! printf '%s' "$REPO_RIA_TRUSTED_TEST_MP" | base64 --decode | gunzip -c > "$TSL_BASE_DIRECTORY/trusted-test-mp.xml"; then
+              echo "ERROR: REPO_RIA_TRUSTED_TEST_MP must be gzip compressed and base64 encoded"
+              exit 1
+            fi
 
             for configFile in "$CONFIG_DIRECTORY/configuration.properties" "$CONFIG_DIRECTORY/default-config.json" \
               "$CONFIG_DIRECTORY/default-config.ecpub" "$CONFIG_DIRECTORY/default-config.ecc" \
@@ -284,7 +287,7 @@ workflows:
 
   release:
     name: RIA DigiDoc release
-    max_build_duration: 30
+    max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
       app_store_connect: Codemagic MOPP
@@ -300,7 +303,7 @@ workflows:
         APP_STORE_APP_ID: 1216104448
         APP_STORE_APPLE_ID: ET847QJV9F
         RESOURCES_DIRECTORY: "Modules/ConfigLib/Sources/ConfigLib/Resources"
-      xcode: latest
+      xcode: 27.1
     scripts:
       - name: Setup dependencies
         script: |
