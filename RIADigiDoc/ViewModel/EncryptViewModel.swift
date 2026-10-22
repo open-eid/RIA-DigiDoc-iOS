@@ -195,14 +195,10 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
             if duplicateFileCount > 1 {
                 errorMessage = ToastMessage(key: "Multiple documents already exist", args: [String(duplicateFileCount)])
-            } else if duplicateFileCount == 1 {
-                if let fileName = errorDetail.userInfo["fileName"] {
-                    errorMessage = ToastMessage(key: "Document already exists", args: [fileName])
-                } else {
-                    errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
-                }
+            } else if duplicateFileCount == 1, let fileName = errorDetail.userInfo["fileName"] {
+                errorMessage = ToastMessage(key: "Document already exists", args: [fileName])
             } else {
-                errorMessage = ToastMessage(key: errorDetail.message, args: [String(failedFileCount)])
+                errorMessage = ToastMessage(key: "Could not add files", args: [String(failedFileCount)])
             }
 
         default:

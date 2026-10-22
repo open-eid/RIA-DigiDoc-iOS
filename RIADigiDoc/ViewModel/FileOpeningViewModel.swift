@@ -199,24 +199,6 @@ class FileOpeningViewModel: FileOpeningViewModelProtocol, Loggable {
         return await fileOpeningRepository.isSivaConfirmationNeeded(files: files)
     }
 
-    private func getFirstFileLocation(file: URL) async throws -> URL {
-        let signedContainersDirectory = try Directories.getCacheDirectory(
-            subfolders: [Constants.Folder.ContainerFolder],
-            fileManager: fileManager
-        )
-
-        let movedFileLocation = signedContainersDirectory.appending(path: file.lastPathComponent)
-
-        if await file.isCryptoContainer() &&
-            fileManager.fileExists(atPath: movedFileLocation.path(percentEncoded: false)) {
-            try fileManager.removeItem(at: file)
-        }
-
-        try fileManager.moveItem(at: file, to: movedFileLocation)
-
-        return movedFileLocation
-    }
-
     private func handleAsicsSivaConfirmation(parentContainer: SignedContainerProtocol) async throws {
         // Only open the nested container when SiVa is actually needed (ASiC-S wrapping a DDOC).
         // An ASiC-S containing a BDOC must stay a regular ASiC-S container.

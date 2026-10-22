@@ -18,9 +18,6 @@ struct NavigationDestinations: ViewModifier {
     @ViewBuilder
     private func destinationView(for destination: NavigationDestination) -> some View {
         switch destination {
-        case .contentView:
-            ContentView()
-
         case .recentDocumentsView(let folderURL, let extensions):
             RecentDocumentsView(folderURL: folderURL, extensions: extensions)
 
