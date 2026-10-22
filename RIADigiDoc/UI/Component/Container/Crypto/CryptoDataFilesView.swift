@@ -11,7 +11,6 @@ struct CryptoDataFilesView: View {
     @AppTypography private var typography
 
     @State private var showBottomSheetFromButton = false
-    @State private var showBottomSheetFromTap = false
 
     @AccessibilityFocusState private var focusedField: AccessibilityField?
 
@@ -26,6 +25,11 @@ struct CryptoDataFilesView: View {
     let showRemoveFileButton: Bool
     @Binding var showRemoveDataFileModal: Bool
     var onSelect: (() -> Void)?
+
+    private var moreOptionsLabel: String {
+        "\(languageSettings.localized("File")) " +
+        "\(fileIndex), \(languageSettings.localized("More options"))"
+    }
 
     private var bottomSheetActions: [BottomSheetButton] {
         DataFileBottomSheetActions.actions(
@@ -78,13 +82,11 @@ struct CryptoDataFilesView: View {
                             .scaledToFit()
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onSurfaceVariant)
-                            .accessibilityLabel(
-                                Text(
-                                    verbatim: "\(languageSettings.localized("File")) " +
-                                    "\(fileIndex), \(languageSettings.localized("More options"))"
-                                )
-                            )
                     })
+                    .accessibilityLabel(Text(verbatim: moreOptionsLabel))
+                    .accessibilityInputLabels(
+                        voiceControlInputLabels(languageSettings.localized("More options"), moreOptionsLabel)
+                    )
                     .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
                     .accessibilityFocusRestore(
                         focusedField: $focusedField,
@@ -102,6 +104,5 @@ struct CryptoDataFilesView: View {
             }
         }
         .accessibilityAddTraits([.isButton])
-        .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
     }
 }
