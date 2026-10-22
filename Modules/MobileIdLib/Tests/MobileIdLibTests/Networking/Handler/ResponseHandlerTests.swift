@@ -80,7 +80,7 @@ struct ResponseHandlerTests {
 
     @Test
     func handleNetworkError_throwsRequestInterruptedWhenNoUrlErrorAndNoStatusCode() {
-        let afError = AFError.serverTrustEvaluationFailed(reason: .noRequiredEvaluator(host: "host.test"))
+        let afError = AFError.explicitlyCancelled
 
         #expect(throws: MobileIdError.requestInterrupted) {
             try handler.handleNetworkError(afError, statusCode: nil)

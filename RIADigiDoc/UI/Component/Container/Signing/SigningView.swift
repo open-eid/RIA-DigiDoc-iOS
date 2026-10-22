@@ -41,7 +41,7 @@ struct SigningView: View {
 
     @State private var showSivaMessage = false
 
-    @State private var scrollPosition: Int?
+    @State private var scrollPosition: SignatureRowID?
     @State private var focusedSignatureIndex: Int?
 
     private var containerTitle: String {
@@ -557,7 +557,7 @@ struct SigningView: View {
         DispatchQueue.main.async {
             guard let lastIndex = viewModel.signatures.indices.last else { return }
 
-            scrollPosition = viewModel.signatures[lastIndex].pos
+            scrollPosition = .signature(viewModel.signatures[lastIndex].pos)
 
             DispatchQueue.main.async {
                 focusedSignatureIndex = lastIndex

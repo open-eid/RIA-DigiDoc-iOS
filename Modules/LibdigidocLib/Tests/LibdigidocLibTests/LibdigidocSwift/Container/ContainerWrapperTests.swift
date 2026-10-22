@@ -384,7 +384,7 @@ struct ContainerWrapperTests {
         }
 
         let tempDirectory = try TestFileUtil.getTemporaryDirectory(
-            subfolder: "ContainerWrapperTests"
+            subfolder: "ContainerWrapperTests/\(UUID().uuidString)"
         )
 
         let localExampleContainer = tempDirectory.appending(path:
@@ -443,7 +443,7 @@ struct ContainerWrapperTests {
         }
 
         let tempDirectory = try TestFileUtil.getTemporaryDirectory(
-            subfolder: "ContainerWrapperTests"
+            subfolder: "ContainerWrapperTests/\(UUID().uuidString)"
         )
 
         let localExampleContainer = tempDirectory.appending(path:
