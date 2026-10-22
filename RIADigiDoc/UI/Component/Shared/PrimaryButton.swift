@@ -21,6 +21,8 @@ struct PrimaryButton: View {
     @AccessibilityFocusState private var isFocused: Bool
     @AccessibilityFocusState private var accessibilityField: AccessibilityField?
 
+    @FocusState private var isKeyboardFocused: Bool
+
     init(
         text: String,
         isButtonEnabled: Bool,
@@ -39,14 +41,41 @@ struct PrimaryButton: View {
         self.foregroundColor = foregroundColor
     }
 
+    private var isFocusHighlighted: Bool {
+        isKeyboardFocused && isButtonEnabled
+    }
+
+    private var accentColor: Color {
+        backgroundColor ?? theme.primary
+    }
+
+    private var fillColor: Color {
+        if isFocusHighlighted {
+            return .clear
+        }
+        return isButtonEnabled ? (backgroundColor ?? theme.primary) : Color.gray
+    }
+
+    private var textColor: Color {
+        if isFocusHighlighted {
+            return accentColor
+        }
+        return isButtonEnabled ? (foregroundColor ?? theme.onPrimary) : theme.surfaceContainerHighest
+    }
+
+    private func activateFromKeyboard() -> KeyPress.Result {
+        guard isButtonEnabled else { return .ignored }
+
+        action()
+        return .handled
+    }
+
     var body: some View {
         let button = Button(
             action: action,
             label: {
                 Text(verbatim: text)
-                    .foregroundStyle(isButtonEnabled
-                                     ? (foregroundColor ?? theme.onPrimary)
-                                     : theme.surfaceContainerHighest)
+                    .foregroundStyle(textColor)
                     .font(typography.labelLarge)
                     .lineLimit(nil)
                     .multilineTextAlignment(.center)
@@ -54,12 +83,17 @@ struct PrimaryButton: View {
                     .padding(.horizontal, Dimensions.Padding.XSPadding)
                     .padding(.vertical, Dimensions.Padding.MSPadding)
                     .frame(maxWidth: .infinity)
-                    .background(
+                    .background(Capsule().fill(fillColor))
+                    .overlay(
                         Capsule()
-                            .fill(isButtonEnabled ? (backgroundColor ?? theme.primary) : Color.gray)
+                            .strokeBorder(accentColor, lineWidth: Dimensions.Height.SBorder)
+                            .opacity(isFocusHighlighted ? 1 : 0)
                     )
             })
             .disabled(!isButtonEnabled)
+            .focusable(isButtonEnabled)
+            .focused($isKeyboardFocused)
+            .onKeyPress(.return) { activateFromKeyboard() }
             .accessibilityFocused($isFocused)
             .onAppear {
                 Task {

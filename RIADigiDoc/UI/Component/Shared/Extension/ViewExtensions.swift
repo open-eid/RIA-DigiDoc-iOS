@@ -22,6 +22,13 @@ func accessibleAction<Field: Hashable>(
     }
 }
 
+func voiceControlInputLabels(_ input: String?, _ label: String) -> [String] {
+    if let input {
+        return [input, label]
+    }
+    return [label]
+}
+
 extension View {
     func accessibilityFocusRestore<Field: Hashable>(
         focusedField: AccessibilityFocusState<Field?>.Binding,
@@ -37,6 +44,41 @@ extension View {
                         focusedField.wrappedValue = field
                     }
                 }
+            }
+    }
+
+    func accessibilityFocusOnAppear(
+        _ focus: AccessibilityFocusState<Bool>.Binding,
+        trigger: String,
+        enabled: Bool = true
+    ) -> some View {
+        modifier(AccessibilityFocusOnAppear(focus: focus, trigger: trigger, enabled: enabled))
+    }
+}
+
+private struct AccessibilityFocusOnAppear: ViewModifier {
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+
+    let focus: AccessibilityFocusState<Bool>.Binding
+    let trigger: String
+    let enabled: Bool
+
+    @State private var hasFocused = false
+
+    func body(content: Content) -> some View {
+        content
+            .accessibilityFocused(focus)
+            .task(id: trigger) {
+                guard enabled, voiceOverEnabled, !hasFocused, !trigger.isEmpty else { return }
+
+                do {
+                    try await Task.sleep(for: .seconds(0.3))
+                } catch {
+                    return
+                }
+
+                hasFocused = true
+                focus.wrappedValue = true
             }
     }
 }

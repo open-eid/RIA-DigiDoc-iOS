@@ -89,6 +89,7 @@ struct MyEidView: View {
             TopBarContainer(
                 title: languageSettings.localized("Main home my eid title"),
                 titleAccessibility: languageSettings.localized("My eid title accessibility"),
+                focusesTitleOnAppear: false,
                 onLeftClick: {
                     dismiss()
                 },

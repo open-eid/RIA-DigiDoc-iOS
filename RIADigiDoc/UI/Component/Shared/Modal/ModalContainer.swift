@@ -33,13 +33,7 @@ struct ModalContainer<Content: View>: View {
             .minimumScaleFactor(0.5)
             .accessibilityHeading(.h1)
             .accessibilityAddTraits([.isHeader])
-            .accessibilityFocused($isFocused)
-            .onAppear {
-                Task {
-                    try? await Task.sleep(for: .seconds(0.3))
-                    isFocused = true
-                }
-            }
+            .accessibilityFocusOnAppear($isFocused, trigger: title)
     }
 
     private var containerContent: some View {

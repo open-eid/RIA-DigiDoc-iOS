@@ -38,6 +38,7 @@ struct RenameModalView: View {
             Color.black
                 .opacity(Dimensions.Shadow.LOpacity)
                 .ignoresSafeArea()
+                .accessibilityHidden(true)
 
             InputModal(
                 icon: "ic_m3_edit_48pt_wght400",
@@ -49,7 +50,9 @@ struct RenameModalView: View {
             )
             .offset(y: -keyboardHeight / 2)
             .animation(.easeOut(duration: Dimensions.Duration.focusAnimation), value: keyboardHeight)
+            .accessibilityElement(children: .contain)
         }
+        .accessibilityAddTraits(.isModal)
         .ignoresSafeArea(.keyboard)
         .onReceive(
             NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)

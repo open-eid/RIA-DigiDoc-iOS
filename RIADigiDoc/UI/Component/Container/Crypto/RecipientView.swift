@@ -34,6 +34,11 @@ struct RecipientView: View {
     @State private var isVoiceOverObserverAdded = false
     @State private var isVoiceOverRunning = UIAccessibility.isVoiceOverRunning
 
+    private var moreOptionsLabel: String {
+        "\(languageSettings.localized("Recipient")) " +
+        "\(recipientIndex), \(languageSettings.localized("More options"))"
+    }
+
     private var bottomSheetActions: [BottomSheetButton] {
         RecipientBottomSheetActions.actions(
             showRemoveRecipientButton: showRemoveRecipientButton,
@@ -182,13 +187,11 @@ struct RecipientView: View {
                             .scaledToFit()
                             .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
                             .foregroundStyle(theme.onSurfaceVariant)
-                            .accessibilityLabel(
-                                Text(verbatim:
-                                        "\(languageSettings.localized("Recipient")) " +
-                                     "\(recipientIndex), \(languageSettings.localized("More options"))"
-                                    )
-                            )
                     })
+                    .accessibilityLabel(Text(verbatim: moreOptionsLabel))
+                    .accessibilityInputLabels(
+                        voiceControlInputLabels(languageSettings.localized("More options"), moreOptionsLabel)
+                    )
                     .bottomSheet(isPresented: $showBottomSheetFromButton, actions: bottomSheetActions)
                     .accessibilityFocusRestore(
                         focusedField: $focusedField,

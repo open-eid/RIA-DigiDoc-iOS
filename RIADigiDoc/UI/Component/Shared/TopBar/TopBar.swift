@@ -14,6 +14,8 @@ struct TopBarContainer<Content: View>: View {
 
     var title: String?
     var titleAccessibility: String?
+
+    var focusesTitleOnAppear: Bool = true
     var showNavigationIcon = true
 
     var leftIcon: String = "ic_m3_arrow_back_ios_48pt_wght400"
@@ -72,6 +74,7 @@ struct TopBarContainer<Content: View>: View {
             TopBar(
                 title: title,
                 titleAccessibility: titleAccessibility,
+                focusesTitleOnAppear: focusesTitleOnAppear,
                 showNavigationIcon: showNavigationIcon,
                 leftIcon: leftIcon,
                 leftIconAccessibility: leftIconAccessibility,
@@ -155,6 +158,8 @@ struct TopBar: View {
 
     var title: String?
     var titleAccessibility: String?
+
+    var focusesTitleOnAppear: Bool = true
     var showNavigationIcon = true
     var leftIcon: String
     var leftIconAccessibility: String
@@ -181,12 +186,7 @@ struct TopBar: View {
 
     var showRightIcons: Bool = true
 
-    private func getInputLabels(_ input: String?, _ label: String) -> [String] {
-        if let input {
-            return [input, label]
-        }
-        return [label]
-    }
+    @AccessibilityFocusState private var isTitleFocused: Bool
 
     var body: some View {
         HStack {
@@ -199,7 +199,9 @@ struct TopBar: View {
                         .foregroundStyle(theme.onSurfaceVariant)
                 }
                 .accessibilityLabel(languageSettings.localized(leftIconAccessibility))
-                .accessibilityInputLabels(getInputLabels(leftIconAccessibilityInput, leftIconAccessibility))
+                .accessibilityInputLabels(
+                    voiceControlInputLabels(leftIconAccessibilityInput, leftIconAccessibility)
+                )
             }
             if let title = title {
                 Text(title)
@@ -209,6 +211,7 @@ struct TopBar: View {
                     .minimumScaleFactor(0.5)
                     .accessibilityLabel(titleAccessibility ?? title)
                     .accessibilityAddTraits(.isHeader)
+                    .accessibilityFocusOnAppear($isTitleFocused, trigger: title, enabled: focusesTitleOnAppear)
             }
 
             Spacer()
@@ -239,8 +242,11 @@ struct TopBar: View {
                             }
                         }
                         .accessibilityLabel(languageSettings.localized(extraButtonIconAccessibility))
-                        .accessibilityInputLabels(getInputLabels(extraButtonIconAccessibilityInput,
-                                                                 extraButtonIconAccessibility))
+                        .accessibilityInputLabels(
+                            voiceControlInputLabels(
+                                extraButtonIconAccessibilityInput, extraButtonIconAccessibility
+                            )
+                        )
                     }
 
                     if let onRightPrimaryClick = onRightPrimaryClick {
@@ -252,8 +258,11 @@ struct TopBar: View {
                                 .foregroundStyle(theme.onSurfaceVariant)
                         }
                         .accessibilityLabel(languageSettings.localized(rightPrimaryIconAccessibility))
-                        .accessibilityInputLabels(getInputLabels(rightPrimaryIconAccessibilityInput,
-                                                                 rightPrimaryIconAccessibility))
+                        .accessibilityInputLabels(
+                            voiceControlInputLabels(
+                                rightPrimaryIconAccessibilityInput, rightPrimaryIconAccessibility
+                            )
+                        )
                         .accessibilityAddTraits(isRightPrimaryLink ? .isLink : [])
                         .accessibilityRemoveTraits(isRightPrimaryLink ? .isButton : [])
                     }
@@ -266,8 +275,11 @@ struct TopBar: View {
                             .foregroundStyle(theme.onSurfaceVariant)
                     }
                     .accessibilityLabel(languageSettings.localized(rightSecondaryIconAccessibility))
-                    .accessibilityInputLabels(getInputLabels(rightSecondaryIconAccessibilityInput,
-                                                             rightSecondaryIconAccessibility))
+                    .accessibilityInputLabels(
+                        voiceControlInputLabels(
+                            rightSecondaryIconAccessibilityInput, rightSecondaryIconAccessibility
+                        )
+                    )
                 }
             }
         }
