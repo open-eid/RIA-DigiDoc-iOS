@@ -38,7 +38,9 @@ final class EncryptedDataUtilTests {
 
     @Test
     func getSymmetricKey_throwsWhenFileDoesNotExist() async throws {
-        let tempDirectory = try TestFileUtil.getTemporaryDirectory(subfolder: "keys")
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
+            subfolder: "keys/\(UUID().uuidString)"
+        )
         defer {
             try? FileManager.default.removeItem(at: tempDirectory)
         }
@@ -54,7 +56,9 @@ final class EncryptedDataUtilTests {
 
     @Test
     func getSymmetricKey_success() async throws {
-        let tempDirectory = try TestFileUtil.getTemporaryDirectory(subfolder: "keys")
+        let tempDirectory = try TestFileUtil.getTemporaryDirectory(
+            subfolder: "keys/\(UUID().uuidString)"
+        )
         defer {
             try? FileManager.default.removeItem(at: tempDirectory)
         }
