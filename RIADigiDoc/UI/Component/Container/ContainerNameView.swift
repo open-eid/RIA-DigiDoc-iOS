@@ -11,7 +11,6 @@ struct ContainerNameView: View {
     @AppTypography private var typography
 
     @State private var showBottomSheetFromButton = false
-    @State private var showBottomSheetFromTap = false
     @State private var tempContainerURL: URL?
     @State private var isShowingFileSaver = false
     @State private var isFileSaved: Bool = false
@@ -149,7 +148,6 @@ struct ContainerNameView: View {
             .background(theme.surfaceContainerHighest)
             .cornerRadius(Dimensions.Corner.MSCornerRadius)
             .padding(.top, Dimensions.Padding.MSPadding)
-            .bottomSheet(isPresented: $showBottomSheetFromTap, actions: bottomSheetActions)
         }
     }
 }
