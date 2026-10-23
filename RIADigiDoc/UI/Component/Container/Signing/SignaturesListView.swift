@@ -6,6 +6,11 @@ import FactoryKit
 import LibdigidocLibSwift
 import UtilsLib
 
+enum SignatureRowID: Hashable {
+    case timestamp(Int)
+    case signature(Int)
+}
+
 struct SignaturesListView: View {
     @AppTheme private var theme
     @AppTypography private var typography
@@ -42,6 +47,7 @@ struct SignaturesListView: View {
                             selectedSignature = timestamp
                         }
                     )
+                    .id(SignatureRowID.timestamp(timestamp.pos))
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             } else {
@@ -60,6 +66,7 @@ struct SignaturesListView: View {
                             selectedSignature = timestamp
                         }
                     )
+                    .id(SignatureRowID.timestamp(timestamp.pos))
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             }
@@ -79,7 +86,7 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
-                    .id(signature.pos)
+                    .id(SignatureRowID.signature(signature.pos))
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
                 .onChange(of: focusedIndex) { _, newValue in
@@ -102,7 +109,7 @@ struct SignaturesListView: View {
                             selectedSignature = signature
                         }
                     )
-                    .id(signature.pos)
+                    .id(SignatureRowID.signature(signature.pos))
                     .accessibilityFocused($focusedSignatureIndex, equals: index)
                 }
             }
