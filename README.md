@@ -7,10 +7,10 @@
 
 This repo contains source code for RIA DigiDoc application for iOS.
 This application contains following functionality:
-* Sign documents with ID-card (via USB card reader and NFC), mobile-ID and Smart-ID.
-* Encrypt and decrypt documents (via USB card reader and NFC)
-* Control ID-card certificates validity (via USB card reader and NFC)
-* Change or unlock PIN/PUK codes (via USB card reader and NFC)
+* Sign documents with ID-card (via NFC), mobile-ID and Smart-ID.
+* Encrypt and decrypt documents (via NFC)
+* Control ID-card certificates validity (via NFC)
+* Change or unlock PIN/PUK codes (via NFC)
 
 ## libdigidocpp
 RIA-DigiDoc-iOS is using static version of libdigidoc. libdigidoc is used in app for managing container manipulations. More info: https://github.com/open-eid/libdigidocpp
@@ -20,11 +20,11 @@ RIA-DigiDoc-iOS is using static version of libcdoc. libcdoc is used in app for e
 
 # Features
 * Creating ASiC-E containers
-* Signing containers with Mobile-ID, Smart-ID and ID-card (via USB card reader and NFC)
+* Signing containers with Mobile-ID, Smart-ID and ID-card (via NFC)
 * Validating ASiC-E, BDOC, ASIC-S and DDOC containers
 * Validating detached XAdES and CAdES
 * Encrypting, decrypting and validating CDOC and CDOC2 containers
-* Change and unlock ID-card PIN codes (via USB card reader and NFC)
+* Change and unlock ID-card PIN codes (via NFC)
 
 ## Overview and how to use
 App requirements, container format overview, documentation links and how to use instructions are available in Wiki:
