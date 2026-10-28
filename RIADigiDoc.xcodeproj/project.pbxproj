@@ -1695,8 +1695,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/open-eid/nfc-iOS-lib.git";
 			requirement = {
-				revision = 1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a;
 				kind = revision;
+				revision = 1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a;
 			};
 		};
 		DF1D59582F3BF88000855E2E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
