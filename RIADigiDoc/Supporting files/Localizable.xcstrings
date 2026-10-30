@@ -55,6 +55,24 @@
         }
       }
     },
+    "Added recipient" : {
+      "comment" : "Accessibility prefix for a row in the Encrypt Recipients added recipients list",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added recipient"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lisatud adressaat"
+          }
+        }
+      }
+    },
     "Added recipients" : {
       "comment" : "Encrypt Recipient Added recipients text",
       "extractionState" : "manual",
@@ -1925,24 +1943,6 @@
         }
       }
     },
-    "Decryption expired without date" : {
-      "comment" : "CDOC2 recipient decryption expired badge when the expiry date is unknown",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Decryption expired"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dekrüpteerimise võimalus aegunud"
-          }
-        }
-      }
-    },
     "Decryption expired" : {
       "comment" : "CDOC2 recipient decryption expired badge",
       "extractionState" : "manual",
@@ -1961,20 +1961,20 @@
         }
       }
     },
-    "Decryption until" : {
-      "comment" : "CDOC2 recipient decryption valid until badge",
+    "Decryption expired without date" : {
+      "comment" : "CDOC2 recipient decryption expired badge when the expiry date is unknown",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decryption until %@"
+            "value" : "Decryption expired"
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dekrüpteerimine võimalik kuni %@"
+            "value" : "Dekrüpteerimise võimalus aegunud"
           }
         }
       }
@@ -2011,6 +2011,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dekrüpteerimise meetod muudetud"
+          }
+        }
+      }
+    },
+    "Decryption until" : {
+      "comment" : "CDOC2 recipient decryption valid until badge",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decryption until %@"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteerimine võimalik kuni %@"
           }
         }
       }
@@ -2177,24 +2195,6 @@
         }
       }
     },
-    "Encrypted files" : {
-      "comment" : "Crypto container files tab title",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encrypted files"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Krüpteeritud failid"
-          }
-        }
-      }
-    },
     "Encrypt" : {
       "comment" : "Encrypt button",
       "extractionState" : "manual",
@@ -2281,6 +2281,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krüpteeri parooliga"
+          }
+        }
+      }
+    },
+    "Encrypted files" : {
+      "comment" : "Crypto container files tab title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encrypted files"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Krüpteeritud failid"
           }
         }
       }
@@ -2375,24 +2393,6 @@
         }
       }
     },
-    "Expired Smart-ID transaction" : {
-      "comment" : "Smart-ID error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your Smart-ID transaction has expired or user account not found"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sinu Smart-ID toiming aegus või kontot ei leitud"
-          }
-        }
-      }
-    },
     "Expired on" : {
       "comment" : "CDOC2 recipient certificate expired badge",
       "extractionState" : "manual",
@@ -2407,6 +2407,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aegus %@"
+          }
+        }
+      }
+    },
+    "Expired Smart-ID transaction" : {
+      "comment" : "Smart-ID error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Smart-ID transaction has expired or user account not found"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu Smart-ID toiming aegus või kontot ei leitud"
           }
         }
       }
@@ -7447,7 +7465,7 @@
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adressaat on konteineris juba olemas"
+            "value" : "Adressaat on ümbrikus juba olemas"
           }
         }
       }
@@ -7520,6 +7538,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adressaadi andmed"
+          }
+        }
+      }
+    },
+    "Recipients already exist in the container" : {
+      "comment" : "Encrypt Recipients view message when every found recipient is already added",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recipients already exist in the container"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressaadid on ümbrikus juba olemas"
           }
         }
       }
