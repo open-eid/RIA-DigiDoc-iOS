@@ -9,6 +9,7 @@ import CryptoObjCWrapper
 
 struct EncryptRecipientView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     @Environment(LanguageSettings.self) private var languageSettings
 
@@ -19,7 +20,8 @@ struct EncryptRecipientView: View {
 
     @AccessibilityFocusState private var isTitleFocused: Bool
     @AccessibilityFocusState private var isSearchFieldFocused: Bool
-    @AccessibilityFocusState private var focusedRecipientIndex: Int?
+    @AccessibilityFocusState private var focusedSearchRecipient: Data?
+    @AccessibilityFocusState private var focusedAddedRecipient: Data?
     @FocusState private var isSearchFocused: Bool
     @State private var isSearchExpanded = false
 
@@ -36,6 +38,8 @@ struct EncryptRecipientView: View {
     @State private var viewModel: EncryptRecipientViewModel
     @State private var encryptViewModel: EncryptViewModel
 
+    private let recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil()
+
     init(cdocOption: EncryptionCdocOption) {
         _cdocOption = State(wrappedValue: cdocOption)
         _viewModel = State(wrappedValue: Container.shared.encryptRecipientViewModel())
@@ -43,11 +47,23 @@ struct EncryptRecipientView: View {
     }
 
     var filteredRecipients: [Addressee] {
-        viewModel.filteredRecipients()
+        viewModel.filteredRecipients().filter { !recipientUtil.isRecipientAdded($0, in: addedRecipients) }
     }
 
     var noRecipients: Bool {
         filteredRecipients.isEmpty
+    }
+
+    var searchReturnedNoRecipients: Bool {
+        viewModel.recipients.isEmpty
+    }
+
+    var allFoundRecipientsAdded: Bool {
+        noRecipients && !searchReturnedNoRecipients
+    }
+
+    private var rowAnimation: Animation? {
+        reduceMotion ? nil : .easeInOut(duration: Dimensions.Duration.rowAnimation)
     }
 
     var noSearchResults: Bool {
@@ -85,11 +101,11 @@ struct EncryptRecipientView: View {
             Spacer().frame(height: Dimensions.Padding.MSPadding)
 
             if #available(iOS 26.0, *) {
-                ForEach(addedRecipients.enumerated(), id: \.offset) { index, item in
+                ForEach(addedRecipients.enumerated(), id: \.element.data) { index, item in
                     addedRecipientRow(index: index, item: item)
                 }
             } else {
-                ForEach(Array(addedRecipients.enumerated()), id: \.offset) { index, item in
+                ForEach(Array(addedRecipients.enumerated()), id: \.element.data) { index, item in
                     addedRecipientRow(index: index, item: item)
                 }
             }
@@ -100,16 +116,17 @@ struct EncryptRecipientView: View {
         .scrollContentBackground(.hidden)
         .listRowSpacing(0)
         .listSectionSpacing(.compact)
+        .animation(rowAnimation, value: addedRecipients.map(\.data))
     }
 
     private var filteredRecipientsSection: some View {
         VStack {
             if #available(iOS 26.0, *) {
-                ForEach(filteredRecipients.enumerated(), id: \.offset) { index, item in
+                ForEach(filteredRecipients.enumerated(), id: \.element.data) { index, item in
                     recipientRow(index: index, item: item)
                 }
             } else {
-                ForEach(Array(filteredRecipients.enumerated()), id: \.offset) { index, item in
+                ForEach(Array(filteredRecipients.enumerated()), id: \.element.data) { index, item in
                     recipientRow(index: index, item: item)
                 }
             }
@@ -119,6 +136,7 @@ struct EncryptRecipientView: View {
         .scrollContentBackground(.hidden)
         .listRowSpacing(0)
         .listSectionSpacing(.compact)
+        .animation(rowAnimation, value: filteredRecipients.map(\.data))
     }
 
     @ViewBuilder
@@ -266,6 +284,10 @@ struct EncryptRecipientView: View {
                 .scrollContentBackground(.hidden)
             } else if let emptyStateMessageKey = viewModel.emptyStateMessageKey {
                 emptyStateView(languageSettings.localized(emptyStateMessageKey))
+            } else if allFoundRecipientsAdded {
+                emptyStateView(
+                    languageSettings.localized("Recipients already exist in the container")
+                )
             } else {
                 filteredRecipientsSection
             }
@@ -276,7 +298,7 @@ struct EncryptRecipientView: View {
                 addedRecipientsSection
             }
         }
-        .accessibilitySortPriority(filteredRecipients.isEmpty ? 2 : 0)
+        .accessibilitySortPriority(searchReturnedNoRecipients ? 2 : 0)
     }
 
     @ViewBuilder
@@ -376,7 +398,6 @@ struct EncryptRecipientView: View {
                                     addedRecipients = await viewModel.filteredAddedRecipients()
                                     selectedRecipient = nil
                                     showRemoveRecipientModal = false
-                                    await viewModel.loadRecipients()
                                 }
                             },
                             onCancel: {
@@ -441,6 +462,7 @@ struct EncryptRecipientView: View {
                 Task { @MainActor in
                     await viewModel.addRecipients(item)
                     addedRecipients = await viewModel.filteredAddedRecipients()
+                    moveFocusAfterAdding(fromIndex: index)
                 }
             },
             onRemoveRecipient: {
@@ -452,7 +474,8 @@ struct EncryptRecipientView: View {
         .contentShape(Rectangle())
         .buttonStyle(.plain)
         .background(theme.surface)
-        .accessibilityFocused($focusedRecipientIndex, equals: index)
+        .transition(.opacity)
+        .accessibilityFocused($focusedSearchRecipient, equals: item.data)
     }
 
     private func addedRecipientRow(index: Int, item: Addressee) -> some View {
@@ -460,6 +483,7 @@ struct EncryptRecipientView: View {
             recipient: item,
             recipientIndex: index,
             showRemoveButton: true,
+            accessibilityPrefixKey: "Added recipient",
             onOpenRecipient: {
                 pathManager
                     .navigate(
@@ -478,6 +502,23 @@ struct EncryptRecipientView: View {
         .contentShape(Rectangle())
         .buttonStyle(.plain)
         .background(theme.surface)
+        .transition(.opacity)
+        .accessibilityFocused($focusedAddedRecipient, equals: item.data)
+    }
+
+    private func moveFocusAfterAdding(fromIndex index: Int) {
+        focusedSearchRecipient = nil
+        focusedAddedRecipient = nil
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + Dimensions.Duration.focusHandoff) {
+            let remaining = filteredRecipients
+
+            if remaining.isEmpty {
+                focusedAddedRecipient = addedRecipients.first?.data
+            } else {
+                focusedSearchRecipient = remaining[min(index, remaining.count - 1)].data
+            }
+        }
     }
 
     private func handlePasswordEncrypt(label: String, password: String) async {

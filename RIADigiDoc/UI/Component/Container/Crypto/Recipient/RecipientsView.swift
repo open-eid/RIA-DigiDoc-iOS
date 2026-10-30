@@ -16,6 +16,7 @@ struct RecipientsView: View {
     let recipientIndex: Int
 
     let showRemoveButton: Bool
+    let accessibilityPrefixKey: String
 
     var onOpenRecipient: (() -> Void)?
     var onRemoveRecipient: (() -> Void)?
@@ -61,6 +62,7 @@ struct RecipientsView: View {
         recipient: Addressee,
         recipientIndex: Int,
         showRemoveButton: Bool,
+        accessibilityPrefixKey: String = "Recipient",
         onOpenRecipient: (() -> Void)? = nil,
         onRemoveRecipient: (() -> Void)? = nil,
         nameUtil: NameUtilProtocol = Container.shared.nameUtil(),
@@ -69,6 +71,7 @@ struct RecipientsView: View {
         self.recipient = recipient
         self.recipientIndex = recipientIndex
         self.showRemoveButton = showRemoveButton
+        self.accessibilityPrefixKey = accessibilityPrefixKey
         self.onOpenRecipient = onOpenRecipient
         self.onRemoveRecipient = onRemoveRecipient
         self.nameUtil = nameUtil
@@ -92,7 +95,7 @@ struct RecipientsView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                             .accessibilityLabel({
-                                let prefix = languageSettings.localized("Recipient")
+                                let prefix = languageSettings.localized(accessibilityPrefixKey)
                                 let name = nameText.lowercased()
                                 return Text(verbatim: "\(prefix) \(recipientIndex + 1), \(name)")
                             }())
