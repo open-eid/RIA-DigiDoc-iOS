@@ -15,6 +15,7 @@ struct HomeViewModelTests {
     private let mockFileManager: FileManagerProtocolMock
     private let mockFileUtil: FileUtilProtocolMock
     private let mockContainerUtil: ContainerUtilProtocolMock
+    private let mockAppVersionUtil: AppVersionUtilProtocolMock
     private let viewModel: HomeViewModel
 
     init() async throws {
@@ -22,10 +23,13 @@ struct HomeViewModelTests {
         mockFileManager = FileManagerProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
         mockContainerUtil = ContainerUtilProtocolMock()
+        mockAppVersionUtil = AppVersionUtilProtocolMock()
+        mockAppVersionUtil.isAppVersionUnsupportedHandler = { false }
         viewModel = HomeViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
             fileManager: mockFileManager,
-            fileUtil: mockFileUtil
+            fileUtil: mockFileUtil,
+            appVersionUtil: mockAppVersionUtil
         )
     }
 
@@ -234,7 +238,8 @@ struct HomeViewModelTests {
         HomeViewModel(
             sharedContainerViewModel: sharedContainerViewModel,
             fileManager: mockFileManager,
-            fileUtil: mockFileUtil
+            fileUtil: mockFileUtil,
+            appVersionUtil: mockAppVersionUtil
         )
     }
 
@@ -243,5 +248,15 @@ struct HomeViewModelTests {
             fileManager: mockFileManager,
             containerUtil: mockContainerUtil
         )
+    }
+
+    @Test
+    func getSharedFiles_returnsNothingWhenAppVersionIsUnsupported() async throws {
+        mockAppVersionUtil.isAppVersionUnsupportedHandler = { true }
+
+        let shared = await viewModel.getSharedFiles()
+
+        #expect(shared.isEmpty)
+        #expect(mockFileManager.contentsOfDirectoryCallCount == 0)
     }
 }

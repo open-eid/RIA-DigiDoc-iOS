@@ -27,6 +27,9 @@ struct RIADigiDocApp: App, Loggable {
     private let fileUtil: FileUtilProtocol
     private let librarySetup: LibrarySetup
     private let documentsMigrator: DocumentsMigratorProtocol
+    private let appVersionUtil: AppVersionUtilProtocol
+
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         _languageSettings = State(wrappedValue: Container.shared.languageSettings())
@@ -40,6 +43,7 @@ struct RIADigiDocApp: App, Loggable {
         self.fileUtil = Container.shared.fileUtil()
         self.librarySetup = Container.shared.librarySetup()
         self.documentsMigrator = Container.shared.documentsMigrator()
+        self.appVersionUtil = Container.shared.appVersionUtil()
     }
 
     private func loadBlockingScreenLanguage() async {
@@ -47,6 +51,41 @@ struct RIADigiDocApp: App, Loggable {
             await languageSettings.loadSelectedLanguage()
         } else {
             languageSettings.loadDeviceLanguage()
+        }
+    }
+
+    private func applyAppVersionSupport() async -> Bool {
+        guard await appVersionUtil.isAppVersionUnsupported() else { return false }
+
+        await loadBlockingScreenLanguage()
+        await MainActor.run {
+            self.isAppVersionUnsupported = true
+        }
+        removePendingSharedFiles()
+
+        return true
+    }
+
+    private func removePendingSharedFiles() {
+        do {
+            try fileUtil.removeSharedFiles(url: Directories.getSharedFolder(fileManager: fileManager))
+        } catch {
+            RIADigiDocApp.logger().error(
+                "Unable to remove pending shared files: \(String(reflecting: error), privacy: .public)"
+            )
+        }
+    }
+
+    private func onScenePhaseActive() {
+        guard isSetupComplete || isAppVersionUnsupported, !isJailbroken else { return }
+
+        Task {
+            if isAppVersionUnsupported {
+                removePendingSharedFiles()
+                return
+            }
+
+            _ = await applyAppVersionSupport()
         }
     }
 
@@ -62,13 +101,7 @@ struct RIADigiDocApp: App, Loggable {
 
             await librarySetup.setupLibraries()
 
-            if await configurationLoader.getConfiguration()?
-                .isAppVersionUnsupported(BundleUtil.getAppVersion()) == true {
-                RIADigiDocApp.logger().error("App version \(BundleUtil.getAppVersion()) is unsupported")
-                await loadBlockingScreenLanguage()
-                await MainActor.run {
-                    self.isAppVersionUnsupported = true
-                }
+            if await applyAppVersionSupport() {
                 return
             }
 
@@ -166,6 +199,11 @@ struct RIADigiDocApp: App, Loggable {
                 }
             }
             .hideSensitiveContent()
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    onScenePhaseActive()
+                }
+            }
         }
     }
 }

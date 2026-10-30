@@ -19,15 +19,18 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
     private let fileManager: FileManagerProtocol
     private let fileUtil: FileUtilProtocol
+    private let appVersionUtil: AppVersionUtilProtocol
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
         fileManager: FileManagerProtocol,
-        fileUtil: FileUtilProtocol
+        fileUtil: FileUtilProtocol,
+        appVersionUtil: AppVersionUtilProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
         self.fileManager = fileManager
         self.fileUtil = fileUtil
+        self.appVersionUtil = appVersionUtil
     }
 
     func didUserCancelFileOpening(isImportingValue: Bool, isFileOpeningLoading: Bool) -> Bool {
@@ -72,6 +75,11 @@ class HomeViewModel: HomeViewModelProtocol, Loggable {
     }
 
     func getSharedFiles() async -> [URL] {
+        guard await !appVersionUtil.isAppVersionUnsupported() else {
+            HomeViewModel.logger().info("App version is unsupported. Ignoring shared files")
+            return []
+        }
+
         do {
             HomeViewModel.logger().info("Checking for shared files...")
             let sharedFolderURL = try await Directories.getSharedFolder(fileManager: fileManager)
