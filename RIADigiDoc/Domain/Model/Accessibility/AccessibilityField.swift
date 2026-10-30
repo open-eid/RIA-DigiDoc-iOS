@@ -8,6 +8,7 @@ enum AccessibilityField: Hashable, Sendable {
     case container(ContainerField)
     case dataFile(DataFileField)
     case signature(SignatureField)
+    case recipient(RecipientField)
     case myEid(MyEidField)
 
     enum TopBarField: Hashable {
@@ -26,6 +27,10 @@ enum AccessibilityField: Hashable, Sendable {
 
     enum SignatureField: Hashable {
         case openSignatureOptionsButton
+    }
+
+    enum RecipientField: Hashable {
+        case openRecipientOptionsButton
     }
 
     enum MyEidField: Hashable {
