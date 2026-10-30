@@ -103,6 +103,8 @@ final class TimeStampSettingsViewModelTests {
 
     @Test
     func saveSettings_successWithManualSettingWithValidURL() async throws {
+        await viewModel.initializeSettings()
+
         viewModel.selectedOption = .manualSetting
         let testURL = "http://valid.url.ee"
         viewModel.tsaUrl = testURL

@@ -81,7 +81,8 @@ extension Container {
             HomeViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
                 fileManager: self.fileManager(),
-                fileUtil: self.fileUtil()
+                fileUtil: self.fileUtil(),
+                appVersionUtil: self.appVersionUtil()
             )
         }
     }
@@ -161,6 +162,11 @@ extension Container {
 
     public var certificateUtil: Factory<CertificateUtilProtocol> {
         self { CertificateUtil() }
+    }
+
+    @MainActor
+    var appVersionUtil: Factory<AppVersionUtilProtocol> {
+        self { @MainActor in AppVersionUtil(configurationLoader: self.configurationLoader()) }
     }
 
     @MainActor
