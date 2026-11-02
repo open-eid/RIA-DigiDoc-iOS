@@ -11,6 +11,7 @@ public enum IdCardError: Error {
     case sessionError
     case pinLocked
     case notActivated
+    case cardNotSupported
 }
 
 extension IdCardError {
@@ -21,6 +22,7 @@ extension IdCardError {
         case .invalidNewPIN: self = .invalidNewPIN
         case .sessionError: self = .sessionError
         case .notActivated: self = .notActivated
+        case .cardNotSupported: self = .cardNotSupported
         @unknown default: self = .sessionError
         }
     }

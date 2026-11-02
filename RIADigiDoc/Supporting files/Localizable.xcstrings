@@ -504,6 +504,24 @@
         }
       }
     },
+    "Card not supported" : {
+      "comment" : "NFC card not supported message",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Card not supported"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaarti ei toetata"
+          }
+        }
+      }
+    },
     "Certificate details" : {
       "comment" : "Title of Certificate Details view",
       "extractionState" : "manual",

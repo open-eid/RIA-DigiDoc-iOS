@@ -277,6 +277,9 @@ final class MyEidPinChangeViewModel: MyEidPinChangeViewModelProtocol, Loggable {
         case .wrongCAN:
             errorMessage = "Wrong CAN"
             errorMessageExtraArguments = []
+        case .cardNotSupported:
+            errorMessage = "Card not supported"
+            errorMessageExtraArguments = []
         case .wrongPIN(let triesLeft):
             if triesLeft > 1 {
                 errorMessage = "PIN verification error multiple"
