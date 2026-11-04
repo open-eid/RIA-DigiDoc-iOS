@@ -26,6 +26,11 @@ struct CryptoDataFilesView: View {
     @Binding var showRemoveDataFileModal: Bool
     var onSelect: (() -> Void)?
 
+    private var fileLabel: String {
+        "\(languageSettings.localized("File")) " +
+        "\(fileIndex), \(dataFile.lastPathComponent.lowercased())"
+    }
+
     private var moreOptionsLabel: String {
         "\(languageSettings.localized("File")) " +
         "\(fileIndex), \(languageSettings.localized("More options"))"
@@ -45,32 +50,42 @@ struct CryptoDataFilesView: View {
         )
     }
 
+    private var fileContent: some View {
+        HStack {
+            Image("ic_m3_attach_file_48pt_wght400")
+                .resizable()
+                .scaledToFit()
+                .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                .foregroundStyle(theme.onSurface)
+                .padding(.trailing, Dimensions.Padding.SPadding)
+                .accessibilityHidden(true)
+
+            Text(verbatim: dataFile.lastPathComponent)
+                .font(typography.titleMedium)
+                .foregroundStyle(theme.onSurface)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(4)
+                .truncationMode(.middle)
+                .multilineTextAlignment(TextAlignment.leading)
+
+            Spacer()
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: fileLabel))
+    }
+
     var body: some View {
         VStack {
             HStack {
-                Image("ic_m3_attach_file_48pt_wght400")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .foregroundStyle(theme.onSurface)
-                    .padding(.trailing, Dimensions.Padding.SPadding)
-                    .accessibilityHidden(true)
-
-                Text(verbatim: dataFile.lastPathComponent)
-                    .font(typography.titleMedium)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(4)
-                    .truncationMode(.middle)
-                    .multilineTextAlignment(TextAlignment.leading)
-                    .accessibilityLabel(
-                        Text(
-                            verbatim: "\(languageSettings.localized("File")) " +
-                            "\(fileIndex), \(dataFile.lastPathComponent.lowercased())"
-                        )
+                if showOpenFileButton {
+                    Button(action: { onOpenFileButtonClick(dataFile) }, label: {
+                        fileContent
+                    })
+                    .buttonStyle(.plain)
+                    .accessibilityInputLabels(
+                        voiceControlInputLabels(dataFile.lastPathComponent, fileLabel)
                     )
 
-                Spacer()
-                if showOpenFileButton {
                     Button(action: accessibleAction(
                         voiceOverEnabled: voiceOverEnabled,
                         focusedField: $focusedField
@@ -93,16 +108,12 @@ struct CryptoDataFilesView: View {
                         field: .dataFile(.openDataFileOptionsButton),
                         when: showBottomSheetFromButton
                     )
+                } else {
+                    fileContent
                 }
             }
             .padding(Dimensions.Padding.MSPadding)
         }
         .listRowInsets(EdgeInsets())
-        .onTapGesture {
-            if showOpenFileButton {
-                onOpenFileButtonClick(dataFile)
-            }
-        }
-        .accessibilityAddTraits([.isButton])
     }
 }
