@@ -229,7 +229,8 @@ class SigningViewModel: SigningViewModelProtocol, Loggable {
         }
 
         do {
-            let updatedContainer = try await signedContainer?.addDataFiles(files, to: container)
+            let validFiles = try await fileOpeningService.getValidFiles(.success(files))
+            let updatedContainer = try await signedContainer?.addDataFiles(validFiles, to: container)
             SigningViewModel.logger().info("Added data files to container")
             successMessage = ToastMessage(
                 key: files.count == 1 ? "File successfully added" : "Files successfully added",

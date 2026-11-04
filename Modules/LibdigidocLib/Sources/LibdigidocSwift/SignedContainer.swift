@@ -156,7 +156,7 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
 
         let updatedContainer = try await container.addDataFiles(containerFile: containerFile, dataFiles: dataFiles)
 
-        return SignedContainer(
+        let signedContainer = SignedContainer(
             containerFile: containerFile,
             isExistingContainer: true,
             container: updatedContainer,
@@ -164,6 +164,44 @@ public actor SignedContainer: SignedContainerProtocol, Loggable {
             fileManager: fileManager,
             containerUtil: containerUtil
         )
+
+        await removeCachedCopies(of: dataFiles, addedTo: signedContainer)
+
+        return signedContainer
+    }
+
+    private func removeCachedCopies(of dataFiles: [URL], addedTo signedContainer: SignedContainer) async {
+        let temporaryDirectory: URL
+
+        do {
+            temporaryDirectory = try Directories.getCacheDirectory(
+                subfolders: [Constants.Folder.ContainerFolder, Constants.Folder.Temp],
+                fileManager: fileManager
+            )
+        } catch {
+            SignedContainer.logger().error(
+                "Unable to resolve the cached data file directory: \(error.localizedDescription)"
+            )
+            return
+        }
+
+        let addedFileNames = Set(await signedContainer.getDataFiles().map { $0.fileName })
+
+        for dataFile in dataFiles where dataFile.isWithin(directory: temporaryDirectory) {
+            guard addedFileNames.contains(dataFile.lastPathComponent),
+                  fileManager.fileExists(atPath: dataFile.resolvedPath),
+                  fileManager.isDeletableFile(atPath: dataFile.resolvedPath) else {
+                continue
+            }
+
+            do {
+                try fileManager.removeItem(at: dataFile)
+            } catch {
+                SignedContainer.logger().error(
+                    "Unable to remove cached data file: \(error.localizedDescription)"
+                )
+            }
+        }
     }
 
     @discardableResult
