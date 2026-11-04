@@ -42,6 +42,7 @@ struct SigningViewModelTests: Loggable {
         mockContainerUtil = ContainerUtilProtocolMock()
         mockFileUtil = FileUtilProtocolMock()
         mockFileOpeningService = FileOpeningServiceProtocolMock()
+        mockFileOpeningService.getValidFilesHandler = { try $0.get() }
         mockMimeTypeCache = MimeTypeCacheProtocolMock()
         mockMimeTypeDecoder = MimeTypeDecoderProtocolMock()
         mockSivaRepository = SivaRepositoryProtocolMock()
@@ -1488,6 +1489,36 @@ struct SigningViewModelTests: Loggable {
 
         #expect(viewModel.successMessage == ToastMessage(key: "File successfully added", args: []))
         await #expect(updatedMockSignedContainer.getDataFiles().count == 2)
+    }
+
+    @Test
+    func addDataFiles_addsTheSanitizedFileInsteadOfTheRawPickedFile() async {
+        let rawFile = URL(fileURLWithPath: "/mock/path/test<a>b|c?d*e.txt")
+        let sanitizedFile = URL(fileURLWithPath: "/mock/cache/testabcde.txt")
+
+        let mockSignedContainer = SignedContainerProtocolMock()
+        mockSignedContainer.getRawContainerFileHandler = {
+            URL(fileURLWithPath: "/mock/path/mockContainer.asice")
+        }
+
+        mockFileInspector.fileSizeHandler = { _ in 123 }
+        mockFileOpeningService.getValidFilesHandler = { _ in [sanitizedFile] }
+
+        let updatedMockSignedContainer = SignedContainerProtocolMock()
+        updatedMockSignedContainer.getDataFilesHandler = { [] }
+        mockSignedContainer.addDataFilesHandler = { _, _ in updatedMockSignedContainer }
+
+        await viewModel.loadContainerData(signedContainer: mockSignedContainer)
+
+        guard let containerFile = await mockSignedContainer.getRawContainerFile() else {
+            Issue.record("Unable to get container file")
+            return
+        }
+
+        await viewModel.addDataFiles([rawFile], to: containerFile)
+
+        #expect(mockSignedContainer.addDataFilesArgValues.count == 1)
+        #expect(mockSignedContainer.addDataFilesArgValues.first?.dataFiles == [sanitizedFile])
     }
 
     @Test
