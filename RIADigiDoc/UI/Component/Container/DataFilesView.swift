@@ -26,6 +26,11 @@ struct DataFilesView: View {
     @Binding var showRemoveDataFileModal: Bool
     var onSelect: (() -> Void)?
 
+    private var fileLabel: String {
+        "\(languageSettings.localized("File")) " +
+        "\(fileIndex), \(dataFile.fileName.lowercased())"
+    }
+
     private var moreOptionsLabel: String {
         "\(languageSettings.localized("File")) " +
         "\(fileIndex), \(languageSettings.localized("More options"))"
@@ -43,31 +48,40 @@ struct DataFilesView: View {
         )
     }
 
+    private var fileContent: some View {
+        HStack {
+            Image("ic_m3_attach_file_48pt_wght400")
+                .resizable()
+                .scaledToFit()
+                .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
+                .foregroundStyle(theme.onSurface)
+                .padding(.trailing, Dimensions.Padding.SPadding)
+                .accessibilityHidden(true)
+
+            Text(verbatim: dataFile.fileName)
+                .font(typography.titleMedium)
+                .foregroundStyle(theme.onSurface)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(4)
+                .truncationMode(.middle)
+                .multilineTextAlignment(TextAlignment.leading)
+
+            Spacer()
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: fileLabel))
+    }
+
     var body: some View {
         VStack {
             HStack {
-                Image("ic_m3_attach_file_48pt_wght400")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: Dimensions.Icon.IconSizeXXS, height: Dimensions.Icon.IconSizeXXS)
-                    .foregroundStyle(theme.onSurface)
-                    .padding(.trailing, Dimensions.Padding.SPadding)
-                    .accessibilityHidden(true)
-
-                Text(verbatim: dataFile.fileName)
-                    .font(typography.titleMedium)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(4)
-                    .truncationMode(.middle)
-                    .multilineTextAlignment(TextAlignment.leading)
-                    .accessibilityLabel(
-                        Text(
-                            verbatim: "\(languageSettings.localized("File")) " +
-                            "\(fileIndex), \(dataFile.fileName.lowercased())"
-                        )
-                    )
-
-                Spacer()
+                Button(action: { onOpenFileButtonClick(dataFile) }, label: {
+                    fileContent
+                })
+                .buttonStyle(.plain)
+                .accessibilityInputLabels(
+                    voiceControlInputLabels(dataFile.fileName, fileLabel)
+                )
 
                 Button(action: accessibleAction(
                     voiceOverEnabled: voiceOverEnabled,
@@ -95,10 +109,6 @@ struct DataFilesView: View {
             .padding(Dimensions.Padding.MSPadding)
         }
         .listRowInsets(EdgeInsets())
-        .onTapGesture {
-            onOpenFileButtonClick(dataFile)
-        }
-        .accessibilityAddTraits([.isButton])
     }
 }
 
