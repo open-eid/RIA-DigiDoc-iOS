@@ -87,6 +87,7 @@ struct RecipientDetailView: View {
 
     @ViewBuilder
     private var certificateRecipientDetails: some View {
+        detailRow("Recipient", value: recipient.lockLabel)
         detailRow("Recipient certificate issuer", value: viewModel.getIssuerName(cert: recipient.data))
         if !nameText.isEmpty {
             NavigationLink(value: NavigationDestination.certificateDetailView(certificate: recipient.data)) {

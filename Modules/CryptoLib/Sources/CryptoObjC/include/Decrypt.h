@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable id)cdocInfo:(NSString *)fullPath error:(NSError **)error;
 + (void)decryptFile:(NSString *)fullPath withCert:(NSData *)certData withToken:(id)smartToken
          completion:(void (^)(NSDictionary<NSString*,NSData*> * _Nullable, NSError * _Nullable))completion;
-+ (NSDictionary<NSString*,NSData*> * _Nullable)decryptFile:(NSString *)fullPath withPassword:(NSString*)password error:(NSError**)error;
++ (NSDictionary<NSString*,NSData*> * _Nullable)decryptFile:(NSString *)fullPath withPassword:(NSString*)password lockIndex:(NSInteger)lockIndex error:(NSError**)error NS_SWIFT_NAME(decryptFile(_:withPassword:lockIndex:));
 @end
 
 NS_ASSUME_NONNULL_END

@@ -402,12 +402,17 @@ extension CryptoContainer {
         containerFile: URL,
         recipients: [Addressee],
         password: String,
+        lockIndex: Int = -1,
         fileManager: FileManagerProtocol = Container.shared.fileManager()
     ) async throws -> CryptoContainerProtocol {
         let decryptedData: [String: Data] = try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
-                    let result = try Decrypt.decryptFile(containerFile.resolvedPath, withPassword: password)
+                    let result = try Decrypt.decryptFile(
+                        containerFile.resolvedPath,
+                        withPassword: password,
+                        lockIndex: lockIndex
+                    )
                     continuation.resume(returning: result)
                 } catch let nsError as NSError where nsError.code == libcdocWrongKeyCode {
                     continuation.resume(throwing: CryptoError.wrongDecryptionKey)

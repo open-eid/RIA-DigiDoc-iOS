@@ -864,6 +864,24 @@
         }
       }
     },
+    "Choose key label" : {
+      "comment" : "Title of the modal that picks which password lock to decrypt with",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose key label"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali võtme silt"
+          }
+        }
+      }
+    },
     "Citizenship" : {
       "comment" : "My eID public data",
       "extractionState" : "manual",
@@ -1903,6 +1921,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ümbriku dekrüpteerimine ebaõnnestus"
+          }
+        }
+      }
+    },
+    "Decrypt with ID-card" : {
+      "comment" : "Decrypt button label when the container also holds password locks",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrypt with ID-card"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dekrüpteeri ID-kaardiga"
           }
         }
       }
