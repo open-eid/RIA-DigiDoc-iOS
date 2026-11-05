@@ -559,7 +559,7 @@
       }
     },
     "Certificate has expired" : {
-      "comment" : "OperationAuthenticateWithWebEID Certificate validity check",
+      "comment" : "Certificate validity check: Web eID authentication and My eID certificate card",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -6660,6 +6660,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tühista blokeering, et PIN-i taas kasutada."
+          }
+        }
+      }
+    },
+    "PIN cannot be used certificate expired" : {
+      "comment" : "My eID message shown when the certificate backing a PIN has expired",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ cannot be used, because the certificate has expired."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ei saa kasutada, kuna sertifikaat on aegunud."
           }
         }
       }
