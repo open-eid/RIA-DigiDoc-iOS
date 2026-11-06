@@ -11,10 +11,10 @@ struct ColoredSignedStatusText: View {
     let text: String
     let status: SignatureStatus
     var archiveTimestampText: String?
-    var isArchiveTimestampExpired: Bool = false
+    var isPastArchiveTimestampValidUntil: Bool = false
 
     private var isSignatureValidOrWarning: Bool {
-        status == .valid || status == .warning || status == .nonQSCD
+        SignatureUtil.isValidOrWarning(status)
     }
 
     private var tagBackgroundColor: Color {
@@ -28,26 +28,34 @@ struct ColoredSignedStatusText: View {
     private var additionalTextColor: Color {
         switch status {
         case .valid:
-            return theme.errorContainer
+            return theme.onWarningContainer
         default:
-            return theme.warning
+            return theme.onErrorContainer
         }
     }
 
     var body: some View {
-        if let archiveText = archiveTimestampText {
-            TagBadge(
-                text: archiveText,
-                tagBackgroundColor: isArchiveTimestampExpired ? theme.errorContainer : theme.successContainer,
-                tagContentColor: isArchiveTimestampExpired ? theme.onErrorContainer : theme.onSuccessContainer
-            )
-        } else {
-            TagBadge(
-                text: text,
-                tagBackgroundColor: tagBackgroundColor,
-                tagContentColor: tagContentColor,
-                additionalTextColor: additionalTextColor
-            )
+        VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
+            if let archiveText = archiveTimestampText {
+                let isExpired = SignatureUtil.isArchiveTimestampExpired(
+                    status: status,
+                    isPastValidUntil: isPastArchiveTimestampValidUntil
+                )
+                TagBadge(
+                    text: archiveText,
+                    tagBackgroundColor: isExpired ? theme.errorContainer : theme.successContainer,
+                    tagContentColor: isExpired ? theme.onErrorContainer : theme.onSuccessContainer
+                )
+            }
+
+            if SignatureUtil.showsStatusBadge(status: status, hasArchiveTimestamp: archiveTimestampText != nil) {
+                TagBadge(
+                    text: text,
+                    tagBackgroundColor: tagBackgroundColor,
+                    tagContentColor: tagContentColor,
+                    additionalTextColor: additionalTextColor
+                )
+            }
         }
     }
 }
@@ -71,6 +79,12 @@ struct ColoredSignedStatusText: View {
     ColoredSignedStatusText(
         text: "Signature is valid",
         status: .valid,
+        archiveTimestampText: "Archive timestamp"
+    )
+
+    ColoredSignedStatusText(
+        text: "Signature is unknown",
+        status: .unknown,
         archiveTimestampText: "Archive timestamp"
     )
 }
