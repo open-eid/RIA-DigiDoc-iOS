@@ -24,8 +24,8 @@ struct EncryptView: View {
     @State private var selectedTab: EncryptViewTab = .files
     @State private var selectedRecipient: Addressee?
     @State private var cdocOption: EncryptionCdocOption
-    @State private var showDecryptPasswordModal = false
-    @State private var passwordDecryptKeyLabel = ""
+    @State private var passwordDecryptTarget: Addressee?
+    @State private var keyLabelChoices: [Addressee] = []
 
     @State private var viewModel: EncryptViewModel
 
@@ -65,7 +65,9 @@ struct EncryptView: View {
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         ) {
-            return languageSettings.localized("Decrypt")
+            return languageSettings.localized(
+                viewModel.hasBothDecryptionMethods ? "Decrypt with ID-card" : "Decrypt"
+            )
         } else if await viewModel.isEncryptButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
@@ -81,7 +83,9 @@ struct EncryptView: View {
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
         ) {
-            return languageSettings.localized("Decrypt container")
+            return languageSettings.localized(
+                viewModel.hasBothDecryptionMethods ? "Decrypt with ID-card" : "Decrypt container"
+            )
         } else if await viewModel.isEncryptButtonShown(
             cryptoContainer: viewModel.cryptoContainer,
             isNestedContainer: isNestedContainer
@@ -231,16 +235,7 @@ struct EncryptView: View {
                                                 }
                                             }
                                         } else if viewModel.isDecryptButtonShown {
-                                            if let passwordRecipient = viewModel.recipients.first(
-                                                where: { $0.certType == .passwordType }
-                                            ) {
-                                                passwordDecryptKeyLabel = passwordRecipient.identifier
-                                                showDecryptPasswordModal = true
-                                            } else {
-                                                isWithEncryption = false
-                                                isWithDecryption = false
-                                                pathManager.navigate(to: .decryptRootView)
-                                            }
+                                            handleDecryptAction()
                                         }
                                     },
                                     onSaveContainerButtonClick: {
@@ -356,9 +351,14 @@ struct EncryptView: View {
                                                 recipients: viewModel.recipients,
                                                 selectedRecipient: $selectedRecipient,
                                                 showRemoveRecipientButton: viewModel.isRecipientRemoveButtonShown(),
+                                                showDecryptRecipientButton: viewModel.hasBothDecryptionMethods &&
+                                                    viewModel.isDecryptButtonShown,
                                                 isCDOC2Container: viewModel.isContainerCDOC2,
                                                 isEncryptedOrDecrypted: viewModel.isContainerEncryptedOrDecrypted,
                                                 showRemoveRecipientModal: $showRemoveRecipientModal,
+                                                onDecryptRecipient: { recipient in
+                                                    passwordDecryptTarget = recipient
+                                                },
                                                 nameUtil: nameUtil,
                                                 recipientUtil: recipientUtil
                                             )
@@ -473,14 +473,27 @@ struct EncryptView: View {
                 }
             )
 
-            if showDecryptPasswordModal {
-                DecryptPasswordModalView(
-                    keyLabel: passwordDecryptKeyLabel,
-                    onDecrypt: { password in
-                        Task { await handlePasswordDecrypt(password) }
+            if !keyLabelChoices.isEmpty {
+                DecryptKeyLabelModalView(
+                    recipients: keyLabelChoices,
+                    onConfirm: { recipient in
+                        keyLabelChoices = []
+                        passwordDecryptTarget = recipient
                     },
                     onCancel: {
-                        showDecryptPasswordModal = false
+                        keyLabelChoices = []
+                    }
+                )
+            }
+
+            if let passwordDecryptTarget {
+                DecryptPasswordModalView(
+                    keyLabel: passwordDecryptTarget.identifier,
+                    onDecrypt: { password in
+                        Task { await handlePasswordDecrypt(password, for: passwordDecryptTarget) }
+                    },
+                    onCancel: {
+                        self.passwordDecryptTarget = nil
                     }
                 )
             }
@@ -564,7 +577,20 @@ struct EncryptView: View {
         }
     }
 
-    private func handlePasswordDecrypt(_ password: String) async {
+    private func handleDecryptAction() {
+        switch viewModel.decryptRoute() {
+        case .idCard:
+            isWithEncryption = false
+            isWithDecryption = false
+            pathManager.navigate(to: .decryptRootView)
+        case .chooseKeyLabel(let recipients):
+            keyLabelChoices = recipients
+        case .password(let recipient):
+            passwordDecryptTarget = recipient
+        }
+    }
+
+    private func handlePasswordDecrypt(_ password: String, for recipient: Addressee) async {
         guard let containerFile = viewModel.containerURL else {
             showMessage("Decrypt general error")
             return
@@ -573,13 +599,14 @@ struct EncryptView: View {
             let decryptedContainer = try await CryptoContainer.decryptWithPassword(
                 containerFile: containerFile,
                 recipients: viewModel.recipients,
-                password: password
+                password: password,
+                lockIndex: recipient.lockIndex
             )
             let sharedVM = Container.shared.sharedContainerViewModel()
             sharedVM.removeLastContainer()
             sharedVM.setCryptoContainer(decryptedContainer)
             await viewModel.loadContainerData(cryptoContainer: decryptedContainer)
-            showDecryptPasswordModal = false
+            passwordDecryptTarget = nil
             selectedTab = .files
             await updateAsyncLabels()
             await viewModel.updateAsyncProperties()

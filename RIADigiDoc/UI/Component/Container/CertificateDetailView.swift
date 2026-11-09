@@ -144,6 +144,48 @@ struct CertificateDetailView: View {
         self.certificate = certificate
     }
 
+    private var subjectNameItems: [SignatureDataItem] {
+        [
+            SignatureDataItem(title: "Country or Region", value: subjectCountryName),
+            SignatureDataItem(title: "Organization", value: subjectOrganizationName),
+            SignatureDataItem(title: "Organizational Unit", value: subjectOrganizationalUnitName),
+            SignatureDataItem(title: "Common Name", value: subjectCommonName),
+            SignatureDataItem(title: "Surname", value: subjectSurname),
+            SignatureDataItem(title: "Given Name", value: subjectGivenName),
+            SignatureDataItem(title: "Serial number", value: subjectSerialNumber)
+        ]
+    }
+
+    private var issuerNameItems: [SignatureDataItem] {
+        [
+            SignatureDataItem(title: "Country or Region", value: issuerCountryName),
+            SignatureDataItem(title: "Organization", value: issuerOrganizationName),
+            SignatureDataItem(title: "Common Name", value: issuerCommonName),
+            SignatureDataItem(title: "Other name", value: issuerOtherName),
+            SignatureDataItem(title: "Serial Number", value: issuerSerialNumber),
+            SignatureDataItem(title: "Version", value: version),
+            SignatureDataItem(title: "Signature Algorithm", value: signatureAlgorithm),
+            SignatureDataItem(title: "Not Valid Before", value: notValidBefore),
+            SignatureDataItem(title: "Not Valid After", value: notValidAfter)
+        ]
+    }
+
+    private var publicKeyItems: [SignatureDataItem] {
+        [
+            SignatureDataItem(title: "Algorithm", value: publicKeyAlgorithm),
+            SignatureDataItem(title: "Public Key", value: publicKey),
+            SignatureDataItem(title: "Key Usage", value: keyUsage),
+            SignatureDataItem(title: "Signature", value: signature)
+        ]
+    }
+
+    private var fingerprintItems: [SignatureDataItem] {
+        [
+            SignatureDataItem(title: "SHA-256", value: sha256Fingerprint),
+            SignatureDataItem(title: "SHA-1", value: sha1Fingerprint)
+        ]
+    }
+
     var body: some View {
         TopBarContainer(
             title: languageSettings.localized("Certificate details"),
@@ -151,266 +193,83 @@ struct CertificateDetailView: View {
             content: {
             ScrollView {
                 LazyVStack(alignment: .leading) {
-                    Text(verbatim: "Subject Name")
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.titleLarge.bold())
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
-                        .padding(.top, Dimensions.Padding.XSPadding)
-                        .accessibilityHeading(.h1)
-                        .accessibilityAddTraits([.isHeader])
-
-                    if !subjectCountryName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Country or Region",
-                                value: subjectCountryName
-                            )
-                        )
-                    }
-
-                    if !subjectOrganizationName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Organization",
-                                value: subjectOrganizationName
-                            )
-                        )
-                    }
-
-                    if !subjectOrganizationalUnitName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Organizational Unit",
-                                value: subjectOrganizationalUnitName
-                            )
-                        )
-                    }
-
-                    if !subjectCommonName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Common Name",
-                                value: subjectCommonName
-                            )
-                        )
-                    }
-
-                    if !subjectSurname.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Surname",
-                                value: subjectSurname
-                            )
-                        )
-                    }
-
-                    if !subjectGivenName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Given Name",
-                                value: subjectGivenName
-                            )
-                        )
-                    }
-
-                    if !subjectSerialNumber.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Serial number",
-                                value: subjectSerialNumber
-                            )
-                        )
-                    }
-
-                    Text(verbatim: "Issuer Name")
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.titleLarge.bold())
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
-                        .padding(.top, Dimensions.Padding.MPadding)
-                        .accessibilityHeading(.h1)
-                        .accessibilityAddTraits([.isHeader])
-
-                    if !issuerCountryName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Country or Region",
-                                value: issuerCountryName
-                            )
-                        )
-                    }
-
-                    if !issuerOrganizationName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Organization",
-                                value: issuerOrganizationName
-                            )
-                        )
-                    }
-
-                    if !issuerCommonName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Common Name",
-                                value: issuerCommonName
-                            )
-                        )
-                    }
-
-                    if !issuerOtherName.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Other name",
-                                value: issuerOtherName
-                            )
-                        )
-                    }
-
-                    if !issuerSerialNumber.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Serial Number",
-                                value: issuerSerialNumber
-                            )
-                        )
-                    }
-
-                    if !version.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Version",
-                                value: version
-                            )
-                        )
-                    }
-
-                    if !signatureAlgorithm.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Signature Algorithm",
-                                value: signatureAlgorithm
-                            )
-                        )
-                    }
-
-                    if !notValidBefore.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Not Valid Before",
-                                value: notValidBefore
-                            )
-                        )
-                    }
-
-                    if !notValidAfter.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Not Valid After",
-                                value: notValidAfter
-                            )
-                        )
-                    }
-
-                    Text(verbatim: "Public Key")
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.titleLarge.bold())
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
-                        .padding(.top, Dimensions.Padding.MPadding)
-                        .accessibilityHeading(.h1)
-                        .accessibilityAddTraits([.isHeader])
-
-                    if !publicKeyAlgorithm.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Algorithm",
-                                value: publicKeyAlgorithm
-                            )
-                        )
-                    }
-
-                    if !publicKey.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Public Key",
-                                value: publicKey
-                            )
-                        )
-                    }
-
-                    if !keyUsage.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Key Usage",
-                                value: keyUsage
-                            )
-                        )
-                    }
-
-                    if !signature.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "Signature",
-                                value: signature
-                            )
-                        )
-                    }
-
-                    Text(verbatim: "Extensions")
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.titleLarge.bold())
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
-                        .padding(.top, Dimensions.Padding.MPadding)
-                        .accessibilityHeading(.h2)
-                        .accessibilityAddTraits([.isHeader])
-
-                    if !extensions.isEmpty {
-                        ForEach(extensions, id: \.id) { extensionItem in
-                            Group {
-                                Text(verbatim: "Extension")
-                                    .foregroundStyle(theme.onSurface)
-                                    .font(typography.bodyLarge.bold())
-
-                                Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
-
-                                VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
-                                    Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
-                                    Text(verbatim: "ID: \(extensionItem.values)")
-                                }
-                                .padding(.leading, Dimensions.Padding.SPadding)
-                            }
-                            .padding(Dimensions.Padding.XSPadding)
-                        }
-                    }
-
-                    Text(verbatim: "Fingerprints")
-                        .foregroundStyle(theme.onSurface)
-                        .font(typography.titleLarge.bold())
-                        .padding(.vertical, Dimensions.Padding.XSPadding)
-                        .padding(.top, Dimensions.Padding.MPadding)
-                        .accessibilityHeading(.h1)
-                        .accessibilityAddTraits([.isHeader])
-
-                    if !sha256Fingerprint.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "SHA-256",
-                                value: sha256Fingerprint
-                            )
-                        )
-                    }
-
-                    if !sha1Fingerprint.isEmpty {
-                        SignerDetailView(
-                            signatureDataItem: SignatureDataItem(
-                                title: "SHA-1",
-                                value: sha1Fingerprint
-                            )
-                        )
-                    }
+                    detailSection(
+                        "Subject Name",
+                        topPadding: Dimensions.Padding.XSPadding,
+                        items: subjectNameItems
+                    )
+                    detailSection(
+                        "Issuer Name",
+                        topPadding: Dimensions.Padding.MPadding,
+                        items: issuerNameItems
+                    )
+                    detailSection(
+                        "Public Key",
+                        topPadding: Dimensions.Padding.MPadding,
+                        items: publicKeyItems
+                    )
+                    extensionsSection
+                    detailSection(
+                        "Fingerprints",
+                        topPadding: Dimensions.Padding.MPadding,
+                        items: fingerprintItems
+                    )
                 }
                 .padding(Dimensions.Padding.SPadding)
             }
         })
+    }
+
+    @ViewBuilder
+    private func detailSection(
+        _ title: String,
+        topPadding: CGFloat,
+        items: [SignatureDataItem]
+    ) -> some View {
+        let populatedItems = items.filter { !$0.value.isEmpty }
+        if !populatedItems.isEmpty {
+            sectionHeader(title, topPadding: topPadding)
+            ForEach(populatedItems, id: \.title) { item in
+                SignerDetailView(signatureDataItem: item)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var extensionsSection: some View {
+        if !extensions.isEmpty {
+            sectionHeader("Extensions", topPadding: Dimensions.Padding.MPadding, heading: .h2)
+            ForEach(extensions, id: \.id) { extensionItem in
+                Group {
+                    Text(verbatim: "Extension")
+                        .foregroundStyle(theme.onSurface)
+                        .font(typography.bodyLarge.bold())
+
+                    Text(verbatim: "\(extensionItem.name) (\(extensionItem.oid))")
+
+                    VStack(alignment: .leading, spacing: Dimensions.Padding.XXSPadding) {
+                        Text(verbatim: "Critical: \(extensionItem.critical ? "Yes" : "No")")
+                        Text(verbatim: "ID: \(extensionItem.values)")
+                    }
+                    .padding(.leading, Dimensions.Padding.SPadding)
+                }
+                .padding(Dimensions.Padding.XSPadding)
+            }
+        }
+    }
+
+    private func sectionHeader(
+        _ title: String,
+        topPadding: CGFloat,
+        heading: AccessibilityHeadingLevel = .h1
+    ) -> some View {
+        Text(verbatim: title)
+            .foregroundStyle(theme.onSurface)
+            .font(typography.titleLarge.bold())
+            .padding(.vertical, Dimensions.Padding.XSPadding)
+            .padding(.top, topPadding)
+            .accessibilityHeading(heading)
+            .accessibilityAddTraits([.isHeader])
     }
 }
 
