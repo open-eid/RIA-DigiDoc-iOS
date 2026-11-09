@@ -36,6 +36,28 @@ struct MyEidView: View {
         idCardData.pinResponse.isCourierCard
     }
 
+    private var authCertValidTo: String {
+        idCardData.authCertNotValidDate ?? ""
+    }
+
+    private var signCertValidTo: String {
+        idCardData.signCertNotValidDate ?? ""
+    }
+
+    private var authCertStatus: MyEidDocumentStatus {
+        guard let notValidAfter = idCardData.authCertNotValidAfter else {
+            return viewModel.getDocumentExpirationStatus(expiryDate: authCertValidTo)
+        }
+        return viewModel.getCertificateStatus(notValidAfter: notValidAfter)
+    }
+
+    private var signCertStatus: MyEidDocumentStatus {
+        guard let notValidAfter = idCardData.signCertNotValidAfter else {
+            return viewModel.getDocumentExpirationStatus(expiryDate: signCertValidTo)
+        }
+        return viewModel.getCertificateStatus(notValidAfter: notValidAfter)
+    }
+
     private var myDataTitle: String {
         languageSettings.localized("My data")
     }
@@ -115,7 +137,6 @@ struct MyEidView: View {
                                         documentExpirationStatus: viewModel
                                             .getDocumentExpirationStatus(expiryDate: idCardData.publicData.dateOfExpiry)
                                     )
-                                    .padding(.top, Dimensions.Padding.SPadding)
                                 } else if selectedTab == .pinsAndCertificates {
                                     MyEidPinsAndCertificatesView(
                                         isPin1Blocked: $isPin1Blocked,
@@ -123,12 +144,13 @@ struct MyEidView: View {
                                         isPukBlocked: $isPukBlocked,
                                         isPin2Activated: $isPin2Activated,
                                         pinChangeVariant: $pinChangeVariant,
-                                        authCertValidTo: idCardData.authCertNotValidDate ?? "",
-                                        signCertValidTo: idCardData.signCertNotValidDate ?? "",
+                                        authCertValidTo: authCertValidTo,
+                                        signCertValidTo: signCertValidTo,
+                                        authCertStatus: authCertStatus,
+                                        signCertStatus: signCertStatus,
                                         isPUKChangeable: idCardData.isPUKChangeable,
                                         isCourierCard: isCourierCard
                                     )
-                                    .padding(.top, Dimensions.Padding.SPadding)
                                 }
                             }
                             .padding(.top, Dimensions.Padding.SPadding)
@@ -303,6 +325,8 @@ struct MyEidView: View {
             ),
             authCertNotValidDate: nil,
             signCertNotValidDate: nil,
+            authCertNotValidAfter: nil,
+            signCertNotValidAfter: nil,
             pinResponse: PinResponse(
                 pin1RetryCount: 3,
                 pin1Active: true,

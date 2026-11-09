@@ -662,6 +662,12 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 publicData: nfcCardData.publicData,
                 authCertNotValidDate: authCertNotValidDate,
                 signCertNotValidDate: signCertNotValidDate,
+                authCertNotValidAfter: nfcCardData.authenticationCertificate.flatMap {
+                    certificateUtil.getNotValidAfterDate(cert: $0)
+                },
+                signCertNotValidAfter: nfcCardData.signatureCertificate.flatMap {
+                    certificateUtil.getNotValidAfterDate(cert: $0)
+                },
                 pinResponse: nfcCardData.pinResponse,
                 isPUKChangeable: nfcCardData.isPUKChangable
             )
