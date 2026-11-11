@@ -92,8 +92,13 @@ struct SmartIdView: View {
                         isSigningEnabled: $isSigningEnabled,
                         personalCodeError: $viewModel.personalCodeErrorKey,
                         onInputChange: {
+                            personalCode = viewModel.formatPersonalCode(
+                                personalCode,
+                                country: country
+                            )
                             isSigningEnabled = viewModel.isSigningEnabled(
-                                personalCode: personalCode
+                                personalCode: personalCode,
+                                country: country
                             )
                         }
                     )

@@ -73,7 +73,7 @@ struct SmartIdViewModelTests {
 
     @Test
     func isSigningEnabled_returnTrueWithValidPersonalCode() {
-        let result = viewModel.isSigningEnabled(personalCode: "60001019906")
+        let result = viewModel.isSigningEnabled(personalCode: "60001019906", country: .estonia)
 
         #expect(result == true)
         #expect(viewModel.personalCodeErrorKey == "")
@@ -81,7 +81,7 @@ struct SmartIdViewModelTests {
 
     @Test
     func isSigningEnabled_returnFalseAndSetsErrorWithInvalidPersonalCode() {
-        let result = viewModel.isSigningEnabled(personalCode: "invalid")
+        let result = viewModel.isSigningEnabled(personalCode: "invalid", country: .estonia)
 
         #expect(result == false)
         #expect(viewModel.personalCodeErrorKey == "Invalid personal code")
@@ -89,10 +89,108 @@ struct SmartIdViewModelTests {
 
     @Test
     func isSigningEnabled_returnFalseWithoutErrorWithEmptyPersonalCode() {
-        let result = viewModel.isSigningEnabled(personalCode: "")
+        let result = viewModel.isSigningEnabled(personalCode: "", country: .estonia)
 
         #expect(result == false)
         #expect(viewModel.personalCodeErrorKey == "")
+    }
+
+    @Test
+    func isSigningEnabled_returnTrueWithLatvianPersonalCode() {
+        let result = viewModel.isSigningEnabled(personalCode: "123456-78901", country: .latvia)
+
+        #expect(result == true)
+        #expect(viewModel.personalCodeErrorKey == "")
+    }
+
+    @Test(arguments: [SmartIdCountry.latvia, SmartIdCountry.lithuania])
+    func isSigningEnabled_returnTrueWithoutValidatingNonEstonianPersonalCode(country: SmartIdCountry) {
+        let result = viewModel.isSigningEnabled(personalCode: "12345", country: country)
+
+        #expect(result == true)
+        #expect(viewModel.personalCodeErrorKey == "")
+    }
+
+    @Test
+    func isSigningEnabled_returnFalseWithoutErrorWithEmptyPersonalCodeForLithuania() {
+        let result = viewModel.isSigningEnabled(personalCode: "", country: .lithuania)
+
+        #expect(result == false)
+        #expect(viewModel.personalCodeErrorKey == "")
+    }
+
+    @Test
+    func isSigningEnabled_clearsEstonianPersonalCodeErrorWhenCountryChanges() {
+        #expect(viewModel.isSigningEnabled(personalCode: "invalid", country: .estonia) == false)
+        #expect(viewModel.personalCodeErrorKey == "Invalid personal code")
+
+        #expect(viewModel.isSigningEnabled(personalCode: "invalid", country: .lithuania) == true)
+        #expect(viewModel.personalCodeErrorKey == "")
+    }
+
+    @Test
+    func formatPersonalCode_addsSeparatorForLatviaWhenMoreThanSixDigitsEntered() {
+        let result = viewModel.formatPersonalCode("1234567", country: .latvia)
+
+        #expect(result == "123456-7")
+    }
+
+    @Test
+    func formatPersonalCode_returnDigitsWithoutSeparatorForLatviaWithSixDigitsOrLess() {
+        #expect(viewModel.formatPersonalCode("123456", country: .latvia) == "123456")
+        #expect(viewModel.formatPersonalCode("123456-", country: .latvia) == "123456")
+    }
+
+    @Test
+    func formatPersonalCode_keepsCorrectlyFormattedLatvianPersonalCode() {
+        let result = viewModel.formatPersonalCode("123456-78901", country: .latvia)
+
+        #expect(result == "123456-78901")
+    }
+
+    @Test
+    func formatPersonalCode_movesMisplacedSeparatorForLatvia() {
+        let result = viewModel.formatPersonalCode("12345-678901", country: .latvia)
+
+        #expect(result == "123456-78901")
+    }
+
+    @Test
+    func formatPersonalCode_removesUnsupportedCharactersAndExtraDigitsForLatvia() {
+        let result = viewModel.formatPersonalCode("12 34*56+789011234", country: .latvia)
+
+        #expect(result == "123456-78901")
+    }
+
+    @Test(arguments: [SmartIdCountry.estonia, SmartIdCountry.lithuania])
+    func formatPersonalCode_returnDigitsWithoutSeparatorForNonLatvianCountries(country: SmartIdCountry) {
+        #expect(viewModel.formatPersonalCode("60001019906", country: country) == "60001019906")
+        #expect(viewModel.formatPersonalCode("600010-19906", country: country) == "60001019906")
+    }
+
+    @Test
+    func formatPersonalCode_restoresEstonianPersonalCodeAfterSwitchingBackFromLatvia() {
+        let formattedForLatvia = viewModel.formatPersonalCode("60001019906", country: .latvia)
+        #expect(formattedForLatvia == "600010-19906")
+
+        let formattedBackForEstonia = viewModel.formatPersonalCode(formattedForLatvia, country: .estonia)
+
+        #expect(formattedBackForEstonia == "60001019906")
+        #expect(viewModel.isSigningEnabled(personalCode: formattedBackForEstonia, country: .estonia) == true)
+    }
+
+    @Test
+    func formatPersonalCode_removesDigitsOutsideAscii() {
+        let fullwidthDigits = "\u{FF11}\u{FF12}\u{FF13}\u{FF14}\u{FF15}\u{FF16}\u{FF17}"
+
+        #expect(viewModel.formatPersonalCode(fullwidthDigits, country: .latvia) == "")
+        #expect(viewModel.formatPersonalCode("1234\u{FF15}5678901", country: .latvia) == "123456-78901")
+    }
+
+    @Test
+    func formatPersonalCode_returnEmptyPersonalCodeWithoutDigits() {
+        #expect(viewModel.formatPersonalCode("", country: .latvia) == "")
+        #expect(viewModel.formatPersonalCode("---", country: .latvia) == "")
     }
 
     @Test

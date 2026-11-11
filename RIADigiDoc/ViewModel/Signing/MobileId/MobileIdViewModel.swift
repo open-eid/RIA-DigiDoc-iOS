@@ -560,7 +560,7 @@ class MobileIdViewModel: MobileIdViewModelProtocol, Loggable {
     }
 
     private func checkPersonalCodeValidity(_ personalCode: String) {
-        guard personalCode.isEmpty || PersonalCodeValidator.isPersonalCodeValid(personalCode) else {
+        guard personalCode.isEmpty || PersonalCodeValidator.isEstonianPersonalCodeValid(personalCode) else {
             personalCodeErrorKey = "Invalid personal code"
             return
         }
