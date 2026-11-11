@@ -12,7 +12,10 @@ public protocol SmartIdViewModelProtocol: Sendable {
     func appDidBecomeActive()
     func isSigningEnabled(
         personalCode: String,
+        country: SmartIdCountry
     ) -> Bool
+
+    func formatPersonalCode(_ personalCode: String, country: SmartIdCountry) -> String
 
     func saveInputData(
         country: SmartIdCountry,
