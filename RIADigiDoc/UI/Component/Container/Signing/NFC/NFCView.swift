@@ -197,14 +197,7 @@ struct NFCView: View {
                     if !isNFCSupported {
                         return
                     }
-                    Task {
-                        let isRoleDataEnabled = await viewModel.isRoleDataEnabled()
-                        if isRoleDataEnabled {
-                            showRoleView = true
-                        } else {
-                            signWebEid()
-                        }
-                    }
+                    signWebEid()
                 case .decrypt:
                     saveInputData()
                     isInProgress = true

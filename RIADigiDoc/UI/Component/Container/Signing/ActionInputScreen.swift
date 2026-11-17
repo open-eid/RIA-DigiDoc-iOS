@@ -185,7 +185,9 @@ struct ActionInputScreen<Content: View>: View {
 
                         content
 
-                        if !isInProgress && showSubmitButton {
+                        let isSubmitButtonVisible = !isInProgress && showSubmitButton
+
+                        if isSubmitButtonVisible {
                             PrimaryButton(
                                 text: buttonTitle,
                                 isButtonEnabled: isActionEnabled,
@@ -205,6 +207,10 @@ struct ActionInputScreen<Content: View>: View {
                                 currentFocus: .constant(nil),
                                 backgroundColor: theme.error,
                                 foregroundColor: theme.onError
+                            )
+                            .padding(
+                                .top,
+                                isSubmitButtonVisible ? Dimensions.Padding.ZeroPadding : Dimensions.Padding.MPadding
                             )
                         }
                     }
