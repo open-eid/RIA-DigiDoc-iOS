@@ -391,9 +391,9 @@ public actor DataStore: DataStoreProtocol {
 
     // MARK: - Smart-ID Methods
     public func getSmartIdInputData() async -> SmartIdInputData {
-        let country = (userDefaults().object(
-            forKey: Keys.smartIdCountry
-        ) as? SmartIdCountry) ?? DefaultValues.smartIdCountry
+        let country = SmartIdCountry(
+            rawValue: userDefaults().string(forKey: Keys.smartIdCountry) ?? ""
+        ) ?? DefaultValues.smartIdCountry
         let personalCode = userDefaults().string(
             forKey: Keys.smartIdPersonalCode
         ) ?? DefaultValues.smartIdPersonalCode

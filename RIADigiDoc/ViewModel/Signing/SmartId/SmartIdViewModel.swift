@@ -70,10 +70,31 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
     }
 
     func isSigningEnabled(
-        personalCode: String
+        personalCode: String,
+        country: SmartIdCountry
     ) -> Bool {
-        checkPersonalCodeValidity(personalCode)
+        checkPersonalCodeValidity(personalCode, country: country)
         return !personalCode.isEmpty && personalCodeErrorKey?.isEmpty == true
+    }
+
+    func formatPersonalCode(_ personalCode: String, country: SmartIdCountry) -> String {
+        let digits = String(
+            personalCode
+                .filter { $0.isASCII && $0.isNumber }
+                .prefix(Constants.Validation.MaximumPersonalCodeLength)
+        )
+
+        guard country == .latvia,
+              digits.count > Constants.Validation.LatvianPersonalCodeSeparatorIndex else {
+            return digits
+        }
+
+        let separatorIndex = digits.index(
+            digits.startIndex,
+            offsetBy: Constants.Validation.LatvianPersonalCodeSeparatorIndex
+        )
+
+        return "\(digits[..<separatorIndex])-\(digits[separatorIndex...])"
     }
 
     func saveInputData(
@@ -292,8 +313,13 @@ class SmartIdViewModel: SmartIdViewModelProtocol, Loggable {
         await dataStore.getIsRoleAndAddressEnabled()
     }
 
-    private func checkPersonalCodeValidity(_ personalCode: String) {
-        guard personalCode.isEmpty || PersonalCodeValidator.isPersonalCodeValid(personalCode) else {
+    private func checkPersonalCodeValidity(_ personalCode: String, country: SmartIdCountry) {
+        guard country == .estonia else {
+            personalCodeErrorKey = ""
+            return
+        }
+
+        guard personalCode.isEmpty || PersonalCodeValidator.isEstonianPersonalCodeValid(personalCode) else {
             personalCodeErrorKey = "Invalid personal code"
             return
         }

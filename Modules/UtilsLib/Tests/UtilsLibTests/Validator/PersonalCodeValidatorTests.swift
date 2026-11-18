@@ -104,4 +104,15 @@ struct PersonalCodeValidatorTests {
 
         #expect(result == false)
     }
+
+    @Test
+    func isEstonianPersonalCodeValid_returnTrueWithValidEstonianPersonalCode() {
+        #expect(PersonalCodeValidator.isEstonianPersonalCodeValid("60001019906"))
+    }
+
+    @Test
+    func isEstonianPersonalCodeValid_returnFalseWithLatvianPersonalCode() {
+        #expect(PersonalCodeValidator.isPersonalCodeValid("123456-78901"))
+        #expect(!PersonalCodeValidator.isEstonianPersonalCodeValid("123456-78901"))
+    }
 }

@@ -77,10 +77,12 @@ struct SmartIdInputView: View {
                         isError: !personalCodeErrorText.isEmpty,
                         errorText: personalCodeErrorText,
                         keyboardType: .phonePad,
-                        showDashButton: true,
                         identifier: "smartIdPersonalCode"
                     )
                     .onChange(of: personalCode) {
+                        onInputChange()
+                    }
+                    .onChange(of: country) {
                         onInputChange()
                     }
                 }

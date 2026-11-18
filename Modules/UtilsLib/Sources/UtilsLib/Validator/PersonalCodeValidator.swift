@@ -7,6 +7,10 @@ import CommonsLib
 public struct PersonalCodeValidator: Loggable {
 
     public static func isPersonalCodeValid(_ personalCode: String) -> Bool {
+        return isEstonianPersonalCodeValid(personalCode) || isLatvianPersonalCodeValid(personalCode)
+    }
+
+    public static func isEstonianPersonalCodeValid(_ personalCode: String) -> Bool {
         return (
             isPersonalCodeLengthValid(personalCode) &&
             isBirthDateValid(personalCode) &&
@@ -14,7 +18,7 @@ public struct PersonalCodeValidator: Loggable {
         ) || (
             isPersonalCodeLengthValid(personalCode) &&
             isMobileIdTestCode(personalCode)
-        ) || isLatvianPersonalCodeValid(personalCode)
+        )
     }
 
     private static func isLatvianPersonalCodeValid(_ personalCode: String) -> Bool {

@@ -426,8 +426,8 @@ final class DataStoreTests {
     @Test
     func setSmartIdInputData_success() async {
         let input = SmartIdInputData(
-            country: .estonia,
-            personalCode: "60001019906",
+            country: .latvia,
+            personalCode: "123456-78901",
             rememberMe: true
         )
 
