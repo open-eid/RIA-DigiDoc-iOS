@@ -727,6 +727,9 @@ class NFCViewModel: NFCViewModelProtocol, Loggable {
                 nfcErrorKey = "PIN blocked"
                 nfcErrorExtraArguments = [pinType.name]
             }
+        case .cardNotSupported:
+            nfcErrorKey = "Card not supported"
+            nfcErrorExtraArguments = []
         case .sessionError:
             nfcErrorKey = "NFC session error"
             nfcErrorExtraArguments = []
