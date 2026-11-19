@@ -27,7 +27,7 @@ let package = Package(
         .package(path: "../CommonsLib"),
         .package(
             url: "https://github.com/open-eid/nfc-iOS-lib.git",
-            revision: "1b7bb16d684f248a4fba74a3413f9e5d7c0e5f4a"
+            revision: "03c5159f6dbbbe1b61305a82f25cad9c20f9e3eb"
         ),
         .package(path: "../UtilsLib"),
         .package(path: "../Test/CommonsTestShared")
