@@ -128,7 +128,6 @@
 		1A438FCF2E7224CE00546B86 /* generate-mocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "generate-mocks.sh"; sourceTree = "<group>"; };
 		1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = tsl_xml_downloader.py; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
-		1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-libcdoc-sim.sh"; sourceTree = "<group>"; };
 		1AD5532C2F57274C00A88151 /* WebEidLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WebEidLib; sourceTree = "<group>"; };
 		DF17B64D2CE26949009B1E17 /* UtilsLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = UtilsLib; sourceTree = "<group>"; };
 		DF2B1BF22F524F83008EC06F /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -595,7 +594,6 @@
 			isa = PBXGroup;
 			children = (
 				DF5CDD242F2BB42C002AB47F /* run-ci-tests.sh */,
-				1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */,
 				1A438FCF2E7224CE00546B86 /* generate-mocks.sh */,
 				DF8ADFC92FF5672E0016D019 /* setup_configuration.py */,
 				1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */,

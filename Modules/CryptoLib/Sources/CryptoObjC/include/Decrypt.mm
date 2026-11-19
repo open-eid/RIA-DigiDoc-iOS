@@ -8,7 +8,7 @@
 #import "SmartCardTokenWrapper.h"
 #import "Config.h"
 
-#include <cdoc/CdocReader.h>
+#include <cdoc/CDocReader.h>
 #include <cdoc/Lock.h>
 
 #include <charconv>

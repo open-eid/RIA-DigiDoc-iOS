@@ -20,6 +20,8 @@ let package = Package(
         .library(name: "CryptoLibMocks", targets: ["CryptoLibMocks"])
     ],
     dependencies: [
+        // Keep CDoc generation outside the app packages' circular dependency graph.
+        .package(path: "CDoc"),
         .package(url: "https://github.com/filom/ASN1Decoder", exact: .init(1, 10, 1)),
         .package(url: "https://github.com/leif-ibsen/BigInt.git", exact: .init(1, 24, 0)),
         .package(url: "https://github.com/hmlongco/Factory", exact: .init(3, 5, 1)),
@@ -33,10 +35,6 @@ let package = Package(
         .package(path: "../Test/CommonsTestShared")
     ],
     targets: [
-        .binaryTarget(
-            name: "cdoc",
-            path: "./Sources/CryptoObjC/Libs/cdoc.xcframework"
-        ),
         .target(
             name: "CryptoObjCWrapper",
             dependencies: [
@@ -58,7 +56,7 @@ let package = Package(
         .target(
             name: "CryptoObjC",
             dependencies: [
-                "cdoc",
+                .product(name: "cdoc", package: "CDoc"),
                 "CryptoObjCWrapper"
 
             ],
@@ -68,6 +66,7 @@ let package = Package(
                 .unsafeFlags(["-fmodules"])
             ],
             cxxSettings: [
+                .headerSearchPath("../../CDoc/libcdoc"),
                 .unsafeFlags(["-std=c++20", "-fcxx-modules"])
             ]
         ),
