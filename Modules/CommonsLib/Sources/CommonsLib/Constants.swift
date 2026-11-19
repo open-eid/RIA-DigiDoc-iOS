@@ -76,7 +76,6 @@ public struct Constants {
         public static let Temp = "tempfiles"
         public static let Shared = "shareddownloads"
         public static let SavedFiles = "savedfiles"
-        public static let LDAPCerts = "LDAPCerts"
         public static let Logs = "logs"
         public static let SiVaCert = "sivacert"
         public static let TSACert = "tsacert"
@@ -86,7 +85,6 @@ public struct Constants {
     public struct File {
         public static let LibDigidocLog = "libdigidocpp.txt"
         public static let AppLog = "ria_digidoc.txt"
-        public static let LDAPCertsPem = "ldapCerts.pem"
         public static let nfcCANKey = "canKey.txt"
 
         // iOS allows 255 characters in a file name, but app may add "(1)" and more to file names.

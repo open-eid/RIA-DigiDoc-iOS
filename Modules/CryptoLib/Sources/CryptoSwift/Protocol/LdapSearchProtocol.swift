@@ -4,6 +4,6 @@
 import CryptoObjCWrapper
 
 /// @mockable
-public protocol OpenLdapProtocol: Sendable {
-    @MainActor func search(identityCode: String) async -> OpenLdapSearchResult
+public protocol LdapSearchProtocol: Sendable {
+    @MainActor func search(identityCode: String) async -> LdapSearchResult
 }

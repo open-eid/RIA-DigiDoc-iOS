@@ -17,17 +17,14 @@ extension Container {
     @MainActor
     public var ldapConfiguration: Factory<LdapConfigurationProtocol> {
         self {
-            @MainActor in LdapConfiguration(
-                fileManager: self.fileManager()
-            )
+            @MainActor in LdapConfiguration()
         }.singleton
     }
 
     @MainActor
-    public var openLdap: Factory<OpenLdapProtocol> {
+    public var ldapSearch: Factory<LdapSearchProtocol> {
         self {
-            @MainActor in OpenLdap(
-                fileManager: self.fileManager(),
+            @MainActor in LdapSearch(
                 ldapConfiguration: self.ldapConfiguration()
             )
         }

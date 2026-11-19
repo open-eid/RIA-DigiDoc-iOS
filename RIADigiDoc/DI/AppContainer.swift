@@ -226,7 +226,7 @@ extension Container {
             @MainActor in
             EncryptRecipientViewModel(
                 sharedContainerViewModel: self.sharedContainerViewModel(),
-                openLdap: self.openLdap()
+                ldapSearch: self.ldapSearch()
             )
         }
     }

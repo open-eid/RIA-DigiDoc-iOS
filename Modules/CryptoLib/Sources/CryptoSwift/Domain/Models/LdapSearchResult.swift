@@ -3,7 +3,7 @@
 
 import CryptoObjCWrapper
 
-public struct OpenLdapSearchResult: Sendable {
+public struct LdapSearchResult: Sendable {
     public var addressees: [Addressee]
     public var tooManyResults: Bool
     public var isNetworkError: Bool

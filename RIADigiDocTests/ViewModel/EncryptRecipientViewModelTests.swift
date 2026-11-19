@@ -5,28 +5,29 @@ import CommonsLib
 import CryptoObjCWrapper
 import CryptoSwift
 import Foundation
+import Synchronization
 import Testing
 
 @MainActor
 struct EncryptRecipientViewModelTests {
 
     private let mockSharedContainerViewModel: SharedContainerViewModelProtocolMock
-    private let mockOpenLdap: OpenLdapProtocolMock
+    private let mockLdapSearch: LdapSearchProtocolMock
     private let viewModel: EncryptRecipientViewModel
 
     init() {
         mockSharedContainerViewModel = SharedContainerViewModelProtocolMock()
-        mockOpenLdap = OpenLdapProtocolMock()
+        mockLdapSearch = LdapSearchProtocolMock()
         viewModel = EncryptRecipientViewModel(
             sharedContainerViewModel: mockSharedContainerViewModel,
-            openLdap: mockOpenLdap
+            ldapSearch: mockLdapSearch
         )
     }
 
     @Test
     func loadRecipients_showNoInternetConnectionWhenLdapServerIsUnreachable() async {
-        mockOpenLdap.searchHandler = { _ in
-            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        mockLdapSearch.searchHandler = { _ in
+            LdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
         }
 
         viewModel.searchText = "60001019906"
@@ -39,8 +40,8 @@ struct EncryptRecipientViewModelTests {
 
     @Test
     func loadRecipients_showNoValidCertificateWhenSearchCompletesWithNoResults() async {
-        mockOpenLdap.searchHandler = { _ in
-            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: false)
+        mockLdapSearch.searchHandler = { _ in
+            LdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: false)
         }
 
         viewModel.searchText = "60001019906"
@@ -55,8 +56,8 @@ struct EncryptRecipientViewModelTests {
     func loadRecipients_showRecipientsWhenServerWasUnreachableButAnotherReturnedResults() async {
         let addressee = Addressee(data: Data([0x01]), cnVal: "TESTNUMBER,SEITSMES,60001019906")
 
-        mockOpenLdap.searchHandler = { _ in
-            OpenLdapSearchResult(addressees: [addressee], tooManyResults: false, isNetworkError: true)
+        mockLdapSearch.searchHandler = { _ in
+            LdapSearchResult(addressees: [addressee], tooManyResults: false, isNetworkError: true)
         }
 
         viewModel.searchText = "60001019906"
@@ -69,8 +70,8 @@ struct EncryptRecipientViewModelTests {
 
     @Test
     func handleSearchTextChange_clearsEmptyStateFromThePreviousSearch() async {
-        mockOpenLdap.searchHandler = { _ in
-            OpenLdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        mockLdapSearch.searchHandler = { _ in
+            LdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
         }
 
         viewModel.searchText = "60001019906"
@@ -81,6 +82,93 @@ struct EncryptRecipientViewModelTests {
 
         #expect(viewModel.emptyStateMessageKey == nil)
         #expect(viewModel.recipients.isEmpty)
+    }
+
+    @Test
+    func loadRecipients_ignoresResultOfOutdatedSearch() async {
+        let outdatedAddressee = Addressee(data: Data([0x01]), cnVal: "TESTNUMBER,SEITSMES,60001019906")
+        let currentAddressee = Addressee(data: Data([0x02]), cnVal: "TESTNUMBER,KAHEKSAS,60001019917")
+        let (started, startedContinuation) = AsyncStream<Void>.makeStream()
+        let (release, releaseContinuation) = AsyncStream<Void>.makeStream()
+
+        mockLdapSearch.searchHandler = { identityCode in
+            guard identityCode == "60001019906" else {
+                return LdapSearchResult(addressees: [currentAddressee], tooManyResults: false)
+            }
+            startedContinuation.yield()
+            for await _ in release { break }
+            return LdapSearchResult(addressees: [outdatedAddressee], tooManyResults: false)
+        }
+
+        viewModel.searchText = "60001019906"
+        let outdatedSearch = Task { await viewModel.loadRecipients() }
+        for await _ in started { break }
+
+        viewModel.searchText = "60001019917"
+        viewModel.handleSearchTextChange()
+        await viewModel.loadRecipients()
+        releaseContinuation.yield()
+        await outdatedSearch.value
+
+        #expect(viewModel.recipients.map(\.data) == [currentAddressee.data])
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @Test
+    func loadRecipients_ignoresResultWhenQueryIsEditedDuringSearch() async {
+        let (started, startedContinuation) = AsyncStream<Void>.makeStream()
+        let (release, releaseContinuation) = AsyncStream<Void>.makeStream()
+
+        mockLdapSearch.searchHandler = { _ in
+            startedContinuation.yield()
+            for await _ in release { break }
+            return LdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        }
+
+        viewModel.searchText = "60001019906"
+        let search = Task { await viewModel.loadRecipients() }
+        for await _ in started { break }
+
+        viewModel.searchText = "6000101990"
+        releaseContinuation.yield()
+        await search.value
+
+        #expect(viewModel.recipients.isEmpty)
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.emptyStateMessageKey == nil)
+    }
+
+    @Test
+    func loadRecipients_ignoresOlderResultForSameQuery() async {
+        let addressee = Addressee(data: Data([0x01]), cnVal: "TESTNUMBER,SEITSMES,60001019906")
+        let callCount = Mutex(0)
+        let (started, startedContinuation) = AsyncStream<Void>.makeStream()
+        let (release, releaseContinuation) = AsyncStream<Void>.makeStream()
+
+        mockLdapSearch.searchHandler = { _ in
+            let call = callCount.withLock { count in
+                count += 1
+                return count
+            }
+            guard call == 1 else {
+                return LdapSearchResult(addressees: [addressee], tooManyResults: false)
+            }
+            startedContinuation.yield()
+            for await _ in release { break }
+            return LdapSearchResult(addressees: [], tooManyResults: false, isNetworkError: true)
+        }
+
+        viewModel.searchText = "60001019906"
+        let olderSearch = Task { await viewModel.loadRecipients() }
+        for await _ in started { break }
+
+        await viewModel.loadRecipients()
+        releaseContinuation.yield()
+        await olderSearch.value
+
+        #expect(viewModel.recipients.map(\.data) == [addressee.data])
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.emptyStateMessageKey == nil)
     }
 
     @Test
