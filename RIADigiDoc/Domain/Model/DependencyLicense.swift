@@ -54,11 +54,6 @@ struct DependencyLicenses {
                 url: URL(string: "https://github.com/open-eid/nfc-iOS-lib")
             ),
             DependencyLicense(
-                name: "OpenLDAP",
-                license: "The OpenLDAP Public License",
-                url: URL(string: "https://www.openldap.org/software/release/license.html")
-            ),
-            DependencyLicense(
                 name: "OpenSSL",
                 license: "OpenSSL License",
                 url: URL(string: "https://www.openssl.org/source/license.txt")

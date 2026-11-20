@@ -23,18 +23,13 @@ actor CryptoSetup: CryptoSetupProtocol {
         self.ldapConfiguration = ldapConfiguration
     }
 
-   public func setLdapConfig(_ configurationProvider: ConfigurationProvider?) async {
-        if let ldapPersonUrl = configurationProvider?.ldapPersonUrl {
-            await ldapConfiguration.setLdapPersonURLS([ldapPersonUrl])
-        }
-
-        if let ldapPersonUrls = configurationProvider?.ldapPersonUrls {
-            await ldapConfiguration.setLdapPersonURLS(ldapPersonUrls)
-        }
-
-        if let ldapCorpUrl = configurationProvider?.ldapCorpUrl {
-            await ldapConfiguration.setLdapCorpURL(ldapCorpUrl)
-        }
+    public func setLdapConfig(_ configurationProvider: ConfigurationProvider?) async {
+        guard let configurationProvider else { return }
+        await ldapConfiguration.update(LdapSettings(
+            personURLs: configurationProvider.ldapPersonUrls,
+            corpURL: configurationProvider.ldapCorpUrl,
+            caCertificates: configurationProvider.ldapCerts
+        ))
     }
 
     public func setCdoc2Config(_ configurationProvider: ConfigurationProvider?) async {

@@ -20,16 +20,17 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     private(set) var emptyStateMessageKey: String?
 
     private let sharedContainerViewModel: SharedContainerViewModelProtocol
-    private let openLdap: OpenLdapProtocol
+    private let ldapSearch: LdapSearchProtocol
+    @ObservationIgnored private var latestSearchID = 0
     var encryptWithPasswordAction: (URL, [URL], String, String) async throws -> any CryptoContainerProtocol =
         CryptoContainer.encryptWithPassword
 
     init(
         sharedContainerViewModel: SharedContainerViewModelProtocol,
-        openLdap: OpenLdapProtocol
+        ldapSearch: LdapSearchProtocol
     ) {
         self.sharedContainerViewModel = sharedContainerViewModel
-        self.openLdap = openLdap
+        self.ldapSearch = ldapSearch
     }
 
     func filteredRecipients() -> [Addressee] {
@@ -64,19 +65,28 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
     }
 
     func loadRecipients() async {
+        latestSearchID += 1
+        let searchID = latestSearchID
+        let searchText = searchText
+
         guard !searchText.isEmpty else {
             recipients = []
             emptyStateMessageKey = nil
             return
         }
 
-        let result = await openLdap.search(identityCode: searchText)
+        let result = await ldapSearch.search(identityCode: searchText)
+
+        guard searchID == latestSearchID, searchText == self.searchText else {
+            EncryptRecipientViewModel.logger().info("Discarding LDAP result for an outdated search")
+            return
+        }
 
         if result.tooManyResults {
             recipients = []
             emptyStateMessageKey = nil
             errorMessage = ToastMessage(key: "Too many results", args: [])
-            EncryptRecipientViewModel.logger().error("Too many results for \(self.searchText)")
+            EncryptRecipientViewModel.logger().error("Too many results for \(searchText)")
         } else if result.addressees.isEmpty {
             let messageKey = result.isNetworkError
                 ? "No Internet connection"
@@ -85,7 +95,7 @@ class EncryptRecipientViewModel: EncryptRecipientViewModelProtocol, Loggable {
             if result.isNetworkError {
                 EncryptRecipientViewModel.logger().error("Unable to reach the LDAP server")
             } else {
-                EncryptRecipientViewModel.logger().error("No recipients found for \(self.searchText)")
+                EncryptRecipientViewModel.logger().error("No recipients found for \(searchText)")
             }
 
             recipients = []

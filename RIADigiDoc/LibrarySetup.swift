@@ -110,8 +110,6 @@ actor LibrarySetup: Loggable {
             await cryptoSetup.setLdapConfig(configurationProvider)
             await cryptoSetup.setCdoc2Config(configurationProvider)
             await cryptoSetup.setCdoc2Settings(configurationProvider)
-
-            try saveLDAPCertsToLibrary(ldapCertsBundle: configurationProvider?.ldapCerts)
         } catch let error {
             switch error {
             case DigiDocError.initializationFailed(let errorDetail):
@@ -122,49 +120,6 @@ actor LibrarySetup: Loggable {
                 "Unknown initialization error: \(String(reflecting: error), privacy: .public)")
             }
         }
-    }
-
-    private func saveLDAPCertsToLibrary(
-        ldapCertsBundle: [Data]?
-    ) throws {
-        guard let ldapCerts = ldapCertsBundle else {
-            return
-        }
-
-        let libraryDir = try fileManager.url(
-            for: .libraryDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
-
-        let certsDir = libraryDir
-            .appending(path: Constants.Folder.LDAPCerts)
-
-        if !fileManager.fileExists(atPath: certsDir.path) {
-            try fileManager.createDirectory(
-                at: certsDir,
-                withIntermediateDirectories: true,
-                attributes: nil
-            )
-        }
-
-        let pemString = ldapCerts.map { certData -> String in
-            let base64 = certData.base64EncodedString(options: [.lineLength64Characters])
-            return """
-            -----BEGIN CERTIFICATE-----
-            \(base64)
-            -----END CERTIFICATE-----
-            """
-        }.joined(separator: "\n\n")
-
-        let pemURL = certsDir.appendingPathComponent(Constants.File.LDAPCertsPem)
-
-        try pemString.write(
-            to: pemURL,
-            atomically: true,
-            encoding: .utf8
-        )
     }
 
     private func initializeLogging() async -> Bool {

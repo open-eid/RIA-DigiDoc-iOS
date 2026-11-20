@@ -37,14 +37,9 @@ let package = Package(
             name: "cdoc",
             path: "./Sources/CryptoObjC/Libs/cdoc.xcframework"
         ),
-        .binaryTarget(
-            name: "LDAP",
-            path: "./Sources/CryptoObjC/Libs/LDAP.xcframework"
-        ),
         .target(
             name: "CryptoObjCWrapper",
             dependencies: [
-                "LDAP",
                 "ASN1Decoder",
                 "CommonsLib",
                 "ConfigLib",

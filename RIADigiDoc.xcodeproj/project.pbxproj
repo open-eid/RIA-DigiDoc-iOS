@@ -125,11 +125,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphonesimulator.sh"; sourceTree = "<group>"; };
-		1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-openldap-iphoneos.sh"; sourceTree = "<group>"; };
 		1A438FCF2E7224CE00546B86 /* generate-mocks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "generate-mocks.sh"; sourceTree = "<group>"; };
 		1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = tsl_xml_downloader.py; sourceTree = "<group>"; };
-		1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-xcframeworks.sh"; sourceTree = "<group>"; };
 		1AA9FF6C2E71A14200FFDC35 /* CryptoLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CryptoLib; sourceTree = "<group>"; };
 		1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-libcdoc-sim.sh"; sourceTree = "<group>"; };
 		1AD5532C2F57274C00A88151 /* WebEidLib */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = WebEidLib; sourceTree = "<group>"; };
@@ -599,9 +596,6 @@
 			children = (
 				DF5CDD242F2BB42C002AB47F /* run-ci-tests.sh */,
 				1AD26AB72E7AB14200A3629D /* build-libcdoc-sim.sh */,
-				1A7D36992E79EB8000CAD7A6 /* build-xcframeworks.sh */,
-				1A3E9ED22E79D35E00033299 /* build-openldap-iphonesimulator.sh */,
-				1A3E9ED62E79DD6E00033299 /* build-openldap-iphoneos.sh */,
 				1A438FCF2E7224CE00546B86 /* generate-mocks.sh */,
 				DF8ADFC92FF5672E0016D019 /* setup_configuration.py */,
 				1A438FD02E7224CE00546B86 /* tsl_xml_downloader.py */,
