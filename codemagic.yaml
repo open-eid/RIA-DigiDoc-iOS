@@ -72,7 +72,7 @@ workflows:
           echo Run tests?: ${{ inputs.enableTests_input }}
       - name: Setup dependencies
         script: |
-          brew install mockolo
+          brew install mockolo flatbuffers
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |
@@ -307,7 +307,7 @@ workflows:
     scripts:
       - name: Setup dependencies
         script: |
-          brew install mockolo
+          brew install mockolo flatbuffers
       - *get_google_services_plist
       - name: "Setup config and TSL files"
         script: |

@@ -47,9 +47,15 @@ runs:
         export LIBDIGIDOCPP_PATH=${{ github.workspace }}/Modules/LibdigidocLib/Sources/LibdigidocObjC/Libs/digidocpp.xcframework
         rm -rf $LIBDIGIDOCPP_PATH/ios-arm64 && mkdir $LIBDIGIDOCPP_PATH/ios-arm64 && cp -r ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64/
         rm -rf $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && mkdir $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator && cp -r ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator/lib/digidocpp.framework $LIBDIGIDOCPP_PATH/ios-arm64_x86_64-simulator/
+    - name: Update OpenSSL in project
+      shell: bash
+      run: |
+        sh scripts/create-openssl-xcframework.sh \
+          ${{ github.workspace }}/libdigidocpp.iphoneos/libdigidocpp.iphoneos \
+          ${{ github.workspace }}/libdigidocpp.iphonesimulator/libdigidocpp.iphonesimulator
     - name: Install dependencies
       shell: bash
-      run: brew install mockolo
+      run: brew install mockolo flatbuffers
     - name: Setup config and TSL files
       shell: bash
       run: |

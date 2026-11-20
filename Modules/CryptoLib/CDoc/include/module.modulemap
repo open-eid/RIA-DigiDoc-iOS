@@ -1,0 +1,16 @@
+module cdoc {
+    header "../libcdoc/cdoc/CDoc.h"
+    header "../libcdoc/cdoc/CDocReader.h"
+    header "../libcdoc/cdoc/CDocWriter.h"
+    header "../libcdoc/cdoc/Configuration.h"
+    header "../libcdoc/cdoc/Exports.h"
+    header "../libcdoc/cdoc/Io.h"
+    header "../libcdoc/cdoc/Recipient.h"
+    header "../libcdoc/cdoc/Lock.h"
+    header "../libcdoc/cdoc/CryptoBackend.h"
+    header "../libcdoc/cdoc/NetworkBackend.h"
+    header "../libcdoc/cdoc/PKCS11Backend.h"
+    header "../libcdoc/cdoc/Logger.h"
+    export *
+    requires cplusplus
+}

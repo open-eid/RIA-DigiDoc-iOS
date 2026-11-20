@@ -15,8 +15,12 @@ This application contains following functionality:
 ## libdigidocpp
 RIA-DigiDoc-iOS is using static version of libdigidoc. libdigidoc is used in app for managing container manipulations. More info: https://github.com/open-eid/libdigidocpp
 
-## libdcdoc
-RIA-DigiDoc-iOS is using static version of libcdoc. libcdoc is used in app for encrypt and decrypt operations. More info: https://github.com/open-eid/libcdoc
+## libcdoc
+CryptoLib builds [libcdoc](https://github.com/open-eid/libcdoc) from source for encryption and decryption. Clone with `--recurse-submodules` or run `git submodule update --init`, then install FlatBuffers with `brew install flatbuffers`.
+
+The CDoc package's SwiftPM build-tool plugin generates the schema headers with `flatc` and exposes the matching C++ headers from the same Homebrew installation. Use Xcode 27 for Xcode builds so the C++ target can use the generated headers. When invoking `swift build` directly with Swift 6.3, use `--build-system swiftbuild`.
+
+Update `VERSION_STR` in `Modules/CryptoLib/CDoc/Package.swift` when updating libcdoc. The script `scripts/create-openssl-xcframework.sh` recreates `OpenSSL.xcframework` from the libdigidocpp `iphoneos` and `iphonesimulator` artifacts.
 
 # Features
 * Creating ASiC-E containers

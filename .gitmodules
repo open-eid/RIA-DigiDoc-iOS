@@ -1,0 +1,3 @@
+[submodule "Modules/CryptoLib/Sources/cdoc/libcdoc"]
+	path = Modules/CryptoLib/CDoc/libcdoc
+	url = https://github.com/open-eid/libcdoc.git
