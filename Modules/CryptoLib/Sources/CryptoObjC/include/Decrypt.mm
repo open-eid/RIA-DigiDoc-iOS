@@ -24,7 +24,7 @@ static CertType certTypeFromLabel(NSString * _Nullable type) {
 
 @implementation Addressee (label)
 
-- (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI {
+- (instancetype)initWithLabel:(const std::string &)label pub:(NSData*)pub concatKDFAlgorithmURI:(NSString *)concatKDFAlgorithmURI lockIndex:(NSInteger)lockIndex {
     std::map<std::string, std::string> info = libcdoc::Lock::parseLabel(label);
     NSString *cn     = info.contains("cn")            ? [NSString stringWithStdString:info["cn"]]            : [NSString stringWithStdString:label];
     NSString *type   = info.contains("type")          ? [NSString stringWithStdString:info["type"]]          : nil;
@@ -46,7 +46,7 @@ static CertType certTypeFromLabel(NSString * _Nullable type) {
         }
     }
 
-    if (self = [self initWithCnVal:cn serialNumber:serial certType:certTypeFromLabel(type) validTo:validTo data:pub concatKDFAlgorithmURI:concatKDFAlgorithmURI lockLabel:@"" lockType:@""]) {
+    if (self = [self initWithCnVal:cn serialNumber:serial certType:certTypeFromLabel(type) validTo:validTo data:pub concatKDFAlgorithmURI:concatKDFAlgorithmURI lockLabel:([NSString stringWithStdString:label] ?: @"") lockType:@"" lockIndex:lockIndex]) {
     }
     return self;
 }
@@ -105,17 +105,19 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
         return [NSError cryptoError:@"Parsing failed" error:error];
     }
     NSMutableArray<Addressee*> *addressees = [[NSMutableArray alloc] init];
-    for(const libcdoc::Lock &lock: reader->getLocks())
+    const auto &locks = reader->getLocks();
+    for(NSInteger lockIndex = 0; lockIndex < (NSInteger)locks.size(); lockIndex++)
     {
+        const libcdoc::Lock &lock = locks[lockIndex];
         if(lock.isCDoc1()) {
             NSString* concatKDFAlgorithmURI = @"";
             if (!lock.isRSA()) {
                 concatKDFAlgorithmURI = [NSString stringWithStdString:lock.getString(libcdoc::Lock::CONCAT_DIGEST)];
             }
-            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::CERT)] concatKDFAlgorithmURI:concatKDFAlgorithmURI]];
+            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::CERT)] concatKDFAlgorithmURI:concatKDFAlgorithmURI lockIndex:lockIndex]];
         } else if(lock.isPKI()) {
-            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)] concatKDFAlgorithmURI:@""]];
-        } else if(lock.isSymmetric()) {
+            [addressees addObject:[[Addressee alloc] initWithLabel:lock.label pub:[NSData dataFromVector:lock.getBytes(libcdoc::Lock::RCPT_KEY)] concatKDFAlgorithmURI:@"" lockIndex:lockIndex]];
+        } else if(lock.type == libcdoc::Lock::Type::PASSWORD) {
             std::map<std::string, std::string> info = libcdoc::Lock::parseLabel(lock.label);
             NSString *cnVal = info.contains("label")
                 ? [NSString stringWithStdString:info["label"]]
@@ -129,9 +131,30 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
                          data:[NSData data]
             concatKDFAlgorithmURI:@""
                     lockLabel:rawLockLabel
-                     lockType:lockTypeName(lock.type)]];
+                     lockType:lockTypeName(lock.type)
+                    lockIndex:lockIndex]];
+        } else if(lock.isSymmetric()) {
+            [addressees addObject:[[Addressee alloc]
+                initWithCnVal:[NSString stringWithStdString:lock.label] ?: @""
+                 serialNumber:nil
+                     certType:CertTypeUnknownType
+                      validTo:nil
+                         data:[NSData data]
+            concatKDFAlgorithmURI:@""
+                    lockLabel:@""
+                     lockType:@""
+                    lockIndex:lockIndex]];
         } else {
-            [addressees addObject:[[Addressee alloc] initWithData:[NSData data] cnVal:@"Unknown capsule"]];
+            [addressees addObject:[[Addressee alloc]
+                initWithCnVal:@"Unknown capsule"
+                 serialNumber:nil
+                     certType:CertTypeUnknownType
+                      validTo:nil
+                         data:[NSData data]
+            concatKDFAlgorithmURI:@""
+                    lockLabel:@""
+                     lockType:@""
+                    lockIndex:lockIndex]];
         }
     }
     if (cdocInfo != nil) {
@@ -199,7 +222,7 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
     });
 }
 
-+ (NSDictionary<NSString*,NSData*> *)decryptFile:(NSString *)fullPath withPassword:(NSString*)password error:(NSError**)error {
++ (NSDictionary<NSString*,NSData*> *)decryptFile:(NSString *)fullPath withPassword:(NSString*)password lockIndex:(NSInteger)lockIndex error:(NSError**)error {
     struct PasswordBackend: public libcdoc::CryptoBackend {
         NSString *password;
         PasswordBackend(NSString *pass) : password(pass) {}
@@ -213,12 +236,24 @@ static NSString *lockTypeName(libcdoc::Lock::Type type) {
         return [NSError cryptoError:@"Failed to create CDocReader" error:error];
     }
 
-    int idx = -1;
     const auto& locks = reader->getLocks();
-    for (size_t i = 0; i < locks.size(); i++) {
-        if (locks[i].type == libcdoc::Lock::Type::PASSWORD) {
-            idx = (int)i;
-            break;
+    BOOL isSelectedLockUsable = lockIndex >= 0
+        && lockIndex < (NSInteger)locks.size()
+        && locks[lockIndex].type == libcdoc::Lock::Type::PASSWORD;
+    if (lockIndex >= 0 && !isSelectedLockUsable) {
+        NSLog(@"Lock %ld is not a password lock (%zu lock(s) in container), falling back to the first password lock",
+              (long)lockIndex, locks.size());
+    }
+
+    NSInteger idx = -1;
+    if (isSelectedLockUsable) {
+        idx = lockIndex;
+    } else {
+        for (size_t i = 0; i < locks.size(); i++) {
+            if (locks[i].type == libcdoc::Lock::Type::PASSWORD) {
+                idx = (NSInteger)i;
+                break;
+            }
         }
     }
     if (idx < 0) {

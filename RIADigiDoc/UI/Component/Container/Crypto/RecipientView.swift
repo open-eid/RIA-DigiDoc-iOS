@@ -24,10 +24,12 @@ struct RecipientView: View {
     let recipientUtil: RecipientUtilProtocol
     let showMoreOptionsButton: Bool
     var showRemoveRecipientButton: Bool
+    var showDecryptRecipientButton: Bool
     let isCDOC2Container: Bool
     let isEncryptedOrDecrypted: Bool
     @Binding var showRemoveRecipientModal: Bool
     var onSelect: (() -> Void)?
+    var onDecryptRecipient: (() -> Void)?
 
     @State private var showDetail = false
     @State private var showBottomSheetFromButton = false
@@ -39,9 +41,18 @@ struct RecipientView: View {
         "\(recipientIndex), \(languageSettings.localized("More options"))"
     }
 
+    private var decryptAccessibilityLabel: String? {
+        guard showDecryptRecipientButton, isPasswordRecipient else { return nil }
+        return "\(languageSettings.localized("Decrypt container")) \(recipient.identifier)"
+    }
+
     private var bottomSheetActions: [BottomSheetButton] {
         RecipientBottomSheetActions.actions(
+            decryptAccessibilityLabel: decryptAccessibilityLabel,
             showRemoveRecipientButton: showRemoveRecipientButton,
+            onDecryptButtonClick: {
+                onDecryptRecipient?()
+            },
             onDetailsButtonClick: {
                 pathManager
                     .navigate(
@@ -110,10 +121,12 @@ struct RecipientView: View {
         recipientUtil: RecipientUtilProtocol = Container.shared.recipientUtil(),
         showMoreOptionsButton: Bool = true,
         showRemoveRecipientButton: Bool = true,
+        showDecryptRecipientButton: Bool = false,
         isCDOC2Container: Bool = false,
         isEncryptedOrDecrypted: Bool = false,
         showRemoveRecipientModal: Binding<Bool>,
-        onSelect: (() -> Void)? = nil
+        onSelect: (() -> Void)? = nil,
+        onDecryptRecipient: (() -> Void)? = nil
     ) {
         self.recipientIndex = recipientIndex
         self.recipient = recipient
@@ -121,10 +134,12 @@ struct RecipientView: View {
         self.recipientUtil = recipientUtil
         self.showMoreOptionsButton = showMoreOptionsButton
         self.showRemoveRecipientButton = showRemoveRecipientButton
+        self.showDecryptRecipientButton = showDecryptRecipientButton
         self.isCDOC2Container = isCDOC2Container
         self.isEncryptedOrDecrypted = isEncryptedOrDecrypted
         self._showRemoveRecipientModal = showRemoveRecipientModal
         self.onSelect = onSelect
+        self.onDecryptRecipient = onDecryptRecipient
     }
 
     var body: some View {

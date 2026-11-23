@@ -3,6 +3,7 @@
 
 import CommonsLib
 import CommonsLibMocks
+import CryptoObjCWrapper
 import CryptoSwift
 import Foundation
 import LibdigidocLibSwiftMocks
@@ -263,5 +264,116 @@ struct EncryptViewModelTests {
         await viewModel.updateAsyncProperties()
 
         #expect(viewModel.isContainerEncryptedOrDecrypted == false)
+    }
+
+    private func passwordRecipient(keyLabel: String, lockIndex: Int) -> Addressee {
+        Addressee(
+            cnVal: keyLabel,
+            serialNumber: nil,
+            certType: .passwordType,
+            validTo: nil,
+            data: Data(),
+            concatKDFAlgorithmURI: "",
+            lockLabel: "data:v=1&label=\(keyLabel)&type=pw",
+            lockType: "PASSWORD",
+            lockIndex: lockIndex
+        )
+    }
+
+    private func certificateRecipient(lockIndex: Int) -> Addressee {
+        Addressee(
+            cnVal: "USER,TEST,38001010001",
+            serialNumber: nil,
+            certType: .iDCardType,
+            validTo: nil,
+            data: Data([0x01]),
+            concatKDFAlgorithmURI: "",
+            lockLabel: "",
+            lockType: "",
+            lockIndex: lockIndex
+        )
+    }
+
+    @Test
+    func passwordRecipients_keepsOnlyPasswordLocksInContainerOrder() {
+        viewModel.recipients = [
+            certificateRecipient(lockIndex: 0),
+            passwordRecipient(keyLabel: "first", lockIndex: 1),
+            passwordRecipient(keyLabel: "second", lockIndex: 2)
+        ]
+
+        #expect(viewModel.passwordRecipients.map(\.identifier) == ["first", "second"])
+        #expect(viewModel.passwordRecipients.map(\.lockIndex) == [1, 2])
+    }
+
+    @Test
+    func hasBothDecryptionMethods_isTrueOnlyWhenBothLockKindsArePresent() {
+        viewModel.recipients = [
+            certificateRecipient(lockIndex: 0),
+            passwordRecipient(keyLabel: "first", lockIndex: 1)
+        ]
+        #expect(viewModel.hasBothDecryptionMethods)
+
+        viewModel.recipients = [passwordRecipient(keyLabel: "only", lockIndex: 0)]
+        #expect(!viewModel.hasBothDecryptionMethods)
+
+        viewModel.recipients = [certificateRecipient(lockIndex: 0)]
+        #expect(!viewModel.hasBothDecryptionMethods)
+
+        viewModel.recipients = []
+        #expect(!viewModel.hasBothDecryptionMethods)
+    }
+
+    @Test
+    func decryptRoute_choosesIdCardWhenNoPasswordLockExists() {
+        viewModel.recipients = [certificateRecipient(lockIndex: 0)]
+
+        #expect(viewModel.decryptRoute() == .idCard)
+    }
+
+    @Test
+    func decryptRoute_choosesIdCardWhenContainerAlsoHoldsCertificateLocks() {
+        viewModel.recipients = [
+            certificateRecipient(lockIndex: 0),
+            passwordRecipient(keyLabel: "only", lockIndex: 1)
+        ]
+
+        #expect(viewModel.decryptRoute() == .idCard)
+    }
+
+    @Test
+    func decryptRoute_promptsForPasswordWhenASingleLockIsTheOnlyOption() {
+        let only = passwordRecipient(keyLabel: "only", lockIndex: 3)
+        viewModel.recipients = [only]
+
+        #expect(viewModel.decryptRoute() == .password(only))
+    }
+
+    @Test
+    func decryptRoute_offersAChoiceBetweenSeveralPasswordLocks() {
+        let first = passwordRecipient(keyLabel: "first", lockIndex: 1)
+        let second = passwordRecipient(keyLabel: "second", lockIndex: 2)
+        viewModel.recipients = [first, second]
+
+        #expect(viewModel.decryptRoute() == .chooseKeyLabel([first, second]))
+    }
+
+    @Test
+    func decryptRoute_carriesTheLockIndexThatReachesTheNativeLayer() {
+        let third = passwordRecipient(keyLabel: "third", lockIndex: 3)
+        viewModel.recipients = [third]
+
+        guard case .password(let recipient) = viewModel.decryptRoute() else {
+            Issue.record("Expected a password route")
+            return
+        }
+        #expect(recipient.lockIndex == 3)
+    }
+
+    @Test
+    func decryptRoute_choosesIdCardWhenTheContainerHasNoRecipients() {
+        viewModel.recipients = []
+
+        #expect(viewModel.decryptRoute() == .idCard)
     }
 }

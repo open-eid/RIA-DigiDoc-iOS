@@ -175,4 +175,36 @@ struct AddresseeTests {
         #expect(addressee.lockLabel == "")
         #expect(addressee.lockType == "")
     }
+
+    @Test
+    func init_lockIndexDefaultsToNoLock() {
+        let addressee = Addressee(
+            data: Data(),
+            cnVal: "USER,TEST,38001010001",
+            givenName: "TEST",
+            surname: "USER",
+            serialNumber: nil,
+            certType: .iDCardType,
+            validTo: nil
+        )
+
+        #expect(addressee.lockIndex == -1)
+    }
+
+    @Test
+    func cnValInit_keepsTheLockIndexItWasBuiltFrom() {
+        let addressee = Addressee(
+            cnVal: "myKey",
+            serialNumber: nil,
+            certType: .passwordType,
+            validTo: nil,
+            data: Data(),
+            concatKDFAlgorithmURI: "",
+            lockLabel: "data:v=1&label=myKey&type=pw",
+            lockType: "PASSWORD",
+            lockIndex: 2
+        )
+
+        #expect(addressee.lockIndex == 2)
+    }
 }

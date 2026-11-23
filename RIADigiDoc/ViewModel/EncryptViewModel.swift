@@ -9,6 +9,12 @@ import CommonsLib
 import UtilsLib
 import LibdigidocLibSwift
 
+enum DecryptRoute: Equatable {
+    case idCard
+    case chooseKeyLabel([Addressee])
+    case password(Addressee)
+}
+
 @Observable
 @MainActor
 class EncryptViewModel: EncryptViewModelProtocol, Loggable {
@@ -57,6 +63,29 @@ class EncryptViewModel: EncryptViewModelProtocol, Loggable {
 
     var isContainerUnencrypted: Bool {
         !isContainerEncrypted && !isContainerDecrypted
+    }
+
+    var passwordRecipients: [Addressee] {
+        recipients.filter { $0.certType == .passwordType }
+    }
+
+    private var certificateRecipients: [Addressee] {
+        recipients.filter { $0.certType != .passwordType }
+    }
+
+    var hasBothDecryptionMethods: Bool {
+        !passwordRecipients.isEmpty && !certificateRecipients.isEmpty
+    }
+
+    func decryptRoute() -> DecryptRoute {
+        let candidates = passwordRecipients
+        guard !candidates.isEmpty, !hasBothDecryptionMethods else {
+            return .idCard
+        }
+        guard candidates.count == 1, let recipient = candidates.first else {
+            return .chooseKeyLabel(candidates)
+        }
+        return .password(recipient)
     }
 
     var isContainerEncryptedOrDecrypted: Bool {

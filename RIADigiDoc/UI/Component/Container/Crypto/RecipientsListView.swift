@@ -13,9 +13,11 @@ struct RecipientsListView: View {
     let recipients: [Addressee]
     @Binding var selectedRecipient: Addressee?
     var showRemoveRecipientButton: Bool
+    var showDecryptRecipientButton: Bool = false
     var isCDOC2Container: Bool = false
     var isEncryptedOrDecrypted: Bool = false
     @Binding var showRemoveRecipientModal: Bool
+    var onDecryptRecipient: ((Addressee) -> Void)?
 
     let nameUtil: NameUtilProtocol
     let recipientUtil: RecipientUtilProtocol
@@ -30,11 +32,15 @@ struct RecipientsListView: View {
                         nameUtil: nameUtil,
                         recipientUtil: recipientUtil,
                         showRemoveRecipientButton: showRemoveRecipientButton,
+                        showDecryptRecipientButton: showDecryptRecipientButton,
                         isCDOC2Container: isCDOC2Container,
                         isEncryptedOrDecrypted: isEncryptedOrDecrypted,
                         showRemoveRecipientModal: $showRemoveRecipientModal,
                         onSelect: {
                             selectedRecipient = recipient
+                        },
+                        onDecryptRecipient: {
+                            onDecryptRecipient?(recipient)
                         }
                     )
                 }
@@ -47,11 +53,15 @@ struct RecipientsListView: View {
                         nameUtil: nameUtil,
                         recipientUtil: recipientUtil,
                         showRemoveRecipientButton: showRemoveRecipientButton,
+                        showDecryptRecipientButton: showDecryptRecipientButton,
                         isCDOC2Container: isCDOC2Container,
                         isEncryptedOrDecrypted: isEncryptedOrDecrypted,
                         showRemoveRecipientModal: $showRemoveRecipientModal,
                         onSelect: {
                             selectedRecipient = recipient
+                        },
+                        onDecryptRecipient: {
+                            onDecryptRecipient?(recipient)
                         }
                     )
                 }
