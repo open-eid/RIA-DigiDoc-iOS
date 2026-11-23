@@ -53,6 +53,11 @@ class MyEidViewModel: MyEidViewModelProtocol, Loggable {
         return sharedMyEidSession.getIsPinBlocked(for: codeType)
     }
 
+    public func getCertificateStatus(notValidAfter: Date?) -> MyEidDocumentStatus {
+        guard let notValidAfter else { return .unknown }
+        return notValidAfter < Date() ? .expired : .valid
+    }
+
     public func getDocumentExpirationStatus(expiryDate: String) -> MyEidDocumentStatus {
         let stringToDate = DateUtil.stringToDate(expiryDate, isUTC: false)
         guard let date = stringToDate else { return .unknown }

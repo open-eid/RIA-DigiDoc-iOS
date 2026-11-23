@@ -17,6 +17,8 @@ struct MyEidPinsAndCertificatesView: View {
     @Binding var pinChangeVariant: PinChangeVariant?
     var authCertValidTo: String
     var signCertValidTo: String
+    var authCertStatus: MyEidDocumentStatus
+    var signCertStatus: MyEidDocumentStatus
     var isPUKChangeable: Bool
     var isCourierCard: Bool
 
@@ -82,6 +84,8 @@ struct MyEidPinsAndCertificatesView: View {
         pinChangeVariant: Binding<PinChangeVariant?> = .constant(nil),
         authCertValidTo: String,
         signCertValidTo: String,
+        authCertStatus: MyEidDocumentStatus,
+        signCertStatus: MyEidDocumentStatus,
         isPUKChangeable: Bool,
         isCourierCard: Bool = false
     ) {
@@ -92,140 +96,177 @@ struct MyEidPinsAndCertificatesView: View {
         self._pinChangeVariant = pinChangeVariant
         self.authCertValidTo = authCertValidTo
         self.signCertValidTo = signCertValidTo
+        self.authCertStatus = authCertStatus
+        self.signCertStatus = signCertStatus
         self.isPUKChangeable = isPUKChangeable
         self.isCourierCard = isCourierCard
     }
 
+    private func certificateSubtitle(status: MyEidDocumentStatus, validTo: String) -> AttributedString {
+        switch status {
+        case .valid:
+            return AttributedString(languageSettings.localized("Certificate is valid until", [validTo]))
+        case .expired:
+            return AttributedString(languageSettings.localized("Certificate has expired"))
+        case .unknown:
+            return AttributedString(languageSettings.localized("My eid status unknown"))
+        }
+    }
+
+    private func certificateUnusableMessage(status: MyEidDocumentStatus, codeType: CodeType) -> String? {
+        guard status == .expired else { return nil }
+        return languageSettings.localized("PIN cannot be used certificate expired", [codeType.name])
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
-            MyEidCertificateCardView(
-                title: languageSettings.localized("Authentication certificate"),
-                subtitle: AttributedString(languageSettings
-                    .localized("Certificate is valid until", [authCertValidTo])),
-                forgotPinText: isPin1Blocked ?
-                languageSettings.localized("Unblock PIN", [CodeType.pin1.name]) :
-                    languageSettings.localized("Forgot PIN", [CodeType.pin1.name]),
-                changePinText: languageSettings
-                    .localized("Change PIN", [CodeType.pin1.name]),
-                isPinBlocked: isPin1Blocked,
-                isPukBlocked: isPukBlocked,
-                isCourierCard: isCourierCard,
-                onForgotPinClick: {
-                    lastFocused = .myEid(.unblockPin1Button)
-                    pinChangeVariant = .pin1Unblock
-                },
-                onChangePinClick: {
-                    lastFocused = .myEid(.changePin1Button)
-                    pinChangeVariant = .pin1Change
-                },
-                forgotPinAccessibilityField: .myEid(.unblockPin1Button),
-                changePinAccessibilityField: .myEid(.changePin1Button),
-                lastFocused: $lastFocused
-            )
-            .opacity(opacityForPin1BlockedState)
+        VStack(alignment: .leading, spacing: Dimensions.Padding.ZeroPadding) {
+            VStack(alignment: .leading) {
+                MyEidCertificateCardView(
+                    title: languageSettings.localized("Authentication certificate"),
+                    subtitle: certificateSubtitle(status: authCertStatus, validTo: authCertValidTo),
+                    forgotPinText: isPin1Blocked ?
+                    languageSettings.localized("Unblock PIN", [CodeType.pin1.name]) :
+                        languageSettings.localized("Forgot PIN", [CodeType.pin1.name]),
+                    changePinText: languageSettings
+                        .localized("Change PIN", [CodeType.pin1.name]),
+                    isPinBlocked: isPin1Blocked,
+                    isPukBlocked: isPukBlocked,
+                    isCourierCard: isCourierCard,
+                    certificateStatus: authCertStatus,
+                    onForgotPinClick: {
+                        lastFocused = .myEid(.unblockPin1Button)
+                        pinChangeVariant = .pin1Unblock
+                    },
+                    onChangePinClick: {
+                        lastFocused = .myEid(.changePin1Button)
+                        pinChangeVariant = .pin1Change
+                    },
+                    forgotPinAccessibilityField: .myEid(.unblockPin1Button),
+                    changePinAccessibilityField: .myEid(.changePin1Button),
+                    lastFocused: $lastFocused
+                )
+                .opacity(opacityForPin1BlockedState)
 
-            if isPin1Blocked {
-                Text(verbatim: pin1BlockedMessage)
-                    .font(typography.bodySmall)
-                    .foregroundStyle(theme.error)
-                    .padding(.vertical, Dimensions.Padding.XSPadding)
-            }
-
-            if isCourierCard {
-                courierCardWarning()
-            }
-        }
-        .padding(.vertical, Dimensions.Padding.SPadding)
-
-        VStack(alignment: .leading) {
-            MyEidCertificateCardView(
-                title: languageSettings.localized("Signing certificate"),
-                subtitle: AttributedString(
-                    languageSettings.localized(
-                        "Certificate is valid until",
-                        [signCertValidTo]
-                    )
-                ),
-                forgotPinText: isPin2Blocked ?
-                languageSettings.localized("Unblock PIN", [CodeType.pin2.name]) :
-                    languageSettings.localized("Forgot PIN", [CodeType.pin2.name]),
-                changePinText: languageSettings
-                    .localized("Change PIN", [CodeType.pin2.name]),
-                isPinBlocked: isPin2Blocked,
-                isPukBlocked: isPukBlocked,
-                isCourierCard: isCourierCard,
-                onForgotPinClick: {
-                    lastFocused = .myEid(.unblockPin2Button)
-                    pinChangeVariant = .pin2Unblock
-                },
-                onChangePinClick: {
-                    lastFocused = .myEid(.changePin2Button)
-                    pinChangeVariant = .pin2Change
-                },
-                forgotPinAccessibilityField: .myEid(.unblockPin2Button),
-                changePinAccessibilityField: .myEid(.changePin2Button),
-                lastFocused: $lastFocused
-            )
-            .opacity(opacityForPin2BlockedState)
-
-            if isPin2Blocked {
-                Text(verbatim: pin2BlockedMessage)
-                    .font(typography.bodySmall)
-                    .foregroundStyle(theme.error)
-                    .padding(.vertical, Dimensions.Padding.XSPadding)
-            }
-
-            if isCourierCard {
-                courierCardWarning()
-            } else if !isPin2Activated {
-                Text(verbatim: pin2LockedMessage)
-                    .font(typography.bodySmall)
-                    .foregroundStyle(theme.error)
-                    .padding(.vertical, Dimensions.Padding.XSPadding)
-
-                if let pin2LockedInfoUrl = URL(string: pin2LockedUrl) {
-                    additionalInformationLink(url: pin2LockedInfoUrl)
+                if let authCertUnusableMessage = certificateUnusableMessage(
+                    status: authCertStatus,
+                    codeType: .pin1
+                ) {
+                    Text(verbatim: authCertUnusableMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                 }
-            }
-        }
-        .padding(.bottom, Dimensions.Padding.SPadding)
 
-        VStack(alignment: .leading) {
-            MyEidCertificateCardView(
-                title: pukCodeTitle,
-                subtitle: pukCodeInfo,
-                isPukBlocked: isPukBlocked,
-                forgotPinAccessibilityField: .myEid(.changePukButton),
-                changePinAccessibilityField: .myEid(.changePukButton),
-                lastFocused: $lastFocused
-            )
-            .opacity(opacityForPukBlockedState)
-            .onTapGesture {
-                if isPUKChangeable {
-                    lastFocused = .myEid(.changePukButton)
-                    pinChangeVariant = .pukChange
-                }
-            }
-            .accessibilityAddTraits([.isButton])
-            .accessibilityFocused($isPukFocused)
-            .task {
-                isPukFocused = lastFocused == .myEid(.changePukButton)
-            }
-
-            if isPukBlocked {
-                Text(verbatim: pukBlockedMessage)
-                    .font(typography.bodySmall)
-                    .foregroundStyle(theme.error)
-                    .padding(.vertical, Dimensions.Padding.XSPadding)
-
-                if let pukBlockedInfoUrl = URL(string: pukBlockedUrl) {
-                    additionalInformationLink(url: pukBlockedInfoUrl)
+                if isPin1Blocked {
+                    Text(verbatim: pin1BlockedMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
                         .padding(.vertical, Dimensions.Padding.XSPadding)
                 }
+
+                if isCourierCard {
+                    courierCardWarning()
+                }
             }
+            .padding(.bottom, Dimensions.Padding.SPadding)
+
+            VStack(alignment: .leading) {
+                MyEidCertificateCardView(
+                    title: languageSettings.localized("Signing certificate"),
+                    subtitle: certificateSubtitle(status: signCertStatus, validTo: signCertValidTo),
+                    forgotPinText: isPin2Blocked ?
+                    languageSettings.localized("Unblock PIN", [CodeType.pin2.name]) :
+                        languageSettings.localized("Forgot PIN", [CodeType.pin2.name]),
+                    changePinText: languageSettings
+                        .localized("Change PIN", [CodeType.pin2.name]),
+                    isPinBlocked: isPin2Blocked,
+                    isPukBlocked: isPukBlocked,
+                    isCourierCard: isCourierCard,
+                    certificateStatus: signCertStatus,
+                    onForgotPinClick: {
+                        lastFocused = .myEid(.unblockPin2Button)
+                        pinChangeVariant = .pin2Unblock
+                    },
+                    onChangePinClick: {
+                        lastFocused = .myEid(.changePin2Button)
+                        pinChangeVariant = .pin2Change
+                    },
+                    forgotPinAccessibilityField: .myEid(.unblockPin2Button),
+                    changePinAccessibilityField: .myEid(.changePin2Button),
+                    lastFocused: $lastFocused
+                )
+                .opacity(opacityForPin2BlockedState)
+
+                if let signCertUnusableMessage = certificateUnusableMessage(
+                    status: signCertStatus,
+                    codeType: .pin2
+                ) {
+                    Text(verbatim: signCertUnusableMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                }
+
+                if isPin2Blocked {
+                    Text(verbatim: pin2BlockedMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+                }
+
+                if isCourierCard {
+                    courierCardWarning()
+                } else if !isPin2Activated && signCertStatus != .expired {
+                    Text(verbatim: pin2LockedMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+
+                    if let pin2LockedInfoUrl = URL(string: pin2LockedUrl) {
+                        additionalInformationLink(url: pin2LockedInfoUrl)
+                            .padding(.vertical, Dimensions.Padding.XSPadding)
+                    }
+                }
+            }
+            .padding(.bottom, Dimensions.Padding.SPadding)
+
+            VStack(alignment: .leading) {
+                MyEidCertificateCardView(
+                    title: pukCodeTitle,
+                    subtitle: pukCodeInfo,
+                    isPinBlocked: isPukBlocked,
+                    isPukBlocked: isPukBlocked,
+                    forgotPinAccessibilityField: .myEid(.changePukButton),
+                    changePinAccessibilityField: .myEid(.changePukButton),
+                    lastFocused: $lastFocused
+                )
+                .opacity(opacityForPukBlockedState)
+                .onTapGesture {
+                    if isPUKChangeable {
+                        lastFocused = .myEid(.changePukButton)
+                        pinChangeVariant = .pukChange
+                    }
+                }
+                .accessibilityAddTraits([.isButton])
+                .accessibilityFocused($isPukFocused)
+                .task {
+                    isPukFocused = lastFocused == .myEid(.changePukButton)
+                }
+
+                if isPukBlocked {
+                    Text(verbatim: pukBlockedMessage)
+                        .font(typography.bodySmall)
+                        .foregroundStyle(theme.error)
+                        .padding(.vertical, Dimensions.Padding.XSPadding)
+
+                    if let pukBlockedInfoUrl = URL(string: pukBlockedUrl) {
+                        additionalInformationLink(url: pukBlockedInfoUrl)
+                            .padding(.vertical, Dimensions.Padding.XSPadding)
+                    }
+                }
+            }
+            .padding(.bottom, Dimensions.Padding.SPadding)
         }
-        .padding(.bottom, Dimensions.Padding.SPadding)
     }
 
     private func getOpacityForBlockedState(isBlocked: Bool) -> Double {

@@ -36,51 +36,53 @@ struct MyEidDataView: View {
     }
 
     var body: some View {
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Given names"),
-                value: givenName
+        VStack(spacing: Dimensions.Padding.ZeroPadding) {
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Given names"),
+                    value: givenName
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Surname"),
-                value: surname
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Surname"),
+                    value: surname
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Citizenship"),
-                value: citizenship
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Citizenship"),
+                    value: citizenship
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Personal code"),
-                value: personalCode,
-                spellOutCharacters: true
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Personal code"),
+                    value: personalCode,
+                    spellOutCharacters: true
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Date of birth"),
-                value: dateOfBirth
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Date of birth"),
+                    value: dateOfBirth
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Id card number"),
-                value: idCardNumber,
-                spellOutCharacters: true
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Id card number"),
+                    value: idCardNumber,
+                    spellOutCharacters: true
+                )
             )
-        )
-        MyEidDetailView(
-            myEidDataItem: MyEidDataItem(
-                title: languageSettings.localized("Valid to date"),
-                value: dateOfExpiry,
-                status: documentExpirationStatus
+            MyEidDetailView(
+                myEidDataItem: MyEidDataItem(
+                    title: languageSettings.localized("Valid to date"),
+                    value: dateOfExpiry,
+                    status: documentExpirationStatus
+                )
             )
-        )
+        }
     }
 }
 
