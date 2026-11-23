@@ -93,12 +93,12 @@ struct SignatureView: View {
         self.onSelect = onSelect
     }
 
-    private var archiveTimestampInfo: (text: String, isExpired: Bool)? {
+    private var archiveTimestampInfo: (text: String, isPastValidUntil: Bool)? {
         guard !isTimestamp && signature.isLTAExtended else { return nil }
         guard let date = certificateUtil.getNotValidAfterDate(cert: signature.archiveTimestampCert) else { return nil }
         let formatted = DateUtil.getFormattedDateTime(date: date, isUTC: false)
         let text = languageSettings.localized("Archive timestamp valid until", [formatted.date])
-        return (text: text, isExpired: date < Date())
+        return (text: text, isPastValidUntil: date < Date())
     }
 
     var body: some View {
@@ -145,7 +145,7 @@ struct SignatureView: View {
                         ),
                         status: signature.status,
                         archiveTimestampText: archiveTimestamp?.text,
-                        isArchiveTimestampExpired: archiveTimestamp?.isExpired ?? false
+                        isPastArchiveTimestampValidUntil: archiveTimestamp?.isPastValidUntil ?? false
                     )
                     .multilineTextAlignment(.center)
 

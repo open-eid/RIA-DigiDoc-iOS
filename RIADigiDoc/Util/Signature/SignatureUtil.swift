@@ -19,4 +19,16 @@ struct SignatureUtil: SignatureUtilProtocol {
                 return isTimestamp ? "Timestamp is unknown" : "Signature is unknown"
             }
     }
+
+    static func isValidOrWarning(_ status: SignatureStatus) -> Bool {
+        status == .valid || status == .warning || status == .nonQSCD
+    }
+
+    static func showsStatusBadge(status: SignatureStatus, hasArchiveTimestamp: Bool) -> Bool {
+        !hasArchiveTimestamp || !isValidOrWarning(status)
+    }
+
+    static func isArchiveTimestampExpired(status: SignatureStatus, isPastValidUntil: Bool) -> Bool {
+        isPastValidUntil || !isValidOrWarning(status)
+    }
 }
